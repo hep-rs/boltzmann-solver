@@ -124,14 +124,6 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
-<span id="71">71</span>
-<span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
 </pre><pre class="rust ">
 <span class="comment">// use common::{constants::{BOSON_GSTAR, FERMION_GSTAR, STANDARD_MODEL_GSTAR}, universe::Universe};</span>
 <span class="kw">use</span> <span class="ident">common</span>::{<span class="ident">constants</span>::<span class="ident">STANDARD_MODEL_GSTAR</span>, <span class="ident">universe</span>::<span class="ident">Universe</span>};
@@ -160,17 +152,8 @@
 
 <span class="kw">impl</span> <span class="ident">Universe</span> <span class="kw">for</span> <span class="ident">StandardModel</span> {
     <span class="kw">fn</span> <span class="ident">entropy_dof</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
+        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">beta</span> <span class="op">&gt;</span> <span class="number">0.0</span>, <span class="string">&quot;beta must be positive.&quot;</span>);
         <span class="ident">interpolation</span>::<span class="ident">linear</span>(<span class="kw-2">&amp;</span><span class="ident">STANDARD_MODEL_GSTAR</span>, <span class="ident">beta</span>.<span class="ident">ln</span>())
-        <span class="comment">// let exotic_bosons: f64 = self.exotic_bosons</span>
-        <span class="comment">//     .iter()</span>
-        <span class="comment">//     .map(|&amp;(m, g)| g * interpolation::linear(&amp;BOSON_GSTAR, (m * beta).ln()).exp())</span>
-        <span class="comment">//     .sum();</span>
-        <span class="comment">// let exotic_fermions: f64 = self.exotic_fermions</span>
-        <span class="comment">//     .iter()</span>
-        <span class="comment">//     .map(|&amp;(m, g)| g * interpolation::linear(&amp;FERMION_GSTAR, (m * beta).ln()).exp())</span>
-        <span class="comment">//     .sum();</span>
-
-        <span class="comment">// sm + exotic_bosons + exotic_fermions</span>
     }
 }
 
@@ -178,6 +161,7 @@
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">StandardModel</span>;
     <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">universe</span>::<span class="ident">Universe</span>;
+    <span class="kw">use</span> <span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">sm_plain</span>() {
@@ -207,7 +191,7 @@
         ];
 
         <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">beta</span>, <span class="ident">g</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">expected</span> {
-            <span class="macro">assert</span><span class="macro">!</span>((<span class="ident">g</span> <span class="op">-</span> <span class="ident">sm</span>.<span class="ident">entropy_dof</span>(<span class="ident">beta</span>)).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1e-10</span>);
+            <span class="ident">approx_eq</span>(<span class="ident">g</span>, <span class="ident">sm</span>.<span class="ident">entropy_dof</span>(<span class="ident">beta</span>), <span class="number">10.0</span>, <span class="number">0.0</span>);
         }
     }
 }

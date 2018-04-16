@@ -119,6 +119,22 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! The effects of the Universe&#39;s evolution play an important role in the</span>
 <span class="doccomment">//! Boltzmann equations.  The [`Universe`] trait describes the evolution of the</span>
@@ -146,7 +162,23 @@
     <span class="doccomment">/// \\[</span>
     <span class="doccomment">///    H(\beta) = \sqrt{\frac{\pi\^2}{90}} g_{*}^{1/2}(\beta) \frac{1}{m_{\text{Pl}}} \frac{1}{\beta\^2}.</span>
     <span class="doccomment">/// \\]</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Which is valid provided that the entropy density of the Universe does</span>
+    <span class="doccomment">/// not change too rapidly.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Warning</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The dominated epoch in the Standard Model of cosmology ends at the</span>
+    <span class="doccomment">/// matter--radiation equality, which occurs at an inverse temperature of</span>
+    <span class="doccomment">/// \\(\beta \approx 10\^{9}\\) GeV^{-1}.</span>
     <span class="kw">fn</span> <span class="ident">hubble_rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
+        <span class="macro">debug_assert_warn</span><span class="macro">!</span>(
+            <span class="ident">beta</span> <span class="op">&lt;</span> <span class="number">1e8</span>,
+            <span class="string">&quot;For β &gt; 10⁸ GeV⁻¹, our Universe transitions into the matter
+            dominated epoch where this implementation of the Hubble rate no
+            longer applies.&quot;</span>
+        );
+
         <span class="comment">// Prefactor: sqrt(pi^2 / 90) ≅ 0.3311529421932034</span>
         <span class="number">0.3311529421932034</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">entropy_dof</span>(<span class="ident">beta</span>)
             <span class="op">/</span> (<span class="ident">constants</span>::<span class="ident">REDUCED_PLANCK_MASS</span> <span class="op">*</span> <span class="ident">beta</span>.<span class="ident">powi</span>(<span class="number">2</span>))

@@ -207,26 +207,26 @@
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">const</span> <span class="ident">DATA</span>: [(<span class="ident">f64</span>, <span class="ident">f64</span>); <span class="number">4</span>] <span class="op">=</span> [(<span class="number">0.0</span>, <span class="number">0.0</span>), (<span class="number">1.0</span>, <span class="number">1.0</span>), (<span class="number">10.0</span>, <span class="number">0.0</span>), (<span class="number">20.0</span>, <span class="number">1.0</span>)];
     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f64</span>;
+    <span class="kw">use</span> <span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">linear</span>() {
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">1_000</span> {
+        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">1_001</span> {
             <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">f64</span> <span class="op">/</span> <span class="number">1_000.0</span>;
             <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">f64</span> <span class="op">/</span> <span class="number">1_000.0</span>;
-            <span class="macro">assert</span><span class="macro">!</span>((<span class="kw">super</span>::<span class="ident">linear</span>(<span class="kw-2">&amp;</span><span class="ident">DATA</span>, <span class="ident">x</span>) <span class="op">-</span> <span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">EPSILON</span>);
+            <span class="ident">approx_eq</span>(<span class="kw">super</span>::<span class="ident">linear</span>(<span class="kw-2">&amp;</span><span class="ident">DATA</span>, <span class="ident">x</span>), <span class="ident">y</span>, <span class="number">10.0</span>, <span class="number">0.0</span>);
         }
 
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">1_000</span>..<span class="number">10_000</span> {
+        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">1_000</span>..<span class="number">10_001</span> {
             <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">f64</span> <span class="op">/</span> <span class="number">1_000.0</span>;
-            <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="number">1.0</span> <span class="op">-</span> (<span class="ident">i</span> <span class="op">-</span> <span class="number">1_000</span>) <span class="kw">as</span> <span class="ident">f64</span> <span class="op">/</span> <span class="number">9_000.0</span>;
-            <span class="macro">assert</span><span class="macro">!</span>((<span class="kw">super</span>::<span class="ident">linear</span>(<span class="kw-2">&amp;</span><span class="ident">DATA</span>, <span class="ident">x</span>) <span class="op">-</span> <span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">EPSILON</span>);
+            <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> (<span class="number">10_000</span> <span class="op">-</span> <span class="ident">i</span>) <span class="kw">as</span> <span class="ident">f64</span> <span class="op">/</span> <span class="number">9_000.0</span>;
+            <span class="ident">approx_eq</span>(<span class="kw">super</span>::<span class="ident">linear</span>(<span class="kw-2">&amp;</span><span class="ident">DATA</span>, <span class="ident">x</span>), <span class="ident">y</span>, <span class="number">10.0</span>, <span class="number">0.0</span>);
         }
 
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">10_000</span>..<span class="number">20_000</span> {
+        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">10_000</span>..<span class="number">20_001</span> {
             <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">f64</span> <span class="op">/</span> <span class="number">1_000.0</span>;
             <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> (<span class="ident">i</span> <span class="op">-</span> <span class="number">10_000</span>) <span class="kw">as</span> <span class="ident">f64</span> <span class="op">/</span> <span class="number">10_000.0</span>;
-
-            <span class="macro">assert</span><span class="macro">!</span>((<span class="kw">super</span>::<span class="ident">linear</span>(<span class="kw-2">&amp;</span><span class="ident">DATA</span>, <span class="ident">x</span>) <span class="op">-</span> <span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">EPSILON</span>);
+            <span class="ident">approx_eq</span>(<span class="kw">super</span>::<span class="ident">linear</span>(<span class="kw-2">&amp;</span><span class="ident">DATA</span>, <span class="ident">x</span>), <span class="ident">y</span>, <span class="number">10.0</span>, <span class="number">0.0</span>);
         }
 
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">linear</span>(<span class="kw-2">&amp;</span><span class="ident">DATA</span>, <span class="ident">f64</span>::<span class="ident">NEG_INFINITY</span>), <span class="number">0.0</span>);
@@ -253,10 +253,10 @@
                     })
                     .<span class="ident">collect</span>();
                 <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">||</span> {
-                    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">100_000</span> {
+                    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">100_001</span> {
                         <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">f64</span> <span class="op">/</span> <span class="number">100_000.0</span>;
                         <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">f64</span> <span class="op">/</span> <span class="number">100_000.0</span>;
-                        <span class="macro">assert</span><span class="macro">!</span>((<span class="kw">super</span>::<span class="ident">linear</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>, <span class="ident">x</span>) <span class="op">-</span> <span class="ident">y</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">EPSILON</span>);
+                        <span class="ident">approx_eq</span>(<span class="kw">super</span>::<span class="ident">linear</span>(<span class="kw-2">&amp;</span><span class="ident">DATA</span>, <span class="ident">x</span>), <span class="ident">y</span>, <span class="number">10.0</span>, <span class="number">0.0</span>);
                     }
                 });
             }

@@ -59,7 +59,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/boltzmann_solver/common/universe.rs.html#14-32' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/boltzmann_solver/common/universe.rs.html#14-48' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait Universe {
     fn <a href='#tymethod.entropy_dof' class='fnname'>entropy_dof</a>(&amp;self, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>;
 
@@ -87,13 +87,19 @@ dominated such that</p>
 <p>\[
 H(\beta) = \sqrt{\frac{\pi^2}{90}} g_{*}^{1/2}(\beta) \frac{1}{m_{\text{Pl}}} \frac{1}{\beta^2}.
 \]</p>
+<p>Which is valid provided that the entropy density of the Universe does
+not change too rapidly.</p>
+<h1 id="warning" class="section-header"><a href="#warning">Warning</a></h1>
+<p>The dominated epoch in the Standard Model of cosmology ends at the
+matter--radiation equality, which occurs at an inverse temperature of
+\(\beta \approx 10^{9}\) GeV^{-1}.</p>
 </div></div>
         <h2 id='implementors' class='small-section-header'>
           Implementors<a href='#implementors' class='anchor'></a>
         </h2>
         <ul class='item-list' id='implementors-list'>
-    <li><div class='out-of-band'><a class='srclink' href='../../src/boltzmann_solver/common/standard_model.rs.html#26-40' title='goto source code'>[src]</a></div><code>impl Universe for <a class="struct" href="../../boltzmann_solver/common/struct.StandardModel.html" title="struct boltzmann_solver::common::StandardModel">StandardModel</a></code></li>
-<li><div class='out-of-band'><a class='srclink' href='../../src/boltzmann_solver/common/universe.rs.html#50-65' title='goto source code'>[src]</a></div><code>impl Universe for <a class="struct" href="../../boltzmann_solver/common/struct.SingleSpecies.html" title="struct boltzmann_solver::common::SingleSpecies">SingleSpecies</a></code></li>
+    <li><div class='out-of-band'><a class='srclink' href='../../src/boltzmann_solver/common/standard_model.rs.html#26-31' title='goto source code'>[src]</a></div><code>impl Universe for <a class="struct" href="../../boltzmann_solver/common/struct.StandardModel.html" title="struct boltzmann_solver::common::StandardModel">StandardModel</a></code></li>
+<li><div class='out-of-band'><a class='srclink' href='../../src/boltzmann_solver/common/universe.rs.html#66-81' title='goto source code'>[src]</a></div><code>impl Universe for <a class="struct" href="../../boltzmann_solver/common/struct.SingleSpecies.html" title="struct boltzmann_solver::common::SingleSpecies">SingleSpecies</a></code></li>
 </ul><script type="text/javascript" async
                          src="../../implementors/boltzmann_solver/prelude/trait.Universe.js">
                  </script></section>
