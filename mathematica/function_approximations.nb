@@ -1,0 +1,729 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{"<<", "FunctionApproximations`"}]], "Input",
+ InitializationCell->True,
+ CellLabel->"In[14]:="],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ "Bose\[LongDash]Einstein: ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    SubscriptBox["Li", "3"], "(",
+    SuperscriptBox["e",
+     RowBox[{"-", "x"}]], ")"}], TraditionalForm]],ExpressionUUID->
+  "ba7eb778-5491-4248-bf7b-e2aa684fbe96"]
+}], "Section"],
+
+Cell[TextData[{
+ "Approximation of ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    SubscriptBox["Li", "3"], "(",
+    SuperscriptBox["e", "\[Mu]\[Beta]"], ")"}], TraditionalForm]],
+  ExpressionUUID->"f6a649dd-b396-4ab3-a87a-68fa487de850"],
+ " that appears Bose\[LongDash]Einstein statistics.  Given that ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{"\[Mu]\[Beta]", "\[LessEqual]", "0"}], TraditionalForm]],
+  ExpressionUUID->"eca835ff-1f47-4af7-bfc5-eecbbf2301af"],
+ " (as ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{"\[Mu]", ">", "0"}], TraditionalForm]],ExpressionUUID->
+  "1a3340ff-db77-4022-b45a-c7dfa655af9a"],
+ " corresponds to a Bose\[LongDash]Einstein condensate which we have to \
+handle separately), we approximation the function ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    SubscriptBox["Li", "3"], "(",
+    SuperscriptBox["e",
+     RowBox[{"-", "x"}]], ")"}], TraditionalForm]],ExpressionUUID->
+  "c733cbeb-dd9e-403b-bf8a-8ef8fbefb7d9"],
+ " for ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{"x", "\[GreaterEqual]", "0"}], TraditionalForm]],ExpressionUUID->
+  "52ef1920-7c61-44a4-aa30-99e89f0b4415"],
+ "."
+}], "Text"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"be", "[", "x_", "]"}], "=",
+    RowBox[{"PolyLog", "[",
+     RowBox[{"3", ",",
+      RowBox[{"Exp", "[",
+       RowBox[{"-", "x"}], "]"}]}], "]"}]}], ";"}],
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{"x12", "=", "0.3"}], ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{"x23", "=", "2.9"}], ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{
+   RowBox[{"f1", "[", "x_", "]"}], "=",
+   RowBox[{
+    RowBox[{"Series", "[",
+     RowBox[{
+      RowBox[{"be", "[", "x", "]"}], ",",
+      RowBox[{"{",
+       RowBox[{"x", ",", "0", ",", "6"}], "}"}], ",",
+      RowBox[{"Assumptions", "\[Rule]",
+       RowBox[{"x", ">", "0"}]}]}], "]"}], "//", "Normal"}]}],
+  ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{
+   RowBox[{"f2", "[", "x_", "]"}], "=",
+   RowBox[{
+    RowBox[{"MiniMaxApproximation", "[",
+     RowBox[{
+      RowBox[{"be", "[", "x", "]"}], ",",
+      RowBox[{"{",
+       RowBox[{"x", ",",
+        RowBox[{"{",
+         RowBox[{"x12", ",", "x23"}], "}"}], ",", "9", ",", "5"}], "}"}]}],
+     "]"}], "\[LeftDoubleBracket]",
+    RowBox[{"2", ",", "1"}], "\[RightDoubleBracket]"}]}],
+  ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"f3", "[", "x_", "]"}], "=",
+    RowBox[{
+     RowBox[{
+      RowBox[{"Series", "[",
+       RowBox[{
+        RowBox[{"be", "[", "x", "]"}], ",",
+        RowBox[{"{",
+         RowBox[{"x", ",", "\[Infinity]", ",", "6"}], "}"}]}], "]"}], "//",
+      "Normal"}], "//", "ExpandAll"}]}], ";"}],
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{"Echo", "[",
+   RowBox[{
+    RowBox[{"f1", "[", "x", "]"}], ",", "\"\<f1: \>\""}], "]"}],
+  ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{"Echo", "[",
+   RowBox[{
+    RowBox[{"f2", "[", "x", "]"}], ",", "\"\<f2: \>\""}], "]"}],
+  ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{
+   RowBox[{"Echo", "[",
+    RowBox[{
+     RowBox[{"f3", "[", "x", "]"}], ",", "\"\<f3: \>\""}], "]"}], ";"}],
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"f", "[", "x_", "]"}], "=",
+    RowBox[{"Piecewise", "[",
+     RowBox[{"{", "\[IndentingNewLine]",
+      RowBox[{
+       RowBox[{"{",
+        RowBox[{
+         RowBox[{"f1", "[", "x", "]"}], ",",
+         RowBox[{"x", "<", "x12"}]}], "}"}], ",", "\[IndentingNewLine]",
+       RowBox[{"{",
+        RowBox[{
+         RowBox[{"f2", "[", "x", "]"}], ",",
+         RowBox[{"x12", "<", "x", "<", "x23"}]}], "}"}], ",",
+       "\[IndentingNewLine]",
+       RowBox[{"{",
+        RowBox[{
+         RowBox[{"f3", "[", "x", "]"}], ",",
+         RowBox[{"x23", "<", "x"}]}], "}"}]}], "\[IndentingNewLine]",
+      "\[IndentingNewLine]", "}"}], "]"}]}], ";"}],
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]",
+ RowBox[{"Quiet", "@",
+  RowBox[{"Show", "[", "\[IndentingNewLine]",
+   RowBox[{
+    RowBox[{"LogLogPlot", "[", "\[IndentingNewLine]",
+     RowBox[{
+      RowBox[{"{", "\[IndentingNewLine]",
+       RowBox[{"Abs", "[",
+        RowBox[{"1", "-",
+         FractionBox[
+          RowBox[{"be", "[", "x", "]"}],
+          RowBox[{"f", "[", "x", "]"}]]}], "]"}], "\[IndentingNewLine]",
+       "}"}], ",", "\[IndentingNewLine]",
+      RowBox[{"{",
+       RowBox[{"x", ",",
+        SuperscriptBox["10",
+         RowBox[{"-", "3"}]], ",",
+        SuperscriptBox["10", "3"]}], "}"}], ",", "\[IndentingNewLine]",
+      RowBox[{"PlotRange", "\[Rule]",
+       RowBox[{"{",
+        RowBox[{"All", ",",
+         RowBox[{"{",
+          RowBox[{
+           SuperscriptBox["10",
+            RowBox[{"-", "20"}]], ",", "2"}], "}"}]}], "}"}]}], ",",
+      "\[IndentingNewLine]",
+      RowBox[{"AxesLabel", "\[Rule]",
+       RowBox[{"{",
+        RowBox[{"\"\<x\>\"", ",", "\"\<Error\>\""}], "}"}]}]}],
+     "\[IndentingNewLine]", "]"}], "\[IndentingNewLine]", ",",
+    "\[IndentingNewLine]",
+    RowBox[{"LogLogPlot", "[", "\[IndentingNewLine]",
+     RowBox[{
+      RowBox[{"{", "\[IndentingNewLine]",
+       RowBox[{
+        RowBox[{"Abs", "[",
+         RowBox[{"1", "-",
+          FractionBox[
+           RowBox[{"be", "[", "x", "]"}],
+           RowBox[{"f1", "[", "x", "]"}]]}], "]"}], ",",
+        "\[IndentingNewLine]",
+        RowBox[{"Abs", "[",
+         RowBox[{"1", "-",
+          FractionBox[
+           RowBox[{"be", "[", "x", "]"}],
+           RowBox[{"f2", "[", "x", "]"}]]}], "]"}], ",",
+        "\[IndentingNewLine]",
+        RowBox[{"Abs", "[",
+         RowBox[{"1", "-",
+          FractionBox[
+           RowBox[{"be", "[", "x", "]"}],
+           RowBox[{"f3", "[", "x", "]"}]]}], "]"}], ",",
+        "\[IndentingNewLine]",
+        RowBox[{"Abs", "[",
+         RowBox[{"1", "-",
+          FractionBox[
+           RowBox[{"be", "[", "x", "]"}],
+           RowBox[{"f", "[", "x", "]"}]]}], "]"}]}], "\[IndentingNewLine]",
+       "}"}], ",", "\[IndentingNewLine]",
+      RowBox[{"{",
+       RowBox[{"x", ",",
+        SuperscriptBox["10",
+         RowBox[{"-", "3"}]], ",",
+        SuperscriptBox["10", "3"]}], "}"}], ",", "\[IndentingNewLine]",
+      RowBox[{"WorkingPrecision", "\[Rule]", "100"}], ",",
+      "\[IndentingNewLine]",
+      RowBox[{"PlotLegends", "\[Rule]",
+       RowBox[{"{",
+        RowBox[{
+        "\"\<f1\>\"", ",", "\"\<f2\>\"", ",", "\"\<f3\>\"", ",",
+         "\"\<f\>\""}], "}"}]}]}], "\[IndentingNewLine]", "]"}]}],
+   "\[IndentingNewLine]", "]"}]}]}], "Input",
+ CellLabel->
+  "In[136]:="],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ FormBox[
+  RowBox[{
+   RowBox[{
+    TagBox["\<\"f1: \"\>",
+     "EchoLabel"], " ",
+    FractionBox[
+     SuperscriptBox["x", "6"], "86400"]}], "-",
+   FractionBox[
+    SuperscriptBox["x", "4"], "288"], "+",
+   FractionBox[
+    SuperscriptBox["x", "3"], "12"], "+",
+   RowBox[{
+    SuperscriptBox["x", "2"], " ",
+    RowBox[{"(",
+     RowBox[{
+      FractionBox["3", "4"], "-",
+      FractionBox[
+       RowBox[{"log", "(", "x", ")"}], "2"]}], ")"}]}], "-",
+   FractionBox[
+    RowBox[{
+     SuperscriptBox["\[Pi]", "2"], " ", "x"}], "6"], "+",
+   TemplateBox[{"3"},
+    "Zeta"]}], TraditionalForm]], "Echo"],
+
+Cell[BoxData[
+ FormBox[
+  RowBox[{
+   TagBox["\<\"f2: \"\>",
+    "EchoLabel"], " ",
+   FractionBox[
+    RowBox[{
+     RowBox[{"0.0001005716961775485`", " ",
+      SuperscriptBox["x", "9"]}], "-",
+     RowBox[{"0.00304844128300116`", " ",
+      SuperscriptBox["x", "8"]}], "+",
+     RowBox[{"0.04149616881257012`", " ",
+      SuperscriptBox["x", "7"]}], "-",
+     RowBox[{"0.3198760240032409`", " ",
+      SuperscriptBox["x", "6"]}], "+",
+     RowBox[{"1.3990485610596688`", " ",
+      SuperscriptBox["x", "5"]}], "-",
+     RowBox[{"2.567786066494296`", " ",
+      SuperscriptBox["x", "4"]}], "-",
+     RowBox[{"3.586692281378151`", " ",
+      SuperscriptBox["x", "3"]}], "+",
+     RowBox[{"16.76313833455987`", " ",
+      SuperscriptBox["x", "2"]}], "+",
+     RowBox[{"11.130385145253056`", " ", "x"}], "+", "1.2017351736065518`"}],
+
+    RowBox[{
+     RowBox[{"0.2334733930429191`", " ",
+      SuperscriptBox["x", "5"]}], "+",
+     RowBox[{"4.228205497851785`", " ",
+      SuperscriptBox["x", "4"]}], "+",
+     RowBox[{"19.636022406192538`", " ",
+      SuperscriptBox["x", "3"]}], "+",
+     RowBox[{"26.459493500453753`", " ",
+      SuperscriptBox["x", "2"]}], "+",
+     RowBox[{"10.610209871175941`", " ", "x"}], "+", "1"}]]}],
+  TraditionalForm]], "Echo"],
+
+Cell[BoxData[
+ FormBox[
+  RowBox[{
+   TagBox["\<\"f3: \"\>",
+    "EchoLabel"], " ",
+   RowBox[{
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{
+       RowBox[{"-", "7"}], " ", "x"}]], "343"], "+",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{
+       RowBox[{"-", "6"}], " ", "x"}]], "216"], "+",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{
+       RowBox[{"-", "5"}], " ", "x"}]], "125"], "+",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{
+       RowBox[{"-", "4"}], " ", "x"}]], "64"], "+",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{
+       RowBox[{"-", "3"}], " ", "x"}]], "27"], "+",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{
+       RowBox[{"-", "2"}], " ", "x"}]], "8"], "+",
+    SuperscriptBox["\[ExponentialE]",
+     RowBox[{"-", "x"}]]}]}], TraditionalForm]], "Echo"]
+}]]
+}]]
+}]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ "Fermi\[LongDash]Dirac: ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{"-",
+    RowBox[{
+     SubscriptBox["Li", "3"], "(",
+     RowBox[{"-",
+      SuperscriptBox["e", "x"]}], ")"}]}], TraditionalForm]],ExpressionUUID->
+  "0a1ee3ea-a3ac-418b-b2fd-f6aaf2ca4957"]
+}], "Section"],
+
+Cell[TextData[{
+ "Approximation of ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{"-",
+    RowBox[{
+     SubscriptBox["Li", "3"], "(",
+     RowBox[{"-",
+      SuperscriptBox["e", "\[Mu]\[Beta]"]}], ")"}]}], TraditionalForm]],
+  ExpressionUUID->"91ce7bd0-8ba3-4cb8-b69a-ce339e9702e2"],
+ " that appears Fermi\[LongDash]Dirac statistics.  Unlike with \
+Bose\[LongDash]Einstein, this approximation is valid for all values of ",
+ Cell[BoxData[
+  FormBox["\[Mu]\[Beta]", TraditionalForm]],ExpressionUUID->
+  "7bdae13f-5003-43a7-806d-112f9966ba96"],
+ " (that is ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{"x", "\[Element]",
+    TemplateBox[{},
+     "Reals"]}], TraditionalForm]],
+  FormatType->"TraditionalForm",ExpressionUUID->
+  "138c6551-9844-4755-945e-32f06e4ab829"],
+ ")."
+}], "Text"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"fd", "[", "x_", "]"}], "=",
+    RowBox[{"-",
+     RowBox[{"PolyLog", "[",
+      RowBox[{"3", ",",
+       RowBox[{"-",
+        RowBox[{"Exp", "[", "x", "]"}]}]}], "]"}]}]}], ";"}],
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{"x12", "=",
+   RowBox[{"-", "2"}]}], ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{"x23", "=", "2"}], ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{
+   RowBox[{"f1", "[", "x_", "]"}], "=",
+   RowBox[{
+    RowBox[{
+     RowBox[{"Series", "[",
+      RowBox[{
+       RowBox[{"fd", "[", "x", "]"}], ",",
+       RowBox[{"{",
+        RowBox[{"x", ",",
+         RowBox[{"-", "\[Infinity]"}], ",", "6"}], "}"}]}], "]"}], "//",
+     "Normal"}], "//", "ExpandAll"}]}], ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{
+   RowBox[{"f2", "[", "x_", "]"}], "=",
+   RowBox[{
+    RowBox[{"MiniMaxApproximation", "[",
+     RowBox[{
+      RowBox[{"fd", "[", "x", "]"}], ",",
+      RowBox[{"{",
+       RowBox[{"x", ",",
+        RowBox[{"{",
+         RowBox[{"x12", ",", "x23"}], "}"}], ",", "8", ",", "5"}], "}"}]}],
+     "]"}], "\[LeftDoubleBracket]",
+    RowBox[{"2", ",", "1"}], "\[RightDoubleBracket]"}]}],
+  ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"f3", "[", "x_", "]"}], "=",
+    RowBox[{
+     RowBox[{
+      RowBox[{"Series", "[",
+       RowBox[{
+        RowBox[{"fd", "[", "x", "]"}], ",",
+        RowBox[{"{",
+         RowBox[{"x", ",", "\[Infinity]", ",", "6"}], "}"}]}], "]"}], "//",
+      "Normal"}], "//", "ExpandAll"}]}], ";"}],
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{"Echo", "[",
+   RowBox[{
+    RowBox[{"f1", "[", "x", "]"}], ",", "\"\<f1: \>\""}], "]"}],
+  ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{"Echo", "[",
+   RowBox[{
+    RowBox[{"f2", "[", "x", "]"}], ",", "\"\<f2: \>\""}], "]"}],
+  ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{
+   RowBox[{"Echo", "[",
+    RowBox[{
+     RowBox[{"f3", "[", "x", "]"}], ",", "\"\<f3: \>\""}], "]"}], ";"}],
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"f", "[", "x_", "]"}], "=",
+    RowBox[{"Piecewise", "[",
+     RowBox[{"{", "\[IndentingNewLine]",
+      RowBox[{
+       RowBox[{"{",
+        RowBox[{
+         RowBox[{"f1", "[", "x", "]"}], ",",
+         RowBox[{"x", "<", "x12"}]}], "}"}], ",", "\[IndentingNewLine]",
+       RowBox[{"{",
+        RowBox[{
+         RowBox[{"f2", "[", "x", "]"}], ",",
+         RowBox[{"x12", "<", "x", "<", "x23"}]}], "}"}], ",",
+       "\[IndentingNewLine]",
+       RowBox[{"{",
+        RowBox[{
+         RowBox[{"f3", "[", "x", "]"}], ",",
+         RowBox[{"x23", "<", "x"}]}], "}"}]}], "\[IndentingNewLine]",
+      "\[IndentingNewLine]", "}"}], "]"}]}], ";"}],
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{"Quiet", "@",
+   RowBox[{"Show", "[", "\[IndentingNewLine]",
+    RowBox[{
+     RowBox[{"LogLogPlot", "[", "\[IndentingNewLine]",
+      RowBox[{
+       RowBox[{"{", "\[IndentingNewLine]",
+        RowBox[{"Abs", "[",
+         RowBox[{"1", "-",
+          FractionBox[
+           RowBox[{"fd", "[",
+            RowBox[{"-", "x"}], "]"}],
+           RowBox[{"f", "[",
+            RowBox[{"-", "x"}], "]"}]]}], "]"}], "\[IndentingNewLine]", "}"}],
+        ",", "\[IndentingNewLine]",
+       RowBox[{"{",
+        RowBox[{"x", ",",
+         SuperscriptBox["10",
+          RowBox[{"-", "3"}]], ",",
+         SuperscriptBox["10", "3"]}], "}"}], ",", "\[IndentingNewLine]",
+       RowBox[{"PlotRange", "\[Rule]",
+        RowBox[{"{",
+         RowBox[{"All", ",",
+          RowBox[{"{",
+           RowBox[{
+            SuperscriptBox["10",
+             RowBox[{"-", "20"}]], ",", "2"}], "}"}]}], "}"}]}], ",",
+       "\[IndentingNewLine]",
+       RowBox[{"PlotLabel", "\[Rule]", "\"\<Negative x\>\""}], ",",
+       "\[IndentingNewLine]",
+       RowBox[{"AxesLabel", "\[Rule]",
+        RowBox[{"{",
+         RowBox[{"\"\<-x\>\"", ",", "\"\<Error\>\""}], "}"}]}]}],
+      "\[IndentingNewLine]", "]"}], "\[IndentingNewLine]", ",",
+     "\[IndentingNewLine]",
+     RowBox[{"LogLogPlot", "[", "\[IndentingNewLine]",
+      RowBox[{
+       RowBox[{"{", "\[IndentingNewLine]",
+        RowBox[{
+         RowBox[{"Abs", "[",
+          RowBox[{"1", "-",
+           FractionBox[
+            RowBox[{"fd", "[",
+             RowBox[{"-", "x"}], "]"}],
+            RowBox[{"f1", "[",
+             RowBox[{"-", "x"}], "]"}]]}], "]"}], ",", "\[IndentingNewLine]",
+
+         RowBox[{"Abs", "[",
+          RowBox[{"1", "-",
+           FractionBox[
+            RowBox[{"fd", "[",
+             RowBox[{"-", "x"}], "]"}],
+            RowBox[{"f2", "[",
+             RowBox[{"-", "x"}], "]"}]]}], "]"}], ",", "\[IndentingNewLine]",
+
+         RowBox[{"Abs", "[",
+          RowBox[{"1", "-",
+           FractionBox[
+            RowBox[{"fd", "[",
+             RowBox[{"-", "x"}], "]"}],
+            RowBox[{"f3", "[",
+             RowBox[{"-", "x"}], "]"}]]}], "]"}], ",", "\[IndentingNewLine]",
+
+         RowBox[{"Abs", "[",
+          RowBox[{"1", "-",
+           FractionBox[
+            RowBox[{"fd", "[",
+             RowBox[{"-", "x"}], "]"}],
+            RowBox[{"f", "[",
+             RowBox[{"-", "x"}], "]"}]]}], "]"}]}], "\[IndentingNewLine]",
+        "}"}], ",", "\[IndentingNewLine]",
+       RowBox[{"{",
+        RowBox[{"x", ",",
+         SuperscriptBox["10",
+          RowBox[{"-", "3"}]], ",",
+         SuperscriptBox["10", "3"]}], "}"}], ",", "\[IndentingNewLine]",
+       RowBox[{"WorkingPrecision", "\[Rule]", "100"}], ",",
+       "\[IndentingNewLine]",
+       RowBox[{"PlotLegends", "\[Rule]",
+        RowBox[{"{",
+         RowBox[{
+         "\"\<f1\>\"", ",", "\"\<f2\>\"", ",", "\"\<f3\>\"", ",",
+          "\"\<f\>\""}], "}"}]}]}], "\[IndentingNewLine]", "]"}]}],
+    "\[IndentingNewLine]", "]"}]}],
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]",
+ RowBox[{"Quiet", "@",
+  RowBox[{"Show", "[", "\[IndentingNewLine]",
+   RowBox[{
+    RowBox[{"LogLogPlot", "[", "\[IndentingNewLine]",
+     RowBox[{
+      RowBox[{"{", "\[IndentingNewLine]",
+       RowBox[{"Abs", "[",
+        RowBox[{"1", "-",
+         FractionBox[
+          RowBox[{"fd", "[", "x", "]"}],
+          RowBox[{"f", "[", "x", "]"}]]}], "]"}], "\[IndentingNewLine]",
+       "}"}], ",", "\[IndentingNewLine]",
+      RowBox[{"{",
+       RowBox[{"x", ",",
+        SuperscriptBox["10",
+         RowBox[{"-", "3"}]], ",",
+        SuperscriptBox["10", "3"]}], "}"}], ",", "\[IndentingNewLine]",
+      RowBox[{"PlotRange", "\[Rule]",
+       RowBox[{"{",
+        RowBox[{"All", ",",
+         RowBox[{"{",
+          RowBox[{
+           SuperscriptBox["10",
+            RowBox[{"-", "20"}]], ",", "2"}], "}"}]}], "}"}]}], ",",
+      "\[IndentingNewLine]",
+      RowBox[{"PlotLabel", "\[Rule]", "\"\<Positive x\>\""}], ",",
+      "\[IndentingNewLine]",
+      RowBox[{"AxesLabel", "\[Rule]",
+       RowBox[{"{",
+        RowBox[{"\"\<x\>\"", ",", "\"\<Error\>\""}], "}"}]}]}],
+     "\[IndentingNewLine]", "]"}], "\[IndentingNewLine]", ",",
+    "\[IndentingNewLine]",
+    RowBox[{"LogLogPlot", "[", "\[IndentingNewLine]",
+     RowBox[{
+      RowBox[{"{", "\[IndentingNewLine]",
+       RowBox[{
+        RowBox[{"Abs", "[",
+         RowBox[{"1", "-",
+          FractionBox[
+           RowBox[{"fd", "[", "x", "]"}],
+           RowBox[{"f1", "[", "x", "]"}]]}], "]"}], ",",
+        "\[IndentingNewLine]",
+        RowBox[{"Abs", "[",
+         RowBox[{"1", "-",
+          FractionBox[
+           RowBox[{"fd", "[", "x", "]"}],
+           RowBox[{"f2", "[", "x", "]"}]]}], "]"}], ",",
+        "\[IndentingNewLine]",
+        RowBox[{"Abs", "[",
+         RowBox[{"1", "-",
+          FractionBox[
+           RowBox[{"fd", "[", "x", "]"}],
+           RowBox[{"f3", "[", "x", "]"}]]}], "]"}], ",",
+        "\[IndentingNewLine]",
+        RowBox[{"Abs", "[",
+         RowBox[{"1", "-",
+          FractionBox[
+           RowBox[{"fd", "[", "x", "]"}],
+           RowBox[{"f", "[", "x", "]"}]]}], "]"}]}], "\[IndentingNewLine]",
+       "}"}], ",", "\[IndentingNewLine]",
+      RowBox[{"{",
+       RowBox[{"x", ",",
+        SuperscriptBox["10",
+         RowBox[{"-", "3"}]], ",",
+        SuperscriptBox["10", "3"]}], "}"}], ",", "\[IndentingNewLine]",
+      RowBox[{"WorkingPrecision", "\[Rule]", "100"}], ",",
+      "\[IndentingNewLine]",
+      RowBox[{"PlotLegends", "\[Rule]",
+       RowBox[{"{",
+        RowBox[{
+        "\"\<f1\>\"", ",", "\"\<f2\>\"", ",", "\"\<f3\>\"", ",",
+         "\"\<f\>\""}], "}"}]}]}], "\[IndentingNewLine]", "]"}]}],
+   "\[IndentingNewLine]", "]"}]}]}], "Input",
+ CellLabel->
+  "In[195]:="],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ FormBox[
+  RowBox[{
+   TagBox["\<\"f1: \"\>",
+    "EchoLabel"], " ",
+   RowBox[{
+    SuperscriptBox["\[ExponentialE]", "x"], "-",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{"2", " ", "x"}]], "8"], "+",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{"3", " ", "x"}]], "27"], "-",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{"4", " ", "x"}]], "64"], "+",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{"5", " ", "x"}]], "125"], "-",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{"6", " ", "x"}]], "216"], "+",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{"7", " ", "x"}]], "343"], "-",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{"8", " ", "x"}]], "512"]}]}], TraditionalForm]], "Echo"],
+
+Cell[BoxData[
+ FormBox[
+  RowBox[{
+   TagBox["\<\"f2: \"\>",
+    "EchoLabel"], " ",
+   FractionBox[
+    RowBox[{
+     RowBox[{"2.67066157447641`*^-6", " ",
+      SuperscriptBox["x", "8"]}], "+",
+     RowBox[{"0.00006518449523360746`", " ",
+      SuperscriptBox["x", "7"]}], "+",
+     RowBox[{"0.0007787514541717888`", " ",
+      SuperscriptBox["x", "6"]}], "+",
+     RowBox[{"0.005983639057326525`", " ",
+      SuperscriptBox["x", "5"]}], "+",
+     RowBox[{"0.032584856463226834`", " ",
+      SuperscriptBox["x", "4"]}], "+",
+     RowBox[{"0.1304632679466868`", " ",
+      SuperscriptBox["x", "3"]}], "+",
+     RowBox[{"0.38420793835698525`", " ",
+      SuperscriptBox["x", "2"]}], "+",
+     RowBox[{"0.7901361792477368`", " ", "x"}], "+", "0.9015426773726936`"}],
+
+    RowBox[{
+     RowBox[{"-",
+      RowBox[{"9.999366808231145`*^-6", " ",
+       SuperscriptBox["x", "5"]}]}], "+",
+     RowBox[{"0.0009824605324480374`", " ",
+      SuperscriptBox["x", "4"]}], "-",
+     RowBox[{"0.0018665111882954295`", " ",
+      SuperscriptBox["x", "3"]}], "+",
+     RowBox[{"0.07446060726103976`", " ",
+      SuperscriptBox["x", "2"]}], "-",
+     RowBox[{"0.03586170152511413`", " ", "x"}], "+", "1"}]]}],
+  TraditionalForm]], "Echo"],
+
+Cell[BoxData[
+ FormBox[
+  RowBox[{
+   TagBox["\<\"f3: \"\>",
+    "EchoLabel"], " ",
+   RowBox[{
+    FractionBox[
+     SuperscriptBox["x", "3"], "6"], "+",
+    FractionBox[
+     RowBox[{
+      SuperscriptBox["\[Pi]", "2"], " ", "x"}], "6"], "+",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{
+       RowBox[{"-", "7"}], " ", "x"}]], "343"], "-",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{
+       RowBox[{"-", "6"}], " ", "x"}]], "216"], "+",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{
+       RowBox[{"-", "5"}], " ", "x"}]], "125"], "-",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{
+       RowBox[{"-", "4"}], " ", "x"}]], "64"], "+",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{
+       RowBox[{"-", "3"}], " ", "x"}]], "27"], "-",
+    FractionBox[
+     SuperscriptBox["\[ExponentialE]",
+      RowBox[{
+       RowBox[{"-", "2"}], " ", "x"}]], "8"], "+",
+    SuperscriptBox["\[ExponentialE]",
+     RowBox[{"-", "x"}]]}]}], TraditionalForm]], "Echo"]
+}]]
+}]]
+}]]
+}]
+(* End of Notebook Content *)

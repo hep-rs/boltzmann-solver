@@ -38,9 +38,6 @@ impl Statistic {
     ///
     /// is used such that the bounds of the integral over \\(t\\) are \\([0,
     /// 1]\\).
-    ///
-    /// **TODO: Is there a better change of variable that makes the integral
-    /// more accurate?**
     pub fn number_density(&self, mass: f64, mu: f64, beta: f64) -> f64 {
         // debug_assert!(
         //     mu <= mass,
@@ -93,8 +90,8 @@ impl Statistic {
     ///
     /// This is theoretically equivalent to setting `mass = 0` in
     /// [`Statistic::number_density`]; however, as there are analytic closed
-    /// forms of the above integral for all statistics, this method will
-    /// generally be much faster and more precise.
+    /// forms of the above integral for all statistics, this method will be much
+    /// faster and more precise.
     pub fn massless_number_density(&self, mu: f64, beta: f64) -> f64 {
         // debug_assert!(
         //     mu <= 0.0,
@@ -116,6 +113,17 @@ impl Statistic {
 /// Approximation of polylogarithm appearing in the Bose–Einstein statistics.
 /// Specifically, this approximates the function \\(\Li_{3} e\^x\\) for \\(x
 /// \leq 0\\).
+///
+/// The approximation is split in three regimes:
+///
+/// - \\(|x| \ll 1\\), where the Taylor series expansion around \\(x = 0\\) is
+///   used;
+/// - \\(|x| \approx 1\\), where a mini-max polynomial is used which ensures the
+///   error is spread over the whole interval and overall bias is minimized.
+///   (This is unlike a Taylor series where the error is minimized at a single
+///   point and increases (sometimes rapidly) everywhere else);
+/// - \\(|x| \gg 1\\), where the Taylor series expansion around \\(x = \infty\\)
+///   is used.
 fn polylog3_be(x: f64) -> f64 {
     debug_assert!(x <= 0.0, "Argument must be negative");
 
@@ -126,7 +134,7 @@ fn polylog3_be(x: f64) -> f64 {
     } else if x < 0.3 {
         // Use the Taylor series expansion around x = 0
         ZETA_3 - 1.6449340668482264365 * x + x.powi(2) * (0.75 - 0.5 * x.ln()) + x.powi(3) / 12.0
-            - x.powi(4) / 288.0 + x.powi(6) / 86_400.0 //
+            - x.powi(4) / 288.0 + x.powi(6) / 86_400.0
     } else if x < 2.9 {
         // Use an optimal rational approximation over the interval [0.3, 2.9].
         let num =
@@ -154,6 +162,17 @@ fn polylog3_be(x: f64) -> f64 {
 /// Approximation of polylogarithm appearing in the Fermi–Dirac statistics.
 /// Specifically, this approximates the function \\(-\Li_{3} (-e\^x)\\) for all
 /// values of \\(x\\).
+///
+/// The approximation is split in three regimes:
+///
+/// - \\(|x| \ll 1\\), where the Taylor series expansion around \\(x = 0\\) is
+///   used;
+/// - \\(|x| \approx 1\\), where a mini-max polynomial is used which ensures the
+///   error is spread over the whole interval and overall bias is minimized.
+///   (This is unlike a Taylor series where the error is minimized at a single
+///   point and increases (sometimes rapidly) everywhere else);
+/// - \\(|x| \gg 1\\), where the Taylor series expansion around \\(x = \infty\\)
+///   is used.
 fn polylog3_fd(x: f64) -> f64 {
     if x > 2.0 {
         let ex = (-x).exp();
