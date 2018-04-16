@@ -18,7 +18,7 @@ install_kcov() {
 
 run_kcov() {
     # Run kcov on all the test suites
-    for file in target/debug/lie-*[^\.d]; do
+    for file in target/debug/boltzmann_solver-*[^\.d]; do
         mkdir -p "target/cov/$(basename $file)";
         echo "Testing $(basename $file)"
         ./kcov-build/usr/local/bin/kcov \
