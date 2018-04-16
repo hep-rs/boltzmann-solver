@@ -61,7 +61,7 @@ Cell[BoxData[{
  RowBox[{
   RowBox[{
    RowBox[{
-    RowBox[{"be", "[", "x_", "]"}], "=",
+    RowBox[{"exact", "[", "x_", "]"}], "=",
     RowBox[{"PolyLog", "[",
      RowBox[{"3", ",",
       RowBox[{"Exp", "[",
@@ -77,7 +77,7 @@ Cell[BoxData[{
    RowBox[{
     RowBox[{"Series", "[",
      RowBox[{
-      RowBox[{"be", "[", "x", "]"}], ",",
+      RowBox[{"exact", "[", "x", "]"}], ",",
       RowBox[{"{",
        RowBox[{"x", ",", "0", ",", "6"}], "}"}], ",",
       RowBox[{"Assumptions", "\[Rule]",
@@ -89,7 +89,7 @@ Cell[BoxData[{
    RowBox[{
     RowBox[{"MiniMaxApproximation", "[",
      RowBox[{
-      RowBox[{"be", "[", "x", "]"}], ",",
+      RowBox[{"exact", "[", "x", "]"}], ",",
       RowBox[{"{",
        RowBox[{"x", ",",
         RowBox[{"{",
@@ -105,7 +105,7 @@ Cell[BoxData[{
      RowBox[{
       RowBox[{"Series", "[",
        RowBox[{
-        RowBox[{"be", "[", "x", "]"}], ",",
+        RowBox[{"exact", "[", "x", "]"}], ",",
         RowBox[{"{",
          RowBox[{"x", ",", "\[Infinity]", ",", "6"}], "}"}]}], "]"}], "//",
       "Normal"}], "//", "ExpandAll"}]}], ";"}],
@@ -157,7 +157,7 @@ Cell[BoxData[{
        RowBox[{"Abs", "[",
         RowBox[{"1", "-",
          FractionBox[
-          RowBox[{"be", "[", "x", "]"}],
+          RowBox[{"exact", "[", "x", "]"}],
           RowBox[{"f", "[", "x", "]"}]]}], "]"}], "\[IndentingNewLine]",
        "}"}], ",", "\[IndentingNewLine]",
       RowBox[{"{",
@@ -185,25 +185,25 @@ Cell[BoxData[{
         RowBox[{"Abs", "[",
          RowBox[{"1", "-",
           FractionBox[
-           RowBox[{"be", "[", "x", "]"}],
+           RowBox[{"exact", "[", "x", "]"}],
            RowBox[{"f1", "[", "x", "]"}]]}], "]"}], ",",
         "\[IndentingNewLine]",
         RowBox[{"Abs", "[",
          RowBox[{"1", "-",
           FractionBox[
-           RowBox[{"be", "[", "x", "]"}],
+           RowBox[{"exact", "[", "x", "]"}],
            RowBox[{"f2", "[", "x", "]"}]]}], "]"}], ",",
         "\[IndentingNewLine]",
         RowBox[{"Abs", "[",
          RowBox[{"1", "-",
           FractionBox[
-           RowBox[{"be", "[", "x", "]"}],
+           RowBox[{"exact", "[", "x", "]"}],
            RowBox[{"f3", "[", "x", "]"}]]}], "]"}], ",",
         "\[IndentingNewLine]",
         RowBox[{"Abs", "[",
          RowBox[{"1", "-",
           FractionBox[
-           RowBox[{"be", "[", "x", "]"}],
+           RowBox[{"exact", "[", "x", "]"}],
            RowBox[{"f", "[", "x", "]"}]]}], "]"}]}], "\[IndentingNewLine]",
        "}"}], ",", "\[IndentingNewLine]",
       RowBox[{"{",
@@ -220,7 +220,7 @@ Cell[BoxData[{
          "\"\<f\>\""}], "}"}]}]}], "\[IndentingNewLine]", "]"}]}],
    "\[IndentingNewLine]", "]"}]}]}], "Input",
  CellLabel->
-  "In[136]:="],
+  "In[658]:="],
 
 Cell[CellGroupData[{
 
@@ -368,7 +368,7 @@ Cell[BoxData[{
  RowBox[{
   RowBox[{
    RowBox[{
-    RowBox[{"fd", "[", "x_", "]"}], "=",
+    RowBox[{"exact", "[", "x_", "]"}], "=",
     RowBox[{"-",
      RowBox[{"PolyLog", "[",
       RowBox[{"3", ",",
@@ -387,7 +387,7 @@ Cell[BoxData[{
     RowBox[{
      RowBox[{"Series", "[",
       RowBox[{
-       RowBox[{"fd", "[", "x", "]"}], ",",
+       RowBox[{"exact", "[", "x", "]"}], ",",
        RowBox[{"{",
         RowBox[{"x", ",",
          RowBox[{"-", "\[Infinity]"}], ",", "6"}], "}"}]}], "]"}], "//",
@@ -398,7 +398,7 @@ Cell[BoxData[{
    RowBox[{
     RowBox[{"MiniMaxApproximation", "[",
      RowBox[{
-      RowBox[{"fd", "[", "x", "]"}], ",",
+      RowBox[{"exact", "[", "x", "]"}], ",",
       RowBox[{"{",
        RowBox[{"x", ",",
         RowBox[{"{",
@@ -414,7 +414,7 @@ Cell[BoxData[{
      RowBox[{
       RowBox[{"Series", "[",
        RowBox[{
-        RowBox[{"fd", "[", "x", "]"}], ",",
+        RowBox[{"exact", "[", "x", "]"}], ",",
         RowBox[{"{",
          RowBox[{"x", ",", "\[Infinity]", ",", "6"}], "}"}]}], "]"}], "//",
       "Normal"}], "//", "ExpandAll"}]}], ";"}],
@@ -454,9 +454,8 @@ Cell[BoxData[{
        RowBox[{"{",
         RowBox[{
          RowBox[{"f3", "[", "x", "]"}], ",",
-         RowBox[{"x23", "<", "x"}]}], "}"}]}], "\[IndentingNewLine]",
-      "\[IndentingNewLine]", "}"}], "]"}]}], ";"}],
-  "\[IndentingNewLine]"}], "\[IndentingNewLine]",
+         RowBox[{"x23", "<", "x"}]}], "}"}]}], "\[IndentingNewLine]", "}"}],
+     "]"}]}], ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]",
  RowBox[{
   RowBox[{"Quiet", "@",
    RowBox[{"Show", "[", "\[IndentingNewLine]",
@@ -467,7 +466,7 @@ Cell[BoxData[{
         RowBox[{"Abs", "[",
          RowBox[{"1", "-",
           FractionBox[
-           RowBox[{"fd", "[",
+           RowBox[{"exact", "[",
             RowBox[{"-", "x"}], "]"}],
            RowBox[{"f", "[",
             RowBox[{"-", "x"}], "]"}]]}], "]"}], "\[IndentingNewLine]", "}"}],
@@ -499,7 +498,7 @@ Cell[BoxData[{
          RowBox[{"Abs", "[",
           RowBox[{"1", "-",
            FractionBox[
-            RowBox[{"fd", "[",
+            RowBox[{"exact", "[",
              RowBox[{"-", "x"}], "]"}],
             RowBox[{"f1", "[",
              RowBox[{"-", "x"}], "]"}]]}], "]"}], ",", "\[IndentingNewLine]",
@@ -507,7 +506,7 @@ Cell[BoxData[{
          RowBox[{"Abs", "[",
           RowBox[{"1", "-",
            FractionBox[
-            RowBox[{"fd", "[",
+            RowBox[{"exact", "[",
              RowBox[{"-", "x"}], "]"}],
             RowBox[{"f2", "[",
              RowBox[{"-", "x"}], "]"}]]}], "]"}], ",", "\[IndentingNewLine]",
@@ -515,7 +514,7 @@ Cell[BoxData[{
          RowBox[{"Abs", "[",
           RowBox[{"1", "-",
            FractionBox[
-            RowBox[{"fd", "[",
+            RowBox[{"exact", "[",
              RowBox[{"-", "x"}], "]"}],
             RowBox[{"f3", "[",
              RowBox[{"-", "x"}], "]"}]]}], "]"}], ",", "\[IndentingNewLine]",
@@ -523,7 +522,7 @@ Cell[BoxData[{
          RowBox[{"Abs", "[",
           RowBox[{"1", "-",
            FractionBox[
-            RowBox[{"fd", "[",
+            RowBox[{"exact", "[",
              RowBox[{"-", "x"}], "]"}],
             RowBox[{"f", "[",
              RowBox[{"-", "x"}], "]"}]]}], "]"}]}], "\[IndentingNewLine]",
@@ -551,7 +550,7 @@ Cell[BoxData[{
        RowBox[{"Abs", "[",
         RowBox[{"1", "-",
          FractionBox[
-          RowBox[{"fd", "[", "x", "]"}],
+          RowBox[{"exact", "[", "x", "]"}],
           RowBox[{"f", "[", "x", "]"}]]}], "]"}], "\[IndentingNewLine]",
        "}"}], ",", "\[IndentingNewLine]",
       RowBox[{"{",
@@ -581,25 +580,25 @@ Cell[BoxData[{
         RowBox[{"Abs", "[",
          RowBox[{"1", "-",
           FractionBox[
-           RowBox[{"fd", "[", "x", "]"}],
+           RowBox[{"exact", "[", "x", "]"}],
            RowBox[{"f1", "[", "x", "]"}]]}], "]"}], ",",
         "\[IndentingNewLine]",
         RowBox[{"Abs", "[",
          RowBox[{"1", "-",
           FractionBox[
-           RowBox[{"fd", "[", "x", "]"}],
+           RowBox[{"exact", "[", "x", "]"}],
            RowBox[{"f2", "[", "x", "]"}]]}], "]"}], ",",
         "\[IndentingNewLine]",
         RowBox[{"Abs", "[",
          RowBox[{"1", "-",
           FractionBox[
-           RowBox[{"fd", "[", "x", "]"}],
+           RowBox[{"exact", "[", "x", "]"}],
            RowBox[{"f3", "[", "x", "]"}]]}], "]"}], ",",
         "\[IndentingNewLine]",
         RowBox[{"Abs", "[",
          RowBox[{"1", "-",
           FractionBox[
-           RowBox[{"fd", "[", "x", "]"}],
+           RowBox[{"exact", "[", "x", "]"}],
            RowBox[{"f", "[", "x", "]"}]]}], "]"}]}], "\[IndentingNewLine]",
        "}"}], ",", "\[IndentingNewLine]",
       RowBox[{"{",
@@ -615,8 +614,9 @@ Cell[BoxData[{
         "\"\<f1\>\"", ",", "\"\<f2\>\"", ",", "\"\<f3\>\"", ",",
          "\"\<f\>\""}], "}"}]}]}], "\[IndentingNewLine]", "]"}]}],
    "\[IndentingNewLine]", "]"}]}]}], "Input",
+
  CellLabel->
-  "In[195]:="],
+  "In[669]:="],
 
 Cell[CellGroupData[{
 
@@ -722,6 +722,328 @@ Cell[BoxData[
        RowBox[{"-", "2"}], " ", "x"}]], "8"], "+",
     SuperscriptBox["\[ExponentialE]",
      RowBox[{"-", "x"}]]}]}], TraditionalForm]], "Echo"]
+}]]
+}]]
+}]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ "BesselK: ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    SubscriptBox["K", "2"], "(", "x", ")"}], TraditionalForm]],
+  FormatType->"TraditionalForm",ExpressionUUID->
+  "1e2a3a46-25e9-4b61-afc0-12b46334b01b"]
+}], "Section"],
+
+Cell[TextData[{
+ "Approximation of ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    SubscriptBox["K", "2"], "(", "x", ")"}], TraditionalForm]],
+  ExpressionUUID->"dd0bc3e6-dec5-4cf5-8c9f-b06bf003081f"],
+ " for ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{"x", "\[GreaterEqual]", "0"}], TraditionalForm]],
+  FormatType->"TraditionalForm",ExpressionUUID->
+  "d42ca8cb-a64b-4b68-9b34-558567e49daa"],
+ "."
+}], "Text"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Limit", "[",
+  RowBox[{
+   RowBox[{"BesselK", "[",
+    RowBox[{"2", ",", "x"}], "]"}], ",",
+   RowBox[{"x", "\[Rule]", "0"}], ",",
+   RowBox[{"Direction", "\[Rule]", "\"\<FromAbove\>\""}]}], "]"}]], "Input",
+ CellLabel->
+  "In[961]:="]
+}]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"exact", "[", "x_", "]"}], "=",
+    RowBox[{"BesselK", "[",
+     RowBox[{"2", ",", "x"}], "]"}]}], ";"}],
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{"x12", "=",
+   RowBox[{"Exp", "[", "0.3", "]"}]}], ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{"x23", "=",
+   RowBox[{"Exp", "[", "3.4", "]"}]}], ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{
+   RowBox[{"f1", "[", "x_", "]"}], "=",
+   RowBox[{
+    RowBox[{
+     RowBox[{"Series", "[",
+      RowBox[{
+       RowBox[{"exact", "[", "x", "]"}], ",",
+       RowBox[{"{",
+        RowBox[{"x", ",",
+         RowBox[{"-", "\[Infinity]"}], ",", "6"}], "}"}]}], "]"}], "//",
+     "Normal"}], "//", "ExpandAll"}]}], ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{
+   RowBox[{"f2", "[", "x_", "]"}], "=",
+   RowBox[{"Exp", "[",
+    RowBox[{
+     RowBox[{"MiniMaxApproximation", "[",
+      RowBox[{
+       RowBox[{"Log", "@",
+        RowBox[{"exact", "[", "x", "]"}]}], ",",
+       RowBox[{"{",
+        RowBox[{"x", ",",
+         RowBox[{"{",
+          RowBox[{"x12", ",", "x23"}], "}"}], ",", "8", ",", "6"}], "}"}]}],
+      "]"}], "\[LeftDoubleBracket]",
+     RowBox[{"2", ",", "1"}], "\[RightDoubleBracket]"}], "]"}]}],
+  ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"f3", "[", "x_", "]"}], "=",
+    RowBox[{
+     RowBox[{
+      RowBox[{"Series", "[",
+       RowBox[{
+        RowBox[{"exact", "[", "x", "]"}], ",",
+        RowBox[{"{",
+         RowBox[{"x", ",", "\[Infinity]", ",", "6"}], "}"}]}], "]"}], "//",
+      "Normal"}], "//", "ExpandAll"}]}], ";"}],
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{"Echo", "[",
+   RowBox[{
+    RowBox[{"Collect", "[",
+     RowBox[{
+      RowBox[{"f1", "[", "x", "]"}], ",",
+      RowBox[{"Exp", "[", "x", "]"}]}],
+     RowBox[{"(*",
+      RowBox[{",",
+       RowBox[{
+        RowBox[{"N", "[",
+         RowBox[{"#", ",", "20"}], "]"}], "&"}]}], "*)"}], "]"}], ",",
+    "\"\<f1: \>\""}], "]"}], ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{"Echo", "[",
+   RowBox[{
+    RowBox[{"f2", "[", "x", "]"}], ",", "\"\<f2: \>\""}], "]"}],
+  ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{
+   RowBox[{"Echo", "[",
+    RowBox[{
+     RowBox[{"Collect", "[",
+      RowBox[{
+       RowBox[{
+        RowBox[{"Exp", "[",
+         RowBox[{"13",
+          RowBox[{"x", "/", "2"}]}], "]"}],
+        RowBox[{"Exp", "[",
+         RowBox[{"Exp", "[", "x", "]"}], "]"}],
+        RowBox[{"f3", "[", "x", "]"}]}], ",",
+       RowBox[{"Exp", "[", "x", "]"}], ",",
+       RowBox[{
+        RowBox[{"N", "[",
+         RowBox[{"#", ",", "20"}], "]"}], "&"}]}], "]"}], ",",
+     "\"\<f3: \>\""}], "]"}], ";"}],
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"f", "[", "x_", "]"}], "=",
+    RowBox[{"Piecewise", "[", "\[IndentingNewLine]",
+     RowBox[{
+      RowBox[{
+       RowBox[{"{",
+        RowBox[{
+         RowBox[{"#1", "[", "x", "]"}], ",",
+         RowBox[{"x", "<", "#2"}]}], "}"}], "&"}], "@@@",
+      RowBox[{"{",
+       RowBox[{
+        RowBox[{"{",
+         RowBox[{"f1", ",", "x12"}], "}"}], ",",
+        RowBox[{"{",
+         RowBox[{"f2", ",", "x23"}], "}"}], ",",
+        RowBox[{"{",
+         RowBox[{"f3", ",", "\[Infinity]"}], "}"}]}], "}"}]}],
+     "\[IndentingNewLine]", "]"}]}], ";"}],
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]",
+ RowBox[{"Quiet", "@",
+  RowBox[{"Show", "[", "\[IndentingNewLine]",
+   RowBox[{
+    RowBox[{"LogPlot", "[", "\[IndentingNewLine]",
+     RowBox[{
+      RowBox[{"{", "\[IndentingNewLine]",
+       RowBox[{"Abs", "[",
+        RowBox[{"1", "-",
+         FractionBox[
+          RowBox[{"exact", "[", "x", "]"}],
+          RowBox[{"f", "[", "x", "]"}]]}], "]"}], "\[IndentingNewLine]",
+       "}"}], ",", "\[IndentingNewLine]",
+      RowBox[{"{",
+       RowBox[{"x", ",",
+        RowBox[{"-", "6"}], ",", "6"}], "}"}], ",", "\[IndentingNewLine]",
+      RowBox[{"PlotRange", "\[Rule]",
+       RowBox[{"{",
+        RowBox[{"All", ",",
+         RowBox[{"{",
+          RowBox[{
+           SuperscriptBox["10",
+            RowBox[{"-", "20"}]], ",", "2"}], "}"}]}], "}"}]}], ",",
+      "\[IndentingNewLine]",
+      RowBox[{"PlotLabel", "\[Rule]", "\"\<Positive x\>\""}], ",",
+      "\[IndentingNewLine]",
+      RowBox[{"AxesLabel", "\[Rule]",
+       RowBox[{"{",
+        RowBox[{"\"\<x\>\"", ",", "\"\<Error\>\""}], "}"}]}]}],
+     "\[IndentingNewLine]", "]"}], "\[IndentingNewLine]", ",",
+    "\[IndentingNewLine]",
+    RowBox[{"LogPlot", "[", "\[IndentingNewLine]",
+     RowBox[{
+      RowBox[{"{", "\[IndentingNewLine]",
+       RowBox[{
+        RowBox[{"Abs", "[",
+         RowBox[{"1", "-",
+          FractionBox[
+           RowBox[{"exact", "[", "x", "]"}],
+           RowBox[{"f1", "[", "x", "]"}]]}], "]"}], ",",
+        "\[IndentingNewLine]",
+        RowBox[{"Abs", "[",
+         RowBox[{"1", "-",
+          FractionBox[
+           RowBox[{"exact", "[", "x", "]"}],
+           RowBox[{"f2", "[", "x", "]"}]]}], "]"}], ",",
+        "\[IndentingNewLine]",
+        RowBox[{"Abs", "[",
+         RowBox[{"1", "-",
+          FractionBox[
+           RowBox[{"exact", "[", "x", "]"}],
+           RowBox[{"f3", "[", "x", "]"}]]}], "]"}], ",",
+        "\[IndentingNewLine]",
+        RowBox[{"Abs", "[",
+         RowBox[{"1", "-",
+          FractionBox[
+           RowBox[{"exact", "[", "x", "]"}],
+           RowBox[{"f", "[", "x", "]"}]]}], "]"}]}], "\[IndentingNewLine]",
+       "}"}], ",", "\[IndentingNewLine]",
+      RowBox[{"{",
+       RowBox[{"x", ",",
+        RowBox[{"-", "6"}], ",", "6"}], "}"}], ",", "\[IndentingNewLine]",
+      RowBox[{"WorkingPrecision", "\[Rule]", "100"}], ",",
+      "\[IndentingNewLine]",
+      RowBox[{"PlotLegends", "\[Rule]",
+       RowBox[{"{",
+        RowBox[{
+        "\"\<f1\>\"", ",", "\"\<f2\>\"", ",", "\"\<f3\>\"", ",",
+         "\"\<f\>\""}], "}"}]}]}], "\[IndentingNewLine]", "]"}]}],
+   "\[IndentingNewLine]", "]"}]}]}], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ FormBox[
+  RowBox[{
+   TagBox["\<\"f1: \"\>",
+    "EchoLabel"], " ",
+   RowBox[{
+    SuperscriptBox["\[ExponentialE]",
+     RowBox[{"-", "x"}]], " ",
+    RowBox[{"(",
+     RowBox[{
+      RowBox[{"-",
+       FractionBox[
+        RowBox[{"15", " ",
+         SqrtBox[
+          FractionBox["\[Pi]", "2"]]}],
+        RowBox[{"8", " ",
+         SuperscriptBox["x",
+          RowBox[{"3", "/", "2"}]]}]]}], "-",
+      FractionBox[
+       RowBox[{"105", " ",
+        SqrtBox[
+         FractionBox["\[Pi]", "2"]]}],
+       RowBox[{"128", " ",
+        SuperscriptBox["x",
+         RowBox[{"5", "/", "2"}]]}]], "+",
+      FractionBox[
+       RowBox[{"315", " ",
+        SqrtBox[
+         FractionBox["\[Pi]", "2"]]}],
+       RowBox[{"1024", " ",
+        SuperscriptBox["x",
+         RowBox[{"7", "/", "2"}]]}]], "-",
+      FractionBox[
+       RowBox[{"10395", " ",
+        SqrtBox[
+         FractionBox["\[Pi]", "2"]]}],
+       RowBox[{"32768", " ",
+        SuperscriptBox["x",
+         RowBox[{"9", "/", "2"}]]}]], "+",
+      FractionBox[
+       RowBox[{"135135", " ",
+        SqrtBox[
+         FractionBox["\[Pi]", "2"]]}],
+       RowBox[{"262144", " ",
+        SuperscriptBox["x",
+         RowBox[{"11", "/", "2"}]]}]], "-",
+      FractionBox[
+       SqrtBox[
+        FractionBox["\[Pi]", "2"]],
+       SqrtBox["x"]]}], ")"}]}]}], TraditionalForm]], "Echo"],
+
+Cell[BoxData[
+ FormBox[
+  RowBox[{
+   TagBox["\<\"f2: \"\>",
+    "EchoLabel"], " ",
+   SuperscriptBox["\[ExponentialE]", "x"]}], TraditionalForm]], "Echo"],
+
+Cell[BoxData[
+ FormBox[
+  RowBox[{
+   TagBox["\<\"f3: \"\>",
+    "EchoLabel"], " ",
+   RowBox[{
+    SuperscriptBox["2.71828182845904523536028747135266249776`20.",
+     SuperscriptBox[
+      "2.71828182845904523536028747135266249776`20.434294481903255", "x"]],
+    " ",
+    SuperscriptBox["\[ExponentialE]",
+     RowBox[{
+      RowBox[{"11", " ", "x"}], "/", "2"}]], " ",
+    RowBox[{"(",
+     RowBox[{
+      FractionBox["2.3499640074665629710147799545103549247`20.",
+       SuperscriptBox["x",
+        RowBox[{"3", "/", "2"}]]], "+",
+      FractionBox["1.02810925326662129981896623009828027955`20.",
+       SuperscriptBox["x",
+        RowBox[{"5", "/", "2"}]]], "-",
+      FractionBox["0.38554096997498298743211233628685510483`20.",
+       SuperscriptBox["x",
+        RowBox[{"7", "/", "2"}]]], "+",
+      FractionBox["0.39758912528670120578936584679581932686`20.",
+       SuperscriptBox["x",
+        RowBox[{"9", "/", "2"}]]], "-",
+      FractionBox["0.64608232859088945940771950104320640615`20.",
+       SuperscriptBox["x",
+        RowBox[{"11", "/", "2"}]]], "+",
+      FractionBox["1.2533141373155002512078826424055226265`20.",
+       SqrtBox["x"]]}], ")"}]}]}], TraditionalForm]], "Echo"]
 }]]
 }]]
 }]]
