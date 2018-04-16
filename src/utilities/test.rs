@@ -10,28 +10,40 @@
 ///
 /// The precision is specified in decimal
 /// significant figures.
-pub(crate) fn approx_eq(a: f64, b: f64, precision: f64, abs: f64) -> bool {
+pub(crate) fn approx_eq(a: f64, b: f64, precision: f64, abs: f64) {
     // If neither are numbers, they are not comparable
-    if a.is_nan() || b.is_nan() {
-        return false;
+    if a.is_nan() {
+        panic!("a is NaN.");
+    }
+    if b.is_nan() {
+        panic!("b is NaN.");
     }
 
     // If they are already identical, return.  They could both be infinite
     // at this stage (which is fine)
     if a == b {
-        return true;
+        debug!("a and b are identical");
+        return;
     }
 
     // Since they are not identical, if either one is infinite, the other
     // must either be another infinity or be finite and therefore they are
     // not equal
-    if a.is_infinite() || b.is_infinite() {
-        return false;
+    match (a.is_infinite(), b.is_infinite()) {
+        (true, true) => panic!("a and b are different infinities."),
+        (true, false) => panic!("a is infinite while b is finite."),
+        (false, true) => panic!("b is infinite while a is finite."),
+        (false, false) => (),
     }
 
     // Check if their absolute error is acceptable
     if (a - b).abs() < abs {
-        return true;
+        debug!(
+            "a and b are within the absolute error ({} < {}).",
+            (a - b).abs(),
+            abs
+        );
+        return;
     }
 
     // Scale numbers to be within the range (-10, 10) so that we can check
@@ -42,5 +54,18 @@ pub(crate) fn approx_eq(a: f64, b: f64, precision: f64, abs: f64) -> bool {
     let a_scaled = a / scale;
     let b_scaled = b / scale;
 
-    (a_scaled - b_scaled).abs() <= 10f64.powf(-precision)
+    let p = (a_scaled - b_scaled).abs();
+    if p <= 10f64.powf(-precision) {
+        debug!(
+            "a and b have the necessary precision ({} ≥ {})",
+            -p.log10(),
+            precision
+        );
+    } else {
+        panic!(
+            "a and b do not have the necessary precision ({} !≥ {})",
+            -p.log10(),
+            precision
+        )
+    }
 }

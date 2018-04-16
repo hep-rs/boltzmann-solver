@@ -42,26 +42,26 @@ pub(crate) fn linear(data: &[(f64, f64)], x: f64) -> f64 {
 mod test {
     const DATA: [(f64, f64); 4] = [(0.0, 0.0), (1.0, 1.0), (10.0, 0.0), (20.0, 1.0)];
     use std::f64;
+    use utilities::test::*;
 
     #[test]
     fn linear() {
-        for i in 0..1_000 {
+        for i in 0..1_001 {
             let x = i as f64 / 1_000.0;
             let y = i as f64 / 1_000.0;
-            assert!((super::linear(&DATA, x) - y).abs() < 2.0 * f64::EPSILON);
+            approx_eq(super::linear(&DATA, x), y, 10.0, 0.0);
         }
 
-        for i in 1_000..10_000 {
+        for i in 1_000..10_001 {
             let x = i as f64 / 1_000.0;
-            let y = 1.0 - (i - 1_000) as f64 / 9_000.0;
-            assert!((super::linear(&DATA, x) - y).abs() < 2.0 * f64::EPSILON);
+            let y = (10_000 - i) as f64 / 9_000.0;
+            approx_eq(super::linear(&DATA, x), y, 10.0, 0.0);
         }
 
-        for i in 10_000..20_000 {
+        for i in 10_000..20_001 {
             let x = i as f64 / 1_000.0;
             let y = (i - 10_000) as f64 / 10_000.0;
-
-            assert!((super::linear(&DATA, x) - y).abs() < 2.0 * f64::EPSILON);
+            approx_eq(super::linear(&DATA, x), y, 10.0, 0.0);
         }
 
         assert_eq!(super::linear(&DATA, f64::NEG_INFINITY), 0.0);
@@ -88,10 +88,10 @@ mod bench {
                     })
                     .collect();
                 b.iter(|| {
-                    for i in 0..100_000 {
+                    for i in 0..100_001 {
                         let x = i as f64 / 100_000.0;
                         let y = i as f64 / 100_000.0;
-                        assert!((super::linear(&data, x) - y).abs() < 2.0 * f64::EPSILON);
+                        approx_eq(super::linear(&DATA, x), y, 10.0, 0.0);
                     }
                 });
             }

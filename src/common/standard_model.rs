@@ -63,7 +63,7 @@ mod test {
         ];
 
         for &(beta, g) in &expected {
-            assert!(approx_eq(g, sm.entropy_dof(beta), 10.0, 0.0));
+            approx_eq(g, sm.entropy_dof(beta), 10.0, 0.0);
         }
     }
 }

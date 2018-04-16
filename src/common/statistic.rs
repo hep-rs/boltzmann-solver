@@ -264,7 +264,7 @@ fn besselk_2(x: f64) -> f64 {
 mod test {
     use super::*;
     use std::f64;
-    use utilities::test::approx_eq;
+    use utilities::test::*;
 
     // Pre-calculated values for the number densities, ordered as: (m, μ, β,
     // n(FD), n(BE), n(MB))
@@ -571,39 +571,21 @@ mod test {
         let mb = Statistic::MaxwellBoltzmann;
 
         for &(m, mu, beta, n_fd, n_be, n_mb) in N_MASSIVE.iter() {
-            println!("(m, μ, β) = ({}, {}, {})", m, mu, beta);
-
-            let precision = 9.0;
-            let abs = 1e-40;
+            debug!("(m, μ, β) = ({}, {}, {})", m, mu, beta);
 
             if !n_fd.is_nan() {
                 let n_fd_calc = fd.number_density(m, mu, beta);
-                assert!(
-                    approx_eq(n_fd, n_fd_calc, precision, abs),
-                    "FD: {:e} !≅ {:e}",
-                    n_fd,
-                    n_fd_calc
-                );
+                approx_eq(n_fd, n_fd_calc, 9.0, 1e-40);
             }
 
             if !n_be.is_nan() {
                 let n_be_calc = be.number_density(m, mu, beta);
-                assert!(
-                    approx_eq(n_be, n_be_calc, precision, abs),
-                    "BE: {:e} !≅ {:e}",
-                    n_be,
-                    n_be_calc
-                );
+                approx_eq(n_be, n_be_calc, 9.0, 1e-40);
             }
 
             if !n_mb.is_nan() {
                 let n_mb_calc = mb.number_density(m, mu, beta);
-                assert!(
-                    approx_eq(n_mb, n_mb_calc, precision, abs),
-                    "MB: {:e} !≅ {:e}",
-                    n_mb,
-                    n_mb_calc
-                );
+                approx_eq(n_mb, n_mb_calc, 9.0, 1e-40);
             }
         }
     }
@@ -615,39 +597,21 @@ mod test {
         let mb = Statistic::MaxwellBoltzmann;
 
         for &(m, mu, beta, n_fd, n_be, n_mb) in N_MASSLESS.iter() {
-            println!("(m, μ, β) = ({}, {}, {})", m, mu, beta);
-
-            let precision = 9.0;
-            let abs = 0.0;
+            debug!("(m, μ, β) = ({}, {}, {})", m, mu, beta);
 
             if !n_fd.is_nan() {
                 let n_fd_calc = fd.massless_number_density(mu, beta);
-                assert!(
-                    approx_eq(n_fd, n_fd_calc, precision, abs),
-                    "FD: {:e} !≅ {:e}",
-                    n_fd,
-                    n_fd_calc
-                );
+                approx_eq(n_fd, n_fd_calc, 9.0, 0.0);
             }
 
             if !n_be.is_nan() {
                 let n_be_calc = be.massless_number_density(mu, beta);
-                assert!(
-                    approx_eq(n_be, n_be_calc, precision, abs),
-                    "BE: {:e} !≅ {:e}",
-                    n_be,
-                    n_be_calc
-                );
+                approx_eq(n_be, n_be_calc, 9.0, 0.0);
             }
 
             if !n_mb.is_nan() {
                 let n_mb_calc = mb.massless_number_density(mu, beta);
-                assert!(
-                    approx_eq(n_mb, n_mb_calc, precision, abs),
-                    "MB: {:e} !≅ {:e}",
-                    n_mb,
-                    n_mb_calc
-                );
+                approx_eq(n_mb, n_mb_calc, 9.0, 0.0);
             }
         }
     }
@@ -659,7 +623,7 @@ mod bench {
     use super::*;
     use super::test::{N_MASSIVE, N_MASSLESS};
     use test::Bencher;
-    use utilities::test::approx_eq;
+    use utilities::test::*;
 
     #[bench]
     fn fermi_dirac_massive(b: &mut Bencher) {
@@ -671,7 +635,7 @@ mod bench {
                     continue;
                 }
                 let n_fd_calc = fd.number_density(m, mu, beta);
-                assert!(approx_eq(n_fd, n_fd_calc, 3.0, 1e-15));
+                approx_eq(n_fd, n_fd_calc, 3.0, 1e-15);
             }
         });
     }
@@ -686,7 +650,7 @@ mod bench {
                     continue;
                 }
                 let n_be_calc = be.number_density(m, mu, beta);
-                assert!(approx_eq(n_be, n_be_calc, 3.0, 1e-15));
+                approx_eq(n_be, n_be_calc, 3.0, 1e-15);
             }
         });
     }
@@ -701,7 +665,7 @@ mod bench {
                     continue;
                 }
                 let n_mb_calc = mb.number_density(m, mu, beta);
-                assert!(approx_eq(n_mb, n_mb_calc, 3.0, 0.0));
+                approx_eq(n_mb, n_mb_calc, 3.0, 0.0);
             }
         });
     }
@@ -716,7 +680,7 @@ mod bench {
                     continue;
                 }
                 let n_fd_calc = fd.massless_number_density(mu, beta);
-                assert!(approx_eq(n_fd, n_fd_calc, 3.0, 1e-15));
+                approx_eq(n_fd, n_fd_calc, 3.0, 1e-15);
             }
         });
     }
@@ -731,7 +695,7 @@ mod bench {
                     continue;
                 }
                 let n_be_calc = be.massless_number_density(mu, beta);
-                assert!(approx_eq(n_be, n_be_calc, 3.0, 1e-15));
+                approx_eq(n_be, n_be_calc, 3.0, 1e-15);
             }
         });
     }
@@ -746,7 +710,7 @@ mod bench {
                     continue;
                 }
                 let n_mb_calc = mb.massless_number_density(mu, beta);
-                assert!(approx_eq(n_mb, n_mb_calc, 3.0, 0.0));
+                approx_eq(n_mb, n_mb_calc, 3.0, 0.0);
             }
         });
     }
