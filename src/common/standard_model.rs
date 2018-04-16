@@ -26,16 +26,6 @@ impl StandardModel {
 impl Universe for StandardModel {
     fn entropy_dof(&self, beta: f64) -> f64 {
         interpolation::linear(&STANDARD_MODEL_GSTAR, beta.ln())
-        // let exotic_bosons: f64 = self.exotic_bosons
-        //     .iter()
-        //     .map(|&(m, g)| g * interpolation::linear(&BOSON_GSTAR, (m * beta).ln()).exp())
-        //     .sum();
-        // let exotic_fermions: f64 = self.exotic_fermions
-        //     .iter()
-        //     .map(|&(m, g)| g * interpolation::linear(&FERMION_GSTAR, (m * beta).ln()).exp())
-        //     .sum();
-
-        // sm + exotic_bosons + exotic_fermions
     }
 }
 
@@ -43,6 +33,7 @@ impl Universe for StandardModel {
 mod test {
     use super::StandardModel;
     use common::universe::Universe;
+    use utilities::test::*;
 
     #[test]
     fn sm_plain() {
@@ -72,7 +63,7 @@ mod test {
         ];
 
         for &(beta, g) in &expected {
-            assert!((g - sm.entropy_dof(beta)).abs() < 1e-10);
+            assert!(approx_eq(g, sm.entropy_dof(beta), 10.0, 0.0));
         }
     }
 }

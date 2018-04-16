@@ -24,7 +24,23 @@ pub trait Universe {
     /// \\[
     ///    H(\beta) = \sqrt{\frac{\pi\^2}{90}} g_{*}^{1/2}(\beta) \frac{1}{m_{\text{Pl}}} \frac{1}{\beta\^2}.
     /// \\]
+    ///
+    /// Which is valid provided that the entropy density of the Universe does
+    /// not change too rapidly.
+    ///
+    /// # Warning
+    ///
+    /// The dominated epoch in the Standard Model of cosmology ends at the
+    /// matter--radiation equality, which occurs at an inverse temperature of
+    /// \\(\beta \approx 10\^{9}\\) GeV^{-1}.
     fn hubble_rate(&self, beta: f64) -> f64 {
+        debug_assert!(
+            beta < 1e8,
+            "For β > 10⁸ GeV⁻¹, our Universe transitions into the matter
+            dominated epoch where this implementation of the Hubble rate no
+            longer applies."
+        );
+
         // Prefactor: sqrt(pi^2 / 90) ≅ 0.3311529421932034
         0.3311529421932034 * self.entropy_dof(beta)
             / (constants::REDUCED_PLANCK_MASS * beta.powi(2))
