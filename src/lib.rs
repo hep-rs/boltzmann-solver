@@ -8,6 +8,14 @@ extern crate quadrature;
 #[cfg(feature = "nightly")]
 extern crate test;
 
+macro_rules! debug_assert_warn {
+    ($cond:expr, $($arg:tt)+) => (
+        if cfg!(debug_assertions) && ($cond) {
+            warn!($($arg,)*);
+        }
+    )
+}
+
 pub mod common;
 pub(crate) mod utilities;
 pub mod prelude;

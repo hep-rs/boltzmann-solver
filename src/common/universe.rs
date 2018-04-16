@@ -34,7 +34,7 @@ pub trait Universe {
     /// matter--radiation equality, which occurs at an inverse temperature of
     /// \\(\beta \approx 10\^{9}\\) GeV^{-1}.
     fn hubble_rate(&self, beta: f64) -> f64 {
-        debug_assert!(
+        debug_assert_warn!(
             beta < 1e8,
             "For β > 10⁸ GeV⁻¹, our Universe transitions into the matter
             dominated epoch where this implementation of the Hubble rate no

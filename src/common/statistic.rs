@@ -38,21 +38,36 @@ impl Statistic {
     /// is used such that the bounds of the integral over \\(t\\) are \\([0,
     /// 1]\\).
     pub fn number_density(&self, mass: f64, mu: f64, beta: f64) -> f64 {
-        // debug_assert!(
-        //     mu <= mass,
-        //     "The chemical potential of a species cannot be greater than the mass."
-        // );
+        debug_assert!(mass >= 0.0, "mass must be positive.");
+        debug_assert!(beta >= 0.0, "β must be positive.");
 
         if mass < 1e-20 {
+            debug!("mass is below threshold, using massless_number_density instead.");
             return self.massless_number_density(mu, beta);
         }
 
         match *self {
-            Statistic::FermiDirac | Statistic::BoseEinstein => {
-                if cfg!(debug_assertions) && mu > 0.9 * mass {
-                    warn!("Evaluation of number densities for μ > 0.9 m can be inaccurate.");
-                }
+            Statistic::FermiDirac => {
+                debug_assert_warn!(
+                    mu > 0.9 * mass,
+                    "Evaluation of number densities for μ > 0.9 m can be inaccurate."
+                );
 
+                let integral = integrate(
+                    |t| {
+                        let u = mass + t / (1.0 - t);
+                        let dudt = (t - 1.0).powi(-2);
+
+                        self.phase_space(u, mu, beta) * u * f64::sqrt(u.powi(2) - mass.powi(2))
+                            * dudt
+                    },
+                    0.0,
+                    1.0,
+                    1e-8,
+                ).integral;
+                integral / (2.0 * PI_2)
+            }
+            Statistic::BoseEinstein => {
                 let integral = integrate(
                     |t| {
                         let u = mass + t / (1.0 - t);
@@ -92,14 +107,17 @@ impl Statistic {
     /// forms of the above integral for all statistics, this method will be much
     /// faster and more precise.
     pub fn massless_number_density(&self, mu: f64, beta: f64) -> f64 {
-        // debug_assert!(
-        //     mu <= 0.0,
-        //     "The chemical potential of a species cannot be greater than the mass."
-        // );
+        debug_assert!(beta >= 0.0, "β must be positive.");
 
         match *self {
             Statistic::FermiDirac => beta.powi(-3) * polylog3_fd(mu * beta) / PI_2,
-            Statistic::BoseEinstein => beta.powi(-3) * polylog3_be(mu * beta) / PI_2,
+            Statistic::BoseEinstein => {
+                debug_assert!(
+                    mu <= 0.0,
+                    "Bose–Einstein condensates (μ > 0) are not supported."
+                );
+                beta.powi(-3) * polylog3_be(mu * beta) / PI_2
+            }
             Statistic::MaxwellBoltzmann => f64::exp(mu * beta) / (PI_2 * beta.powi(3)),
         }
     }

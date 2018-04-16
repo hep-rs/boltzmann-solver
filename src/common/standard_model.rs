@@ -25,6 +25,7 @@ impl StandardModel {
 
 impl Universe for StandardModel {
     fn entropy_dof(&self, beta: f64) -> f64 {
+        debug_assert!(beta > 0.0, "beta must be positive.");
         interpolation::linear(&STANDARD_MODEL_GSTAR, beta.ln())
     }
 }
