@@ -10,6 +10,9 @@
 extern crate log;
 extern crate quadrature;
 
+#[cfg(test)]
+extern crate csv;
+
 #[cfg(feature = "nightly")]
 extern crate test;
 
