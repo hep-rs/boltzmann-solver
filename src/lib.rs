@@ -32,4 +32,3 @@ pub use universe::{SingleSpecies, Universe};
 
 // pub mod common;
 pub(crate) mod utilities;
-pub mod prelude;
