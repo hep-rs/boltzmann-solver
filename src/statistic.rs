@@ -1,7 +1,7 @@
 use quadrature::integrate;
 use std::f64;
 
-use common::constants::{PI_2, ZETA_3};
+use constants::{PI_2, ZETA_3};
 
 pub enum Statistic {
     FermiDirac,

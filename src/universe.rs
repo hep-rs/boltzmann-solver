@@ -2,7 +2,8 @@
 //! Boltzmann equations.  The [`Universe`] trait describes the evolution of the
 //! Universe.
 
-use common::{constants, Statistic};
+use constants;
+use statistic::Statistic;
 use utilities::interpolation;
 
 /// Collection of properties which determine the evolution of a Universe.

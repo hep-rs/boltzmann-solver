@@ -1,5 +1,5 @@
-// use common::{constants::{BOSON_GSTAR, FERMION_GSTAR, STANDARD_MODEL_GSTAR}, universe::Universe};
-use common::{constants::STANDARD_MODEL_GSTAR, universe::Universe};
+use constants::STANDARD_MODEL_GSTAR;
+use universe::Universe;
 use utilities::interpolation;
 
 /// Implementation of [`Universe`] for the Standard Model.
@@ -33,7 +33,7 @@ impl Universe for StandardModel {
 #[cfg(test)]
 mod test {
     use super::StandardModel;
-    use common::universe::Universe;
+    use universe::Universe;
     use utilities::test::*;
 
     #[test]

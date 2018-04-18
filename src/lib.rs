@@ -1,3 +1,6 @@
+//! # `boltzmann-solver` provides functionalities to solve Boltzmann equation in
+//! the context of particle physics / early cosmology.
+
 #![cfg_attr(feature = "nightly", feature(test))]
 #![cfg_attr(feature = "cargo-clippy", allow(unreadable_literal))]
 #![cfg_attr(feature = "strict", deny(missing_docs))]
@@ -18,6 +21,15 @@ macro_rules! debug_assert_warn {
     )
 }
 
-pub mod common;
+pub mod constants;
+mod standard_model;
+mod statistic;
+mod universe;
+
+pub use standard_model::StandardModel;
+pub use statistic::Statistic;
+pub use universe::{SingleSpecies, Universe};
+
+// pub mod common;
 pub(crate) mod utilities;
 pub mod prelude;
