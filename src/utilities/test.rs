@@ -48,7 +48,7 @@ pub(crate) fn approx_eq(a: f64, b: f64, precision: f64, abs: f64) {
 
     // Scale numbers to be within the range (-10, 10) so that we can check
     // the significant figures.
-    let avg = 0.5 * (a + b);
+    let avg = 0.5 * (a + b).abs();
     let scale = f64::powf(10.0, avg.log10().floor());
 
     let a_scaled = a / scale;
