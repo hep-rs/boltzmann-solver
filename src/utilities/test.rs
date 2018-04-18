@@ -69,3 +69,92 @@ pub(crate) fn approx_eq(a: f64, b: f64, precision: f64, abs: f64) {
         )
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use std::f64;
+
+    #[test]
+    #[should_panic]
+    fn a_nan() {
+        approx_eq(f64::NAN, 0.0, 10.0, 0.0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn b_nan() {
+        approx_eq(1.0, f64::NAN, 10.0, 0.0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn a_b_nan() {
+        approx_eq(f64::NAN, f64::NAN, 10.0, 0.0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn a_infinite() {
+        approx_eq(f64::INFINITY, 0.0, 10.0, 0.0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn b_infinite() {
+        approx_eq(0.0, f64::INFINITY, 10.0, 0.0);
+    }
+
+    #[test]
+    fn a_b_infinite() {
+        approx_eq(f64::INFINITY, f64::INFINITY, 10.0, 0.0);
+        approx_eq(f64::NEG_INFINITY, f64::NEG_INFINITY, 10.0, 0.0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn a_b_diff_infinite() {
+        approx_eq(f64::INFINITY, f64::NEG_INFINITY, 10.0, 0.0);
+    }
+
+    #[test]
+    fn absolute_error() {
+        approx_eq(1e-20, 2e-20, 10.0, 1e-10);
+        approx_eq(-1e-20, 2e-20, 10.0, 1e-10);
+        approx_eq(1e-20, -2e-20, 10.0, 1e-10);
+        approx_eq(-1e-20, -2e-20, 10.0, 1e-10);
+    }
+
+    #[test]
+    #[should_panic]
+    fn absolute_error_panic() {
+        approx_eq(1e-20, 2e-20, 10.0, 1e-30);
+    }
+
+    #[test]
+    fn precision() {
+        let eps = 0.05;
+        approx_eq(1.0000000000000000, 1.1000000000000000, 1.0 - eps, 0.0);
+        approx_eq(1.0000000000000000, 1.0100000000000000, 2.0 - eps, 0.0);
+        approx_eq(1.0000000000000000, 1.0010000000000000, 3.0 - eps, 0.0);
+        approx_eq(1.0000000000000000, 1.0001000000000000, 4.0 - eps, 0.0);
+        approx_eq(1.0000000000000000, 1.0000100000000000, 5.0 - eps, 0.0);
+        approx_eq(1.0000000000000000, 1.0000010000000000, 6.0 - eps, 0.0);
+        approx_eq(1.0000000000000000, 1.0000001000000000, 7.0 - eps, 0.0);
+        approx_eq(1.0000000000000000, 1.0000000100000000, 8.0 - eps, 0.0);
+        approx_eq(1.0000000000000000, 1.0000000010000000, 9.0 - eps, 0.0);
+        approx_eq(1.0000000000000000, 1.0000000001000000, 10.0 - eps, 0.0);
+        approx_eq(1.0000000000000000, 1.0000000000100000, 11.0 - eps, 0.0);
+        approx_eq(1.0000000000000000, 1.0000000000010000, 12.0 - eps, 0.0);
+        approx_eq(1.0000000000000000, 1.0000000000001000, 13.0 - eps, 0.0);
+        approx_eq(1.0000000000000000, 1.0000000000000100, 14.0 - eps, 0.0);
+        approx_eq(1.0000000000000000, 1.0000000000000010, 15.0 - eps, 0.0);
+        approx_eq(1.0000000000000000, 1.0000000000000001, 16.0 - eps, 0.0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn precision_panic() {
+        approx_eq(1.0000000000000000, 1.0000000010000000, 10.0, 0.0);
+    }
+}
