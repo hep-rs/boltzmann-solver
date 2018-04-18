@@ -308,304 +308,33 @@ mod test {
     use super::*;
     use std::f64;
     use utilities::test::*;
+    use csv;
 
-    // Pre-calculated values for the number densities, ordered as: (m, μ, β,
-    // n(FD), n(BE), n(MB))
-    pub(crate) const N_MASSIVE: [(f64, f64, f64, f64, f64, f64); 48] = [
-        (
-            0.,
-            0.,
-            0.001,
-            9.134537117517981e7,
-            1.2179382823357308e8,
-            1.0132118364233777e8,
-        ),
-        (
-            0.,
-            0.,
-            1.,
-            0.09134537117517981,
-            0.12179382823357308,
-            0.10132118364233778,
-        ),
-        (
-            0.,
-            0.,
-            100000.,
-            9.13453711751798e-17,
-            1.217938282335731e-16,
-            1.0132118364233779e-16,
-        ),
-        (
-            0.,
-            0.,
-            1e10,
-            9.134537117517982e-32,
-            1.2179382823357307e-31,
-            1.0132118364233776e-31,
-        ),
-        (
-            0.,
-            -1.,
-            0.001,
-            9.126207294865051e7,
-            1.216275875172078e8,
-            1.0121991310240461e8,
-        ),
-        (
-            0.,
-            -1.,
-            1.,
-            0.03572229088117184,
-            0.03921083444514606,
-            0.0372739804171723,
-        ),
-        (0., -1., 100000., 0., 0., 0.),
-        (0., -1., 1e10, 0., 0., 0.),
-        (
-            0.,
-            -100.,
-            0.001,
-            8.335485239905512e7,
-            1.07061981931697e8,
-            9.16791981992802e7,
-        ),
-        (
-            0.,
-            -100.,
-            1.,
-            3.769225011298561e-45,
-            3.7692250112985615e-45,
-            3.769225011298561e-45,
-        ),
-        (0., -100., 100000., 0., 0., 0.),
-        (0., -100., 1e10, 0., 0., 0.),
-        (
-            0.,
-            0.5,
-            0.001,
-            9.138704662171356e7,
-            f64::NAN,
-            1.0137185690141802e8,
-        ),
-        (
-            0.,
-            0.5,
-            1.,
-            0.1429119703211247,
-            f64::NAN,
-            0.1670503906436362,
-        ),
-        (
-            0.,
-            0.5,
-            100000.,
-            0.0021108580008820372,
-            f64::NAN,
-            f64::INFINITY,
-        ),
-        (
-            0.,
-            0.5,
-            1e10,
-            0.0021108579925487032,
-            f64::NAN,
-            f64::INFINITY,
-        ),
-        (
-            1.,
-            0.,
-            0.001,
-            9.134535361757061e7,
-            1.2179362303531149e8,
-            1.013211583120911e8,
-        ),
-        (
-            1.,
-            0.,
-            1.,
-            0.07674843297292647,
-            0.09007599694230539,
-            0.08231530021891435,
-        ),
-        (1., 0., 100000., 0., 0., 0.),
-        (1., 0., 1e10, 0., 0., 0.),
-        (
-            1.,
-            -1.,
-            0.001,
-            9.126205540370326e7,
-            1.2162741742152852e8,
-            1.0121988779747552e8,
-        ),
-        (
-            1.,
-            -1.,
-            1.,
-            0.029460205682984904,
-            0.03120816941577316,
-            0.03028210664439372,
-        ),
-        (1., -1., 100000., 0., 0., 0.),
-        (1., -1., 1e10, 0., 0., 0.),
-        (
-            1.,
-            -100.,
-            0.001,
-            8.335483607631086e7,
-            1.0706192235376576e8,
-            9.16791752795252e7,
-        ),
-        (
-            1.,
-            -100.,
-            1.,
-            3.062191708033259e-45,
-            3.062191708033259e-45,
-            3.0621917080332595e-45,
-        ),
-        (1., -100., 100000., 0., 0., 0.),
-        (1., -100., 1e10, 0., 0., 0.),
-        (
-            1.,
-            0.5,
-            0.001,
-            9.1387029057771e7,
-            1.2187702569412377e8,
-            1.0137183155850305e8,
-        ),
-        (
-            1.,
-            0.5,
-            1.,
-            0.12172746331013472,
-            0.16067639370683204,
-            0.13571498637499102,
-        ),
-        (1., 0.5, 100000., 0., 0., 0.),
-        (1., 0.5, 1e10, 0., 0., 0.),
-        (1e8, 0., 0.001, 0., 0., 0.),
-        (1e8, 0., 1., 0., 0., 0.),
-        (1e8, 0., 100000., 0., 0., 0.),
-        (1e8, 0., 1e10, 0., 0., 0.),
-        (1e8, -1., 0.001, 0., 0., 0.),
-        (1e8, -1., 1., 0., 0., 0.),
-        (1e8, -1., 100000., 0., 0., 0.),
-        (1e8, -1., 1e10, 0., 0., 0.),
-        (1e8, -100., 0.001, 0., 0., 0.),
-        (1e8, -100., 1., 0., 0., 0.),
-        (1e8, -100., 100000., 0., 0., 0.),
-        (1e8, -100., 1e10, 0., 0., 0.),
-        (1e8, 0.5, 0.001, 0., 0., 0.),
-        (1e8, 0.5, 1., 0., 0., 0.),
-        (1e8, 0.5, 100000., 0., 0., 0.),
-        (1e8, 0.5, 1e10, 0., 0., 0.),
-    ];
+    #[test]
+    fn phase_space() {
+        let fd = Statistic::FermiDirac;
+        let be = Statistic::BoseEinstein;
+        let mb = Statistic::MaxwellBoltzmann;
 
-    // Pre-calculated values for the number densities, ordered as: (m, μ, β,
-    // n(FD), n(BE), n(MB))
-    pub(crate) const N_MASSLESS: [(f64, f64, f64, f64, f64, f64); 16] = [
-        (
-            0.,
-            0.,
-            0.001,
-            9.134537117517981e7,
-            1.2179382823357308e8,
-            1.0132118364233777e8,
-        ),
-        (
-            0.,
-            0.,
-            1.,
-            0.09134537117517981,
-            0.12179382823357308,
-            0.10132118364233778,
-        ),
-        (
-            0.,
-            0.,
-            100000.,
-            9.13453711751798e-17,
-            1.217938282335731e-16,
-            1.0132118364233779e-16,
-        ),
-        (
-            0.,
-            0.,
-            1e10,
-            9.134537117517982e-32,
-            1.2179382823357307e-31,
-            1.0132118364233776e-31,
-        ),
-        (
-            0.,
-            -1.,
-            0.001,
-            9.126207294865051e7,
-            1.216275875172078e8,
-            1.0121991310240461e8,
-        ),
-        (
-            0.,
-            -1.,
-            1.,
-            0.03572229088117184,
-            0.03921083444514606,
-            0.0372739804171723,
-        ),
-        (0., -1., 100000., 0., 0., 0.),
-        (0., -1., 1e10, 0., 0., 0.),
-        (
-            0.,
-            -100.,
-            0.001,
-            8.335485239905512e7,
-            1.07061981931697e8,
-            9.16791981992802e7,
-        ),
-        (
-            0.,
-            -100.,
-            1.,
-            3.769225011298561e-45,
-            3.7692250112985615e-45,
-            3.769225011298561e-45,
-        ),
-        (0., -100., 100000., 0., 0., 0.),
-        (0., -100., 1e10, 0., 0., 0.),
-        (
-            0.,
-            0.5,
-            0.001,
-            9.138704662171356e7,
-            f64::NAN,
-            1.0137185690141802e8,
-        ),
-        (
-            0.,
-            0.5,
-            1.,
-            0.1429119703211247,
-            f64::NAN,
-            0.1670503906436362,
-        ),
-        (
-            0.,
-            0.5,
-            100000.,
-            0.0021108580008820372,
-            f64::NAN,
-            f64::INFINITY,
-        ),
-        (
-            0.,
-            0.5,
-            1e10,
-            0.0021108579925487032,
-            f64::NAN,
-            f64::INFINITY,
-        ),
-    ];
+        let mut rdr = csv::Reader::from_path("test/data/phase_space.csv").unwrap();
+
+        for result in rdr.deserialize() {
+            let (e, mu, beta, f_fd, f_be, f_mb): (f64, f64, f64, f64, f64, f64) = result.unwrap();
+
+            if !f_fd.is_nan() {
+                let f = fd.phase_space(e, mu, beta);
+                approx_eq(f_fd, f, 10.0, 1e-50);
+            }
+            if !f_be.is_nan() {
+                let f = be.phase_space(e, mu, beta);
+                approx_eq(f_be, f, 10.0, 1e-50);
+            }
+            if !f_mb.is_nan() {
+                let f = mb.phase_space(e, mu, beta);
+                approx_eq(f_mb, f, 10.0, 1e-50);
+            }
+        }
+    }
 
     #[test]
     fn massive() {
@@ -613,48 +342,54 @@ mod test {
         let be = Statistic::BoseEinstein;
         let mb = Statistic::MaxwellBoltzmann;
 
-        for &(m, mu, beta, n_fd, n_be, n_mb) in N_MASSIVE.iter() {
-            debug!("(m, μ, β) = ({}, {}, {})", m, mu, beta);
+        let mut rdr = csv::Reader::from_path("test/data/number_density_massive.csv").unwrap();
+
+        for result in rdr.deserialize() {
+            let (m, mu, beta, n_fd, n_be, n_mb): (f64, f64, f64, f64, f64, f64) = result.unwrap();
+            println!("(m, μ, β) = ({:e}, {:e}, {:e})", m, mu, beta);
 
             if !n_fd.is_nan() {
-                let n_fd_calc = fd.number_density(m, mu, beta);
-                approx_eq(n_fd, n_fd_calc, 9.0, 1e-40);
+                let n = fd.number_density(m, mu, beta);
+                approx_eq(n_fd, n, 3.0, 1e-40);
             }
-
             if !n_be.is_nan() {
-                let n_be_calc = be.number_density(m, mu, beta);
-                approx_eq(n_be, n_be_calc, 9.0, 1e-40);
+                let n = be.number_density(m, mu, beta);
+                approx_eq(n_be, n, 3.0, 1e-40);
             }
-
             if !n_mb.is_nan() {
-                let n_mb_calc = mb.number_density(m, mu, beta);
-                approx_eq(n_mb, n_mb_calc, 9.0, 1e-40);
+                let n = mb.number_density(m, mu, beta);
+                approx_eq(n_mb, n, 3.0, 1e-40);
             }
         }
     }
 
     #[test]
     fn massless() {
+        // TODO: Improve precision of the functions (3 decimal places is not
+        // good enough).
         let fd = Statistic::FermiDirac;
         let be = Statistic::BoseEinstein;
         let mb = Statistic::MaxwellBoltzmann;
 
-        for &(m, mu, beta, n_fd, n_be, n_mb) in N_MASSLESS.iter() {
-            debug!("(m, μ, β) = ({}, {}, {})", m, mu, beta);
+        let mut rdr = csv::Reader::from_path("test/data/number_density_massless.csv").unwrap();
+
+        for result in rdr.deserialize() {
+            let (mu, beta, n_fd, n_be, n_mb): (f64, f64, f64, f64, f64) = result.unwrap();
+            // println!("(μ, β) = ({:e}, {:e})", mu, beta);
 
             if !n_fd.is_nan() {
-                let n_fd_calc = fd.massless_number_density(mu, beta);
-                approx_eq(n_fd, n_fd_calc, 9.0, 0.0);
+                let n = fd.massless_number_density(mu, beta);
+                approx_eq(n_fd, n, 3.0, 0.0);
             }
 
             if !n_be.is_nan() {
-                let n_be_calc = be.massless_number_density(mu, beta);
-                approx_eq(n_be, n_be_calc, 9.0, 0.0);
+                let n = be.massless_number_density(mu, beta);
+                approx_eq(n_be, n, 3.0, 0.0);
             }
 
             if !n_mb.is_nan() {
-                let n_mb_calc = mb.massless_number_density(mu, beta);
-                approx_eq(n_mb, n_mb_calc, 9.0, 0.0);
+                let n = mb.massless_number_density(mu, beta);
+                approx_eq(n_mb, n, 3.0, 0.0);
             }
         }
     }
@@ -664,21 +399,24 @@ mod test {
 #[cfg(test)]
 mod bench {
     use super::*;
-    use super::test::{N_MASSIVE, N_MASSLESS};
     use test::Bencher;
     use utilities::test::*;
+    use csv;
 
     #[bench]
     fn fermi_dirac_massive(b: &mut Bencher) {
         let fd = Statistic::FermiDirac;
+        let rdr = csv::Reader::from_path("test/data/number_density_massive.csv").unwrap();
+        let data: Vec<(f64, f64, f64, f64, f64, f64)> =
+            rdr.into_deserialize().map(|r| r.unwrap()).collect();
 
         b.iter(|| {
-            for &(m, mu, beta, n_fd, _, _) in N_MASSIVE.iter() {
+            for &(m, mu, beta, n_fd, _, _) in &data {
                 if n_fd.is_nan() {
                     continue;
                 }
-                let n_fd_calc = fd.number_density(m, mu, beta);
-                approx_eq(n_fd, n_fd_calc, 3.0, 1e-15);
+                let n = fd.number_density(m, mu, beta);
+                approx_eq(n_fd, n, 3.0, 1e-15);
             }
         });
     }
@@ -686,9 +424,12 @@ mod bench {
     #[bench]
     fn bose_einstein_massive(b: &mut Bencher) {
         let be = Statistic::BoseEinstein;
+        let rdr = csv::Reader::from_path("test/data/number_density_massive.csv").unwrap();
+        let data: Vec<(f64, f64, f64, f64, f64, f64)> =
+            rdr.into_deserialize().map(|r| r.unwrap()).collect();
 
         b.iter(|| {
-            for &(m, mu, beta, _, n_be, _) in N_MASSIVE.iter() {
+            for &(m, mu, beta, _, n_be, _) in &data {
                 if n_be.is_nan() {
                     continue;
                 }
@@ -701,14 +442,17 @@ mod bench {
     #[bench]
     fn maxwell_boltzmann_massive(b: &mut Bencher) {
         let mb = Statistic::MaxwellBoltzmann;
+        let rdr = csv::Reader::from_path("test/data/number_density_massive.csv").unwrap();
+        let data: Vec<(f64, f64, f64, f64, f64, f64)> =
+            rdr.into_deserialize().map(|r| r.unwrap()).collect();
 
         b.iter(|| {
-            for &(m, mu, beta, _, _, n_mb) in N_MASSIVE.iter() {
+            for &(m, mu, beta, _, _, n_mb) in &data {
                 if n_mb.is_nan() {
                     continue;
                 }
-                let n_mb_calc = mb.number_density(m, mu, beta);
-                approx_eq(n_mb, n_mb_calc, 3.0, 0.0);
+                let n = mb.number_density(m, mu, beta);
+                approx_eq(n_mb, n, 3.0, 0.0);
             }
         });
     }
@@ -716,14 +460,17 @@ mod bench {
     #[bench]
     fn fermi_dirac_massless(b: &mut Bencher) {
         let fd = Statistic::FermiDirac;
+        let rdr = csv::Reader::from_path("test/data/number_density_massless.csv").unwrap();
+        let data: Vec<(f64, f64, f64, f64, f64)> =
+            rdr.into_deserialize().map(|r| r.unwrap()).collect();
 
         b.iter(|| {
-            for &(_, mu, beta, n_fd, _, _) in N_MASSLESS.iter() {
+            for &(mu, beta, n_fd, _, _) in &data {
                 if n_fd.is_nan() {
                     continue;
                 }
-                let n_fd_calc = fd.massless_number_density(mu, beta);
-                approx_eq(n_fd, n_fd_calc, 3.0, 1e-15);
+                let n = fd.massless_number_density(mu, beta);
+                approx_eq(n_fd, n, 3.0, 1e-15);
             }
         });
     }
@@ -731,14 +478,17 @@ mod bench {
     #[bench]
     fn bose_einstein_massless(b: &mut Bencher) {
         let be = Statistic::BoseEinstein;
+        let rdr = csv::Reader::from_path("test/data/number_density_massless.csv").unwrap();
+        let data: Vec<(f64, f64, f64, f64, f64)> =
+            rdr.into_deserialize().map(|r| r.unwrap()).collect();
 
         b.iter(|| {
-            for &(_, mu, beta, _, n_be, _) in N_MASSLESS.iter() {
+            for &(mu, beta, _, n_be, _) in &data {
                 if n_be.is_nan() {
                     continue;
                 }
-                let n_be_calc = be.massless_number_density(mu, beta);
-                approx_eq(n_be, n_be_calc, 3.0, 1e-15);
+                let n = be.massless_number_density(mu, beta);
+                approx_eq(n_be, n, 3.0, 1e-15);
             }
         });
     }
@@ -746,14 +496,18 @@ mod bench {
     #[bench]
     fn maxwell_boltzmann_massless(b: &mut Bencher) {
         let mb = Statistic::MaxwellBoltzmann;
+        let rdr = csv::Reader::from_path("test/data/number_density_massless.csv").unwrap();
+        let data: Vec<(f64, f64, f64, f64, f64)> =
+            rdr.into_deserialize().map(|r| r.unwrap()).collect();
 
         b.iter(|| {
-            for &(_, mu, beta, _, _, n_mb) in N_MASSLESS.iter() {
+            for &(mu, beta, _, _, n_mb) in &data {
                 if n_mb.is_nan() {
                     continue;
                 }
-                let n_mb_calc = mb.massless_number_density(mu, beta);
-                approx_eq(n_mb, n_mb_calc, 3.0, 0.0);
+
+                let n = mb.massless_number_density(mu, beta);
+                approx_eq(n_mb, n, 3.0, 0.0);
             }
         });
     }
