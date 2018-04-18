@@ -40,9 +40,10 @@ pub(crate) fn linear(data: &[(f64, f64)], x: f64) -> f64 {
 
 #[cfg(test)]
 mod test {
-    const DATA: [(f64, f64); 4] = [(0.0, 0.0), (1.0, 1.0), (10.0, 0.0), (20.0, 1.0)];
     use std::f64;
     use utilities::test::*;
+
+    pub(crate) const DATA: [(f64, f64); 4] = [(0.0, 0.0), (1.0, 1.0), (10.0, 0.0), (20.0, 1.0)];
 
     #[test]
     fn linear() {
@@ -74,8 +75,9 @@ mod test {
 #[cfg(feature = "nightly")]
 #[cfg(test)]
 mod bench {
-    use test::Bencher;
     use std::f64;
+    use test::Bencher;
+    use utilities::test::*;
 
     macro_rules! linear {
         ($f:ident, $n:expr) => {
@@ -91,7 +93,7 @@ mod bench {
                     for i in 0..100_001 {
                         let x = i as f64 / 100_000.0;
                         let y = i as f64 / 100_000.0;
-                        approx_eq(super::linear(&DATA, x), y, 10.0, 0.0);
+                        approx_eq(super::linear(&data, x), y, 10.0, 0.0);
                     }
                 });
             }
