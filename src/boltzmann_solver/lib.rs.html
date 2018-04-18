@@ -83,9 +83,19 @@
 <span id="27">27</span>
 <span id="28">28</span>
 <span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
 </pre><pre class="rust ">
+<span class="doccomment">//! # `boltzmann-solver` provides functionalities to solve Boltzmann equation in</span>
+<span class="doccomment">//! the context of particle physics / early cosmology.</span>
+
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>, <span class="ident">feature</span>(<span class="ident">test</span>))]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>, <span class="ident">allow</span>(<span class="ident">unreadable_literal</span>))]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;strict&quot;</span>, <span class="ident">deny</span>(<span class="ident">missing_docs</span>))]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;strict&quot;</span>, <span class="ident">deny</span>(<span class="ident">warnings</span>))]</span>
 
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">log</span>;
@@ -102,17 +112,17 @@
     )
 }
 
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">debug_assert_info</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cond</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">tt</span>)<span class="op">+</span>) <span class="op">=&gt;</span> (
-        <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">debug_assertions</span>) <span class="op">&amp;&amp;</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cond</span>) {
-            <span class="macro">info</span><span class="macro">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>,)<span class="kw-2">*</span>);
-        }
-    )
-}
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">constants</span>;
+<span class="kw">mod</span> <span class="ident">standard_model</span>;
+<span class="kw">mod</span> <span class="ident">statistic</span>;
+<span class="kw">mod</span> <span class="ident">universe</span>;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">common</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">standard_model</span>::<span class="ident">StandardModel</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">statistic</span>::<span class="ident">Statistic</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">universe</span>::{<span class="ident">SingleSpecies</span>, <span class="ident">Universe</span>};
+
+<span class="comment">// pub mod common;</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">utilities</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span>;
 </pre>
 </section>
     <section id='search' class="content hidden"></section>
