@@ -39,7 +39,7 @@ mod test {
 
     #[test]
     fn sm_plain() {
-        let sm = StandardModel::default();
+        let sm = StandardModel::new();
         let expected = [
             (10000., 4.78),
             (3981.0717055349724, 8.166790484506452),
