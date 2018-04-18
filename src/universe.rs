@@ -48,6 +48,23 @@ pub trait Universe {
     }
 }
 
+/// Contribution from a single particle in the Universe.
+///
+/// The particle can be either a fermion or boson with arbitrary (non-integral)
+/// degrees of freedom.  The degrees of freedom are (typically):
+///
+/// - 2 for a fermion;
+/// - 1 for a real scalar;
+/// - 2 for a complex scalar;
+/// - 2 for a massless boson;
+/// - 3 for a massive boson (dependent on the gauge).
+///
+/// The contribution of the particle to the entropy of the Universe is based on
+/// the data from [`arXiv:1609.04979`](https://arxiv.org/abs/1609.04979).
+///
+/// Note that this always assumes the particle to be free and does not work if
+/// the particle forms bound states below a particular energy scale (such as
+/// with coloured particles in the Standard Model).
 pub struct SingleSpecies {
     statistic: Statistic,
     mass: f64,
@@ -55,6 +72,8 @@ pub struct SingleSpecies {
 }
 
 impl SingleSpecies {
+    /// Create a new particle with the specified statistic, mass and degrees of
+    /// freedom.
     pub fn new(statistic: Statistic, mass: f64, dof: f64) -> Self {
         SingleSpecies {
             statistic,

@@ -18,6 +18,7 @@ use utilities::interpolation;
 pub struct StandardModel;
 
 impl StandardModel {
+    /// Create an instance of the Standard Model.
     pub fn new() -> Self {
         StandardModel::default()
     }

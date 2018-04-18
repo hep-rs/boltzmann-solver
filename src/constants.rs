@@ -1,3 +1,10 @@
+//! Predefined constants.
+//!
+//! Although computing some of these values is generally very fast (e.g. `PI_2
+//! == PI.powi(2)`), it will be slightly faster to use pre-defined constant
+//! which, in certain performance-sensitive functions, can result in an
+//! appreciable performance improvement.
+
 /// Planck mass, \\(M_{\text{Pl}} = \sqrt{\hbar c / G}\\), in units of GeV /
 /// \\(c\^2\\).
 ///
@@ -17,6 +24,7 @@ pub const ZETA_3: f64 = 1.2020569031595942854;
 
 /// \\(\pi\\)
 pub const PI: f64 = ::std::f64::consts::PI;
+/// \\(\pi\\), with a different name to follow the convention for `PI_n`.
 pub const PI_1: f64 = PI;
 /// \\(\pi\^2\\)
 pub const PI_2: f64 = 9.8696044010893586188;

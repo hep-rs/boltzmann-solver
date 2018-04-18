@@ -3,13 +3,38 @@ use std::f64;
 
 use constants::{PI_2, ZETA_3};
 
+/// The statistics which describe the distribution of particles over energy
+/// states.  Both Fermi--Dirac and Bose--Einstein quantum statistics are
+/// implemented, as well as the classical Maxwell--Boltzmann statistic.
 pub enum Statistic {
+    /// Fermi--Dirac statistic describing half-integer-spin particles:
+    ///
+    /// \\[
+    ///   f_{\textsc{fd}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.
+    /// \\]
     FermiDirac,
+    /// Bose--Einstein statistic describing integer-spin particles:
+    ///
+    /// \\[
+    ///   f_{\textsc{be}} = \frac{1}{\exp[(E - \mu) \beta] - 1}.
+    /// \\]
     BoseEinstein,
+    /// Maxwell--Boltzmann statistic describing classical particles:
+    ///
+    /// \\[
+    ///   f_{\textsc{mb}} = \exp[-(E - \mu) \beta]
+    /// \\]
     MaxwellBoltzmann,
 }
 
 impl Statistic {
+    /// Evaluate the phase space distribution, \\(f\\).  They are defined as:
+    ///
+    /// \\[
+    ///   f_{\textsc{fd}} = \frac{1}{\exp[(E - \mu) \beta] + 1};
+    ///   f_{\textsc{be}} = \frac{1}{\exp[(E - \mu) \beta] - 1}; \quad \text{and}
+    ///   f_{\textsc{mb}} = \exp[-(E - \mu) \beta].
+    /// \\]
     pub fn phase_space(&self, e: f64, mu: f64, beta: f64) -> f64 {
         match *self {
             Statistic::FermiDirac => 1.0 / (f64::exp((e - mu) * beta) + 1.0),
