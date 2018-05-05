@@ -57,13 +57,17 @@ pub(crate) fn approx_eq(a: f64, b: f64, precision: f64, abs: f64) {
     let p = (a_scaled - b_scaled).abs();
     if p <= 10f64.powf(-precision) {
         debug!(
-            "a and b have the necessary precision ({} ≥ {})",
+            "a ({:e}) and b ({:e}) have the necessary precision ({:.3} ≥ {:.3})",
+            a,
+            b,
             -p.log10(),
             precision
         );
     } else {
         panic!(
-            "a and b do not have the necessary precision ({} !≥ {})",
+            "a ({:e}) and b ({:e}) do not have the necessary precision ({:.3} !≥ {:.3})",
+            a,
+            b,
             -p.log10(),
             precision
         )

@@ -42,9 +42,8 @@ pub trait Universe {
             longer applies."
         );
 
-        // Prefactor: sqrt(pi^2 / 90) ≅ 0.3311529421932034
-        0.3311529421932034 * self.entropy_dof(beta)
-            / (constants::REDUCED_PLANCK_MASS * beta.powi(2))
+        // Prefactor: sqrt(pi^2 / 90) / REDUCED_PLANCK_MASS ≅ 1.35977e-19
+        1.35977e-19 * self.entropy_dof(beta) * beta.powi(-2)
     }
 }
 
@@ -96,6 +95,7 @@ impl Universe for SingleSpecies {
                     * interpolation::linear(&constants::BOSON_GSTAR, (self.mass * beta).ln()).exp()
             }
             Statistic::MaxwellBoltzmann => unimplemented!(),
+            Statistic::MaxwellJuttner => unimplemented!(),
         }
     }
 }
