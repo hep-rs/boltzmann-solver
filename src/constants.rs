@@ -1,9 +1,9 @@
-//! Predefined constants.
+//! Collection of physical and mathematical constants which appear frequently.
 //!
-//! Although computing some of these values is generally very fast (e.g. `PI_2
-//! == PI.powi(2)`), it will be slightly faster to use pre-defined constant
-//! which, in certain performance-sensitive functions, can result in an
-//! appreciable performance improvement.
+//! When implementing code that is numerically intensive, it advisable to
+//! collect all the constants into a single multiplicative constants; however,
+//! make sure to document in the code what the resulting 'magic number'
+//! corresponds to.
 
 /// Planck mass, \\(M_{\text{Pl}} = \sqrt{\hbar c / G}\\), in units of GeV /
 /// \\(c\^2\\).
@@ -19,19 +19,27 @@ pub const PLANCK_MASS: f64 = 1.220_910e19;
 /// \\(m_{\text{Pl}}\\), in contrast to the Planck mass \\(M_{\text{Pl}}\\).
 pub const REDUCED_PLANCK_MASS: f64 = 2.435_363e18;
 
-/// The Riemann zeta function evaluated at 3.
-pub const ZETA_3: f64 = 1.2020569031595942854;
+/// Riemann zeta function evaluated at 3: \\(\zeta(3) \approx 1.202\dots\\)
+pub const ZETA_3: f64 = 1.202056903159594285399738161511449990765;
 
 /// \\(\pi\\)
 pub const PI: f64 = ::std::f64::consts::PI;
-/// \\(\pi\\), with a different name to follow the convention for `PI_n`.
+/// \\(\pi\\) [named to follow the convention `PI_n`]
 pub const PI_1: f64 = PI;
 /// \\(\pi\^2\\)
-pub const PI_2: f64 = 9.8696044010893586188;
+pub const PI_2: f64 = 9.869604401089358618834490999876151135314;
+/// \\(\pi\^3\\)
+pub const PI_3: f64 = 3.100627668029982017547631506710139520223e1;
+/// \\(\pi\^4\\)
+pub const PI_4: f64 = 9.740909103400243723644033268870511124973e1;
 /// \\(\pi^{-1}\\)
-pub const PI_M1: f64 = 0.31830988618379067154;
+pub const PI_M1: f64 = 3.183098861837906715377675267450287240689e-1;
 /// \\(\pi^{-2}\\)
-pub const PI_M2: f64 = 0.10132118364233777144;
+pub const PI_M2: f64 = 1.013211836423377714438794632097276389044e-1;
+/// \\(\pi^{-3}\\)
+pub const PI_M3: f64 = 3.225153443319948918442205268856368859306e-2;
+/// \\(\pi^{-4}\\)
+pub const PI_M4: f64 = 1.026598225468433518915278326711869414183e-2;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Crate Constants
