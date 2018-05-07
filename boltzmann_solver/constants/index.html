@@ -59,11 +59,12 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/boltzmann_solver/constants.rs.html#1-156' title='goto source code'>[src]</a></span></h1>
-<div class='docblock'><p>Predefined constants.</p>
-<p>Although computing some of these values is generally very fast (e.g. <code>PI_2 == PI.powi(2)</code>), it will be slightly faster to use pre-defined constant
-which, in certain performance-sensitive functions, can result in an
-appreciable performance improvement.</p>
+               </span><a class='srclink' href='../../src/boltzmann_solver/constants.rs.html#1-164' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Collection of physical and mathematical constants which appear frequently.</p>
+<p>When implementing code that is numerically intensive, it advisable to
+collect all the constants into a single multiplicative constants; however,
+make sure to document in the code what the resulting 'magic number'
+corresponds to.</p>
 </div><h2 id='constants' class='section-header'><a href="#constants">Constants</a></h2>
 <table>
                        <tr class=' module-item'>
@@ -78,7 +79,7 @@ appreciable performance improvement.</p>
                            <td><a class="constant" href="constant.PI_1.html"
                                   title='constant boltzmann_solver::constants::PI_1'>PI_1</a></td>
                            <td class='docblock-short'>
-                                <p>\(\pi\), with a different name to follow the convention for <code>PI_n</code>.</p>
+                                <p>\(\pi\) [named to follow the convention <code>PI_n</code>]</p>
 
                            </td>
                        </tr>
@@ -87,6 +88,22 @@ appreciable performance improvement.</p>
                                   title='constant boltzmann_solver::constants::PI_2'>PI_2</a></td>
                            <td class='docblock-short'>
                                 <p>\(\pi^2\)</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.PI_3.html"
+                                  title='constant boltzmann_solver::constants::PI_3'>PI_3</a></td>
+                           <td class='docblock-short'>
+                                <p>\(\pi^3\)</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.PI_4.html"
+                                  title='constant boltzmann_solver::constants::PI_4'>PI_4</a></td>
+                           <td class='docblock-short'>
+                                <p>\(\pi^4\)</p>
 
                            </td>
                        </tr>
@@ -103,6 +120,22 @@ appreciable performance improvement.</p>
                                   title='constant boltzmann_solver::constants::PI_M2'>PI_M2</a></td>
                            <td class='docblock-short'>
                                 <p>\(\pi^{-2}\)</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.PI_M3.html"
+                                  title='constant boltzmann_solver::constants::PI_M3'>PI_M3</a></td>
+                           <td class='docblock-short'>
+                                <p>\(\pi^{-3}\)</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.PI_M4.html"
+                                  title='constant boltzmann_solver::constants::PI_M4'>PI_M4</a></td>
+                           <td class='docblock-short'>
+                                <p>\(\pi^{-4}\)</p>
 
                            </td>
                        </tr>
@@ -128,7 +161,7 @@ units of GeV / \(c^2\).</p>
                            <td><a class="constant" href="constant.ZETA_3.html"
                                   title='constant boltzmann_solver::constants::ZETA_3'>ZETA_3</a></td>
                            <td class='docblock-short'>
-                                <p>The Riemann zeta function evaluated at 3.</p>
+                                <p>Riemann zeta function evaluated at 3: \(\zeta(3) \approx 1.202\dots\)</p>
 
                            </td>
                        </tr></table></section>

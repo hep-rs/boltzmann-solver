@@ -33,7 +33,7 @@
     <nav class="sidebar">
         <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'>Enum Statistic</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#variants">Variants</a><div class="sidebar-links"><a href="#variant.FermiDirac">FermiDirac</a><a href="#variant.BoseEinstein">BoseEinstein</a><a href="#variant.MaxwellBoltzmann">MaxwellBoltzmann</a></div><a class="sidebar-title" href="#methods">Methods</a><div class="sidebar-links"><a href="#method.phase_space">phase_space</a><a href="#method.number_density">number_density</a><a href="#method.massless_number_density">massless_number_density</a></div></div><p class='location'><a href='index.html'>boltzmann_solver</a></p><script>window.sidebarCurrent = {name: 'Statistic', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
+        <p class='location'>Enum Statistic</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#variants">Variants</a><div class="sidebar-links"><a href="#variant.FermiDirac">FermiDirac</a><a href="#variant.BoseEinstein">BoseEinstein</a><a href="#variant.MaxwellBoltzmann">MaxwellBoltzmann</a><a href="#variant.MaxwellJuttner">MaxwellJuttner</a></div><a class="sidebar-title" href="#methods">Methods</a><div class="sidebar-links"><a href="#method.phase_space">phase_space</a><a href="#method.number_density">number_density</a><a href="#method.massless_number_density">massless_number_density</a></div></div><p class='location'><a href='index.html'>boltzmann_solver</a></p><script>window.sidebarCurrent = {name: 'Statistic', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
     </nav>
 
     <div class="theme-picker">
@@ -59,11 +59,12 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/boltzmann_solver/statistic.rs.html#9-28' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../src/boltzmann_solver/statistic.rs.html#10-35' title='goto source code'>[src]</a></span></h1>
 <pre class='rust enum'>pub enum Statistic {
     FermiDirac,
     BoseEinstein,
     MaxwellBoltzmann,
+    MaxwellJuttner,
 }</pre><div class='docblock'><p>The statistics which describe the distribution of particles over energy
 states.  Both Fermi--Dirac and Bose--Einstein quantum statistics are
 implemented, as well as the classical Maxwell--Boltzmann statistic.</p>
@@ -71,32 +72,31 @@ implemented, as well as the classical Maxwell--Boltzmann statistic.</p>
                    Variants<a href='#variants' class='anchor'></a></h2>
 <span id="variant.FermiDirac" class="variant small-section-header"><a href="#variant.FermiDirac" class="anchor field"></a><span id='FermiDirac.v' class='invisible'><code>FermiDirac</code></span></span><div class='docblock'><p>Fermi--Dirac statistic describing half-integer-spin particles:</p>
 <p>\[
-f_{\textsc{fd}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.
+f_{\textsc{FD}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.
 \]</p>
 </div><span id="variant.BoseEinstein" class="variant small-section-header"><a href="#variant.BoseEinstein" class="anchor field"></a><span id='BoseEinstein.v' class='invisible'><code>BoseEinstein</code></span></span><div class='docblock'><p>Bose--Einstein statistic describing integer-spin particles:</p>
 <p>\[
-f_{\textsc{be}} = \frac{1}{\exp[(E - \mu) \beta] - 1}.
+f_{\textsc{BE}} = \frac{1}{\exp[(E - \mu) \beta] - 1}.
 \]</p>
 </div><span id="variant.MaxwellBoltzmann" class="variant small-section-header"><a href="#variant.MaxwellBoltzmann" class="anchor field"></a><span id='MaxwellBoltzmann.v' class='invisible'><code>MaxwellBoltzmann</code></span></span><div class='docblock'><p>Maxwell--Boltzmann statistic describing classical particles:</p>
 <p>\[
-f_{\textsc{mb}} = \exp[-(E - \mu) \beta]
+f_{\textsc{MB}} = \exp[-(E - \mu) \beta].
+\]</p>
+</div><span id="variant.MaxwellJuttner" class="variant small-section-header"><a href="#variant.MaxwellJuttner" class="anchor field"></a><span id='MaxwellJuttner.v' class='invisible'><code>MaxwellJuttner</code></span></span><div class='docblock'><p>Maxwell--Jüttner statistic describing relativistic classical particles:</p>
+<p>\[
+f_{\textsc{MJ}} = \frac{E \beta \sqrt{E^2 - m^2}}{m K_2(m \beta)} \exp[- E \beta].
 \]</p>
 </div>
                     <h2 id='methods' class='small-section-header'>
                       Methods<a href='#methods' class='anchor'></a>
                     </h2>
-                <h3 id='impl' class='impl'><span class='in-band'><code>impl <a class="enum" href="../boltzmann_solver/enum.Statistic.html" title="enum boltzmann_solver::Statistic">Statistic</a></code><a href='#impl' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/boltzmann_solver/statistic.rs.html#30-149' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.phase_space' class="method"><span id='phase_space.v' class='invisible'><code>pub fn <a href='#method.phase_space' class='fnname'>phase_space</a>(&amp;self, e: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/boltzmann_solver/statistic.rs.html#38-44' title='goto source code'>[src]</a></span></h4>
-<div class='docblock'><p>Evaluate the phase space distribution, \(f\).  They are defined as:</p>
-<p>\[
-f_{\textsc{fd}} = \frac{1}{\exp[(E - \mu) \beta] + 1};
-f_{\textsc{be}} = \frac{1}{\exp[(E - \mu) \beta] - 1}; \quad \text{and}
-f_{\textsc{mb}} = \exp[-(E - \mu) \beta].
-\]</p>
-</div><h4 id='method.number_density' class="method"><span id='number_density.v' class='invisible'><code>pub fn <a href='#method.number_density' class='fnname'>number_density</a>(&amp;self, mass: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/boltzmann_solver/statistic.rs.html#65-121' title='goto source code'>[src]</a></span></h4>
+                <h3 id='impl' class='impl'><span class='in-band'><code>impl <a class="enum" href="../boltzmann_solver/enum.Statistic.html" title="enum boltzmann_solver::Statistic">Statistic</a></code><a href='#impl' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/boltzmann_solver/statistic.rs.html#37-165' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.phase_space' class="method"><span id='phase_space.v' class='invisible'><code>pub fn <a href='#method.phase_space' class='fnname'>phase_space</a>(&amp;self, e: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, m: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/boltzmann_solver/statistic.rs.html#39-49' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Evaluate the phase space distribution, \(f\) as defined above.</p>
+</div><h4 id='method.number_density' class="method"><span id='number_density.v' class='invisible'><code>pub fn <a href='#method.number_density' class='fnname'>number_density</a>(&amp;self, mass: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/boltzmann_solver/statistic.rs.html#70-136' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Return number density for a particle following the specified statistic.</p>
 <p>\[
-n = \frac{1}{2 \pi^2} \int_{m}^{\infty} f(u, \mu, \beta) u \sqrt{u^2 - m^2} \dd u
+n = \frac{1}{2 \pi^2} \int_{m}^{\infty} f_{i} u \sqrt{u^2 - m^2} \dd u
 \]</p>
 <h1 id="implementation-details" class="section-header"><a href="#implementation-details">Implementation Details</a></h1>
 <p>If an analytic closed form is available for the integral, it will be
@@ -108,11 +108,11 @@ u \to m + \frac{t}{1 - t}, \qquad \dd u \to \frac{\dd t}{(t - 1)^2}
 \]</p>
 <p>is used such that the bounds of the integral over \(t\) are \([0,
 1]\).</p>
-</div><h4 id='method.massless_number_density' class="method"><span id='massless_number_density.v' class='invisible'><code>pub fn <a href='#method.massless_number_density' class='fnname'>massless_number_density</a>(&amp;self, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/boltzmann_solver/statistic.rs.html#134-148' title='goto source code'>[src]</a></span></h4>
+</div><h4 id='method.massless_number_density' class="method"><span id='massless_number_density.v' class='invisible'><code>pub fn <a href='#method.massless_number_density' class='fnname'>massless_number_density</a>(&amp;self, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/boltzmann_solver/statistic.rs.html#149-164' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Return number density for a massless particle following the specified
 statistic.</p>
 <p>\[
-n = \frac{1}{2 \pi^2} \int_{0}^{\infty} f(u, \mu, \beta) u^2 \dd u
+n = \frac{1}{2 \pi^2} \int_{0}^{\infty} f_{i} u^2 \dd u
 \]</p>
 <p>This is theoretically equivalent to setting <code>mass = 0</code> in
 [<code>Statistic::number_density</code>]; however, as there are analytic closed

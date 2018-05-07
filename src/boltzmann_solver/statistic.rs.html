@@ -479,100 +479,12 @@
 <span id="423">423</span>
 <span id="424">424</span>
 <span id="425">425</span>
-<span id="426">426</span>
-<span id="427">427</span>
-<span id="428">428</span>
-<span id="429">429</span>
-<span id="430">430</span>
-<span id="431">431</span>
-<span id="432">432</span>
-<span id="433">433</span>
-<span id="434">434</span>
-<span id="435">435</span>
-<span id="436">436</span>
-<span id="437">437</span>
-<span id="438">438</span>
-<span id="439">439</span>
-<span id="440">440</span>
-<span id="441">441</span>
-<span id="442">442</span>
-<span id="443">443</span>
-<span id="444">444</span>
-<span id="445">445</span>
-<span id="446">446</span>
-<span id="447">447</span>
-<span id="448">448</span>
-<span id="449">449</span>
-<span id="450">450</span>
-<span id="451">451</span>
-<span id="452">452</span>
-<span id="453">453</span>
-<span id="454">454</span>
-<span id="455">455</span>
-<span id="456">456</span>
-<span id="457">457</span>
-<span id="458">458</span>
-<span id="459">459</span>
-<span id="460">460</span>
-<span id="461">461</span>
-<span id="462">462</span>
-<span id="463">463</span>
-<span id="464">464</span>
-<span id="465">465</span>
-<span id="466">466</span>
-<span id="467">467</span>
-<span id="468">468</span>
-<span id="469">469</span>
-<span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
-<span id="474">474</span>
-<span id="475">475</span>
-<span id="476">476</span>
-<span id="477">477</span>
-<span id="478">478</span>
-<span id="479">479</span>
-<span id="480">480</span>
-<span id="481">481</span>
-<span id="482">482</span>
-<span id="483">483</span>
-<span id="484">484</span>
-<span id="485">485</span>
-<span id="486">486</span>
-<span id="487">487</span>
-<span id="488">488</span>
-<span id="489">489</span>
-<span id="490">490</span>
-<span id="491">491</span>
-<span id="492">492</span>
-<span id="493">493</span>
-<span id="494">494</span>
-<span id="495">495</span>
-<span id="496">496</span>
-<span id="497">497</span>
-<span id="498">498</span>
-<span id="499">499</span>
-<span id="500">500</span>
-<span id="501">501</span>
-<span id="502">502</span>
-<span id="503">503</span>
-<span id="504">504</span>
-<span id="505">505</span>
-<span id="506">506</span>
-<span id="507">507</span>
-<span id="508">508</span>
-<span id="509">509</span>
-<span id="510">510</span>
-<span id="511">511</span>
-<span id="512">512</span>
-<span id="513">513</span>
-<span id="514">514</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">quadrature</span>::<span class="ident">integrate</span>;
+<span class="kw">use</span> <span class="ident">special_functions</span>::{<span class="ident">bessel</span>, <span class="ident">polylog</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f64</span>;
 
-<span class="kw">use</span> <span class="ident">constants</span>::{<span class="ident">PI_2</span>, <span class="ident">ZETA_3</span>};
+<span class="kw">use</span> <span class="ident">constants</span>::<span class="ident">PI_M2</span>;
 
 <span class="doccomment">/// The statistics which describe the distribution of particles over energy</span>
 <span class="doccomment">/// states.  Both Fermi--Dirac and Bose--Einstein quantum statistics are</span>
@@ -581,43 +493,47 @@
     <span class="doccomment">/// Fermi--Dirac statistic describing half-integer-spin particles:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// \\[</span>
-    <span class="doccomment">///   f_{\textsc{fd}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.</span>
+    <span class="doccomment">///   f_{\textsc{FD}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.</span>
     <span class="doccomment">/// \\]</span>
     <span class="ident">FermiDirac</span>,
     <span class="doccomment">/// Bose--Einstein statistic describing integer-spin particles:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// \\[</span>
-    <span class="doccomment">///   f_{\textsc{be}} = \frac{1}{\exp[(E - \mu) \beta] - 1}.</span>
+    <span class="doccomment">///   f_{\textsc{BE}} = \frac{1}{\exp[(E - \mu) \beta] - 1}.</span>
     <span class="doccomment">/// \\]</span>
     <span class="ident">BoseEinstein</span>,
     <span class="doccomment">/// Maxwell--Boltzmann statistic describing classical particles:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// \\[</span>
-    <span class="doccomment">///   f_{\textsc{mb}} = \exp[-(E - \mu) \beta]</span>
+    <span class="doccomment">///   f_{\textsc{MB}} = \exp[-(E - \mu) \beta].</span>
     <span class="doccomment">/// \\]</span>
     <span class="ident">MaxwellBoltzmann</span>,
+    <span class="doccomment">/// Maxwell--Jüttner statistic describing relativistic classical particles:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// \\[</span>
+    <span class="doccomment">///   f_{\textsc{MJ}} = \frac{E \beta \sqrt{E\^2 - m^2}}{m K_2(m \beta)} \exp[- E \beta].</span>
+    <span class="doccomment">/// \\]</span>
+    <span class="ident">MaxwellJuttner</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Statistic</span> {
-    <span class="doccomment">/// Evaluate the phase space distribution, \\(f\\).  They are defined as:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// \\[</span>
-    <span class="doccomment">///   f_{\textsc{fd}} = \frac{1}{\exp[(E - \mu) \beta] + 1};</span>
-    <span class="doccomment">///   f_{\textsc{be}} = \frac{1}{\exp[(E - \mu) \beta] - 1}; \quad \text{and}</span>
-    <span class="doccomment">///   f_{\textsc{mb}} = \exp[-(E - \mu) \beta].</span>
-    <span class="doccomment">/// \\]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">phase_space</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">e</span>: <span class="ident">f64</span>, <span class="ident">mu</span>: <span class="ident">f64</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
+    <span class="doccomment">/// Evaluate the phase space distribution, \\(f\\) as defined above.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">phase_space</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">e</span>: <span class="ident">f64</span>, <span class="ident">m</span>: <span class="ident">f64</span>, <span class="ident">mu</span>: <span class="ident">f64</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="ident">Statistic</span>::<span class="ident">FermiDirac</span> <span class="op">=&gt;</span> <span class="number">1.0</span> <span class="op">/</span> (<span class="ident">f64</span>::<span class="ident">exp</span>((<span class="ident">e</span> <span class="op">-</span> <span class="ident">mu</span>) <span class="op">*</span> <span class="ident">beta</span>) <span class="op">+</span> <span class="number">1.0</span>),
             <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span> <span class="op">=&gt;</span> <span class="number">1.0</span> <span class="op">/</span> (<span class="ident">f64</span>::<span class="ident">exp</span>((<span class="ident">e</span> <span class="op">-</span> <span class="ident">mu</span>) <span class="op">*</span> <span class="ident">beta</span>) <span class="op">-</span> <span class="number">1.0</span>),
             <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span> <span class="op">=&gt;</span> <span class="ident">f64</span>::<span class="ident">exp</span>(<span class="op">-</span>(<span class="ident">e</span> <span class="op">-</span> <span class="ident">mu</span>) <span class="op">*</span> <span class="ident">beta</span>),
+            <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span> <span class="op">=&gt;</span> {
+                <span class="ident">beta</span> <span class="op">*</span> <span class="ident">e</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">sqrt</span>(<span class="ident">e</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="ident">m</span>.<span class="ident">powi</span>(<span class="number">2</span>)) <span class="op">*</span> (<span class="op">-</span><span class="ident">e</span> <span class="op">*</span> <span class="ident">beta</span>).<span class="ident">exp</span>()
+                    <span class="op">/</span> (<span class="ident">m</span> <span class="op">*</span> <span class="ident">bessel</span>::<span class="ident">k_2</span>(<span class="ident">m</span> <span class="op">*</span> <span class="ident">beta</span>))
+            }
         }
     }
 
     <span class="doccomment">/// Return number density for a particle following the specified statistic.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// \\[</span>
-    <span class="doccomment">///    n = \frac{1}{2 \pi\^2} \int_{m}\^{\infty} f(u, \mu, \beta) u \sqrt{u\^2 - m\^2} \dd u</span>
+    <span class="doccomment">///    n = \frac{1}{2 \pi\^2} \int_{m}\^{\infty} f_{i} u \sqrt{u\^2 - m\^2} \dd u</span>
     <span class="doccomment">/// \\]</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Implementation Details</span>
@@ -654,14 +570,19 @@
                         <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">mass</span> <span class="op">+</span> <span class="ident">t</span> <span class="op">/</span> (<span class="number">1.0</span> <span class="op">-</span> <span class="ident">t</span>);
                         <span class="kw">let</span> <span class="ident">dudt</span> <span class="op">=</span> (<span class="ident">t</span> <span class="op">-</span> <span class="number">1.0</span>).<span class="ident">powi</span>(<span class="op">-</span><span class="number">2</span>);
 
-                        <span class="self">self</span>.<span class="ident">phase_space</span>(<span class="ident">u</span>, <span class="ident">mu</span>, <span class="ident">beta</span>) <span class="op">*</span> <span class="ident">u</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">sqrt</span>(<span class="ident">u</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="ident">mass</span>.<span class="ident">powi</span>(<span class="number">2</span>))
-                            <span class="op">*</span> <span class="ident">dudt</span>
+                        <span class="self">self</span>.<span class="ident">phase_space</span>(<span class="ident">u</span>, <span class="ident">mass</span>, <span class="ident">mu</span>, <span class="ident">beta</span>) <span class="op">*</span> <span class="ident">u</span>
+                            <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">sqrt</span>(<span class="ident">u</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="ident">mass</span>.<span class="ident">powi</span>(<span class="number">2</span>)) <span class="op">*</span> <span class="ident">dudt</span>
                     },
                     <span class="number">0.0</span>,
                     <span class="number">1.0</span>,
-                    <span class="number">1e-8</span>,
-                ).<span class="ident">integral</span>;
-                <span class="ident">integral</span> <span class="op">/</span> (<span class="number">2.0</span> <span class="op">*</span> <span class="ident">PI_2</span>)
+                    <span class="number">1e-12</span>,
+                );
+                <span class="macro">debug</span><span class="macro">!</span>(
+                    <span class="string">&quot;Fermi–Dirac integral: {:e} ± {:e} ({} function evaluations)&quot;</span>,
+                    <span class="ident">integral</span>.<span class="ident">integral</span>, <span class="ident">integral</span>.<span class="ident">error_estimate</span>, <span class="ident">integral</span>.<span class="ident">num_function_evaluations</span>
+                );
+                <span class="comment">// 1/(2 π²) ≅ 0.050660591821168885722</span>
+                <span class="number">0.050660591821168885722</span> <span class="op">*</span> <span class="ident">integral</span>.<span class="ident">integral</span>
             }
             <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span> <span class="op">=&gt;</span> {
                 <span class="kw">let</span> <span class="ident">integral</span> <span class="op">=</span> <span class="ident">integrate</span>(
@@ -669,24 +590,29 @@
                         <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">mass</span> <span class="op">+</span> <span class="ident">t</span> <span class="op">/</span> (<span class="number">1.0</span> <span class="op">-</span> <span class="ident">t</span>);
                         <span class="kw">let</span> <span class="ident">dudt</span> <span class="op">=</span> (<span class="ident">t</span> <span class="op">-</span> <span class="number">1.0</span>).<span class="ident">powi</span>(<span class="op">-</span><span class="number">2</span>);
 
-                        <span class="self">self</span>.<span class="ident">phase_space</span>(<span class="ident">u</span>, <span class="ident">mu</span>, <span class="ident">beta</span>) <span class="op">*</span> <span class="ident">u</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">sqrt</span>(<span class="ident">u</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="ident">mass</span>.<span class="ident">powi</span>(<span class="number">2</span>))
-                            <span class="op">*</span> <span class="ident">dudt</span>
+                        <span class="self">self</span>.<span class="ident">phase_space</span>(<span class="ident">u</span>, <span class="ident">mass</span>, <span class="ident">mu</span>, <span class="ident">beta</span>) <span class="op">*</span> <span class="ident">u</span>
+                            <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">sqrt</span>(<span class="ident">u</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="ident">mass</span>.<span class="ident">powi</span>(<span class="number">2</span>)) <span class="op">*</span> <span class="ident">dudt</span>
                     },
                     <span class="number">0.0</span>,
                     <span class="number">1.0</span>,
-                    <span class="number">1e-8</span>,
-                ).<span class="ident">integral</span>;
-                <span class="ident">integral</span> <span class="op">/</span> (<span class="number">2.0</span> <span class="op">*</span> <span class="ident">PI_2</span>)
+                    <span class="number">1e-12</span>,
+                );
+                <span class="macro">debug</span><span class="macro">!</span>(
+                    <span class="string">&quot;Bose–Einstein integral: {:e} ± {:e} ({} function evaluations)&quot;</span>,
+                    <span class="ident">integral</span>.<span class="ident">integral</span>, <span class="ident">integral</span>.<span class="ident">error_estimate</span>, <span class="ident">integral</span>.<span class="ident">num_function_evaluations</span>
+                );
+                <span class="comment">// 1/(2 π²) ≅ 0.050660591821168885722</span>
+                <span class="number">0.050660591821168885722</span> <span class="op">*</span> <span class="ident">integral</span>.<span class="ident">integral</span>
             }
             <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span> <span class="op">=&gt;</span> {
-                <span class="comment">// Since K₂(x) exp(x) → 0 as x → ∞, we evaluate the bessel</span>
-                <span class="comment">// function first and check if it is zero</span>
-                <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="ident">besselk_2</span>(<span class="ident">mass</span> <span class="op">*</span> <span class="ident">beta</span>);
-                <span class="kw">if</span> <span class="ident">k</span> <span class="op">==</span> <span class="number">0.0</span> {
-                    <span class="number">0.0</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">mass</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">*</span> <span class="ident">k</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">exp</span>(<span class="ident">beta</span> <span class="op">*</span> <span class="ident">mu</span>) <span class="op">/</span> (<span class="number">2.0</span> <span class="op">*</span> <span class="ident">PI_2</span> <span class="op">*</span> <span class="ident">beta</span>)
-                }
+                <span class="comment">// 1/(2 π²) ≅ 0.050660591821168885722</span>
+                <span class="number">0.050660591821168885722</span> <span class="op">*</span> <span class="ident">mass</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">*</span> <span class="ident">bessel</span>::<span class="ident">k_2</span>(<span class="ident">mass</span> <span class="op">*</span> <span class="ident">beta</span>)
+                    <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">exp</span>(<span class="ident">mu</span> <span class="op">*</span> <span class="ident">beta</span>) <span class="op">/</span> <span class="ident">beta</span>
+            }
+            <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span> <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="ident">m_beta</span> <span class="op">=</span> <span class="ident">mass</span> <span class="op">*</span> <span class="ident">beta</span>;
+                <span class="ident">PI_M2</span> <span class="op">*</span> (<span class="ident">m_beta</span> <span class="op">+</span> <span class="number">2.0</span>) <span class="op">*</span> (<span class="ident">m_beta</span> <span class="op">*</span> (<span class="ident">m_beta</span> <span class="op">+</span> <span class="number">3.0</span>) <span class="op">+</span> <span class="number">6.0</span>)
+                    <span class="op">/</span> (<span class="ident">beta</span>.<span class="ident">powi</span>(<span class="number">4</span>) <span class="op">*</span> <span class="ident">mass</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">exp</span>(<span class="ident">m_beta</span>) <span class="op">*</span> <span class="ident">bessel</span>::<span class="ident">k_2</span>(<span class="ident">m_beta</span>))
             }
         }
     }
@@ -695,7 +621,7 @@
     <span class="doccomment">/// statistic.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// \\[</span>
-    <span class="doccomment">///    n = \frac{1}{2 \pi\^2} \int_{0}\^{\infty} f(u, \mu, \beta) u\^2 \dd u</span>
+    <span class="doccomment">///    n = \frac{1}{2 \pi\^2} \int_{0}\^{\infty} f_{i} u\^2 \dd u</span>
     <span class="doccomment">/// \\]</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is theoretically equivalent to setting `mass = 0` in</span>
@@ -706,170 +632,16 @@
         <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">beta</span> <span class="op">&gt;=</span> <span class="number">0.0</span>, <span class="string">&quot;β must be positive.&quot;</span>);
 
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Statistic</span>::<span class="ident">FermiDirac</span> <span class="op">=&gt;</span> <span class="ident">beta</span>.<span class="ident">powi</span>(<span class="op">-</span><span class="number">3</span>) <span class="op">*</span> <span class="ident">polylog3_fd</span>(<span class="ident">mu</span> <span class="op">*</span> <span class="ident">beta</span>) <span class="op">/</span> <span class="ident">PI_2</span>,
+            <span class="ident">Statistic</span>::<span class="ident">FermiDirac</span> <span class="op">=&gt;</span> <span class="ident">PI_M2</span> <span class="op">*</span> <span class="ident">polylog</span>::<span class="ident">fermi_dirac</span>(<span class="ident">mu</span> <span class="op">*</span> <span class="ident">beta</span>) <span class="op">*</span> <span class="ident">beta</span>.<span class="ident">powi</span>(<span class="op">-</span><span class="number">3</span>),
             <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span> <span class="op">=&gt;</span> {
                 <span class="macro">debug_assert</span><span class="macro">!</span>(
                     <span class="ident">mu</span> <span class="op">&lt;=</span> <span class="number">0.0</span>,
                     <span class="string">&quot;Bose–Einstein condensates (μ &gt; 0) are not supported.&quot;</span>
                 );
-                <span class="ident">beta</span>.<span class="ident">powi</span>(<span class="op">-</span><span class="number">3</span>) <span class="op">*</span> <span class="ident">polylog3_be</span>(<span class="ident">mu</span> <span class="op">*</span> <span class="ident">beta</span>) <span class="op">/</span> <span class="ident">PI_2</span>
+                <span class="ident">PI_M2</span> <span class="op">*</span> <span class="ident">polylog</span>::<span class="ident">bose_einstein</span>(<span class="ident">mu</span> <span class="op">*</span> <span class="ident">beta</span>) <span class="op">*</span> <span class="ident">beta</span>.<span class="ident">powi</span>(<span class="op">-</span><span class="number">3</span>)
             }
-            <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span> <span class="op">=&gt;</span> <span class="ident">f64</span>::<span class="ident">exp</span>(<span class="ident">mu</span> <span class="op">*</span> <span class="ident">beta</span>) <span class="op">/</span> (<span class="ident">PI_2</span> <span class="op">*</span> <span class="ident">beta</span>.<span class="ident">powi</span>(<span class="number">3</span>)),
-        }
-    }
-}
-
-<span class="comment">////////////////////////////////////////////////////////////////////////////////</span>
-<span class="comment">// Approximations of special functions</span>
-<span class="comment">////////////////////////////////////////////////////////////////////////////////</span>
-
-<span class="doccomment">/// Approximation of polylogarithm appearing in the Bose–Einstein statistics.</span>
-<span class="doccomment">/// Specifically, this approximates the function \\(\Li_{3} e\^x\\) for \\(x</span>
-<span class="doccomment">/// \leq 0\\).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The approximation is split in three regimes:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - \\(|x| \ll 1\\), where the Taylor series expansion around \\(x = 0\\) is</span>
-<span class="doccomment">///   used;</span>
-<span class="doccomment">/// - \\(|x| \approx 1\\), where a mini-max polynomial is used which ensures the</span>
-<span class="doccomment">///   error is spread over the whole interval and overall bias is minimized.</span>
-<span class="doccomment">///   (This is unlike a Taylor series where the error is minimized at a single</span>
-<span class="doccomment">///   point and increases (sometimes rapidly) everywhere else);</span>
-<span class="doccomment">/// - \\(|x| \gg 1\\), where the Taylor series expansion around \\(x = \infty\\)</span>
-<span class="doccomment">///   is used.</span>
-<span class="kw">fn</span> <span class="ident">polylog3_be</span>(<span class="ident">x</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
-    <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">x</span> <span class="op">&lt;=</span> <span class="number">0.0</span>, <span class="string">&quot;Argument must be negative&quot;</span>);
-
-    <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="op">-</span><span class="ident">x</span>;
-
-    <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="number">0.0</span> {
-        <span class="ident">ZETA_3</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="number">0.3</span> {
-        <span class="comment">// Use the Taylor series expansion around x = 0</span>
-        <span class="ident">ZETA_3</span> <span class="op">-</span> <span class="number">1.6449340668482264365</span> <span class="op">*</span> <span class="ident">x</span> <span class="op">+</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">*</span> (<span class="number">0.75</span> <span class="op">-</span> <span class="number">0.5</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">ln</span>()) <span class="op">+</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">3</span>) <span class="op">/</span> <span class="number">12.0</span>
-            <span class="op">-</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">4</span>) <span class="op">/</span> <span class="number">288.0</span> <span class="op">+</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">6</span>) <span class="op">/</span> <span class="number">86_400.0</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="number">2.9</span> {
-        <span class="comment">// Use an optimal rational approximation over the interval [0.3, 2.9].</span>
-        <span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span>
-            <span class="number">1.2017351736193496426</span> <span class="op">+</span> <span class="number">11.130386039166276983</span> <span class="op">*</span> <span class="ident">x</span> <span class="op">+</span> <span class="number">16.763142740004630592</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">2</span>)
-                <span class="op">-</span> <span class="number">3.5866918478417107386</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">3</span>) <span class="op">-</span> <span class="number">2.5677885464330382624</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">4</span>)
-                <span class="op">+</span> <span class="number">1.3990498418553116275</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">5</span>) <span class="op">-</span> <span class="number">0.31987635479827042139</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">6</span>)
-                <span class="op">+</span> <span class="number">0.041496218824634329175</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">7</span>)
-                <span class="op">-</span> <span class="number">0.0030484455959885731970</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">8</span>)
-                <span class="op">+</span> <span class="number">0.00010057186312115009437</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">9</span>);
-        <span class="kw">let</span> <span class="ident">denom</span> <span class="op">=</span>
-            <span class="number">1.0000000000000000000</span> <span class="op">+</span> <span class="number">10.610210615418754674</span> <span class="op">*</span> <span class="ident">x</span> <span class="op">+</span> <span class="number">26.459498162787458568</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">2</span>)
-                <span class="op">+</span> <span class="number">19.636027801659040900</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">3</span>) <span class="op">+</span> <span class="number">4.2282059978048909782</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">4</span>)
-                <span class="op">+</span> <span class="number">0.23347307007870895240</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">5</span>);
-
-        <span class="ident">num</span> <span class="op">/</span> <span class="ident">denom</span>
-    } <span class="kw">else</span> {
-        <span class="comment">// Use the Taylor series expansion around x = +∞</span>
-        <span class="kw">let</span> <span class="ident">ex</span> <span class="op">=</span> (<span class="op">-</span><span class="ident">x</span>).<span class="ident">exp</span>();
-
-        <span class="ident">ex</span> <span class="op">+</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">/</span> <span class="number">8.0</span> <span class="op">+</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">3</span>) <span class="op">/</span> <span class="number">27.0</span> <span class="op">+</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">3</span>) <span class="op">/</span> <span class="number">64.0</span> <span class="op">+</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">4</span>) <span class="op">/</span> <span class="number">64.0</span>
-            <span class="op">+</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">5</span>) <span class="op">/</span> <span class="number">125.0</span> <span class="op">+</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">6</span>) <span class="op">/</span> <span class="number">216.0</span> <span class="op">+</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">7</span>) <span class="op">/</span> <span class="number">343.0</span>
-    }
-}
-
-<span class="doccomment">/// Approximation of polylogarithm appearing in the Fermi–Dirac statistics.</span>
-<span class="doccomment">/// Specifically, this approximates the function \\(-\Li_{3} (-e\^x)\\) for all</span>
-<span class="doccomment">/// values of \\(x\\).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The approximation is split in three regimes:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - \\(|x| \ll 1\\), where the Taylor series expansion around \\(x = 0\\) is</span>
-<span class="doccomment">///   used;</span>
-<span class="doccomment">/// - \\(|x| \approx 1\\), where a mini-max polynomial is used which ensures the</span>
-<span class="doccomment">///   error is spread over the whole interval and overall bias is minimized.</span>
-<span class="doccomment">///   (This is unlike a Taylor series where the error is minimized at a single</span>
-<span class="doccomment">///   point and increases (sometimes rapidly) everywhere else);</span>
-<span class="doccomment">/// - \\(|x| \gg 1\\), where the Taylor series expansion around \\(x = \infty\\)</span>
-<span class="doccomment">///   is used.</span>
-<span class="kw">fn</span> <span class="ident">polylog3_fd</span>(<span class="ident">x</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
-    <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="op">-</span><span class="number">2.0</span> {
-        <span class="kw">let</span> <span class="ident">ex</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">exp</span>();
-
-        <span class="ident">ex</span> <span class="op">-</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">/</span> <span class="number">8.0</span> <span class="op">+</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">3</span>) <span class="op">/</span> <span class="number">27.0</span> <span class="op">-</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">4</span>) <span class="op">/</span> <span class="number">64.0</span> <span class="op">+</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">5</span>) <span class="op">/</span> <span class="number">125.0</span>
-            <span class="op">-</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">6</span>) <span class="op">/</span> <span class="number">216.0</span> <span class="op">+</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">7</span>) <span class="op">/</span> <span class="number">343.0</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="number">2.0</span> {
-        <span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span> <span class="number">0.90154267737269372427</span> <span class="op">+</span> <span class="number">0.79013622598610500367</span> <span class="op">*</span> <span class="ident">x</span>
-            <span class="op">+</span> <span class="number">0.38420797837830254983</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">2</span>)
-            <span class="op">+</span> <span class="number">0.13046328601539294844</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">3</span>)
-            <span class="op">+</span> <span class="number">0.032584861964205293045</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">4</span>)
-            <span class="op">+</span> <span class="number">0.0059836402495576932393</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">5</span>)
-            <span class="op">+</span> <span class="number">0.00077875163435983431872</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">6</span>)
-            <span class="op">+</span> <span class="number">0.000065184512549694586562</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">7</span>)
-            <span class="op">+</span> <span class="number">2.6706623808079665948e-6</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">8</span>);
-        <span class="kw">let</span> <span class="ident">denom</span> <span class="op">=</span> <span class="number">1.0000000000000000000</span> <span class="op">-</span> <span class="number">0.035861649682456530419</span> <span class="op">*</span> <span class="ident">x</span>
-            <span class="op">+</span> <span class="number">0.074460604357617095904</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">2</span>)
-            <span class="op">-</span> <span class="number">0.0018665084270511311858</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">3</span>)
-            <span class="op">+</span> <span class="number">0.00098246043925023765414</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">4</span>)
-            <span class="op">-</span> <span class="number">9.9993514636981945645e-6</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">5</span>);
-
-        <span class="ident">num</span> <span class="op">/</span> <span class="ident">denom</span>
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">ex</span> <span class="op">=</span> (<span class="op">-</span><span class="ident">x</span>).<span class="ident">exp</span>();
-
-        <span class="number">1.6449340668482264365</span> <span class="op">*</span> <span class="ident">x</span> <span class="op">+</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">3</span>) <span class="op">/</span> <span class="number">6.0</span> <span class="op">+</span> <span class="ident">ex</span> <span class="op">-</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">/</span> <span class="number">8.0</span> <span class="op">+</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">3</span>) <span class="op">/</span> <span class="number">27.0</span>
-            <span class="op">-</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">4</span>) <span class="op">/</span> <span class="number">64.0</span> <span class="op">+</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">5</span>) <span class="op">/</span> <span class="number">125.0</span> <span class="op">-</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">6</span>) <span class="op">/</span> <span class="number">216.0</span>
-            <span class="op">+</span> <span class="ident">ex</span>.<span class="ident">powi</span>(<span class="number">7</span>) <span class="op">/</span> <span class="number">343.0</span>
-    }
-}
-
-<span class="doccomment">/// Approximation of modified Bessel function \\(K_2(x)\\).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The approximation is split in three regimes:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - \\(|x| \ll 1\\), where the Taylor series expansion around \\(x = 0\\) is</span>
-<span class="doccomment">///   used;</span>
-<span class="doccomment">/// - \\(|x| \approx 1\\), where a mini-max polynomial is used which ensures the</span>
-<span class="doccomment">///   error is spread over the whole interval and overall bias is minimized.</span>
-<span class="doccomment">///   (This is unlike a Taylor series where the error is minimized at a single</span>
-<span class="doccomment">///   point and increases (sometimes rapidly) everywhere else);</span>
-<span class="doccomment">/// - \\(|x| \gg 1\\), where the Taylor series expansion around \\(x = \infty\\)</span>
-<span class="doccomment">///   is used.</span>
-<span class="kw">fn</span> <span class="ident">besselk_2</span>(<span class="ident">x</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
-    <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">x</span> <span class="op">&gt;=</span> <span class="number">0.0</span>, <span class="string">&quot;Argument of BesselK must be positive.&quot;</span>);
-
-    <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="number">0.0</span> {
-        <span class="kw">return</span> <span class="ident">f64</span>::<span class="ident">INFINITY</span>;
-    }
-
-    <span class="comment">// The approximation is done in the log-transformed variable (that is, the</span>
-    <span class="comment">// interpolation is of the function K₂(exp(x))).</span>
-    <span class="kw">let</span> <span class="ident">xln</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">ln</span>();
-
-    <span class="kw">if</span> <span class="ident">xln</span> <span class="op">&lt;</span> <span class="number">0.3</span> {
-        <span class="kw">let</span> <span class="ident">x2</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">2</span>);
-
-        <span class="op">-</span><span class="number">0.50000000000000000000</span> <span class="op">+</span> <span class="ident">x2</span> <span class="op">*</span> (<span class="number">0.10824143945730155610</span> <span class="op">-</span> <span class="number">0.12500000000000000000</span> <span class="op">*</span> <span class="ident">xln</span>)
-            <span class="op">+</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">x2</span>.<span class="ident">powi</span>(<span class="op">-</span><span class="number">1</span>)
-            <span class="op">+</span> <span class="ident">x2</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">*</span> (<span class="number">0.015964564399219574120</span> <span class="op">-</span> <span class="number">0.010416666666666666667</span> <span class="op">*</span> <span class="ident">xln</span>)
-            <span class="op">+</span> <span class="ident">x2</span>.<span class="ident">powi</span>(<span class="number">3</span>) <span class="op">*</span> (<span class="number">0.00062096294997561169124</span> <span class="op">-</span> <span class="number">0.00032552083333333333333</span> <span class="op">*</span> <span class="ident">xln</span>)
-            <span class="op">+</span> <span class="ident">x2</span>.<span class="ident">powi</span>(<span class="number">4</span>) <span class="op">*</span> (<span class="number">0.000011796141758852787447</span> <span class="op">-</span> <span class="number">5.4253472222222222222e-6</span> <span class="op">*</span> <span class="ident">xln</span>)
-            <span class="op">+</span> <span class="ident">x2</span>.<span class="ident">powi</span>(<span class="number">5</span>) <span class="op">*</span> (<span class="number">1.3465023364738628899e-7</span> <span class="op">-</span> <span class="number">5.6514033564814814815e-8</span> <span class="op">*</span> <span class="ident">xln</span>)
-            <span class="op">+</span> <span class="ident">x2</span>.<span class="ident">powi</span>(<span class="number">6</span>) <span class="op">*</span> (<span class="number">1.0309882406219202048e-9</span> <span class="op">-</span> <span class="number">4.0367166832010582011e-10</span> <span class="op">*</span> <span class="ident">xln</span>)
-            <span class="op">+</span> <span class="ident">x2</span>.<span class="ident">powi</span>(<span class="number">7</span>) <span class="op">*</span> (<span class="number">5.6763386749232758866e-12</span> <span class="op">-</span> <span class="number">2.1024566058338844797e-12</span> <span class="op">*</span> <span class="ident">xln</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">xln</span> <span class="op">&lt;</span> <span class="number">3.4</span> {
-        <span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span> <span class="op">-</span><span class="number">0.0000180238</span> <span class="op">*</span> <span class="ident">xln</span>.<span class="ident">powi</span>(<span class="number">8</span>) <span class="op">-</span> <span class="number">0.0000205089</span> <span class="op">*</span> <span class="ident">xln</span>.<span class="ident">powi</span>(<span class="number">7</span>)
-            <span class="op">+</span> <span class="number">0.00064349</span> <span class="op">*</span> <span class="ident">xln</span>.<span class="ident">powi</span>(<span class="number">6</span>) <span class="op">-</span> <span class="number">0.0178769</span> <span class="op">*</span> <span class="ident">xln</span>.<span class="ident">powi</span>(<span class="number">5</span>)
-            <span class="op">+</span> <span class="number">0.072644</span> <span class="op">*</span> <span class="ident">xln</span>.<span class="ident">powi</span>(<span class="number">4</span>) <span class="op">-</span> <span class="number">0.467429</span> <span class="op">*</span> <span class="ident">xln</span>.<span class="ident">powi</span>(<span class="number">3</span>)
-            <span class="op">+</span> <span class="number">0.78293</span> <span class="op">*</span> <span class="ident">xln</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="number">2.57649</span> <span class="op">*</span> <span class="ident">xln</span> <span class="op">+</span> <span class="number">0.485409</span>;
-        <span class="kw">let</span> <span class="ident">denom</span> <span class="op">=</span> <span class="number">0.0000176583</span> <span class="op">*</span> <span class="ident">xln</span>.<span class="ident">powi</span>(<span class="number">6</span>) <span class="op">-</span> <span class="number">0.000523792</span> <span class="op">*</span> <span class="ident">xln</span>.<span class="ident">powi</span>(<span class="number">5</span>)
-            <span class="op">+</span> <span class="number">0.00663565</span> <span class="op">*</span> <span class="ident">xln</span>.<span class="ident">powi</span>(<span class="number">4</span>) <span class="op">-</span> <span class="number">0.045622</span> <span class="op">*</span> <span class="ident">xln</span>.<span class="ident">powi</span>(<span class="number">3</span>)
-            <span class="op">+</span> <span class="number">0.177564</span> <span class="op">*</span> <span class="ident">xln</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="number">0.424493</span> <span class="op">*</span> <span class="ident">xln</span> <span class="op">+</span> <span class="number">1.0</span>;
-
-        (<span class="ident">num</span> <span class="op">/</span> <span class="ident">denom</span>).<span class="ident">exp</span>()
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">ex</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">exp</span>();
-        <span class="kw">if</span> <span class="ident">ex</span> <span class="op">==</span> <span class="ident">f64</span>::<span class="ident">INFINITY</span> {
-            <span class="number">0.0</span>
-        } <span class="kw">else</span> {
-            (<span class="number">1.4133050937925706925</span> <span class="op">-</span> <span class="number">0.64608232859088945941</span> <span class="op">*</span> <span class="ident">x</span> <span class="op">+</span> <span class="number">0.39758912528670120579</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">2</span>)
-                <span class="op">-</span> <span class="number">0.38554096997498298743</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">3</span>)
-                <span class="op">+</span> <span class="number">1.0281092532666212998</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">4</span>) <span class="op">+</span> <span class="number">2.3499640074665629710</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">5</span>)
-                <span class="op">+</span> <span class="number">1.2533141373155002512</span> <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powi</span>(<span class="number">6</span>)) <span class="op">/</span> (<span class="number">6.5</span> <span class="op">*</span> <span class="ident">xln</span>).<span class="ident">exp</span>() <span class="op">/</span> <span class="ident">ex</span>
+            <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span> <span class="op">=&gt;</span> <span class="ident">PI_M2</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">exp</span>(<span class="ident">mu</span> <span class="op">*</span> <span class="ident">beta</span>) <span class="op">*</span> <span class="ident">beta</span>.<span class="ident">powi</span>(<span class="op">-</span><span class="number">3</span>),
+            <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span> <span class="op">=&gt;</span> <span class="number">0.0</span>,
         }
     }
 }
@@ -881,28 +653,38 @@
     <span class="kw">use</span> <span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident">csv</span>;
 
+    <span class="kw">type</span> <span class="ident">Row6</span> <span class="op">=</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>);
+    <span class="kw">type</span> <span class="ident">Row7</span> <span class="op">=</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>);
+    <span class="kw">type</span> <span class="ident">Row8</span> <span class="op">=</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>);
+
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">phase_space</span>() {
         <span class="kw">let</span> <span class="ident">fd</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">FermiDirac</span>;
         <span class="kw">let</span> <span class="ident">be</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span>;
         <span class="kw">let</span> <span class="ident">mb</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span>;
+        <span class="kw">let</span> <span class="ident">mj</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/phase_space.csv&quot;</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">for</span> <span class="ident">result</span> <span class="kw">in</span> <span class="ident">rdr</span>.<span class="ident">deserialize</span>() {
-            <span class="kw">let</span> (<span class="ident">e</span>, <span class="ident">mu</span>, <span class="ident">beta</span>, <span class="ident">f_fd</span>, <span class="ident">f_be</span>, <span class="ident">f_mb</span>): (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap</span>();
+            <span class="kw">let</span> (<span class="ident">e</span>, <span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>, <span class="ident">f_fd</span>, <span class="ident">f_be</span>, <span class="ident">f_mb</span>, <span class="ident">f_mj</span>): <span class="ident">Row8</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap</span>();
+            <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;(e, m, μ, β) = ({:e}, {:e}, {:e}, {:e})&quot;</span>, <span class="ident">e</span>, <span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
 
             <span class="kw">if</span> <span class="op">!</span><span class="ident">f_fd</span>.<span class="ident">is_nan</span>() {
-                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">fd</span>.<span class="ident">phase_space</span>(<span class="ident">e</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
-                <span class="ident">approx_eq</span>(<span class="ident">f_fd</span>, <span class="ident">f</span>, <span class="number">10.0</span>, <span class="number">1e-50</span>);
+                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">fd</span>.<span class="ident">phase_space</span>(<span class="ident">e</span>, <span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
+                <span class="ident">approx_eq</span>(<span class="ident">f_fd</span>, <span class="ident">f</span>, <span class="number">10.0</span>, <span class="number">0.0</span>);
             }
             <span class="kw">if</span> <span class="op">!</span><span class="ident">f_be</span>.<span class="ident">is_nan</span>() {
-                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">be</span>.<span class="ident">phase_space</span>(<span class="ident">e</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
-                <span class="ident">approx_eq</span>(<span class="ident">f_be</span>, <span class="ident">f</span>, <span class="number">10.0</span>, <span class="number">1e-50</span>);
+                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">be</span>.<span class="ident">phase_space</span>(<span class="ident">e</span>, <span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
+                <span class="ident">approx_eq</span>(<span class="ident">f_be</span>, <span class="ident">f</span>, <span class="number">10.0</span>, <span class="number">0.0</span>);
             }
             <span class="kw">if</span> <span class="op">!</span><span class="ident">f_mb</span>.<span class="ident">is_nan</span>() {
-                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">mb</span>.<span class="ident">phase_space</span>(<span class="ident">e</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
-                <span class="ident">approx_eq</span>(<span class="ident">f_mb</span>, <span class="ident">f</span>, <span class="number">10.0</span>, <span class="number">1e-50</span>);
+                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">mb</span>.<span class="ident">phase_space</span>(<span class="ident">e</span>, <span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
+                <span class="ident">approx_eq</span>(<span class="ident">f_mb</span>, <span class="ident">f</span>, <span class="number">10.0</span>, <span class="number">0.0</span>);
+            }
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">f_mj</span>.<span class="ident">is_nan</span>() {
+                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">mj</span>.<span class="ident">phase_space</span>(<span class="ident">e</span>, <span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
+                <span class="ident">approx_eq</span>(<span class="ident">f_mj</span>, <span class="ident">f</span>, <span class="number">10.0</span>, <span class="number">0.0</span>);
             }
         }
     }
@@ -912,55 +694,65 @@
         <span class="kw">let</span> <span class="ident">fd</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">FermiDirac</span>;
         <span class="kw">let</span> <span class="ident">be</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span>;
         <span class="kw">let</span> <span class="ident">mb</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span>;
+        <span class="kw">let</span> <span class="ident">mj</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">for</span> <span class="ident">result</span> <span class="kw">in</span> <span class="ident">rdr</span>.<span class="ident">deserialize</span>() {
-            <span class="kw">let</span> (<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>, <span class="ident">n_fd</span>, <span class="ident">n_be</span>, <span class="ident">n_mb</span>): (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap</span>();
+            <span class="kw">let</span> (<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>, <span class="ident">n_fd</span>, <span class="ident">n_be</span>, <span class="ident">n_mb</span>, <span class="ident">n_mj</span>): <span class="ident">Row7</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap</span>();
             <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;(m, μ, β) = ({:e}, {:e}, {:e})&quot;</span>, <span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
 
             <span class="kw">if</span> <span class="op">!</span><span class="ident">n_fd</span>.<span class="ident">is_nan</span>() {
                 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">fd</span>.<span class="ident">number_density</span>(<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
-                <span class="ident">approx_eq</span>(<span class="ident">n_fd</span>, <span class="ident">n</span>, <span class="number">3.0</span>, <span class="number">1e-40</span>);
+                <span class="ident">approx_eq</span>(<span class="ident">n_fd</span>, <span class="ident">n</span>, <span class="number">10.0</span>, <span class="number">1e-100</span>);
             }
             <span class="kw">if</span> <span class="op">!</span><span class="ident">n_be</span>.<span class="ident">is_nan</span>() {
                 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">be</span>.<span class="ident">number_density</span>(<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
-                <span class="ident">approx_eq</span>(<span class="ident">n_be</span>, <span class="ident">n</span>, <span class="number">3.0</span>, <span class="number">1e-40</span>);
+                <span class="ident">approx_eq</span>(<span class="ident">n_be</span>, <span class="ident">n</span>, <span class="number">10.0</span>, <span class="number">1e-100</span>);
             }
             <span class="kw">if</span> <span class="op">!</span><span class="ident">n_mb</span>.<span class="ident">is_nan</span>() {
                 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mb</span>.<span class="ident">number_density</span>(<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
-                <span class="ident">approx_eq</span>(<span class="ident">n_mb</span>, <span class="ident">n</span>, <span class="number">3.0</span>, <span class="number">1e-40</span>);
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">n</span>.<span class="ident">is_nan</span>() {
+                    <span class="ident">approx_eq</span>(<span class="ident">n_mb</span>, <span class="ident">n</span>, <span class="number">10.0</span>, <span class="number">1e-100</span>);
+                }
+            }
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">n_mj</span>.<span class="ident">is_nan</span>() {
+                <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mj</span>.<span class="ident">number_density</span>(<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">n</span>.<span class="ident">is_nan</span>() {
+                    <span class="ident">approx_eq</span>(<span class="ident">n_mj</span>, <span class="ident">n</span>, <span class="number">10.0</span>, <span class="number">1e-100</span>);
+                }
             }
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">massless</span>() {
-        <span class="comment">// TODO: Improve precision of the functions (3 decimal places is not</span>
-        <span class="comment">// good enough).</span>
         <span class="kw">let</span> <span class="ident">fd</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">FermiDirac</span>;
         <span class="kw">let</span> <span class="ident">be</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span>;
         <span class="kw">let</span> <span class="ident">mb</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span>;
+        <span class="kw">let</span> <span class="ident">mj</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">for</span> <span class="ident">result</span> <span class="kw">in</span> <span class="ident">rdr</span>.<span class="ident">deserialize</span>() {
-            <span class="kw">let</span> (<span class="ident">mu</span>, <span class="ident">beta</span>, <span class="ident">n_fd</span>, <span class="ident">n_be</span>, <span class="ident">n_mb</span>): (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap</span>();
-            <span class="comment">// println!(&quot;(μ, β) = ({:e}, {:e})&quot;, mu, beta);</span>
+            <span class="kw">let</span> (<span class="ident">mu</span>, <span class="ident">beta</span>, <span class="ident">n_fd</span>, <span class="ident">n_be</span>, <span class="ident">n_mb</span>, <span class="ident">n_mj</span>): <span class="ident">Row6</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap</span>();
+            <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;(μ, β) = ({:e}, {:e})&quot;</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
 
             <span class="kw">if</span> <span class="op">!</span><span class="ident">n_fd</span>.<span class="ident">is_nan</span>() {
                 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">fd</span>.<span class="ident">massless_number_density</span>(<span class="ident">mu</span>, <span class="ident">beta</span>);
-                <span class="ident">approx_eq</span>(<span class="ident">n_fd</span>, <span class="ident">n</span>, <span class="number">3.0</span>, <span class="number">0.0</span>);
+                <span class="ident">approx_eq</span>(<span class="ident">n_fd</span>, <span class="ident">n</span>, <span class="number">10.0</span>, <span class="number">1e-100</span>);
             }
-
             <span class="kw">if</span> <span class="op">!</span><span class="ident">n_be</span>.<span class="ident">is_nan</span>() {
                 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">be</span>.<span class="ident">massless_number_density</span>(<span class="ident">mu</span>, <span class="ident">beta</span>);
-                <span class="ident">approx_eq</span>(<span class="ident">n_be</span>, <span class="ident">n</span>, <span class="number">3.0</span>, <span class="number">0.0</span>);
+                <span class="ident">approx_eq</span>(<span class="ident">n_be</span>, <span class="ident">n</span>, <span class="number">10.0</span>, <span class="number">1e-100</span>);
             }
-
             <span class="kw">if</span> <span class="op">!</span><span class="ident">n_mb</span>.<span class="ident">is_nan</span>() {
                 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mb</span>.<span class="ident">massless_number_density</span>(<span class="ident">mu</span>, <span class="ident">beta</span>);
-                <span class="ident">approx_eq</span>(<span class="ident">n_mb</span>, <span class="ident">n</span>, <span class="number">3.0</span>, <span class="number">0.0</span>);
+                <span class="ident">approx_eq</span>(<span class="ident">n_mb</span>, <span class="ident">n</span>, <span class="number">10.0</span>, <span class="number">1e-100</span>);
+            }
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">n_mj</span>.<span class="ident">is_nan</span>() {
+                <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mj</span>.<span class="ident">massless_number_density</span>(<span class="ident">mu</span>, <span class="ident">beta</span>);
+                <span class="ident">approx_eq</span>(<span class="ident">n_mj</span>, <span class="ident">n</span>, <span class="number">10.0</span>, <span class="number">1e-100</span>);
             }
         }
     }
@@ -970,24 +762,26 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">bench</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">test</span>::<span class="ident">Bencher</span>;
-    <span class="kw">use</span> <span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident">test</span>::{<span class="ident">black_box</span>, <span class="ident">Bencher</span>};
     <span class="kw">use</span> <span class="ident">csv</span>;
+
+    <span class="kw">type</span> <span class="ident">Row7</span> <span class="op">=</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>);
+
+    <span class="kw">const</span> <span class="ident">STEP_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">10</span>;
 
     <span class="attribute">#[<span class="ident">bench</span>]</span>
     <span class="kw">fn</span> <span class="ident">fermi_dirac_massive</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">fd</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">FermiDirac</span>;
         <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>)<span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>()).<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>()
+            .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>())
+            .<span class="ident">collect</span>();
 
         <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">||</span> {
-            <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>, <span class="ident">n_fd</span>, _, _) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span> {
-                <span class="kw">if</span> <span class="ident">n_fd</span>.<span class="ident">is_nan</span>() {
-                    <span class="kw">continue</span>;
-                }
+            <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>, _, _, _, _) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span> {
                 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">fd</span>.<span class="ident">number_density</span>(<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
-                <span class="ident">approx_eq</span>(<span class="ident">n_fd</span>, <span class="ident">n</span>, <span class="number">3.0</span>, <span class="number">1e-15</span>);
+                <span class="ident">black_box</span>(<span class="ident">n</span>);
             }
         });
     }
@@ -996,16 +790,15 @@
     <span class="kw">fn</span> <span class="ident">bose_einstein_massive</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">be</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span>;
         <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>)<span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>()).<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>()
+            .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>())
+            .<span class="ident">collect</span>();
 
         <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">||</span> {
-            <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>, _, <span class="ident">n_be</span>, _) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span> {
-                <span class="kw">if</span> <span class="ident">n_be</span>.<span class="ident">is_nan</span>() {
-                    <span class="kw">continue</span>;
-                }
-                <span class="kw">let</span> <span class="ident">n_be_calc</span> <span class="op">=</span> <span class="ident">be</span>.<span class="ident">number_density</span>(<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
-                <span class="ident">approx_eq</span>(<span class="ident">n_be</span>, <span class="ident">n_be_calc</span>, <span class="number">3.0</span>, <span class="number">1e-15</span>);
+            <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>, _, _, _, _) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span> {
+                <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">be</span>.<span class="ident">number_density</span>(<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
+                <span class="ident">black_box</span>(<span class="ident">n</span>);
             }
         });
     }
@@ -1014,16 +807,32 @@
     <span class="kw">fn</span> <span class="ident">maxwell_boltzmann_massive</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">mb</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span>;
         <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>)<span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>()).<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>()
+            .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>())
+            .<span class="ident">collect</span>();
 
         <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">||</span> {
-            <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>, _, _, <span class="ident">n_mb</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span> {
-                <span class="kw">if</span> <span class="ident">n_mb</span>.<span class="ident">is_nan</span>() {
-                    <span class="kw">continue</span>;
-                }
+            <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>, _, _, _, _) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span> {
                 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mb</span>.<span class="ident">number_density</span>(<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
-                <span class="ident">approx_eq</span>(<span class="ident">n_mb</span>, <span class="ident">n</span>, <span class="number">3.0</span>, <span class="number">0.0</span>);
+                <span class="ident">black_box</span>(<span class="ident">n</span>);
+            }
+        });
+    }
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">maxwell_juttner_massive</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
+        <span class="kw">let</span> <span class="ident">mj</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span>;
+        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>()
+            .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>())
+            .<span class="ident">collect</span>();
+
+        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">||</span> {
+            <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>, _, _, _, _) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span> {
+                <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mj</span>.<span class="ident">number_density</span>(<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
+                <span class="ident">black_box</span>(<span class="ident">n</span>);
             }
         });
     }
@@ -1031,17 +840,16 @@
     <span class="attribute">#[<span class="ident">bench</span>]</span>
     <span class="kw">fn</span> <span class="ident">fermi_dirac_massless</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">fd</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">FermiDirac</span>;
-        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>)<span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>()).<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>()
+            .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>())
+            .<span class="ident">collect</span>();
 
         <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">||</span> {
-            <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">mu</span>, <span class="ident">beta</span>, <span class="ident">n_fd</span>, _, _) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span> {
-                <span class="kw">if</span> <span class="ident">n_fd</span>.<span class="ident">is_nan</span>() {
-                    <span class="kw">continue</span>;
-                }
+            <span class="kw">for</span> <span class="kw-2">&amp;</span>(_, <span class="ident">mu</span>, <span class="ident">beta</span>, _, _, _, _) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span> {
                 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">fd</span>.<span class="ident">massless_number_density</span>(<span class="ident">mu</span>, <span class="ident">beta</span>);
-                <span class="ident">approx_eq</span>(<span class="ident">n_fd</span>, <span class="ident">n</span>, <span class="number">3.0</span>, <span class="number">1e-15</span>);
+                <span class="ident">black_box</span>(<span class="ident">n</span>);
             }
         });
     }
@@ -1049,17 +857,16 @@
     <span class="attribute">#[<span class="ident">bench</span>]</span>
     <span class="kw">fn</span> <span class="ident">bose_einstein_massless</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">be</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span>;
-        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>)<span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>()).<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>()
+            .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>())
+            .<span class="ident">collect</span>();
 
         <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">||</span> {
-            <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">mu</span>, <span class="ident">beta</span>, _, <span class="ident">n_be</span>, _) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span> {
-                <span class="kw">if</span> <span class="ident">n_be</span>.<span class="ident">is_nan</span>() {
-                    <span class="kw">continue</span>;
-                }
+            <span class="kw">for</span> <span class="kw-2">&amp;</span>(_, <span class="ident">mu</span>, <span class="ident">beta</span>, _, _, _, _) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span> {
                 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">be</span>.<span class="ident">massless_number_density</span>(<span class="ident">mu</span>, <span class="ident">beta</span>);
-                <span class="ident">approx_eq</span>(<span class="ident">n_be</span>, <span class="ident">n</span>, <span class="number">3.0</span>, <span class="number">1e-15</span>);
+                <span class="ident">black_box</span>(<span class="ident">n</span>);
             }
         });
     }
@@ -1067,18 +874,33 @@
     <span class="attribute">#[<span class="ident">bench</span>]</span>
     <span class="kw">fn</span> <span class="ident">maxwell_boltzmann_massless</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">mb</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span>;
-        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>)<span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>()).<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>()
+            .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>())
+            .<span class="ident">collect</span>();
 
         <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">||</span> {
-            <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">mu</span>, <span class="ident">beta</span>, _, _, <span class="ident">n_mb</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span> {
-                <span class="kw">if</span> <span class="ident">n_mb</span>.<span class="ident">is_nan</span>() {
-                    <span class="kw">continue</span>;
-                }
-
+            <span class="kw">for</span> <span class="kw-2">&amp;</span>(_, <span class="ident">mu</span>, <span class="ident">beta</span>, _, _, _, _) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span> {
                 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mb</span>.<span class="ident">massless_number_density</span>(<span class="ident">mu</span>, <span class="ident">beta</span>);
-                <span class="ident">approx_eq</span>(<span class="ident">n_mb</span>, <span class="ident">n</span>, <span class="number">3.0</span>, <span class="number">0.0</span>);
+                <span class="ident">black_box</span>(<span class="ident">n</span>);
+            }
+        });
+    }
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">maxwell_juttner_massless</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
+        <span class="kw">let</span> <span class="ident">mj</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span>;
+        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>()
+            .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>())
+            .<span class="ident">collect</span>();
+
+        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">||</span> {
+            <span class="kw">for</span> <span class="kw-2">&amp;</span>(_, <span class="ident">mu</span>, <span class="ident">beta</span>, _, _, _, _) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span> {
+                <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mj</span>.<span class="ident">massless_number_density</span>(<span class="ident">mu</span>, <span class="ident">beta</span>);
+                <span class="ident">black_box</span>(<span class="ident">n</span>);
             }
         });
     }

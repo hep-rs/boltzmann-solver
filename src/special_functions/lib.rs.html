@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/git/checkouts/special-functions-dd045b770e648524/96baf8a/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
@@ -93,52 +93,46 @@
 <span id="37">37</span>
 <span id="38">38</span>
 <span id="39">39</span>
-<span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
 </pre><pre class="rust ">
-<span class="doccomment">//! `boltzmann-solver` is a library allowing for Boltzmann equation in the</span>
-<span class="doccomment">//! context of particle physics / early cosmology.  It provides functionalities</span>
-<span class="doccomment">//! to solve Boltzmann equation in the case where a single species is out of</span>
-<span class="doccomment">//! equilibrium, as well as functionalities to solve the Boltzmann equations</span>
-<span class="doccomment">//! more general when multiple species are all out of equilibrium.</span>
+<span class="doccomment">//! Library providing pure rust implementation of various special functions,</span>
+<span class="doccomment">//! with particular focus to high-energy particle physics.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This library will attempt to provide full 64-bit precision by default.  In</span>
+<span class="doccomment">//! circumstances where such precision may be particularly slow to achieve, a</span>
+<span class="doccomment">//! less accurate implementation may be provided.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! **This library is still undergoing development.**</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [![Crates.io](https://img.shields.io/crates/v/hep-special-functions.svg)](https://crates.io/crates/hep-special-functions)</span>
+<span class="doccomment">//! [![Travis](https://img.shields.io/travis/hep-rs/special-functions/master.svg)](https://travis-ci.org/hep-rs/special-functions)</span>
+<span class="doccomment">//! [![Codecov](https://img.shields.io/codecov/c/github/hep-rs/special-functions/master.svg)](https://codecov.io/gh/hep-rs/special-functions)</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Licensed under [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The documentation makes use of [MathJax](https://www.mathjax.org/) in order</span>
+<span class="doccomment">//! to display mathematics.  A version of the documentation with MathJax</span>
+<span class="doccomment">//! integrated is available</span>
+<span class="doccomment">//! [here](https://hep.rs/special-functions/special_functions).</span>
 
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>, <span class="ident">feature</span>(<span class="ident">test</span>))]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>, <span class="ident">feature</span>(<span class="ident">iterator_step_by</span>))]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>, <span class="ident">allow</span>(<span class="ident">unreadable_literal</span>))]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;strict&quot;</span>, <span class="ident">deny</span>(<span class="ident">missing_docs</span>))]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;strict&quot;</span>, <span class="ident">deny</span>(<span class="ident">warnings</span>))]</span>
 
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">log</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">quadrature</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">special_functions</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">csv</span>;
-
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">test</span>;
 
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">debug_assert_warn</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cond</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">tt</span>)<span class="op">+</span>) <span class="op">=&gt;</span> (
-        <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">debug_assertions</span>) <span class="op">&amp;&amp;</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cond</span>) {
-            <span class="macro">warn</span><span class="macro">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>,)<span class="kw-2">*</span>);
-        }
-    )
-}
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">polylog</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bessel</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">polynomial</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">interpolation</span>;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">constants</span>;
-<span class="kw">mod</span> <span class="ident">standard_model</span>;
-<span class="kw">mod</span> <span class="ident">statistic</span>;
-<span class="kw">mod</span> <span class="ident">universe</span>;
-
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">standard_model</span>::<span class="ident">StandardModel</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">statistic</span>::<span class="ident">Statistic</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">universe</span>::{<span class="ident">SingleSpecies</span>, <span class="ident">Universe</span>};
-
-<span class="comment">// pub mod common;</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">utilities</span>;
+<span class="kw">mod</span> <span class="ident">utilities</span>;
 </pre>
 </section>
     <section id='search' class="content hidden"></section>
@@ -199,7 +193,7 @@
 
     <script>
         window.rootPath = "../../";
-        window.currentCrate = "boltzmann_solver";
+        window.currentCrate = "special_functions";
     </script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>

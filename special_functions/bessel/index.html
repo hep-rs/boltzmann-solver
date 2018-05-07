@@ -4,17 +4,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `boltzmann_solver` crate.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, boltzmann_solver">
+    <meta name="description" content="API documentation for the Rust `bessel` mod in crate `special_functions`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, bessel">
 
-    <title>boltzmann_solver - Rust</title>
+    <title>special_functions::bessel - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../normalize.css">
-    <link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
     
-    <link rel="stylesheet" type="text/css" href="../dark.css">
-    <link rel="stylesheet" type="text/css" href="../main.css" id="themeStyle">
-    <script src="../storage.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
@@ -33,16 +33,16 @@
     <nav class="sidebar">
         <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'>Crate boltzmann_solver</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'boltzmann_solver', ty: 'mod', relpath: '../'};</script></div>
+        <p class='location'>Module bessel</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../index.html'>special_functions</a></p><script>window.sidebarCurrent = {name: 'bessel', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div>
     </nav>
 
     <div class="theme-picker">
         <button id="theme-picker" aria-label="Pick another theme!">
-            <img src="../brush.svg" width="18" alt="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
         </button>
         <div id="theme-choices"></div>
     </div>
-    <script src="../theme.js"></script>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -55,60 +55,49 @@
     </nav>
 
     <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Crate <a class="mod" href=''>boltzmann_solver</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>special_functions</a>::<wbr><a class="mod" href=''>bessel</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/boltzmann_solver/lib.rs.html#1-42' title='goto source code'>[src]</a></span></h1>
-<div class='docblock'><p><code>boltzmann-solver</code> is a library allowing for Boltzmann equation in the
-context of particle physics / early cosmology.  It provides functionalities
-to solve Boltzmann equation in the case where a single species is out of
-equilibrium, as well as functionalities to solve the Boltzmann equations
-more general when multiple species are all out of equilibrium.</p>
-</div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+               </span><a class='srclink' href='../../src/special_functions/bessel/mod.rs.html#1-266' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Bessel functions</p>
+<p>At this stage, this only implements the function \(K_0(x)\), \(K_1\),
+\(K_2\) and \(K_3\).</p>
+</div><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class="mod" href="constants/index.html"
-                                  title='mod boltzmann_solver::constants'>constants</a></td>
+                           <td><a class="fn" href="fn.k_0.html"
+                                  title='fn special_functions::bessel::k_0'>k_0</a></td>
                            <td class='docblock-short'>
-                                <p>Collection of physical and mathematical constants which appear frequently.</p>
-
-                           </td>
-                       </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.SingleSpecies.html"
-                                  title='struct boltzmann_solver::SingleSpecies'>SingleSpecies</a></td>
-                           <td class='docblock-short'>
-                                <p>Contribution from a single particle in the Universe.</p>
+                                <p>Approximation of modified Bessel function \(K_0(x)\) for all \(x \geq
+0\).</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="struct" href="struct.StandardModel.html"
-                                  title='struct boltzmann_solver::StandardModel'>StandardModel</a></td>
+                           <td><a class="fn" href="fn.k_1.html"
+                                  title='fn special_functions::bessel::k_1'>k_1</a></td>
                            <td class='docblock-short'>
-                                <p>Implementation of [<code>Universe</code>] for the Standard Model.</p>
+                                <p>Approximation of modified Bessel function \(K_1(x)\) for all \(x \geq
+0\).</p>
 
                            </td>
-                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
-<table>
+                       </tr>
                        <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Statistic.html"
-                                  title='enum boltzmann_solver::Statistic'>Statistic</a></td>
+                           <td><a class="fn" href="fn.k_2.html"
+                                  title='fn special_functions::bessel::k_2'>k_2</a></td>
                            <td class='docblock-short'>
-                                <p>The statistics which describe the distribution of particles over energy
-states.  Both Fermi--Dirac and Bose--Einstein quantum statistics are
-implemented, as well as the classical Maxwell--Boltzmann statistic.</p>
+                                <p>Approximation of modified Bessel function \(K_2(x)\) for all \(x \geq
+0\).</p>
 
                            </td>
-                       </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
-<table>
+                       </tr>
                        <tr class=' module-item'>
-                           <td><a class="trait" href="trait.Universe.html"
-                                  title='trait boltzmann_solver::Universe'>Universe</a></td>
+                           <td><a class="fn" href="fn.k_3.html"
+                                  title='fn special_functions::bessel::k_3'>k_3</a></td>
                            <td class='docblock-short'>
-                                <p>Collection of properties which determine the evolution of a Universe.</p>
+                                <p>Approximation of modified Bessel function \(K_3(x)\) for all \(x \geq
+0\).</p>
 
                            </td>
                        </tr></table></section>
@@ -169,10 +158,10 @@ implemented, as well as the classical Maxwell--Boltzmann statistic.</p>
     
 
     <script>
-        window.rootPath = "../";
-        window.currentCrate = "boltzmann_solver";
+        window.rootPath = "../../";
+        window.currentCrate = "special_functions";
     </script>
-    <script src="../main.js"></script>
-    <script defer src="../search-index.js"></script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}"}}});</script></body>
 </html>

@@ -210,13 +210,21 @@
 <span id="154">154</span>
 <span id="155">155</span>
 <span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
 </pre><pre class="rust ">
-<span class="doccomment">//! Predefined constants.</span>
+<span class="doccomment">//! Collection of physical and mathematical constants which appear frequently.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Although computing some of these values is generally very fast (e.g. `PI_2</span>
-<span class="doccomment">//! == PI.powi(2)`), it will be slightly faster to use pre-defined constant</span>
-<span class="doccomment">//! which, in certain performance-sensitive functions, can result in an</span>
-<span class="doccomment">//! appreciable performance improvement.</span>
+<span class="doccomment">//! When implementing code that is numerically intensive, it advisable to</span>
+<span class="doccomment">//! collect all the constants into a single multiplicative constants; however,</span>
+<span class="doccomment">//! make sure to document in the code what the resulting &#39;magic number&#39;</span>
+<span class="doccomment">//! corresponds to.</span>
 
 <span class="doccomment">/// Planck mass, \\(M_{\text{Pl}} = \sqrt{\hbar c / G}\\), in units of GeV /</span>
 <span class="doccomment">/// \\(c\^2\\).</span>
@@ -232,19 +240,27 @@
 <span class="doccomment">/// \\(m_{\text{Pl}}\\), in contrast to the Planck mass \\(M_{\text{Pl}}\\).</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">REDUCED_PLANCK_MASS</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">2.435_363e18</span>;
 
-<span class="doccomment">/// The Riemann zeta function evaluated at 3.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ZETA_3</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">1.2020569031595942854</span>;
+<span class="doccomment">/// Riemann zeta function evaluated at 3: \\(\zeta(3) \approx 1.202\dots\\)</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ZETA_3</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">1.202056903159594285399738161511449990765</span>;
 
 <span class="doccomment">/// \\(\pi\\)</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PI</span>: <span class="ident">f64</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">consts</span>::<span class="ident">PI</span>;
-<span class="doccomment">/// \\(\pi\\), with a different name to follow the convention for `PI_n`.</span>
+<span class="doccomment">/// \\(\pi\\) [named to follow the convention `PI_n`]</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PI_1</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="ident">PI</span>;
 <span class="doccomment">/// \\(\pi\^2\\)</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PI_2</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">9.8696044010893586188</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PI_2</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">9.869604401089358618834490999876151135314</span>;
+<span class="doccomment">/// \\(\pi\^3\\)</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PI_3</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">3.100627668029982017547631506710139520223e1</span>;
+<span class="doccomment">/// \\(\pi\^4\\)</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PI_4</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">9.740909103400243723644033268870511124973e1</span>;
 <span class="doccomment">/// \\(\pi^{-1}\\)</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PI_M1</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.31830988618379067154</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PI_M1</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">3.183098861837906715377675267450287240689e-1</span>;
 <span class="doccomment">/// \\(\pi^{-2}\\)</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PI_M2</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.10132118364233777144</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PI_M2</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">1.013211836423377714438794632097276389044e-1</span>;
+<span class="doccomment">/// \\(\pi^{-3}\\)</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PI_M3</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">3.225153443319948918442205268856368859306e-2</span>;
+<span class="doccomment">/// \\(\pi^{-4}\\)</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PI_M4</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">1.026598225468433518915278326711869414183e-2</span>;
 
 <span class="comment">////////////////////////////////////////////////////////////////////////////////</span>
 <span class="comment">// Crate Constants</span>

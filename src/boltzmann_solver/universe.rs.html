@@ -200,9 +200,8 @@
             longer applies.&quot;</span>
         );
 
-        <span class="comment">// Prefactor: sqrt(pi^2 / 90) ≅ 0.3311529421932034</span>
-        <span class="number">0.3311529421932034</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">entropy_dof</span>(<span class="ident">beta</span>)
-            <span class="op">/</span> (<span class="ident">constants</span>::<span class="ident">REDUCED_PLANCK_MASS</span> <span class="op">*</span> <span class="ident">beta</span>.<span class="ident">powi</span>(<span class="number">2</span>))
+        <span class="comment">// Prefactor: sqrt(pi^2 / 90) / REDUCED_PLANCK_MASS ≅ 1.35977e-19</span>
+        <span class="number">1.35977e-19</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">entropy_dof</span>(<span class="ident">beta</span>) <span class="op">*</span> <span class="ident">beta</span>.<span class="ident">powi</span>(<span class="op">-</span><span class="number">2</span>)
     }
 }
 
@@ -254,6 +253,7 @@
                     <span class="op">*</span> <span class="ident">interpolation</span>::<span class="ident">linear</span>(<span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">BOSON_GSTAR</span>, (<span class="self">self</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">beta</span>).<span class="ident">ln</span>()).<span class="ident">exp</span>()
             }
             <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span> <span class="op">=&gt;</span> <span class="macro">unimplemented</span><span class="macro">!</span>(),
+            <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span> <span class="op">=&gt;</span> <span class="macro">unimplemented</span><span class="macro">!</span>(),
         }
     }
 }
