@@ -10,7 +10,7 @@ use special_functions::interpolation;
 /// Effective Degrees of Freedom in the Early Universe* by Lars
 /// Husdal](https://arxiv.org/abs/1609.04979).
 ///
-/// Due to the intricacies of the transition from the quark--gluon plasma to
+/// Due to the intricacies of the transition from the quark–gluon plasma to
 /// hadrons, none of the individual particles of the Standard Model are included
 /// here.  In the future, the interactions from the leptons, the Higgs doublet
 /// and electromagnetic and weak bosons might be included.
