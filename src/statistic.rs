@@ -186,7 +186,7 @@ mod test {
 
         for result in rdr.deserialize() {
             let (e, m, mu, beta, f_fd, f_be, f_mb, f_mj): Row8 = result.unwrap();
-            println!("(e, m, μ, β) = ({:e}, {:e}, {:e}, {:e})", e, m, mu, beta);
+            // println!("(e, m, μ, β) = ({:e}, {:e}, {:e}, {:e})", e, m, mu, beta);
 
             if !f_fd.is_nan() {
                 let f = fd.phase_space(e, m, mu, beta);
@@ -218,7 +218,7 @@ mod test {
 
         for result in rdr.deserialize() {
             let (m, mu, beta, n_fd, n_be, n_mb, n_mj): Row7 = result.unwrap();
-            println!("(m, μ, β) = ({:e}, {:e}, {:e})", m, mu, beta);
+            // println!("(m, μ, β) = ({:e}, {:e}, {:e})", m, mu, beta);
 
             if !n_fd.is_nan() {
                 let n = fd.number_density(m, mu, beta);
@@ -254,7 +254,7 @@ mod test {
 
         for result in rdr.deserialize() {
             let (mu, beta, n_fd, n_be, n_mb, n_mj): Row6 = result.unwrap();
-            println!("(μ, β) = ({:e}, {:e})", mu, beta);
+            // println!("(μ, β) = ({:e}, {:e})", mu, beta);
 
             if !n_fd.is_nan() {
                 let n = fd.massless_number_density(mu, beta);
