@@ -668,7 +668,7 @@
 
         <span class="kw">for</span> <span class="ident">result</span> <span class="kw">in</span> <span class="ident">rdr</span>.<span class="ident">deserialize</span>() {
             <span class="kw">let</span> (<span class="ident">e</span>, <span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>, <span class="ident">f_fd</span>, <span class="ident">f_be</span>, <span class="ident">f_mb</span>, <span class="ident">f_mj</span>): <span class="ident">Row8</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap</span>();
-            <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;(e, m, μ, β) = ({:e}, {:e}, {:e}, {:e})&quot;</span>, <span class="ident">e</span>, <span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
+            <span class="comment">// println!(&quot;(e, m, μ, β) = ({:e}, {:e}, {:e}, {:e})&quot;, e, m, mu, beta);</span>
 
             <span class="kw">if</span> <span class="op">!</span><span class="ident">f_fd</span>.<span class="ident">is_nan</span>() {
                 <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">fd</span>.<span class="ident">phase_space</span>(<span class="ident">e</span>, <span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
@@ -700,7 +700,7 @@
 
         <span class="kw">for</span> <span class="ident">result</span> <span class="kw">in</span> <span class="ident">rdr</span>.<span class="ident">deserialize</span>() {
             <span class="kw">let</span> (<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>, <span class="ident">n_fd</span>, <span class="ident">n_be</span>, <span class="ident">n_mb</span>, <span class="ident">n_mj</span>): <span class="ident">Row7</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap</span>();
-            <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;(m, μ, β) = ({:e}, {:e}, {:e})&quot;</span>, <span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
+            <span class="comment">// println!(&quot;(m, μ, β) = ({:e}, {:e}, {:e})&quot;, m, mu, beta);</span>
 
             <span class="kw">if</span> <span class="op">!</span><span class="ident">n_fd</span>.<span class="ident">is_nan</span>() {
                 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">fd</span>.<span class="ident">number_density</span>(<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
@@ -736,7 +736,7 @@
 
         <span class="kw">for</span> <span class="ident">result</span> <span class="kw">in</span> <span class="ident">rdr</span>.<span class="ident">deserialize</span>() {
             <span class="kw">let</span> (<span class="ident">mu</span>, <span class="ident">beta</span>, <span class="ident">n_fd</span>, <span class="ident">n_be</span>, <span class="ident">n_mb</span>, <span class="ident">n_mj</span>): <span class="ident">Row6</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap</span>();
-            <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;(μ, β) = ({:e}, {:e})&quot;</span>, <span class="ident">mu</span>, <span class="ident">beta</span>);
+            <span class="comment">// println!(&quot;(μ, β) = ({:e}, {:e})&quot;, mu, beta);</span>
 
             <span class="kw">if</span> <span class="op">!</span><span class="ident">n_fd</span>.<span class="ident">is_nan</span>() {
                 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">fd</span>.<span class="ident">massless_number_density</span>(<span class="ident">mu</span>, <span class="ident">beta</span>);
