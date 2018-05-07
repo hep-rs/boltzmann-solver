@@ -6,14 +6,14 @@
 //! corresponds to.
 
 /// Planck mass, \\(M_{\text{Pl}} = \sqrt{\hbar c / G}\\), in units of GeV /
-/// \\(c\^2\\).
+/// \\(c^2\\).
 ///
 /// In this library, the Planck mass will be denoted by \\(M_{\text{Pl}}\\), in
 /// contrast to the reduced Planck mass \\(m_{\text{Pl}}\\).
 pub const PLANCK_MASS: f64 = 1.220_910e19;
 
 /// Reduced Planck mass, \\(m_{\text{Pl}} = \sqrt{\hbar c / 8 \pi G}\\), in
-/// units of GeV / \\(c\^2\\).
+/// units of GeV / \\(c^2\\).
 ///
 /// In this library, the reduced Planck mass will be denoted by
 /// \\(m_{\text{Pl}}\\), in contrast to the Planck mass \\(M_{\text{Pl}}\\).
@@ -26,11 +26,11 @@ pub const ZETA_3: f64 = 1.202056903159594285399738161511449990765;
 pub const PI: f64 = ::std::f64::consts::PI;
 /// \\(\pi\\) [named to follow the convention `PI_n`]
 pub const PI_1: f64 = PI;
-/// \\(\pi\^2\\)
+/// \\(\pi^2\\)
 pub const PI_2: f64 = 9.869604401089358618834490999876151135314;
-/// \\(\pi\^3\\)
+/// \\(\pi^3\\)
 pub const PI_3: f64 = 3.100627668029982017547631506710139520223e1;
-/// \\(\pi\^4\\)
+/// \\(\pi^4\\)
 pub const PI_4: f64 = 9.740909103400243723644033268870511124973e1;
 /// \\(\pi^{-1}\\)
 pub const PI_M1: f64 = 3.183098861837906715377675267450287240689e-1;

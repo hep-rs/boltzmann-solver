@@ -5,32 +5,32 @@ use std::f64;
 use constants::PI_M2;
 
 /// The statistics which describe the distribution of particles over energy
-/// states.  Both Fermi--Dirac and Bose--Einstein quantum statistics are
-/// implemented, as well as the classical Maxwell--Boltzmann statistic.
+/// states.  Both Fermi–Dirac and Bose–Einstein quantum statistics are
+/// implemented, as well as the classical Maxwell–Boltzmann statistic.
 pub enum Statistic {
-    /// Fermi--Dirac statistic describing half-integer-spin particles:
+    /// Fermi–Dirac statistic describing half-integer-spin particles:
     ///
-    /// \\[
+    /// \\begin{equation}
     ///   f_{\textsc{FD}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.
-    /// \\]
+    /// \\end{equation}
     FermiDirac,
-    /// Bose--Einstein statistic describing integer-spin particles:
+    /// Bose–Einstein statistic describing integer-spin particles:
     ///
-    /// \\[
+    /// \\begin{equation}
     ///   f_{\textsc{BE}} = \frac{1}{\exp[(E - \mu) \beta] - 1}.
-    /// \\]
+    /// \\end{equation}
     BoseEinstein,
-    /// Maxwell--Boltzmann statistic describing classical particles:
+    /// Maxwell–Boltzmann statistic describing classical particles:
     ///
-    /// \\[
+    /// \\begin{equation}
     ///   f_{\textsc{MB}} = \exp[-(E - \mu) \beta].
-    /// \\]
+    /// \\end{equation}
     MaxwellBoltzmann,
-    /// Maxwell--Jüttner statistic describing relativistic classical particles:
+    /// Maxwell–Jüttner statistic describing relativistic classical particles:
     ///
-    /// \\[
-    ///   f_{\textsc{MJ}} = \frac{E \beta \sqrt{E\^2 - m^2}}{m K_2(m \beta)} \exp[- E \beta].
-    /// \\]
+    /// \\begin{equation}
+    ///   f_{\textsc{MJ}} = \frac{E \beta \sqrt{E^2 - m^2}}{m K_2(m \beta)} \exp[- E \beta].
+    /// \\end{equation}
     MaxwellJuttner,
 }
 
@@ -50,9 +50,9 @@ impl Statistic {
 
     /// Return number density for a particle following the specified statistic.
     ///
-    /// \\[
-    ///    n = \frac{1}{2 \pi\^2} \int_{m}\^{\infty} f_{i} u \sqrt{u\^2 - m\^2} \dd u
-    /// \\]
+    /// \\begin{equation}
+    ///    n = \frac{1}{2 \pi^2} \int_{m}^{\infty} f_{i} u \sqrt{u^2 - m^2} \dd u
+    /// \\end{equation}
     ///
     /// # Implementation Details
     ///
@@ -61,9 +61,9 @@ impl Statistic {
     /// semi-infinite integral is numerical evaluated.  In order to make the
     /// calculation tractable on a computer, the change of variables
     ///
-    /// \\[
-    ///   u \to m + \frac{t}{1 - t}, \qquad \dd u \to \frac{\dd t}{(t - 1)\^2}
-    /// \\]
+    /// \\begin{equation}
+    ///   u \to m + \frac{t}{1 - t}, \qquad \dd u \to \frac{\dd t}{(t - 1)^2}
+    /// \\end{equation}
     ///
     /// is used such that the bounds of the integral over \\(t\\) are \\([0,
     /// 1]\\).
@@ -138,9 +138,9 @@ impl Statistic {
     /// Return number density for a massless particle following the specified
     /// statistic.
     ///
-    /// \\[
-    ///    n = \frac{1}{2 \pi\^2} \int_{0}\^{\infty} f_{i} u\^2 \dd u
-    /// \\]
+    /// \\begin{equation}
+    ///    n = \frac{1}{2 \pi^2} \int_{0}^{\infty} f_{i} u^2 \dd u
+    /// \\end{equation}
     ///
     /// This is theoretically equivalent to setting `mass = 0` in
     /// [`Statistic::number_density`]; however, as there are analytic closed
