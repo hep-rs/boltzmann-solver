@@ -59,12 +59,70 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/boltzmann_solver/lib.rs.html#1-42' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../src/boltzmann_solver/lib.rs.html#1-119' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p><code>boltzmann-solver</code> is a library allowing for Boltzmann equation in the
 context of particle physics / early cosmology.  It provides functionalities
 to solve Boltzmann equation in the case where a single species is out of
 equilibrium, as well as functionalities to solve the Boltzmann equations
 more general when multiple species are all out of equilibrium.</p>
+<p><strong>This library is still undergoing development.</strong></p>
+<p><a href="https://crates.io/crates/hep-boltzmann-solver"><img src="https://img.shields.io/crates/v/hep-boltzmann-solver.svg" alt="Crates.io" /></a>
+<a href="https://travis-ci.org/hep-rs/boltzmann-solver"><img src="https://img.shields.io/travis/hep-rs/boltzmann-solver/master.svg" alt="Travis" /></a>
+<a href="https://codecov.io/gh/hep-rs/boltzmann-solver"><img src="https://img.shields.io/codecov/c/github/hep-rs/boltzmann-solver/master.svg" alt="Codecov" /></a></p>
+<p>Licensed under <a href="https://www.gnu.org/licenses/gpl-3.0.html">GPLv3</a>.</p>
+<p>The documentation makes use of <a href="https://www.mathjax.org/">MathJax</a> in order
+to display mathematics.  A version of the documentation with MathJax
+integrated is available <a href="https://hep.rs/boltzmann-solver/boltzmann_solver">here</a>.</p>
+<h1 id="introduction" class="section-header"><a href="#introduction">Introduction</a></h1>
+<p>Within the context of cosmology, the Boltzmann equation is a differential
+equation which describes the evolution of the phase-space distribution of a
+species of particles.  In full generality, it is given by</p>
+<p>\begin{equation}
+\vt L[f] = \vt C[f]
+\end{equation}</p>
+<p>where \(\vt L\) is the Liouville operator and \(\vt C\) is the collision
+operator.</p>
+<p>In general, the phase space distribution dependent on position, momentum and
+time \(f(\vt x, \vt p, t)\); however, assuming the early Universe to be
+isotropic and homogeneous it can be expressed as a function of just energy
+and time, \(f(E, t)\).  In the FLRW metric, the Liouville operator
+simplifies to only be dependent the time-like derivatives:</p>
+<p>\begin{equation}
+\vt L[f] \stackrel{\mathrm{\tiny FLRW}}{=} \left[ E \pfrac{}{t} - H (E^2 - m^2) \pfrac{}{E} \right] f,
+\end{equation}</p>
+<p>where \(H \defeq \dot a / a\) is Hubble's constant.</p>
+<p>In the absence of any collisions, the Boltzmann equation ensures that the
+phase space distribution is conserved.  More explicitly, integrating the
+phase space, the Liouville operator becomes</p>
+<p>\begin{equation}
+g \int \vt L[f] \frac{\dd^3 \vt p}{(2 \pi)^3 E} = \pfrac{n}{t} + 3 H n = \frac{1}{a^3} \pfrac{(n a^3)}{t}
+\end{equation}</p>
+<p>which ensures that the overall number of particles is conserved under the
+scaling by the FLRW metric.  Note that the number density is related to the
+phase space distribution through</p>
+<p>\begin{equation}
+n \defeq g \int f \frac{\dd^3 \vt p}{(2 \pi)^3} = \frac{g}{2 \pi^2} \int_m^\infty f \sqrt{E^2 - m^2} E \dd E
+\end{equation}</p>
+<p>where \(g\) is the number of internal degrees of freedom of the particle.</p>
+<p>The collision term in the Boltzmann equation describes the changes to the
+phase space distribution that arise from collisions—either through the
+scattering of other particles, or creation/annihilation of the species in
+question.  The integrated collision term for a particular process \(a_1 +
+a_2 + \cdots \leftrightarrow b_1 + b_2 + \cdots\) (which we will denote as
+\(\vt a \leftrightarrow \vt b\)) is:</p>
+<p>\begin{equation}
+\begin{aligned}
+g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3 E_{a_1}}
+&amp;= - \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right) \times (2 \pi)^4 \delta(\vt p_{\vt a} - \vt p_{\vt b}) \\
+&amp;\quad \times \Bigl[ \abs{\mathcal M(\vt a | \vt b)}^2 f_{a_1} f_{a_2} \cdots (1 \pm f_{b_1}) (1 \pm f_{b_2}) \cdots \\
+&amp;\qquad - \abs{\mathcal M(\vt b | \vt a)}^2 f_{b_1} f_{b_2} \cdots (1 \pm f_{a_1}) (1 \pm f_{a_2}) \cdots \Bigr],
+\end{aligned}
+\end{equation}</p>
+<p>where \(\dd \Pi_i \defeq \dd^3 \vt p_i / (2 \pi)^3 E_i\); \(\vt p_{\vt a}
+\defeq \vt p_{a_1} + \vt p_{a_2} + \cdots\) (and similarly for \(\vt
+p_{\vt b}\)), \(\abs{\mathcal M(\vt a | \vt b)}^2\) is the squared matrix
+element going from initial state \(\vt a\) to \(\vt b\) and is <em>summed
+over</em> all <em>internal degrees of freedom</em>.</p>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
                        <tr class=' module-item'>
@@ -98,8 +156,8 @@ more general when multiple species are all out of equilibrium.</p>
                                   title='enum boltzmann_solver::Statistic'>Statistic</a></td>
                            <td class='docblock-short'>
                                 <p>The statistics which describe the distribution of particles over energy
-states.  Both Fermi--Dirac and Bose--Einstein quantum statistics are
-implemented, as well as the classical Maxwell--Boltzmann statistic.</p>
+states.  Both Fermi–Dirac and Bose–Einstein quantum statistics are
+implemented, as well as the classical Maxwell–Boltzmann statistic.</p>
 
                            </td>
                        </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>

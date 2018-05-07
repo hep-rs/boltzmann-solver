@@ -487,32 +487,32 @@
 <span class="kw">use</span> <span class="ident">constants</span>::<span class="ident">PI_M2</span>;
 
 <span class="doccomment">/// The statistics which describe the distribution of particles over energy</span>
-<span class="doccomment">/// states.  Both Fermi--Dirac and Bose--Einstein quantum statistics are</span>
-<span class="doccomment">/// implemented, as well as the classical Maxwell--Boltzmann statistic.</span>
+<span class="doccomment">/// states.  Both Fermi–Dirac and Bose–Einstein quantum statistics are</span>
+<span class="doccomment">/// implemented, as well as the classical Maxwell–Boltzmann statistic.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Statistic</span> {
-    <span class="doccomment">/// Fermi--Dirac statistic describing half-integer-spin particles:</span>
+    <span class="doccomment">/// Fermi–Dirac statistic describing half-integer-spin particles:</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// \\[</span>
+    <span class="doccomment">/// \\begin{equation}</span>
     <span class="doccomment">///   f_{\textsc{FD}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.</span>
-    <span class="doccomment">/// \\]</span>
+    <span class="doccomment">/// \\end{equation}</span>
     <span class="ident">FermiDirac</span>,
-    <span class="doccomment">/// Bose--Einstein statistic describing integer-spin particles:</span>
+    <span class="doccomment">/// Bose–Einstein statistic describing integer-spin particles:</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// \\[</span>
+    <span class="doccomment">/// \\begin{equation}</span>
     <span class="doccomment">///   f_{\textsc{BE}} = \frac{1}{\exp[(E - \mu) \beta] - 1}.</span>
-    <span class="doccomment">/// \\]</span>
+    <span class="doccomment">/// \\end{equation}</span>
     <span class="ident">BoseEinstein</span>,
-    <span class="doccomment">/// Maxwell--Boltzmann statistic describing classical particles:</span>
+    <span class="doccomment">/// Maxwell–Boltzmann statistic describing classical particles:</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// \\[</span>
+    <span class="doccomment">/// \\begin{equation}</span>
     <span class="doccomment">///   f_{\textsc{MB}} = \exp[-(E - \mu) \beta].</span>
-    <span class="doccomment">/// \\]</span>
+    <span class="doccomment">/// \\end{equation}</span>
     <span class="ident">MaxwellBoltzmann</span>,
-    <span class="doccomment">/// Maxwell--Jüttner statistic describing relativistic classical particles:</span>
+    <span class="doccomment">/// Maxwell–Jüttner statistic describing relativistic classical particles:</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// \\[</span>
-    <span class="doccomment">///   f_{\textsc{MJ}} = \frac{E \beta \sqrt{E\^2 - m^2}}{m K_2(m \beta)} \exp[- E \beta].</span>
-    <span class="doccomment">/// \\]</span>
+    <span class="doccomment">/// \\begin{equation}</span>
+    <span class="doccomment">///   f_{\textsc{MJ}} = \frac{E \beta \sqrt{E^2 - m^2}}{m K_2(m \beta)} \exp[- E \beta].</span>
+    <span class="doccomment">/// \\end{equation}</span>
     <span class="ident">MaxwellJuttner</span>,
 }
 
@@ -532,9 +532,9 @@
 
     <span class="doccomment">/// Return number density for a particle following the specified statistic.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// \\[</span>
-    <span class="doccomment">///    n = \frac{1}{2 \pi\^2} \int_{m}\^{\infty} f_{i} u \sqrt{u\^2 - m\^2} \dd u</span>
-    <span class="doccomment">/// \\]</span>
+    <span class="doccomment">/// \\begin{equation}</span>
+    <span class="doccomment">///    n = \frac{1}{2 \pi^2} \int_{m}^{\infty} f_{i} u \sqrt{u^2 - m^2} \dd u</span>
+    <span class="doccomment">/// \\end{equation}</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Implementation Details</span>
     <span class="doccomment">///</span>
@@ -543,9 +543,9 @@
     <span class="doccomment">/// semi-infinite integral is numerical evaluated.  In order to make the</span>
     <span class="doccomment">/// calculation tractable on a computer, the change of variables</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// \\[</span>
-    <span class="doccomment">///   u \to m + \frac{t}{1 - t}, \qquad \dd u \to \frac{\dd t}{(t - 1)\^2}</span>
-    <span class="doccomment">/// \\]</span>
+    <span class="doccomment">/// \\begin{equation}</span>
+    <span class="doccomment">///   u \to m + \frac{t}{1 - t}, \qquad \dd u \to \frac{\dd t}{(t - 1)^2}</span>
+    <span class="doccomment">/// \\end{equation}</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// is used such that the bounds of the integral over \\(t\\) are \\([0,</span>
     <span class="doccomment">/// 1]\\).</span>
@@ -620,9 +620,9 @@
     <span class="doccomment">/// Return number density for a massless particle following the specified</span>
     <span class="doccomment">/// statistic.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// \\[</span>
-    <span class="doccomment">///    n = \frac{1}{2 \pi\^2} \int_{0}\^{\infty} f_{i} u\^2 \dd u</span>
-    <span class="doccomment">/// \\]</span>
+    <span class="doccomment">/// \\begin{equation}</span>
+    <span class="doccomment">///    n = \frac{1}{2 \pi^2} \int_{0}^{\infty} f_{i} u^2 \dd u</span>
+    <span class="doccomment">/// \\end{equation}</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is theoretically equivalent to setting `mass = 0` in</span>
     <span class="doccomment">/// [`Statistic::number_density`]; however, as there are analytic closed</span>
