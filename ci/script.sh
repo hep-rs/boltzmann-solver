@@ -10,7 +10,7 @@ clippy_lints() {
 
 # Run the standard build and test suite.
 build_and_test() {
-    cargo build
+    cargo build $FEATURES
     cargo test $FEATURES
 }
 
