@@ -4,7 +4,7 @@
 
 use constants;
 use statistic::Statistic;
-use utilities::interpolation;
+use special_functions::interpolation;
 
 /// Collection of properties which determine the evolution of a Universe.
 ///

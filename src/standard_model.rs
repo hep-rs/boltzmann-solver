@@ -1,6 +1,6 @@
 use constants::STANDARD_MODEL_GSTAR;
 use universe::Universe;
-use utilities::interpolation;
+use special_functions::interpolation;
 
 /// Implementation of [`Universe`] for the Standard Model.
 ///
