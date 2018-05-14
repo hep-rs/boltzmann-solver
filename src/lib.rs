@@ -80,11 +80,15 @@
 //!   \end{aligned}
 //! \\end{equation}
 //!
-//! where \\(\dd \Pi_i \defeq \dd^3 \vt p_i / (2 \pi)^3 E_i\\); \\(p_{\vt a}
-//! \defeq p_{a_1} + p_{a_2} + \cdots\\) (and similarly for \\(p_{\vt b}\\)),
-//! \\(\abs{\mathcal M(\vt a | \vt b)}^2\\) is the squared amplitude going from
-//! initial state \\(\vt a\\) to \\(\vt b\\) and is *summed over* all *internal
-//! degrees of freedom*.
+//! where \\(p_{\vt a} \defeq p_{a_1} + p_{a_2} + \cdots\\) (and similarly for
+//! \\(p_{\vt b}\\)); \\(\abs{\mathcal M(\vt a | \vt b)}^2\\) is the squared
+//! amplitude going from initial state \\(\vt a\\) to \\(\vt b\\) and is *summed
+//! over* all *internal degrees of freedom*; and
+//!
+//! \\begin{equation}
+//!   \dd \Pi_i \defeq \frac{\dd^3 \vt p_i}{(2 \pi)^3 E_i}
+//!             \equiv E_i \sqrt{E_i^2 - m_i^2} \frac{\dd E_i \dd \Omega_i}{(2 \pi)^3}.
+//! \\end{equation}
 //!
 //! The factors \\(1 \pm f\\) account for Pauli suppression and Bose enhancement
 //! in the transition \\(\vt a \leftrightarrow \vt b\\), where \\(1 + f\\) is
