@@ -1,3 +1,16 @@
+//! If the rate of collisions between particles is sufficiently high (as is
+//! usually the case), the phase space distribution of the particles will
+//! quickly converge onto either the Fermi–Dirac statistic or the Bose–Einstein
+//! statistic depending on whether the particle is a half-integer or integer
+//! spin particle.
+//!
+//! Furthermore, in the limit that the occupation is really low, both statistics
+//! resemble the Maxwell–Boltzmann distribution in the non-relativistic case, or
+//! the Maxwell–Jüttner distribution for the relativistic case.
+//!
+//! The statistics are implemented, as well as calculations of the number
+//! density.
+
 use quadrature::integrate;
 use special_functions::{bessel, polylog};
 use std::f64;
@@ -167,9 +180,9 @@ impl Statistic {
 #[cfg(test)]
 mod test {
     use super::*;
+    use csv;
     use std::f64;
     use utilities::test::*;
-    use csv;
 
     type Row6 = (f64, f64, f64, f64, f64, f64);
     type Row7 = (f64, f64, f64, f64, f64, f64, f64);
@@ -280,8 +293,8 @@ mod test {
 #[cfg(test)]
 mod bench {
     use super::*;
-    use test::{black_box, Bencher};
     use csv;
+    use test::{black_box, Bencher};
 
     type Row7 = (f64, f64, f64, f64, f64, f64, f64);
 
