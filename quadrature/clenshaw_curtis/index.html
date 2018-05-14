@@ -10,10 +10,11 @@
     <title>quadrature::clenshaw_curtis - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../normalize.css">
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css"
+          id="mainThemeStyle">
     
     <link rel="stylesheet" type="text/css" href="../../dark.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle">
     <script src="../../storage.js"></script>
     
 
@@ -54,13 +55,11 @@
         </form>
     </nav>
 
-    <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>quadrature</a>::<wbr><a class="mod" href=''>clenshaw_curtis</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content"><h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>quadrature</a>::<wbr><a class="mod" href=''>clenshaw_curtis</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/quadrature/clenshaw_curtis/mod.rs.html#1-139' title='goto source code'>[src]</a></span></h1>
-<div class='docblock'><p>The <code>clenshaw_curtis</code> module provides a <code>integrate</code> function with the same signature as <code>quadrature::integrate</code>.
+               </span><a class='srclink' href='../../src/quadrature/clenshaw_curtis/mod.rs.html#1-139' title='goto source code'>[src]</a></span></h1><div class='docblock'><p>The <code>clenshaw_curtis</code> module provides a <code>integrate</code> function with the same signature as <code>quadrature::integrate</code>.
 The implemented variant of clenshaw curtis quadrature is adaptive, however the weights change for each adaptation. This unfortunately means that the sum needs to be recalculated for each layer of adaptation.
 It also does not allocate on the heap, however it does use a <code>[f64; 129]</code> to store the function values. It has a hard coded maximum of approximately 257 function evaluations. This guarantees that the algorithm will return.
 The clenshaw curtis algorithm exactly integrates polynomials of order N. This implementation starts with an N of approximately 5 and increases up to an N of approximately 257. In general the error in the algorithm decreases exponentially in the number of function evaluations. In summery clenshaw curtis will in general use <strong>more stack space</strong> and <strong>run slower</strong> than the double exponential algorithm, unless clenshaw curtis can get the exact solution.</p>

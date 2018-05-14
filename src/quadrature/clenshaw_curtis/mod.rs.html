@@ -10,10 +10,11 @@
     <title>mod.rs.html -- source</title>
 
     <link rel="stylesheet" type="text/css" href="../../../normalize.css">
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css"
+          id="mainThemeStyle">
     
     <link rel="stylesheet" type="text/css" href="../../../dark.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css" id="themeStyle">
+    <link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle">
     <script src="../../../storage.js"></script>
     
 
@@ -277,7 +278,7 @@
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">trivial_function_works</span>() {
-        <span class="kw">let</span> <span class="ident">o</span> <span class="op">=</span> <span class="ident">integrate</span>(<span class="op">|</span>_<span class="op">|</span> <span class="number">0.5</span>, <span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1e-14</span>);
+        <span class="kw">let</span> <span class="ident">o</span> <span class="op">=</span> <span class="ident">integrate</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="number">0.5</span>, <span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1e-14</span>);
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">o</span>.<span class="ident">error_estimate</span> <span class="op">&lt;=</span> <span class="number">1e-14</span>,
                 <span class="string">&quot;error_estimate larger then asked. estimate: {:#?}, asked: {:#?}&quot;</span>,
                 <span class="ident">o</span>.<span class="ident">error_estimate</span>,

@@ -4,17 +4,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `src/universe.rs`.">
+    <meta name="description" content="Source to the Rust file `src/universe/mod.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
-    <title>universe.rs.html -- source</title>
+    <title>mod.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../normalize.css">
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css"
+          id="mainThemeStyle">
     
-    <link rel="stylesheet" type="text/css" href="../../dark.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
-    <script src="../../storage.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle">
+    <script src="../../../storage.js"></script>
     
 
     
@@ -38,11 +39,11 @@
 
     <div class="theme-picker">
         <button id="theme-picker" aria-label="Pick another theme!">
-            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
         </button>
         <div id="theme-choices"></div>
     </div>
-    <script src="../../theme.js"></script>
+    <script src="../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -155,14 +156,22 @@
 <span id="99"> 99</span>
 <span id="100">100</span>
 <span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! The effects of the Universe&#39;s evolution play an important role in the</span>
-<span class="doccomment">//! Boltzmann equations.  The [`Universe`] trait describes the evolution of the</span>
-<span class="doccomment">//! Universe.</span>
+<span class="doccomment">//! Boltzmann equation.  This information is provided by implementations of the</span>
+<span class="doccomment">//! [`Universe`] trait.</span>
+
+<span class="kw">mod</span> <span class="ident">standard_model</span>;
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">standard_model</span>::<span class="ident">StandardModel</span>;
 
 <span class="kw">use</span> <span class="ident">constants</span>;
-<span class="kw">use</span> <span class="ident">statistic</span>::<span class="ident">Statistic</span>;
 <span class="kw">use</span> <span class="ident">special_functions</span>::<span class="ident">interpolation</span>;
+<span class="kw">use</span> <span class="ident">statistic</span>::<span class="ident">Statistic</span>;
 
 <span class="doccomment">/// Collection of properties which determine the evolution of a Universe.</span>
 <span class="doccomment">///</span>
@@ -316,10 +325,10 @@
     
 
     <script>
-        window.rootPath = "../../";
+        window.rootPath = "../../../";
         window.currentCrate = "boltzmann_solver";
     </script>
-    <script src="../../main.js"></script>
-    <script defer src="../../search-index.js"></script>
+    <script src="../../../main.js"></script>
+    <script defer src="../../../search-index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body>
 </html>

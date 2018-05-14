@@ -10,10 +10,11 @@
     <title>boltzmann_solver - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../normalize.css">
-    <link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle">
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css"
+          id="mainThemeStyle">
     
     <link rel="stylesheet" type="text/css" href="../dark.css">
-    <link rel="stylesheet" type="text/css" href="../main.css" id="themeStyle">
+    <link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle">
     <script src="../storage.js"></script>
     
 
@@ -33,7 +34,7 @@
     <nav class="sidebar">
         <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'>Crate boltzmann_solver</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'boltzmann_solver', ty: 'mod', relpath: '../'};</script></div>
+        <p class='location'>Crate boltzmann_solver</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#modules">Modules</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'boltzmann_solver', ty: 'mod', relpath: '../'};</script></div>
     </nav>
 
     <div class="theme-picker">
@@ -54,13 +55,11 @@
         </form>
     </nav>
 
-    <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Crate <a class="mod" href=''>boltzmann_solver</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content"><h1 class='fqn'><span class='in-band'>Crate <a class="mod" href=''>boltzmann_solver</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/boltzmann_solver/lib.rs.html#1-245' title='goto source code'>[src]</a></span></h1>
-<div class='docblock'><p><code>boltzmann-solver</code> is a library allowing for Boltzmann equation in the
+               </span><a class='srclink' href='../src/boltzmann_solver/lib.rs.html#1-244' title='goto source code'>[src]</a></span></h1><div class='docblock'><p><code>boltzmann-solver</code> is a library allowing for Boltzmann equation in the
 context of particle physics / early cosmology.  It provides functionalities
 to solve Boltzmann equation in the case where a single species is out of
 equilibrium, as well as functionalities to solve the Boltzmann equations
@@ -121,11 +120,14 @@ g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3 E_{a_1}}
 - \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right) \Bigr],
 \end{aligned}
 \end{equation}</p>
-<p>where \(\dd \Pi_i \defeq \dd^3 \vt p_i / (2 \pi)^3 E_i\); \(p_{\vt a}
-\defeq p_{a_1} + p_{a_2} + \cdots\) (and similarly for \(p_{\vt b}\)),
-\(\abs{\mathcal M(\vt a | \vt b)}^2\) is the squared amplitude going from
-initial state \(\vt a\) to \(\vt b\) and is <em>summed over</em> all <em>internal
-degrees of freedom</em>.</p>
+<p>where \(p_{\vt a} \defeq p_{a_1} + p_{a_2} + \cdots\) (and similarly for
+\(p_{\vt b}\)); \(\abs{\mathcal M(\vt a | \vt b)}^2\) is the squared
+amplitude going from initial state \(\vt a\) to \(\vt b\) and is <em>summed
+over</em> all <em>internal degrees of freedom</em>; and</p>
+<p>\begin{equation}
+\dd \Pi_i \defeq \frac{\dd^3 \vt p_i}{(2 \pi)^3 E_i}
+\equiv E_i \sqrt{E_i^2 - m_i^2} \frac{\dd E_i \dd \Omega_i}{(2 \pi)^3}.
+\end{equation}</p>
 <p>The factors \(1 \pm f\) account for Pauli suppression and Bose enhancement
 in the transition \(\vt a \leftrightarrow \vt b\), where \(1 + f\) is
 used for Bose–Einstein statistics, and \(1 - f\) is used for Fermi–Dirac
@@ -243,41 +245,26 @@ g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3 E_{a_1}}
                                 <p>Collection of physical and mathematical constants which appear frequently.</p>
 
                            </td>
-                       </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
-<table>
+                       </tr>
                        <tr class=' module-item'>
-                           <td><a class="struct" href="struct.SingleSpecies.html"
-                                  title='struct boltzmann_solver::SingleSpecies'>SingleSpecies</a></td>
+                           <td><a class="mod" href="statistic/index.html"
+                                  title='mod boltzmann_solver::statistic'>statistic</a></td>
                            <td class='docblock-short'>
-                                <p>Contribution from a single particle in the Universe.</p>
+                                <p>If the rate of collisions between particles is sufficiently high (as is
+usually the case), the phase space distribution of the particles will
+quickly converge onto either the Fermi–Dirac statistic or the Bose–Einstein
+statistic depending on whether the particle is a half-integer or integer
+spin particle.</p>
 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="struct" href="struct.StandardModel.html"
-                                  title='struct boltzmann_solver::StandardModel'>StandardModel</a></td>
+                           <td><a class="mod" href="universe/index.html"
+                                  title='mod boltzmann_solver::universe'>universe</a></td>
                            <td class='docblock-short'>
-                                <p>Implementation of [<code>Universe</code>] for the Standard Model.</p>
-
-                           </td>
-                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Statistic.html"
-                                  title='enum boltzmann_solver::Statistic'>Statistic</a></td>
-                           <td class='docblock-short'>
-                                <p>The statistics which describe the distribution of particles over energy
-states.  Both Fermi–Dirac and Bose–Einstein quantum statistics are
-implemented, as well as the classical Maxwell–Boltzmann statistic.</p>
-
-                           </td>
-                       </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="trait" href="trait.Universe.html"
-                                  title='trait boltzmann_solver::Universe'>Universe</a></td>
-                           <td class='docblock-short'>
-                                <p>Collection of properties which determine the evolution of a Universe.</p>
+                                <p>The effects of the Universe's evolution play an important role in the
+Boltzmann equation.  This information is provided by implementations of the
+[<code>Universe</code>] trait.</p>
 
                            </td>
                        </tr></table></section>

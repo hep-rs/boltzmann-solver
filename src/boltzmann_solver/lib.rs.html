@@ -10,10 +10,11 @@
     <title>lib.rs.html -- source</title>
 
     <link rel="stylesheet" type="text/css" href="../../normalize.css">
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css"
+          id="mainThemeStyle">
     
     <link rel="stylesheet" type="text/css" href="../../dark.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle">
     <script src="../../storage.js"></script>
     
 
@@ -298,7 +299,6 @@
 <span id="242">242</span>
 <span id="243">243</span>
 <span id="244">244</span>
-<span id="245">245</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! `boltzmann-solver` is a library allowing for Boltzmann equation in the</span>
 <span class="doccomment">//! context of particle physics / early cosmology.  It provides functionalities</span>
@@ -382,11 +382,15 @@
 <span class="doccomment">//!   \end{aligned}</span>
 <span class="doccomment">//! \\end{equation}</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! where \\(\dd \Pi_i \defeq \dd^3 \vt p_i / (2 \pi)^3 E_i\\); \\(p_{\vt a}</span>
-<span class="doccomment">//! \defeq p_{a_1} + p_{a_2} + \cdots\\) (and similarly for \\(p_{\vt b}\\)),</span>
-<span class="doccomment">//! \\(\abs{\mathcal M(\vt a | \vt b)}^2\\) is the squared amplitude going from</span>
-<span class="doccomment">//! initial state \\(\vt a\\) to \\(\vt b\\) and is *summed over* all *internal</span>
-<span class="doccomment">//! degrees of freedom*.</span>
+<span class="doccomment">//! where \\(p_{\vt a} \defeq p_{a_1} + p_{a_2} + \cdots\\) (and similarly for</span>
+<span class="doccomment">//! \\(p_{\vt b}\\)); \\(\abs{\mathcal M(\vt a | \vt b)}^2\\) is the squared</span>
+<span class="doccomment">//! amplitude going from initial state \\(\vt a\\) to \\(\vt b\\) and is *summed</span>
+<span class="doccomment">//! over* all *internal degrees of freedom*; and</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! \\begin{equation}</span>
+<span class="doccomment">//!   \dd \Pi_i \defeq \frac{\dd^3 \vt p_i}{(2 \pi)^3 E_i}</span>
+<span class="doccomment">//!             \equiv E_i \sqrt{E_i^2 - m_i^2} \frac{\dd E_i \dd \Omega_i}{(2 \pi)^3}.</span>
+<span class="doccomment">//! \\end{equation}</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The factors \\(1 \pm f\\) account for Pauli suppression and Bose enhancement</span>
 <span class="doccomment">//! in the transition \\(\vt a \leftrightarrow \vt b\\), where \\(1 + f\\) is</span>
@@ -535,13 +539,8 @@
 }
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">constants</span>;
-<span class="kw">mod</span> <span class="ident">standard_model</span>;
-<span class="kw">mod</span> <span class="ident">statistic</span>;
-<span class="kw">mod</span> <span class="ident">universe</span>;
-
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">standard_model</span>::<span class="ident">StandardModel</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">statistic</span>::<span class="ident">Statistic</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">universe</span>::{<span class="ident">SingleSpecies</span>, <span class="ident">Universe</span>};
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">statistic</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">universe</span>;
 
 <span class="comment">// pub mod common;</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">utilities</span>;
