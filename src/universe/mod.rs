@@ -1,10 +1,14 @@
 //! The effects of the Universe's evolution play an important role in the
-//! Boltzmann equations.  The [`Universe`] trait describes the evolution of the
-//! Universe.
+//! Boltzmann equation.  This information is provided by implementations of the
+//! [`Universe`] trait.
+
+mod standard_model;
+
+pub use self::standard_model::StandardModel;
 
 use constants;
-use statistic::Statistic;
 use special_functions::interpolation;
+use statistic::Statistic;
 
 /// Collection of properties which determine the evolution of a Universe.
 ///
