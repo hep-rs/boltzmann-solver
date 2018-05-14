@@ -233,13 +233,8 @@ macro_rules! debug_assert_warn {
 }
 
 pub mod constants;
-mod standard_model;
-mod statistic;
-mod universe;
-
-pub use standard_model::StandardModel;
-pub use statistic::Statistic;
-pub use universe::{SingleSpecies, Universe};
+pub mod statistic;
+pub mod universe;
 
 // pub mod common;
 pub(crate) mod utilities;
