@@ -23,7 +23,7 @@
 //! species of particles.  In full generality, it is given by
 //!
 //! \\begin{equation}
-//!     \vt L[f] = \vt C[f]
+//!   \vt L[f] = \vt C[f]
 //! \\end{equation}
 //!
 //! where \\(\vt L\\) is the Liouville operator and \\(\vt C\\) is the collision
@@ -38,30 +38,30 @@
 //! simplifies to only be dependent the time-like derivatives:
 //!
 //! \\begin{equation}
-//!     \vt L[f] \stackrel{\mathrm{\tiny FLRW}}{=} \left[ E \pfrac{}{t} - H (E^2 - m^2) \pfrac{}{E} \right] f,
+//!   \vt L[f] \stackrel{\mathrm{\tiny FLRW}}{=} \left[ E \pfrac{}{t} - H (E^2 - m^2) \pfrac{}{E} \right] f,
 //! \\end{equation}
 //!
 //! where \\(H \defeq \dot a / a\\) is Hubble's constant.
 //!
-//! ### Collision Operator
-//!
 //! In the absence of any collisions, the Boltzmann equation ensures that the
-//! phase space distribution is conserved.  More explicitly, integrating the
-//! phase space, the Liouville operator becomes
+//! phase space distribution is conserved.  This implies that after integrating
+//! the phase space, the number density per comoving volume remains constant if
+//! there are no collisions.  This is evident after integrating the Liouville
+//! operator over the phase space:
 //!
 //! \\begin{equation}
-//!     g \int \vt L[f] \frac{\dd^3 \vt p}{(2 \pi)^3 E} = \pfrac{n}{t} + 3 H n = \frac{1}{a^3} \pfrac{(n a^3)}{t}
+//!   g \int \vt L[f] \frac{\dd^3 \vt p}{(2 \pi)^3 E} = \pfrac{n}{t} + 3 H n = \frac{1}{a^3} \pfrac{(n a^3)}{t}.
 //! \\end{equation}
 //!
-//! which ensures that the overall number of particles is conserved under the
-//! scaling by the FLRW metric.  Note that the number density is related to the
-//! phase space distribution through
+//! The number density is related to the phase space distribution through
 //!
 //! \\begin{equation}
-//!     n \defeq g \int f \frac{\dd^3 \vt p}{(2 \pi)^3} = \frac{g}{2 \pi^2} \int_m^\infty f \sqrt{E^2 - m^2} E \dd E
+//!   n \defeq g \int f \frac{\dd^3 \vt p}{(2 \pi)^3} = \frac{g}{2 \pi^2} \int_m^\infty f \sqrt{E^2 - m^2} E \dd E,
 //! \\end{equation}
 //!
 //! where \\(g\\) is the number of internal degrees of freedom of the particle.
+//!
+//! ### Collision Operator
 //!
 //! The collision term in the Boltzmann equation describes the changes to the
 //! phase space distribution that arise from collisions—either through the
