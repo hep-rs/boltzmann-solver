@@ -105,7 +105,6 @@
 
 #![cfg_attr(feature = "nightly", feature(test))]
 #![cfg_attr(feature = "nightly", feature(iterator_step_by))]
-#![cfg_attr(feature = "cargo-clippy", allow(unreadable_literal))]
 #![cfg_attr(feature = "strict", deny(missing_docs))]
 #![cfg_attr(feature = "strict", deny(warnings))]
 
