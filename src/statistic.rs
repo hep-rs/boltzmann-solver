@@ -112,8 +112,8 @@ impl Statistic {
                     "Fermi–Dirac integral: {:e} ± {:e} ({} function evaluations)",
                     integral.integral, integral.error_estimate, integral.num_function_evaluations
                 );
-                // 1/(2 π²) ≅ 0.050660591821168885722
-                0.050660591821168885722 * integral.integral
+                // 1/(2 π²) ≅ 0.050_660_591_821_168_89
+                0.050_660_591_821_168_89 * integral.integral
             }
             Statistic::BoseEinstein => {
                 let integral = integrate(
@@ -132,12 +132,12 @@ impl Statistic {
                     "Bose–Einstein integral: {:e} ± {:e} ({} function evaluations)",
                     integral.integral, integral.error_estimate, integral.num_function_evaluations
                 );
-                // 1/(2 π²) ≅ 0.050660591821168885722
-                0.050660591821168885722 * integral.integral
+                // 1/(2 π²) ≅ 0.050_660_591_821_168_89
+                0.050_660_591_821_168_89 * integral.integral
             }
             Statistic::MaxwellBoltzmann => {
-                // 1/(2 π²) ≅ 0.050660591821168885722
-                0.050660591821168885722 * mass.powi(2) * bessel::k_2(mass * beta)
+                // 1/(2 π²) ≅ 0.050_660_591_821_168_89
+                0.050_660_591_821_168_89 * mass.powi(2) * bessel::k_2(mass * beta)
                     * f64::exp(mu * beta) / beta
             }
             Statistic::MaxwellJuttner => {
