@@ -59,7 +59,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/boltzmann_solver/lib.rs.html#1-244' title='goto source code'>[src]</a></span></h1><div class='docblock'><p><code>boltzmann-solver</code> is a library allowing for Boltzmann equation in the
+               </span><a class='srclink' href='../src/boltzmann_solver/lib.rs.html#1-137' title='goto source code'>[src]</a></span></h1><div class='docblock'><p><code>boltzmann-solver</code> is a library allowing for Boltzmann equation in the
 context of particle physics / early cosmology.  It provides functionalities
 to solve Boltzmann equation in the case where a single species is out of
 equilibrium, as well as functionalities to solve the Boltzmann equations
@@ -90,7 +90,10 @@ simplifies to only be dependent the time-like derivatives:</p>
 <p>\begin{equation}
 \vt L[f] \stackrel{\mathrm{\tiny FLRW}}{=} \left[ E \pfrac{}{t} - H (E^2 - m^2) \pfrac{}{E} \right] f,
 \end{equation}</p>
-<p>where \(H \defeq \dot a / a\) is Hubble's constant.</p>
+<p>where \(H \defeq \dot a / a\) is Hubble's constant.  Unless there is a
+sudden increase in entropy due to the out-of-equilibrium decay of a
+particle, the entropy per comoving volume remains constant: \(\dd(s a^3) =
+0\).  Furthermore,</p>
 <p>In the absence of any collisions, the Boltzmann equation ensures that the
 phase space distribution is conserved.  This implies that after integrating
 the phase space, the number density per comoving volume remains constant if
@@ -126,116 +129,16 @@ amplitude going from initial state \(\vt a\) to \(\vt b\) and is <em>summed
 over</em> all <em>internal degrees of freedom</em>; and</p>
 <p>\begin{equation}
 \dd \Pi_i \defeq \frac{\dd^3 \vt p_i}{(2 \pi)^3 E_i}
-\equiv E_i \sqrt{E_i^2 - m_i^2} \frac{\dd E_i \dd \Omega_i}{(2 \pi)^3}.
+\equiv E_i \sqrt{E_i^2 - m_i^2} \frac{\dd E_i \dd \Omega_i}{(2 \pi)^3}
 \end{equation}</p>
 <p>The factors \(1 \pm f\) account for Pauli suppression and Bose enhancement
 in the transition \(\vt a \leftrightarrow \vt b\), where \(1 + f\) is
-used for Bose–Einstein statistics, and \(1 - f\) is used for Fermi–Dirac
-statistics.</p>
+used for Bose–Einstein statistics as it increases the probability of a
+transition into a highly occupied state; and \(1 - f\) is used for
+Fermi–Dirac statistics as it decreases the probability of a transition into
+a highly occupied state.</p>
 <p>The above collision term accounts for a single interaction and in general a
 sum over all possible interactions must be done.</p>
-<h2 id="simplifying-assumptions" class="section-header"><a href="#simplifying-assumptions">Simplifying Assumptions</a></h2>
-<p>Solving the Boltzmann equation in generality without making any assumption
-about the phase space distribution \(f\) (other than specifying some
-initial condition) is a difficult problem.  A couple of assumptions can be
-made to simplify the Boltzmann equation above.</p>
-<ul>
-<li>
-<p><em>Assume kinetic equilibrium.</em> If the rate at which a particle species is
-scattering is sufficiently fast, phase space distribution of this species
-will rapidly converge converge onto either the Bose–Einstein or
-Fermi–Dirac distributions:</p>
-<p>\begin{equation}
-f_{\textsc{BE}} = \frac{1}{\exp[(E - \mu) \beta] - 1}, \qquad
-f_{\textsc{FD}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.
-\end{equation}</p>
-<p>For a particular that remains in kinetic equilibrium, the evolution of its
-phase space is entirely described by the evolution of \(\mu\) in time.</p>
-</li>
-<li>
-<p><em>Assume \(\beta \gg E - \mu\).</em> In the limit that the temperature is
-much less than \(E - \mu\) (or equivalently, that the inverse
-temperature \(\beta\) is greater than \(E - \mu\)), both the
-Fermi–Dirac and Bose–Einstein approach the Maxwell–Boltzmann distribution:</p>
-<p>\begin{equation}
-f_{\textsc{MB}} = \exp[-(E - \mu) \beta]
-\end{equation}</p>
-<p>Furthermore, the assumption that \(\beta \gg E - \mu\) implies that
-\(f_{\textsc{BE}}, f_{\textsc{FD}} \ll 1\).  Consequently, the Pauli
-suppression and Bose enhancement factors in the collision term can all be
-neglected resulting in:</p>
-<p>\begin{equation}
-\begin{aligned}
-g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3 E_{a_1}}
-&amp;= - \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right)
-(2 \pi)^4 \delta(p_{\vt a} - p_{\vt b}) \\
-&amp;\quad \times \Biggl[ \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right)
-- \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \Biggr],
-\end{aligned}
-\end{equation}</p>
-<p>Combined with the assumption that all species are in kinetic equilibrium,
-then the collision term can be further simplified to:</p>
-<p>\begin{equation}
-\begin{aligned}
-g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3 E_{a_1}}
-&amp;= - \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right)
-(2 \pi)^4 \delta(p_{\vt a} - p_{\vt b}) \\
-&amp;\quad \times \Biggl[ \abs{\mathcal M(\vt a | \vt b)}^2 e^{ \beta \sum_{\vt a} \mu_i }
-- \abs{\mathcal M(\vt b | \vt a)}^2 e^{ \beta \sum_{\vt b} \mu_i } \Biggr]
-e^{ - \beta \sum_{\vt a} E_i },
-\end{aligned}
-\end{equation}</p>
-<p>where energy conservation (as imposed by the Dirac delta) is used to
-equate \(\sum_{\vt a} E_i = \sum_{\vt b} E_i\).</p>
-<p>It should be noted that this assumption also simplifies greatly the
-expression for the number density.  In particular, we obtain:</p>
-</li>
-</ul>
-<p>\begin{equation}
-n = e^{\mu \beta} \frac{m^2 K_2(m \beta)}{2 \pi^2 \beta} = e^{\mu \beta} n^{(0)}
-\end{equation}</p>
-<ul>
-<li>
-<p><em>Assume \(\mathcal{CP}\) symmetry.</em> If \(\mathcal{CP}\) symmetry is
-assumed, then \(\abs{\mathcal M(\vt a | \vt b)}^2 \equiv \abs{\mathcal
-M(\vt b | \vt a)}^2\).  This simplification allows for the exponentials
-of \(\mu\) to be taken out of the integral entirely:</p>
-<p>\begin{equation}
-g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3 E_{a_1}}
-= - \left[ e^{ \beta \sum_{\vt a} \mu_i } - e^{ \beta \sum_{\vt b} \mu_i } \right]
-\int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right) (2 \pi)^4 \delta(p_{\vt a} - p_{\vt b})
-\abs{\mathcal M(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i }.
-\end{equation}</p>
-<p>The remaining integrand is then independent of time and can be
-pre-calculated.  In the case of a \(2 \leftrightarrow 2\) interaction,
-this integral is related to the thermally averaged cross-section
-\(\angles{\sigma v_\text{rel}}\).</p>
-<p>Solving the Boltzmann equation is generally required within the context of
-baryogenesis and leptogenesis where the assumption of \(\mathcal{CP}\)
-symmetry is evidently not correct.  In such cases, it is convenient to
-define the parameter \(\epsilon\) to account for all of the
-\(\mathcal{CP}\) asymmetry as.  That is:</p>
-<p>\begin{equation}
-\abs{\mathcal M(\vt a | \vt b)}^2 = (1 + \epsilon) \abs{\mathcal{M^{(0)}(\vt a | \vt b)}}^2, \qquad
-\abs{\mathcal M(\vt b | \vt a)}^2 = (1 - \epsilon) \abs{\mathcal{M^{(0)}(\vt a | \vt b)}}^2,
-\end{equation}</p>
-<p>where \(\abs{\mathcal{M^{(0)}}(\vt a | \vt b)}^2\) is the
-\(\mathcal{CP}\)-symmetric squared amplitude.  With \(\epsilon\)
-defined as above, the collision term becomes:</p>
-<p>\begin{equation}
-\begin{aligned}
-g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3 E_{a_1}}
-&amp;= - \left(
-\left[ e^{ \beta \sum_{\vt a} \mu_i } - e^{ \beta \sum_{\vt b} \mu_i } \right]
-+ \epsilon \left[ e^{ \beta \sum_{\vt a} \mu_i } + e^{ \beta \sum_{\vt b} \mu_i } \right]
-\right) \\
-&amp;\quad \times
-\int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right) (2 \pi)^4 \delta(p_{\vt a} - p_{\vt b})
-\abs{\mathcal M^{(0)}(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i }.
-\end{aligned}
-\end{equation}</p>
-</li>
-</ul>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
                        <tr class=' module-item'>
@@ -243,6 +146,14 @@ g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3 E_{a_1}}
                                   title='mod boltzmann_solver::constants'>constants</a></td>
                            <td class='docblock-short'>
                                 <p>Collection of physical and mathematical constants which appear frequently.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="mod" href="solver/index.html"
+                                  title='mod boltzmann_solver::solver'>solver</a></td>
+                           <td class='docblock-short'>
+                                <p>Solvers for the Boltzmann equation, or sets of Boltzmann equations</p>
 
                            </td>
                        </tr>

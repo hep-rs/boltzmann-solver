@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `number_density` mod in crate `boltzmann_solver`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, number_density">
+
+    <title>boltzmann_solver::solver::number_density - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css"
+          id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle">
+    <script src="../../../storage.js"></script>
+    
+
+    
+    
+</head>
+<body class="rustdoc mod"><!-- Google Tag Manager (noscript) --><noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N9HX7G4" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript><!-- End Google Tag Manager (noscript) -->
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
+        
+        <p class='location'>Module number_density</p><div class="sidebar-elems"><p class='location'><a href='../../index.html'>boltzmann_solver</a>::<wbr><a href='../index.html'>solver</a></p><script>window.sidebarCurrent = {name: 'number_density', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div>
+    </nav>
+
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../theme.js"></script>
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content"><h1 class='fqn'><span class='in-band'>Module <a href='../../index.html'>boltzmann_solver</a>::<wbr><a href='../index.html'>solver</a>::<wbr><a class="mod" href=''>number_density</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../../../src/boltzmann_solver/solver/number_density.rs.html#1-117' title='goto source code'>[src]</a></span></h1><div class='docblock'><p>Solver for the number density evolution given by integrating the Boltzmann
+equation.</p>
+<p>Solving the Boltzmann equation in generality without making any assumption
+about the phase space distribution \(f\) (other than specifying some
+initial condition) is a difficult problem.  Furthermore, within the context
+of baryogenesis and leptogenesis, we are only interested in the number
+density (or more specifically, the difference in the number densities or a
+particle and its corresponding antiparticle).</p>
+<p>A couple of assumptions can be made to simplify the Boltzmann equation so
+that the number densities can be computed directly.</p>
+<ul>
+<li>
+<p><em>Assume kinetic equilibrium.</em> If the rate at which a particle species is
+scattering is sufficiently fast, phase space distribution of this species
+will rapidly converge converge onto either the Bose–Einstein or
+Fermi–Dirac distributions:</p>
+<p>\begin{equation}
+f_{\textsc{BE}} = \frac{1}{\exp[(E - \mu) \beta] - 1}, \qquad
+f_{\textsc{FD}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.
+\end{equation}</p>
+<p>For a particular that remains in kinetic equilibrium, the evolution of its
+phase space is entirely described by the evolution of \(\mu\) in time.</p>
+</li>
+<li>
+<p><em>Assume \(\beta \gg E - \mu\).</em> In the limit that the temperature is
+much less than \(E - \mu\) (or equivalently, that the inverse
+temperature \(\beta\) is greater than \(E - \mu\)), both the
+Fermi–Dirac and Bose–Einstein approach the Maxwell–Boltzmann distribution:</p>
+<p>\begin{equation}
+f_{\textsc{MB}} = \exp[-(E - \mu) \beta]
+\end{equation}</p>
+<p>Furthermore, the assumption that \(\beta \gg E - \mu\) implies that
+\(f_{\textsc{BE}}, f_{\textsc{FD}} \ll 1\).  Consequently, the Pauli
+suppression and Bose enhancement factors in the collision term can all be
+neglected resulting in:</p>
+<p>\begin{equation}
+\begin{aligned}
+g_{a_1} \int \vt C[f_{a_{1}}] \dd \Pi_{a_1}
+&amp;= - \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right)
+(2 \pi)^4 \delta(p_{\vt a} - p_{\vt b}) \\
+&amp;\quad \times \Biggl[ \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right)
+- \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \Biggr],
+\end{aligned}
+\end{equation}</p>
+<p>Combined with the assumption that all species are in kinetic equilibrium,
+then the collision term can be further simplified to:</p>
+<p>\begin{equation}
+\begin{aligned}
+g_{a_1} \int \vt C[f_{a_{1}}] \dd \Pi_{a_1}
+&amp;= - \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right)
+(2 \pi)^4 \delta(p_{\vt a} - p_{\vt b}) \\
+&amp;\quad \times \Biggl[ \abs{\mathcal M(\vt a | \vt b)}^2 e^{ \beta \sum_{\vt a} \mu_i }
+- \abs{\mathcal M(\vt b | \vt a)}^2 e^{ \beta \sum_{\vt b} \mu_i } \Biggr]
+e^{ - \beta \sum_{\vt a} E_i },
+\end{aligned}
+\end{equation}</p>
+<p>where energy conservation (as imposed by the Dirac delta) is used to
+equate \(\sum_{\vt a} E_i = \sum_{\vt b} E_i\).</p>
+<p>It should be noted that this assumption also simplifies greatly the
+expression for the number density.  In particular, we obtain:</p>
+</li>
+</ul>
+<p>\begin{equation}
+n = e^{\mu \beta} \frac{m^2 K_2(m \beta)}{2 \pi^2 \beta} = e^{\mu \beta} n^{(0)}
+\end{equation}</p>
+<ul>
+<li>
+<p><em>Assume \(\mathcal{CP}\) symmetry.</em> If \(\mathcal{CP}\) symmetry is
+assumed, then \(\abs{\mathcal M(\vt a | \vt b)}^2 \equiv \abs{\mathcal
+M(\vt b | \vt a)}^2\).  This simplification allows for the exponentials
+of \(\mu\) to be taken out of the integral entirely:</p>
+<p>\begin{equation}
+g_{a_1} \int \vt C[f_{a_{1}}] \dd \Pi_{a_1}
+= - \left[ e^{ \beta \sum_{\vt a} \mu_i } - e^{ \beta \sum_{\vt b} \mu_i } \right]
+\int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right) (2 \pi)^4 \delta(p_{\vt a} - p_{\vt b})
+\abs{\mathcal M(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i }.
+\end{equation}</p>
+<p>The remaining integrand is then independent of time and can be
+pre-calculated.  In the case of a \(2 \leftrightarrow 2\) interaction,
+this integral is related to the thermally averaged cross-section
+\(\angles{\sigma v_\text{rel}}\).</p>
+<p>Solving the Boltzmann equation is generally required within the context of
+baryogenesis and leptogenesis where the assumption of \(\mathcal{CP}\)
+symmetry is evidently not correct.  In such cases, it is convenient to
+define the parameter \(\epsilon\) to account for all of the
+\(\mathcal{CP}\) asymmetry as.  That is:</p>
+<p>\begin{equation}
+\abs{\mathcal M(\vt a | \vt b)}^2 = (1 + \epsilon) \abs{\mathcal{M^{(0)}(\vt a | \vt b)}}^2, \qquad
+\abs{\mathcal M(\vt b | \vt a)}^2 = (1 - \epsilon) \abs{\mathcal{M^{(0)}(\vt a | \vt b)}}^2,
+\end{equation}</p>
+<p>where \(\abs{\mathcal{M^{(0)}}(\vt a | \vt b)}^2\) is the
+\(\mathcal{CP}\)-symmetric squared amplitude.  With \(\epsilon\)
+defined as above, the collision term becomes:</p>
+<p>\begin{equation}
+\begin{aligned}
+g_{a_1} \int \vt C[f_{a_{1}}] \dd \Pi_{a_1}
+&amp;= - \left[ e^{ \beta \sum_{\vt a} \mu_i } - e^{ \beta \sum_{\vt b} \mu_i } \right] \times
+\int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right) (2 \pi)^4 \delta(p_{\vt a} - p_{\vt b})
+\abs{\mathcal M^{(0)}(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i } \\
+&amp;\quad - \left[ e^{ \beta \sum_{\vt a} \mu_i } + e^{ \beta \sum_{\vt b} \mu_i } \right] \times
+\int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right) (2 \pi)^4 \delta(p_{\vt a} - p_{\vt b})
+\epsilon \abs{\mathcal M^{(0)}(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i }.
+\end{aligned}
+\end{equation}</p>
+</li>
+</ul>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt><kbd>?</kbd></dt>
+                    <dd>Show this help dialog</dd>
+                    <dt><kbd>S</kbd></dt>
+                    <dd>Focus the search field</dd>
+                    <dt><kbd>↑</kbd></dt>
+                    <dd>Move up in search results</dd>
+                    <dt><kbd>↓</kbd></dt>
+                    <dd>Move down in search results</dd>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
+                    <dd>Go to active search result</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../";
+        window.currentCrate = "boltzmann_solver";
+    </script>
+    <script src="../../../main.js"></script>
+    <script defer src="../../../search-index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body>
+</html>
