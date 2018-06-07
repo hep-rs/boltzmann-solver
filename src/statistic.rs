@@ -51,12 +51,27 @@ impl Statistic {
     /// Evaluate the phase space distribution, \\(f\\) as defined above.
     pub fn phase_space(&self, e: f64, m: f64, mu: f64, beta: f64) -> f64 {
         match *self {
-            Statistic::FermiDirac => 1.0 / (f64::exp((e - mu) * beta) + 1.0),
-            Statistic::BoseEinstein => 1.0 / (f64::exp((e - mu) * beta) - 1.0),
+            Statistic::FermiDirac => (f64::exp((e - mu) * beta) + 1.0).recip(),
+            Statistic::BoseEinstein => {
+                let exponent = (e - mu) * beta;
+                if exponent.abs() < 1.0 {
+                    f64::exp_m1(exponent).recip()
+                } else {
+                    (f64::exp(exponent) - 1.0).recip()
+                }
+            }
             Statistic::MaxwellBoltzmann => f64::exp(-(e - mu) * beta),
             Statistic::MaxwellJuttner => {
-                beta * e * f64::sqrt(e.powi(2) - m.powi(2)) * (-e * beta).exp()
-                    / (m * bessel::k_2(m * beta))
+                // Check whether we'll likely have zero or not
+                if ((m / e).powi(2) - 1.0).abs() < f64::EPSILON || e * beta > 700.0 {
+                    0.0
+                } else {
+                    // Note that instead of `f64::sqrt(e.powi(2) - m.powi(2))`
+                    // we use the more precise (but equivalent) form: `e *
+                    // f64::sqrt(1.0 - (m / e).powi(2))`.
+                    beta * e.powi(2) * f64::sqrt(1.0 - (m / e).powi(2))
+                        / (f64::exp(e * beta) * m * bessel::k_2(m * beta))
+                }
             }
         }
     }
