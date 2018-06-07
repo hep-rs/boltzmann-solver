@@ -63,13 +63,21 @@ impl Species {
     }
 }
 
+struct StepChange {
+    increase: f64,
+    decrease: f64,
+}
+
 /// The solver holding all the information.
 #[allow(dead_code)]
 pub struct PhaseSpaceSolver {
+    initialized: bool,
     beta_range: (f64, f64),
     species: Vec<Species>,
     energies: Array1<f64>,
+    energy_steps: usize,
     energy_step_size: f64,
+    step_change: StepChange,
 }
 
 impl PhaseSpaceSolver {
@@ -78,10 +86,16 @@ impl PhaseSpaceSolver {
     /// The default range of temperatures span 1 GeV through to 10^{20} GeV.
     pub fn new() -> Self {
         Self {
+            initialized: false,
             beta_range: (1e-20, 1e0),
             species: Vec::new(),
             energies: Array1::zeros(0),
+            energy_steps: 2usize.pow(10),
             energy_step_size: 0.0,
+            step_change: StepChange {
+                increase: 1.1,
+                decrease: 0.5,
+            },
         }
     }
 
@@ -129,9 +143,56 @@ impl PhaseSpaceSolver {
     /// Specify the number of energy steps to use in the energy lattice.
     ///
     /// By default, this is set to 2048 steps.
+    ///
+    /// # Panic
+    ///
+    /// Panics if the energy steps is zero.
     pub fn energy_steps(mut self, energy_steps: usize) -> Self {
-        self.energies = Array1::linspace(0.0, self.beta_range.0.recip(), energy_steps);
+        assert!(energy_steps > 0, "Energy steps must be greater than 0.");
+        self.energy_steps = energy_steps;
+        self
+    }
+
+    /// Specify the granularity of the way time evolution is done.
+    ///
+    /// The time evolution is done with a step size of \\(h\\) such that
+    /// \\(\beta \to \beta + h\\) in the next step.  As the range of \\(\beta\\)
+    /// spans several orders of magnitude, the step size must be adjusted during
+    /// the time evolution.  This is done by estimating the error at each step
+    /// and if it falls below a particular threshold, the step size is increased
+    /// multiplicatively by \\(h \to h \times \Delta_{+}\\).  Similarly, if the
+    /// estimated error becomes too large, the step size is decreases
+    /// multiplicatively by \\(h \to h \times \Delta_{-}\\).
+    ///
+    /// The value of \\(\Delta_{+}\\) is specified by `increase` and the value
+    /// of \\(\Delta_{-}\\) is specified by `decrease`.  They are `1.1` and
+    /// `0.5` respectively by default.
+    ///
+    /// # Panic
+    ///
+    /// This will panic if the increase factor is not greater than `1.0` or if
+    /// the decrease factor is not less than `1.0`.
+    pub fn step_change(mut self, increase: f64, decrease: f64) -> Self {
+        assert!(
+            increase > 1.0,
+            "The multiplicative factor to increase the step size must be greater
+            than 1."
+        );
+        assert!(
+            decrease < 1.0,
+            "The multiplicative factor to decrease the step size must be greater
+            than 1."
+        );
+        self.step_change = StepChange { increase, decrease };
+        self
+    }
+
+    /// Initialize the phase space solver.
+    pub fn initialize(mut self) -> Self {
+        self.energies = Array1::linspace(0.0, 10.0 * self.beta_range.0.recip(), self.energy_steps);
         self.energy_step_size = self.energies[1] - self.energies[0];
+        self.initialized = true;
+
         self
     }
 
@@ -203,10 +264,12 @@ impl PhaseSpaceSolver {
     where
         U: Universe,
     {
+        assert!(
+            self.initialized,
+            "The phase space solver has to be initialized first with the `initialize()` method."
+        );
+
         let mut y = self.create_initial_conditions();
-        for i in 0..y.shape()[0] {
-            println!("{:>8} : {:>8.2e}", i, y.slice(s![i, ..]));
-        }
 
         // Since the factor of (E² - m²) / E is constant, pre-compute it here once
         let ei_m_on_ei = Array2::from_shape_fn(y.dim(), |(si, ei)| {
@@ -219,45 +282,72 @@ impl PhaseSpaceSolver {
         });
 
         let mut beta = self.beta_range.0;
-        let mut h = beta / 5.0;
+        let mut h = beta / 10.0;
 
+        let mut n_eval = 0;
         while beta < self.beta_range.1 {
-            println!("beta = {:.3e}", beta);
-            println!("{:>10} = {:.3e}", "H", universe.hubble_rate(beta));
-            // Standard Runge-Kutta integration
+            n_eval += 1;
+
+            // Standard Runge-Kutta integration.
             let k1 = self.derivative(&y) * &ei_m_on_ei * universe.hubble_rate(beta);
             let k2 = self.derivative(&(&y + &(&k1 * 0.5))) * &ei_m_on_ei
                 * universe.hubble_rate(beta + 0.5 * h);
             let k3 = self.derivative(&(&y + &(&k2 * 0.5))) * &ei_m_on_ei
                 * universe.hubble_rate(beta + 0.5 * h);
             let k4 = self.derivative(&(&y + &k3)) * &ei_m_on_ei * universe.hubble_rate(beta + h);
-            // println!("k1 = {:.1e}", k1);
-            // println!("k2 = {:.1e}", k2);
-            // println!("k3 = {:.1e}", k3);
-            // println!("k4 = {:.1e}", k4);
 
-            let dy = (k2 * 2.0 + k3 * 3.0 + k4 + &k1) * h / 6.0;
-            println!("{:>10} = {:.1e}", "dy", dy);
-            y += &dy;
-            println!("{:>10} = {:.1e}", "y", y);
+            // Calculate dy.  Note that we consume k2, k3 and k4 here.  We use
+            // k1 by reference since we need it later to get the error estimate.
+            let dy = (k2 * 2.0 + k3 * 2.0 + k4 + &k1) * h / 6.0;
 
-            // Check the error on the RK method vs the Euler method.  If it is small enough, increase the step size.
-            let err = ((dy - k1 * h) / &y).fold(0.0, |err, &v| {
-                if v.is_finite() {
-                    err + v.abs()
-                } else {
-                    err
+            // Check the error on the RK method vs the Euler method.  If it is
+            // small enough, increase the step size.  We use the maximum error
+            // for any given element of `dy`.
+            let err = ((k1 * h - &dy) / &y)
+                .iter()
+                .filter(|v| v.is_finite())
+                .map(|v| v.abs())
+                .max_by(|a, b| a.partial_cmp(b).unwrap())
+                .expect("Unable to calculate error estimate");
+
+            // Adjust the step size as needed based on the step size.
+            if err < 1e-10 {
+                h *= self.step_change.increase;
+                debug!(
+                    "Step {:>7}, β = {:>9.2e} -> Increased h to {:.3e}",
+                    n_eval, beta, h
+                );
+            } else if err > 1e-3 {
+                h *= self.step_change.decrease;
+                debug!(
+                    "Step {:>7}, β = {:>9.2e} -> Decreased h to {:.3e}",
+                    n_eval, beta, h
+                );
+
+                // Prevent h from getting too small that it might make
+                // integration take too long.  Use the result regardless even
+                // though it is bigger than desired error.
+                if beta / h > 1e5 {
+                    warn!(
+                        "Step {:>7}, β = {:>9.2e} -> Step size getting too small (β / h = {:.1e}).",
+                        n_eval, beta, beta / h
+                    );
+
+                    while beta / h > 1e5 {
+                        h *= self.step_change.increase;
+                    }
+
+                    y += &dy;
+                    beta += h;
                 }
-            }) / (y.len() as f64);
-            println!("{:>10} = {:.3e}", "err", err);
-            if err < 0.005 {
-                h *= 1.05;
                 continue;
-            } else if err > 0.01 {
-                h *= 0.95
             }
+
+            y += &dy;
             beta += h;
         }
+
+        info!("Number of evaluations: {}", n_eval);
 
         y
     }
@@ -278,20 +368,13 @@ mod test {
     fn no_interaction() {
         let phi = Species::new(0, 5.0);
         let mut solver = PhaseSpaceSolver::new()
-            .energy_steps(16)
-            .beta_range(1e-20, 1.0);
+            .temperature_range(1e20, 1e-10)
+            .step_change(1.1, 0.5)
+            .initialize();
         solver.add_species(phi);
 
-        println!("Energies : {:>8.2e}", solver.energies);
-        for _ in 0..173 {
-            print!("=");
-        }
-        println!("");
 
-        let sol = solver.solve(&StandardModel::new());
 
-        for i in 0..sol.shape()[0] {
-            println!("{:>8} : {:>8.2e}", i, sol.slice(s![i, ..]));
-        }
+        solver.solve(&StandardModel::new());
     }
 }
