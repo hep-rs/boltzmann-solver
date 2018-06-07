@@ -110,7 +110,7 @@
 
 #[macro_use]
 extern crate log;
-#[macro_use]
+#[cfg_attr(test, macro_use)]
 extern crate ndarray;
 extern crate quadrature;
 extern crate special_functions;
