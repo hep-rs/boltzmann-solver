@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `phase_space` mod in crate `boltzmann_solver`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, phase_space">
+    <meta name="description" content="API documentation for the Rust `Species` struct in crate `boltzmann_solver`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Species">
 
-    <title>boltzmann_solver::solver::phase_space - Rust</title>
+    <title>boltzmann_solver::solver::phase_space::Species - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css"
@@ -21,7 +21,7 @@
     
     
 </head>
-<body class="rustdoc mod"><!-- Google Tag Manager (noscript) --><noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N9HX7G4" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript><!-- End Google Tag Manager (noscript) -->
+<body class="rustdoc struct">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -34,7 +34,7 @@
     <nav class="sidebar">
         <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'>Module phase_space</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li></ul></div><p class='location'><a href='../../index.html'>boltzmann_solver</a>::<wbr><a href='../index.html'>solver</a></p><script>window.sidebarCurrent = {name: 'phase_space', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div>
+        <p class='location'>Struct Species</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#methods">Methods</a><div class="sidebar-links"><a href="#method.new">new</a></div><a class="sidebar-title" href="#synthetic-implementations">Auto Trait Implementations</a><div class="sidebar-links"><a href="#impl-Send">Send</a><a href="#impl-Sync">Sync</a></div></div><p class='location'><a href='../../index.html'>boltzmann_solver</a>::<wbr><a href='../index.html'>solver</a>::<wbr><a href='index.html'>phase_space</a></p><script>window.sidebarCurrent = {name: 'Species', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
     </nav>
 
     <div class="theme-picker">
@@ -55,66 +55,27 @@
         </form>
     </nav>
 
-    <section id='main' class="content"><h1 class='fqn'><span class='in-band'>Module <a href='../../index.html'>boltzmann_solver</a>::<wbr><a href='../index.html'>solver</a>::<wbr><a class="mod" href=''>phase_space</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content"><h1 class='fqn'><span class='in-band'>Struct <a href='../../index.html'>boltzmann_solver</a>::<wbr><a href='../index.html'>solver</a>::<wbr><a href='index.html'>phase_space</a>::<wbr><a class="struct" href=''>Species</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../../src/boltzmann_solver/solver/phase_space.rs.html#1-297' title='goto source code'>[src]</a></span></h1><div class='docblock'><p>Solver for the phase-space form of the Boltzmann equation.</p>
-<p>This solver allows for arbitrary phase spaces, though still assumes them to
-be homogeneous and isotropic such that they only depending on the energy.</p>
-<p>The solver requires initial conditions to be provided and then evolves them
-in time.  It discretizes the phase space in the energy-direction,
-\(f_{i}(\beta) \defeq f(E_i, \beta)\), and then solves the differential
-equation:</p>
-<p>\begin{equation}
-\pfrac{f_i}{t} = \frac{\int \vt C[f] \dd \Omega}{4 \pi E_i}
-+ H \frac{E_i^2 - m^2}{E_i} \pfrac{f}{E}
-\end{equation}</p>
-<p>where the derivative with respective to \(E\) is done discretely; for example:</p>
-<p>\begin{equation}
-\pfrac{f}{E} \approx \left[ \frac{f_{i-1} - f_i}{E_{i-1} - E_i}
-- \frac{f_{i+1} - f_{i-1}}{E_{i+1} - E_{i-1}}
-+ \frac{f_{i+1} - f_i}{E_{i+1} - E_i} \right]
-\stackrel{\mathrm{constant} \Delta E}{=} \frac{f_{i+1} - f_{i-1}}{2 \Delta E}.
-\end{equation}</p>
-<p>The collision operator is integrated over the angular components
-analytically and the remaining energy integrals being done numerically over
-the lattice:</p>
-<p>\begin{align}
-\int \vt C[f_{a_{1}}(E_i, t_i)] \dd \Omega_{a_1}
-&amp;= - \int \left( \prod_{\vt a \neq a_1, \vt b} \dd \Pi_i \right)
-(2 \pi)^4 \delta(p_{\vt a} - p_{\vt b}) \\
-&amp;\quad \times \Bigl[ \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right) \left(\prod_{\vt b} 1 \pm f_i \right)
-- \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right) \Bigr],
-\\
-&amp;= - \frac{1}{(\Delta E)^n} \sum_{E_{\vt a} \neq E_{a_1}, E_{\vt b}} (2\pi) \delta(E_{\vt a} - E_{\vt b})
-\int \left( \prod_{\vt a \neq a_1, \vt b} \dd \Omega_i \right) (2 \pi)^3 \delta(\Omega_{\vt a} - \Omega_{\vt b}) \\
-&amp;\quad \times \Bigl[ \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right) \left(\prod_{\vt b} 1 \pm f_i \right)
-- \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right) \Bigr],
-\end{align}</p>
-<p>where the integrals over \(\int \dd \Omega_{\vt a, \vt b} (2\pi)^3
-\delta(\Omega_{\vt a} - \Omega_{\vt b}) \abs{\mathcal M(\vt a | \vt b)}^2\)
-must be done analytically (and similarly for \(\abs{\mathcal M(\vt b | \vt
-a)}^2\)) while leaving all dependence on \(E_i\) and \(\abs{\vt p_i}\)
-explicit.</p>
-</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.PhaseSpaceSolver.html"
-                                  title='struct boltzmann_solver::solver::phase_space::PhaseSpaceSolver'>PhaseSpaceSolver</a></td>
-                           <td class='docblock-short'>
-                                <p>The solver holding all the information.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.Species.html"
-                                  title='struct boltzmann_solver::solver::phase_space::Species'>Species</a></td>
-                           <td class='docblock-short'>
-                                <p>Species</p>
-
-                           </td>
-                       </tr></table></section>
+               </span><a class='srclink' href='../../../src/boltzmann_solver/solver/phase_space.rs.html#54-57' title='goto source code'>[src]</a></span></h1><div class="docblock type-decl"><pre class='rust struct'>pub struct Species { /* fields omitted */ }</pre></div><div class='docblock'><p>Species</p>
+</div>
+                    <h2 id='methods' class='small-section-header'>
+                      Methods<a href='#methods' class='anchor'></a>
+                    </h2>
+                <h3 id='impl' class='impl'><span class='in-band'><table class='table-display'><tbody><tr><td><code>impl <a class="struct" href="../../../boltzmann_solver/solver/phase_space/struct.Species.html" title="struct boltzmann_solver::solver::phase_space::Species">Species</a></code><a href='#impl' class='anchor'></a></span></td><td><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../src/boltzmann_solver/solver/phase_space.rs.html#59-64' title='goto source code'>[src]</a></span></td></tr></tbody></table></h3><div class='impl-items'><h4 id='method.new' class="method"><span id='new.v' class='invisible'><table class='table-display'><tbody><tr><td><code>pub fn <a href='#method.new' class='fnname'>new</a>(spin: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>, mass: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; Self</code></span></td><td><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../src/boltzmann_solver/solver/phase_space.rs.html#61-63' title='goto source code'>[src]</a></td></tr></tbody></table></span></h4><div class='docblock'><p>Create a new species with the specified spin and mass.</p>
+</div></div>
+            <h2 id='implementations' class='small-section-header'>
+              Trait Implementations<a href='#implementations' class='anchor'></a>
+            </h2>
+            <div id='implementations-list'>
+        </div>
+                <h2 id='synthetic-implementations' class='small-section-header'>
+                  Auto Trait Implementations<a href='#synthetic-implementations' class='anchor'></a>
+                </h2>
+                <div id='synthetic-implementations-list'>
+            <h3 id='impl-Send' class='impl'><span class='in-band'><table class='table-display'><tbody><tr><td><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> for <a class="struct" href="../../../boltzmann_solver/solver/phase_space/struct.Species.html" title="struct boltzmann_solver::solver::phase_space::Species">Species</a></code><a href='#impl-Send' class='anchor'></a></span></td><td><span class='out-of-band'></span></td></tr></tbody></table></h3><div class='impl-items'></div><h3 id='impl-Sync' class='impl'><span class='in-band'><table class='table-display'><tbody><tr><td><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> for <a class="struct" href="../../../boltzmann_solver/solver/phase_space/struct.Species.html" title="struct boltzmann_solver::solver::phase_space::Species">Species</a></code><a href='#impl-Sync' class='anchor'></a></span></td><td><span class='out-of-band'></span></td></tr></tbody></table></h3><div class='impl-items'></div></div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
