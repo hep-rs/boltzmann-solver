@@ -493,6 +493,21 @@
 <span id="436">436</span>
 <span id="437">437</span>
 <span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! If the rate of collisions between particles is sufficiently high (as is</span>
 <span class="doccomment">//! usually the case), the phase space distribution of the particles will</span>
@@ -547,12 +562,27 @@
     <span class="doccomment">/// Evaluate the phase space distribution, \\(f\\) as defined above.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">phase_space</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">e</span>: <span class="ident">f64</span>, <span class="ident">m</span>: <span class="ident">f64</span>, <span class="ident">mu</span>: <span class="ident">f64</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Statistic</span>::<span class="ident">FermiDirac</span> <span class="op">=&gt;</span> <span class="number">1.0</span> <span class="op">/</span> (<span class="ident">f64</span>::<span class="ident">exp</span>((<span class="ident">e</span> <span class="op">-</span> <span class="ident">mu</span>) <span class="op">*</span> <span class="ident">beta</span>) <span class="op">+</span> <span class="number">1.0</span>),
-            <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span> <span class="op">=&gt;</span> <span class="number">1.0</span> <span class="op">/</span> (<span class="ident">f64</span>::<span class="ident">exp</span>((<span class="ident">e</span> <span class="op">-</span> <span class="ident">mu</span>) <span class="op">*</span> <span class="ident">beta</span>) <span class="op">-</span> <span class="number">1.0</span>),
+            <span class="ident">Statistic</span>::<span class="ident">FermiDirac</span> <span class="op">=&gt;</span> (<span class="ident">f64</span>::<span class="ident">exp</span>((<span class="ident">e</span> <span class="op">-</span> <span class="ident">mu</span>) <span class="op">*</span> <span class="ident">beta</span>) <span class="op">+</span> <span class="number">1.0</span>).<span class="ident">recip</span>(),
+            <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span> <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="ident">exponent</span> <span class="op">=</span> (<span class="ident">e</span> <span class="op">-</span> <span class="ident">mu</span>) <span class="op">*</span> <span class="ident">beta</span>;
+                <span class="kw">if</span> <span class="ident">exponent</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="number">1.0</span> {
+                    <span class="ident">f64</span>::<span class="ident">exp_m1</span>(<span class="ident">exponent</span>).<span class="ident">recip</span>()
+                } <span class="kw">else</span> {
+                    (<span class="ident">f64</span>::<span class="ident">exp</span>(<span class="ident">exponent</span>) <span class="op">-</span> <span class="number">1.0</span>).<span class="ident">recip</span>()
+                }
+            }
             <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span> <span class="op">=&gt;</span> <span class="ident">f64</span>::<span class="ident">exp</span>(<span class="op">-</span>(<span class="ident">e</span> <span class="op">-</span> <span class="ident">mu</span>) <span class="op">*</span> <span class="ident">beta</span>),
             <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span> <span class="op">=&gt;</span> {
-                <span class="ident">beta</span> <span class="op">*</span> <span class="ident">e</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">sqrt</span>(<span class="ident">e</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="ident">m</span>.<span class="ident">powi</span>(<span class="number">2</span>)) <span class="op">*</span> (<span class="op">-</span><span class="ident">e</span> <span class="op">*</span> <span class="ident">beta</span>).<span class="ident">exp</span>()
-                    <span class="op">/</span> (<span class="ident">m</span> <span class="op">*</span> <span class="ident">bessel</span>::<span class="ident">k_2</span>(<span class="ident">m</span> <span class="op">*</span> <span class="ident">beta</span>))
+                <span class="comment">// Check whether we&#39;ll likely have zero or not</span>
+                <span class="kw">if</span> ((<span class="ident">m</span> <span class="op">/</span> <span class="ident">e</span>).<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="number">1.0</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">f64</span>::<span class="ident">EPSILON</span> <span class="op">||</span> <span class="ident">e</span> <span class="op">*</span> <span class="ident">beta</span> <span class="op">&gt;</span> <span class="number">700.0</span> {
+                    <span class="number">0.0</span>
+                } <span class="kw">else</span> {
+                    <span class="comment">// Note that instead of `f64::sqrt(e.powi(2) - m.powi(2))`</span>
+                    <span class="comment">// we use the more precise (but equivalent) form: `e *</span>
+                    <span class="comment">// f64::sqrt(1.0 - (m / e).powi(2))`.</span>
+                    <span class="ident">beta</span> <span class="op">*</span> <span class="ident">e</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">sqrt</span>(<span class="number">1.0</span> <span class="op">-</span> (<span class="ident">m</span> <span class="op">/</span> <span class="ident">e</span>).<span class="ident">powi</span>(<span class="number">2</span>))
+                        <span class="op">/</span> (<span class="ident">f64</span>::<span class="ident">exp</span>(<span class="ident">e</span> <span class="op">*</span> <span class="ident">beta</span>) <span class="op">*</span> <span class="ident">m</span> <span class="op">*</span> <span class="ident">bessel</span>::<span class="ident">k_2</span>(<span class="ident">m</span> <span class="op">*</span> <span class="ident">beta</span>))
+                }
             }
         }
     }
