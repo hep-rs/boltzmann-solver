@@ -1,1 +1,1 @@
-initSidebarItems({});
+initSidebarItems({"struct":[["NumberDensitySolver","Boltzmann equation solver for the number density"]]});

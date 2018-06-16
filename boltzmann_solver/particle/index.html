@@ -4,18 +4,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `phase_space` mod in crate `boltzmann_solver`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, phase_space">
+    <meta name="description" content="API documentation for the Rust `particle` mod in crate `boltzmann_solver`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, particle">
 
-    <title>boltzmann_solver::solver::phase_space - Rust</title>
+    <title>boltzmann_solver::particle - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css"
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css"
           id="mainThemeStyle">
     
-    <link rel="stylesheet" type="text/css" href="../../../dark.css">
-    <link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle">
-    <script src="../../../storage.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
@@ -34,16 +34,16 @@
     <nav class="sidebar">
         <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'>Module phase_space</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li></ul></div><p class='location'><a href='../../index.html'>boltzmann_solver</a>::<wbr><a href='../index.html'>solver</a></p><script>window.sidebarCurrent = {name: 'phase_space', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div>
+        <p class='location'>Module particle</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li></ul></div><p class='location'><a href='../index.html'>boltzmann_solver</a></p><script>window.sidebarCurrent = {name: 'particle', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div>
     </nav>
 
     <div class="theme-picker">
         <button id="theme-picker" aria-label="Pick another theme!">
-            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
         </button>
         <div id="theme-choices"></div>
     </div>
-    <script src="../../../theme.js"></script>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -55,55 +55,18 @@
         </form>
     </nav>
 
-    <section id='main' class="content"><h1 class='fqn'><span class='in-band'>Module <a href='../../index.html'>boltzmann_solver</a>::<wbr><a href='../index.html'>solver</a>::<wbr><a class="mod" href=''>phase_space</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content"><h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>boltzmann_solver</a>::<wbr><a class="mod" href=''>particle</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../../src/boltzmann_solver/solver/phase_space.rs.html#1-354' title='goto source code'>[src]</a></span></h1><div class='docblock'><p>Solver for the phase-space form of the Boltzmann equation.</p>
-<p>This solver allows for arbitrary phase spaces, though still assumes them to
-be homogeneous and isotropic such that they only depending on the energy.</p>
-<p>The solver requires initial conditions to be provided and then evolves them
-in time.  It discretizes the phase space in the energy-direction,
-\(f_{i}(\beta) \defeq f(E_i, \beta)\), and then solves the differential
-equation:</p>
-<p>\begin{equation}
-\pfrac{f_i}{t} = \frac{\int \vt C[f] \dd \Omega}{4 \pi E_i}
-+ H \frac{E_i^2 - m^2}{E_i} \pfrac{f}{E}
-\end{equation}</p>
-<p>where the derivative with respective to \(E\) is done discretely; for example:</p>
-<p>\begin{equation}
-\pfrac{f}{E} \approx \left[ \frac{f_{i-1} - f_i}{E_{i-1} - E_i}
-- \frac{f_{i+1} - f_{i-1}}{E_{i+1} - E_{i-1}}
-+ \frac{f_{i+1} - f_i}{E_{i+1} - E_i} \right]
-\stackrel{\mathrm{constant} \Delta E}{=} \frac{f_{i+1} - f_{i-1}}{2 \Delta E}.
-\end{equation}</p>
-<p>The collision operator is integrated over the angular components
-analytically and the remaining energy integrals being done numerically over
-the lattice:</p>
-<p>\begin{align}
-\int \vt C[f_{a_{1}}(E_i, t_i)] \dd \Omega_{a_1}
-&amp;= - \int \left( \prod_{\vt a \neq a_1, \vt b} \dd \Pi_i \right)
-(2 \pi)^4 \delta(p_{\vt a} - p_{\vt b}) \\
-&amp;\quad \times \Bigl[ \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right) \left(\prod_{\vt b} 1 \pm f_i \right)
-- \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right) \Bigr],
-\\
-&amp;= - \frac{1}{(\Delta E)^n} \sum_{E_{\vt a} \neq E_{a_1}, E_{\vt b}} (2\pi) \delta(E_{\vt a} - E_{\vt b})
-\int \left( \prod_{\vt a \neq a_1, \vt b} \dd \Omega_i \right) (2 \pi)^3 \delta(\Omega_{\vt a} - \Omega_{\vt b}) \\
-&amp;\quad \times \Bigl[ \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right) \left(\prod_{\vt b} 1 \pm f_i \right)
-- \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right) \Bigr],
-\end{align}</p>
-<p>where the integrals over \(\int \dd \Omega_{\vt a, \vt b} (2\pi)^3
-\delta(\Omega_{\vt a} - \Omega_{\vt b}) \abs{\mathcal M(\vt a | \vt b)}^2\)
-must be done analytically (and similarly for \(\abs{\mathcal M(\vt b | \vt
-a)}^2\)) while leaving all dependence on \(E_i\) and \(\abs{\vt p_i}\)
-explicit.</p>
+               </span><a class='srclink' href='../../src/boltzmann_solver/particle.rs.html#1-156' title='goto source code'>[src]</a></span></h1><div class='docblock'><p>Basic implementation of a particle type</p>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class="struct" href="struct.PhaseSpaceSolver.html"
-                                  title='struct boltzmann_solver::solver::phase_space::PhaseSpaceSolver'>PhaseSpaceSolver</a></td>
+                           <td><a class="struct" href="struct.Particle.html"
+                                  title='struct boltzmann_solver::particle::Particle'>Particle</a></td>
                            <td class='docblock-short'>
-                                <p>The solver holding all the information.</p>
+                                <p>Particle type</p>
 
                            </td>
                        </tr></table></section>
@@ -164,10 +127,10 @@ explicit.</p>
     
 
     <script>
-        window.rootPath = "../../../";
+        window.rootPath = "../../";
         window.currentCrate = "boltzmann_solver";
     </script>
-    <script src="../../../main.js"></script>
-    <script defer src="../../../search-index.js"></script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body>
 </html>
