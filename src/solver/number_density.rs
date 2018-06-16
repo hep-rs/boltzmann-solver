@@ -115,3 +115,276 @@
 //!              \epsilon \abs{\mathcal M^{(0)}(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i }.
 //!     \\end{aligned}
 //!   \\end{equation}
+
+use super::{ErrorTolerance, Solver, StepChange};
+use ndarray::prelude::*;
+use particle::Particle;
+use statistic::Statistic::{BoseEinstein, FermiDirac};
+use universe::Universe;
+
+/// Boltzmann equation solver for the number density
+pub struct NumberDensitySolver {
+    initialized: bool,
+    beta_range: (f64, f64),
+    particles: Vec<Particle>,
+    interactions: Vec<Box<Fn(&Array1<f64>, f64) -> Array1<f64>>>,
+    step_change: StepChange,
+    error_tolerance: ErrorTolerance,
+}
+
+impl Solver for NumberDensitySolver {
+    type Solution = Array1<f64>;
+
+    /// Create a new instance of the number density solver.
+    ///
+    /// The default range of temperatures span 1 GeV through to 10^{20} GeV.
+    fn new() -> Self {
+        Self {
+            initialized: false,
+            beta_range: (1e-20, 1e0),
+            particles: Vec::with_capacity(20),
+            interactions: Vec::with_capacity(100),
+            step_change: StepChange {
+                increase: 1.1,
+                decrease: 0.5,
+            },
+            error_tolerance: ErrorTolerance {
+                upper: 1e-2,
+                lower: 1e-5,
+            },
+        }
+    }
+
+    /// Set the range of inverse temperature values over which the phase space
+    /// is evolved.
+    ///
+    /// Inverse temperature must be provided in units of GeV^{-1}.
+    ///
+    /// This function has a convenience alternative called
+    /// [`NumberDensitySolver::temperature_range`] allowing for the limits to be
+    /// specified as temperature in the units of GeV.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the starting value is larger than the final value.
+    fn beta_range(mut self, start: f64, end: f64) -> Self {
+        assert!(
+            start < end,
+            "The initial β must be smaller than the final β value."
+        );
+        self.beta_range = (start, end);
+        self
+    }
+
+    /// Set the range of temperature values over which the phase space is
+    /// evolved.
+    ///
+    /// Temperature must be provided in units of GeV.
+    ///
+    /// This function is a convenience alternative to
+    /// [`NumberDensitySolver::beta_range`].
+    ///
+    /// # Panics
+    ///
+    /// Panics if the starting value is smaller than the final value.
+    fn temperature_range(mut self, start: f64, end: f64) -> Self {
+        assert!(
+            start > end,
+            "The initial temperature must be larger than the final temperature."
+        );
+        self.beta_range = (start.recip(), end.recip());
+        self
+    }
+
+    fn step_change(mut self, increase: f64, decrease: f64) -> Self {
+        assert!(
+            increase > 1.0,
+            "The multiplicative factor to increase the step size must be greater
+            than 1."
+        );
+        assert!(
+            decrease < 1.0,
+            "The multiplicative factor to decrease the step size must be greater
+            than 1."
+        );
+        self.step_change = StepChange { increase, decrease };
+        self
+    }
+
+    fn error_tolerance(mut self, upper: f64, lower: f64) -> Self {
+        assert!(
+            upper > lower,
+            "The upper error tolerance must be greater than the lower tolerance"
+        );
+        self.error_tolerance = ErrorTolerance { upper, lower };
+        self
+    }
+
+    fn initialize(mut self) -> Self {
+        self.initialized = true;
+
+        self
+    }
+
+    fn add_particle(&mut self, s: Particle) -> &mut Self {
+        self.particles.push(s);
+        self
+    }
+
+    fn add_interaction<F: 'static>(&mut self, f: F) -> &mut Self
+    where
+        F: Fn(&Self::Solution, f64) -> Self::Solution,
+    {
+        self.interactions.push(Box::new(f));
+        self
+    }
+
+    fn solve<U>(&self, universe: &U) -> Self::Solution
+    where
+        U: Universe,
+    {
+        assert!(
+            self.initialized,
+            "The phase space solver has to be initialized first with the `initialize()` method."
+        );
+
+        let mut y = self.create_initial_conditions();
+        let mut beta = self.beta_range.0;
+        let mut h = beta / 10.0;
+
+        let mut n_eval = 0;
+        while beta < self.beta_range.1 {
+            n_eval += 1;
+
+            // Standard Runge-Kutta integration.
+            let mut k1 = -&y * (3.0 * universe.hubble_rate(beta));
+            k1 = k1 + self.interactions
+                .iter()
+                .map(|f| f(&y, beta))
+                .fold(Self::Solution::zeros(y.dim()), |s, v| s + v);
+            k1 *= h;
+            let tmp = &y + &(&k1 * 0.5);
+            let mut k2 = -&tmp * (3.0 * universe.hubble_rate(beta + 0.5 * h));
+            k2 = k2 + self.interactions
+                .iter()
+                .map(|f| f(&tmp, beta + 0.5 * h))
+                .fold(Self::Solution::zeros(y.dim()), |s, v| s + v);
+            k2 *= h;
+            let tmp = &y + &(&k2 * 0.5);
+            let mut k3 = -&tmp * (3.0 * universe.hubble_rate(beta + 0.5 * h));
+            k3 = k3 + self.interactions
+                .iter()
+                .map(|f| f(&tmp, beta + 0.5 * h))
+                .fold(Self::Solution::zeros(y.dim()), |s, v| s + v);
+            k3 *= h;
+            let tmp = &y + &k3;
+            let mut k4 = -&tmp * (3.0 * universe.hubble_rate(beta + h));
+            k4 = k4 + self.interactions
+                .iter()
+                .map(|f| f(&tmp, beta + h))
+                .fold(Self::Solution::zeros(y.dim()), |s, v| s + v);
+            k4 *= h;
+
+            // Calculate dy.  Note that we consume k2, k3 and k4 here.  We use
+            // k1 by reference since we need it later to get the error estimate.
+            let dy = (k2 * 2.0 + k3 * 2.0 + k4 + &k1) / 6.0;
+
+            // Check the error on the RK method vs the Euler method.  If it is
+            // small enough, increase the step size.  We use the maximum error
+            // for any given element of `dy`.
+            let err = (k1 / &dy)
+                .iter()
+                .filter(|v| v.is_finite())
+                .map(|v| (v - 1.0).abs())
+                .max_by(|a, b| a.partial_cmp(b).unwrap())
+                .expect("Unable to calculate error estimate");
+
+            // Adjust the step size as needed based on the step size.
+            if err < self.error_tolerance.lower {
+                h *= self.step_change.increase;
+                debug!(
+                    "Step {:>7}, β = {:>9.2e} -> Increased h to {:.3e} (error was {:.3e})",
+                    n_eval, beta, h, err
+                );
+            } else if err > self.error_tolerance.upper {
+                h *= self.step_change.decrease;
+                debug!(
+                    "Step {:>7}, β = {:>9.2e} -> Decreased h to {:.3e} (error was {:.3e})",
+                    n_eval, beta, h, err
+                );
+
+                // Prevent h from getting too small that it might make
+                // integration take too long.  Use the result regardless even
+                // though it is bigger than desired error.
+                if beta / h > 1e5 {
+                    warn!(
+                        "Step {:>7}, β = {:>9.2e} -> Step size getting too small (β / h = {:.1e}).",
+                        n_eval, beta, beta / h
+                    );
+
+                    while beta / h > 1e5 {
+                        h *= self.step_change.increase;
+                    }
+
+                    y += &dy;
+                    beta += h;
+                }
+
+                continue;
+            }
+
+            y += &dy;
+            beta += h;
+        }
+
+        info!("Number of evaluations: {}", n_eval);
+
+        y
+    }
+}
+
+impl Default for NumberDensitySolver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl NumberDensitySolver {
+    /// Create an array containing the initial conditions for all the particle
+    /// species.
+    ///
+    /// All particles species are assumed to be in thermal equilibrium at this
+    /// energy, with the distribution following either the Bose–Einstein or
+    /// Fermi–Dirac distribution as determined by their spin.
+    fn create_initial_conditions(&self) -> Array1<f64> {
+        Array1::from_shape_fn(self.particles.len(), |si| {
+            let s = &self.particles[si];
+
+            if s.spin % 2 == 0 {
+                BoseEinstein.number_density(s.mass, 0.0, self.beta_range.0)
+            } else {
+                FermiDirac.number_density(s.mass, 0.0, self.beta_range.0)
+            }
+        })
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use universe::StandardModel;
+
+    #[test]
+    fn no_interaction() {
+        let phi = Particle::new(0, 5.0);
+        let mut solver = NumberDensitySolver::new()
+            .temperature_range(1e20, 1e-10)
+            .error_tolerance(1e-1, 1e-2)
+            .initialize();
+
+        solver.add_particle(phi);
+
+        let sol = solver.solve(&StandardModel::new());
+        assert!(sol[0] < 1e-100);
+    }
+}
