@@ -131,6 +131,7 @@ macro_rules! debug_assert_warn {
 }
 
 pub mod constants;
+pub mod particle;
 pub mod solver;
 pub mod statistic;
 pub mod universe;
