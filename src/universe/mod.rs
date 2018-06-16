@@ -47,7 +47,7 @@ pub trait Universe {
         );
 
         // Prefactor: sqrt(pi^2 / 90) / REDUCED_PLANCK_MASS ≅ 1.35977e-19
-        1.35977e-19 * self.entropy_dof(beta) * beta.powi(-2)
+        1.35977e-19 * self.entropy_dof(beta).sqrt() * beta.powi(-2)
     }
 }
 
