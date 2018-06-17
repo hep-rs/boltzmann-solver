@@ -81,6 +81,10 @@ impl PhaseSpaceSolver {
 }
 
 impl Solver for PhaseSpaceSolver {
+    /// The solution is a two-dimensional array.  The first axis (`Axis(0)`)
+    /// corresponds to the particle species and has the same ordering as the
+    /// order in which [`add_particle`] is invoked.  The second axis (`Axis(1)`)
+    /// contains the energies.
     type Solution = Array2<f64>;
 
     fn new() -> Self {

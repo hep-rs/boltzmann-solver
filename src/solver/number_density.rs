@@ -133,6 +133,10 @@ pub struct NumberDensitySolver {
 }
 
 impl Solver for NumberDensitySolver {
+    /// The solution is a one-dimensional array of number densities for each
+    /// particle species (or aggregated number density in the case of
+    /// \\(n_{\mathsc{b-l}}\\)), in the same order as [`add_particle`] is
+    /// invoked.
     type Solution = Array1<f64>;
 
     /// Create a new instance of the number density solver.
