@@ -158,9 +158,15 @@ impl Solver for PhaseSpaceSolver {
         self
     }
 
-    fn add_particle(&mut self, s: Particle) -> &mut Self {
-        self.particles.push(s);
-        self
+    fn add_particle(&mut self, p: Particle) {
+        self.particles.push(p);
+    }
+
+    fn add_particles<I>(&mut self, iter: I)
+    where
+        I: IntoIterator<Item = Particle>,
+    {
+        self.particles.extend(iter);
     }
 
     fn add_interaction<F: 'static>(&mut self, f: F) -> &mut Self
