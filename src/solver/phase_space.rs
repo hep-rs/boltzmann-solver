@@ -57,6 +57,7 @@ pub struct PhaseSpaceSolver {
     initialized: bool,
     beta_range: (f64, f64),
     particles: Vec<Particle>,
+    #[cfg_attr(feature = "cargo-clippy", allow(type_complexity))]
     interactions: Vec<Box<Fn(Array2<f64>, &Array2<f64>, f64) -> Array2<f64>>>,
     energies: Array1<f64>,
     energy_steps: usize,
