@@ -2,6 +2,7 @@
 
 use constants::{BOSON_GSTAR, FERMION_GSTAR};
 use special_functions::interpolation;
+use std::f64;
 use universe::Universe;
 
 /// Particle type
@@ -84,7 +85,7 @@ impl Universe for Particle {
         if let Some(dof) = self.dof {
             g1 * dof
         } else {
-            g1 * (self.spin + 1) as f64 * if self.complex { 2.0 } else { 1.0 }
+            g1 * f64::from(self.spin + 1) * if self.complex { 2.0 } else { 1.0 }
         }
     }
 }
