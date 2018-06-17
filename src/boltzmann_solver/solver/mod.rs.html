@@ -190,6 +190,16 @@
 <span id="133">133</span>
 <span id="134">134</span>
 <span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Solvers for the Boltzmann equation, or sets of Boltzmann equations</span>
 
@@ -212,7 +222,8 @@
 <span class="doccomment">/// Common interface for the Boltzmann equation solvers.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Solver</span> {
     <span class="doccomment">/// The final solution by the solver.  This will typically be an array for</span>
-    <span class="doccomment">/// values.</span>
+    <span class="doccomment">/// values with the ordering corresponding to the way `add_particle` was</span>
+    <span class="doccomment">/// invoked.</span>
     <span class="kw">type</span> <span class="ident">Solution</span>;
 
     <span class="doccomment">/// Create a new instance of the solver.</span>
@@ -305,18 +316,27 @@
     <span class="doccomment">/// Add an interaction.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The interaction is a functional of the solution at a particular inverse</span>
-    <span class="doccomment">/// temperature:</span>
+    <span class="doccomment">/// temperature.  The function is of the following form:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// F(&amp;Self::Solution, beta: f64) -&gt; Self::Solution</span>
+    <span class="doccomment">/// f(sum: Self::Solution, densities: &amp;Self::Solution, beta: f64) -&gt; Self::Solution</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// It does not modify the solution in place.</span>
+    <span class="doccomment">/// The first argument, `sum`, contains the sum of all interactions and the</span>
+    <span class="doccomment">/// second argument, `densities`, contains the values of the various</span>
+    <span class="doccomment">/// number densities at the specified `beta`.  The `sum` is moved into the</span>
+    <span class="doccomment">/// function and is expected to be returned.  For example:</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The solution follows the same ordering as the species were added.</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// fn f(sum: mut Array1&lt;f64&gt;, densities: Array1&lt;f64&gt;, beta: f64) -&gt; Array1&lt;f64&gt; {</span>
+    <span class="doccomment">///     sum[0] += - densities[1] * beta;</span>
+    <span class="doccomment">///     sum[1] += - densities[0] * beta;</span>
+    <span class="doccomment">///     sum</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">add_interaction</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">int</span>: <span class="ident">F</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Solution</span>, <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span>::<span class="ident">Solution</span>;
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="self">Self</span>::<span class="ident">Solution</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Solution</span>, <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span>::<span class="ident">Solution</span>;
 
     <span class="doccomment">/// Evolve the initial conditions by solving the PDEs.</span>
     <span class="doccomment">///</span>
