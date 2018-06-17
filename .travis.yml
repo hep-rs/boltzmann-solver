@@ -38,7 +38,7 @@ before_script:
         export FEATURES="--features strict";
     fi
   - |
-    if [[ "$TRAVIS_RUST_VERSION" == "nightly" ]] && cargo install clippy ; then
+    if [[ "$TRAVIS_RUST_VERSION" == "nightly" ]] && cargo install clippy --force ; then
         export CLIPPY=true;
     else
         export CLIPPY=false;
