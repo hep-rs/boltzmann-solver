@@ -108,7 +108,12 @@ pub trait Solver {
     ///
     /// If the particle and anti-particle are to be treated separately, the two
     /// species have to be added.
-    fn add_particle(&mut self, s: Particle) -> &mut Self;
+    fn add_particle(&mut self, p: Particle);
+
+    /// Add a multiple particles from a vector or slice.
+    fn add_particles<I>(&mut self, iter: I)
+    where
+        I: IntoIterator<Item = Particle>;
 
     /// Add an interaction.
     ///
