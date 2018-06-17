@@ -127,7 +127,7 @@ pub struct NumberDensitySolver {
     initialized: bool,
     beta_range: (f64, f64),
     particles: Vec<Particle>,
-    interactions: Vec<Box<Fn(&Array1<f64>, f64) -> Array1<f64>>>,
+    interactions: Vec<Box<Fn(Array1<f64>, &Array1<f64>, f64) -> Array1<f64>>>,
     step_change: StepChange,
     error_tolerance: ErrorTolerance,
 }
@@ -233,7 +233,7 @@ impl Solver for NumberDensitySolver {
 
     fn add_interaction<F: 'static>(&mut self, f: F) -> &mut Self
     where
-        F: Fn(&Self::Solution, f64) -> Self::Solution,
+        F: Fn(Self::Solution, &Self::Solution, f64) -> Self::Solution,
     {
         self.interactions.push(Box::new(f));
         self
@@ -260,29 +260,29 @@ impl Solver for NumberDensitySolver {
             let mut k1 = -&y * (3.0 * universe.hubble_rate(beta));
             k1 = k1 + self.interactions
                 .iter()
-                .map(|f| f(&y, beta))
-                .fold(Self::Solution::zeros(y.dim()), |s, v| s + v);
+                .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &y, beta));
             k1 *= h;
             let tmp = &y + &(&k1 * 0.5);
             let mut k2 = -&tmp * (3.0 * universe.hubble_rate(beta + 0.5 * h));
             k2 = k2 + self.interactions
                 .iter()
-                .map(|f| f(&tmp, beta + 0.5 * h))
-                .fold(Self::Solution::zeros(y.dim()), |s, v| s + v);
+                .fold(Self::Solution::zeros(y.dim()), |s, f| {
+                    f(s, &tmp, beta + 0.5 * h)
+                });
             k2 *= h;
             let tmp = &y + &(&k2 * 0.5);
             let mut k3 = -&tmp * (3.0 * universe.hubble_rate(beta + 0.5 * h));
             k3 = k3 + self.interactions
                 .iter()
-                .map(|f| f(&tmp, beta + 0.5 * h))
-                .fold(Self::Solution::zeros(y.dim()), |s, v| s + v);
+                .fold(Self::Solution::zeros(y.dim()), |s, f| {
+                    f(s, &tmp, beta + 0.5 * h)
+                });
             k3 *= h;
             let tmp = &y + &k3;
             let mut k4 = -&tmp * (3.0 * universe.hubble_rate(beta + h));
             k4 = k4 + self.interactions
                 .iter()
-                .map(|f| f(&tmp, beta + h))
-                .fold(Self::Solution::zeros(y.dim()), |s, v| s + v);
+                .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, beta + h));
             k4 *= h;
 
             // Calculate dy.  Note that we consume k2, k3 and k4 here.  We use
