@@ -47,9 +47,66 @@ pub enum Statistic {
     MaxwellJuttner,
 }
 
-impl Statistic {
-    /// Evaluate the phase space distribution, \\(f\\) as defined above.
-    pub fn phase_space(&self, e: f64, m: f64, mu: f64, beta: f64) -> f64 {
+pub trait Statistics {
+    /// Evaluate the phase space distribution, for a given energy, mass,
+    /// chemical potential and inverse temperature.
+    fn phase_space(&self, e: f64, m: f64, mu: f64, beta: f64) -> f64;
+
+    /// Return number density for a particle following the specified statistic.
+    ///
+    /// \\begin{equation}
+    ///    n = \frac{1}{2 \pi^2} \int_{m}^{\infty} f_{i} u \sqrt{u^2 - m^2} \dd u.
+    /// \\end{equation}
+    ///
+    /// The naïve implementation will perform a numerical integration.
+    ///
+    /// # Note to Implementors
+    ///
+    /// If an analytic closed form is available for the integral, it should be
+    /// preferred over the numerical integration.
+    fn number_density(&self, mass: f64, mu: f64, beta: f64) -> f64 {
+        let integral = integrate(
+            |t| {
+                let u = mass + t / (1.0 - t);
+                let dudt = (t - 1.0).powi(-2);
+
+                self.phase_space(u, mass, mu, beta) * u * f64::sqrt(u.powi(2) - mass.powi(2)) * dudt
+            },
+            0.0,
+            1.0,
+            1e-12,
+        );
+        debug!(
+            "Phase space integral: {:e} ± {:e} ({} function evaluations)",
+            integral.integral, integral.error_estimate, integral.num_function_evaluations
+        );
+        // 1/(2 π²) ≅ 0.050_660_591_821_168_89
+        0.050_660_591_821_168_89 * integral.integral
+    }
+
+    /// Return number density for a massless particle following the specified
+    /// statistic.
+    ///
+    /// \\begin{equation}
+    ///    n = \frac{1}{2 \pi^2} \int_{0}^{\infty} f_{i} u^2 \dd u
+    /// \\end{equation}
+    ///
+    /// The naïve implementation simply calls [`Statistics::numer_density`]
+    /// setting `mass = 0.0` and then uses numerical integration.
+    ///
+    /// # Note to Implementors
+    ///
+    /// If an analytic closed form is available for the integral, it should be
+    /// preferred over the numerical integration.
+    fn massless_number_density(&self, mu: f64, beta: f64) -> f64 {
+        self.number_density(0.0, mu, beta)
+    }
+}
+
+impl Statistics for Statistic {
+    /// Evaluate the phase space distribution, \\(f\\) as defined above for the
+    /// four statistics.
+    fn phase_space(&self, e: f64, m: f64, mu: f64, beta: f64) -> f64 {
         match *self {
             Statistic::FermiDirac => (f64::exp((e - mu) * beta) + 1.0).recip(),
             Statistic::BoseEinstein => {
@@ -84,18 +141,10 @@ impl Statistic {
     ///
     /// # Implementation Details
     ///
-    /// If an analytic closed form is available for the integral, it will be
-    /// preferred over the numerical integration.  Failing that, the
-    /// semi-infinite integral is numerical evaluated.  In order to make the
-    /// calculation tractable on a computer, the change of variables
-    ///
-    /// \\begin{equation}
-    ///   u \to m + \frac{t}{1 - t}, \qquad \dd u \to \frac{\dd t}{(t - 1)^2}
-    /// \\end{equation}
-    ///
-    /// is used such that the bounds of the integral over \\(t\\) are \\([0,
-    /// 1]\\).
-    pub fn number_density(&self, mass: f64, mu: f64, beta: f64) -> f64 {
+    /// Both the Fermi–Dirac and Bose–Einstein statistic rely on numerical
+    /// integration and thus are fairly slow.  The Maxwell–Boltzmann and
+    /// Maxwell–Jüttner distributions offer exact implementations.
+    fn number_density(&self, mass: f64, mu: f64, beta: f64) -> f64 {
         debug_assert!(mass >= 0.0, "mass must be positive.");
         debug_assert!(beta >= 0.0, "β must be positive.");
 
@@ -170,11 +219,11 @@ impl Statistic {
     ///    n = \frac{1}{2 \pi^2} \int_{0}^{\infty} f_{i} u^2 \dd u
     /// \\end{equation}
     ///
-    /// This is theoretically equivalent to setting `mass = 0` in
-    /// [`Statistic::number_density`]; however, as there are analytic closed
-    /// forms of the above integral for all statistics, this method will be much
-    /// faster and more precise.
-    pub fn massless_number_density(&self, mu: f64, beta: f64) -> f64 {
+    /// # Implementation Details
+    ///
+    /// All four statistics have exact implementations and do not rely on any
+    /// numerical integration.
+    fn massless_number_density(&self, mu: f64, beta: f64) -> f64 {
         debug_assert!(beta >= 0.0, "β must be positive.");
 
         match *self {

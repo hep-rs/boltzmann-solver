@@ -2,6 +2,7 @@
 
 use constants::{BOSON_GSTAR, FERMION_GSTAR};
 use special_functions::interpolation;
+use statistic::{Statistic, Statistics};
 use std::f64;
 use universe::Universe;
 
@@ -72,6 +73,25 @@ impl Particle {
     /// Returns true if the particle is fermionic.
     pub fn is_fermionic(&self) -> bool {
         self.spin % 2 == 1
+    }
+
+    /// Return the quantum statistic that this particle obeys.
+    fn statistic(&self) -> Statistic {
+        if self.is_fermionic() {
+            Statistic::FermiDirac
+        } else {
+            Statistic::BoseEinstein
+        }
+    }
+
+    /// Return the equilibrium phase space occupation of the particle.
+    pub fn phase_space(&self, e: f64, mu: f64, beta: f64) -> f64 {
+        self.statistic().phase_space(e, self.mass, mu, beta)
+    }
+
+    /// Return the equilibrium number density of the particle.
+    pub fn number_density(&self, mu: f64, beta: f64) -> f64 {
+        self.statistic().number_density(self.mass, mu, beta)
     }
 }
 
