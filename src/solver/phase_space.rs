@@ -46,11 +46,20 @@
 //! explicit.
 
 use super::{ErrorTolerance, Solver, StepChange};
-use ndarray::prelude::*;
+use ndarray::{prelude::*, Zip};
 use particle::Particle;
-use statistic::Statistic::{BoseEinstein, FermiDirac};
+use statistic::{Statistic::{BoseEinstein, FermiDirac},
+                Statistics};
 use std::f64;
 use universe::Universe;
+
+pub struct Context {
+    pub beta: f64,
+    pub hubble_rate: f64,
+    pub eq_f: Array2<f64>,
+    pub eq_boson: Array1<f64>,
+    pub eq_fermion: Array1<f64>,
+}
 
 /// The solver holding all the information.
 pub struct PhaseSpaceSolver {
@@ -58,7 +67,7 @@ pub struct PhaseSpaceSolver {
     beta_range: (f64, f64),
     particles: Vec<Particle>,
     #[cfg_attr(feature = "cargo-clippy", allow(type_complexity))]
-    interactions: Vec<Box<Fn(Array2<f64>, &Array2<f64>, f64) -> Array2<f64>>>,
+    interactions: Vec<Box<Fn(Array2<f64>, &Array2<f64>, &Context) -> Array2<f64>>>,
     energies: Array1<f64>,
     energy_steps: usize,
     energy_step_size: f64,
@@ -87,6 +96,8 @@ impl Solver for PhaseSpaceSolver {
     /// order in which [`add_particle`] is invoked.  The second axis (`Axis(1)`)
     /// contains the energies.
     type Solution = Array2<f64>;
+
+    type Context = Context;
 
     fn new() -> Self {
         Self {
@@ -171,7 +182,7 @@ impl Solver for PhaseSpaceSolver {
 
     fn add_interaction<F: 'static>(&mut self, f: F) -> &mut Self
     where
-        F: Fn(Self::Solution, &Self::Solution, f64) -> Self::Solution,
+        F: Fn(Self::Solution, &Self::Solution, &Self::Context) -> Self::Solution,
     {
         self.interactions.push(Box::new(f));
         self
@@ -186,7 +197,7 @@ impl Solver for PhaseSpaceSolver {
             "The phase space solver has to be initialized first with the `initialize()` method."
         );
 
-        let mut y = self.create_initial_conditions();
+        let mut y = self.equilibrium_phase_space(self.beta_range.0);
 
         // Since the factor of (E² - m²) / E is constant, pre-compute it here once
         let ei_m_on_ei = Array2::from_shape_fn(y.dim(), |(si, ei)| {
@@ -198,6 +209,12 @@ impl Solver for PhaseSpaceSolver {
             }
         });
 
+        let mut k1: Self::Solution;
+        let mut k2: Self::Solution;
+        let mut k3: Self::Solution;
+        let mut k4: Self::Solution;
+        let mut tmp: Self::Solution;
+
         let mut beta = self.beta_range.0;
         let mut h = beta / 10.0;
 
@@ -206,33 +223,56 @@ impl Solver for PhaseSpaceSolver {
             n_eval += 1;
 
             // Standard Runge-Kutta integration.
-            let mut k1 = self.derivative(&y) * &ei_m_on_ei * universe.hubble_rate(beta);
-            k1 = k1 + self.interactions
+            let c = self.context(beta, universe);
+            k1 = self.interactions
                 .iter()
-                .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &y, beta));
-            k1 *= h;
-            let tmp = &y + &(&k1 * 0.5);
-            let mut k2 = self.derivative(&tmp) * &ei_m_on_ei * universe.hubble_rate(beta + 0.5 * h);
-            k2 = k2 + self.interactions
-                .iter()
-                .fold(Self::Solution::zeros(y.dim()), |s, f| {
-                    f(s, &tmp, beta + 0.5 * h)
+                .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &y, &c));
+            Zip::from(&mut k1)
+                .and(&y)
+                .and(&ei_m_on_ei)
+                .apply(|k, &y, &de| {
+                    *k += y * de * c.hubble_rate;
+                    *k *= h;
                 });
-            k2 *= h;
-            let tmp = &y + &(&k2 * 0.5);
-            let mut k3 = self.derivative(&tmp) * &ei_m_on_ei * universe.hubble_rate(beta + 0.5 * h);
-            k3 = k3 + self.interactions
+
+            let c = self.context(beta + 0.5 * h, universe);
+            tmp = &y + &(&k1 * 0.5);
+            k2 = self.interactions
                 .iter()
-                .fold(Self::Solution::zeros(y.dim()), |s, f| {
-                    f(s, &tmp, beta + 0.5 * h)
+                .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, &c));
+            Zip::from(&mut k2)
+                .and(&tmp)
+                .and(&ei_m_on_ei)
+                .apply(|k, &y, &de| {
+                    *k += y * de * c.hubble_rate;
+                    *k *= h;
                 });
-            k3 *= h;
-            let tmp = &y + &k3;
-            let mut k4 = self.derivative(&tmp) * &ei_m_on_ei * universe.hubble_rate(beta + h);
-            k4 = k4 + self.interactions
+
+            let c = self.context(beta + 0.5 * h, universe);
+            tmp = &y + &(&k2 * 0.5);
+            k3 = self.interactions
                 .iter()
-                .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, beta + h));
-            k4 *= h;
+                .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, &c));
+            Zip::from(&mut k3)
+                .and(&tmp)
+                .and(&ei_m_on_ei)
+                .apply(|k, &y, &de| {
+                    *k += y * de * c.hubble_rate;
+                    *k *= h;
+                });
+
+            let c = self.context(beta + h, universe);
+            tmp = &y + &k3;
+            k4 = self.interactions
+                .iter()
+                .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, &c));
+            Zip::from(&mut k4)
+                .and(&tmp)
+                .and(&ei_m_on_ei)
+                .apply(|k, &y, &de| {
+                    *k += y * de * c.hubble_rate;
+                    *k *= h;
+                });
 
             // Calculate dy.  Note that we consume k2, k3 and k4 here.  We use
             // k1 by reference since we need it later to get the error estimate.
@@ -246,7 +286,7 @@ impl Solver for PhaseSpaceSolver {
                 .filter(|v| v.is_finite())
                 .map(|v| (v - 1.0).abs())
                 .max_by(|a, b| a.partial_cmp(b).unwrap())
-                .expect("Unable to calculate error estimate");
+                .unwrap_or(0.0);
 
             // Adjust the step size as needed based on the step size.
             if err < self.error_tolerance.lower {
@@ -304,16 +344,11 @@ impl PhaseSpaceSolver {
     /// All particles species are assumed to be in thermal equilibrium at this
     /// energy, with the distribution following either the Bose–Einstein or
     /// Fermi–Dirac distribution as determined by their spin.
-    fn create_initial_conditions(&self) -> Array2<f64> {
+    fn equilibrium_phase_space(&self, beta: f64) -> Array2<f64> {
         Array2::from_shape_fn((self.particles.len(), self.energies.dim()), |(si, ei)| {
-            let s = &self.particles[si];
+            let p = &self.particles[si];
             let e = self.energies[ei];
-
-            if s.spin % 2 == 0 {
-                BoseEinstein.phase_space(e, s.mass, 0.0, self.beta_range.0)
-            } else {
-                FermiDirac.phase_space(e, s.mass, 0.0, self.beta_range.0)
-            }
+            p.phase_space(e, 0.0, beta)
         })
     }
 
@@ -341,6 +376,18 @@ impl PhaseSpaceSolver {
                 _ => 0.0,
             }
         })
+    }
+
+    fn context<U: Universe>(&self, beta: f64, universe: &U) -> Context {
+        Context {
+            beta: beta,
+            hubble_rate: universe.hubble_rate(beta),
+            eq_f: self.equilibrium_phase_space(beta),
+            eq_boson: self.energies
+                .map(|&e| BoseEinstein.phase_space(e, 0.0, 0.0, beta)),
+            eq_fermion: self.energies
+                .map(|&e| FermiDirac.phase_space(e, 0.0, 0.0, beta)),
+        }
     }
 }
 

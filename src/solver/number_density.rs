@@ -117,10 +117,19 @@
 //!   \\end{equation}
 
 use super::{ErrorTolerance, Solver, StepChange};
-use ndarray::prelude::*;
+use ndarray::{prelude::*, Zip};
 use particle::Particle;
-use statistic::Statistic::{BoseEinstein, FermiDirac};
+use statistic::{Statistic::{BoseEinstein, FermiDirac},
+                Statistics};
 use universe::Universe;
+
+pub struct Context {
+    pub beta: f64,
+    pub hubble_rate: f64,
+    pub eq_n: Array1<f64>,
+    pub eq_boson: f64,
+    pub eq_fermion: f64,
+}
 
 /// Boltzmann equation solver for the number density
 pub struct NumberDensitySolver {
@@ -128,9 +137,17 @@ pub struct NumberDensitySolver {
     beta_range: (f64, f64),
     particles: Vec<Particle>,
     #[cfg_attr(feature = "cargo-clippy", allow(type_complexity))]
-    interactions: Vec<Box<Fn(Array1<f64>, &Array1<f64>, f64) -> Array1<f64>>>,
+    interactions: Vec<Box<Fn(Array1<f64>, &Array1<f64>, &Context) -> Array1<f64>>>,
     step_change: StepChange,
     error_tolerance: ErrorTolerance,
+    normalize_to_photons: bool,
+}
+
+impl NumberDensitySolver {
+    pub fn normalize_to_photons(mut self, v: bool) -> Self {
+        self.normalize_to_photons = v;
+        self
+    }
 }
 
 impl Solver for NumberDensitySolver {
@@ -139,6 +156,8 @@ impl Solver for NumberDensitySolver {
     /// \\(n_{\mathsc{b-l}}\\)), in the same order as [`add_particle`] is
     /// invoked.
     type Solution = Array1<f64>;
+
+    type Context = Context;
 
     /// Create a new instance of the number density solver.
     ///
@@ -157,6 +176,7 @@ impl Solver for NumberDensitySolver {
                 upper: 1e-2,
                 lower: 1e-5,
             },
+            normalize_to_photons: true,
         }
     }
 
@@ -244,7 +264,7 @@ impl Solver for NumberDensitySolver {
 
     fn add_interaction<F: 'static>(&mut self, f: F) -> &mut Self
     where
-        F: Fn(Self::Solution, &Self::Solution, f64) -> Self::Solution,
+        F: Fn(Self::Solution, &Self::Solution, &Self::Context) -> Self::Solution,
     {
         self.interactions.push(Box::new(f));
         self
@@ -259,42 +279,75 @@ impl Solver for NumberDensitySolver {
             "The phase space solver has to be initialized first with the `initialize()` method."
         );
 
-        let mut y = self.create_initial_conditions();
+        let mut y = self.equilibrium_number_densities(self.beta_range.0);
         let mut beta = self.beta_range.0;
         let mut h = beta / 10.0;
 
+        // Allocate variables which will be re-used each for loop
+        let mut k1: Self::Solution;
+        let mut k2: Self::Solution;
+        let mut k3: Self::Solution;
+        let mut k4: Self::Solution;
+        let mut tmp: Self::Solution;
         let mut n_eval = 0;
         while beta < self.beta_range.1 {
             n_eval += 1;
 
             // Standard Runge-Kutta integration.
-            let mut k1 = -&y * (3.0 * universe.hubble_rate(beta));
-            k1 = k1 + self.interactions
+            let c = self.context(beta, universe);
+            k1 = self.interactions
                 .iter()
-                .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &y, beta));
-            k1 *= h;
-            let tmp = &y + &(&k1 * 0.5);
-            let mut k2 = -&tmp * (3.0 * universe.hubble_rate(beta + 0.5 * h));
-            k2 = k2 + self.interactions
-                .iter()
-                .fold(Self::Solution::zeros(y.dim()), |s, f| {
-                    f(s, &tmp, beta + 0.5 * h)
+                .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &y, &c));
+            if !self.normalize_to_photons {
+                Zip::from(&mut k1).and(&y).apply(|k, &t| {
+                    *k -= -t * 3.0 * c.hubble_rate;
+                    *k *= h
                 });
-            k2 *= h;
-            let tmp = &y + &(&k2 * 0.5);
-            let mut k3 = -&tmp * (3.0 * universe.hubble_rate(beta + 0.5 * h));
-            k3 = k3 + self.interactions
+            } else {
+                k1 *= h;
+            };
+
+            let c = self.context(beta + 0.5 * h, universe);
+            tmp = &y + &(&k1 * 0.5);
+            k2 = self.interactions
                 .iter()
-                .fold(Self::Solution::zeros(y.dim()), |s, f| {
-                    f(s, &tmp, beta + 0.5 * h)
-                });
-            k3 *= h;
+                .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, &c));
+            if !self.normalize_to_photons {
+                Zip::from(&mut k2).and(&tmp).apply(|k, &t| {
+                    *k -= t * 3.0 * c.hubble_rate;
+                    *k *= h
+                })
+            } else {
+                k2 *= h;
+            }
+
+            let c = self.context(beta + 0.5 * h, universe);
+            tmp = &y + &(&k2 * 0.5);
+            k3 = self.interactions
+                .iter()
+                .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, &c));
+            if !self.normalize_to_photons {
+                Zip::from(&mut k3).and(&tmp).apply(|k, &t| {
+                    *k -= t * 3.0 * c.hubble_rate;
+                    *k *= h
+                })
+            } else {
+                k3 *= h;
+            }
+
+            let c = self.context(beta + h, universe);
             let tmp = &y + &k3;
-            let mut k4 = -&tmp * (3.0 * universe.hubble_rate(beta + h));
-            k4 = k4 + self.interactions
+            k4 = self.interactions
                 .iter()
-                .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, beta + h));
-            k4 *= h;
+                .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, &c));
+            if !self.normalize_to_photons {
+                Zip::from(&mut k4).and(&tmp).apply(|k, &t| {
+                    *k -= t * 3.0 * c.hubble_rate;
+                    *k *= h
+                })
+            } else {
+                k4 *= h;
+            }
 
             // Calculate dy.  Note that we consume k2, k3 and k4 here.  We use
             // k1 by reference since we need it later to get the error estimate.
@@ -308,7 +361,7 @@ impl Solver for NumberDensitySolver {
                 .filter(|v| v.is_finite())
                 .map(|v| (v - 1.0).abs())
                 .max_by(|a, b| a.partial_cmp(b).unwrap())
-                .expect("Unable to calculate error estimate");
+                .unwrap_or(0.0);
 
             // Adjust the step size as needed based on the step size.
             if err < self.error_tolerance.lower {
@@ -367,16 +420,24 @@ impl NumberDensitySolver {
     /// All particles species are assumed to be in thermal equilibrium at this
     /// energy, with the distribution following either the Bose–Einstein or
     /// Fermi–Dirac distribution as determined by their spin.
-    fn create_initial_conditions(&self) -> Array1<f64> {
-        Array1::from_shape_fn(self.particles.len(), |si| {
-            let s = &self.particles[si];
+    fn equilibrium_number_densities(&self, beta: f64) -> Array1<f64> {
+        let a = Array1::from_iter(self.particles.iter().map(|p| p.number_density(0.0, beta)));
 
-            if s.spin % 2 == 0 {
-                BoseEinstein.number_density(s.mass, 0.0, self.beta_range.0)
-            } else {
-                FermiDirac.number_density(s.mass, 0.0, self.beta_range.0)
-            }
-        })
+        if self.normalize_to_photons {
+            a / BoseEinstein.massless_number_density(0.0, beta)
+        } else {
+            a
+        }
+    }
+
+    fn context<U: Universe>(&self, beta: f64, universe: &U) -> Context {
+        Context {
+            beta: beta,
+            hubble_rate: universe.hubble_rate(beta),
+            eq_n: self.equilibrium_number_densities(beta),
+            eq_boson: BoseEinstein.massless_number_density(0.0, beta),
+            eq_fermion: FermiDirac.massless_number_density(0.0, beta),
+        }
     }
 }
 
@@ -391,6 +452,7 @@ mod test {
         let mut solver = NumberDensitySolver::new()
             .temperature_range(1e20, 1e-10)
             .error_tolerance(1e-1, 1e-2)
+            .normalize_to_photons(true)
             .initialize();
 
         solver.add_particle(phi);

@@ -23,6 +23,13 @@ pub trait Solver {
     /// invoked.
     type Solution;
 
+    /// Context containing relevant information precomputed by the solver which
+    /// can be used in the calculation of the interactions.
+    ///
+    /// This is used in order to avoid running possibly time-consuming functions
+    /// for each interaction.
+    type Context;
+
     /// Create a new instance of the solver.
     ///
     /// In general, the solver is instantiated as follows:
@@ -138,7 +145,7 @@ pub trait Solver {
     /// ```
     fn add_interaction<F: 'static>(&mut self, int: F) -> &mut Self
     where
-        F: Fn(Self::Solution, &Self::Solution, f64) -> Self::Solution;
+        F: Fn(Self::Solution, &Self::Solution, &Self::Context) -> Self::Solution;
 
     /// Evolve the initial conditions by solving the PDEs.
     ///
