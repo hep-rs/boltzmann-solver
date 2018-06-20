@@ -19,7 +19,7 @@ use universe::Universe;
 /// example).
 ///
 /// In the long run, it is intended that this type be replaced by another one.
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Particle {
     /// The spin is stored as twice the spin, so a spin-½ particle has `spin ==
     /// 1` and a spin-1 particle has `spin == 2`
@@ -61,21 +61,25 @@ impl Particle {
     }
 
     /// Returns true if the particle is complex.
+    #[inline]
     pub fn is_complex(&self) -> bool {
         self.complex
     }
 
     /// Returns true if the particle is bosonic.
+    #[inline]
     pub fn is_bosonic(&self) -> bool {
         self.spin % 2 == 0
     }
 
     /// Returns true if the particle is fermionic.
+    #[inline]
     pub fn is_fermionic(&self) -> bool {
         self.spin % 2 == 1
     }
 
     /// Return the quantum statistic that this particle obeys.
+    #[inline]
     fn statistic(&self) -> Statistic {
         if self.is_fermionic() {
             Statistic::FermiDirac
