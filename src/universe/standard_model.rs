@@ -14,7 +14,7 @@ use universe::Universe;
 /// hadrons, none of the individual particles of the Standard Model are included
 /// here.  In the future, the interactions from the leptons, the Higgs doublet
 /// and electromagnetic and weak bosons might be included.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone, Copy)]
 pub struct StandardModel;
 
 impl StandardModel {
