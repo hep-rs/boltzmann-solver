@@ -239,10 +239,10 @@ impl Solver for PhaseSpaceSolver {
                 .iter()
                 .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &y, &c));
             Zip::from(&mut k1)
-                .and(&y)
+                .and(&self.derivative(&y))
                 .and(&ei_m_on_ei)
-                .apply(|k, &y, &de| {
-                    *k += y * de * c.hubble_rate;
+                .apply(|k, &dy, &de| {
+                    *k += dy * de * c.hubble_rate;
                     *k *= h;
                 });
 
@@ -252,10 +252,10 @@ impl Solver for PhaseSpaceSolver {
                 .iter()
                 .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, &c));
             Zip::from(&mut k2)
-                .and(&tmp)
+                .and(&self.derivative(&tmp))
                 .and(&ei_m_on_ei)
-                .apply(|k, &y, &de| {
-                    *k += y * de * c.hubble_rate;
+                .apply(|k, &dy, &de| {
+                    *k += dy * de * c.hubble_rate;
                     *k *= h;
                 });
 
@@ -265,10 +265,10 @@ impl Solver for PhaseSpaceSolver {
                 .iter()
                 .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, &c));
             Zip::from(&mut k3)
-                .and(&tmp)
+                .and(&self.derivative(&tmp))
                 .and(&ei_m_on_ei)
-                .apply(|k, &y, &de| {
-                    *k += y * de * c.hubble_rate;
+                .apply(|k, &dy, &de| {
+                    *k += dy * de * c.hubble_rate;
                     *k *= h;
                 });
 
@@ -278,10 +278,10 @@ impl Solver for PhaseSpaceSolver {
                 .iter()
                 .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, &c));
             Zip::from(&mut k4)
-                .and(&tmp)
+                .and(&self.derivative(&tmp))
                 .and(&ei_m_on_ei)
-                .apply(|k, &y, &de| {
-                    *k += y * de * c.hubble_rate;
+                .apply(|k, &dy, &de| {
+                    *k += dy * de * c.hubble_rate;
                     *k *= h;
                 });
 
