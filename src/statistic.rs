@@ -47,6 +47,7 @@ pub enum Statistic {
     MaxwellJuttner,
 }
 
+/// Equilibrium statistics.
 pub trait Statistics {
     /// Evaluate the phase space distribution, for a given energy, mass,
     /// chemical potential and inverse temperature.
