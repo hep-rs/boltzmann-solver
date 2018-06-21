@@ -2,9 +2,7 @@
 set -ux
 
 clean_previous_builds() {
-    for file in target/debug/boltzmann_solver-*[^\.d]; do
-        rm $file
-    done
+    find target -type f -name "boltzmann_solver-*" -exec rm '{}' +
 }
 
 main() {
