@@ -458,19 +458,19 @@ impl NumberDensitySolver {
 mod test {
     use super::*;
     use universe::StandardModel;
+    use utilities::test::*;
 
     #[test]
     fn no_interaction() {
-        let phi = Particle::new(0, 5.0);
+        let phi = Particle::new(0, 1e3);
         let mut solver = NumberDensitySolver::new()
             .temperature_range(1e20, 1e-10)
-            .error_tolerance(1e-1, 1e-2)
             .normalize_to_photons(true)
             .initialize();
 
         solver.add_particle(phi);
 
         let sol = solver.solve(&StandardModel::new());
-        assert!(sol[0] < 1e-100);
+        approx_eq(sol[0], 1.0, 8.0, 0.0);
     }
 }
