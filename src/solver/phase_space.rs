@@ -53,11 +53,22 @@ use statistic::{Statistic::{BoseEinstein, FermiDirac},
 use std::f64;
 use universe::Universe;
 
+/// Context provided containing pre-computed values which might be useful when
+/// evaluating interactions.
 pub struct Context {
+    /// Inverse temperature in GeV^{-1}
     pub beta: f64,
+    /// Hubble rate, in GeV
     pub hubble_rate: f64,
+    /// Equilibrium phase spaces for the particles.  The first axis has the
+    /// particles and follows the same order as specified to the solver.  The
+    /// second axis has the energies
     pub eq_f: Array2<f64>,
+    /// Equilibrium phase space for massless bosons.  This is specified per
+    /// degree of freedom (that is \\(g = 1\\))
     pub eq_boson: Array1<f64>,
+    /// Equilibrium phase space for massless fermions.  This is specified per
+    /// degree of freedom (that is \\(g = 1\\))
     pub eq_fermion: Array1<f64>,
 }
 

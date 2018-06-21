@@ -123,11 +123,21 @@ use statistic::{Statistic::{BoseEinstein, FermiDirac},
                 Statistics};
 use universe::Universe;
 
+/// Context provided containing pre-computed values which might be useful when
+/// evaluating interactions.
 pub struct Context {
+    /// Inverse temperature in GeV^{-1}
     pub beta: f64,
+    /// Hubble rate, in GeV
     pub hubble_rate: f64,
+    /// Equilibrium number densities for the particles.  This is provided in the
+    /// same order as specified to the solver
     pub eq_n: Array1<f64>,
+    /// Equilibrium number density for massless bosons.  This is specified per
+    /// degree of freedom (that is \\(g = 1\\))
     pub eq_boson: f64,
+    /// Equilibrium number density for massless fermions.  This is specified per
+    /// degree of freedom (that is \\(g = 1\\))
     pub eq_fermion: f64,
 }
 
@@ -144,6 +154,9 @@ pub struct NumberDensitySolver {
 }
 
 impl NumberDensitySolver {
+    /// Normalize the number densities to the photon number density during the
+    /// calculations.  As a consequence, the effects from the expansion of the
+    /// Universe are automatically taken into account.
     pub fn normalize_to_photons(mut self, v: bool) -> Self {
         self.normalize_to_photons = v;
         self
