@@ -149,18 +149,13 @@ impl Statistics for Statistic {
         debug_assert!(mass >= 0.0, "mass must be positive.");
         debug_assert!(beta >= 0.0, "β must be positive.");
 
-        if mass < 1e-20 {
+        if mass * beta < 1e-4 {
             debug!("mass is below threshold, using massless_number_density instead.");
             return self.massless_number_density(mu, beta);
         }
 
         match *self {
             Statistic::FermiDirac => {
-                debug_assert_warn!(
-                    mu > 0.9 * mass,
-                    "Evaluation of number densities for μ > 0.9 m can be inaccurate."
-                );
-
                 let integral = integrate(
                     |t| {
                         let u = mass + t / (1.0 - t);
