@@ -78,6 +78,16 @@ impl Particle {
         self.spin % 2 == 1
     }
 
+    /// Return the number of degrees of freedom for the underlying particle.
+    #[inline]
+    pub fn degrees_of_freedom(&self) -> f64 {
+        if let Some(dof) = self.dof {
+            dof
+        } else {
+            f64::from(self.spin + 1) * if self.complex { 2.0 } else { 1.0 }
+        }
+    }
+
     /// Return the quantum statistic that this particle obeys.
     #[inline]
     fn statistic(&self) -> Statistic {
@@ -90,26 +100,23 @@ impl Particle {
 
     /// Return the equilibrium phase space occupation of the particle.
     pub fn phase_space(&self, e: f64, mu: f64, beta: f64) -> f64 {
-        self.statistic().phase_space(e, self.mass, mu, beta)
+        self.statistic().phase_space(e, self.mass, mu, beta) * self.degrees_of_freedom()
     }
 
     /// Return the equilibrium number density of the particle.
     pub fn number_density(&self, mu: f64, beta: f64) -> f64 {
-        self.statistic().number_density(self.mass, mu, beta)
+        self.statistic().number_density(self.mass, mu, beta) * self.degrees_of_freedom()
     }
 }
 
 impl Universe for Particle {
     fn entropy_dof(&self, beta: f64) -> f64 {
-        let g1 = if self.is_bosonic() {
+        if self.is_bosonic() {
             interpolation::linear(&BOSON_GSTAR, (self.mass * beta).ln()).exp()
+                * self.degrees_of_freedom()
         } else {
             interpolation::linear(&FERMION_GSTAR, (self.mass * beta).ln()).exp()
-        };
-        if let Some(dof) = self.dof {
-            g1 * dof
-        } else {
-            g1 * f64::from(self.spin + 1) * if self.complex { 2.0 } else { 1.0 }
+                * self.degrees_of_freedom()
         }
     }
 }
