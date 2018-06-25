@@ -149,20 +149,22 @@ impl Statistics for Statistic {
         debug_assert!(mass >= 0.0, "mass must be positive.");
         debug_assert!(beta >= 0.0, "β must be positive.");
 
-        if mass * beta < 1e-4 {
-            debug!("mass is below threshold, using massless_number_density instead.");
-            return self.massless_number_density(mu, beta);
-        }
-
         match *self {
             Statistic::FermiDirac => {
+                if mass * beta < 1e-4 {
+                    debug!("Mass is below threshold, using massless_number_density instead.");
+                    return self.massless_number_density(mu, beta);
+                }
+
                 let integral = integrate(
                     |t| {
                         let u = mass + t / (1.0 - t);
                         let dudt = (t - 1.0).powi(-2);
 
-                        self.phase_space(u, mass, mu, beta) * u
-                            * f64::sqrt(u.powi(2) - mass.powi(2)) * dudt
+                        self.phase_space(u, mass, mu, beta)
+                            * u
+                            * f64::sqrt(u.powi(2) - mass.powi(2))
+                            * dudt
                     },
                     0.0,
                     1.0,
@@ -176,13 +178,20 @@ impl Statistics for Statistic {
                 0.050_660_591_821_168_89 * integral.integral
             }
             Statistic::BoseEinstein => {
+                if mass * beta < 1e-4 {
+                    debug!("Mass is below threshold, using massless_number_density instead.");
+                    return self.massless_number_density(mu, beta);
+                }
+
                 let integral = integrate(
                     |t| {
                         let u = mass + t / (1.0 - t);
                         let dudt = (t - 1.0).powi(-2);
 
-                        self.phase_space(u, mass, mu, beta) * u
-                            * f64::sqrt(u.powi(2) - mass.powi(2)) * dudt
+                        self.phase_space(u, mass, mu, beta)
+                            * u
+                            * f64::sqrt(u.powi(2) - mass.powi(2))
+                            * dudt
                     },
                     0.0,
                     1.0,
@@ -196,8 +205,15 @@ impl Statistics for Statistic {
                 0.050_660_591_821_168_89 * integral.integral
             }
             Statistic::MaxwellBoltzmann => {
+                if mass * beta < 1e-4 {
+                    debug!("Mass is below threshold, using massless_number_density instead.");
+                    return self.massless_number_density(mu, beta);
+                }
+
                 // 1/(2 π²) ≅ 0.050_660_591_821_168_89
-                0.050_660_591_821_168_89 * mass.powi(2) * bessel::k_2(mass * beta)
+                0.050_660_591_821_168_89
+                    * mass.powi(2)
+                    * bessel::k_2(mass * beta)
                     * f64::exp(mu * beta) / beta
             }
             Statistic::MaxwellJuttner => {
