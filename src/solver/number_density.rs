@@ -457,6 +457,8 @@ impl NumberDensitySolver {
 #[cfg(test)]
 mod test {
     use super::*;
+    use special_functions::bessel;
+    use std::f64::consts;
     use universe::StandardModel;
     use utilities::test::*;
 
@@ -472,5 +474,53 @@ mod test {
 
         let sol = solver.solve(&StandardModel::new());
         approx_eq(sol[0], 1.0, 8.0, 0.0);
+    }
+
+    #[test]
+    fn minimal_leptogenesis() {
+        let n1 = Particle::new(1, 1e10);
+        let b_minus_l = Particle::new(0, 0.0).set_dof(0.0);
+
+        let yukawa: f64 = 1e-4;
+        let epsilon = 1e-7;
+        let decay_zero_temp = yukawa.powi(2) / (16.0 * consts::PI.powi(2)) * n1.mass;
+
+        let universe = StandardModel::new();
+        let mut solver = NumberDensitySolver::new()
+            .beta_range(1e-14, 1e0)
+            .error_tolerance(1e-1, 1e-2)
+            .normalize_to_photons(true)
+            .initialize();
+
+        solver.add_particle(n1);
+        solver.add_particle(b_minus_l);
+
+        // Interaction N ↔ e± H∓ (decay of N, asymmetry in B-L and washout)
+        solver.add_interaction(move |mut s, n, ref c| {
+            let m_beta = n1.mass * c.beta;
+            let dilation_factor = if m_beta > 600.0 {
+                1.0
+            } else if m_beta < 1e-15 {
+                0.0
+            } else {
+                bessel::k_1(n1.mass * c.beta) / bessel::k_2(n1.mass * c.beta)
+            };
+
+            let decay = decay_zero_temp * dilation_factor;
+
+            let full_decay = (n[0] - c.eq_n[0]) / (c.hubble_rate * c.beta) * decay;
+            let inverse_decay = decay * c.eq_n[0] / (2.0 * c.eq_fermion);
+            let washout = inverse_decay / (2.0 * c.hubble_rate * c.beta);
+
+            s[0] -= full_decay;
+            s[1] += epsilon * full_decay;
+            s[1] -= washout * n[1] / (c.hubble_rate * c.beta);
+            s
+        });
+
+        let sol = solver.solve(&universe);
+
+        assert!(sol[0] < 1e-20);
+        assert!(1e-10 < sol[1] && sol[1] < 1e-5);
     }
 }
