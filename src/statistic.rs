@@ -92,7 +92,7 @@ pub trait Statistics {
     ///    n = \frac{1}{2 \pi^2} \int_{0}^{\infty} f_{i} u^2 \dd u
     /// \\end{equation}
     ///
-    /// The naïve implementation simply calls [`Statistics::numer_density`]
+    /// The naïve implementation simply calls [`Statistics::number_density`]
     /// setting `mass = 0.0` and then uses numerical integration.
     ///
     /// # Note to Implementors

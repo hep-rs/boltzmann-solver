@@ -9,7 +9,7 @@
 //! equation:
 //!
 //! \\begin{equation}
-//!   \pfrac{f_i}{t} = \frac{\int \vt C[f] \dd \Omega}{4 \pi E_i}
+//!   \pfrac{f_i}{t} = \frac{\int \vt C\[f\] \dd \Omega}{4 \pi E_i}
 //!                  + H \frac{E_i^2 - m^2}{E_i} \pfrac{f}{E}
 //! \\end{equation}
 //!
@@ -48,8 +48,9 @@
 use super::{ErrorTolerance, Solver, StepChange};
 use ndarray::{prelude::*, Zip};
 use particle::Particle;
-use statistic::{Statistic::{BoseEinstein, FermiDirac},
-                Statistics};
+use statistic::{
+    Statistic::{BoseEinstein, FermiDirac}, Statistics,
+};
 use std::f64;
 use universe::Universe;
 
@@ -104,8 +105,8 @@ impl PhaseSpaceSolver {
 impl Solver for PhaseSpaceSolver {
     /// The solution is a two-dimensional array.  The first axis (`Axis(0)`)
     /// corresponds to the particle species and has the same ordering as the
-    /// order in which [`add_particle`] is invoked.  The second axis (`Axis(1)`)
-    /// contains the energies.
+    /// order in which [`Solver::add_particle`] is invoked.  The second axis
+    /// (`Axis(1)`) contains the energies.
     type Solution = Array2<f64>;
 
     type Context = Context;
@@ -415,8 +416,6 @@ mod test {
             .error_tolerance(1e-1, 1e-2)
             .initialize();
         solver.add_particle(phi);
-
-
 
         solver.solve(&StandardModel::new());
     }
