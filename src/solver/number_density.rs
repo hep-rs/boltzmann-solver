@@ -167,8 +167,8 @@ impl NumberDensitySolver {
 impl Solver for NumberDensitySolver {
     /// The solution is a one-dimensional array of number densities for each
     /// particle species (or aggregated number density in the case of
-    /// \\(n_{\mathsc{b-l}}\\)), in the same order as [`add_particle`] is
-    /// invoked.
+    /// \\(n_{\mathsc{b-l}}\\)), in the same order as [`Solver::add_particle`]
+    /// is invoked.
     type Solution = Array1<f64>;
 
     type Context = Context;
@@ -200,8 +200,8 @@ impl Solver for NumberDensitySolver {
     /// Inverse temperature must be provided in units of GeV^{-1}.
     ///
     /// This function has a convenience alternative called
-    /// [`NumberDensitySolver::temperature_range`] allowing for the limits to be
-    /// specified as temperature in the units of GeV.
+    /// [`Solver::temperature_range`] allowing for the limits to be specified as
+    /// temperature in the units of GeV.
     ///
     /// # Panics
     ///

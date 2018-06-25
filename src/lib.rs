@@ -23,7 +23,7 @@
 //! species of particles.  In full generality, it is given by
 //!
 //! \\begin{equation}
-//!   \vt L[f] = \vt C[f]
+//!   \vt L\[f\] = \vt C\[f\]
 //! \\end{equation}
 //!
 //! where \\(\vt L\\) is the Liouville operator and \\(\vt C\\) is the collision
@@ -38,7 +38,7 @@
 //! simplifies to only be dependent the time-like derivatives:
 //!
 //! \\begin{equation}
-//!   \vt L[f] \stackrel{\mathrm{\tiny FLRW}}{=} \left[ E \pfrac{}{t} - H (E^2 - m^2) \pfrac{}{E} \right] f,
+//!   \vt L\[f\] \stackrel{\mathrm{\tiny FLRW}}{=} \left[ E \pfrac{}{t} - H (E^2 - m^2) \pfrac{}{E} \right] f,
 //! \\end{equation}
 //!
 //! where \\(H \defeq \dot a / a\\) is Hubble's constant.  Unless there is a
@@ -53,7 +53,7 @@
 //! operator over the phase space:
 //!
 //! \\begin{equation}
-//!   g \int \vt L[f] \frac{\dd^3 \vt p}{(2 \pi)^3 E} = \pfrac{n}{t} + 3 H n = \frac{1}{a^3} \pfrac{(n a^3)}{t}.
+//!   g \int \vt L\[f\] \frac{\dd^3 \vt p}{(2 \pi)^3 E} = \pfrac{n}{t} + 3 H n = \frac{1}{a^3} \pfrac{(n a^3)}{t}.
 //! \\end{equation}
 //!
 //! The number density is related to the phase space distribution through
