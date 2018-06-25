@@ -117,10 +117,11 @@
 //!   \\end{equation}
 
 use super::{ErrorTolerance, Solver, StepChange};
-use ndarray::{prelude::*, Zip};
+use ndarray::{prelude::*, FoldWhile, Zip};
 use particle::Particle;
-use statistic::{Statistic::{BoseEinstein, FermiDirac},
-                Statistics};
+use statistic::{
+    Statistic::{BoseEinstein, FermiDirac}, Statistics,
+};
 use universe::Universe;
 
 /// Context provided containing pre-computed values which might be useful when
@@ -302,6 +303,7 @@ impl Solver for NumberDensitySolver {
         let mut k3: Self::Solution;
         let mut k4: Self::Solution;
         let mut tmp: Self::Solution;
+
         let mut n_eval = 0;
         while beta < self.beta_range.1 {
             n_eval += 1;
@@ -369,12 +371,17 @@ impl Solver for NumberDensitySolver {
             // Check the error on the RK method vs the Euler method.  If it is
             // small enough, increase the step size.  We use the maximum error
             // for any given element of `dy`.
-            let err = (k1 / &dy)
-                .iter()
-                .filter(|v| v.is_finite())
-                .map(|v| (v - 1.0).abs())
-                .max_by(|a, b| a.partial_cmp(b).unwrap())
-                .unwrap_or(0.0);
+            let err = Zip::from(&k1)
+                .and(&dy)
+                .fold_while(0.0, |e, k, d| {
+                    let v = (d / k - 1.0).abs();
+                    if v.is_finite() && v > e {
+                        FoldWhile::Continue(v)
+                    } else {
+                        FoldWhile::Continue(e)
+                    }
+                })
+                .into_inner();
 
             // Adjust the step size as needed based on the step size.
             if err < self.error_tolerance.lower {
