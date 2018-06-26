@@ -40,9 +40,9 @@
 //!
 //!   \\begin{equation}
 //!     \begin{aligned}
-//!       g_{a_1} \int \vt C[f_{a_{1}}] \dd \Pi_{a_1}
+//!       g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
 //!         &= - \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right)
-//!                   (2 \pi)^4 \delta(p_{\vt a} - p_{\vt b}) \\\\
+//!                   (2 \pi)^4 \delta^4(p_{\vt a} - p_{\vt b}) \\\\
 //!         &\quad \times \Biggl[ \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right)
 //!                             - \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \Biggr],
 //!     \end{aligned}
@@ -53,9 +53,9 @@
 //!
 //!   \\begin{equation}
 //!     \begin{aligned}
-//!       g_{a_1} \int \vt C[f_{a_{1}}] \dd \Pi_{a_1}
+//!       g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
 //!         &= - \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right)
-//!                   (2 \pi)^4 \delta(p_{\vt a} - p_{\vt b}) \\\\
+//!                   (2 \pi)^4 \delta^4(p_{\vt a} - p_{\vt b}) \\\\
 //!         &\quad \times \Biggl[ \abs{\mathcal M(\vt a | \vt b)}^2 e^{ \beta \sum_{\vt a} \mu_i }
 //!                             - \abs{\mathcal M(\vt b | \vt a)}^2 e^{ \beta \sum_{\vt b} \mu_i } \Biggr]
 //!                       e^{ - \beta \sum_{\vt a} E_i },
@@ -66,11 +66,14 @@
 //!   equate \\(\sum_{\vt a} E_i = \sum_{\vt b} E_i\\).
 //!
 //!   It should be noted that this assumption also simplifies greatly the
-//!   expression for the number density.  In particular, we obtain:
+//!   expression for the number density.  In particular, we obtain
 //!
-//!  \\begin{equation}
-//!    n = e^{\mu \beta} \frac{m^2 K_2(m \beta)}{2 \pi^2 \beta} = e^{\mu \beta} n^{(0)}
-//!  \\end{equation}
+//!   \\begin{equation}
+//!     n = e^{\mu \beta} \frac{m^2 K_2(m \beta)}{2 \pi^2 \beta} = e^{\mu \beta} n^{(0)},
+//!   \\end{equation}
+//!
+//!   where \\(n^{(0)}\\) is the equilibrium number density when \\(\mu =
+//!   0\\).
 //!
 //! - *Assume \\(\mathcal{CP}\\) symmetry.* If \\(\mathcal{CP}\\) symmetry is
 //!   assumed, then \\(\abs{\mathcal M(\vt a | \vt b)}^2 \equiv \abs{\mathcal
@@ -78,9 +81,9 @@
 //!   of \\(\mu\\) to be taken out of the integral entirely:
 //!
 //!   \\begin{equation}
-//!     g_{a_1} \int \vt C[f_{a_{1}}] \dd \Pi_{a_1}
+//!     g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
 //!       = - \left[ e^{ \beta \sum_{\vt a} \mu_i } - e^{ \beta \sum_{\vt b} \mu_i } \right]
-//!            \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right) (2 \pi)^4 \delta(p_{\vt a} - p_{\vt b})
+//!            \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right) (2 \pi)^4 \delta^4(p_{\vt a} - p_{\vt b})
 //!            \abs{\mathcal M(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i }.
 //!   \\end{equation}
 //!
@@ -106,12 +109,12 @@
 //!
 //!   \\begin{equation}
 //!     \begin{aligned}
-//!       g_{a_1} \int \vt C[f_{a_{1}}] \dd \Pi_{a_1}
+//!       g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
 //!         &= - \left[ e^{ \beta \sum_{\vt a} \mu_i } - e^{ \beta \sum_{\vt b} \mu_i } \right] \times
-//!              \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right) (2 \pi)^4 \delta(p_{\vt a} - p_{\vt b})
+//!              \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right) (2 \pi)^4 \delta^4(p_{\vt a} - p_{\vt b})
 //!              \abs{\mathcal M^{(0)}(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i } \\\\
 //!         &\quad - \left[ e^{ \beta \sum_{\vt a} \mu_i } + e^{ \beta \sum_{\vt b} \mu_i } \right] \times
-//!              \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right) (2 \pi)^4 \delta(p_{\vt a} - p_{\vt b})
+//!              \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right) (2 \pi)^4 \delta^4(p_{\vt a} - p_{\vt b})
 //!              \epsilon \abs{\mathcal M^{(0)}(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i }.
 //!     \\end{aligned}
 //!   \\end{equation}
