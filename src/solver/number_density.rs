@@ -510,7 +510,7 @@ mod test {
             } else if m_beta < 1e-15 {
                 0.0
             } else {
-                bessel::k_1(n1.mass * c.beta) / bessel::k_2(n1.mass * c.beta)
+                bessel::k_1(m_beta) / bessel::k_2(m_beta)
             };
 
             let decay = decay_zero_temp * dilation_factor;
