@@ -53,7 +53,7 @@
 //! operator over the phase space:
 //!
 //! \\begin{equation}
-//!   g \int \vt L\[f\] \frac{\dd^3 \vt p}{(2 \pi)^3 E} = \pfrac{n}{t} + 3 H n = \frac{1}{a^3} \pfrac{(n a^3)}{t}.
+//!   g \int \vt L\[f\] \frac{\dd^3 \vt p}{(2 \pi)^3} = \pfrac{n}{t} + 3 H n = \frac{1}{a^3} \pfrac{(n a^3)}{t}.
 //! \\end{equation}
 //!
 //! The number density is related to the phase space distribution through
@@ -75,9 +75,9 @@
 //!
 //! \\begin{equation}
 //!   \begin{aligned}
-//!     g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3 E_{a_1}}
+//!     g_{a_1} \int \vt C[f_{a_1}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3}
 //!       &= - \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right)
-//!                 (2 \pi)^4 \delta(p_{\vt a} - p_{\vt b}) \\\\
+//!                 (2 \pi)^4 \delta^4(p_{\vt a} - p_{\vt b}) \\\\
 //!       &\quad \times \Bigl[ \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right) \left(\prod_{\vt b} 1 \pm f_i \right)
 //!                          - \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right) \Bigr],
 //!   \end{aligned}
@@ -85,13 +85,18 @@
 //!
 //! where \\(p_{\vt a} \defeq p_{a_1} + p_{a_2} + \cdots\\) (and similarly for
 //! \\(p_{\vt b}\\)); \\(\abs{\mathcal M(\vt a | \vt b)}^2\\) is the squared
-//! amplitude going from initial state \\(\vt a\\) to \\(\vt b\\) and is *summed
-//! over* all *internal degrees of freedom*; and
+//! amplitude going from initial state \\(\vt a\\) to \\(\vt b\\) and is
+//! *averaged over* all *internal degrees of freedom*; and
 //!
 //! \\begin{equation}
-//!   \dd \Pi_i \defeq \frac{\dd^3 \vt p_i}{(2 \pi)^3 E_i}
-//!             \equiv E_i \sqrt{E_i^2 - m_i^2} \frac{\dd E_i \dd \Omega_i}{(2 \pi)^3}
+//!   \dd \Pi_i \defeq \frac{g_i \dd^3 \vt p_i}{(2 \pi)^3 2 E_i}
+//!             \equiv E_i \sqrt{E_i^2 - m_i^2} \frac{\dd E_i \dd \Omega_i}{2 (2 \pi)^3}.
 //! \\end{equation}
+//!
+//! Note that as the squared amplitude is averaged over all internal degrees of
+//! freedom, they will cancel out with the \\(g_i\\) factors in each \\(\dd
+//! \Pi_i\\) term; as a result, some authors omit \\(g_i\\) from the definition
+//! of \\(\dd \Pi_i\\).
 //!
 //! The factors \\(1 \pm f\\) account for Pauli suppression and Bose enhancement
 //! in the transition \\(\vt a \leftrightarrow \vt b\\), where \\(1 + f\\) is
