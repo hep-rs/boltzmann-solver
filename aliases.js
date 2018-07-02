@@ -1,0 +1,14 @@
+var ALIASES = {};
+ALIASES['boltzmann_solver'] = {};
+ALIASES['cfg_if'] = {};
+ALIASES['either'] = {};
+ALIASES['itertools'] = {};
+ALIASES['log'] = {};
+ALIASES['matrixmultiply'] = {};
+ALIASES['ndarray'] = {};
+ALIASES['num_complex'] = {};
+ALIASES['num_traits'] = {};
+ALIASES['num_traits'] = {};
+ALIASES['quadrature'] = {};
+ALIASES['rawpointer'] = {};
+ALIASES['special_functions'] = {};
