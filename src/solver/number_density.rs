@@ -128,12 +128,93 @@
 // //!     \\end{aligned}
 // //!   \\end{equation}
 //!
+//! # Interactions
 //!
+//! The majority of interactions can be accounted for by looking at simply \\(1
+//! \leftrightarrow 2\\) decays/inverse decays and \\(2 \leftrightarrow 2\\)
+//! scatterings.  In the former case, the calculations can be done entirely
+//! analytically and are presented below.
 //!
+//! ## Decays and Inverse Decays
 //!
+//! Considering the interaction \\(a \leftrightarrow b + c\\), the reaction is
 //!
+//! \\begin{equation}
+//!   \begin{aligned}
+//!     g_a \int \vt C\[f_a\] \frac{\dd \vt p_a}{(2\pi)^3}
+//!       &= - \frac{n_a}{n^{(0)}_a} \gamma(a \to bc) + \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} \gamma(bc \to a)
+//!   \end{aligned}
+//! \\end{equation}
 //!
+//! In every case, the squared matrix element will be completely independent of
+//! all initial and final state momenta (even \\(\varepsilon \cdot p\\) terms
+//! vanish after averaging over both initial and final spins).
 //!
+//! ### Decay Term
+//!
+//! For the decay, the integration over the final state momenta is trivial as
+//! the only final-state-momentum dependence appears within the Dirac delta
+//! function.  Consequently, we need only integrate over the initial state
+//! momentum:
+//!
+//! \\begin{equation}
+//!   \begin{aligned}
+//!     \gamma(a \to bc)
+//!       &= - \abs{\mathcal M(a \to bc)}^2 \int \dd \Pi_a \dd \Pi_b \dd \Pi_c (2\pi)^4 \delta^4(p_a - p_b - p_c) f^{(0)}_a \\\\
+//!       &= - \frac{\abs{\mathcal M(a \to bc)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}
+//!   \end{aligned}
+//! \\end{equation}
+//!
+//! Combined with the number density scaling:
+//!
+//! \\begin{equation}
+//!   \frac{n_a}{n^{(0)}_a} \gamma(a \to bc)
+//!     = n_a \frac{\abs{\mathcal M(a \to bc)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
+//! \\end{equation}
+//!
+//! where the analytic expression for \\(n^{(0)}_a\\) was used to introduce the
+//! second Bessel function.
+//!
+//! The ratio of Bessel functions is generally referred to as the *time-dilation
+//! factor* for the decaying particle.  When \\(m \beta \gg 1\\), the ratio of
+//! Bessel functions approaches 1, and when \\(m \beta \ll 1\\), the ratio
+//! approaches \\(0\\).
+//!
+//! If the final state particles are essentially massless in comparison to the
+//! decaying particle, then the decay rate in the rest frame of the particle of
+//! \\(\Gamma_\text{rest} = \abs{\mathcal M}^2 / 16 \pi m_a\\) and the above
+//! expression can be simplified to
+//!
+//! \\begin{equation}
+//!   \frac{n_a}{n^{(0)}\_a} \gamma(a \to bc)
+//!   = n_a \Gamma_\text{rest} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}.
+//! \\end{equation}
+//!
+//! ### Inverse Decay
+//!
+//! The inverse decay rate is given by
+//!
+//! \\begin{equation}
+//!   \gamma(bc \to a)
+//!     = \abs{\mathcal M(bc \to a)}^2 \int \dd \Pi_a \dd \Pi_b \dd \Pi_c (2 \pi)^4 \delta^4(p_b + p_c - p_a) f^{(0)}_b f^{(0)}_c
+//! \\end{equation}
+//!
+//! The Dirac delta enforces that \\(E_a = E_b + E_c\\) which implies that
+//! \\(f^{(0)}_a = f^{(0)}_b f^{(0)}_c\\) thereby making the integral identical
+//! to the decay scenario:
+//!
+//! \\begin{equation}
+//!   \gamma(bc \to a)
+//!     = \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}
+//!     = n^{(0)}_a \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
+//! \\end{equation}
+//!
+//! The full expression including the number density scaling becomes:
+//!
+//! \\begin{equation}
+//!   \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} \gamma(bc \to a)
+//!     = \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} n^{(0)}_a \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
+//! \\end{equation}
 
 use super::{ErrorTolerance, Solver, StepChange};
 use ndarray::{prelude::*, FoldWhile, Zip};
