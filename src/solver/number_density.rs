@@ -552,7 +552,7 @@ impl NumberDensitySolver {
 
     fn context<U: Universe>(&self, beta: f64, universe: &U) -> Context {
         Context {
-            beta: beta,
+            beta,
             hubble_rate: universe.hubble_rate(beta),
             eq_n: self.equilibrium_number_densities(beta),
             eq_boson: BoseEinstein.massless_number_density(0.0, beta),
