@@ -392,7 +392,7 @@ impl PhaseSpaceSolver {
 
     fn context<U: Universe>(&self, beta: f64, universe: &U) -> Context {
         Context {
-            beta: beta,
+            beta,
             hubble_rate: universe.hubble_rate(beta),
             eq_f: self.equilibrium_phase_space(beta),
             eq_boson: self.energies
