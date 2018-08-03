@@ -215,7 +215,8 @@ use super::{ErrorTolerance, Solver, StepChange};
 use ndarray::{prelude::*, FoldWhile, Zip};
 use particle::Particle;
 use statistic::{
-    Statistic::{BoseEinstein, FermiDirac}, Statistics,
+    Statistic::{BoseEinstein, FermiDirac},
+    Statistics,
 };
 use universe::Universe;
 
@@ -405,7 +406,8 @@ impl Solver for NumberDensitySolver {
 
             // Standard Runge-Kutta integration.
             let c = self.context(beta, universe);
-            k1 = self.interactions
+            k1 = self
+                .interactions
                 .iter()
                 .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &y, &c));
             if !self.normalize_to_photons {
@@ -419,7 +421,8 @@ impl Solver for NumberDensitySolver {
 
             let c = self.context(beta + 0.5 * h, universe);
             tmp = &y + &(&k1 * 0.5);
-            k2 = self.interactions
+            k2 = self
+                .interactions
                 .iter()
                 .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, &c));
             if !self.normalize_to_photons {
@@ -433,7 +436,8 @@ impl Solver for NumberDensitySolver {
 
             let c = self.context(beta + 0.5 * h, universe);
             tmp = &y + &(&k2 * 0.5);
-            k3 = self.interactions
+            k3 = self
+                .interactions
                 .iter()
                 .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, &c));
             if !self.normalize_to_photons {
@@ -447,7 +451,8 @@ impl Solver for NumberDensitySolver {
 
             let c = self.context(beta + h, universe);
             let tmp = &y + &k3;
-            k4 = self.interactions
+            k4 = self
+                .interactions
                 .iter()
                 .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, &c));
             if !self.normalize_to_photons {
