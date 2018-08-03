@@ -49,7 +49,8 @@ use super::{ErrorTolerance, Solver, StepChange};
 use ndarray::{prelude::*, Zip};
 use particle::Particle;
 use statistic::{
-    Statistic::{BoseEinstein, FermiDirac}, Statistics,
+    Statistic::{BoseEinstein, FermiDirac},
+    Statistics,
 };
 use std::f64;
 use universe::Universe;
@@ -236,7 +237,8 @@ impl Solver for PhaseSpaceSolver {
 
             // Standard Runge-Kutta integration.
             let c = self.context(beta, universe);
-            k1 = self.interactions
+            k1 = self
+                .interactions
                 .iter()
                 .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &y, &c));
             Zip::from(&mut k1)
@@ -249,7 +251,8 @@ impl Solver for PhaseSpaceSolver {
 
             let c = self.context(beta + 0.5 * h, universe);
             tmp = &y + &(&k1 * 0.5);
-            k2 = self.interactions
+            k2 = self
+                .interactions
                 .iter()
                 .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, &c));
             Zip::from(&mut k2)
@@ -262,7 +265,8 @@ impl Solver for PhaseSpaceSolver {
 
             let c = self.context(beta + 0.5 * h, universe);
             tmp = &y + &(&k2 * 0.5);
-            k3 = self.interactions
+            k3 = self
+                .interactions
                 .iter()
                 .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, &c));
             Zip::from(&mut k3)
@@ -275,7 +279,8 @@ impl Solver for PhaseSpaceSolver {
 
             let c = self.context(beta + h, universe);
             tmp = &y + &k3;
-            k4 = self.interactions
+            k4 = self
+                .interactions
                 .iter()
                 .fold(Self::Solution::zeros(y.dim()), |s, f| f(s, &tmp, &c));
             Zip::from(&mut k4)
@@ -395,9 +400,11 @@ impl PhaseSpaceSolver {
             beta,
             hubble_rate: universe.hubble_rate(beta),
             eq_f: self.equilibrium_phase_space(beta),
-            eq_boson: self.energies
+            eq_boson: self
+                .energies
                 .map(|&e| BoseEinstein.phase_space(e, 0.0, 0.0, beta)),
-            eq_fermion: self.energies
+            eq_fermion: self
+                .energies
                 .map(|&e| FermiDirac.phase_space(e, 0.0, 0.0, beta)),
         }
     }
