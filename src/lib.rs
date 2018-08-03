@@ -70,27 +70,33 @@
 //! phase space distribution that arise from collisions—either through the
 //! scattering of other particles, or creation/annihilation of the species in
 //! question.  The integrated collision term for a particular process \\(a_1 +
-//! a_2 + \cdots \leftrightarrow b_1 + b_2 + \cdots\\) (which we will denote as
+//! \cdots + a_n \leftrightarrow b_1 + \cdots + b_m\\) (which we will denote as
 //! \\(\vt a \leftrightarrow \vt b\\)) is:
 //!
 //! \\begin{equation}
 //!   \begin{aligned}
 //!     g_{a_1} \int \vt C[f_{a_1}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3}
-//!       &= - \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right)
-//!                 (2 \pi)^4 \delta^4(p_{\vt a} - p_{\vt b}) \\\\
-//!       &\quad \times \Bigl[ \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right) \left(\prod_{\vt b} 1 \pm f_i \right)
-//!                          - \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right) \Bigr],
+//!       &= - \int_{\vt a}^{\vt b}
+//!          \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right) \left(\prod_{\vt b} 1 \pm f_i \right)
+//!                          - \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right),
 //!   \end{aligned}
 //! \\end{equation}
 //!
-//! where \\(p_{\vt a} \defeq p_{a_1} + p_{a_2} + \cdots\\) (and similarly for
-//! \\(p_{\vt b}\\)); \\(\abs{\mathcal M(\vt a | \vt b)}^2\\) is the squared
-//! amplitude going from initial state \\(\vt a\\) to \\(\vt b\\) and is
-//! *averaged over* all *internal degrees of freedom*; and
+//! where \\(\abs{\mathcal M(\vt a | \vt b)}^2\\) is the squared amplitude going
+//! from initial state \\(\vt a\\) to \\(\vt b\\) and is *averaged over* all
+//! *internal degrees of freedom*, and the integration is done of the
+//! Lorentz-invariant phase space
 //!
 //! \\begin{equation}
-//!   \dd \Pi_i \defeq \frac{g_i \dd^3 \vt p_i}{(2 \pi)^3 2 E_i}
-//!             \equiv E_i \sqrt{E_i^2 - m_i^2} \frac{\dd E_i \dd \Omega_i}{2 (2 \pi)^3}.
+//!   \int_{\vt a}^{\vt b} \defeq
+//!      \int \dd \Pi_{a_1} \dots \dd \Pi_{a_n} \dd \Pi_{b_1} \dots \dd \Pi_{b_m}
+//!      (2 \pi)^4 \delta^4(p_{a_1} + \cdots + p_{a_n} - p_{b_1} - \cdots - p_{b_m})
+//! \\end{equation}
+//!
+//! in which
+//!
+//! \\begin{equation}
+//!   \dd \Pi_i \defeq \frac{g_i \dd^3 \vt p_i}{(2 \pi)^3 2 E_i}.
 //! \\end{equation}
 //!
 //! Note that as the squared amplitude is averaged over all internal degrees of

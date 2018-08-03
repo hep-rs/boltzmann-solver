@@ -57,14 +57,12 @@
 //!   \\begin{equation}
 //!     \begin{aligned}
 //!       g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
-//!         &= - \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right)
-//!                   (2 \pi)^4 \delta^4(p_{\vt a} - p_{\vt b}) \\\\
-//!         &\quad \times \Biggl[ \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right)
-//!                             - \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \Biggr] \\\\
-//!         &= - \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right)
-//!                   (2 \pi)^4 \delta^4(p_{\vt a} - p_{\vt b}) \\\\
-//!         &\quad \times \Biggl[ \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right)
-//!                             - \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right) \Biggr].
+//!         &= - \int_{\vt a}^{\vt b}
+//!            \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{i \in \vt a} f_i \right)
+//!            - \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{i \in \vt b} f_i \right) \\\\
+//!         &= - \int_{\vt a}^{\vt b}
+//!            \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right)
+//!             - \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right).
 //!     \end{aligned}
 //!   \\end{equation}
 //!
@@ -72,16 +70,16 @@
 //!
 //!   \\begin{equation}
 //!       g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
-//!         = - \left( \prod_{\vt a} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt a | \vt b)
-//!           + \left( \prod_{\vt b} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt b | \vt a),
+//!         = - \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt a | \vt b)
+//!           + \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt b | \vt a),
 //!   \\end{equation}
 //!
 //!   where we have introduced the interaction density
 //!
 //!   \\begin{equation}
 //!     \gamma(\vt a | \vt b)
-//!       = \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right) (2 \pi)^4 \delta^4(p_{\vt a} - p_{\vt b})
-//!         \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f^{(0)}_i \right).
+//!       = \int_{\vt a}^{\vt b}
+//!         \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{i \in \vt a} f^{(0)}_i \right).
 //!   \\end{equation}
 //!
 // //! - *Assume \\(\mathcal{CP}\\) symmetry.* If \\(\mathcal{CP}\\) symmetry is
@@ -92,8 +90,7 @@
 // //!   \\begin{equation}
 // //!     g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
 // //!       = - \left[ e^{ \beta \sum_{\vt a} \mu_i } - e^{ \beta \sum_{\vt b} \mu_i } \right]
-// //!            \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right) (2 \pi)^4 \delta^4(p_{\vt a} - p_{\vt b})
-// //!            \abs{\mathcal M(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i }.
+// //!            \int_{\vt a}^{\vt b} \abs{\mathcal M(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i }.
 // //!   \\end{equation}
 // //!
 // //!   The remaining integrand is then independent of time and can be
@@ -120,11 +117,9 @@
 // //!     \begin{aligned}
 // //!       g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
 // //!         &= - \left[ e^{ \beta \sum_{\vt a} \mu_i } - e^{ \beta \sum_{\vt b} \mu_i } \right] \times
-// //!              \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right) (2 \pi)^4 \delta^4(p_{\vt a} - p_{\vt b})
-// //!              \abs{\mathcal M^{(0)}(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i } \\\\
+// //!              \int_{\vt a}^{\vt b} \abs{\mathcal M^{(0)}(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i } \\\\
 // //!         &\quad - \left[ e^{ \beta \sum_{\vt a} \mu_i } + e^{ \beta \sum_{\vt b} \mu_i } \right] \times
-// //!              \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right) (2 \pi)^4 \delta^4(p_{\vt a} - p_{\vt b})
-// //!              \epsilon \abs{\mathcal M^{(0)}(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i }.
+// //!              \int_{\vt a}^{\vt b} \epsilon \abs{\mathcal M^{(0)}(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i }.
 // //!     \\end{aligned}
 // //!   \\end{equation}
 //!
@@ -160,7 +155,7 @@
 //! \\begin{equation}
 //!   \begin{aligned}
 //!     \gamma(a \to bc)
-//!       &= - \abs{\mathcal M(a \to bc)}^2 \int \dd \Pi_a \dd \Pi_b \dd \Pi_c (2\pi)^4 \delta^4(p_a - p_b - p_c) f^{(0)}_a \\\\
+//!       &= - \abs{\mathcal M(a \to bc)}^2 \int_{a}^{b,c} f^{(0)}_a \\\\
 //!       &= - \frac{\abs{\mathcal M(a \to bc)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}
 //!   \end{aligned}
 //! \\end{equation}
@@ -196,7 +191,7 @@
 //!
 //! \\begin{equation}
 //!   \gamma(bc \to a)
-//!     = \abs{\mathcal M(bc \to a)}^2 \int \dd \Pi_a \dd \Pi_b \dd \Pi_c (2 \pi)^4 \delta^4(p_b + p_c - p_a) f^{(0)}_b f^{(0)}_c
+//!     = \abs{\mathcal M(bc \to a)}^2 \int_{a}^{b,c} f^{(0)}_b f^{(0)}_c
 //! \\end{equation}
 //!
 //! The Dirac delta enforces that \\(E_a = E_b + E_c\\) which implies that
