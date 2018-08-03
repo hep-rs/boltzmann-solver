@@ -47,27 +47,25 @@ neglected resulting in:</p>
 <p>\begin{equation}
 \begin{aligned}
 g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
-&amp;= - \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right)
-(2 \pi)^4 \delta^4(p_{\vt a} - p_{\vt b}) \\
-&amp;\quad \times \Biggl[ \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right)
-- \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \Biggr] \\
-&amp;= - \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right)
-(2 \pi)^4 \delta^4(p_{\vt a} - p_{\vt b}) \\
-&amp;\quad \times \Biggl[ \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right)
-- \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right) \Biggr].
+&amp;= - \int_{\vt a}^{\vt b}
+\abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{i \in \vt a} f_i \right)
+- \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{i \in \vt b} f_i \right) \\
+&amp;= - \int_{\vt a}^{\vt b}
+\abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right)
+- \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right).
 \end{aligned}
 \end{equation}</p>
 <p>This is then commonly expressed as,</p>
 <p>\begin{equation}
 g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
-= - \left( \prod_{\vt a} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt a | \vt b)
-+ \left( \prod_{\vt b} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt b | \vt a),
+= - \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt a | \vt b)
++ \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt b | \vt a),
 \end{equation}</p>
 <p>where we have introduced the interaction density</p>
 <p>\begin{equation}
 \gamma(\vt a | \vt b)
-= \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right) (2 \pi)^4 \delta^4(p_{\vt a} - p_{\vt b})
-\abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f^{(0)}_i \right).
+= \int_{\vt a}^{\vt b}
+\abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{i \in \vt a} f^{(0)}_i \right).
 \end{equation}</p>
 </li>
 </ul>
@@ -95,7 +93,7 @@ momentum:</p>
 <p>\begin{equation}
 \begin{aligned}
 \gamma(a \to bc)
-&amp;= - \abs{\mathcal M(a \to bc)}^2 \int \dd \Pi_a \dd \Pi_b \dd \Pi_c (2\pi)^4 \delta^4(p_a - p_b - p_c) f^{(0)}_a \\
+&amp;= - \abs{\mathcal M(a \to bc)}^2 \int_{a}^{b,c} f^{(0)}_a \\
 &amp;= - \frac{\abs{\mathcal M(a \to bc)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}
 \end{aligned}
 \end{equation}</p>
@@ -122,7 +120,7 @@ expression can be simplified to</p>
 <p>The inverse decay rate is given by</p>
 <p>\begin{equation}
 \gamma(bc \to a)
-= \abs{\mathcal M(bc \to a)}^2 \int \dd \Pi_a \dd \Pi_b \dd \Pi_c (2 \pi)^4 \delta^4(p_b + p_c - p_a) f^{(0)}_b f^{(0)}_c
+= \abs{\mathcal M(bc \to a)}^2 \int_{a}^{b,c} f^{(0)}_b f^{(0)}_c
 \end{equation}</p>
 <p>The Dirac delta enforces that \(E_a = E_b + E_c\) which implies that
 \(f^{(0)}_a = f^{(0)}_b f^{(0)}_c\) thereby making the integral identical

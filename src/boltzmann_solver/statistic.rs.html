@@ -518,6 +518,14 @@
 <span id="518">518</span>
 <span id="519">519</span>
 <span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! If the rate of collisions between particles is sufficiently high (as is</span>
 <span class="doccomment">//! usually the case), the phase space distribution of the particles will</span>
@@ -903,7 +911,8 @@
     <span class="kw">fn</span> <span class="ident">fermi_dirac_massive</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">fd</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">FermiDirac</span>;
         <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>()
+        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>
+            .<span class="ident">into_deserialize</span>()
             .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>())
             .<span class="ident">collect</span>();
@@ -920,7 +929,8 @@
     <span class="kw">fn</span> <span class="ident">bose_einstein_massive</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">be</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span>;
         <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>()
+        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>
+            .<span class="ident">into_deserialize</span>()
             .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>())
             .<span class="ident">collect</span>();
@@ -941,7 +951,8 @@
     <span class="kw">fn</span> <span class="ident">maxwell_boltzmann_massive</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">mb</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span>;
         <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>()
+        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>
+            .<span class="ident">into_deserialize</span>()
             .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>())
             .<span class="ident">collect</span>();
@@ -958,7 +969,8 @@
     <span class="kw">fn</span> <span class="ident">maxwell_juttner_massive</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">mj</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span>;
         <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>()
+        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>
+            .<span class="ident">into_deserialize</span>()
             .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>())
             .<span class="ident">collect</span>();
@@ -975,7 +987,8 @@
     <span class="kw">fn</span> <span class="ident">fermi_dirac_massless</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">fd</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">FermiDirac</span>;
         <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row6</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>()
+        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row6</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>
+            .<span class="ident">into_deserialize</span>()
             .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>())
             .<span class="ident">collect</span>();
@@ -992,7 +1005,8 @@
     <span class="kw">fn</span> <span class="ident">bose_einstein_massless</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">be</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span>;
         <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row6</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>()
+        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row6</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>
+            .<span class="ident">into_deserialize</span>()
             .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>())
             .<span class="ident">collect</span>();
@@ -1009,7 +1023,8 @@
     <span class="kw">fn</span> <span class="ident">maxwell_boltzmann_massless</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">mb</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span>;
         <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row6</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>()
+        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row6</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>
+            .<span class="ident">into_deserialize</span>()
             .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>())
             .<span class="ident">collect</span>();
@@ -1026,7 +1041,8 @@
     <span class="kw">fn</span> <span class="ident">maxwell_juttner_massless</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">mj</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span>;
         <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row6</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>.<span class="ident">into_deserialize</span>()
+        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row6</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>
+            .<span class="ident">into_deserialize</span>()
             .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">unwrap</span>())
             .<span class="ident">collect</span>();

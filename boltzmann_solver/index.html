@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `boltzmann_solver` crate."><meta name="keywords" content="rust, rustlang, rust-lang, boltzmann_solver"><title>boltzmann_solver - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script></head><body class="rustdoc mod"><!-- Google Tag Manager (noscript) --><noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N9HX7G4" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript><!-- End Google Tag Manager (noscript) --><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Crate boltzmann_solver</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#modules">Modules</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'boltzmann_solver', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='in-band'>Crate <a class="mod" href=''>boltzmann_solver</a></span><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/boltzmann_solver/lib.rs.html#1-145' title='goto source code'>[src]</a></span></h1><div class='docblock'><p><code>boltzmann-solver</code> is a library allowing for Boltzmann equation in the
+<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `boltzmann_solver` crate."><meta name="keywords" content="rust, rustlang, rust-lang, boltzmann_solver"><title>boltzmann_solver - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script></head><body class="rustdoc mod"><!-- Google Tag Manager (noscript) --><noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N9HX7G4" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript><!-- End Google Tag Manager (noscript) --><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Crate boltzmann_solver</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#modules">Modules</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'boltzmann_solver', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='in-band'>Crate <a class="mod" href=''>boltzmann_solver</a></span><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/boltzmann_solver/lib.rs.html#1-151' title='goto source code'>[src]</a></span></h1><div class='docblock'><p><code>boltzmann-solver</code> is a library allowing for Boltzmann equation in the
 context of particle physics / early cosmology.  It provides functionalities
 to solve Boltzmann equation in the case where a single species is out of
 equilibrium, as well as functionalities to solve the Boltzmann equations
@@ -51,24 +51,28 @@ n \defeq g \int f \frac{\dd^3 \vt p}{(2 \pi)^3} = \frac{g}{2 \pi^2} \int_m^\inft
 phase space distribution that arise from collisions—either through the
 scattering of other particles, or creation/annihilation of the species in
 question.  The integrated collision term for a particular process \(a_1 +
-a_2 + \cdots \leftrightarrow b_1 + b_2 + \cdots\) (which we will denote as
+\cdots + a_n \leftrightarrow b_1 + \cdots + b_m\) (which we will denote as
 \(\vt a \leftrightarrow \vt b\)) is:</p>
 <p>\begin{equation}
 \begin{aligned}
 g_{a_1} \int \vt C[f_{a_1}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3}
-&amp;= - \int \left( \prod_{\vt a, \vt b} \dd \Pi_i \right)
-(2 \pi)^4 \delta^4(p_{\vt a} - p_{\vt b}) \\
-&amp;\quad \times \Bigl[ \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right) \left(\prod_{\vt b} 1 \pm f_i \right)
-- \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right) \Bigr],
+&amp;= - \int_{\vt a}^{\vt b}
+\abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right) \left(\prod_{\vt b} 1 \pm f_i \right)
+- \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right),
 \end{aligned}
 \end{equation}</p>
-<p>where \(p_{\vt a} \defeq p_{a_1} + p_{a_2} + \cdots\) (and similarly for
-\(p_{\vt b}\)); \(\abs{\mathcal M(\vt a | \vt b)}^2\) is the squared
-amplitude going from initial state \(\vt a\) to \(\vt b\) and is
-<em>averaged over</em> all <em>internal degrees of freedom</em>; and</p>
+<p>where \(\abs{\mathcal M(\vt a | \vt b)}^2\) is the squared amplitude going
+from initial state \(\vt a\) to \(\vt b\) and is <em>averaged over</em> all
+<em>internal degrees of freedom</em>, and the integration is done of the
+Lorentz-invariant phase space</p>
 <p>\begin{equation}
-\dd \Pi_i \defeq \frac{g_i \dd^3 \vt p_i}{(2 \pi)^3 2 E_i}
-\equiv E_i \sqrt{E_i^2 - m_i^2} \frac{\dd E_i \dd \Omega_i}{2 (2 \pi)^3}.
+\int_{\vt a}^{\vt b} \defeq
+\int \dd \Pi_{a_1} \dots \dd \Pi_{a_n} \dd \Pi_{b_1} \dots \dd \Pi_{b_m}
+(2 \pi)^4 \delta^4(p_{a_1} + \cdots + p_{a_n} - p_{b_1} - \cdots - p_{b_m})
+\end{equation}</p>
+<p>in which</p>
+<p>\begin{equation}
+\dd \Pi_i \defeq \frac{g_i \dd^3 \vt p_i}{(2 \pi)^3 2 E_i}.
 \end{equation}</p>
 <p>Note that as the squared amplitude is averaged over all internal degrees of
 freedom, they will cancel out with the \(g_i\) factors in each \(\dd
