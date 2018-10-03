@@ -673,6 +673,38 @@
 <span id="673">673</span>
 <span id="674">674</span>
 <span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
+<span id="704">704</span>
+<span id="705">705</span>
+<span id="706">706</span>
+<span id="707">707</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Solver for the number density evolution given by integrating the Boltzmann</span>
 <span class="doccomment">//! equation.</span>
@@ -917,17 +949,50 @@
 <span class="doccomment">//!   \gamma(ab \to cd) = \frac{g_a g_b g_c g_d}{512 \pi^5 \beta} \int \abs{\mathcal M(ab \to cd)}^2 \frac{K_1(\sqrt s \beta)}{\sqrt s} \dd s \dd t</span>
 <span class="doccomment">//! \\end{equation}</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ## Two-to-\\(n\\) Scattering</span>
+<span class="doccomment">//! ### Real Intermediate State</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! In \\(2 \to n\\) scattering, the initial state phase space integration can</span>
-<span class="doccomment">//! be done as before resulting in the same expression as above featuring the</span>
-<span class="doccomment">//! reduced cross-section; however, simplifying the final state phase space</span>
-<span class="doccomment">//! integration will depend on the nature of the process.  The general form of</span>
-<span class="doccomment">//! the reduced cross-section is:</span>
+<span class="doccomment">//! When considering both \\(1 \leftrightarrow 2\\) and \\(2 \leftrightarrow</span>
+<span class="doccomment">//! 2\\) scattering processes, there is a double counting issue that arises from</span>
+<span class="doccomment">//! having a real intermediate state (RIS) in \\(2 \leftrightarrow 2\\)</span>
+<span class="doccomment">//! interactions.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! As a concrete example, one may have the processes \\(ab \leftrightarrow X\\)</span>
+<span class="doccomment">//! and \\(X \leftrightarrow cd\\) and thus also \\(ab \leftrightarrow cd\\).</span>
+<span class="doccomment">//! In computing the squared amplitude for the \\(2 \leftrightarrow 2\\)</span>
+<span class="doccomment">//! process, one needs to subtract the RIS:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! \\begin{equation}</span>
-<span class="doccomment">//!   \hat \sigma_{ab}^{\vt c}(s) = \Phi_{2}(q_{ab}; p_a, p_b) \int \left( \prod_{i \in \vt c} \dd \Pi_i \right) (2 \pi)^4 \delta^4(q_{ab} - p_{\vt c}) \abs{\mathcal M(ab \to \vt c)}^2</span>
+<span class="doccomment">//!   \abs{\mathcal M(ab \leftrightarrow cd)}^2 = \abs{\mathcal M_\text{full}(ab \leftrightarrow cd)}^2 - \abs{\mathcal M_\textsc{RIS}(ab \leftrightarrow cd)}^2</span>
 <span class="doccomment">//! \\end{equation}</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! In the case of a single scalar RIS, the RIS-subtracted amplitude is given by</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! \\begin{align}</span>
+<span class="doccomment">//!   \abs{\mathcal M_\textsc{RIS}(ab \to cd)}</span>
+<span class="doccomment">//!     &amp;= \frac{\pi}{m_X \Gamma_X} \delta(s - m_X^2) \theta(\sqrt{s}) \\\\</span>
+<span class="doccomment">//!     &amp;\quad \Big[</span>
+<span class="doccomment">//!         \abs{\mathcal M(ab \to X)}^2 \abs{\mathcal M(X \to cd)}^2</span>
+<span class="doccomment">//!         + \abs{\mathcal M(ab \to \overline X)}^2 \abs{\mathcal M(\overline X \to cd)}^2</span>
+<span class="doccomment">//!       \Big].</span>
+<span class="doccomment">//! \\end{align}</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Care must be taken for fermions as the spinorial structure prevents a simple</span>
+<span class="doccomment">//! factorization in separate squared amplitude.  Furthermore if there are</span>
+<span class="doccomment">//! multiple intermediate states, the mixing between these states must also be</span>
+<span class="doccomment">//! taken into account.</span>
+
+<span class="comment">// //!</span>
+<span class="comment">// //! ## Two-to-\\(n\\) Scattering</span>
+<span class="comment">// //!</span>
+<span class="comment">// //! In \\(2 \to n\\) scattering, the initial state phase space integration can</span>
+<span class="comment">// //! be done as before resulting in the same expression as above featuring the</span>
+<span class="comment">// //! reduced cross-section; however, simplifying the final state phase space</span>
+<span class="comment">// //! integration will depend on the nature of the process.  The general form of</span>
+<span class="comment">// //! the reduced cross-section is:</span>
+<span class="comment">// //!</span>
+<span class="comment">// //! \\begin{equation}</span>
+<span class="comment">// //!   \hat \sigma_{ab}^{\vt c}(s) = \Phi_{2}(q_{ab}; p_a, p_b) \int \left( \prod_{i \in \vt c} \dd \Pi_i \right) (2 \pi)^4 \delta^4(q_{ab} - p_{\vt c}) \abs{\mathcal M(ab \to \vt c)}^2</span>
+<span class="comment">// //! \\end{equation}</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ErrorTolerance</span>, <span class="ident">Solver</span>, <span class="ident">StepChange</span>};
 <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">FoldWhile</span>, <span class="ident">Zip</span>};
@@ -1198,8 +1263,7 @@
                     } <span class="kw">else</span> {
                         <span class="ident">FoldWhile</span>::<span class="ident">Continue</span>(<span class="ident">e</span>)
                     }
-                })
-                .<span class="ident">into_inner</span>();
+                }).<span class="ident">into_inner</span>();
 
             <span class="comment">// Adjust the step size as needed based on the step size.</span>
             <span class="kw">if</span> <span class="ident">err</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">error_tolerance</span>.<span class="ident">lower</span> {
