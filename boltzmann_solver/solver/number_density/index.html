@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `number_density` mod in crate `boltzmann_solver`."><meta name="keywords" content="rust, rustlang, rust-lang, number_density"><title>boltzmann_solver::solver::number_density - Rust</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script></head><body class="rustdoc mod"><!-- Google Tag Manager (noscript) --><noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N9HX7G4" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript><!-- End Google Tag Manager (noscript) --><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module number_density</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li></ul></div><p class='location'><a href='../../index.html'>boltzmann_solver</a>::<wbr><a href='../index.html'>solver</a></p><script>window.sidebarCurrent = {name: 'number_density', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='in-band'>Module <a href='../../index.html'>boltzmann_solver</a>::<wbr><a href='../index.html'>solver</a>::<wbr><a class="mod" href=''>number_density</a></span><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../../src/boltzmann_solver/solver/number_density.rs.html#1-633' title='goto source code'>[src]</a></span></h1><div class='docblock'><p>Solver for the number density evolution given by integrating the Boltzmann
+<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `number_density` mod in crate `boltzmann_solver`."><meta name="keywords" content="rust, rustlang, rust-lang, number_density"><title>boltzmann_solver::solver::number_density - Rust</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script></head><body class="rustdoc mod"><!-- Google Tag Manager (noscript) --><noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N9HX7G4" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript><!-- End Google Tag Manager (noscript) --><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module number_density</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li></ul></div><p class='location'><a href='../../index.html'>boltzmann_solver</a>::<wbr><a href='../index.html'>solver</a></p><script>window.sidebarCurrent = {name: 'number_density', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='in-band'>Module <a href='../../index.html'>boltzmann_solver</a>::<wbr><a href='../index.html'>solver</a>::<wbr><a class="mod" href=''>number_density</a></span><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../../src/boltzmann_solver/solver/number_density.rs.html#1-675' title='goto source code'>[src]</a></span></h1><div class='docblock'><p>Solver for the number density evolution given by integrating the Boltzmann
 equation.</p>
 <p>Solving the Boltzmann equation in generality without making any assumption
 about the phase space distribution \(f\) (other than specifying some
@@ -35,7 +35,7 @@ f_{\textsc{MB}} = \exp[-(E - \mu) \beta].
 n = \frac{g m^2 K_2(m \beta)}{2 \pi^2 \beta} e^{\mu \beta} = n^{(0)} e^{\mu \beta},
 \end{equation}</p>
 <p>where \(n^{(0)}\) is the equilibrium number density when \(\mu = 0\).
-and conversely allows for the equilibrium phase space distribution to be
+This also allows for the equilibrium phase space distribution to be
 expressed in terms of the \(\mu = 0\) distribution:</p>
 <p>\begin{equation}
 f_{\textsc{MB}} = e^{\mu \beta} f_{\textsc{MB}}^{(0)} = \frac{n}{n^{(0)}} f_{\textsc{MB}}^{(0)}.
@@ -48,32 +48,33 @@ neglected resulting in:</p>
 \begin{aligned}
 g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
 &amp;= - \int_{\vt a}^{\vt b}
-\abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{i \in \vt a} f_i \right)
-- \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{i \in \vt b} f_i \right) \\
+\abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f_i \right)
+- \abs{\mathcal M(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} f_i \right) \\
 &amp;= - \int_{\vt a}^{\vt b}
-\abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right)
-- \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right).
+\abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right)
+- \abs{\mathcal M(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right).
 \end{aligned}
 \end{equation}</p>
 <p>This is then commonly expressed as,</p>
 <p>\begin{equation}
 g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
-= - \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt a | \vt b)
-+ \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt b | \vt a),
+= - \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt a \to \vt b)
++ \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt b \to \vt a),
 \end{equation}</p>
 <p>where we have introduced the interaction density</p>
 <p>\begin{equation}
-\gamma(\vt a | \vt b)
+\gamma(\vt a \to \vt b)
 = \int_{\vt a}^{\vt b}
-\abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{i \in \vt a} f^{(0)}_i \right).
+\abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f^{(0)}_i \right).
 \end{equation}</p>
 </li>
 </ul>
 <h1 id="interactions" class="section-header"><a href="#interactions">Interactions</a></h1>
 <p>The majority of interactions can be accounted for by looking at simply \(1
 \leftrightarrow 2\) decays/inverse decays and \(2 \leftrightarrow 2\)
-scatterings.  In the former case, the calculations can be done entirely
-analytically and are presented below.</p>
+scatterings.  In the former case, the phase space integration can be done
+entirely analytically and is presented below; whilst in the latter case, the
+phase space integration can be simplified to just two integrals.</p>
 <h2 id="decays-and-inverse-decays" class="section-header"><a href="#decays-and-inverse-decays">Decays and Inverse Decays</a></h2>
 <p>Considering the interaction \(a \leftrightarrow b + c\), the reaction is</p>
 <p>\begin{equation}
@@ -134,6 +135,34 @@ to the decay scenario:</p>
 <p>\begin{equation}
 \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} \gamma(bc \to a)
 = \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} n^{(0)}_a \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
+\end{equation}</p>
+<h2 id="two-body-scattering" class="section-header"><a href="#two-body-scattering">Two Body Scattering</a></h2>
+<p>The two-to-two scattering \(ab \to cd\) reaction density is given by</p>
+<p>\begin{equation}
+\gamma(ab \to cd) = \int_{a,b}^{c,d} \abs{\mathcal M(ab \to cd)}^2 f_a^{(0)} f_b^{(0)}
+\end{equation}</p>
+<p>The two initial-state phase space integrals can be reduced to a simple
+integral over the centre-of-mass \(s\):</p>
+<p>\begin{equation}
+\gamma(ab \to cd) = \frac{1}{8 \pi^3 \beta} \int \hat \sigma_{ab}^{cd}(s) \sqrt{s} K_1(\sqrt{s} \beta) \dd s
+\end{equation}</p>
+<p>where \(\hat \sigma(s)\) is the reduced cross-section:</p>
+<p>\begin{equation}
+\hat \sigma_{ab}^{cd}(s) = \frac{g_a g_b g_c g_d}{64 \pi^2 s} \int \abs{\mathcal M(ab \to cd)}^2 \dd t
+\end{equation}</p>
+<p>in which \(t\) is the usual Mandelstam variable.</p>
+<p>As a result, the full \(2 \to 2\) cross-section can be expressed as</p>
+<p>\begin{equation}
+\gamma(ab \to cd) = \frac{g_a g_b g_c g_d}{512 \pi^5 \beta} \int \abs{\mathcal M(ab \to cd)}^2 \frac{K_1(\sqrt s \beta)}{\sqrt s} \dd s \dd t
+\end{equation}</p>
+<h2 id="two-to-n-scattering" class="section-header"><a href="#two-to-n-scattering">Two-to-\(n\) Scattering</a></h2>
+<p>In \(2 \to n\) scattering, the initial state phase space integration can
+be done as before resulting in the same expression as above featuring the
+reduced cross-section; however, simplifying the final state phase space
+integration will depend on the nature of the process.  The general form of
+the reduced cross-section is:</p>
+<p>\begin{equation}
+\hat \sigma_{ab}^{\vt c}(s) = \Phi_{2}(q_{ab}; p_a, p_b) \int \left( \prod_{i \in \vt c} \dd \Pi_i \right) (2 \pi)^4 \delta^4(q_{ab} - p_{\vt c}) \abs{\mathcal M(ab \to \vt c)}^2
 \end{equation}</p>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>

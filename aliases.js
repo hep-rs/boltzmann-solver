@@ -8,7 +8,6 @@ ALIASES['matrixmultiply'] = {};
 ALIASES['ndarray'] = {};
 ALIASES['num_complex'] = {};
 ALIASES['num_traits'] = {};
-ALIASES['num_traits'] = {};
 ALIASES['quadrature'] = {};
 ALIASES['rawpointer'] = {};
 ALIASES['special_functions'] = {};
