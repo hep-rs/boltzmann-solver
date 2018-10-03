@@ -214,7 +214,8 @@ impl Statistics for Statistic {
                 0.050_660_591_821_168_89
                     * mass.powi(2)
                     * bessel::k_2(mass * beta)
-                    * f64::exp(mu * beta) / beta
+                    * f64::exp(mu * beta)
+                    / beta
             }
             Statistic::MaxwellJuttner => {
                 let m_beta = mass * beta;
