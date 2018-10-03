@@ -555,8 +555,7 @@ impl Solver for NumberDensitySolver {
                     } else {
                         FoldWhile::Continue(e)
                     }
-                })
-                .into_inner();
+                }).into_inner();
 
             // Adjust the step size as needed based on the step size.
             if err < self.error_tolerance.lower {
