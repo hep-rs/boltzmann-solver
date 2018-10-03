@@ -211,6 +211,47 @@
 //!   \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} \gamma(bc \to a)
 //!     = \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} n^{(0)}_a \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
 //! \\end{equation}
+//!
+//! ## Two Body Scattering
+//!
+//! The two-to-two scattering \\(ab \to cd\\) reaction density is given by
+//!
+//! \\begin{equation}
+//!   \gamma(ab \to cd) = \int_{a,b}^{c,d} \abs{\mathcal M(ab \to cd)}^2 f_a^{(0)} f_b^{(0)}
+//! \\end{equation}
+//!
+//! The two initial-state phase space integrals can be reduced to a simple
+//! integral over the centre-of-mass \\(s\\):
+//!
+//! \\begin{equation}
+//!   \gamma(ab \to cd) = \frac{1}{8 \pi^3 \beta} \int \hat \sigma_{ab}^{cd}(s) \sqrt{s} K_1(\sqrt{s} \beta) \dd s
+//! \\end{equation}
+//!
+//! where \\(\hat \sigma(s)\\) is the reduced cross-section:
+//!
+//! \\begin{equation}
+//!   \hat \sigma_{ab}^{cd}(s) = \frac{g_a g_b g_c g_d}{64 \pi^2 s} \int \abs{\mathcal M(ab \to cd)}^2 \dd t
+//! \\end{equation}
+//!
+//! in which \\(t\\) is the usual Mandelstam variable.
+//!
+//! As a result, the full \\(2 \to 2\\) cross-section can be expressed as
+//!
+//! \\begin{equation}
+//!   \gamma(ab \to cd) = \frac{g_a g_b g_c g_d}{512 \pi^5 \beta} \int \abs{\mathcal M(ab \to cd)}^2 \frac{K_1(\sqrt s \beta)}{\sqrt s} \dd s \dd t
+//! \\end{equation}
+//!
+//! ## Two-to-\\(n\\) Scattering
+//!
+//! In \\(2 \to n\\) scattering, the initial state phase space integration can
+//! be done as before resulting in the same expression as above featuring the
+//! reduced cross-section; however, simplifying the final state phase space
+//! integration will depend on the nature of the process.  The general form of
+//! the reduced cross-section is:
+//!
+//! \\begin{equation}
+//!   \hat \sigma_{ab}^{\vt c}(s) = \Phi_{2}(q_{ab}; p_a, p_b) \int \left( \prod_{i \in \vt c} \dd \Pi_i \right) (2 \pi)^4 \delta^4(q_{ab} - p_{\vt c}) \abs{\mathcal M(ab \to \vt c)}^2
+//! \\end{equation}
 
 use super::{ErrorTolerance, Solver, StepChange};
 use ndarray::{prelude::*, FoldWhile, Zip};
