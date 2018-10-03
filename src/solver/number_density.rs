@@ -42,7 +42,7 @@
 //!   \\end{equation}
 //!
 //!   where \\(n^{(0)}\\) is the equilibrium number density when \\(\mu = 0\\).
-//!   and conversely allows for the equilibrium phase space distribution to be
+//!   This also allows for the equilibrium phase space distribution to be
 //!   expressed in terms of the \\(\mu = 0\\) distribution:
 //!
 //!   \\begin{equation}
@@ -58,11 +58,11 @@
 //!     \begin{aligned}
 //!       g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
 //!         &= - \int_{\vt a}^{\vt b}
-//!            \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{i \in \vt a} f_i \right)
-//!            - \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{i \in \vt b} f_i \right) \\\\
+//!            \abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f_i \right)
+//!            - \abs{\mathcal M(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} f_i \right) \\\\
 //!         &= - \int_{\vt a}^{\vt b}
-//!            \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right)
-//!             - \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right).
+//!            \abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right)
+//!             - \abs{\mathcal M(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right).
 //!     \end{aligned}
 //!   \\end{equation}
 //!
@@ -70,27 +70,27 @@
 //!
 //!   \\begin{equation}
 //!       g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
-//!         = - \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt a | \vt b)
-//!           + \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt b | \vt a),
+//!         = - \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt a \to \vt b)
+//!           + \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt b \to \vt a),
 //!   \\end{equation}
 //!
 //!   where we have introduced the interaction density
 //!
 //!   \\begin{equation}
-//!     \gamma(\vt a | \vt b)
+//!     \gamma(\vt a \to \vt b)
 //!       = \int_{\vt a}^{\vt b}
-//!         \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{i \in \vt a} f^{(0)}_i \right).
+//!         \abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f^{(0)}_i \right).
 //!   \\end{equation}
 //!
 // //! - *Assume \\(\mathcal{CP}\\) symmetry.* If \\(\mathcal{CP}\\) symmetry is
-// //!   assumed, then \\(\abs{\mathcal M(\vt a | \vt b)}^2 \equiv \abs{\mathcal
-// //!   M(\vt b | \vt a)}^2\\).  This simplification allows for the exponentials
+// //!   assumed, then \\(\abs{\mathcal M(\vt a \to \vt b)}^2 \equiv \abs{\mathcal
+// //!   M(\vt b \to \vt a)}^2\\).  This simplification allows for the exponentials
 // //!   of \\(\mu\\) to be taken out of the integral entirely:
 // //!
 // //!   \\begin{equation}
 // //!     g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
 // //!       = - \left[ e^{ \beta \sum_{\vt a} \mu_i } - e^{ \beta \sum_{\vt b} \mu_i } \right]
-// //!            \int_{\vt a}^{\vt b} \abs{\mathcal M(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i }.
+// //!            \int_{\vt a}^{\vt b} \abs{\mathcal M(\vt a \to \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i }.
 // //!   \\end{equation}
 // //!
 // //!   The remaining integrand is then independent of time and can be
@@ -105,11 +105,11 @@
 // //!   \\(\mathcal{CP}\\) asymmetry as.  That is:
 // //!
 // //!   \\begin{equation}
-// //!     \abs{\mathcal M(\vt a | \vt b)}^2 = (1 + \epsilon) \abs{\mathcal{M^{(0)}(\vt a | \vt b)}}^2, \qquad
-// //!     \abs{\mathcal M(\vt b | \vt a)}^2 = (1 - \epsilon) \abs{\mathcal{M^{(0)}(\vt a | \vt b)}}^2,
+// //!     \abs{\mathcal M(\vt a \to \vt b)}^2 = (1 + \epsilon) \abs{\mathcal{M^{(0)}(\vt a \to \vt b)}}^2, \qquad
+// //!     \abs{\mathcal M(\vt b \to \vt a)}^2 = (1 - \epsilon) \abs{\mathcal{M^{(0)}(\vt a \to \vt b)}}^2,
 // //!   \\end{equation}
 // //!
-// //!   where \\(\abs{\mathcal{M^{(0)}}(\vt a | \vt b)}^2\\) is the
+// //!   where \\(\abs{\mathcal{M^{(0)}}(\vt a \to \vt b)}^2\\) is the
 // //!   \\(\mathcal{CP}\\)-symmetric squared amplitude.  With \\(\epsilon\\)
 // //!   defined as above, the collision term becomes:
 // //!
@@ -117,9 +117,9 @@
 // //!     \begin{aligned}
 // //!       g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
 // //!         &= - \left[ e^{ \beta \sum_{\vt a} \mu_i } - e^{ \beta \sum_{\vt b} \mu_i } \right] \times
-// //!              \int_{\vt a}^{\vt b} \abs{\mathcal M^{(0)}(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i } \\\\
+// //!              \int_{\vt a}^{\vt b} \abs{\mathcal M^{(0)}(\vt a \to \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i } \\\\
 // //!         &\quad - \left[ e^{ \beta \sum_{\vt a} \mu_i } + e^{ \beta \sum_{\vt b} \mu_i } \right] \times
-// //!              \int_{\vt a}^{\vt b} \epsilon \abs{\mathcal M^{(0)}(\vt a | \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i }.
+// //!              \int_{\vt a}^{\vt b} \epsilon \abs{\mathcal M^{(0)}(\vt a \to \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i }.
 // //!     \\end{aligned}
 // //!   \\end{equation}
 //!
@@ -127,8 +127,9 @@
 //!
 //! The majority of interactions can be accounted for by looking at simply \\(1
 //! \leftrightarrow 2\\) decays/inverse decays and \\(2 \leftrightarrow 2\\)
-//! scatterings.  In the former case, the calculations can be done entirely
-//! analytically and are presented below.
+//! scatterings.  In the former case, the phase space integration can be done
+//! entirely analytically and is presented below; whilst in the latter case, the
+//! phase space integration can be simplified to just two integrals.
 //!
 //! ## Decays and Inverse Decays
 //!
