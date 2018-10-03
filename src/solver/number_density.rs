@@ -241,17 +241,50 @@
 //!   \gamma(ab \to cd) = \frac{g_a g_b g_c g_d}{512 \pi^5 \beta} \int \abs{\mathcal M(ab \to cd)}^2 \frac{K_1(\sqrt s \beta)}{\sqrt s} \dd s \dd t
 //! \\end{equation}
 //!
-//! ## Two-to-\\(n\\) Scattering
+//! ### Real Intermediate State
 //!
-//! In \\(2 \to n\\) scattering, the initial state phase space integration can
-//! be done as before resulting in the same expression as above featuring the
-//! reduced cross-section; however, simplifying the final state phase space
-//! integration will depend on the nature of the process.  The general form of
-//! the reduced cross-section is:
+//! When considering both \\(1 \leftrightarrow 2\\) and \\(2 \leftrightarrow
+//! 2\\) scattering processes, there is a double counting issue that arises from
+//! having a real intermediate state (RIS) in \\(2 \leftrightarrow 2\\)
+//! interactions.
+//!
+//! As a concrete example, one may have the processes \\(ab \leftrightarrow X\\)
+//! and \\(X \leftrightarrow cd\\) and thus also \\(ab \leftrightarrow cd\\).
+//! In computing the squared amplitude for the \\(2 \leftrightarrow 2\\)
+//! process, one needs to subtract the RIS:
 //!
 //! \\begin{equation}
-//!   \hat \sigma_{ab}^{\vt c}(s) = \Phi_{2}(q_{ab}; p_a, p_b) \int \left( \prod_{i \in \vt c} \dd \Pi_i \right) (2 \pi)^4 \delta^4(q_{ab} - p_{\vt c}) \abs{\mathcal M(ab \to \vt c)}^2
+//!   \abs{\mathcal M(ab \leftrightarrow cd)}^2 = \abs{\mathcal M_\text{full}(ab \leftrightarrow cd)}^2 - \abs{\mathcal M_\textsc{RIS}(ab \leftrightarrow cd)}^2
 //! \\end{equation}
+//!
+//! In the case of a single scalar RIS, the RIS-subtracted amplitude is given by
+//!
+//! \\begin{align}
+//!   \abs{\mathcal M_\textsc{RIS}(ab \to cd)}
+//!     &= \frac{\pi}{m_X \Gamma_X} \delta(s - m_X^2) \theta(\sqrt{s}) \\\\
+//!     &\quad \Big[
+//!         \abs{\mathcal M(ab \to X)}^2 \abs{\mathcal M(X \to cd)}^2
+//!         + \abs{\mathcal M(ab \to \overline X)}^2 \abs{\mathcal M(\overline X \to cd)}^2
+//!       \Big].
+//! \\end{align}
+//!
+//! Care must be taken for fermions as the spinorial structure prevents a simple
+//! factorization in separate squared amplitude.  Furthermore if there are
+//! multiple intermediate states, the mixing between these states must also be
+//! taken into account.
+
+// //!
+// //! ## Two-to-\\(n\\) Scattering
+// //!
+// //! In \\(2 \to n\\) scattering, the initial state phase space integration can
+// //! be done as before resulting in the same expression as above featuring the
+// //! reduced cross-section; however, simplifying the final state phase space
+// //! integration will depend on the nature of the process.  The general form of
+// //! the reduced cross-section is:
+// //!
+// //! \\begin{equation}
+// //!   \hat \sigma_{ab}^{\vt c}(s) = \Phi_{2}(q_{ab}; p_a, p_b) \int \left( \prod_{i \in \vt c} \dd \Pi_i \right) (2 \pi)^4 \delta^4(q_{ab} - p_{\vt c}) \abs{\mathcal M(ab \to \vt c)}^2
+// //! \\end{equation}
 
 use super::{ErrorTolerance, Solver, StepChange};
 use ndarray::{prelude::*, FoldWhile, Zip};
