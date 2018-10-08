@@ -107,6 +107,12 @@ impl Particle {
     pub fn number_density(&self, mu: f64, beta: f64) -> f64 {
         self.statistic().number_density(self.mass, mu, beta) * self.degrees_of_freedom()
     }
+
+    /// Return the equilibrium number density of the particle, normalized to the
+    /// number density of a massless boson with one degree of freedom.
+    pub fn normalized_number_density(&self, mu: f64, beta: f64) -> f64 {
+        self.number_density(mu, beta) / Statistic::BoseEinstein.massless_number_density(mu, beta)
+    }
 }
 
 impl Universe for Particle {
@@ -124,6 +130,7 @@ impl Universe for Particle {
 #[cfg(test)]
 mod test {
     use super::*;
+    use utilities::test::*;
 
     #[test]
     fn real_scalar() {
@@ -135,6 +142,13 @@ mod test {
 
         assert!(particle.entropy_dof(1e-10) == 1.0);
         assert!(particle.entropy_dof(1e10) < 1e-30);
+
+        approx_eq(
+            particle.normalized_number_density(0.0, 1e-10),
+            1.0,
+            8.0,
+            0.0,
+        );
     }
 
     #[test]
@@ -147,6 +161,13 @@ mod test {
 
         assert!(particle.entropy_dof(1e-10) == 2.0);
         assert!(particle.entropy_dof(1e10) < 1e-30);
+
+        approx_eq(
+            particle.normalized_number_density(0.0, 1e-10),
+            2.0,
+            8.0,
+            0.0,
+        );
     }
 
     #[test]
@@ -159,6 +180,13 @@ mod test {
 
         assert!(particle.entropy_dof(1e-10) == 2.0 * 0.875);
         assert!(particle.entropy_dof(1e10) < 1e-30);
+
+        approx_eq(
+            particle.normalized_number_density(0.0, 1e-10),
+            1.5,
+            8.0,
+            0.0,
+        );
     }
 
     #[test]
@@ -171,6 +199,13 @@ mod test {
 
         assert!(particle.entropy_dof(1e-10) == 3.0);
         assert!(particle.entropy_dof(1e10) < 1e-30);
+
+        approx_eq(
+            particle.normalized_number_density(0.0, 1e-10),
+            3.0,
+            8.0,
+            0.0,
+        );
     }
 
     #[test]
@@ -183,6 +218,31 @@ mod test {
 
         assert!(particle.entropy_dof(1e-10) == 2.5);
         assert!(particle.entropy_dof(1e10) < 1e-30);
+
+        approx_eq(
+            particle.normalized_number_density(0.0, 1e-10),
+            2.5,
+            8.0,
+            0.0,
+        );
     }
 
+    #[test]
+    fn fermion_dof() {
+        let particle = Particle::new(1, 1.0).set_dof(1.2);
+
+        assert!(!particle.is_bosonic());
+        assert!(particle.is_fermionic());
+        assert!(!particle.is_complex());
+
+        assert!(particle.entropy_dof(1e-10) == 1.2 * 0.875);
+        assert!(particle.entropy_dof(1e10) < 1e-30);
+
+        approx_eq(
+            particle.normalized_number_density(0.0, 1e-10),
+            1.2 * 0.75,
+            8.0,
+            0.0,
+        );
+    }
 }
