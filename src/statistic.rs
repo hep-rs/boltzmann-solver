@@ -277,8 +277,9 @@ impl Statistics for Statistic {
                 } else if m_beta > 1e4 {
                     0.0
                 } else {
-                    // TODO: Find a better approximation
-                    0.75 * f64::exp(-m_beta)
+                    0.75 * f64::exp(-m_beta - (2.75612 + 2.11777 * m_beta.powf(-0.920114)).recip())
+                        * (1.0 + m_beta.powf(1.5))
+                        * (1.0 + 0.390466 * f64::exp(-(0.460648 * m_beta.ln() - 0.0116323).powi(2)))
                 }
             }
             Statistic::BoseEinstein => {
@@ -288,8 +289,8 @@ impl Statistics for Statistic {
                 } else if m_beta > 1e4 {
                     0.0
                 } else {
-                    // TODO: Find a better approximation
-                    f64::exp(-m_beta)
+                    f64::exp(-m_beta - (1.53451 + 1.3537 * m_beta.powf(-1.17357)).recip())
+                        * (1.0 + m_beta.powf(1.5))
                 }
             }
             Statistic::MaxwellBoltzmann => {
