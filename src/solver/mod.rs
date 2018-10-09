@@ -16,6 +16,17 @@ struct ErrorTolerance {
     lower: f64,
 }
 
+/// Initial conditions for a particle.
+pub enum InitialCondition {
+    /// The particle's initial density is its equilibrium number with the
+    /// provided value of the chemical potential (in GeV)
+    Equilibrium(f64),
+    /// The particle's initial density begins with a fixed (arbitrary) value.
+    Fixed(f64),
+    /// The particle's initial abundance is zero.
+    Zero,
+}
+
 /// Common interface for the Boltzmann equation solvers.
 pub trait Solver {
     /// The final solution by the solver.  This will typically be an array for
@@ -115,7 +126,7 @@ pub trait Solver {
     ///
     /// If the particle and anti-particle are to be treated separately, the two
     /// species have to be added.
-    fn add_particle(&mut self, p: Particle);
+    fn add_particle(&mut self, p: Particle, initial_condition: InitialCondition);
 
     /// Add a multiple particles from a vector or slice.
     fn add_particles<I>(&mut self, iter: I)

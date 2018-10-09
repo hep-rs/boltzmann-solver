@@ -286,13 +286,9 @@
 // //!   \hat \sigma_{ab}^{\vt c}(s) = \Phi_{2}(q_{ab}; p_a, p_b) \int \left( \prod_{i \in \vt c} \dd \Pi_i \right) (2 \pi)^4 \delta^4(q_{ab} - p_{\vt c}) \abs{\mathcal M(ab \to \vt c)}^2
 // //! \\end{equation}
 
-use super::{ErrorTolerance, Solver, StepChange};
+use super::{ErrorTolerance, InitialCondition, Solver, StepChange};
 use ndarray::{prelude::*, FoldWhile, Zip};
 use particle::Particle;
-use statistic::{
-    Statistic::{BoseEinstein, FermiDirac},
-    Statistics,
-};
 use universe::Universe;
 
 /// Context provided containing pre-computed values which might be useful when
@@ -318,6 +314,7 @@ pub struct NumberDensitySolver {
     initialized: bool,
     beta_range: (f64, f64),
     particles: Vec<Particle>,
+    initial_conditions: Vec<f64>,
     #[cfg_attr(feature = "cargo-clippy", allow(type_complexity))]
     interactions: Vec<Box<Fn(Array1<f64>, &Array1<f64>, &Context) -> Array1<f64>>>,
     step_change: StepChange,
@@ -352,6 +349,7 @@ impl Solver for NumberDensitySolver {
             initialized: false,
             beta_range: (1e-20, 1e0),
             particles: Vec::with_capacity(20),
+            initial_conditions: Vec::with_capacity(20),
             interactions: Vec::with_capacity(100),
             step_change: StepChange {
                 increase: 1.1,
@@ -436,7 +434,15 @@ impl Solver for NumberDensitySolver {
         self
     }
 
-    fn add_particle(&mut self, s: Particle) {
+    fn add_particle(&mut self, s: Particle, initial_condition: InitialCondition) {
+        match initial_condition {
+            InitialCondition::Equilibrium(mu) => self
+                .initial_conditions
+                .push(s.normalized_number_density(mu, self.beta_range.0)),
+            InitialCondition::Fixed(n) => self.initial_conditions.push(n),
+            InitialCondition::Zero => self.initial_conditions.push(0.0),
+        }
+
         self.particles.push(s);
     }
 
@@ -464,7 +470,7 @@ impl Solver for NumberDensitySolver {
             "The phase space solver has to be initialized first with the `initialize()` method."
         );
 
-        let mut y = self.equilibrium_number_densities(self.beta_range.0);
+        let mut n = Array1::from_vec(self.initial_conditions.clone());
         let mut beta = self.beta_range.0;
         let mut h = beta / 10.0;
 
@@ -643,6 +649,7 @@ mod test {
     use universe::StandardModel;
     use utilities::test::*;
 
+    /// The most trivial example with a single particle and no interactions.
     #[test]
     fn no_interaction() {
         let phi = Particle::new(0, 1e3);
@@ -651,7 +658,7 @@ mod test {
             .normalize_to_photons(true)
             .initialize();
 
-        solver.add_particle(phi);
+        solver.add_particle(phi, InitialCondition::Equilibrium(0.0));
 
         let sol = solver.solve(&StandardModel::new());
         approx_eq(sol[0], 1.0, 8.0, 0.0);
@@ -673,8 +680,8 @@ mod test {
             .normalize_to_photons(true)
             .initialize();
 
-        solver.add_particle(n1);
-        solver.add_particle(b_minus_l);
+        solver.add_particle(n1, InitialCondition::Equilibrium(0.0));
+        solver.add_particle(b_minus_l, InitialCondition::Zero);
 
         // Interaction N ↔ e± H∓ (decay of N, asymmetry in B-L and washout)
         solver.add_interaction(move |mut s, n, ref c| {

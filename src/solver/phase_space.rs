@@ -45,7 +45,7 @@
 //! a)}^2\\)) while leaving all dependence on \\(E_i\\) and \\(\abs{\vt p_i}\\)
 //! explicit.
 
-use super::{ErrorTolerance, Solver, StepChange};
+use super::{ErrorTolerance, InitialCondition, Solver, StepChange};
 use ndarray::{prelude::*, Zip};
 use particle::Particle;
 use statistic::{
@@ -182,7 +182,7 @@ impl Solver for PhaseSpaceSolver {
         self
     }
 
-    fn add_particle(&mut self, p: Particle) {
+    fn add_particle(&mut self, p: Particle, _initial_condition: InitialCondition) {
         self.particles.push(p);
     }
 
@@ -422,7 +422,7 @@ mod test {
             .temperature_range(1e20, 1e-10)
             .error_tolerance(1e-1, 1e-2)
             .initialize();
-        solver.add_particle(phi);
+        solver.add_particle(phi, InitialCondition::Equilibrium(0.0));
 
         solver.solve(&StandardModel::new());
     }
