@@ -111,7 +111,9 @@ impl Particle {
     /// Return the equilibrium number density of the particle, normalized to the
     /// number density of a massless boson with one degree of freedom.
     pub fn normalized_number_density(&self, mu: f64, beta: f64) -> f64 {
-        self.number_density(mu, beta) / Statistic::BoseEinstein.massless_number_density(mu, beta)
+        self.statistic()
+            .normalized_number_density(self.mass, mu, beta)
+            * self.degrees_of_freedom()
     }
 }
 
