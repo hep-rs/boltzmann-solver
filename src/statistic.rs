@@ -15,7 +15,7 @@ use quadrature::integrate;
 use special_functions::{bessel, polylog};
 use std::f64;
 
-use constants::PI_M2;
+use constants::{PI_M2, ZETA_3};
 
 /// The statistics which describe the distribution of particles over energy
 /// states.  Both Fermi–Dirac and Bose–Einstein quantum statistics are
@@ -85,6 +85,11 @@ pub trait Statistics {
         0.050_660_591_821_168_89 * integral.integral
     }
 
+    /// Return number density for a particle following the specified statistic,
+    /// normalized to the number density of a massless boson with a single
+    /// degree of freedom.
+    fn normalized_number_density(&self, mass: f64, mu: f64, beta: f64) -> f64;
+
     /// Return number density for a massless particle following the specified
     /// statistic.
     ///
@@ -143,8 +148,9 @@ impl Statistics for Statistic {
     /// # Implementation Details
     ///
     /// Both the Fermi–Dirac and Bose–Einstein statistic rely on numerical
-    /// integration and thus are fairly slow.  The Maxwell–Boltzmann and
-    /// Maxwell–Jüttner distributions offer exact implementations.
+    /// integration and thus are fairly slow and are prone to errors in certain
+    /// regimes.  The Maxwell–Boltzmann and Maxwell–Jüttner distributions offer
+    /// exact implementations.
     fn number_density(&self, mass: f64, mu: f64, beta: f64) -> f64 {
         debug_assert!(mass >= 0.0, "mass must be positive.");
         debug_assert!(beta >= 0.0, "β must be positive.");
@@ -221,6 +227,61 @@ impl Statistics for Statistic {
                 let m_beta = mass * beta;
                 PI_M2 * (m_beta + 2.0) * (m_beta * (m_beta + 3.0) + 6.0)
                     / (beta.powi(4) * mass * f64::exp(m_beta) * bessel::k_2(m_beta))
+            }
+        }
+    }
+
+    /// Return number density for a particle following the specified statistic,
+    /// normalized to the number density of a massless boson with a single
+    /// degree of freedom.
+    ///
+    /// # Implementation Details
+    ///
+    /// This implementation assumes that the chemical potential is negligible.
+    fn normalized_number_density(&self, mass: f64, mu: f64, beta: f64) -> f64 {
+        debug_assert!(mass >= 0.0, "mass must be positive.");
+        debug_assert!(beta >= 0.0, "β must be positive.");
+        if cfg!(debug_assertions) && mu > 0.01 * mass {
+            warn!(
+                "The chemical potential should be negligible.  The result may not be
+    reliable."
+            );
+        }
+
+        match *self {
+            Statistic::FermiDirac => {
+                let m_beta = mass * beta;
+                if m_beta < 1e-4 {
+                    0.76
+                } else if m_beta > 1e4 {
+                    0.0
+                } else {
+                    // TODO: Find a better approximation
+                    0.75 * f64::exp(-m_beta)
+                }
+            }
+            Statistic::BoseEinstein => {
+                let m_beta = mass * beta;
+                if m_beta < 1e-4 {
+                    1.0
+                } else if m_beta > 1e4 {
+                    0.0
+                } else {
+                    // TODO: Find a better approximation
+                    f64::exp(-m_beta)
+                }
+            }
+            Statistic::MaxwellBoltzmann => {
+                // 1/(2 ζ(3)) ≅ 0.415_953_686_290_353_734_34
+                0.415_953_686_290_353_734_34
+                    * mass.powi(2)
+                    * bessel::k_2(mass * beta)
+                    * beta.powi(2)
+            }
+            Statistic::MaxwellJuttner => {
+                let m_beta = mass * beta;
+                (m_beta + 2.0) * (m_beta * (m_beta + 3.0) + 6.0)
+                    / (ZETA_3 * m_beta * f64::exp(m_beta) * bessel::k_2(m_beta))
             }
         }
     }
