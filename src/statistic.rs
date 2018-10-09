@@ -180,6 +180,12 @@ impl Statistics for Statistic {
                     "Fermi–Dirac integral: {:e} ± {:e} ({} function evaluations)",
                     integral.integral, integral.error_estimate, integral.num_function_evaluations
                 );
+                if cfg!(debug_assertions) && integral.error_estimate > 0.01 * integral.integral {
+                    warn!(
+                        "Fermi–Dirac integral has a relative error of {:0.2}%",
+                        integral.error_estimate / integral.integral.abs()
+                    );
+                }
                 // 1/(2 π²) ≅ 0.050_660_591_821_168_89
                 0.050_660_591_821_168_89 * integral.integral
             }
@@ -207,6 +213,12 @@ impl Statistics for Statistic {
                     "Bose–Einstein integral: {:e} ± {:e} ({} function evaluations)",
                     integral.integral, integral.error_estimate, integral.num_function_evaluations
                 );
+                if cfg!(debug_assertions) && integral.error_estimate > 0.01 * integral.integral {
+                    warn!(
+                        "Bose–Einstein integral has a relative error of {:0.2}%",
+                        integral.error_estimate / integral.integral.abs()
+                    );
+                }
                 // 1/(2 π²) ≅ 0.050_660_591_821_168_89
                 0.050_660_591_821_168_89 * integral.integral
             }
