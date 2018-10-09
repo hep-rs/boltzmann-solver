@@ -17,6 +17,15 @@ use std::f64;
 
 use constants::{PI_M2, ZETA_3};
 
+/// Equilibrium number density for massless bosons, normalized to the
+/// equilibrium number density of a massless boson.  This is specified per
+/// degree of freedom (that is \\(g = 1\\)).
+pub const BOSON_EQ_DENSITY: f64 = 1.0;
+/// Equilibrium number density for massless fermions, normalized to the
+/// equilibrium number density of a massless boson.  This is specified per
+/// degree of freedom (that is \\(g = 1\\))
+pub const FERMION_EQ_DENSITY: f64 = 0.75;
+
 /// The statistics which describe the distribution of particles over energy
 /// states.  Both Fermi–Dirac and Bose–Einstein quantum statistics are
 /// implemented, as well as the classical Maxwell–Boltzmann statistic.
