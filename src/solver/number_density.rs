@@ -212,6 +212,12 @@
 //!     = \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} n^{(0)}_a \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
 //! \\end{equation}
 //!
+//! Note that if only the tree-level contributions are considered for the decay
+//! and inverse decays, then both squared amplitudes will be in fact identical
+//! and thus \\(\gamma(ab \to c) \equiv \gamma(c \to ab)\\).  As a result, the
+//! decay and inverse decay only differ by a scaling factor to take into account
+//! the initial state particles.
+//!
 //! ## Two Body Scattering
 //!
 //! The two-to-two scattering \\(ab \to cd\\) reaction density is given by
