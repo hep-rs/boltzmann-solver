@@ -300,6 +300,8 @@ use universe::Universe;
 /// Context provided containing pre-computed values which might be useful when
 /// evaluating interactions.
 pub struct Context {
+    /// Evaluation step
+    pub step: u64,
     /// Inverse temperature in GeV^{-1}
     pub beta: f64,
     /// Hubble rate, in GeV
@@ -474,19 +476,19 @@ impl Solver for NumberDensitySolver {
         let mut k4: Self::Solution;
         let mut tmp: Self::Solution;
 
-        let mut n_eval = 0;
+        let mut step = 0;
         while beta < self.beta_range.1 {
-            n_eval += 1;
+            step += 1;
 
             // Standard Runge-Kutta integration.
-            let c = self.context(beta, universe);
+            let c = self.context(step, beta, universe);
             k1 = self
                 .interactions
                 .iter()
                 .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &n, &c))
                 * h;
 
-            let c = self.context(beta + 0.5 * h, universe);
+            let c = self.context(step, beta + 0.5 * h, universe);
             tmp = &n + &(&k1 * 0.5);
             k2 = self
                 .interactions
@@ -494,7 +496,7 @@ impl Solver for NumberDensitySolver {
                 .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &tmp, &c))
                 * h;
 
-            let c = self.context(beta + 0.5 * h, universe);
+            let c = self.context(step, beta + 0.5 * h, universe);
             tmp = &n + &(&k2 * 0.5);
             k3 = self
                 .interactions
@@ -502,7 +504,7 @@ impl Solver for NumberDensitySolver {
                 .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &tmp, &c))
                 * h;
 
-            let c = self.context(beta + h, universe);
+            let c = self.context(step, beta + h, universe);
             let tmp = &n + &k3;
             k4 = self
                 .interactions
@@ -533,13 +535,13 @@ impl Solver for NumberDensitySolver {
                 h *= self.step_change.increase;
                 debug!(
                     "Step {:>7}, β = {:>9.2e} -> Increased h to {:.3e} (error was {:.3e})",
-                    n_eval, beta, h, err
+                    step, beta, h, err
                 );
             } else if err > self.error_tolerance.upper {
                 h *= self.step_change.decrease;
                 debug!(
                     "Step {:>7}, β = {:>9.2e} -> Decreased h to {:.3e} (error was {:.3e})",
-                    n_eval, beta, h, err
+                    step, beta, h, err
                 );
 
                 // Prevent h from getting too small that it might make
@@ -548,7 +550,7 @@ impl Solver for NumberDensitySolver {
                 if beta / h > 1e5 {
                     warn!(
                         "Step {:>7}, β = {:>9.2e} -> Step size getting too small (β / h = {:.1e}).",
-                        n_eval, beta, beta / h
+                        step, beta, beta / h
                     );
 
                     while beta / h > 1e5 {
@@ -564,16 +566,9 @@ impl Solver for NumberDensitySolver {
 
             n += &dn;
             beta += h;
-
-            if n_eval % 100 == 0 {
-                println!("======");
-                println!("β    = {:.2e}", beta);
-                println!("eq_n = {:.2e}", c.eq_n);
-                println!("n    = {:.2e}", n);
-            }
         }
 
-        info!("Number of evaluations: {}", n_eval);
+        info!("Number of evaluations: {}", step);
 
         n
     }
@@ -600,8 +595,9 @@ impl NumberDensitySolver {
         )
     }
 
-    fn context<U: Universe>(&self, beta: f64, universe: &U) -> Context {
+    fn context<U: Universe>(&self, step: u64, beta: f64, universe: &U) -> Context {
         Context {
+            step,
             beta,
             hubble_rate: universe.hubble_rate(beta),
             eq_n: self.equilibrium_number_densities(beta),
