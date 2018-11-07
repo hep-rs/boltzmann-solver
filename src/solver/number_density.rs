@@ -293,7 +293,6 @@
 // //! \\end{equation}
 
 use super::{ErrorTolerance, InitialCondition, Solver, StepChange};
-use constants::EULER_GAMMA;
 use ndarray::{prelude::*, FoldWhile, Zip};
 use particle::Particle;
 use universe::Universe;
@@ -624,6 +623,7 @@ impl NumberDensitySolver {
 #[cfg(test)]
 mod test {
     use super::*;
+    use constants::EULER_GAMMA;
     use csv;
     use special_functions::bessel;
     use std::cell::RefCell;
