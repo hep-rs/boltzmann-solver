@@ -293,6 +293,7 @@
 // //! \\end{equation}
 
 use super::{ErrorTolerance, InitialCondition, Solver, StepChange};
+use constants::EULER_GAMMA;
 use ndarray::{prelude::*, FoldWhile, Zip};
 use particle::Particle;
 use universe::Universe;
@@ -659,6 +660,7 @@ mod test {
             }
         };
 
+        let top_yukawa: f64 = 1.0;
         let yukawa: f64 = 1e-4;
         let epsilon = 1e-6;
         let amplitude_squared = yukawa.powi(2) * n1.mass.powi(2);
@@ -669,17 +671,30 @@ mod test {
             .error_tolerance(1e-1, 1e-2)
             .initialize();
 
-        let csv = RefCell::new(csv::Writer::from_path("/tmp/minimal_leptogenesis.csv").unwrap());
-        csv.borrow_mut()
-            .serialize((
-                "beta",
-                "n0",
-                "n1",
-                "n0_eq",
-                "n1_eq",
-                "decay",
-                "inverse-decay",
-            )).unwrap();
+        // Setup the various loggers
+        ::std::fs::create_dir("/tmp/minimal_leptogenesis/").unwrap_or(());
+
+        let csv_n =
+            RefCell::new(csv::Writer::from_path("/tmp/minimal_leptogenesis/n.csv").unwrap());
+        csv_n
+            .borrow_mut()
+            .serialize(("beta", "n0", "n1", "n0_eq", "n1_eq"))
+            .unwrap();
+
+        let csv_decay =
+            RefCell::new(csv::Writer::from_path("/tmp/minimal_leptogenesis/decay.csv").unwrap());
+        csv_decay
+            .borrow_mut()
+            .serialize(("beta", "decay", "inverse-decay"))
+            .unwrap();
+
+        let csv_scattering = RefCell::new(
+            csv::Writer::from_path("/tmp/minimal_leptogenesis/scattering.csv").unwrap(),
+        );
+        csv_scattering
+            .borrow_mut()
+            .serialize(("beta", "scattering"))
+            .unwrap();
 
         // solver.add_particle(n1, InitialCondition::Equilibrium(0.0));
         solver.add_particle(n1, InitialCondition::Zero);
@@ -702,18 +717,48 @@ mod test {
             s[0] -= net_decay;
             s[1] += -epsilon * net_decay - 0.5 * n[1] * inverse_decay;
 
-            csv.borrow_mut()
-                .serialize((
-                    c.beta,
-                    n[0],
-                    n[1],
-                    c.eq_n[0],
-                    c.eq_n[1],
-                    decay,
-                    inverse_decay,
-                )).unwrap();
+            csv_decay
+                .borrow_mut()
+                .serialize((c.beta, decay, inverse_decay))
+                .unwrap();
 
             s
+        });
+
+        // Scatterings NL ↔ tb and Nt ↔ Lb.
+        solver.add_interaction(move |mut s, n, ref c| {
+            let m_beta = n1.mass * c.beta;
+            let mh = 0.4 / c.beta;
+
+            let prefactor = 2.6441e12 * (top_yukawa * yukawa).powi(2) / n1.mass;
+            let f_phi_s = 2.0 * (1.0 - m_beta.powi(2) * (f64::ln(2.0 / m_beta) - EULER_GAMMA));
+            let f_phi_t = 2.0
+                * (1.0
+                    + m_beta.powi(2) / 2.0
+                        * f64::ln(n1.mass / mh)
+                        * (f64::ln(2.0 / m_beta) - EULER_GAMMA));
+
+            let s_phi_s = prefactor * f_phi_s / 2.0;
+            let s_phi_t = prefactor * f_phi_t / 2.0;
+
+            let scattering = 2.0 * s_phi_s + 4.0 * s_phi_t;
+            let washout = n[0] * s_phi_s + 2.0 * c.eq_n[0] * s_phi_t;
+
+            s[0] -= scattering * (n[0] - c.eq_n[0]);
+            s[1] -= -n[1] * washout;
+
+            csv_scattering
+                .borrow_mut()
+                .serialize((c.beta, scattering))
+                .unwrap();
+
+            s
+        });
+
+        solver.set_logger(move |n, c| {
+            csv_n
+                .borrow_mut()
+                .serialize((c.beta, n[0], n[1], c.eq_n[0], c.eq_n[1]));
         });
 
         let sol = solver.solve(&universe);
