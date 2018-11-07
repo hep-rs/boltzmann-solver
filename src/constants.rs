@@ -22,6 +22,9 @@ pub const REDUCED_PLANCK_MASS: f64 = 2.435_363e18;
 /// Riemann zeta function evaluated at 3: \\(\zeta(3) \approx 1.202\dots\\)
 pub const ZETA_3: f64 = 1.202_056_903_159_594_2;
 
+/// Euler gamma constant: \\(\gamma_\textsc{E} \approx 0.577\dots\\)
+pub const EULER_GAMMA: f64 = 0.577_215_664_901_532_860_61;
+
 /// \\(\pi\\)
 pub const PI: f64 = ::std::f64::consts::PI;
 /// \\(\pi\\) [named to follow the convention `PI_n`]
