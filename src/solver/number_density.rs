@@ -758,7 +758,8 @@ mod test {
         solver.set_logger(move |n, c| {
             csv_n
                 .borrow_mut()
-                .serialize((c.beta, n[0], n[1], c.eq_n[0], c.eq_n[1]));
+                .serialize((c.beta, n[0], n[1], c.eq_n[0], c.eq_n[1]))
+                .unwrap();
         });
 
         let sol = solver.solve(&universe);
