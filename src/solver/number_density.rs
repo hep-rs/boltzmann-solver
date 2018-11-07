@@ -324,6 +324,7 @@ pub struct NumberDensitySolver {
     initial_conditions: Vec<f64>,
     #[cfg_attr(feature = "cargo-clippy", allow(type_complexity))]
     interactions: Vec<Box<Fn(Array1<f64>, &Array1<f64>, &Context) -> Array1<f64>>>,
+    logger: Box<Fn(&Array1<f64>, &Context)>,
     step_change: StepChange,
     error_tolerance: ErrorTolerance,
 }
@@ -347,6 +348,7 @@ impl Solver for NumberDensitySolver {
             particles: Vec::with_capacity(20),
             initial_conditions: Vec::with_capacity(20),
             interactions: Vec::with_capacity(100),
+            logger: Box::new(|_, _| {}),
             step_change: StepChange {
                 increase: 1.1,
                 decrease: 0.5,
@@ -456,6 +458,14 @@ impl Solver for NumberDensitySolver {
         self
     }
 
+    fn set_logger<F: 'static>(&mut self, f: F) -> &mut Self
+    where
+        F: Fn(&Self::Solution, &Self::Context),
+    {
+        self.logger = Box::new(f);
+        self
+    }
+
     fn solve<U>(&self, universe: &U) -> Self::Solution
     where
         U: Universe,
@@ -480,8 +490,13 @@ impl Solver for NumberDensitySolver {
         while beta < self.beta_range.1 {
             step += 1;
 
-            // Standard Runge-Kutta integration.
+            // Create the initial context
             let c = self.context(step, beta, universe);
+
+            // Run the logger now
+            (*self.logger)(&n, &c);
+
+            // Standard Runge-Kutta integration.
             k1 = self
                 .interactions
                 .iter()

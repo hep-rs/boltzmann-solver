@@ -158,6 +158,20 @@ pub trait Solver {
     where
         F: Fn(Self::Solution, &Self::Solution, &Self::Context) -> Self::Solution;
 
+    /// Set the logger.
+    ///
+    /// The logger provides some insight into the numerical integration 'black
+    /// box'.  Specifically, it is run at the start of each integration step and
+    /// has access to the `Solution` and `Context` at the start of the
+    /// integration step.  As a result, for the first step, the solution will be
+    /// equal to the initial conditions.
+    ///
+    /// This is useful if one wants to track the evolution of the solutions and
+    /// log these in a CSV file.
+    fn set_logger<F: 'static>(&mut self, f: F) -> &mut Self
+    where
+        F: Fn(&Self::Solution, &Self::Context);
+
     /// Evolve the initial conditions by solving the PDEs.
     ///
     /// Note that this is not a true PDE solver, but instead converts the PDE
