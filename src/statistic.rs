@@ -277,9 +277,11 @@ impl Statistics for Statistic {
                 } else if m_beta > 1e4 {
                     0.0
                 } else {
-                    0.75 * f64::exp(-m_beta - (2.75612 + 2.11777 * m_beta.powf(-0.920114)).recip())
+                    0.75 * f64::exp(-m_beta - (2.75612 + 2.11777 * m_beta.powf(-0.920_114)).recip())
                         * (1.0 + m_beta.powf(1.5))
-                        * (1.0 + 0.390466 * f64::exp(-(0.460648 * m_beta.ln() - 0.0116323).powi(2)))
+                        * (1.0
+                            + 0.390_466
+                                * f64::exp(-(0.460_648 * m_beta.ln() - 0.011_632_3).powi(2)))
                 }
             }
             Statistic::BoseEinstein => {
@@ -295,10 +297,7 @@ impl Statistics for Statistic {
             }
             Statistic::MaxwellBoltzmann => {
                 // 1/(2 ζ(3)) ≅ 0.415_953_686_290_353_734_34
-                0.415_953_686_290_353_734_34
-                    * mass.powi(2)
-                    * bessel::k_2(mass * beta)
-                    * beta.powi(2)
+                0.415_953_686_290_353_73 * mass.powi(2) * bessel::k_2(mass * beta) * beta.powi(2)
             }
             Statistic::MaxwellJuttner => {
                 let m_beta = mass * beta;
