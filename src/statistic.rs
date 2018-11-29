@@ -354,7 +354,7 @@ mod test {
         let mb = Statistic::MaxwellBoltzmann;
         let mj = Statistic::MaxwellJuttner;
 
-        let mut rdr = csv::Reader::from_path("test/data/phase_space.csv").unwrap();
+        let mut rdr = csv::Reader::from_path("tests/data/phase_space.csv").unwrap();
 
         for result in rdr.deserialize() {
             let (e, m, mu, beta, f_fd, f_be, f_mb, f_mj): Row8 = result.unwrap();
@@ -386,7 +386,7 @@ mod test {
         let mb = Statistic::MaxwellBoltzmann;
         let mj = Statistic::MaxwellJuttner;
 
-        let mut rdr = csv::Reader::from_path("test/data/number_density_massive.csv").unwrap();
+        let mut rdr = csv::Reader::from_path("tests/data/number_density_massive.csv").unwrap();
 
         for result in rdr.deserialize() {
             let (m, mu, beta, n_fd, n_be, n_mb, n_mj): Row7 = result.unwrap();
@@ -423,7 +423,7 @@ mod test {
         let mb = Statistic::MaxwellBoltzmann;
         let mj = Statistic::MaxwellJuttner;
 
-        let mut rdr = csv::Reader::from_path("test/data/number_density_massless.csv").unwrap();
+        let mut rdr = csv::Reader::from_path("tests/data/number_density_massless.csv").unwrap();
 
         for result in rdr.deserialize() {
             let (mu, beta, n_fd, n_be, n_mb, n_mj): Row6 = result.unwrap();
@@ -464,7 +464,7 @@ mod bench {
     #[bench]
     fn fermi_dirac_massive(b: &mut Bencher) {
         let fd = Statistic::FermiDirac;
-        let rdr = csv::Reader::from_path("test/data/number_density_massive.csv").unwrap();
+        let rdr = csv::Reader::from_path("tests/data/number_density_massive.csv").unwrap();
         let data: Vec<Row7> = rdr
             .into_deserialize()
             .step_by(STEP_SIZE)
@@ -482,7 +482,7 @@ mod bench {
     #[bench]
     fn bose_einstein_massive(b: &mut Bencher) {
         let be = Statistic::BoseEinstein;
-        let rdr = csv::Reader::from_path("test/data/number_density_massive.csv").unwrap();
+        let rdr = csv::Reader::from_path("tests/data/number_density_massive.csv").unwrap();
         let data: Vec<Row7> = rdr
             .into_deserialize()
             .step_by(STEP_SIZE)
@@ -504,7 +504,7 @@ mod bench {
     #[bench]
     fn maxwell_boltzmann_massive(b: &mut Bencher) {
         let mb = Statistic::MaxwellBoltzmann;
-        let rdr = csv::Reader::from_path("test/data/number_density_massive.csv").unwrap();
+        let rdr = csv::Reader::from_path("tests/data/number_density_massive.csv").unwrap();
         let data: Vec<Row7> = rdr
             .into_deserialize()
             .step_by(STEP_SIZE)
@@ -522,7 +522,7 @@ mod bench {
     #[bench]
     fn maxwell_juttner_massive(b: &mut Bencher) {
         let mj = Statistic::MaxwellJuttner;
-        let rdr = csv::Reader::from_path("test/data/number_density_massive.csv").unwrap();
+        let rdr = csv::Reader::from_path("tests/data/number_density_massive.csv").unwrap();
         let data: Vec<Row7> = rdr
             .into_deserialize()
             .step_by(STEP_SIZE)
@@ -540,7 +540,7 @@ mod bench {
     #[bench]
     fn fermi_dirac_massless(b: &mut Bencher) {
         let fd = Statistic::FermiDirac;
-        let rdr = csv::Reader::from_path("test/data/number_density_massless.csv").unwrap();
+        let rdr = csv::Reader::from_path("tests/data/number_density_massless.csv").unwrap();
         let data: Vec<Row6> = rdr
             .into_deserialize()
             .step_by(STEP_SIZE)
@@ -558,7 +558,7 @@ mod bench {
     #[bench]
     fn bose_einstein_massless(b: &mut Bencher) {
         let be = Statistic::BoseEinstein;
-        let rdr = csv::Reader::from_path("test/data/number_density_massless.csv").unwrap();
+        let rdr = csv::Reader::from_path("tests/data/number_density_massless.csv").unwrap();
         let data: Vec<Row6> = rdr
             .into_deserialize()
             .step_by(STEP_SIZE)
@@ -576,7 +576,7 @@ mod bench {
     #[bench]
     fn maxwell_boltzmann_massless(b: &mut Bencher) {
         let mb = Statistic::MaxwellBoltzmann;
-        let rdr = csv::Reader::from_path("test/data/number_density_massless.csv").unwrap();
+        let rdr = csv::Reader::from_path("tests/data/number_density_massless.csv").unwrap();
         let data: Vec<Row6> = rdr
             .into_deserialize()
             .step_by(STEP_SIZE)
@@ -594,7 +594,7 @@ mod bench {
     #[bench]
     fn maxwell_juttner_massless(b: &mut Bencher) {
         let mj = Statistic::MaxwellJuttner;
-        let rdr = csv::Reader::from_path("test/data/number_density_massless.csv").unwrap();
+        let rdr = csv::Reader::from_path("tests/data/number_density_massless.csv").unwrap();
         let data: Vec<Row6> = rdr
             .into_deserialize()
             .step_by(STEP_SIZE)
