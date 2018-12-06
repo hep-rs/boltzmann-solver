@@ -115,14 +115,11 @@
 //! sum over all possible interactions must be done.
 
 #![cfg_attr(feature = "nightly", feature(test))]
-#![cfg_attr(feature = "nightly", feature(iterator_step_by))]
 #![cfg_attr(feature = "strict", deny(missing_docs))]
 #![cfg_attr(feature = "strict", deny(warnings))]
 
 #[macro_use]
 extern crate log;
-#[cfg_attr(test, allow(unused_imports))]
-#[cfg_attr(test, macro_use)]
 extern crate ndarray;
 extern crate quadrature;
 extern crate special_functions;
