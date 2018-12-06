@@ -212,11 +212,28 @@
 //!     = \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} n^{(0)}_a \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
 //! \\end{equation}
 //!
-//! Note that if only the tree-level contributions are considered for the decay
-//! and inverse decays, then both squared amplitudes will be in fact identical
-//! and thus \\(\gamma(ab \to c) \equiv \gamma(c \to ab)\\).  As a result, the
-//! decay and inverse decay only differ by a scaling factor to take into account
-//! the initial state particles.
+//! ### Combined Decay and Inverse Decay
+//!
+//! If only the tree-level contributions are considered for the decay and
+//! inverse decays, then both squared amplitudes will be in fact identical and
+//! thus \\(\gamma(ab \to c) \equiv \gamma(c \to ab)\\).  As a result, the decay
+//! and inverse decay only differ by a scaling factor to take into account the
+//! initial state particles.
+//!
+//! In particular, we can define an alternative reaction rate,
+//!
+//! \\begin{equation}
+//!   \tilde \gamma(a \to bc) = \frac{\abs{\mathcal{M}(a \to bc)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)},
+//! \\end{equation}
+//!
+//! which allows for the overall \\(1 \leftrightarrow 2\\) reaction rate to be expressed as:
+//!
+//! \\begin{equation}
+//!   \frac{n_a}{n_a^{(0)}} \gamma(a \to bc) - \frac{n_b n_c}{n_b^{(0)} n_c^{(0)}} \gamma(bc \to a)
+//!   = \left[ n_a - \frac{n_b n_c}{n_b^{(0)} n_c^{(0)}} n_a^{(0)} \right] \tilde \gamma(a \to bc)
+//! \\end{equation}
+//!
+//! provided the forward and backward rates are equal.
 //!
 //! ## Two Body Scattering
 //!
