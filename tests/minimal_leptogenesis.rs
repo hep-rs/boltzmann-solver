@@ -64,8 +64,6 @@ impl Couplings {
     }
 }
 
-// Lagrangian parameters
-#[allow(non_snake_case)]
 #[test]
 fn minimal_leptogenesis() {
     // Setup the directory for CSV output
@@ -85,6 +83,8 @@ fn minimal_leptogenesis() {
     // RH neutrino mass
     let mass_n = n.mass;
     let mass2_n = mass_n.powi(2);
+
+    let width2_h = |beta: f64| 0.01 * (0.16 * beta.powi(-2));
 
     // Create the Solver and set integration parameters
     let mut solver = NumberDensitySolver::new()
@@ -136,19 +136,21 @@ fn minimal_leptogenesis() {
         s
     });
 
-    // Scattering NL ↔ Qq and NL ↔ Qq (s-channel)
+    // Scattering NL ↔ Qq, NQ ↔ Lq and Nq ↔ LQ (s- and t-channel)
     ////////////////////////////////////////////////////////////////////////////////
     let csv = RefCell::new(
-        csv::Writer::from_path("/tmp/minimal_leptogenesis/scattering_NL.csv").unwrap(),
+        csv::Writer::from_path("/tmp/minimal_leptogenesis/scattering_NLQq.csv").unwrap(),
     );
     csv.borrow_mut()
-        .serialize(("beta", "N₁L → Qq", "Qq → N₁L"))
+        .serialize(("beta", "N₁Q → Lq", "Lq → N₁Q"))
         .unwrap();
 
     let couplings = Couplings::new();
     solver.add_interaction(move |mut s, n, ref c| {
-        let mass2_h = mass2_h(c.beta);
         let mut gamma = {
+            let mass2_h = mass2_h(c.beta);
+            let width2_h = width2_h(c.beta);
+
             let mut m2 = 0.0;
             for (a2, b1, b2) in iproduct!(0..3, 0..3, 0..3) {
                 m2 += 9.0
@@ -157,68 +159,25 @@ fn minimal_leptogenesis() {
                         + couplings.yukawa_HQu[[b1, b2]].norm_sqr());
             }
 
-            let integrand = |ss: f64| {
-                let s = mass2_n + (1.0 - ss) / ss;
-                let sqrt_s = s.sqrt();
-                let dsdss = ss.powi(-2);
-
-                sqrt_s
-                    * ((s - mass2_n) * (s - mass2_h)
-                        / ((s - mass2_h).powi(2) + (0.1 * mass2_h).powi(2))).powi(2)
-                    * bessel::k_1(sqrt_s * c.beta)
-                    * dsdss
-            };
-            m2 * integrate(integrand, 0.0, 1.0, 0.0).integral
-        };
-        gamma /= 512.0 * PI_5 * c.hubble_rate * c.beta;
-
-        let forward = checked_div(n[1], c.eq_n[1]) * gamma;
-        let backward = gamma;
-        let net_forward = forward - backward;
-
-        s[0] -= n[0] * backward;
-        s[1] -= net_forward;
-
-        csv.borrow_mut()
-            .serialize((c.beta, forward, backward))
-            .unwrap();
-
-        s
-    });
-
-    // Scattering NQ ↔ Lq and Nq ↔ LQ (t-channel)
-    ////////////////////////////////////////////////////////////////////////////////
-    let csv = RefCell::new(
-        csv::Writer::from_path("/tmp/minimal_leptogenesis/scattering_NQ.csv").unwrap(),
-    );
-    csv.borrow_mut()
-        .serialize(("beta", "N₁Q → Lq", "Lq → N₁Q"))
-        .unwrap();
-
-    let couplings = Couplings::new();
-    solver.add_interaction(move |mut s, n, ref c| {
-        let mass2_h = mass2_h(c.beta);
-        let mut gamma = {
-            let mut m2 = 0.0;
-            for (a2, b1, b2) in iproduct!(0..3, 0..3, 0..3) {
-                m2 += 18.0
-                    * couplings.yukawa_HNL[[0, a2]].norm_sqr()
-                    * (couplings.yukawa_HQd[[b1, b2]].norm_sqr()
-                        + couplings.yukawa_HQu[[b1, b2]].norm_sqr());
-            }
-
             let s_integrand = |ss: f64| {
                 let s = mass2_n + (1.0 - ss) / ss;
-                let sqrt_s = s.sqrt();
                 let dsdss = ss.powi(-2);
+                let sqrt_s = s.sqrt();
 
                 let t_integrand = |t: f64| {
-                    (t + mass2_n) * (t + mass2_h).powi(2) * bessel::k_1(sqrt_s * c.beta)
-                        / sqrt_s
-                        / ((t + mass2_h).powi(2) + (0.1 * mass2_h).powi(2)).powi(2)
+                    ( // s-channel
+                        s * (s - mass2_n) * (s - mass2_h).powi(2)
+                            / ((s - mass2_h).powi(2) + width2_h * mass2_h).powi(2)
+                    ) + ( // t-channel
+                          2.0 * (t + mass2_n) * (t + mass2_h).powi(2)
+                              / ((t + mass2_h).powi(2) + width2_h * mass2_h).powi(2)
+                      )
                 };
 
-                integrate(t_integrand, mass2_h - s, 0.0, 0.0).integral * dsdss
+                integrate(t_integrand, mass2_n - s, 0.0, 0.0).integral
+                    * bessel::k_1(sqrt_s * c.beta)
+                    / sqrt_s
+                    * dsdss
             };
             m2 * integrate(s_integrand, 0.0, 1.0, 0.0).integral
         };
