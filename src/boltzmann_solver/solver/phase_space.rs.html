@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/phase_space.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>phase_space.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/phase_space.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>phase_space.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -427,6 +427,16 @@
 <span id="427">427</span>
 <span id="428">428</span>
 <span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Solver for the phase-space form of the Boltzmann equation.</span>
 <span class="doccomment">//!</span>
@@ -475,7 +485,7 @@
 <span class="doccomment">//! a)}^2\\)) while leaving all dependence on \\(E_i\\) and \\(\abs{\vt p_i}\\)</span>
 <span class="doccomment">//! explicit.</span>
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ErrorTolerance</span>, <span class="ident">Solver</span>, <span class="ident">StepChange</span>};
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ErrorTolerance</span>, <span class="ident">InitialCondition</span>, <span class="ident">Solver</span>, <span class="ident">StepChange</span>};
 <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">Zip</span>};
 <span class="kw">use</span> <span class="ident">particle</span>::<span class="ident">Particle</span>;
 <span class="kw">use</span> <span class="ident">statistic</span>::{
@@ -511,6 +521,7 @@
     <span class="ident">particles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Particle</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>, <span class="ident">allow</span>(<span class="ident">type_complexity</span>))]</span>
     <span class="ident">interactions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Fn</span>(<span class="ident">Array2</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Array2</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="ident">Array2</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">logger</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Array2</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Context</span>)<span class="op">&gt;</span>,
     <span class="ident">energies</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
     <span class="ident">energy_steps</span>: <span class="ident">usize</span>,
     <span class="ident">energy_step_size</span>: <span class="ident">f64</span>,
@@ -548,6 +559,7 @@
             <span class="ident">beta_range</span>: (<span class="number">1e-20</span>, <span class="number">1e0</span>),
             <span class="ident">particles</span>: <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="number">20</span>),
             <span class="ident">interactions</span>: <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="number">100</span>),
+            <span class="ident">logger</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {}),
             <span class="ident">energies</span>: <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="number">0</span>),
             <span class="ident">energy_steps</span>: <span class="number">2usize</span>.<span class="ident">pow</span>(<span class="number">10</span>),
             <span class="ident">energy_step_size</span>: <span class="number">0.0</span>,
@@ -612,7 +624,7 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">add_particle</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">p</span>: <span class="ident">Particle</span>) {
+    <span class="kw">fn</span> <span class="ident">add_particle</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">p</span>: <span class="ident">Particle</span>, <span class="ident">_initial_condition</span>: <span class="ident">InitialCondition</span>) {
         <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">push</span>(<span class="ident">p</span>);
     }
 
@@ -628,6 +640,14 @@
         <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="self">Self</span>::<span class="ident">Solution</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Solution</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="self">Self</span>::<span class="ident">Solution</span>,
     {
         <span class="self">self</span>.<span class="ident">interactions</span>.<span class="ident">push</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">f</span>));
+        <span class="self">self</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">set_logger</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Solution</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Context</span>),
+    {
+        <span class="self">self</span>.<span class="ident">logger</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">f</span>);
         <span class="self">self</span>
     }
 
@@ -852,7 +872,7 @@
             .<span class="ident">temperature_range</span>(<span class="number">1e20</span>, <span class="number">1e-10</span>)
             .<span class="ident">error_tolerance</span>(<span class="number">1e-1</span>, <span class="number">1e-2</span>)
             .<span class="ident">initialize</span>();
-        <span class="ident">solver</span>.<span class="ident">add_particle</span>(<span class="ident">phi</span>);
+        <span class="ident">solver</span>.<span class="ident">add_particle</span>(<span class="ident">phi</span>, <span class="ident">InitialCondition</span>::<span class="ident">Equilibrium</span>(<span class="number">0.0</span>));
 
         <span class="ident">solver</span>.<span class="ident">solve</span>(<span class="kw-2">&amp;</span><span class="ident">StandardModel</span>::<span class="ident">new</span>());
     }

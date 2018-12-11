@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.12.0/src/slice.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>slice.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.12.1/src/slice.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>slice.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -623,6 +623,8 @@
 <span id="623">623</span>
 <span id="624">624</span>
 <span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
 </pre><pre class="rust ">
 <span class="comment">// Copyright 2014-2016 bluss and ndarray developers.</span>
 <span class="comment">//</span>
@@ -1061,7 +1063,7 @@
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">impl_slicenextdim_larger</span> {
     (($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">generics</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>), <span class="macro-nonterminal">$</span><span class="self">self</span>:<span class="macro-nonterminal">ty</span>) <span class="op">=&gt;</span> {
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D1</span>: <span class="ident">Dimension</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">generics</span>),<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">SliceNextDim</span><span class="op">&lt;</span><span class="ident">D1</span>, <span class="ident">D1</span>::<span class="ident">Larger</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="self">self</span> {
+        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D1</span>: <span class="ident">Dimension</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">generics</span>)<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">SliceNextDim</span><span class="op">&lt;</span><span class="ident">D1</span>, <span class="ident">D1</span>::<span class="ident">Larger</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="self">self</span> {
             <span class="kw">fn</span> <span class="macro-nonterminal">next_dim</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">D1</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">D1</span>::<span class="ident">Larger</span><span class="op">&gt;</span> {
                 <span class="ident">PhantomData</span>
             }
@@ -1091,12 +1093,14 @@
 <span class="doccomment">/// The syntax is `s![` *[ axis-slice-or-index [, axis-slice-or-index [ , ... ]</span>
 <span class="doccomment">/// ] ]* `]`, where *axis-slice-or-index* is any of the following:</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// * *index*: an index to use for taking a subview with respect to that axis</span>
-<span class="doccomment">/// * *range*: a range with step size 1 to use for slicing that axis</span>
-<span class="doccomment">/// * *range* `;` *step*: a range with step size *step* to use for slicing that axis</span>
-<span class="doccomment">/// * *slice*: a [`Slice`] instance to use for slicing that axis</span>
+<span class="doccomment">/// * *index*: an index to use for taking a subview with respect to that axis.</span>
+<span class="doccomment">///   (The index is selected. The axis is removed except with</span>
+<span class="doccomment">///   [`.slice_collapse()`].)</span>
+<span class="doccomment">/// * *range*: a range with step size 1 to use for slicing that axis.</span>
+<span class="doccomment">/// * *range* `;` *step*: a range with step size *step* to use for slicing that axis.</span>
+<span class="doccomment">/// * *slice*: a [`Slice`] instance to use for slicing that axis.</span>
 <span class="doccomment">/// * *slice* `;` *step*: a range constructed from the start and end of a [`Slice`]</span>
-<span class="doccomment">///   instance, with new step size *step*, to use for slicing that axis</span>
+<span class="doccomment">///   instance, with new step size *step*, to use for slicing that axis.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Slice`]: struct.Slice.html</span>
 <span class="doccomment">///</span>
@@ -1112,12 +1116,12 @@
 <span class="doccomment">/// the third axis for 1..5 with default step size 1. The input array must have</span>
 <span class="doccomment">/// 3 dimensions. The resulting slice would have shape `[2, 4]` for</span>
 <span class="doccomment">/// [`.slice()`], [`.slice_mut()`], and [`.slice_move()`], and shape</span>
-<span class="doccomment">/// `[2, 1, 4]` for [`.slice_inplace()`].</span>
+<span class="doccomment">/// `[2, 1, 4]` for [`.slice_collapse()`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`.slice()`]: struct.ArrayBase.html#method.slice</span>
 <span class="doccomment">/// [`.slice_mut()`]: struct.ArrayBase.html#method.slice_mut</span>
 <span class="doccomment">/// [`.slice_move()`]: struct.ArrayBase.html#method.slice_move</span>
-<span class="doccomment">/// [`.slice_inplace()`]: struct.ArrayBase.html#method.slice_inplace</span>
+<span class="doccomment">/// [`.slice_collapse()`]: struct.ArrayBase.html#method.slice_collapse</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// See also [*Slicing*](struct.ArrayBase.html#slicing).</span>
 <span class="doccomment">///</span>

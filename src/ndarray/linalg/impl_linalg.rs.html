@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.12.0/src/linalg/impl_linalg.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>impl_linalg.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.12.1/src/linalg/impl_linalg.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>impl_linalg.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -793,6 +793,10 @@
 <span id="793">793</span>
 <span id="794">794</span>
 <span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
 </pre><pre class="rust ">
 <span class="comment">// Copyright 2014-2016 bluss and ndarray developers.</span>
 <span class="comment">//</span>
@@ -1015,7 +1019,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Return a result array with shape *M* × *K*.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panics** if shapes are incompatible.&lt;br&gt;</span>
+    <span class="doccomment">/// **Panics** if shapes are incompatible or the number of elements in the</span>
+    <span class="doccomment">/// result would overflow `isize`.</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// *Note:* If enabled, uses blas `gemv/gemm` for elements of `f32, f64`</span>
     <span class="doccomment">/// when memory layout allows. The default matrixmultiply backend</span>
     <span class="doccomment">/// is otherwise used for `f32, f64` for all memory layouts.</span>
@@ -1070,11 +1076,13 @@
     }
 }
 
+<span class="doccomment">/// Assumes that `m` and `n` are ≤ `isize::MAX`.</span>
 <span class="attribute">#[<span class="ident">cold</span>]</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">never</span>)]</span>
 <span class="kw">fn</span> <span class="ident">dot_shape_error</span>(<span class="ident">m</span>: <span class="ident">usize</span>, <span class="ident">k</span>: <span class="ident">usize</span>, <span class="ident">k2</span>: <span class="ident">usize</span>, <span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="op">!</span> {
-    <span class="kw">if</span> <span class="ident">m</span>.<span class="ident">checked_mul</span>(<span class="ident">n</span>).<span class="ident">is_none</span>() {
-        <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;ndarray: shape {} × {} overflows type range&quot;</span>, <span class="ident">m</span>, <span class="ident">n</span>);
+    <span class="kw">match</span> <span class="ident">m</span>.<span class="ident">checked_mul</span>(<span class="ident">n</span>) {
+        <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;=</span> ::<span class="ident">std</span>::<span class="ident">isize</span>::<span class="ident">MAX</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">=&gt;</span> {},
+        <span class="kw">_</span> <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;ndarray: shape {} × {} overflows isize&quot;</span>, <span class="ident">m</span>, <span class="ident">n</span>),
     }
     <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;ndarray: inputs {} × {} and {} × {} are not compatible for matrix multiplication&quot;</span>,
            <span class="ident">m</span>, <span class="ident">k</span>, <span class="ident">k2</span>, <span class="ident">n</span>);

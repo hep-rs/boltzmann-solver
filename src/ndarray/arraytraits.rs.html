@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.12.0/src/arraytraits.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>arraytraits.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.12.1/src/arraytraits.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>arraytraits.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -315,6 +315,23 @@
 <span id="315">315</span>
 <span id="316">316</span>
 <span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
 </pre><pre class="rust ">
 <span class="comment">// Copyright 2014-2016 bluss and ndarray developers.</span>
 <span class="comment">//</span>
@@ -327,6 +344,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">hash</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">FromIterator</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">IntoIterator</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{
     <span class="ident">Index</span>,
     <span class="ident">IndexMut</span>,
@@ -534,11 +552,19 @@
 <span class="doccomment">/// Implementation of `ArrayView::from(&amp;S)` where `S` is a slice or slicable.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Create a one-dimensional read-only array view of the data in `slice`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// **Panics** if the slice length is greater than `isize::MAX`.</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">Slice</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Slice</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ArrayView</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">Ix1</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">Slice</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">A</span>]<span class="op">&gt;</span>
 {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Slice</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">xs</span> <span class="op">=</span> <span class="ident">slice</span>.<span class="ident">as_ref</span>();
+        <span class="kw">if</span> <span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="number">0</span> {
+            <span class="macro">assert</span><span class="macro">!</span>(
+                <span class="ident">xs</span>.<span class="ident">len</span>() <span class="op">&lt;=</span> ::<span class="ident">std</span>::<span class="ident">isize</span>::<span class="ident">MAX</span> <span class="kw">as</span> <span class="ident">usize</span>,
+                <span class="string">&quot;Slice length must fit in `isize`.&quot;</span>,
+            );
+        }
         <span class="kw">unsafe</span> {
             <span class="self">Self</span>::<span class="ident">from_shape_ptr</span>(<span class="ident">xs</span>.<span class="ident">len</span>(), <span class="ident">xs</span>.<span class="ident">as_ptr</span>())
         }
@@ -560,11 +586,19 @@
 <span class="doccomment">/// Implementation of `ArrayViewMut::from(&amp;mut S)` where `S` is a slice or slicable.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Create a one-dimensional read-write array view of the data in `slice`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// **Panics** if the slice length is greater than `isize::MAX`.</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">Slice</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Slice</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ArrayViewMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">Ix1</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">Slice</span>: <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">A</span>]<span class="op">&gt;</span>
 {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Slice</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">xs</span> <span class="op">=</span> <span class="ident">slice</span>.<span class="ident">as_mut</span>();
+        <span class="kw">if</span> <span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="number">0</span> {
+            <span class="macro">assert</span><span class="macro">!</span>(
+                <span class="ident">xs</span>.<span class="ident">len</span>() <span class="op">&lt;=</span> ::<span class="ident">std</span>::<span class="ident">isize</span>::<span class="ident">MAX</span> <span class="kw">as</span> <span class="ident">usize</span>,
+                <span class="string">&quot;Slice length must fit in `isize`.&quot;</span>,
+            );
+        }
         <span class="kw">unsafe</span> {
             <span class="self">Self</span>::<span class="ident">from_shape_ptr</span>(<span class="ident">xs</span>.<span class="ident">len</span>(), <span class="ident">xs</span>.<span class="ident">as_mut_ptr</span>())
         }
@@ -595,7 +629,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// fn sum&lt;&#39;a, V: AsArray&lt;&#39;a, f64&gt;&gt;(data: V) -&gt; f64 {</span>
 <span class="doccomment">///     let array_view = data.into();</span>
-<span class="doccomment">///     array_view.scalar_sum()</span>
+<span class="doccomment">///     array_view.sum()</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(</span>

@@ -1,8 +1,10 @@
 var ALIASES = {};
 ALIASES['boltzmann_solver'] = {};
+ALIASES['c_vec'] = {};
 ALIASES['cfg_if'] = {};
 ALIASES['either'] = {};
 ALIASES['itertools'] = {};
+ALIASES['libc'] = {};
 ALIASES['log'] = {};
 ALIASES['matrixmultiply'] = {};
 ALIASES['ndarray'] = {};
@@ -10,4 +12,5 @@ ALIASES['num_complex'] = {};
 ALIASES['num_traits'] = {};
 ALIASES['quadrature'] = {};
 ALIASES['rawpointer'] = {};
+ALIASES['rgsl'] = {};
 ALIASES['special_functions'] = {};

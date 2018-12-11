@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Context","Context provided containing pre-computed values which might be useful when evaluating interactions."],["NumberDensitySolver","Boltzmann equation solver for the number density"]]});
+initSidebarItems({"struct":[["Context","Context provided containing pre-computed values which might be useful when evaluating interactions."],["NumberDensitySolver","Boltzmann equation solver for the number density."]]});

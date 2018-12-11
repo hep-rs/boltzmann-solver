@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.12.0/src/numeric/impl_numeric.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>impl_numeric.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.12.1/src/numeric/impl_numeric.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>impl_numeric.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -202,6 +202,87 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
 </pre><pre class="rust ">
 <span class="comment">// Copyright 2014-2016 bluss and ndarray developers.</span>
 <span class="comment">//</span>
@@ -211,20 +292,16 @@
 <span class="comment">// option. This file may not be copied, modified, or distributed</span>
 <span class="comment">// except according to those terms.</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::<span class="ident">Add</span>;
-<span class="kw">use</span> <span class="ident">libnum</span>::{<span class="self">self</span>, <span class="ident">Zero</span>, <span class="ident">Float</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">Add</span>, <span class="ident">Div</span>, <span class="ident">Mul</span>};
+<span class="kw">use</span> <span class="ident">libnum</span>::{<span class="self">self</span>, <span class="ident">One</span>, <span class="ident">Zero</span>, <span class="ident">Float</span>};
 <span class="kw">use</span> <span class="ident">itertools</span>::<span class="ident">free</span>::<span class="ident">enumerate</span>;
 
 <span class="kw">use</span> <span class="ident">imp_prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">numeric_util</span>;
 
-<span class="kw">use</span> {
-    <span class="ident">LinalgScalar</span>,
-    <span class="ident">FoldWhile</span>,
-    <span class="ident">Zip</span>,
-};
+<span class="kw">use</span> {<span class="ident">FoldWhile</span>, <span class="ident">Zip</span>};
 
-<span class="doccomment">/// Numerical methods for arrays.</span>
+<span class="doccomment">/// # Numerical Methods for Arrays</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span>, <span class="ident">D</span><span class="op">&gt;</span> <span class="ident">ArrayBase</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">D</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Data</span><span class="op">&lt;</span><span class="ident">Elem</span><span class="op">=</span><span class="ident">A</span><span class="op">&gt;</span>,
           <span class="ident">D</span>: <span class="ident">Dimension</span>,
@@ -236,20 +313,57 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let a = arr2(&amp;[[1., 2.],</span>
     <span class="doccomment">///                [3., 4.]]);</span>
-    <span class="doccomment">/// assert_eq!(a.scalar_sum(), 10.);</span>
+    <span class="doccomment">/// assert_eq!(a.sum(), 10.);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_sum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">A</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">A</span>
         <span class="kw">where</span> <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">=</span><span class="ident">A</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">libnum</span>::<span class="ident">Zero</span>,
     {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">slc</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_slice_memory_order</span>() {
-            <span class="kw">return</span> <span class="ident">numeric_util</span>::<span class="ident">unrolled_sum</span>(<span class="ident">slc</span>);
+            <span class="kw">return</span> <span class="ident">numeric_util</span>::<span class="ident">unrolled_fold</span>(<span class="ident">slc</span>, <span class="ident">A</span>::<span class="ident">zero</span>, <span class="ident">A</span>::<span class="ident">add</span>);
         }
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sum</span> <span class="op">=</span> <span class="ident">A</span>::<span class="ident">zero</span>();
         <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">inner_rows</span>() {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">slc</span>) <span class="op">=</span> <span class="ident">row</span>.<span class="ident">as_slice</span>() {
-                <span class="ident">sum</span> <span class="op">=</span> <span class="ident">sum</span> <span class="op">+</span> <span class="ident">numeric_util</span>::<span class="ident">unrolled_sum</span>(<span class="ident">slc</span>);
+                <span class="ident">sum</span> <span class="op">=</span> <span class="ident">sum</span> <span class="op">+</span> <span class="ident">numeric_util</span>::<span class="ident">unrolled_fold</span>(<span class="ident">slc</span>, <span class="ident">A</span>::<span class="ident">zero</span>, <span class="ident">A</span>::<span class="ident">add</span>);
             } <span class="kw">else</span> {
                 <span class="ident">sum</span> <span class="op">=</span> <span class="ident">sum</span> <span class="op">+</span> <span class="ident">row</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="ident">A</span>::<span class="ident">zero</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">elt</span><span class="op">|</span> <span class="ident">acc</span> <span class="op">+</span> <span class="ident">elt</span>.<span class="ident">clone</span>());
+            }
+        }
+        <span class="ident">sum</span>
+    }
+
+    <span class="doccomment">/// Return the sum of all elements in the array.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// *This method has been renamed to `.sum()` and will be deprecated in the</span>
+    <span class="doccomment">/// next version.*</span>
+    <span class="comment">// #[deprecated(note=&quot;renamed to `sum`&quot;, since=&quot;0.13&quot;)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_sum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">A</span>
+        <span class="kw">where</span> <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">=</span><span class="ident">A</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">libnum</span>::<span class="ident">Zero</span>,
+    {
+        <span class="self">self</span>.<span class="ident">sum</span>()
+    }
+
+    <span class="doccomment">/// Return the product of all elements in the array.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use ndarray::arr2;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let a = arr2(&amp;[[1., 2.],</span>
+    <span class="doccomment">///                [3., 4.]]);</span>
+    <span class="doccomment">/// assert_eq!(a.product(), 24.);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">product</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">A</span>
+        <span class="kw">where</span> <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">=</span><span class="ident">A</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">libnum</span>::<span class="ident">One</span>,
+    {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">slc</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_slice_memory_order</span>() {
+            <span class="kw">return</span> <span class="ident">numeric_util</span>::<span class="ident">unrolled_fold</span>(<span class="ident">slc</span>, <span class="ident">A</span>::<span class="ident">one</span>, <span class="ident">A</span>::<span class="ident">mul</span>);
+        }
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sum</span> <span class="op">=</span> <span class="ident">A</span>::<span class="ident">one</span>();
+        <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">inner_rows</span>() {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">slc</span>) <span class="op">=</span> <span class="ident">row</span>.<span class="ident">as_slice</span>() {
+                <span class="ident">sum</span> <span class="op">=</span> <span class="ident">sum</span> <span class="op">*</span> <span class="ident">numeric_util</span>::<span class="ident">unrolled_fold</span>(<span class="ident">slc</span>, <span class="ident">A</span>::<span class="ident">one</span>, <span class="ident">A</span>::<span class="ident">mul</span>);
+            } <span class="kw">else</span> {
+                <span class="ident">sum</span> <span class="op">=</span> <span class="ident">sum</span> <span class="op">*</span> <span class="ident">row</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="ident">A</span>::<span class="ident">one</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">elt</span><span class="op">|</span> <span class="ident">acc</span> <span class="op">*</span> <span class="ident">elt</span>.<span class="ident">clone</span>());
             }
         }
         <span class="ident">sum</span>
@@ -276,17 +390,17 @@
               <span class="ident">D</span>: <span class="ident">RemoveAxis</span>,
     {
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len_of</span>(<span class="ident">axis</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">subview</span>(<span class="ident">axis</span>, <span class="number">0</span>).<span class="ident">to_owned</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Array</span>::<span class="ident">zeros</span>(<span class="self">self</span>.<span class="ident">raw_dim</span>().<span class="ident">remove_axis</span>(<span class="ident">axis</span>));
         <span class="kw">let</span> <span class="ident">stride</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">strides</span>()[<span class="ident">axis</span>.<span class="ident">index</span>()];
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ndim</span>() <span class="op">==</span> <span class="number">2</span> <span class="op">&amp;&amp;</span> <span class="ident">stride</span> <span class="op">==</span> <span class="number">1</span> {
             <span class="comment">// contiguous along the axis we are summing</span>
             <span class="kw">let</span> <span class="ident">ax</span> <span class="op">=</span> <span class="ident">axis</span>.<span class="ident">index</span>();
             <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">elt</span>) <span class="kw">in</span> <span class="ident">enumerate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">res</span>) {
-                <span class="kw-2">*</span><span class="ident">elt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">subview</span>(<span class="ident">Axis</span>(<span class="number">1</span> <span class="op">-</span> <span class="ident">ax</span>), <span class="ident">i</span>).<span class="ident">scalar_sum</span>();
+                <span class="kw-2">*</span><span class="ident">elt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index_axis</span>(<span class="ident">Axis</span>(<span class="number">1</span> <span class="op">-</span> <span class="ident">ax</span>), <span class="ident">i</span>).<span class="ident">sum</span>();
             }
         } <span class="kw">else</span> {
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">1</span>..<span class="ident">n</span> {
-                <span class="kw">let</span> <span class="ident">view</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">subview</span>(<span class="ident">axis</span>, <span class="ident">i</span>);
+            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
+                <span class="kw">let</span> <span class="ident">view</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index_axis</span>(<span class="ident">axis</span>, <span class="ident">i</span>);
                 <span class="ident">res</span> <span class="op">=</span> <span class="ident">res</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">view</span>;
             }
         }
@@ -295,7 +409,8 @@
 
     <span class="doccomment">/// Return mean along `axis`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panics** if `axis` is out of bounds.</span>
+    <span class="doccomment">/// **Panics** if `axis` is out of bounds or if the length of the axis is</span>
+    <span class="doccomment">/// zero and division by zero panics for type `A`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use ndarray::{aview1, arr2, Axis};</span>
@@ -308,13 +423,13 @@
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mean_axis</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">axis</span>: <span class="ident">Axis</span>) <span class="op">-&gt;</span> <span class="ident">Array</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">D</span>::<span class="ident">Smaller</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">A</span>: <span class="ident">LinalgScalar</span>,
+        <span class="kw">where</span> <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Zero</span> <span class="op">+</span> <span class="ident">One</span> <span class="op">+</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">=</span><span class="ident">A</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">=</span><span class="ident">A</span><span class="op">&gt;</span>,
               <span class="ident">D</span>: <span class="ident">RemoveAxis</span>,
     {
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len_of</span>(<span class="ident">axis</span>);
         <span class="kw">let</span> <span class="ident">sum</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sum_axis</span>(<span class="ident">axis</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cnt</span> <span class="op">=</span> <span class="ident">A</span>::<span class="ident">one</span>();
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">1</span>..<span class="ident">n</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cnt</span> <span class="op">=</span> <span class="ident">A</span>::<span class="ident">zero</span>();
+        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
             <span class="ident">cnt</span> <span class="op">=</span> <span class="ident">cnt</span> <span class="op">+</span> <span class="ident">A</span>::<span class="ident">one</span>();
         }
         <span class="ident">sum</span> <span class="op">/</span> <span class="kw-2">&amp;</span><span class="ident">aview0</span>(<span class="kw-2">&amp;</span><span class="ident">cnt</span>)
@@ -380,8 +495,55 @@
                     of the axis you are computing the variance for!&quot;</span>)
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="ident">dof</span> <span class="op">=</span> <span class="ident">count</span> <span class="op">-</span> <span class="ident">ddof</span>;
-            <span class="ident">sum_sq</span>.<span class="ident">mapv</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span> <span class="op">/</span> <span class="ident">dof</span>)
+            <span class="ident">sum_sq</span>.<span class="ident">mapv_into</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span> <span class="op">/</span> <span class="ident">dof</span>)
         }
+    }
+
+    <span class="doccomment">/// Return standard deviation along `axis`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The standard deviation is computed from the variance using</span>
+    <span class="doccomment">/// the [Welford one-pass algorithm](https://www.jstor.org/stable/1266577).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The parameter `ddof` specifies the &quot;delta degrees of freedom&quot;. For</span>
+    <span class="doccomment">/// example, to calculate the population standard deviation, use `ddof = 0`,</span>
+    <span class="doccomment">/// or to calculate the sample standard deviation, use `ddof = 1`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The standard deviation is defined as:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```text</span>
+    <span class="doccomment">///                    1       n</span>
+    <span class="doccomment">/// stddev = sqrt ( ――――――――   ∑ (xᵢ - x̅)² )</span>
+    <span class="doccomment">///                 n - ddof  i=1</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// where</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```text</span>
+    <span class="doccomment">///     1   n</span>
+    <span class="doccomment">/// x̅ = ―   ∑ xᵢ</span>
+    <span class="doccomment">///     n  i=1</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Panics** if `ddof` is greater than or equal to the length of the</span>
+    <span class="doccomment">/// axis, if `axis` is out of bounds, or if the length of the axis is zero.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use ndarray::{aview1, arr2, Axis};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let a = arr2(&amp;[[1., 2.],</span>
+    <span class="doccomment">///                [3., 4.],</span>
+    <span class="doccomment">///                [5., 6.]]);</span>
+    <span class="doccomment">/// let stddev = a.std_axis(Axis(0), 1.);</span>
+    <span class="doccomment">/// assert_eq!(stddev, aview1(&amp;[2., 2.]));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">std_axis</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">axis</span>: <span class="ident">Axis</span>, <span class="ident">ddof</span>: <span class="ident">A</span>) <span class="op">-&gt;</span> <span class="ident">Array</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">D</span>::<span class="ident">Smaller</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">A</span>: <span class="ident">Float</span>,
+        <span class="ident">D</span>: <span class="ident">RemoveAxis</span>,
+    {
+        <span class="self">self</span>.<span class="ident">var_axis</span>(<span class="ident">axis</span>, <span class="ident">ddof</span>).<span class="ident">mapv_into</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">sqrt</span>())
     }
 
     <span class="doccomment">/// Return `true` if the arrays&#39; elementwise differences are all within</span>

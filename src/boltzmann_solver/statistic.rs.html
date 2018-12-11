@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/statistic.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>statistic.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/statistic.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>statistic.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -527,6 +527,88 @@
 <span id="527">527</span>
 <span id="528">528</span>
 <span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! If the rate of collisions between particles is sufficiently high (as is</span>
 <span class="doccomment">//! usually the case), the phase space distribution of the particles will</span>
@@ -545,7 +627,16 @@
 <span class="kw">use</span> <span class="ident">special_functions</span>::{<span class="ident">bessel</span>, <span class="ident">polylog</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f64</span>;
 
-<span class="kw">use</span> <span class="ident">constants</span>::<span class="ident">PI_M2</span>;
+<span class="kw">use</span> <span class="ident">constants</span>::{<span class="ident">PI_M2</span>, <span class="ident">ZETA_3</span>};
+
+<span class="doccomment">/// Equilibrium number density for massless bosons, normalized to the</span>
+<span class="doccomment">/// equilibrium number density of a massless boson.  This is specified per</span>
+<span class="doccomment">/// degree of freedom (that is \\(g = 1\\)).</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BOSON_EQ_DENSITY</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">1.0</span>;
+<span class="doccomment">/// Equilibrium number density for massless fermions, normalized to the</span>
+<span class="doccomment">/// equilibrium number density of a massless boson.  This is specified per</span>
+<span class="doccomment">/// degree of freedom (that is \\(g = 1\\))</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FERMION_EQ_DENSITY</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.75</span>;
 
 <span class="doccomment">/// The statistics which describe the distribution of particles over energy</span>
 <span class="doccomment">/// states.  Both Fermi–Dirac and Bose–Einstein quantum statistics are</span>
@@ -615,6 +706,11 @@
         <span class="number">0.050_660_591_821_168_89</span> <span class="op">*</span> <span class="ident">integral</span>.<span class="ident">integral</span>
     }
 
+    <span class="doccomment">/// Return number density for a particle following the specified statistic,</span>
+    <span class="doccomment">/// normalized to the number density of a massless boson with a single</span>
+    <span class="doccomment">/// degree of freedom.</span>
+    <span class="kw">fn</span> <span class="ident">normalized_number_density</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mass</span>: <span class="ident">f64</span>, <span class="ident">mu</span>: <span class="ident">f64</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span>;
+
     <span class="doccomment">/// Return number density for a massless particle following the specified</span>
     <span class="doccomment">/// statistic.</span>
     <span class="doccomment">///</span>
@@ -673,8 +769,9 @@
     <span class="doccomment">/// # Implementation Details</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Both the Fermi–Dirac and Bose–Einstein statistic rely on numerical</span>
-    <span class="doccomment">/// integration and thus are fairly slow.  The Maxwell–Boltzmann and</span>
-    <span class="doccomment">/// Maxwell–Jüttner distributions offer exact implementations.</span>
+    <span class="doccomment">/// integration and thus are fairly slow and are prone to errors in certain</span>
+    <span class="doccomment">/// regimes.  The Maxwell–Boltzmann and Maxwell–Jüttner distributions offer</span>
+    <span class="doccomment">/// exact implementations.</span>
     <span class="kw">fn</span> <span class="ident">number_density</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mass</span>: <span class="ident">f64</span>, <span class="ident">mu</span>: <span class="ident">f64</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
         <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">mass</span> <span class="op">&gt;=</span> <span class="number">0.0</span>, <span class="string">&quot;mass must be positive.&quot;</span>);
         <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">beta</span> <span class="op">&gt;=</span> <span class="number">0.0</span>, <span class="string">&quot;β must be positive.&quot;</span>);
@@ -704,6 +801,12 @@
                     <span class="string">&quot;Fermi–Dirac integral: {:e} ± {:e} ({} function evaluations)&quot;</span>,
                     <span class="ident">integral</span>.<span class="ident">integral</span>, <span class="ident">integral</span>.<span class="ident">error_estimate</span>, <span class="ident">integral</span>.<span class="ident">num_function_evaluations</span>
                 );
+                <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">debug_assertions</span>) <span class="op">&amp;&amp;</span> <span class="ident">integral</span>.<span class="ident">error_estimate</span> <span class="op">&gt;</span> <span class="number">0.01</span> <span class="op">*</span> <span class="ident">integral</span>.<span class="ident">integral</span> {
+                    <span class="macro">warn</span><span class="macro">!</span>(
+                        <span class="string">&quot;Fermi–Dirac integral has a relative error of {:0.2}%&quot;</span>,
+                        <span class="ident">integral</span>.<span class="ident">error_estimate</span> <span class="op">/</span> <span class="ident">integral</span>.<span class="ident">integral</span>.<span class="ident">abs</span>()
+                    );
+                }
                 <span class="comment">// 1/(2 π²) ≅ 0.050_660_591_821_168_89</span>
                 <span class="number">0.050_660_591_821_168_89</span> <span class="op">*</span> <span class="ident">integral</span>.<span class="ident">integral</span>
             }
@@ -731,6 +834,12 @@
                     <span class="string">&quot;Bose–Einstein integral: {:e} ± {:e} ({} function evaluations)&quot;</span>,
                     <span class="ident">integral</span>.<span class="ident">integral</span>, <span class="ident">integral</span>.<span class="ident">error_estimate</span>, <span class="ident">integral</span>.<span class="ident">num_function_evaluations</span>
                 );
+                <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">debug_assertions</span>) <span class="op">&amp;&amp;</span> <span class="ident">integral</span>.<span class="ident">error_estimate</span> <span class="op">&gt;</span> <span class="number">0.01</span> <span class="op">*</span> <span class="ident">integral</span>.<span class="ident">integral</span> {
+                    <span class="macro">warn</span><span class="macro">!</span>(
+                        <span class="string">&quot;Bose–Einstein integral has a relative error of {:0.2}%&quot;</span>,
+                        <span class="ident">integral</span>.<span class="ident">error_estimate</span> <span class="op">/</span> <span class="ident">integral</span>.<span class="ident">integral</span>.<span class="ident">abs</span>()
+                    );
+                }
                 <span class="comment">// 1/(2 π²) ≅ 0.050_660_591_821_168_89</span>
                 <span class="number">0.050_660_591_821_168_89</span> <span class="op">*</span> <span class="ident">integral</span>.<span class="ident">integral</span>
             }
@@ -751,6 +860,61 @@
                 <span class="kw">let</span> <span class="ident">m_beta</span> <span class="op">=</span> <span class="ident">mass</span> <span class="op">*</span> <span class="ident">beta</span>;
                 <span class="ident">PI_M2</span> <span class="op">*</span> (<span class="ident">m_beta</span> <span class="op">+</span> <span class="number">2.0</span>) <span class="op">*</span> (<span class="ident">m_beta</span> <span class="op">*</span> (<span class="ident">m_beta</span> <span class="op">+</span> <span class="number">3.0</span>) <span class="op">+</span> <span class="number">6.0</span>)
                     <span class="op">/</span> (<span class="ident">beta</span>.<span class="ident">powi</span>(<span class="number">4</span>) <span class="op">*</span> <span class="ident">mass</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">exp</span>(<span class="ident">m_beta</span>) <span class="op">*</span> <span class="ident">bessel</span>::<span class="ident">k_2</span>(<span class="ident">m_beta</span>))
+            }
+        }
+    }
+
+    <span class="doccomment">/// Return number density for a particle following the specified statistic,</span>
+    <span class="doccomment">/// normalized to the number density of a massless boson with a single</span>
+    <span class="doccomment">/// degree of freedom.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Implementation Details</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This implementation assumes that the chemical potential is negligible.</span>
+    <span class="kw">fn</span> <span class="ident">normalized_number_density</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mass</span>: <span class="ident">f64</span>, <span class="ident">mu</span>: <span class="ident">f64</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
+        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">mass</span> <span class="op">&gt;=</span> <span class="number">0.0</span>, <span class="string">&quot;mass must be positive.&quot;</span>);
+        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">beta</span> <span class="op">&gt;=</span> <span class="number">0.0</span>, <span class="string">&quot;β must be positive.&quot;</span>);
+        <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">debug_assertions</span>) <span class="op">&amp;&amp;</span> <span class="ident">mu</span> <span class="op">&gt;</span> <span class="number">0.01</span> <span class="op">*</span> <span class="ident">mass</span> {
+            <span class="macro">warn</span><span class="macro">!</span>(
+                <span class="string">&quot;The chemical potential should be negligible.  The result may not be
+    reliable.&quot;</span>
+            );
+        }
+
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">Statistic</span>::<span class="ident">FermiDirac</span> <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="ident">m_beta</span> <span class="op">=</span> <span class="ident">mass</span> <span class="op">*</span> <span class="ident">beta</span>;
+                <span class="kw">if</span> <span class="ident">m_beta</span> <span class="op">&lt;</span> <span class="number">1e-4</span> {
+                    <span class="number">0.75</span>
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">m_beta</span> <span class="op">&gt;</span> <span class="number">1e4</span> {
+                    <span class="number">0.0</span>
+                } <span class="kw">else</span> {
+                    <span class="number">0.75</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">exp</span>(<span class="op">-</span><span class="ident">m_beta</span> <span class="op">-</span> (<span class="number">2.75612</span> <span class="op">+</span> <span class="number">2.11777</span> <span class="op">*</span> <span class="ident">m_beta</span>.<span class="ident">powf</span>(<span class="op">-</span><span class="number">0.920_114</span>)).<span class="ident">recip</span>())
+                        <span class="op">*</span> (<span class="number">1.0</span> <span class="op">+</span> <span class="ident">m_beta</span>.<span class="ident">powf</span>(<span class="number">1.5</span>))
+                        <span class="op">*</span> (<span class="number">1.0</span>
+                            <span class="op">+</span> <span class="number">0.390_466</span>
+                                <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">exp</span>(<span class="op">-</span>(<span class="number">0.460_648</span> <span class="op">*</span> <span class="ident">m_beta</span>.<span class="ident">ln</span>() <span class="op">-</span> <span class="number">0.011_632_3</span>).<span class="ident">powi</span>(<span class="number">2</span>)))
+                }
+            }
+            <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span> <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="ident">m_beta</span> <span class="op">=</span> <span class="ident">mass</span> <span class="op">*</span> <span class="ident">beta</span>;
+                <span class="kw">if</span> <span class="ident">m_beta</span> <span class="op">&lt;</span> <span class="number">1e-4</span> {
+                    <span class="number">1.0</span>
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">m_beta</span> <span class="op">&gt;</span> <span class="number">1e4</span> {
+                    <span class="number">0.0</span>
+                } <span class="kw">else</span> {
+                    <span class="ident">f64</span>::<span class="ident">exp</span>(<span class="op">-</span><span class="ident">m_beta</span> <span class="op">-</span> (<span class="number">1.53451</span> <span class="op">+</span> <span class="number">1.3537</span> <span class="op">*</span> <span class="ident">m_beta</span>.<span class="ident">powf</span>(<span class="op">-</span><span class="number">1.17357</span>)).<span class="ident">recip</span>())
+                        <span class="op">*</span> (<span class="number">1.0</span> <span class="op">+</span> <span class="ident">m_beta</span>.<span class="ident">powf</span>(<span class="number">1.5</span>))
+                }
+            }
+            <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span> <span class="op">=&gt;</span> {
+                <span class="comment">// 1/(2 ζ(3)) ≅ 0.415_953_686_290_353_734_34</span>
+                <span class="number">0.415_953_686_290_353_73</span> <span class="op">*</span> <span class="ident">mass</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">*</span> <span class="ident">bessel</span>::<span class="ident">k_2</span>(<span class="ident">mass</span> <span class="op">*</span> <span class="ident">beta</span>) <span class="op">*</span> <span class="ident">beta</span>.<span class="ident">powi</span>(<span class="number">2</span>)
+            }
+            <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span> <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="ident">m_beta</span> <span class="op">=</span> <span class="ident">mass</span> <span class="op">*</span> <span class="ident">beta</span>;
+                (<span class="ident">m_beta</span> <span class="op">+</span> <span class="number">2.0</span>) <span class="op">*</span> (<span class="ident">m_beta</span> <span class="op">*</span> (<span class="ident">m_beta</span> <span class="op">+</span> <span class="number">3.0</span>) <span class="op">+</span> <span class="number">6.0</span>)
+                    <span class="op">/</span> (<span class="ident">ZETA_3</span> <span class="op">*</span> <span class="ident">m_beta</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">exp</span>(<span class="ident">m_beta</span>) <span class="op">*</span> <span class="ident">bessel</span>::<span class="ident">k_2</span>(<span class="ident">m_beta</span>))
             }
         }
     }
@@ -802,7 +966,7 @@
         <span class="kw">let</span> <span class="ident">mb</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span>;
         <span class="kw">let</span> <span class="ident">mj</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/phase_space.csv&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;tests/data/phase_space.csv&quot;</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">for</span> <span class="ident">result</span> <span class="kw">in</span> <span class="ident">rdr</span>.<span class="ident">deserialize</span>() {
             <span class="kw">let</span> (<span class="ident">e</span>, <span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>, <span class="ident">f_fd</span>, <span class="ident">f_be</span>, <span class="ident">f_mb</span>, <span class="ident">f_mj</span>): <span class="ident">Row8</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap</span>();
@@ -834,7 +998,7 @@
         <span class="kw">let</span> <span class="ident">mb</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span>;
         <span class="kw">let</span> <span class="ident">mj</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;tests/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">for</span> <span class="ident">result</span> <span class="kw">in</span> <span class="ident">rdr</span>.<span class="ident">deserialize</span>() {
             <span class="kw">let</span> (<span class="ident">m</span>, <span class="ident">mu</span>, <span class="ident">beta</span>, <span class="ident">n_fd</span>, <span class="ident">n_be</span>, <span class="ident">n_mb</span>, <span class="ident">n_mj</span>): <span class="ident">Row7</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap</span>();
@@ -871,7 +1035,7 @@
         <span class="kw">let</span> <span class="ident">mb</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span>;
         <span class="kw">let</span> <span class="ident">mj</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;tests/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">for</span> <span class="ident">result</span> <span class="kw">in</span> <span class="ident">rdr</span>.<span class="ident">deserialize</span>() {
             <span class="kw">let</span> (<span class="ident">mu</span>, <span class="ident">beta</span>, <span class="ident">n_fd</span>, <span class="ident">n_be</span>, <span class="ident">n_mb</span>, <span class="ident">n_mj</span>): <span class="ident">Row6</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap</span>();
@@ -912,7 +1076,7 @@
     <span class="attribute">#[<span class="ident">bench</span>]</span>
     <span class="kw">fn</span> <span class="ident">fermi_dirac_massive</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">fd</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">FermiDirac</span>;
-        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;tests/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>
             .<span class="ident">into_deserialize</span>()
             .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
@@ -930,7 +1094,7 @@
     <span class="attribute">#[<span class="ident">bench</span>]</span>
     <span class="kw">fn</span> <span class="ident">bose_einstein_massive</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">be</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span>;
-        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;tests/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>
             .<span class="ident">into_deserialize</span>()
             .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
@@ -952,7 +1116,7 @@
     <span class="attribute">#[<span class="ident">bench</span>]</span>
     <span class="kw">fn</span> <span class="ident">maxwell_boltzmann_massive</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">mb</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span>;
-        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;tests/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>
             .<span class="ident">into_deserialize</span>()
             .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
@@ -970,7 +1134,7 @@
     <span class="attribute">#[<span class="ident">bench</span>]</span>
     <span class="kw">fn</span> <span class="ident">maxwell_juttner_massive</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">mj</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span>;
-        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;tests/data/number_density_massive.csv&quot;</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row7</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>
             .<span class="ident">into_deserialize</span>()
             .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
@@ -988,7 +1152,7 @@
     <span class="attribute">#[<span class="ident">bench</span>]</span>
     <span class="kw">fn</span> <span class="ident">fermi_dirac_massless</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">fd</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">FermiDirac</span>;
-        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;tests/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row6</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>
             .<span class="ident">into_deserialize</span>()
             .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
@@ -1006,7 +1170,7 @@
     <span class="attribute">#[<span class="ident">bench</span>]</span>
     <span class="kw">fn</span> <span class="ident">bose_einstein_massless</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">be</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span>;
-        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;tests/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row6</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>
             .<span class="ident">into_deserialize</span>()
             .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
@@ -1024,7 +1188,7 @@
     <span class="attribute">#[<span class="ident">bench</span>]</span>
     <span class="kw">fn</span> <span class="ident">maxwell_boltzmann_massless</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">mb</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellBoltzmann</span>;
-        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;tests/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row6</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>
             .<span class="ident">into_deserialize</span>()
             .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
@@ -1042,7 +1206,7 @@
     <span class="attribute">#[<span class="ident">bench</span>]</span>
     <span class="kw">fn</span> <span class="ident">maxwell_juttner_massless</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">mj</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">MaxwellJuttner</span>;
-        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;test/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">rdr</span> <span class="op">=</span> <span class="ident">csv</span>::<span class="ident">Reader</span>::<span class="ident">from_path</span>(<span class="string">&quot;tests/data/number_density_massless.csv&quot;</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row6</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdr</span>
             .<span class="ident">into_deserialize</span>()
             .<span class="ident">step_by</span>(<span class="ident">STEP_SIZE</span>)
