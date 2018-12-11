@@ -273,7 +273,7 @@ impl Statistics for Statistic {
             Statistic::FermiDirac => {
                 let m_beta = mass * beta;
                 if m_beta < 1e-4 {
-                    0.76
+                    0.75
                 } else if m_beta > 1e4 {
                     0.0
                 } else {
