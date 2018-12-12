@@ -82,47 +82,6 @@
 //!         \abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f^{(0)}_i \right).
 //!   \\end{equation}
 //!
-// //! - *Assume \\(\mathcal{CP}\\) symmetry.* If \\(\mathcal{CP}\\) symmetry is
-// //!   assumed, then \\(\abs{\mathcal M(\vt a \to \vt b)}^2 \equiv \abs{\mathcal
-// //!   M(\vt b \to \vt a)}^2\\).  This simplification allows for the exponentials
-// //!   of \\(\mu\\) to be taken out of the integral entirely:
-// //!
-// //!   \\begin{equation}
-// //!     g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
-// //!       = - \left[ e^{ \beta \sum_{\vt a} \mu_i } - e^{ \beta \sum_{\vt b} \mu_i } \right]
-// //!            \int_{\vt a}^{\vt b} \abs{\mathcal M(\vt a \to \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i }.
-// //!   \\end{equation}
-// //!
-// //!   The remaining integrand is then independent of time and can be
-// //!   pre-calculated.  In the case of a \\(2 \leftrightarrow 2\\) interaction,
-// //!   this integral is related to the thermally averaged cross-section
-// //!   \\(\angles{\sigma v_\text{rel}}\\).
-// //!
-// //!   Solving the Boltzmann equation is generally required within the context of
-// //!   baryogenesis and leptogenesis where the assumption of \\(\mathcal{CP}\\)
-// //!   symmetry is evidently not correct.  In such cases, it is convenient to
-// //!   define the parameter \\(\epsilon\\) to account for all of the
-// //!   \\(\mathcal{CP}\\) asymmetry as.  That is:
-// //!
-// //!   \\begin{equation}
-// //!     \abs{\mathcal M(\vt a \to \vt b)}^2 = (1 + \epsilon) \abs{\mathcal{M^{(0)}(\vt a \to \vt b)}}^2, \qquad
-// //!     \abs{\mathcal M(\vt b \to \vt a)}^2 = (1 - \epsilon) \abs{\mathcal{M^{(0)}(\vt a \to \vt b)}}^2,
-// //!   \\end{equation}
-// //!
-// //!   where \\(\abs{\mathcal{M^{(0)}}(\vt a \to \vt b)}^2\\) is the
-// //!   \\(\mathcal{CP}\\)-symmetric squared amplitude.  With \\(\epsilon\\)
-// //!   defined as above, the collision term becomes:
-// //!
-// //!   \\begin{equation}
-// //!     \begin{aligned}
-// //!       g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
-// //!         &= - \left[ e^{ \beta \sum_{\vt a} \mu_i } - e^{ \beta \sum_{\vt b} \mu_i } \right] \times
-// //!              \int_{\vt a}^{\vt b} \abs{\mathcal M^{(0)}(\vt a \to \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i } \\\\
-// //!         &\quad - \left[ e^{ \beta \sum_{\vt a} \mu_i } + e^{ \beta \sum_{\vt b} \mu_i } \right] \times
-// //!              \int_{\vt a}^{\vt b} \epsilon \abs{\mathcal M^{(0)}(\vt a \to \vt b)}^2 e^{ - \beta \sum_{\vt a} E_i }.
-// //!     \\end{aligned}
-// //!   \\end{equation}
-//!
 //! # Interactions
 //!
 //! The majority of interactions can be accounted for by looking at simply \\(1
@@ -295,19 +254,6 @@
 //! factorization in separate squared amplitude.  Furthermore if there are
 //! multiple intermediate states, the mixing between these states must also be
 //! taken into account.
-
-// //!
-// //! ## Two-to-\\(n\\) Scattering
-// //!
-// //! In \\(2 \to n\\) scattering, the initial state phase space integration can
-// //! be done as before resulting in the same expression as above featuring the
-// //! reduced cross-section; however, simplifying the final state phase space
-// //! integration will depend on the nature of the process.  The general form of
-// //! the reduced cross-section is:
-// //!
-// //! \\begin{equation}
-// //!   \hat \sigma_{ab}^{\vt c}(s) = \Phi_{2}(q_{ab}; p_a, p_b) \int \left( \prod_{i \in \vt c} \dd \Pi_i \right) (2 \pi)^4 \delta^4(q_{ab} - p_{\vt c}) \abs{\mathcal M(ab \to \vt c)}^2
-// //! \\end{equation}
 
 use super::{EmptyModel, ErrorTolerance, InitialCondition, Model, Solver, StepChange};
 use ndarray::{prelude::*, FoldWhile, Zip};
