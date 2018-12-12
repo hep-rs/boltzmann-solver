@@ -61,7 +61,7 @@ pub const PI_M5: f64 = 3.267_763_643_053_385_6e-3;
 /// The second column is the value of \\(g_{*}\\).
 ///
 /// Data is sourced from [`arXiv:1609.04979`](https://arxiv.org/abs/1609.04979).
-#[cfg_attr(feature = "cargo-clippy", allow(approx_constant))]
+#[allow(clippy::approx_constant)]
 pub(crate) const STANDARD_MODEL_GSTAR: [(f64, f64); 37] = [
     (-9.210_340_371_976_184, 106.75),
     (-8.517_193_191_416_238, 106.75),
@@ -111,7 +111,7 @@ pub(crate) const STANDARD_MODEL_GSTAR: [(f64, f64); 37] = [
 /// \\(\log(g_{*})\\).
 ///
 /// Data is sourced from [`arXiv:1609.04979`](https://arxiv.org/abs/1609.04979).
-#[cfg_attr(feature = "cargo-clippy", allow(approx_constant))]
+#[allow(clippy::approx_constant)]
 pub(crate) const FERMION_GSTAR: [(f64, f64); 21] = [
     (-2.302_585_092_994_046, -0.133_531_392_624_522_63),
     (-0.693_147_180_559_945_3, -0.134_674_903_326_601_6),
@@ -145,7 +145,7 @@ pub(crate) const FERMION_GSTAR: [(f64, f64); 21] = [
 /// \\(\log(g_{*})\\).
 ///
 /// Data is sourced from [`arXiv:1609.04979`](https://arxiv.org/abs/1609.04979).
-#[cfg_attr(feature = "cargo-clippy", allow(approx_constant))]
+#[allow(clippy::approx_constant)]
 pub(crate) const BOSON_GSTAR: [(f64, f64); 21] = [
     (-2.302_585_092_994_046, 0.0),
     (-0.693_147_180_559_945, -0.002_002_002_670_673_079_3),

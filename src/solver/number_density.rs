@@ -287,7 +287,7 @@ pub struct NumberDensitySolver<M: Model> {
     beta_range: (f64, f64),
     particles: Vec<Particle>,
     initial_conditions: Vec<f64>,
-    #[cfg_attr(feature = "cargo-clippy", allow(type_complexity))]
+    #[allow(clippy::type_complexity)]
     interactions: Vec<Box<Fn(Array1<f64>, &Array1<f64>, &Context<M>) -> Array1<f64>>>,
     logger: Box<Fn(&Array1<f64>, &Context<M>)>,
     step_change: StepChange,
