@@ -27,6 +27,25 @@ pub enum InitialCondition {
     Zero,
 }
 
+/// Contains all the information relevant to a particular model, including
+/// masses, widths and couplings.  All these attributes can be dependent on the
+/// inverse temperature \\(\beta\\).
+pub trait Model {
+    /// Instantiate a new instance of the model parameters with the values
+    /// calculated at the inverse temperature \\(\beta\\).
+    fn new(beta: f64) -> Self;
+}
+
+/// An empty model containing no couplings, masses, etc.  This is can be used
+/// for very simple implementations of the Boltzmann solver.
+pub struct EmptyModel;
+
+impl Model for EmptyModel {
+    fn new(_: f64) -> Self {
+        EmptyModel
+    }
+}
+
 /// Common interface for the Boltzmann equation solvers.
 pub trait Solver {
     /// The final solution by the solver.  This will typically be an array for

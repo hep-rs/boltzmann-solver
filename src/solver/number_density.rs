@@ -309,14 +309,14 @@
 // //!   \hat \sigma_{ab}^{\vt c}(s) = \Phi_{2}(q_{ab}; p_a, p_b) \int \left( \prod_{i \in \vt c} \dd \Pi_i \right) (2 \pi)^4 \delta^4(q_{ab} - p_{\vt c}) \abs{\mathcal M(ab \to \vt c)}^2
 // //! \\end{equation}
 
-use super::{ErrorTolerance, InitialCondition, Solver, StepChange};
+use super::{EmptyModel, ErrorTolerance, InitialCondition, Model, Solver, StepChange};
 use ndarray::{prelude::*, FoldWhile, Zip};
 use particle::Particle;
 use universe::Universe;
 
 /// Context provided containing pre-computed values which might be useful when
 /// evaluating interactions.
-pub struct Context {
+pub struct Context<M: Model> {
     /// Evaluation step
     pub step: u64,
     /// Inverse temperature in GeV^{-1}
@@ -327,6 +327,8 @@ pub struct Context {
     /// equilibrium number density for a massless boson with \\(g = 1\\).  This
     /// is provided in the same order as specified to the solver
     pub eq_n: Array1<f64>,
+    /// Model data
+    pub model: M,
 }
 
 /// Boltzmann equation solver for the number density.
@@ -334,26 +336,26 @@ pub struct Context {
 /// All number densities are normalized to that of a massless boson with a
 /// single degree of freedom (\\(g = 1\\)).  As a result of this convention,
 /// \\(n_\gamma = 2\\) as the photon has two degrees of freedom.
-pub struct NumberDensitySolver {
+pub struct NumberDensitySolver<M: Model> {
     initialized: bool,
     beta_range: (f64, f64),
     particles: Vec<Particle>,
     initial_conditions: Vec<f64>,
     #[cfg_attr(feature = "cargo-clippy", allow(type_complexity))]
-    interactions: Vec<Box<Fn(Array1<f64>, &Array1<f64>, &Context) -> Array1<f64>>>,
-    logger: Box<Fn(&Array1<f64>, &Context)>,
+    interactions: Vec<Box<Fn(Array1<f64>, &Array1<f64>, &Context<M>) -> Array1<f64>>>,
+    logger: Box<Fn(&Array1<f64>, &Context<M>)>,
     step_change: StepChange,
     error_tolerance: ErrorTolerance,
 }
 
-impl Solver for NumberDensitySolver {
+impl<M: Model> Solver for NumberDensitySolver<M> {
     /// The solution is a one-dimensional array of number densities for each
     /// particle species (or aggregated number density in the case of
     /// \\(n_{\mathsc{b-l}}\\)), in the same order as [`Solver::add_particle`]
     /// is invoked.
     type Solution = Array1<f64>;
 
-    type Context = Context;
+    type Context = Context<M>;
 
     /// Create a new instance of the number density solver.
     ///
@@ -560,7 +562,8 @@ impl Solver for NumberDensitySolver {
                     } else {
                         FoldWhile::Continue(e)
                     }
-                }).into_inner();
+                })
+                .into_inner();
 
             // Adjust the step size as needed based on the step size.
             if err < self.error_tolerance.lower {
@@ -606,13 +609,13 @@ impl Solver for NumberDensitySolver {
     }
 }
 
-impl Default for NumberDensitySolver {
+impl Default for NumberDensitySolver<EmptyModel> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl NumberDensitySolver {
+impl<M: Model> NumberDensitySolver<M> {
     /// Create an array containing the initial conditions for all the particle
     /// species.
     ///
@@ -627,12 +630,13 @@ impl NumberDensitySolver {
         )
     }
 
-    fn context<U: Universe>(&self, step: u64, beta: f64, universe: &U) -> Context {
+    fn context<U: Universe>(&self, step: u64, beta: f64, universe: &U) -> Context<M> {
         Context {
             step,
             beta,
             hubble_rate: universe.hubble_rate(beta),
             eq_n: self.equilibrium_number_densities(beta),
+            model: M::new(beta),
         }
     }
 }
@@ -647,7 +651,7 @@ mod test {
     #[test]
     fn no_interaction() {
         let phi = Particle::new(0, 1e3);
-        let mut solver = NumberDensitySolver::new()
+        let mut solver = NumberDensitySolver::default()
             .temperature_range(1e20, 1e-10)
             .initialize();
 
