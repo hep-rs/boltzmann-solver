@@ -10,7 +10,7 @@ extern crate special_functions;
 use boltzmann_solver::{
     constants::{PI_1, PI_5},
     particle::Particle,
-    solver::{number_density::NumberDensitySolver, InitialCondition, Solver},
+    solver::{number_density::NumberDensitySolver, InitialCondition, Model, Solver},
     universe::StandardModel,
 };
 use itertools::iproduct;
@@ -30,31 +30,97 @@ fn checked_div(a: f64, b: f64) -> f64 {
     }
 }
 
+struct Masses {
+    n: f64,
+    h: f64,
+}
+
+impl Masses {
+    fn new(beta: f64) -> Self {
+        Masses {
+            n: 1e10,
+            h: 0.4 / beta,
+        }
+    }
+}
+
+struct SquaredMasses {
+    n: f64,
+    h: f64,
+}
+
+impl SquaredMasses {
+    fn new(beta: f64) -> Self {
+        let m = Masses::new(beta);
+        SquaredMasses {
+            n: m.n.powi(2),
+            h: m.h.powi(2),
+        }
+    }
+}
+
+struct Widths {
+    // n: f64,
+    h: f64,
+}
+
+impl Widths {
+    fn new(beta: f64) -> Self {
+        let m = Masses::new(beta);
+        Widths {
+            // n: 0.0,
+            h: 0.1 * m.h,
+        }
+    }
+}
+
+struct SquaredWidths {
+    // n: f64,
+    h: f64,
+}
+
+impl SquaredWidths {
+    fn new(beta: f64) -> Self {
+        let w = Widths::new(beta);
+        SquaredWidths {
+            // n: w.n.powi(2),
+            h: w.h.powi(2),
+        }
+    }
+}
+
 #[allow(non_snake_case)]
-#[derive(Clone)]
-struct Couplings {
-    yukawa_HQu: Array2<Complex<f64>>,
-    yukawa_HQd: Array2<Complex<f64>>,
-    yukawa_HNL: Array2<Complex<f64>>,
+struct LeptogenesisModel {
+    mass: Masses,
+    mass2: SquaredMasses,
+    // width: Widths,
+    width2: SquaredWidths,
+    y_HQu: Array2<Complex<f64>>,
+    y_HQd: Array2<Complex<f64>>,
+    y_HNL: Array2<Complex<f64>>,
     epsilon: f64,
 }
 
-impl Couplings {
-    fn new() -> Self {
-        Couplings {
-            yukawa_HQu: array![
+impl Model for LeptogenesisModel {
+    fn new(beta: f64) -> Self {
+        LeptogenesisModel {
+            mass: Masses::new(beta),
+            mass2: SquaredMasses::new(beta),
+            // width: Widths::new(beta),
+            width2: SquaredWidths::new(beta),
+            y_HQu: array![
                 [Complex::new(172.200, 0.0), zero(), zero()],
                 [zero(), Complex::new(95e-3, 0.0), zero()],
                 [zero(), zero(), Complex::new(2.2e-3, 0.0)],
             ] * 2.0f64.sqrt()
                 / 246.0,
-            yukawa_HQd: array![
+            y_HQd: array![
                 [Complex::new(4.2, 0.0), zero(), zero()],
                 [zero(), Complex::new(1.25, 0.0), zero()],
                 [zero(), zero(), Complex::new(5e-3, 0.0)],
             ] * 2.0f64.sqrt()
                 / 246.0,
-            yukawa_HNL: array![[
+            y_HNL: array![[
                 Complex::new(1e-4, 0.0),
                 Complex::new(1e-4, 1e-5),
                 Complex::new(1e-4, 1e-5)
@@ -69,25 +135,18 @@ fn minimal_leptogenesis() {
     // Setup the directory for CSV output
     ::std::fs::create_dir("/tmp/minimal_leptogenesis/").unwrap_or(());
 
+    let model = LeptogenesisModel::new(1e-15);
+
     // Set up the universe in which we'll run the Boltzmann equations
     let universe = StandardModel::new();
 
     // Initialize particles we want to keep track of.  All other particles
     // are assumed to be always in equilibrium.
     let b_minus_l = Particle::new(0, 0.0).set_dof(0.0);
-    let n = Particle::new(1, 1e10);
-
-    // Thermal correction to the Higgs mass is given by:
-    //    Π = (3 / 16) (g2)² T² + (1 / 16) (g')² T²
-    let mass2_h = |beta: f64| 0.16 * beta.powi(-2);
-    // RH neutrino mass
-    let mass_n = n.mass;
-    let mass2_n = mass_n.powi(2);
-
-    let width2_h = |beta: f64| 0.01 * (0.16 * beta.powi(-2));
+    let n = Particle::new(1, model.mass.n);
 
     // Create the Solver and set integration parameters
-    let mut solver = NumberDensitySolver::new()
+    let mut solver: NumberDensitySolver<LeptogenesisModel> = NumberDensitySolver::new()
         .beta_range(1e-14, 1e0)
         .error_tolerance(1e-1, 1e-2)
         .initialize();
@@ -105,7 +164,6 @@ fn minimal_leptogenesis() {
         .serialize(("beta", "γ̃", "N₁ → HL", "HL → N₁"))
         .unwrap();
 
-    let couplings = Couplings::new();
     solver.add_interaction(move |mut s, n, ref c| {
         // Note that this is *not* exactly gamma and differs in the
         // normalization.  It actually just needs to be multiplied by n for
@@ -113,10 +171,10 @@ fn minimal_leptogenesis() {
         let gamma_tilde = {
             let mut m2 = 0.0;
             for b in 0..3 {
-                m2 += couplings.yukawa_HNL[[0, b]].norm_sqr();
+                m2 += c.model.y_HNL[[0, b]].norm_sqr();
             }
-            m2 *= (mass2_n - mass2_h(c.beta)) * bessel::k_1_on_k_2(mass_n * c.beta);
-            m2 /= c.hubble_rate * c.beta * 16.0 * PI_1 * mass_n;
+            m2 *= (c.model.mass2.n - c.model.mass2.h) * bessel::k_1_on_k_2(c.model.mass.n * c.beta);
+            m2 /= c.hubble_rate * c.beta * 16.0 * PI_1 * c.model.mass.n;
             m2
         };
 
@@ -126,7 +184,7 @@ fn minimal_leptogenesis() {
         let inverse_decay = c.eq_n[1] * gamma_tilde;
         let net_decay = decay - inverse_decay;
 
-        s[0] += -couplings.epsilon * net_decay - n[0] * inverse_decay;
+        s[0] += -c.model.epsilon * net_decay - n[0] * inverse_decay;
         s[1] -= net_decay;
 
         csv.borrow_mut()
@@ -145,36 +203,35 @@ fn minimal_leptogenesis() {
         .serialize(("beta", "N₁Q → Lq", "Lq → N₁Q"))
         .unwrap();
 
-    let couplings = Couplings::new();
     solver.add_interaction(move |mut s, n, ref c| {
         let mut gamma = {
-            let mass2_h = mass2_h(c.beta);
-            let width2_h = width2_h(c.beta);
-
             let mut m2 = 0.0;
             for (a2, b1, b2) in iproduct!(0..3, 0..3, 0..3) {
                 m2 += 9.0
-                    * couplings.yukawa_HNL[[0, a2]].norm_sqr()
-                    * (couplings.yukawa_HQd[[b1, b2]].norm_sqr()
-                        + couplings.yukawa_HQu[[b1, b2]].norm_sqr());
+                    * c.model.y_HNL[[0, a2]].norm_sqr()
+                    * (c.model.y_HQd[[b1, b2]].norm_sqr() + c.model.y_HQu[[b1, b2]].norm_sqr());
             }
 
             let s_integrand = |ss: f64| {
-                let s = mass2_n + (1.0 - ss) / ss;
+                let s = c.model.mass2.n + (1.0 - ss) / ss;
                 let dsdss = ss.powi(-2);
                 let sqrt_s = s.sqrt();
 
                 let t_integrand = |t: f64| {
-                    ( // s-channel
-                        s * (s - mass2_n) * (s - mass2_h).powi(2)
-                            / ((s - mass2_h).powi(2) + width2_h * mass2_h).powi(2)
-                    ) + ( // t-channel
-                          2.0 * (t + mass2_n) * (t + mass2_h).powi(2)
-                              / ((t + mass2_h).powi(2) + width2_h * mass2_h).powi(2)
-                      )
+                    (
+                        // s-channel
+                        s * (s - c.model.mass2.n) * (s - c.model.mass2.h).powi(2)
+                            / ((s - c.model.mass2.h).powi(2) + c.model.width2.h * c.model.mass2.h)
+                                .powi(2)
+                    ) + (
+                        // t-channel
+                        2.0 * (t + c.model.mass2.n) * (t + c.model.mass2.h).powi(2)
+                            / ((t + c.model.mass2.h).powi(2) + c.model.width2.h * c.model.mass2.h)
+                                .powi(2)
+                    )
                 };
 
-                integrate(t_integrand, mass2_n - s, 0.0, 0.0).integral
+                integrate(t_integrand, c.model.mass2.n - s, 0.0, 0.0).integral
                     * bessel::k_1(sqrt_s * c.beta)
                     / sqrt_s
                     * dsdss
