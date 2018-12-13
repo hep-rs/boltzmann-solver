@@ -529,7 +529,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 // integration take too long.  Use the result regardless even
                 // though it is bigger than desired error.
                 if beta / h > 1e5 {
-                    warn!(
+                    debug!(
                         "Step {:>7}, β = {:>9.2e} -> Step size getting too small (β / h = {:.1e}).",
                         step, beta, beta / h
                     );
