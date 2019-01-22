@@ -29,55 +29,13 @@ procedure uses only function evaluations (not derivatives). The state for root p
 solvers is held in a gsl_root_fdfsolver struct. The updates require both the function and
 its derivative (hence the name fdf) to be supplied by the user.</p>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RootFSolver.html"
-                                  title='struct rgsl::types::roots::RootFSolver'>RootFSolver</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RootFSolverType.html"
-                                  title='struct rgsl::types::roots::RootFSolverType'>RootFSolverType</a></td>
-                           <td class='docblock-short'>
-                                <p>The root bracketing algorithms described in this section require an initial interval which is
+<table><tr class='module-item'><td><a class="struct" href="struct.RootFSolver.html" title='rgsl::types::roots::RootFSolver struct'>RootFSolver</a></td><td class='docblock-short'></td></tr><tr class='module-item'><td><a class="struct" href="struct.RootFSolverType.html" title='rgsl::types::roots::RootFSolverType struct'>RootFSolverType</a></td><td class='docblock-short'><p>The root bracketing algorithms described in this section require an initial interval which is
 guaranteed to contain a root—if a and b are the endpoints of the interval then f (a) must
 differ in sign from f (b). This ensures that the function crosses zero at least once in the
 interval. If a valid initial interval is used then these algorithm cannot fail, provided the
 function is well-behaved.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RootFdfSolver.html"
-                                  title='struct rgsl::types::roots::RootFdfSolver'>RootFdfSolver</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RootFdfSolverType.html"
-                                  title='struct rgsl::types::roots::RootFdfSolverType'>RootFdfSolverType</a></td>
-                           <td class='docblock-short'>
-                                <p>The root polishing algorithms described in this section require an initial guess for the
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RootFdfSolver.html" title='rgsl::types::roots::RootFdfSolver struct'>RootFdfSolver</a></td><td class='docblock-short'></td></tr><tr class='module-item'><td><a class="struct" href="struct.RootFdfSolverType.html" title='rgsl::types::roots::RootFdfSolverType struct'>RootFdfSolverType</a></td><td class='docblock-short'><p>The root polishing algorithms described in this section require an initial guess for the
 location of the root. There is no absolute guarantee of convergence—the function must be
 suitable for this technique and the initial guess must be sufficiently close to the root
 for it to work. When these conditions are satisfied then convergence is quadratic.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RootFunction.html"
-                                  title='struct rgsl::types::roots::RootFunction'>RootFunction</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.RootFunctionFdf.html"
-                                  title='struct rgsl::types::roots::RootFunctionFdf'>RootFunctionFdf</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../";window.currentCrate = "rgsl";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script defer src="../../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RootFunction.html" title='rgsl::types::roots::RootFunction struct'>RootFunction</a></td><td class='docblock-short'></td></tr><tr class='module-item'><td><a class="struct" href="struct.RootFunctionFdf.html" title='rgsl::types::roots::RootFunctionFdf struct'>RootFunctionFdf</a></td><td class='docblock-short'></td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../";window.currentCrate = "rgsl";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script defer src="../../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>
