@@ -260,6 +260,8 @@ use ndarray::{prelude::*, FoldWhile, Zip};
 use particle::Particle;
 use universe::Universe;
 
+use super::tableau::rkf45::{RK_A, RK_B, RK_C, RK_ORDER};
+
 /// Context provided containing pre-computed values which might be useful when
 /// evaluating interactions.
 pub struct Context<M: Model> {
@@ -445,11 +447,13 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         let mut h = beta / 10.0;
 
         // Allocate variables which will be re-used each for loop
-        let mut k1: Self::Solution;
-        let mut k2: Self::Solution;
-        let mut k3: Self::Solution;
-        let mut k4: Self::Solution;
-        let mut tmp: Self::Solution;
+        let mut k: [Self::Solution; RK_ORDER + 1];
+        unsafe {
+            k = std::mem::uninitialized();
+            for ki in &mut k[..] {
+                std::ptr::write(ki, Self::Solution::zeros(n.dim()));
+            }
+        };
 
         let mut step = 0;
         while beta < self.beta_range.1 {
@@ -461,48 +465,43 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             // Run the logger now
             (*self.logger)(&n, &c);
 
-            // Standard Runge-Kutta integration.
-            k1 = self
+            // Runge–Kutta method
+            ////////////////////////////////////////
+
+            // 0th order term (Newton method) is always the same
+            k[0] = self
                 .interactions
                 .iter()
                 .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &n, &c))
                 * h;
 
-            let c = self.context(step, beta + 0.5 * h, universe);
-            tmp = &n + &(&k1 * 0.5);
-            k2 = self
-                .interactions
-                .iter()
-                .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &tmp, &c))
-                * h;
+            for i in 0..(RK_ORDER - 1) {
+                let c = self.context(step, beta + RK_C[i] * h, universe);
+                let n_tmp = (0..=i).fold(n.clone(), |total, j| total + &k[j] * RK_A[i][j]);
+                k[i + 1] = self
+                    .interactions
+                    .iter()
+                    .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &n_tmp, &c))
+                    * h;
+            }
 
-            let c = self.context(step, beta + 0.5 * h, universe);
-            tmp = &n + &(&k2 * 0.5);
-            k3 = self
-                .interactions
-                .iter()
-                .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &tmp, &c))
-                * h;
-
-            let c = self.context(step, beta + h, universe);
-            let tmp = &n + &k3;
-            k4 = self
-                .interactions
-                .iter()
-                .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &tmp, &c))
-                * h;
-
-            // Calculate dn.  Note that we consume k2, k3 and k4 here.  We use
-            // k1 by reference since we need it later to get the error estimate.
-            let dn = (k2 * 2.0 + k3 * 2.0 + k4 + &k1) / 6.0;
+            // Calculate dn.
+            let dn = [
+                (0..RK_ORDER).fold(Self::Solution::zeros(n.dim()), |total, i| {
+                    total + &(&k[i] * RK_B[0][i])
+                }),
+                (0..RK_ORDER).fold(Self::Solution::zeros(n.dim()), |total, i| {
+                    total + &(&k[i] * RK_B[1][i])
+                }),
+            ];
 
             // Check the error on the RK method vs the Euler method.  If it is
             // small enough, increase the step size.  We use the maximum error
             // for any given element of `dn`.
-            let err = Zip::from(&k1)
-                .and(&dn)
-                .fold_while(0.0, |e, k, d| {
-                    let v = (d / k - 1.0).abs();
+            let err = Zip::from(&dn[0])
+                .and(&dn[1])
+                .fold_while(0.0, |e, a, b| {
+                    let v = ((a - b) / a).abs();
                     if v.is_finite() && v > e {
                         FoldWhile::Continue(v)
                     } else {
@@ -537,12 +536,9 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                     while beta / h > 1e5 {
                         h *= self.step_change.increase;
                     }
-
-                    n += &dn;
-                    beta += h;
+                } else {
+                    continue;
                 }
-
-                continue;
             }
 
             n += &dn;

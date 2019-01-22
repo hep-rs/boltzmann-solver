@@ -5,6 +5,7 @@ use universe::Universe;
 
 pub mod number_density;
 pub mod phase_space;
+mod tableau;
 
 struct StepChange {
     increase: f64,
