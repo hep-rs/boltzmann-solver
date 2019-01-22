@@ -541,7 +541,15 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 }
             }
 
-            n += &dn;
+            Zip::from(&mut n).and(&dn[0]).apply(|n, dn| {
+                let next_n = *n + dn;
+                if next_n * (*n) >= 0.0 {
+                    *n = next_n;
+                } else {
+                    *n = 0.0;
+                }
+            });
+            // n += &dn[0];
             beta += h;
         }
 
