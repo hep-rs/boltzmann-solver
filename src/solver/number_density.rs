@@ -319,18 +319,9 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             initial_conditions: Vec::with_capacity(20),
             interactions: Vec::with_capacity(100),
             logger: Box::new(|_, _| {}),
-            step_change: StepChange {
-                increase: 1.1,
-                decrease: 0.5,
-            },
-            step_precision: StepPrecision {
-                min: 1e-6,
-                max: 1e-2,
-            },
-            error_tolerance: ErrorTolerance {
-                upper: 1e-2,
-                lower: 1e-5,
-            },
+            step_change: StepChange::default(),
+            step_precision: StepPrecision::default(),
+            error_tolerance: ErrorTolerance::default(),
         }
     }
 
