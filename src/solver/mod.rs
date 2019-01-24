@@ -12,9 +12,41 @@ struct StepChange {
     decrease: f64,
 }
 
+impl Default for StepChange {
+    fn default() -> Self {
+        StepChange {
+            increase: 1.1,
+            decrease: 0.5,
+        }
+    }
+}
+
+struct StepPrecision {
+    min: f64,
+    max: f64,
+}
+
+impl Default for StepPrecision {
+    fn default() -> Self {
+        StepPrecision {
+            min: 1e-6,
+            max: 1e-2,
+        }
+    }
+}
+
 struct ErrorTolerance {
     upper: f64,
     lower: f64,
+}
+
+impl Default for ErrorTolerance {
+    fn default() -> Self {
+        ErrorTolerance {
+            upper: 1e-2,
+            lower: 1e-5,
+        }
+    }
 }
 
 /// Initial conditions for a particle.
@@ -120,6 +152,29 @@ pub trait Solver {
     /// This will panic if the increase factor is not greater than `1.0` or if
     /// the decrease factor is not less than `1.0`.
     fn step_change(self, increase: f64, decrease: f64) -> Self;
+
+    /// Specify what the relative size of the step size can be.
+    ///
+    /// The time evolution is done with a step size of \\(h\\) such that
+    /// \\(\beta \to \beta + h\\) is the next step.  In general, one wants \\(h
+    /// < \beta\\) when solving the Boltzmann equations.  The values of `min`
+    /// and `max` specify how big \\(h\\) can be relative to \\(\beta\\):
+    ///
+    /// \\begin{equation}
+    ///   p_\text{min} \beta < h < p_\text{max} \beta
+    /// \\end{equation}
+    ///
+    /// The default values are `min = 1e-6` and `max = 1e-2`.
+    ///
+    /// The relative step precision has a higher priority on the step size than
+    /// the error.  That is, the step size will never be less than
+    /// \\(p_\text{min} \beta\\) even if this results in a larger local error
+    /// than desired.
+    ///
+    /// # Panic
+    ///
+    /// This will panic if `min >= max`.
+    fn step_precision(self, min: f64, max: f64) -> Self;
 
     /// Specify the local error tolerance.
     ///

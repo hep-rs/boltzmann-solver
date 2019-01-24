@@ -255,7 +255,9 @@
 //! multiple intermediate states, the mixing between these states must also be
 //! taken into account.
 
-use super::{EmptyModel, ErrorTolerance, InitialCondition, Model, Solver, StepChange};
+use super::{
+    EmptyModel, ErrorTolerance, InitialCondition, Model, Solver, StepChange, StepPrecision,
+};
 use ndarray::{prelude::*, FoldWhile, Zip};
 use particle::Particle;
 use universe::Universe;
@@ -293,6 +295,7 @@ pub struct NumberDensitySolver<M: Model> {
     interactions: Vec<Box<Fn(Array1<f64>, &Array1<f64>, &Context<M>) -> Array1<f64>>>,
     logger: Box<Fn(&Array1<f64>, &Context<M>)>,
     step_change: StepChange,
+    step_precision: StepPrecision,
     error_tolerance: ErrorTolerance,
 }
 
@@ -319,6 +322,10 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             step_change: StepChange {
                 increase: 1.1,
                 decrease: 0.5,
+            },
+            step_precision: StepPrecision {
+                min: 1e-6,
+                max: 1e-2,
             },
             error_tolerance: ErrorTolerance {
                 upper: 1e-2,
@@ -380,6 +387,15 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             than 1."
         );
         self.step_change = StepChange { increase, decrease };
+        self
+    }
+
+    fn step_precision(mut self, min: f64, max: f64) -> Self {
+        assert!(
+            min < max,
+            "Minimum step precision must be smaller than the maximum step precision."
+        );
+        self.step_precision = StepPrecision { min, max };
         self
     }
 
@@ -518,7 +534,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                     step, beta, h, err
                 );
 
-                if beta / h < 1e2 {
+                if beta * self.step_precision.max < h {
                     debug!(
                         "Step {:>7}, β = {:>9.2e} -> Step size getting too big (β / h = {:.1e}).",
                         step,
@@ -526,7 +542,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                         beta / h
                     );
 
-                    while beta / h < 1e2 {
+                    while beta * self.step_precision.max < h {
                         h *= self.step_change.decrease;
                     }
                 }
@@ -540,13 +556,13 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 // Prevent h from getting too small that it might make
                 // integration take too long.  Use the result regardless even
                 // though it is bigger than desired error.
-                if beta / h > 1e5 {
+                if beta * self.step_precision.min > h {
                     debug!(
                         "Step {:>7}, β = {:>9.2e} -> Step size getting too small (β / h = {:.1e}).",
                         step, beta, beta / h
                     );
 
-                    while beta / h > 1e5 {
+                    while beta * self.step_precision.min > h {
                         h *= self.step_change.increase;
                     }
                 } else {
