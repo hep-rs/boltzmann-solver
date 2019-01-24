@@ -45,7 +45,7 @@
 //! a)}^2\\)) while leaving all dependence on \\(E_i\\) and \\(\abs{\vt p_i}\\)
 //! explicit.
 
-use super::{ErrorTolerance, InitialCondition, Solver, StepChange};
+use super::{ErrorTolerance, InitialCondition, Solver, StepChange, StepPrecision};
 use ndarray::{prelude::*, Zip};
 use particle::Particle;
 use statistic::{
@@ -86,6 +86,7 @@ pub struct PhaseSpaceSolver {
     energy_steps: usize,
     energy_step_size: f64,
     step_change: StepChange,
+    step_precision: StepPrecision,
     error_tolerance: ErrorTolerance,
 }
 
@@ -123,14 +124,9 @@ impl Solver for PhaseSpaceSolver {
             energies: Array1::zeros(0),
             energy_steps: 2usize.pow(10),
             energy_step_size: 0.0,
-            step_change: StepChange {
-                increase: 1.1,
-                decrease: 0.5,
-            },
-            error_tolerance: ErrorTolerance {
-                upper: 1e-2,
-                lower: 1e-5,
-            },
+            step_change: StepChange::default(),
+            step_precision: StepPrecision::default(),
+            error_tolerance: ErrorTolerance::default(),
         }
     }
 
@@ -164,6 +160,15 @@ impl Solver for PhaseSpaceSolver {
             than 1."
         );
         self.step_change = StepChange { increase, decrease };
+        self
+    }
+
+    fn step_precision(mut self, min: f64, max: f64) -> Self {
+        assert!(
+            min < max,
+            "Minimum step precision must be smaller than the maximum step precision."
+        );
+        self.step_precision = StepPrecision { min, max };
         self
     }
 
