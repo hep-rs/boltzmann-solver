@@ -517,6 +517,19 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                     "Step {:>7}, β = {:>9.2e} -> Increased h to {:.3e} (error was {:.3e})",
                     step, beta, h, err
                 );
+
+                if beta / h < 1e2 {
+                    debug!(
+                        "Step {:>7}, β = {:>9.2e} -> Step size getting too big (β / h = {:.1e}).",
+                        step,
+                        beta,
+                        beta / h
+                    );
+
+                    while beta / h < 1e2 {
+                        h *= self.step_change.decrease;
+                    }
+                }
             } else if err > self.error_tolerance.upper {
                 h *= self.step_change.decrease;
                 debug!(
