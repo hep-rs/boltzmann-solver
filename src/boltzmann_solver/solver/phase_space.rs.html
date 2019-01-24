@@ -437,6 +437,11 @@
 <span id="437">437</span>
 <span id="438">438</span>
 <span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Solver for the phase-space form of the Boltzmann equation.</span>
 <span class="doccomment">//!</span>
@@ -485,7 +490,7 @@
 <span class="doccomment">//! a)}^2\\)) while leaving all dependence on \\(E_i\\) and \\(\abs{\vt p_i}\\)</span>
 <span class="doccomment">//! explicit.</span>
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ErrorTolerance</span>, <span class="ident">InitialCondition</span>, <span class="ident">Solver</span>, <span class="ident">StepChange</span>};
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ErrorTolerance</span>, <span class="ident">InitialCondition</span>, <span class="ident">Solver</span>, <span class="ident">StepChange</span>, <span class="ident">StepPrecision</span>};
 <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">Zip</span>};
 <span class="kw">use</span> <span class="ident">particle</span>::<span class="ident">Particle</span>;
 <span class="kw">use</span> <span class="ident">statistic</span>::{
@@ -526,6 +531,7 @@
     <span class="ident">energy_steps</span>: <span class="ident">usize</span>,
     <span class="ident">energy_step_size</span>: <span class="ident">f64</span>,
     <span class="ident">step_change</span>: <span class="ident">StepChange</span>,
+    <span class="ident">step_precision</span>: <span class="ident">StepPrecision</span>,
     <span class="ident">error_tolerance</span>: <span class="ident">ErrorTolerance</span>,
 }
 
@@ -563,14 +569,9 @@
             <span class="ident">energies</span>: <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="number">0</span>),
             <span class="ident">energy_steps</span>: <span class="number">2usize</span>.<span class="ident">pow</span>(<span class="number">10</span>),
             <span class="ident">energy_step_size</span>: <span class="number">0.0</span>,
-            <span class="ident">step_change</span>: <span class="ident">StepChange</span> {
-                <span class="ident">increase</span>: <span class="number">1.1</span>,
-                <span class="ident">decrease</span>: <span class="number">0.5</span>,
-            },
-            <span class="ident">error_tolerance</span>: <span class="ident">ErrorTolerance</span> {
-                <span class="ident">upper</span>: <span class="number">1e-2</span>,
-                <span class="ident">lower</span>: <span class="number">1e-5</span>,
-            },
+            <span class="ident">step_change</span>: <span class="ident">StepChange</span>::<span class="ident">default</span>(),
+            <span class="ident">step_precision</span>: <span class="ident">StepPrecision</span>::<span class="ident">default</span>(),
+            <span class="ident">error_tolerance</span>: <span class="ident">ErrorTolerance</span>::<span class="ident">default</span>(),
         }
     }
 
@@ -604,6 +605,15 @@
             than 1.&quot;</span>
         );
         <span class="self">self</span>.<span class="ident">step_change</span> <span class="op">=</span> <span class="ident">StepChange</span> { <span class="ident">increase</span>, <span class="ident">decrease</span> };
+        <span class="self">self</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">step_precision</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">min</span>: <span class="ident">f64</span>, <span class="ident">max</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="macro">assert</span><span class="macro">!</span>(
+            <span class="ident">min</span> <span class="op">&lt;</span> <span class="ident">max</span>,
+            <span class="string">&quot;Minimum step precision must be smaller than the maximum step precision.&quot;</span>
+        );
+        <span class="self">self</span>.<span class="ident">step_precision</span> <span class="op">=</span> <span class="ident">StepPrecision</span> { <span class="ident">min</span>, <span class="ident">max</span> };
         <span class="self">self</span>
     }
 
