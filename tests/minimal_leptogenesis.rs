@@ -259,13 +259,13 @@ fn minimal_leptogenesis() {
     let logger = RefCell::new(csv::Writer::from_path("/tmp/minimal_leptogenesis/n.csv").unwrap());
     logger
         .borrow_mut()
-        .serialize(("beta", "B-L", "N₁", "(N₁)"))
+        .serialize(("beta", "B-L", "Δ(B-L)", "N₁", "Δ(N₁)", "(N₁)"))
         .unwrap();
 
-    solver.set_logger(move |n, c| {
+    solver.set_logger(move |n, dn, c| {
         logger
             .borrow_mut()
-            .serialize((c.beta, n[0], n[1], c.eq_n[1]))
+            .serialize((c.beta, n[0], dn[0], n[1], c.eq_n[1], dn[1]))
             .unwrap();
     });
 

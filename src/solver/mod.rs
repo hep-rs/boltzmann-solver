@@ -187,7 +187,8 @@ pub trait Solver {
     ///
     /// The logger provides some insight into the numerical integration 'black
     /// box'.  Specifically, it is run at the start of each integration step and
-    /// has access to the `Solution` and `Context` at the start of the
+    /// has access to the current value as a `&Solution`, the change from this
+    /// step as a `&Solution`, and the current `Context` at the start of the
     /// integration step.  As a result, for the first step, the solution will be
     /// equal to the initial conditions.
     ///
@@ -195,7 +196,7 @@ pub trait Solver {
     /// log these in a CSV file.
     fn set_logger<F: 'static>(&mut self, f: F) -> &mut Self
     where
-        F: Fn(&Self::Solution, &Self::Context);
+        F: Fn(&Self::Solution, &Self::Solution, &Self::Context);
 
     /// Evolve the initial conditions by solving the PDEs.
     ///

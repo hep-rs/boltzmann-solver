@@ -293,7 +293,7 @@ pub struct NumberDensitySolver<M: Model> {
     initial_conditions: Vec<f64>,
     #[allow(clippy::type_complexity)]
     interactions: Vec<Box<Fn(Array1<f64>, &Array1<f64>, &Context<M>) -> Array1<f64>>>,
-    logger: Box<Fn(&Array1<f64>, &Context<M>)>,
+    logger: Box<Fn(&Array1<f64>, &Array1<f64>, &Context<M>)>,
     step_change: StepChange,
     step_precision: StepPrecision,
     error_tolerance: ErrorTolerance,
@@ -318,7 +318,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             particles: Vec::with_capacity(20),
             initial_conditions: Vec::with_capacity(20),
             interactions: Vec::with_capacity(100),
-            logger: Box::new(|_, _| {}),
+            logger: Box::new(|_, _, _| {}),
             step_change: StepChange::default(),
             step_precision: StepPrecision::default(),
             error_tolerance: ErrorTolerance::default(),
@@ -434,7 +434,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
 
     fn set_logger<F: 'static>(&mut self, f: F) -> &mut Self
     where
-        F: Fn(&Self::Solution, &Self::Context),
+        F: Fn(&Self::Solution, &Self::Solution, &Self::Context),
     {
         self.logger = Box::new(f);
         self
@@ -468,9 +468,6 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
 
             // Create the initial context
             let c = self.context(step, beta, universe);
-
-            // Run the logger now
-            (*self.logger)(&n, &c);
 
             // Runge–Kutta method
             ////////////////////////////////////////
@@ -569,8 +566,10 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                     *n = 0.0;
                 }
             });
-            // n += &dn[0];
             beta += h;
+
+            // Run the logger now
+            (*self.logger)(&n, &dn[0], &c);
         }
 
         info!("Number of evaluations: {}", step);

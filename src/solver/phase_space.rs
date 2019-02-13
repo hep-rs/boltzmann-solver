@@ -81,7 +81,7 @@ pub struct PhaseSpaceSolver {
     particles: Vec<Particle>,
     #[allow(clippy::type_complexity)]
     interactions: Vec<Box<Fn(Array2<f64>, &Array2<f64>, &Context) -> Array2<f64>>>,
-    logger: Box<Fn(&Array2<f64>, &Context)>,
+    logger: Box<Fn(&Array2<f64>, &Array2<f64>, &Context)>,
     energies: Array1<f64>,
     energy_steps: usize,
     energy_step_size: f64,
@@ -120,7 +120,7 @@ impl Solver for PhaseSpaceSolver {
             beta_range: (1e-20, 1e0),
             particles: Vec::with_capacity(20),
             interactions: Vec::with_capacity(100),
-            logger: Box::new(|_, _| {}),
+            logger: Box::new(|_, _, _| {}),
             energies: Array1::zeros(0),
             energy_steps: 2usize.pow(10),
             energy_step_size: 0.0,
@@ -210,7 +210,7 @@ impl Solver for PhaseSpaceSolver {
 
     fn set_logger<F: 'static>(&mut self, f: F) -> &mut Self
     where
-        F: Fn(&Self::Solution, &Self::Context),
+        F: Fn(&Self::Solution, &Self::Solution, &Self::Context),
     {
         self.logger = Box::new(f);
         self
