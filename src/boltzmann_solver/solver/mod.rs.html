@@ -205,6 +205,7 @@
 <span id="205">205</span>
 <span id="206">206</span>
 <span id="207">207</span>
+<span id="208">208</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Solvers for the Boltzmann equation, or sets of Boltzmann equations</span>
 
@@ -395,7 +396,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The logger provides some insight into the numerical integration &#39;black</span>
     <span class="doccomment">/// box&#39;.  Specifically, it is run at the start of each integration step and</span>
-    <span class="doccomment">/// has access to the `Solution` and `Context` at the start of the</span>
+    <span class="doccomment">/// has access to the current value as a `&amp;Solution`, the change from this</span>
+    <span class="doccomment">/// step as a `&amp;Solution`, and the current `Context` at the start of the</span>
     <span class="doccomment">/// integration step.  As a result, for the first step, the solution will be</span>
     <span class="doccomment">/// equal to the initial conditions.</span>
     <span class="doccomment">///</span>
@@ -403,7 +405,7 @@
     <span class="doccomment">/// log these in a CSV file.</span>
     <span class="kw">fn</span> <span class="ident">set_logger</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Solution</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Context</span>);
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Solution</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Solution</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Context</span>);
 
     <span class="doccomment">/// Evolve the initial conditions by solving the PDEs.</span>
     <span class="doccomment">///</span>
