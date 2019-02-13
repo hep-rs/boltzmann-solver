@@ -31,18 +31,11 @@ addons:
       - libgsl0-dev
 
 before_script:
-  - export PATH=$PATH:~/.cargo/bin
   - |
     if [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then
         export FEATURES="--all-features";
     else
         export FEATURES="--features strict";
-    fi
-  - |
-    if [[ "$TRAVIS_RUST_VERSION" == "nightly" ]] && cargo install clippy --force ; then
-        export CLIPPY=true;
-    else
-        export CLIPPY=false;
     fi
   - bash ./ci/before_script.sh
 

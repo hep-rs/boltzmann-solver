@@ -1,12 +1,20 @@
 # Exit on any error
 set -ux
 
-clean_previous_builds() {
+# Install clippy and rustfmt
+rustup_tools() {
+    rustup component add clippy rustfmt
+}
+
+# Remove old builds from cache
+clean() {
     find target -type f -name "boltzmann_solver-*" -exec rm '{}' +
 }
 
+
 main() {
-    clean_previous_builds
+    rustup_tools
+    clean
 }
 
 main
