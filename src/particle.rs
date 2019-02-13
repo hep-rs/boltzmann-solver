@@ -132,7 +132,7 @@ impl Universe for Particle {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
     use crate::utilities::test::*;
 

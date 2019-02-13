@@ -610,7 +610,7 @@ impl<M: Model> NumberDensitySolver<M> {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
     use crate::universe::StandardModel;
     use crate::utilities::test::*;

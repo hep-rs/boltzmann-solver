@@ -336,7 +336,7 @@ impl Statistics for Statistic {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
     use crate::utilities::test::*;
     use csv;
