@@ -31,7 +31,7 @@ impl Universe for StandardModel {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::StandardModel;
     use crate::universe::Universe;
     use crate::utilities::test::*;
