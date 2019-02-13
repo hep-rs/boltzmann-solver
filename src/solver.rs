@@ -7,8 +7,8 @@ mod tableau;
 
 pub use self::options::InitialCondition;
 pub(crate) use self::options::{ErrorTolerance, StepChange, StepPrecision};
-use particle::Particle;
-use universe::Universe;
+use crate::particle::Particle;
+use crate::universe::Universe;
 
 /// Contains all the information relevant to a particular model, including
 /// masses, widths and couplings.  All these attributes can be dependent on the

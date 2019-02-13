@@ -46,14 +46,16 @@
 //! explicit.
 
 use super::{ErrorTolerance, InitialCondition, Solver, StepChange, StepPrecision};
-use ndarray::{prelude::*, Zip};
-use particle::Particle;
-use statistic::{
-    Statistic::{BoseEinstein, FermiDirac},
-    Statistics,
+use crate::{
+    particle::Particle,
+    statistic::{
+        Statistic::{BoseEinstein, FermiDirac},
+        Statistics,
+    },
+    universe::Universe,
 };
+use ndarray::{prelude::*, Zip};
 use std::f64;
-use universe::Universe;
 
 /// Context provided containing pre-computed values which might be useful when
 /// evaluating interactions.
@@ -428,7 +430,7 @@ impl PhaseSpaceSolver {
 #[cfg(test)]
 mod test {
     use super::*;
-    use universe::StandardModel;
+    use crate::universe::StandardModel;
 
     #[test]
     fn no_interaction() {
