@@ -100,11 +100,9 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
-<span id="103">103</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">constants</span>::<span class="ident">STANDARD_MODEL_GSTAR</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constants</span>::<span class="ident">STANDARD_MODEL_GSTAR</span>, <span class="ident">universe</span>::<span class="ident">Universe</span>};
 <span class="kw">use</span> <span class="ident">special_functions</span>::<span class="ident">interpolation</span>;
-<span class="kw">use</span> <span class="ident">universe</span>::<span class="ident">Universe</span>;
 
 <span class="doccomment">/// Implementation of [`Universe`] for the Standard Model.</span>
 <span class="doccomment">///</span>
@@ -138,8 +136,8 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">StandardModel</span>;
-    <span class="kw">use</span> <span class="ident">universe</span>::<span class="ident">Universe</span>;
-    <span class="kw">use</span> <span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">universe</span>::<span class="ident">Universe</span>;
+    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">dof</span>() {

@@ -608,7 +608,6 @@
 <span id="608">608</span>
 <span id="609">609</span>
 <span id="610">610</span>
-<span id="611">611</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! If the rate of collisions between particles is sufficiently high (as is</span>
 <span class="doccomment">//! usually the case), the phase space distribution of the particles will</span>
@@ -623,11 +622,10 @@
 <span class="doccomment">//! The statistics are implemented, as well as calculations of the number</span>
 <span class="doccomment">//! density.</span>
 
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">constants</span>::{<span class="ident">PI_M2</span>, <span class="ident">ZETA_3</span>};
 <span class="kw">use</span> <span class="ident">quadrature</span>::<span class="ident">integrate</span>;
 <span class="kw">use</span> <span class="ident">special_functions</span>::{<span class="ident">bessel</span>, <span class="ident">polylog</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f64</span>;
-
-<span class="kw">use</span> <span class="ident">constants</span>::{<span class="ident">PI_M2</span>, <span class="ident">ZETA_3</span>};
 
 <span class="doccomment">/// Equilibrium number density for massless bosons, normalized to the</span>
 <span class="doccomment">/// equilibrium number density of a massless boson.  This is specified per</span>
@@ -951,9 +949,9 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident">csv</span>;
     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f64</span>;
-    <span class="kw">use</span> <span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
 
     <span class="kw">type</span> <span class="ident">Row6</span> <span class="op">=</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>);
     <span class="kw">type</span> <span class="ident">Row7</span> <span class="op">=</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>);

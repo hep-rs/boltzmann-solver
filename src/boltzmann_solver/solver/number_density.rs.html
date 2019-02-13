@@ -629,7 +629,6 @@
 <span id="629">629</span>
 <span id="630">630</span>
 <span id="631">631</span>
-<span id="632">632</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Solver for the number density evolution given by integrating the Boltzmann</span>
 <span class="doccomment">//! equation.</span>
@@ -891,9 +890,8 @@
 <span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">EmptyModel</span>, <span class="ident">ErrorTolerance</span>, <span class="ident">InitialCondition</span>, <span class="ident">Model</span>, <span class="ident">Solver</span>, <span class="ident">StepChange</span>, <span class="ident">StepPrecision</span>,
 };
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">particle</span>::<span class="ident">Particle</span>, <span class="ident">universe</span>::<span class="ident">Universe</span>};
 <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">FoldWhile</span>, <span class="ident">Zip</span>};
-<span class="kw">use</span> <span class="ident">particle</span>::<span class="ident">Particle</span>;
-<span class="kw">use</span> <span class="ident">universe</span>::<span class="ident">Universe</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">tableau</span>::<span class="ident">rkf45</span>::{<span class="ident">RK_A</span>, <span class="ident">RK_B</span>, <span class="ident">RK_C</span>, <span class="ident">RK_ORDER</span>};
 
@@ -1246,8 +1244,8 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">universe</span>::<span class="ident">StandardModel</span>;
-    <span class="kw">use</span> <span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">universe</span>::<span class="ident">StandardModel</span>;
+    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
 
     <span class="doccomment">/// The most trivial example with a single particle and no interactions.</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
