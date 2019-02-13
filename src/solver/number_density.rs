@@ -292,6 +292,7 @@ pub struct NumberDensitySolver<M: Model> {
     initial_conditions: Vec<f64>,
     #[allow(clippy::type_complexity)]
     interactions: Vec<Box<Fn(Array1<f64>, &Array1<f64>, &Context<M>) -> Array1<f64>>>,
+    #[allow(clippy::type_complexity)]
     logger: Box<Fn(&Array1<f64>, &Array1<f64>, &Context<M>)>,
     step_change: StepChange,
     step_precision: StepPrecision,
@@ -439,6 +440,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         self
     }
 
+    #[allow(clippy::many_single_char_names)]
     fn solve<U>(&self, universe: &U) -> Self::Solution
     where
         U: Universe,

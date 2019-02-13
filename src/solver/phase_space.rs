@@ -83,6 +83,7 @@ pub struct PhaseSpaceSolver {
     particles: Vec<Particle>,
     #[allow(clippy::type_complexity)]
     interactions: Vec<Box<Fn(Array2<f64>, &Array2<f64>, &Context) -> Array2<f64>>>,
+    #[allow(clippy::type_complexity)]
     logger: Box<Fn(&Array2<f64>, &Array2<f64>, &Context)>,
     energies: Array1<f64>,
     energy_steps: usize,
