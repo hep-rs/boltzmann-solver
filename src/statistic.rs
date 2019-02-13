@@ -11,11 +11,10 @@
 //! The statistics are implemented, as well as calculations of the number
 //! density.
 
+use crate::constants::{PI_M2, ZETA_3};
 use quadrature::integrate;
 use special_functions::{bessel, polylog};
 use std::f64;
-
-use constants::{PI_M2, ZETA_3};
 
 /// Equilibrium number density for massless bosons, normalized to the
 /// equilibrium number density of a massless boson.  This is specified per
@@ -339,9 +338,9 @@ impl Statistics for Statistic {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::utilities::test::*;
     use csv;
     use std::f64;
-    use utilities::test::*;
 
     type Row6 = (f64, f64, f64, f64, f64, f64);
     type Row7 = (f64, f64, f64, f64, f64, f64, f64);

@@ -1,10 +1,12 @@
 //! Basic implementation of a particle type
 
-use constants::{BOSON_GSTAR, FERMION_GSTAR};
+use crate::{
+    constants::{BOSON_GSTAR, FERMION_GSTAR},
+    statistic::{Statistic, Statistics},
+    universe::Universe,
+};
 use special_functions::interpolation;
-use statistic::{Statistic, Statistics};
 use std::f64;
-use universe::Universe;
 
 /// Particle type
 ///
@@ -132,7 +134,7 @@ impl Universe for Particle {
 #[cfg(test)]
 mod test {
     use super::*;
-    use utilities::test::*;
+    use crate::utilities::test::*;
 
     #[test]
     fn real_scalar() {

@@ -1,6 +1,5 @@
-use constants::STANDARD_MODEL_GSTAR;
+use crate::{constants::STANDARD_MODEL_GSTAR, universe::Universe};
 use special_functions::interpolation;
-use universe::Universe;
 
 /// Implementation of [`Universe`] for the Standard Model.
 ///
@@ -34,8 +33,8 @@ impl Universe for StandardModel {
 #[cfg(test)]
 mod test {
     use super::StandardModel;
-    use universe::Universe;
-    use utilities::test::*;
+    use crate::universe::Universe;
+    use crate::utilities::test::*;
 
     #[test]
     fn dof() {

@@ -6,9 +6,8 @@ mod standard_model;
 
 pub use self::standard_model::StandardModel;
 
-use constants;
+use crate::{constants, statistic::Statistic};
 use special_functions::interpolation;
-use statistic::Statistic;
 
 /// Collection of properties which determine the evolution of a Universe.
 ///

@@ -258,9 +258,8 @@
 use super::{
     EmptyModel, ErrorTolerance, InitialCondition, Model, Solver, StepChange, StepPrecision,
 };
+use crate::{particle::Particle, universe::Universe};
 use ndarray::{prelude::*, FoldWhile, Zip};
-use particle::Particle;
-use universe::Universe;
 
 use super::tableau::rkf45::{RK_A, RK_B, RK_C, RK_ORDER};
 
@@ -613,8 +612,8 @@ impl<M: Model> NumberDensitySolver<M> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use universe::StandardModel;
-    use utilities::test::*;
+    use crate::universe::StandardModel;
+    use crate::utilities::test::*;
 
     /// The most trivial example with a single particle and no interactions.
     #[test]
