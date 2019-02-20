@@ -1,3 +1,5 @@
+#!/usr/bin/bash
+
 # Exit on any error
 set -eux
 

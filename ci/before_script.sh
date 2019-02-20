@@ -1,5 +1,7 @@
+#!/usr/bin/bash
+
 # Exit on any error
-set -ux
+set -eux
 
 # Install clippy and rustfmt
 rustup_tools() {
