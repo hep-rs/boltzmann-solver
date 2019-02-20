@@ -115,8 +115,6 @@
 //! sum over all possible interactions must be done.
 
 #![cfg_attr(feature = "nightly", feature(test))]
-#![cfg_attr(feature = "strict", deny(missing_docs))]
-#![cfg_attr(feature = "strict", deny(warnings))]
 
 #[macro_use]
 extern crate log;
