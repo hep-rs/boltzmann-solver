@@ -142,8 +142,8 @@ fn minimal_leptogenesis() {
 
     // Initialize particles we want to keep track of.  All other particles
     // are assumed to be always in equilibrium.
-    let b_minus_l = Particle::new(0, 0.0).set_dof(0.0);
-    let n = Particle::new(1, model.mass.n);
+    let b_minus_l = Particle::new("B-L".to_string(), 0, 0.0).set_dof(0.0);
+    let n = Particle::new("N".to_string(), 1, model.mass.n);
 
     // Create the Solver and set integration parameters
     let mut solver: NumberDensitySolver<LeptogenesisModel> = NumberDensitySolver::new()
@@ -157,8 +157,38 @@ fn minimal_leptogenesis() {
     solver.add_particle(n, InitialCondition::Zero);
     // solver.add_particle(n, InitialCondition::Equilibrium(0.0));
 
-    // Interaction N ↔ LH
+    // Logging of number densities
     ////////////////////////////////////////////////////////////////////////////////
+    let logger = RefCell::new(csv::Writer::from_path("/tmp/minimal_leptogenesis/n.csv").unwrap());
+    logger
+        .borrow_mut()
+        .serialize(("beta", "B-L", "Δ(B-L)", "N₁", "Δ(N₁)", "(N₁)"))
+        .unwrap();
+
+    solver.set_logger(move |n, dn, c| {
+        logger
+            .borrow_mut()
+            .serialize((c.beta, n[0], dn[0], n[1], c.eq_n[1], dn[1]))
+            .unwrap();
+    });
+
+    // Interactions
+    ////////////////////////////////////////////////////////////////////////////////
+
+    interaction_n_el_h(&mut solver);
+    interaction_n_el_ql_qr(&mut solver);
+
+    // Run solver
+    ////////////////////////////////////////////////////////////////////////////////
+
+    let sol = solver.solve(&universe);
+
+    assert!(1e-10 < sol[0].abs() && sol[0].abs() < 1e-5);
+    assert!(sol[1] < 1e-20);
+}
+
+/// Interaction N ↔ LH
+fn interaction_n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
     let csv = RefCell::new(csv::Writer::from_path("/tmp/minimal_leptogenesis/decay.csv").unwrap());
     csv.borrow_mut()
         .serialize(("beta", "γ̃", "N₁ → HL", "HL → N₁"))
@@ -193,9 +223,10 @@ fn minimal_leptogenesis() {
 
         s
     });
+}
 
-    // Scattering NL ↔ Qq, NQ ↔ Lq and Nq ↔ LQ (s- and t-channel)
-    ////////////////////////////////////////////////////////////////////////////////
+/// Scattering NL ↔ Qq, NQ ↔ Lq and Nq ↔ LQ (s- and t-channel)
+fn interaction_n_el_ql_qr(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
     let csv = RefCell::new(
         csv::Writer::from_path("/tmp/minimal_leptogenesis/scattering_NLQq.csv").unwrap(),
     );
@@ -253,24 +284,4 @@ fn minimal_leptogenesis() {
 
         s
     });
-
-    // Logging of number densities
-    ////////////////////////////////////////////////////////////////////////////////
-    let logger = RefCell::new(csv::Writer::from_path("/tmp/minimal_leptogenesis/n.csv").unwrap());
-    logger
-        .borrow_mut()
-        .serialize(("beta", "B-L", "Δ(B-L)", "N₁", "Δ(N₁)", "(N₁)"))
-        .unwrap();
-
-    solver.set_logger(move |n, dn, c| {
-        logger
-            .borrow_mut()
-            .serialize((c.beta, n[0], dn[0], n[1], c.eq_n[1], dn[1]))
-            .unwrap();
-    });
-
-    let sol = solver.solve(&universe);
-
-    assert!(1e-10 < sol[0].abs() && sol[0].abs() < 1e-5);
-    assert!(sol[1] < 1e-20);
 }
