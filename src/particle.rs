@@ -6,7 +6,7 @@ use crate::{
     universe::Universe,
 };
 use special_functions::interpolation;
-use std::f64;
+use std::{f64, hash};
 
 /// Particle type
 ///
@@ -20,9 +20,13 @@ use std::f64;
 /// which will override this calculation (which can be used for multiplets for
 /// example).
 ///
+/// For hashing purposes, only the particle's name is taken into account.
+///
 /// In the long run, it is intended that this type be replaced by another one.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct Particle {
+    /// Name of the particle.  This is used in order to hash the particle.
+    pub name: String,
     /// The spin is stored as twice the spin, so a spin-½ particle has `spin ==
     /// 1` and a spin-1 particle has `spin == 2`
     pub spin: u8,
@@ -38,8 +42,9 @@ impl Particle {
     /// The mass is specified in units of GeV, and the spin is multiplied by a
     /// factor of two such that a spin-½ particle has `spin == 1` and a spin-1
     /// particle has `spin == 2`.
-    pub fn new(spin: u8, mass: f64) -> Self {
+    pub fn new(name: String, spin: u8, mass: f64) -> Self {
         Self {
+            name,
             spin,
             mass,
             complex: false,
@@ -134,6 +139,12 @@ impl Universe for Particle {
     }
 }
 
+impl hash::Hash for Particle {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -141,7 +152,7 @@ mod tests {
 
     #[test]
     fn real_scalar() {
-        let particle = Particle::new(0, 1.0);
+        let particle = Particle::new("S".to_string(), 0, 1.0);
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
@@ -160,7 +171,7 @@ mod tests {
 
     #[test]
     fn complex_scalar() {
-        let particle = Particle::new(0, 1.0).set_complex();
+        let particle = Particle::new("φ".to_string(), 0, 1.0).set_complex();
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
@@ -179,7 +190,7 @@ mod tests {
 
     #[test]
     fn fermion() {
-        let particle = Particle::new(1, 1.0);
+        let particle = Particle::new("ψ".to_string(), 1, 1.0);
 
         assert!(!particle.is_bosonic());
         assert!(particle.is_fermionic());
@@ -198,7 +209,7 @@ mod tests {
 
     #[test]
     fn gauge_boson() {
-        let particle = Particle::new(2, 1.0);
+        let particle = Particle::new("A".to_string(), 2, 1.0);
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
@@ -217,7 +228,9 @@ mod tests {
 
     #[test]
     fn complex_scalar_dof() {
-        let particle = Particle::new(0, 1.0).set_complex().set_dof(2.5);
+        let particle = Particle::new("φ".to_string(), 0, 1.0)
+            .set_complex()
+            .set_dof(2.5);
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
@@ -236,7 +249,7 @@ mod tests {
 
     #[test]
     fn fermion_dof() {
-        let particle = Particle::new(1, 1.0).set_dof(1.2);
+        let particle = Particle::new("ψ".to_string(), 1, 1.0).set_dof(1.2);
 
         assert!(!particle.is_bosonic());
         assert!(particle.is_fermionic());
