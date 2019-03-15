@@ -450,6 +450,10 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         );
 
         let mut n = Array1::from_vec(self.initial_conditions.clone());
+        let mut dn = [
+            Self::Solution::zeros(n.dim()),
+            Self::Solution::zeros(n.dim()),
+        ];
         let mut beta = self.beta_range.0;
         let mut h = beta / 10.0;
 
@@ -463,16 +467,21 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         };
 
         let mut step = 0;
+
+        // Create the initial context
+        let mut c = self.context(step, beta, universe);
+
+        // Run the logger now
+        (*self.logger)(&n, &dn[0], &c);
+
         while beta < self.beta_range.1 {
             step += 1;
-
-            // Create the initial context
-            let c = self.context(step, beta, universe);
 
             // Runge–Kutta method
             ////////////////////////////////////////
 
             // 0th order term (Newton method) is always the same
+            c = self.context(step, beta, universe);
             k[0] = self
                 .interactions
                 .iter()
@@ -480,7 +489,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 * h;
 
             for i in 0..(RK_ORDER - 1) {
-                let c = self.context(step, beta + RK_C[i] * h, universe);
+                c = self.context(step, beta + RK_C[i] * h, universe);
                 let n_tmp = (0..=i).fold(n.clone(), |total, j| total + &k[j] * RK_A[i][j]);
                 k[i + 1] = self
                     .interactions
@@ -490,14 +499,12 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             }
 
             // Calculate dn.
-            let dn = [
-                (0..RK_ORDER).fold(Self::Solution::zeros(n.dim()), |total, i| {
-                    total + &(&k[i] * RK_B[0][i])
-                }),
-                (0..RK_ORDER).fold(Self::Solution::zeros(n.dim()), |total, i| {
-                    total + &(&k[i] * RK_B[1][i])
-                }),
-            ];
+            dn[0] = (0..RK_ORDER).fold(Self::Solution::zeros(n.dim()), |total, i| {
+                total + &(&k[i] * RK_B[0][i])
+            });
+            dn[1] = (0..RK_ORDER).fold(Self::Solution::zeros(n.dim()), |total, i| {
+                total + &(&k[i] * RK_B[1][i])
+            });
 
             // Check the error on the RK method vs the Euler method.  If it is
             // small enough, increase the step size.  We use the maximum error
