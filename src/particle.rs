@@ -101,17 +101,20 @@ impl Particle {
     }
 
     /// Return the equilibrium phase space occupation of the particle.
+    #[inline]
     pub fn phase_space(&self, e: f64, mu: f64, beta: f64) -> f64 {
         self.statistic().phase_space(e, self.mass, mu, beta) * self.degrees_of_freedom()
     }
 
     /// Return the equilibrium number density of the particle.
+    #[inline]
     pub fn number_density(&self, mu: f64, beta: f64) -> f64 {
         self.statistic().number_density(self.mass, mu, beta) * self.degrees_of_freedom()
     }
 
     /// Return the equilibrium number density of the particle, normalized to the
     /// number density of a massless boson with one degree of freedom.
+    #[inline]
     pub fn normalized_number_density(&self, mu: f64, beta: f64) -> f64 {
         self.statistic()
             .normalized_number_density(self.mass, mu, beta)
