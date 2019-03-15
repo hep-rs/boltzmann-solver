@@ -256,12 +256,11 @@
 //! taken into account.
 
 use super::{
+    tableau::rkf45::{RK_A, RK_B, RK_C, RK_ORDER},
     EmptyModel, ErrorTolerance, InitialCondition, Model, Solver, StepChange, StepPrecision,
 };
 use crate::{particle::Particle, universe::Universe};
 use ndarray::{prelude::*, FoldWhile, Zip};
-
-use super::tableau::rkf45::{RK_A, RK_B, RK_C, RK_ORDER};
 
 /// Context provided containing pre-computed values which might be useful when
 /// evaluating interactions.
