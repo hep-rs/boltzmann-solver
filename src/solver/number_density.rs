@@ -620,7 +620,7 @@ mod tests {
     /// The most trivial example with a single particle and no interactions.
     #[test]
     fn no_interaction() {
-        let phi = Particle::new(0, 1e3);
+        let phi = Particle::new("φ".to_string(), 0, 1e3);
         let mut solver = NumberDensitySolver::default()
             .temperature_range(1e20, 1e-10)
             .initialize();

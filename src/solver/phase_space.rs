@@ -435,7 +435,7 @@ mod tests {
 
     #[test]
     fn no_interaction() {
-        let phi = Particle::new(0, 5.0);
+        let phi = Particle::new("φ".to_string(), 0, 5.0);
         let mut solver = PhaseSpaceSolver::new()
             .temperature_range(1e20, 1e-10)
             .error_tolerance(1e-1, 1e-2)
