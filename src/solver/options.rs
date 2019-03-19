@@ -8,8 +8,8 @@ pub(crate) struct StepChange {
 impl Default for StepChange {
     fn default() -> Self {
         StepChange {
-            increase: 1.1,
-            decrease: 0.5,
+            increase: 1.2,
+            decrease: 0.8,
         }
     }
 }
@@ -24,7 +24,7 @@ impl Default for StepPrecision {
     fn default() -> Self {
         StepPrecision {
             min: 1e-6,
-            max: 1e-1,
+            max: 1e-2,
         }
     }
 }
