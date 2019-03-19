@@ -489,12 +489,12 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 * h;
 
             for i in 0..(RK_ORDER - 1) {
-                c = self.context(step, beta + RK_C[i] * h, universe);
+                let c_tmp = self.context(step, beta + RK_C[i] * h, universe);
                 let n_tmp = (0..=i).fold(n.clone(), |total, j| total + &k[j] * RK_A[i][j]);
                 k[i + 1] = self
                     .interactions
                     .iter()
-                    .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &n_tmp, &c))
+                    .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &n_tmp, &c_tmp))
                     * h;
             }
 
