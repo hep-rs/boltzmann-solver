@@ -627,16 +627,6 @@
 <span id="627">627</span>
 <span id="628">628</span>
 <span id="629">629</span>
-<span id="630">630</span>
-<span id="631">631</span>
-<span id="632">632</span>
-<span id="633">633</span>
-<span id="634">634</span>
-<span id="635">635</span>
-<span id="636">636</span>
-<span id="637">637</span>
-<span id="638">638</span>
-<span id="639">639</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Solver for the number density evolution given by integrating the Boltzmann</span>
 <span class="doccomment">//! equation.</span>
@@ -1161,48 +1151,38 @@
                 })
                 .<span class="ident">into_inner</span>();
 
-            <span class="comment">// Adjust the step size as needed based on the step size.</span>
+            <span class="comment">// Adjust the step size based on the error</span>
             <span class="kw">if</span> <span class="ident">err</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">error_tolerance</span>.<span class="ident">lower</span> {
                 <span class="ident">h</span> <span class="op">*=</span> <span class="self">self</span>.<span class="ident">step_change</span>.<span class="ident">increase</span>;
                 <span class="macro">debug</span><span class="macro">!</span>(
-                    <span class="string">&quot;Step {:&gt;7}, β = {:&gt;9.2e} -&gt; Increased h to {:.3e} (error was {:.3e})&quot;</span>,
-                    <span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">h</span>, <span class="ident">err</span>
+                    <span class="string">&quot;Step {:&gt;7}, β = {:&gt;9.2e} -&gt; Error too small ({:.3e}), increasing h to {:.3e}&quot;</span>,
+                    <span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">err</span>, <span class="ident">h</span>
                 );
-
-                <span class="kw">if</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">max</span> <span class="op">&lt;</span> <span class="ident">h</span> {
-                    <span class="macro">debug</span><span class="macro">!</span>(
-                        <span class="string">&quot;Step {:&gt;7}, β = {:&gt;9.2e} -&gt; Step size getting too big (β / h = {:.1e}).&quot;</span>,
-                        <span class="ident">step</span>,
-                        <span class="ident">beta</span>,
-                        <span class="ident">beta</span> <span class="op">/</span> <span class="ident">h</span>
-                    );
-
-                    <span class="kw">while</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">max</span> <span class="op">&lt;</span> <span class="ident">h</span> {
-                        <span class="ident">h</span> <span class="op">*=</span> <span class="self">self</span>.<span class="ident">step_change</span>.<span class="ident">decrease</span>;
-                    }
-                }
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">err</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">error_tolerance</span>.<span class="ident">upper</span> {
                 <span class="ident">h</span> <span class="op">*=</span> <span class="self">self</span>.<span class="ident">step_change</span>.<span class="ident">decrease</span>;
                 <span class="macro">debug</span><span class="macro">!</span>(
-                    <span class="string">&quot;Step {:&gt;7}, β = {:&gt;9.2e} -&gt; Decreased h to {:.3e} (error was {:.3e})&quot;</span>,
-                    <span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">h</span>, <span class="ident">err</span>
+                    <span class="string">&quot;Step {:&gt;7}, β = {:&gt;9.2e} -&gt; Error too large ({:.3e}), decreasing h to {:.3e}&quot;</span>,
+                    <span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">err</span>, <span class="ident">h</span>
                 );
+            }
 
-                <span class="comment">// Prevent h from getting too small that it might make</span>
-                <span class="comment">// integration take too long.  Use the result regardless even</span>
-                <span class="comment">// though it is bigger than desired error.</span>
-                <span class="kw">if</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span> <span class="op">&gt;</span> <span class="ident">h</span> {
-                    <span class="macro">debug</span><span class="macro">!</span>(
-                        <span class="string">&quot;Step {:&gt;7}, β = {:&gt;9.2e} -&gt; Step size getting too small (β / h = {:.1e}).&quot;</span>,
-                        <span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">beta</span> <span class="op">/</span> <span class="ident">h</span>
-                    );
-
-                    <span class="kw">while</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span> <span class="op">&gt;</span> <span class="ident">h</span> {
-                        <span class="ident">h</span> <span class="op">*=</span> <span class="self">self</span>.<span class="ident">step_change</span>.<span class="ident">increase</span>;
-                    }
-                } <span class="kw">else</span> {
-                    <span class="kw">continue</span>;
-                }
+            <span class="comment">// Prevent h from getting too small or too big in proportion to the</span>
+            <span class="comment">// current value of beta.</span>
+            <span class="kw">while</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">max</span> <span class="op">&lt;</span> <span class="ident">h</span> {
+                <span class="ident">h</span> <span class="op">*=</span> <span class="self">self</span>.<span class="ident">step_change</span>.<span class="ident">decrease</span>;
+                <span class="macro">debug</span><span class="macro">!</span>(
+                    <span class="string">&quot;Step {:&gt;7}, β = {:&gt;9.2e} -&gt; Step size too large, decreasing h to {:.3e}&quot;</span>,
+                    <span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">h</span>
+                );
+            }
+            <span class="kw">while</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span> <span class="op">&gt;</span> <span class="ident">h</span> {
+                <span class="ident">h</span> <span class="op">*=</span> <span class="self">self</span>.<span class="ident">step_change</span>.<span class="ident">increase</span>;
+                <span class="macro">debug</span><span class="macro">!</span>(
+                    <span class="string">&quot;Step {:&gt;7}, β = {:&gt;9.2e} -&gt; Step size too small, increase h to {:.3e}&quot;</span>,
+                    <span class="ident">step</span>,
+                    <span class="ident">beta</span>,
+                    <span class="ident">beta</span> <span class="op">/</span> <span class="ident">h</span>
+                );
             }
 
             <span class="ident">Zip</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">n</span>).<span class="ident">and</span>(<span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>]).<span class="ident">apply</span>(<span class="op">|</span><span class="ident">n</span>, <span class="ident">dn</span><span class="op">|</span> {
