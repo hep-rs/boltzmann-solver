@@ -521,48 +521,38 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 })
                 .into_inner();
 
-            // Adjust the step size as needed based on the step size.
+            // Adjust the step size based on the error
             if err < self.error_tolerance.lower {
                 h *= self.step_change.increase;
                 debug!(
-                    "Step {:>7}, β = {:>9.2e} -> Increased h to {:.3e} (error was {:.3e})",
-                    step, beta, h, err
+                    "Step {:>7}, β = {:>9.2e} -> Error too small ({:.3e}), increasing h to {:.3e}",
+                    step, beta, err, h
                 );
-
-                if beta * self.step_precision.max < h {
-                    debug!(
-                        "Step {:>7}, β = {:>9.2e} -> Step size getting too big (β / h = {:.1e}).",
-                        step,
-                        beta,
-                        beta / h
-                    );
-
-                    while beta * self.step_precision.max < h {
-                        h *= self.step_change.decrease;
-                    }
-                }
             } else if err > self.error_tolerance.upper {
                 h *= self.step_change.decrease;
                 debug!(
-                    "Step {:>7}, β = {:>9.2e} -> Decreased h to {:.3e} (error was {:.3e})",
-                    step, beta, h, err
+                    "Step {:>7}, β = {:>9.2e} -> Error too large ({:.3e}), decreasing h to {:.3e}",
+                    step, beta, err, h
                 );
+            }
 
-                // Prevent h from getting too small that it might make
-                // integration take too long.  Use the result regardless even
-                // though it is bigger than desired error.
-                if beta * self.step_precision.min > h {
-                    debug!(
-                        "Step {:>7}, β = {:>9.2e} -> Step size getting too small (β / h = {:.1e}).",
-                        step, beta, beta / h
-                    );
-
-                    while beta * self.step_precision.min > h {
-                        h *= self.step_change.increase;
-                    }
-                } else {
-                    continue;
-                }
+            // Prevent h from getting too small or too big in proportion to the
+            // current value of beta.
+            while h > beta * self.step_precision.max {
+                h *= self.step_change.decrease;
+                debug!(
+                    "Step {:>7}, β = {:>9.2e} -> Step size too large, decreasing h to {:.3e}",
+                    step, beta, h
+                );
+            }
+            while h < beta * self.step_precision.min {
+                h *= self.step_change.increase;
+                debug!(
+                    "Step {:>7}, β = {:>9.2e} -> Step size too small, increase h to {:.3e}",
+                    step,
+                    beta,
+                    beta / h
+                );
             }
 
             Zip::from(&mut n).and(&dn[0]).apply(|n, dn| {
