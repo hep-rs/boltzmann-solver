@@ -269,6 +269,8 @@ pub struct Context<M: Model> {
     pub step: u64,
     /// Inverse temperature in GeV^{-1}
     pub beta: f64,
+    /// Current step size
+    pub step_size: f64,
     /// Hubble rate, in GeV
     pub hubble_rate: f64,
     /// Equilibrium number densities for the particles, normalized to the
@@ -469,7 +471,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         let mut step = 0;
 
         // Create the initial context
-        let mut c = self.context(step, beta, universe);
+        let mut c = self.context(step, beta, h, universe);
 
         // Run the logger now
         (*self.logger)(&n, &dn[0], &c);
@@ -481,7 +483,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             ////////////////////////////////////////
 
             // 0th order term (Newton method) is always the same
-            c = self.context(step, beta, universe);
+            c = self.context(step, beta, h, universe);
             k[0] = self
                 .interactions
                 .iter()
@@ -489,7 +491,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 * h;
 
             for i in 0..(RK_ORDER - 1) {
-                let c_tmp = self.context(step, beta + RK_C[i] * h, universe);
+                let c_tmp = self.context(step, beta + RK_C[i] * h, h, universe);
                 let n_tmp = (0..=i).fold(n.clone(), |total, j| total + &k[j] * RK_A[i][j]);
                 k[i + 1] = self
                     .interactions
@@ -596,10 +598,17 @@ impl<M: Model> NumberDensitySolver<M> {
         )
     }
 
-    fn context<U: Universe>(&self, step: u64, beta: f64, universe: &U) -> Context<M> {
+    fn context<U: Universe>(
+        &self,
+        step: u64,
+        beta: f64,
+        step_size: f64,
+        universe: &U,
+    ) -> Context<M> {
         Context {
             step,
             beta,
+            step_size,
             hubble_rate: universe.hubble_rate(beta),
             eq_n: self.equilibrium_number_densities(beta),
             model: M::new(beta),
