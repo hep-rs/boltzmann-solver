@@ -540,20 +540,17 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
 
             // Prevent h from getting too small or too big in proportion to the
             // current value of beta.
-            while h > beta * self.step_precision.max {
-                h *= self.step_change.decrease;
+            if h > beta * self.step_precision.max {
+                h = beta * self.step_precision.max * self.step_change.decrease;
                 debug!(
                     "Step {:}, β = {:.4e} -> Step size too large, decreasing h to {:.3e}",
                     step, beta, h
                 );
-            }
-            while h < beta * self.step_precision.min {
-                h *= self.step_change.increase;
+            } else if h < beta * self.step_precision.min {
+                h = beta * self.step_precision.min * self.step_change.increase;
                 debug!(
                     "Step {:}, β = {:.4e} -> Step size too small, increase h to {:.3e}",
-                    step,
-                    beta,
-                    beta / h
+                    step, beta, h
                 );
             }
 
