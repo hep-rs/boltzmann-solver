@@ -23,6 +23,7 @@ pub(crate) mod rkf45;
 
 #[cfg(test)]
 mod tests {
+    use crate::utilities::test::*;
     use ndarray::{array, Array1};
     use std::f64::consts::PI;
 
@@ -79,7 +80,7 @@ mod tests {
     solve_ode!(solve_ode_rkf45, rkf45);
 
     macro_rules! test_sine {
-        ( $name:ident, $solver:ident ) => {
+        ( $name:ident, $solver:ident, $prec:expr ) => {
             #[test]
             fn $name() {
                 let f = |_t: f64, x: &Array1<f64>| -> Array1<f64> { array![-x[1], x[0]] };
@@ -89,19 +90,19 @@ mod tests {
                 let t = 0.0;
 
                 let (_, x) = $solver(x, t, TWO_PI, h, f);
-                assert!((dbg!(x[0]) - 1.0).abs() < h);
-                assert!((dbg!(x[1]) - h).abs() < h);
+                approx_eq(x[0], 1.0, $prec, 0.0);
+                approx_eq(x[1], h, $prec, 0.0);
             }
         };
     }
 
-    test_sine!(test_sine_midpoint, solve_ode_midpoint);
-    test_sine!(test_sine_rk4, solve_ode_rk4);
-    test_sine!(test_sine_rk4_38, solve_ode_rk4_38);
-    test_sine!(test_sine_rkf45, solve_ode_rkf45);
+    test_sine!(test_sine_midpoint, solve_ode_midpoint, 3.3);
+    test_sine!(test_sine_rk4, solve_ode_rk4, 7.7);
+    test_sine!(test_sine_rk4_38, solve_ode_rk4_38, 7.7);
+    test_sine!(test_sine_rkf45, solve_ode_rkf45, 7.7);
 
     macro_rules! test_lotka_volterra {
-        ( $name:ident, $solver:ident ) => {
+        ( $name:ident, $solver:ident, $prec:expr ) => {
             #[test]
             fn $name() {
                 let f = |_t: f64, x: &Array1<f64>| -> Array1<f64> {
@@ -113,25 +114,26 @@ mod tests {
                 let t = 0.0;
 
                 let (_, x) = $solver(x, t, 10.0, h, f);
-                assert!((dbg!(x[0]) - 0.62237406351892283361214420345).abs() < h);
-                assert!((dbg!(x[1]) - 2.1153312681627127969862394480).abs() < h);
+                approx_eq(x[0], 0.622_374_063_518_922_9, $prec, 0.0);
+                approx_eq(x[1], 2.115_331_268_162_712_8, $prec, 0.0);
             }
         };
     }
 
-    test_lotka_volterra!(test_lotka_volterra_midpoint, solve_ode_midpoint);
-    test_lotka_volterra!(test_lotka_volterra_rk4, solve_ode_rk4);
-    test_lotka_volterra!(test_lotka_volterra_rk4_38, solve_ode_rk4_38);
-    test_lotka_volterra!(test_lotka_volterra_rkf45, solve_ode_rkf45);
+    test_lotka_volterra!(test_lotka_volterra_midpoint, solve_ode_midpoint, 4.0);
+    test_lotka_volterra!(test_lotka_volterra_rk4, solve_ode_rk4, 4.0);
+    test_lotka_volterra!(test_lotka_volterra_rk4_38, solve_ode_rk4_38, 4.0);
+    test_lotka_volterra!(test_lotka_volterra_rkf45, solve_ode_rkf45, 4.0);
 }
 
 #[cfg(feature = "nightly")]
 #[cfg(test)]
 mod bench {
     use super::tests::{solve_ode_midpoint, solve_ode_rk4, solve_ode_rk4_38, solve_ode_rkf45};
+    use crate::utilities::test::*;
     use ndarray::{array, Array1};
     use std::f64::consts::PI;
-    use test::{black_box, Bencher};
+    use test::Bencher;
 
     const TWO_PI: f64 = 2.0 * PI;
 
@@ -147,8 +149,8 @@ mod bench {
                     let t = 0.0;
 
                     let (_, x) = $solver(x, t, TWO_PI, h, f);
-                    assert!((dbg!(x[0]) - 1.0).abs() < h);
-                    assert!((dbg!(x[1]) - h).abs() < h);
+                    approx_eq(x[0], 1.0, 1.0, 0.0);
+                    approx_eq(x[1], h, 1.0, 0.0);
                 });
             }
         };
@@ -173,8 +175,8 @@ mod bench {
                     let t = 0.0;
 
                     let (_, x) = $solver(x, t, 10.0, h, f);
-                    assert!((dbg!(x[0]) - 0.62237406351892283361214420345).abs() < h);
-                    assert!((dbg!(x[1]) - 2.1153312681627127969862394480).abs() < h);
+                    approx_eq(x[0], 0.622_374_063_518_922_9, 1.0, 0.0);
+                    approx_eq(x[1], 2.115_331_268_162_712_8, 1.0, 0.0);
                 });
             }
         };
