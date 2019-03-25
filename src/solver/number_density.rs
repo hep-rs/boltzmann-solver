@@ -457,7 +457,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             Self::Solution::zeros(n.dim()),
         ];
         let mut beta = self.beta_range.0;
-        let mut h = beta / 10.0;
+        let mut h = beta * self.step_precision.min;
 
         // Allocate variables which will be re-used each for loop
         let mut k: [Self::Solution; RK_ORDER + 1];
