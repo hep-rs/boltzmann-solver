@@ -527,13 +527,13 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             if err < self.error_tolerance.lower {
                 h *= self.step_change.increase;
                 debug!(
-                    "Step {:}, β = {:.4e} -> Error too small ({:.3e}), increasing h to {:.3e}",
+                    "Step {:}, β = {:.4e} -> Error too small ({:.3e}), increased h to {:.3e}",
                     step, beta, err, h
                 );
             } else if err > self.error_tolerance.upper {
                 h *= self.step_change.decrease;
                 debug!(
-                    "Step {:}, β = {:.4e} -> Error too large ({:.3e}), decreasing h to {:.3e}",
+                    "Step {:}, β = {:.4e} -> Error too large ({:.3e}), decreased h to {:.3e}",
                     step, beta, err, h
                 );
             }
@@ -543,13 +543,13 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             if h > beta * self.step_precision.max {
                 h = beta * self.step_precision.max * self.step_change.decrease;
                 debug!(
-                    "Step {:}, β = {:.4e} -> Step size too large, decreasing h to {:.3e}",
+                    "Step {:}, β = {:.4e} -> Step size too large, decreased h to {:.3e}",
                     step, beta, h
                 );
             } else if h < beta * self.step_precision.min {
                 h = beta * self.step_precision.min * self.step_change.increase;
                 debug!(
-                    "Step {:}, β = {:.4e} -> Step size too small, increase h to {:.3e}",
+                    "Step {:}, β = {:.4e} -> Step size too small, increased h to {:.3e}",
                     step, beta, h
                 );
             }
