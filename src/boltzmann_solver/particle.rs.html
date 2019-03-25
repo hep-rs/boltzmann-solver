@@ -427,7 +427,7 @@
         <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_fermionic</span>());
         <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_complex</span>());
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>) <span class="op">==</span> <span class="number">1.0</span>);
+        <span class="ident">approx_eq</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>), <span class="number">1.0</span>, <span class="number">8.0</span>, <span class="number">0.0</span>);
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e10</span>) <span class="op">&lt;</span> <span class="number">1e-30</span>);
 
         <span class="ident">approx_eq</span>(
@@ -446,7 +446,7 @@
         <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_fermionic</span>());
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">is_complex</span>());
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>) <span class="op">==</span> <span class="number">2.0</span>);
+        <span class="ident">approx_eq</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>), <span class="number">2.0</span>, <span class="number">8.0</span>, <span class="number">0.0</span>);
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e10</span>) <span class="op">&lt;</span> <span class="number">1e-30</span>);
 
         <span class="ident">approx_eq</span>(
@@ -465,7 +465,7 @@
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">is_fermionic</span>());
         <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_complex</span>());
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>) <span class="op">==</span> <span class="number">2.0</span> <span class="op">*</span> <span class="number">0.875</span>);
+        <span class="ident">approx_eq</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>), <span class="number">2.0</span> <span class="op">*</span> <span class="number">0.875</span>, <span class="number">8.0</span>, <span class="number">0.0</span>);
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e10</span>) <span class="op">&lt;</span> <span class="number">1e-30</span>);
 
         <span class="ident">approx_eq</span>(
@@ -484,7 +484,7 @@
         <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_fermionic</span>());
         <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_complex</span>());
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>) <span class="op">==</span> <span class="number">3.0</span>);
+        <span class="ident">approx_eq</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>), <span class="number">3.0</span>, <span class="number">8.0</span>, <span class="number">0.0</span>);
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e10</span>) <span class="op">&lt;</span> <span class="number">1e-30</span>);
 
         <span class="ident">approx_eq</span>(
@@ -505,7 +505,7 @@
         <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_fermionic</span>());
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">is_complex</span>());
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>) <span class="op">==</span> <span class="number">2.5</span>);
+        <span class="ident">approx_eq</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>), <span class="number">2.5</span>, <span class="number">8.0</span>, <span class="number">0.0</span>);
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e10</span>) <span class="op">&lt;</span> <span class="number">1e-30</span>);
 
         <span class="ident">approx_eq</span>(
@@ -524,7 +524,7 @@
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">is_fermionic</span>());
         <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_complex</span>());
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>) <span class="op">==</span> <span class="number">1.2</span> <span class="op">*</span> <span class="number">0.875</span>);
+        <span class="ident">approx_eq</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>), <span class="number">1.2</span> <span class="op">*</span> <span class="number">0.875</span>, <span class="number">8.0</span>, <span class="number">0.0</span>);
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e10</span>) <span class="op">&lt;</span> <span class="number">1e-30</span>);
 
         <span class="ident">approx_eq</span>(

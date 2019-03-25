@@ -185,6 +185,8 @@
 <span id="185">185</span>
 <span id="186">186</span>
 <span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">/// # Butcher tableaux</span>
 <span class="doccomment">///</span>
@@ -211,6 +213,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">array</span>, <span class="ident">Array1</span>};
     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">consts</span>::<span class="ident">PI</span>;
 
@@ -267,7 +270,7 @@
     <span class="macro">solve_ode</span><span class="macro">!</span>(<span class="ident">solve_ode_rkf45</span>, <span class="ident">rkf45</span>);
 
     <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">test_sine</span> {
-        ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>:<span class="ident">ident</span> ) <span class="op">=&gt;</span> {
+        ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prec</span>:<span class="ident">expr</span> ) <span class="op">=&gt;</span> {
             <span class="attribute">#[<span class="ident">test</span>]</span>
             <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>() {
                 <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">_t</span>: <span class="ident">f64</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">|</span> <span class="op">-&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> { <span class="macro">array</span><span class="macro">!</span>[<span class="op">-</span><span class="ident">x</span>[<span class="number">1</span>], <span class="ident">x</span>[<span class="number">0</span>]] };
@@ -277,19 +280,19 @@
                 <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="number">0.0</span>;
 
                 <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">x</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>(<span class="ident">x</span>, <span class="ident">t</span>, <span class="ident">TWO_PI</span>, <span class="ident">h</span>, <span class="ident">f</span>);
-                <span class="macro">assert</span><span class="macro">!</span>((<span class="macro">dbg</span><span class="macro">!</span>(<span class="ident">x</span>[<span class="number">0</span>]) <span class="op">-</span> <span class="number">1.0</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">h</span>);
-                <span class="macro">assert</span><span class="macro">!</span>((<span class="macro">dbg</span><span class="macro">!</span>(<span class="ident">x</span>[<span class="number">1</span>]) <span class="op">-</span> <span class="ident">h</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">h</span>);
+                <span class="ident">approx_eq</span>(<span class="ident">x</span>[<span class="number">0</span>], <span class="number">1.0</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prec</span>, <span class="number">0.0</span>);
+                <span class="ident">approx_eq</span>(<span class="ident">x</span>[<span class="number">1</span>], <span class="ident">h</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prec</span>, <span class="number">0.0</span>);
             }
         };
     }
 
-    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_midpoint</span>, <span class="ident">solve_ode_midpoint</span>);
-    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_rk4</span>, <span class="ident">solve_ode_rk4</span>);
-    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_rk4_38</span>, <span class="ident">solve_ode_rk4_38</span>);
-    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_rkf45</span>, <span class="ident">solve_ode_rkf45</span>);
+    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_midpoint</span>, <span class="ident">solve_ode_midpoint</span>, <span class="number">3.3</span>);
+    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_rk4</span>, <span class="ident">solve_ode_rk4</span>, <span class="number">7.7</span>);
+    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_rk4_38</span>, <span class="ident">solve_ode_rk4_38</span>, <span class="number">7.7</span>);
+    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_rkf45</span>, <span class="ident">solve_ode_rkf45</span>, <span class="number">7.7</span>);
 
     <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">test_lotka_volterra</span> {
-        ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>:<span class="ident">ident</span> ) <span class="op">=&gt;</span> {
+        ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prec</span>:<span class="ident">expr</span> ) <span class="op">=&gt;</span> {
             <span class="attribute">#[<span class="ident">test</span>]</span>
             <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>() {
                 <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">_t</span>: <span class="ident">f64</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">|</span> <span class="op">-&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
@@ -301,25 +304,26 @@
                 <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="number">0.0</span>;
 
                 <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">x</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>(<span class="ident">x</span>, <span class="ident">t</span>, <span class="number">10.0</span>, <span class="ident">h</span>, <span class="ident">f</span>);
-                <span class="macro">assert</span><span class="macro">!</span>((<span class="macro">dbg</span><span class="macro">!</span>(<span class="ident">x</span>[<span class="number">0</span>]) <span class="op">-</span> <span class="number">0.62237406351892283361214420345</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">h</span>);
-                <span class="macro">assert</span><span class="macro">!</span>((<span class="macro">dbg</span><span class="macro">!</span>(<span class="ident">x</span>[<span class="number">1</span>]) <span class="op">-</span> <span class="number">2.1153312681627127969862394480</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">h</span>);
+                <span class="ident">approx_eq</span>(<span class="ident">x</span>[<span class="number">0</span>], <span class="number">0.622_374_063_518_922_9</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prec</span>, <span class="number">0.0</span>);
+                <span class="ident">approx_eq</span>(<span class="ident">x</span>[<span class="number">1</span>], <span class="number">2.115_331_268_162_712_8</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prec</span>, <span class="number">0.0</span>);
             }
         };
     }
 
-    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_midpoint</span>, <span class="ident">solve_ode_midpoint</span>);
-    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_rk4</span>, <span class="ident">solve_ode_rk4</span>);
-    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_rk4_38</span>, <span class="ident">solve_ode_rk4_38</span>);
-    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_rkf45</span>, <span class="ident">solve_ode_rkf45</span>);
+    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_midpoint</span>, <span class="ident">solve_ode_midpoint</span>, <span class="number">4.0</span>);
+    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_rk4</span>, <span class="ident">solve_ode_rk4</span>, <span class="number">4.0</span>);
+    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_rk4_38</span>, <span class="ident">solve_ode_rk4_38</span>, <span class="number">4.0</span>);
+    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_rkf45</span>, <span class="ident">solve_ode_rkf45</span>, <span class="number">4.0</span>);
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">bench</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">tests</span>::{<span class="ident">solve_ode_midpoint</span>, <span class="ident">solve_ode_rk4</span>, <span class="ident">solve_ode_rk4_38</span>, <span class="ident">solve_ode_rkf45</span>};
+    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">array</span>, <span class="ident">Array1</span>};
     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">consts</span>::<span class="ident">PI</span>;
-    <span class="kw">use</span> <span class="ident">test</span>::{<span class="ident">black_box</span>, <span class="ident">Bencher</span>};
+    <span class="kw">use</span> <span class="ident">test</span>::<span class="ident">Bencher</span>;
 
     <span class="kw">const</span> <span class="ident">TWO_PI</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">PI</span>;
 
@@ -335,8 +339,8 @@
                     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="number">0.0</span>;
 
                     <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">x</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>(<span class="ident">x</span>, <span class="ident">t</span>, <span class="ident">TWO_PI</span>, <span class="ident">h</span>, <span class="ident">f</span>);
-                    <span class="macro">assert</span><span class="macro">!</span>((<span class="macro">dbg</span><span class="macro">!</span>(<span class="ident">x</span>[<span class="number">0</span>]) <span class="op">-</span> <span class="number">1.0</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">h</span>);
-                    <span class="macro">assert</span><span class="macro">!</span>((<span class="macro">dbg</span><span class="macro">!</span>(<span class="ident">x</span>[<span class="number">1</span>]) <span class="op">-</span> <span class="ident">h</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">h</span>);
+                    <span class="ident">approx_eq</span>(<span class="ident">x</span>[<span class="number">0</span>], <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>);
+                    <span class="ident">approx_eq</span>(<span class="ident">x</span>[<span class="number">1</span>], <span class="ident">h</span>, <span class="number">1.0</span>, <span class="number">0.0</span>);
                 });
             }
         };
@@ -361,8 +365,8 @@
                     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="number">0.0</span>;
 
                     <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">x</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>(<span class="ident">x</span>, <span class="ident">t</span>, <span class="number">10.0</span>, <span class="ident">h</span>, <span class="ident">f</span>);
-                    <span class="macro">assert</span><span class="macro">!</span>((<span class="macro">dbg</span><span class="macro">!</span>(<span class="ident">x</span>[<span class="number">0</span>]) <span class="op">-</span> <span class="number">0.62237406351892283361214420345</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">h</span>);
-                    <span class="macro">assert</span><span class="macro">!</span>((<span class="macro">dbg</span><span class="macro">!</span>(<span class="ident">x</span>[<span class="number">1</span>]) <span class="op">-</span> <span class="number">2.1153312681627127969862394480</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">h</span>);
+                    <span class="ident">approx_eq</span>(<span class="ident">x</span>[<span class="number">0</span>], <span class="number">0.622_374_063_518_922_9</span>, <span class="number">1.0</span>, <span class="number">0.0</span>);
+                    <span class="ident">approx_eq</span>(<span class="ident">x</span>[<span class="number">1</span>], <span class="number">2.115_331_268_162_712_8</span>, <span class="number">1.0</span>, <span class="number">0.0</span>);
                 });
             }
         };
