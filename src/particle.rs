@@ -158,7 +158,7 @@ mod tests {
         assert!(!particle.is_fermionic());
         assert!(!particle.is_complex());
 
-        assert!(particle.entropy_dof(1e-10) == 1.0);
+        approx_eq(particle.entropy_dof(1e-10), 1.0, 8.0, 0.0);
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
@@ -177,7 +177,7 @@ mod tests {
         assert!(!particle.is_fermionic());
         assert!(particle.is_complex());
 
-        assert!(particle.entropy_dof(1e-10) == 2.0);
+        approx_eq(particle.entropy_dof(1e-10), 2.0, 8.0, 0.0);
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
@@ -196,7 +196,7 @@ mod tests {
         assert!(particle.is_fermionic());
         assert!(!particle.is_complex());
 
-        assert!(particle.entropy_dof(1e-10) == 2.0 * 0.875);
+        approx_eq(particle.entropy_dof(1e-10), 2.0 * 0.875, 8.0, 0.0);
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
@@ -215,7 +215,7 @@ mod tests {
         assert!(!particle.is_fermionic());
         assert!(!particle.is_complex());
 
-        assert!(particle.entropy_dof(1e-10) == 3.0);
+        approx_eq(particle.entropy_dof(1e-10), 3.0, 8.0, 0.0);
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
@@ -236,7 +236,7 @@ mod tests {
         assert!(!particle.is_fermionic());
         assert!(particle.is_complex());
 
-        assert!(particle.entropy_dof(1e-10) == 2.5);
+        approx_eq(particle.entropy_dof(1e-10), 2.5, 8.0, 0.0);
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
@@ -255,7 +255,7 @@ mod tests {
         assert!(particle.is_fermionic());
         assert!(!particle.is_complex());
 
-        assert!(particle.entropy_dof(1e-10) == 1.2 * 0.875);
+        approx_eq(particle.entropy_dof(1e-10), 1.2 * 0.875, 8.0, 0.0);
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
