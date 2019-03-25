@@ -1,25 +1,25 @@
-/// # Butcher tableaux
-///
-/// A Butcher tableau is as described at https://en.wikipedia.org/wiki/Butcher_tableau.
-///
-///
-/// Note that the indexing is slightly different than usual convention (and uses 0-indexing).  In
-/// particular, for an `n`th order solver:
-///
-/// - the Runge-Kutta matrix `a[i][j]` is an `(n-1)x(n-1)` matrix with non-zero entries
-///   located when `i ≤ j`.
-/// - the weights vector `b[i]` is an `n` vector.
-/// - the nodes vector `c[i]` is an `n-1` vector and differs from literature where
-///   the first (always zero) entry is omitted.  Combined with 0-indexing, this
-///   means that `c[0]` corresponds to *c₂* in the literature.
-///
-/// Lastly, adaptive methods with two weights vectors will be stored as
-/// `b[0][i]` and `b[1][i]`; with `b[0]` containing the lower-order weights, and
-/// `b[1]` the higher order weights.
-pub(crate) mod midpoint;
-pub(crate) mod rk4;
-pub(crate) mod rk4_38;
-pub(crate) mod rkf45;
+//! # Butcher tableaux
+//!
+//! A Butcher tableau is as described at https://en.wikipedia.org/wiki/Butcher_tableau.
+//!
+//! Note that the indexing is slightly different than usual convention (and uses 0-indexing).  In
+//! particular, for an `n`th order solver:
+//!
+//! - the Runge-Kutta matrix `a[i][j]` is an `(n-1)x(n-1)` matrix with non-zero entries
+//!   located when `i ≤ j`.
+//! - the weights vector `b[i]` is an `n` vector.
+//! - the nodes vector `c[i]` is an `n-1` vector and differs from literature where
+//!   the first (always zero) entry is omitted.  Combined with 0-indexing, this
+//!   means that `c[0]` corresponds to *c₂* in the literature.
+//!
+//! Lastly, adaptive methods with two weights vectors will be stored as
+//! `b[0][i]` and `b[1][i]`; with `b[0]` containing the higher-order weights, and
+//! `b[0]` the higher order weights.
+
+pub(crate) mod bs32;
+pub(crate) mod ck54;
+pub(crate) mod dp54;
+pub(crate) mod rkf54;
 
 #[cfg(test)]
 mod tests {
@@ -65,7 +65,7 @@ mod tests {
                     dx[1] = (0..RK_ORDER)
                         .fold(Array1::zeros(2), |total, i| total + &(&k[i] * RK_B[1][i]));
 
-                    x += &dx[1];
+                    x += &dx[0];
                     t += h;
                 }
 
@@ -74,10 +74,10 @@ mod tests {
         };
     }
 
-    solve_ode!(solve_ode_midpoint, midpoint);
-    solve_ode!(solve_ode_rk4, rk4);
-    solve_ode!(solve_ode_rk4_38, rk4_38);
-    solve_ode!(solve_ode_rkf45, rkf45);
+    solve_ode!(solve_ode_bs32, bs32);
+    solve_ode!(solve_ode_ck54, ck54);
+    solve_ode!(solve_ode_dp54, dp54);
+    solve_ode!(solve_ode_rkf54, rkf54);
 
     macro_rules! test_sine {
         ( $name:ident, $solver:ident, $prec:expr ) => {
@@ -96,10 +96,10 @@ mod tests {
         };
     }
 
-    test_sine!(test_sine_midpoint, solve_ode_midpoint, 3.3);
-    test_sine!(test_sine_rk4, solve_ode_rk4, 7.7);
-    test_sine!(test_sine_rk4_38, solve_ode_rk4_38, 7.7);
-    test_sine!(test_sine_rkf45, solve_ode_rkf45, 7.7);
+    test_sine!(test_sine_bs32, solve_ode_bs32, 7.7);
+    test_sine!(test_sine_ck54, solve_ode_ck54, 7.7);
+    test_sine!(test_sine_dp54, solve_ode_dp54, 7.7);
+    test_sine!(test_sine_rkf54, solve_ode_rkf54, 7.7);
 
     macro_rules! test_lotka_volterra {
         ( $name:ident, $solver:ident, $prec:expr ) => {
@@ -120,16 +120,16 @@ mod tests {
         };
     }
 
-    test_lotka_volterra!(test_lotka_volterra_midpoint, solve_ode_midpoint, 4.0);
-    test_lotka_volterra!(test_lotka_volterra_rk4, solve_ode_rk4, 4.0);
-    test_lotka_volterra!(test_lotka_volterra_rk4_38, solve_ode_rk4_38, 4.0);
-    test_lotka_volterra!(test_lotka_volterra_rkf45, solve_ode_rkf45, 4.0);
+    test_lotka_volterra!(test_lotka_volterra_bs32, solve_ode_bs32, 4.0);
+    test_lotka_volterra!(test_lotka_volterra_ck54, solve_ode_ck54, 4.0);
+    test_lotka_volterra!(test_lotka_volterra_dp54, solve_ode_dp54, 4.0);
+    test_lotka_volterra!(test_lotka_volterra_rkf54, solve_ode_rkf54, 4.0);
 }
 
 #[cfg(feature = "nightly")]
 #[cfg(test)]
 mod bench {
-    use super::tests::{solve_ode_midpoint, solve_ode_rk4, solve_ode_rk4_38, solve_ode_rkf45};
+    use super::tests::{solve_ode_bs32, solve_ode_ck54, solve_ode_dp54, solve_ode_rkf54};
     use crate::utilities::test::*;
     use ndarray::{array, Array1};
     use std::f64::consts::PI;
@@ -156,10 +156,10 @@ mod bench {
         };
     }
 
-    bench_sine!(bench_sine_midpoint, solve_ode_midpoint);
-    bench_sine!(bench_sine_rk4, solve_ode_rk4);
-    bench_sine!(bench_sine_rk4_38, solve_ode_rk4_38);
-    bench_sine!(bench_sine_rkf45, solve_ode_rkf45);
+    bench_sine!(bench_sine_bs32, solve_ode_bs32);
+    bench_sine!(bench_sine_ck54, solve_ode_ck54);
+    bench_sine!(bench_sine_dp54, solve_ode_dp54);
+    bench_sine!(bench_sine_rkf54, solve_ode_rkf54);
 
     macro_rules! bench_lotka_volterra {
         ( $name:ident, $solver:ident ) => {
@@ -182,8 +182,8 @@ mod bench {
         };
     }
 
-    bench_lotka_volterra!(bench_lotka_volterra_midpoint, solve_ode_midpoint);
-    bench_lotka_volterra!(bench_lotka_volterra_rk4, solve_ode_rk4);
-    bench_lotka_volterra!(bench_lotka_volterra_rk4_38, solve_ode_rk4_38);
-    bench_lotka_volterra!(bench_lotka_volterra_rkf45, solve_ode_rkf45);
+    bench_lotka_volterra!(bench_lotka_volterra_bs32, solve_ode_bs32);
+    bench_lotka_volterra!(bench_lotka_volterra_ck54, solve_ode_ck54);
+    bench_lotka_volterra!(bench_lotka_volterra_dp54, solve_ode_dp54);
+    bench_lotka_volterra!(bench_lotka_volterra_rkf54, solve_ode_rkf54);
 }

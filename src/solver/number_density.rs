@@ -256,7 +256,7 @@
 //! taken into account.
 
 use super::{
-    tableau::rkf45::{RK_A, RK_B, RK_C, RK_ORDER},
+    tableau::dp54::{RK_A, RK_B, RK_C, RK_ORDER},
     EmptyModel, ErrorTolerance, InitialCondition, Model, Solver, StepChange, StepPrecision,
 };
 use crate::{particle::Particle, universe::Universe};
