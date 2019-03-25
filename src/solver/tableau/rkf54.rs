@@ -1,3 +1,4 @@
+//! Runge–Kutta–Fehlberg Method
 #[allow(dead_code)]
 pub const RK_ORDER: usize = 6;
 #[allow(dead_code)]
@@ -17,20 +18,20 @@ pub const RK_A: [[f64; RK_ORDER - 1]; RK_ORDER - 1] = [
 #[allow(dead_code)]
 pub const RK_B: [[f64; RK_ORDER]; 2] = [
     [
-        25.0 / 216.0,
-        0.0,
-        1408.0 / 2565.0,
-        2197.0 / 4104.0,
-        -1.0 / 5.0,
-        0.0,
-    ],
-    [
         16.0 / 135.0,
         0.0,
         6656.0 / 12825.0,
         28561.0 / 56430.0,
         -9.0 / 50.0,
         2.0 / 55.0,
+    ],
+    [
+        25.0 / 216.0,
+        0.0,
+        1408.0 / 2565.0,
+        2197.0 / 4104.0,
+        -1.0 / 5.0,
+        0.0,
     ],
 ];
 #[allow(dead_code)]
