@@ -2,7 +2,7 @@
 
 pub mod number_density;
 mod options;
-pub mod phase_space;
+// pub mod phase_space;
 mod tableau;
 
 pub use self::options::InitialCondition;
