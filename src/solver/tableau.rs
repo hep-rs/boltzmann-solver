@@ -20,6 +20,7 @@ pub(crate) mod bs32;
 pub(crate) mod ck54;
 pub(crate) mod dp54;
 pub(crate) mod rkf54;
+pub mod dp87;
 
 #[cfg(test)]
 mod tests {
@@ -77,6 +78,7 @@ mod tests {
     solve_ode!(solve_ode_bs32, bs32);
     solve_ode!(solve_ode_ck54, ck54);
     solve_ode!(solve_ode_dp54, dp54);
+    solve_ode!(solve_ode_dp87, dp87);
     solve_ode!(solve_ode_rkf54, rkf54);
 
     macro_rules! test_sine {
@@ -99,6 +101,7 @@ mod tests {
     test_sine!(test_sine_bs32, solve_ode_bs32, 7.7);
     test_sine!(test_sine_ck54, solve_ode_ck54, 7.7);
     test_sine!(test_sine_dp54, solve_ode_dp54, 7.7);
+    test_sine!(test_sine_dp87, solve_ode_dp87, 7.7);
     test_sine!(test_sine_rkf54, solve_ode_rkf54, 7.7);
 
     macro_rules! test_lotka_volterra {
@@ -123,6 +126,7 @@ mod tests {
     test_lotka_volterra!(test_lotka_volterra_bs32, solve_ode_bs32, 4.0);
     test_lotka_volterra!(test_lotka_volterra_ck54, solve_ode_ck54, 4.0);
     test_lotka_volterra!(test_lotka_volterra_dp54, solve_ode_dp54, 4.0);
+    test_lotka_volterra!(test_lotka_volterra_dp87, solve_ode_dp87, 4.0);
     test_lotka_volterra!(test_lotka_volterra_rkf54, solve_ode_rkf54, 4.0);
 }
 
