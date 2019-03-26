@@ -148,7 +148,6 @@ fn minimal_leptogenesis() {
     // Create the Solver and set integration parameters
     let mut solver: NumberDensitySolver<LeptogenesisModel> = NumberDensitySolver::new()
         .beta_range(1e-14, 1e0)
-        .error_tolerance(1e-1, 1e-2)
         .initialize();
 
     // Add the particles to the solver, using for initial condition either 0 or

@@ -1,5 +1,8 @@
 //! Runge–Kutta–Fehlberg Method
-pub const RK_ORDER: usize = 5;
+
+#![allow(dead_code)]
+
+pub const RK_ORDER: i32 = 5;
 pub const RK_DIM: usize = 6;
 pub const RK_A: [[f64; RK_DIM - 1]; RK_DIM - 1] = [
     [1.0 / 4.0, 0.0, 0.0, 0.0, 0.0],

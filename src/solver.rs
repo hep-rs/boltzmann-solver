@@ -6,7 +6,7 @@ pub mod phase_space;
 mod tableau;
 
 pub use self::options::InitialCondition;
-pub(crate) use self::options::{ErrorTolerance, StepChange, StepPrecision};
+pub(crate) use self::options::{StepChange, StepPrecision};
 use crate::particle::Particle;
 use crate::universe::Universe;
 
@@ -128,17 +128,9 @@ pub trait Solver {
 
     /// Specify the local error tolerance.
     ///
-    /// At each step, the solver will compare approximates the integration using
-    /// both the Euler and Runge-Kutta methods.  The error is then calculated as:
-    ///
-    /// \\begin{equation}
-    ///   \mathrm{Error} = \left\lvert \frac{(\Delta y)_{\mathrm{Euler}}}{(\Delta y)_{\mathrm{RK}}} - 1 \right\rvert
-    /// \\end{equation}
-    ///
-    /// If the error is greater than the upper bound specified, the integration
-    /// step size is made smaller.  Conversely, if the error is smaller than the
-    /// lower bound, the integration step is increased.
-    fn error_tolerance(self, upper: f64, lower: f64) -> Self;
+    /// If the error deviates too far from the specified tolerance, the
+    /// integration step size is adjusted accordingly.
+    fn error_tolerance(self, tol: f64) -> Self;
 
     /// Initialize the phase space solver.
     fn initialize(self) -> Self;

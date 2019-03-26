@@ -45,7 +45,7 @@
 //! a)}^2\\)) while leaving all dependence on \\(E_i\\) and \\(\abs{\vt p_i}\\)
 //! explicit.
 
-use super::{ErrorTolerance, InitialCondition, Solver, StepChange, StepPrecision};
+use super::{InitialCondition, Solver, StepChange, StepPrecision};
 use crate::{
     particle::Particle,
     statistic::{
@@ -90,7 +90,7 @@ pub struct PhaseSpaceSolver {
     energy_step_size: f64,
     step_change: StepChange,
     step_precision: StepPrecision,
-    error_tolerance: ErrorTolerance,
+    error_tolerance: f64,
 }
 
 impl PhaseSpaceSolver {
@@ -129,7 +129,7 @@ impl Solver for PhaseSpaceSolver {
             energy_step_size: 0.0,
             step_change: StepChange::default(),
             step_precision: StepPrecision::default(),
-            error_tolerance: ErrorTolerance::default(),
+            error_tolerance: 1e-4,
         }
     }
 
@@ -175,12 +175,9 @@ impl Solver for PhaseSpaceSolver {
         self
     }
 
-    fn error_tolerance(mut self, upper: f64, lower: f64) -> Self {
-        assert!(
-            upper > lower,
-            "The upper error tolerance must be greater than the lower tolerance"
-        );
-        self.error_tolerance = ErrorTolerance { upper, lower };
+    fn error_tolerance(mut self, tol: f64) -> Self {
+        assert!(tol > 0.0, "The error tolerance must be greater than 0.");
+        self.error_tolerance = tol;
         self
     }
 
@@ -324,37 +321,37 @@ impl Solver for PhaseSpaceSolver {
                 .unwrap_or(0.0);
 
             // Adjust the step size as needed based on the step size.
-            if err < self.error_tolerance.lower {
-                h *= self.step_change.increase;
-                debug!(
-                    "Step {:>7}, β = {:>9.2e} -> Increased h to {:.3e}",
-                    n_eval, beta, h
-                );
-            } else if err > self.error_tolerance.upper {
-                h *= self.step_change.decrease;
-                debug!(
-                    "Step {:>7}, β = {:>9.2e} -> Decreased h to {:.3e}",
-                    n_eval, beta, h
-                );
+            // if err < self.error_tolerance.lower {
+            //     h *= self.step_change.increase;
+            //     debug!(
+            //         "Step {:>7}, β = {:>9.2e} -> Increased h to {:.3e}",
+            //         n_eval, beta, h
+            //     );
+            // } else if err > self.error_tolerance.upper {
+            //     h *= self.step_change.decrease;
+            //     debug!(
+            //         "Step {:>7}, β = {:>9.2e} -> Decreased h to {:.3e}",
+            //         n_eval, beta, h
+            //     );
 
-                // Prevent h from getting too small that it might make
-                // integration take too long.  Use the result regardless even
-                // though it is bigger than desired error.
-                if beta / h > 1e5 {
-                    warn!(
-                        "Step {:>7}, β = {:>9.2e} -> Step size getting too small (β / h = {:.1e}).",
-                        n_eval, beta, beta / h
-                    );
+            //     // Prevent h from getting too small that it might make
+            //     // integration take too long.  Use the result regardless even
+            //     // though it is bigger than desired error.
+            //     if beta / h > 1e5 {
+            //         warn!(
+            //             "Step {:>7}, β = {:>9.2e} -> Step size getting too small (β / h = {:.1e}).",
+            //             n_eval, beta, beta / h
+            //         );
 
-                    while beta / h > 1e5 {
-                        h *= self.step_change.increase;
-                    }
+            //         while beta / h > 1e5 {
+            //             h *= self.step_change.increase;
+            //         }
 
-                    y += &dy;
-                    beta += h;
-                }
-                continue;
-            }
+            //         y += &dy;
+            //         beta += h;
+            //     }
+            //     continue;
+            // }
 
             y += &dy;
             beta += h;
@@ -438,7 +435,6 @@ mod tests {
         let phi = Particle::new("φ".to_string(), 0, 5.0);
         let mut solver = PhaseSpaceSolver::new()
             .temperature_range(1e20, 1e-10)
-            .error_tolerance(1e-1, 1e-2)
             .initialize();
         solver.add_particle(phi, InitialCondition::Equilibrium(0.0));
 
