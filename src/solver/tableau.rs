@@ -12,15 +12,18 @@
 //!   the first (always zero) entry is omitted.  Combined with 0-indexing, this
 //!   means that `c[0]` corresponds to *c₂* in the literature.
 //!
+//! The dimension of the various arrays is determined by `RK_DIM` whilst the
+//! order of the solution is set in `RK_ORDER`.
+//!
 //! Lastly, adaptive methods with two weights vectors will be stored as
 //! `b[0][i]` and `b[1][i]`; with `b[0]` containing the higher-order weights, and
 //! `b[0]` the higher order weights.
 
-pub(crate) mod bs32;
-pub(crate) mod ck54;
-pub(crate) mod dp54;
-pub(crate) mod rkf54;
+pub mod bs32;
+pub mod ck54;
+pub mod dp54;
 pub mod dp87;
+pub mod rkf54;
 
 #[cfg(test)]
 mod tests {
@@ -45,7 +48,7 @@ mod tests {
                 use super::$method::*;
 
                 let mut dx = [Array1::zeros(x.dim()), Array1::zeros(x.dim())];
-                let mut k: [Array1<f64>; RK_ORDER + 1];
+                let mut k: [Array1<f64>; RK_DIM + 1];
                 unsafe {
                     k = std::mem::uninitialized();
                     for ki in &mut k[..] {
@@ -55,15 +58,15 @@ mod tests {
 
                 while t < tf {
                     k[0] = f(t, &x) * h;
-                    for i in 0..(RK_ORDER - 1) {
+                    for i in 0..(RK_DIM - 1) {
                         let t_tmp = t + RK_C[i] * h;
                         let x_tmp = (0..=i).fold(x.clone(), |total, j| total + &k[j] * RK_A[i][j]);
                         k[i + 1] = f(t_tmp, &x_tmp) * h;
                     }
 
-                    dx[0] = (0..RK_ORDER)
+                    dx[0] = (0..RK_DIM)
                         .fold(Array1::zeros(2), |total, i| total + &(&k[i] * RK_B[0][i]));
-                    dx[1] = (0..RK_ORDER)
+                    dx[1] = (0..RK_DIM)
                         .fold(Array1::zeros(2), |total, i| total + &(&k[i] * RK_B[1][i]));
 
                     x += &dx[0];

@@ -1,8 +1,7 @@
 //! Dormand–Prince Method
-#[allow(dead_code)]
-pub const RK_ORDER: usize = 7;
-#[allow(dead_code)]
-pub const RK_A: [[f64; RK_ORDER - 1]; RK_ORDER - 1] = [
+pub const RK_ORDER: usize = 5;
+pub const RK_DIM: usize = 7;
+pub const RK_A: [[f64; RK_DIM - 1]; RK_DIM - 1] = [
     [1.0 / 5.0, 0.0, 0.0, 0.0, 0.0, 0.0],
     [3.0 / 40.0, 9.0 / 40.0, 0.0, 0.0, 0.0, 0.0],
     [44.0 / 45.0, -56.0 / 15.0, 32.0 / 9.0, 0.0, 0.0, 0.0],
@@ -31,8 +30,7 @@ pub const RK_A: [[f64; RK_ORDER - 1]; RK_ORDER - 1] = [
         11.0 / 84.0,
     ],
 ];
-#[allow(dead_code)]
-pub const RK_B: [[f64; RK_ORDER]; 2] = [
+pub const RK_B: [[f64; RK_DIM]; 2] = [
     [
         35.0 / 384.0,
         0.0,
@@ -52,5 +50,4 @@ pub const RK_B: [[f64; RK_ORDER]; 2] = [
         1.0 / 40.0,
     ],
 ];
-#[allow(dead_code)]
-pub const RK_C: [f64; RK_ORDER - 1] = [1.0 / 5.0, 3.0 / 10.0, 4.0 / 5.0, 8.0 / 9.0, 1.0, 1.0];
+pub const RK_C: [f64; RK_DIM - 1] = [1.0 / 5.0, 3.0 / 10.0, 4.0 / 5.0, 8.0 / 9.0, 1.0, 1.0];

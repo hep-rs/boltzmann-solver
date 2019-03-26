@@ -256,10 +256,9 @@
 //! taken into account.
 
 use super::{
-    tableau::dp54::{RK_A, RK_B, RK_C, RK_ORDER},
     EmptyModel, ErrorTolerance, InitialCondition, Model, Solver, StepChange, StepPrecision,
 };
-use crate::{particle::Particle, universe::Universe};
+use crate::{particle::Particle, solver::tableau::dp87::*, universe::Universe};
 use ndarray::{prelude::*, FoldWhile, Zip};
 
 /// Context provided containing pre-computed values which might be useful when
@@ -460,7 +459,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         let mut h = beta * self.step_precision.min;
 
         // Allocate variables which will be re-used each for loop
-        let mut k: [Self::Solution; RK_ORDER + 1];
+        let mut k: [Self::Solution; RK_DIM + 1];
         unsafe {
             k = std::mem::uninitialized();
             for ki in &mut k[..] {
@@ -490,7 +489,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &n, &c))
                 * h;
 
-            for i in 0..(RK_ORDER - 1) {
+            for i in 0..(RK_DIM - 1) {
                 let c_tmp = self.context(step, beta + RK_C[i] * h, h, universe);
                 let n_tmp = (0..=i).fold(n.clone(), |total, j| total + &k[j] * RK_A[i][j]);
                 k[i + 1] = self
@@ -501,10 +500,10 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             }
 
             // Calculate dn.
-            dn[0] = (0..RK_ORDER).fold(Self::Solution::zeros(n.dim()), |total, i| {
+            dn[0] = (0..RK_DIM).fold(Self::Solution::zeros(n.dim()), |total, i| {
                 total + &(&k[i] * RK_B[0][i])
             });
-            dn[1] = (0..RK_ORDER).fold(Self::Solution::zeros(n.dim()), |total, i| {
+            dn[1] = (0..RK_DIM).fold(Self::Solution::zeros(n.dim()), |total, i| {
                 total + &(&k[i] * RK_B[1][i])
             });
 
