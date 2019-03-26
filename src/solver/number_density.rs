@@ -598,19 +598,18 @@ impl<M: Model> NumberDensitySolver<M> {
     ) {
         // In order to avoid over-shooting 0, we set the number density
         // to be exactly 0 whenever it changes sign.
-        // Zip::from(&mut n).and(&(h * &dn[0])).apply(|n, dn| {
-        //     let next_n = *n + dn;
-        //     if next_n * (*n) >= 0.0 {
-        //         *n = next_n;
-        //     } else {
-        //         *n = 0.0;
-        //     }
-        // });
-        *n = &(*n) + &(dn * h);
+        Zip::from(&mut *n).and(dn).apply(|n, dn| {
+            let next_n = *n + h * dn;
+            if next_n * (*n) >= 0.0 {
+                *n = next_n;
+            } else {
+                *n = 0.0;
+            }
+        });
         *beta += h;
 
         // Run the logger now
-        (*self.logger)(&n, dn, c);
+        (*self.logger)(n, dn, c);
     }
 
     fn context<U: Universe>(
