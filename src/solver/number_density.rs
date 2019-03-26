@@ -445,16 +445,14 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             "The phase space solver has to be initialized first with the `initialize()` method."
         );
 
+        // Initialize all the variables that will be used in the integration
         let mut n = Array1::from_vec(self.initial_conditions.clone());
         let mut dn = [
             Self::Solution::zeros(n.dim()),
             Self::Solution::zeros(n.dim()),
         ];
-        let mut beta = self.beta_range.0;
-        let mut h = beta * self.step_precision.min;
 
-        // Allocate variables which will be re-used each for loop
-        let mut k: [Self::Solution; RK_DIM + 1];
+        let mut k: [Self::Solution; RK_S];
         unsafe {
             k = std::mem::uninitialized();
             for ki in &mut k[..] {
@@ -463,57 +461,66 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         };
 
         let mut step = 0;
+        let mut advanced: bool;
+        let mut beta = self.beta_range.0;
+        let mut h = beta * self.step_precision.min;
 
-        // Create the initial context
-        let mut c = self.context(step, beta, h, universe);
-
-        // Run the logger now
+        // Create the initial context and log the initial conditions
+        let mut c = self.context(step, beta, universe, h);
         (*self.logger)(&n, &dn[0], &c);
 
         while beta < self.beta_range.1 {
             step += 1;
+            advanced = false;
 
-            // Runge–Kutta method
-            ////////////////////////////////////////
-
-            // 0th order term (Newton method) is always the same
-            c = self.context(step, beta, h, universe);
-            k[0] = self
+            // Compute each k[i]
+            c = self.context(step, beta, universe, h);
+            k[0] = h * self
                 .interactions
                 .iter()
-                .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &n, &c))
-                * h;
-
-            for i in 0..(RK_DIM - 1) {
-                let c_tmp = self.context(step, beta + RK_C[i] * h, h, universe);
-                let n_tmp = (0..=i).fold(n.clone(), |total, j| total + &k[j] * RK_A[i][j]);
-                k[i + 1] = self
+                .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &n, &c));
+            for i in 0..RK_S {
+                let c_tmp = self.context(step, beta + RK_C[i] * h, universe, h);
+                let ai = RK_A[i];
+                let n_tmp = (0..i).fold(n.clone(), |total, j| total + h * ai[j] * &k[j]);
+                k[i] = self
                     .interactions
                     .iter()
-                    .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &n_tmp, &c_tmp))
-                    * h;
+                    .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &n_tmp, &c_tmp));
             }
 
-            // Calculate dn.
-            dn[0] = (0..RK_DIM).fold(Self::Solution::zeros(n.dim()), |total, i| {
-                total + &(&k[i] * RK_B[0][i])
+            // Calculate the two estimates
+            dn[0] = (0..RK_S).fold(Self::Solution::zeros(n.dim()), |total, i| {
+                total + RK_B[0][i] * &k[i]
             });
-            dn[1] = (0..RK_DIM).fold(Self::Solution::zeros(n.dim()), |total, i| {
-                total + &(&k[i] * RK_B[1][i])
+            dn[1] = (0..RK_S).fold(Self::Solution::zeros(n.dim()), |total, i| {
+                total + RK_B[1][i] * &k[i]
             });
 
-            // Check the error on the RK method vs the Euler method.  If it is
-            // small enough, increase the step size.  We use the maximum error
-            // for any given element of `dn`.
+            // Get the error between the estimates
             let err = Zip::from(&dn[0])
                 .and(&dn[1])
-                .fold_while(0.0, |e, a, b| FoldWhile::Continue(e + (a - b)))
-                .into_inner()
-                .abs();
+                .fold_while(0.0, |e, a, b| {
+                    let v = (a - b).abs();
+                    if v > e {
+                        FoldWhile::Continue(v)
+                    } else {
+                        FoldWhile::Continue(e)
+                    }
+                })
+                .into_inner();
 
-            let delta = 0.9 * (self.error_tolerance / err).powf(1.0 / f64::from(RK_ORDER));
+            // If the error is within the tolerance, add the result
+            if err < self.error_tolerance {
+                self.advance(&mut n, &dn[0], &mut beta, h, &c);
+                advanced = true;
+            }
 
-            // Adjust the step size based on the error
+            // Compute the change in step size based on the current error
+            let delta = 0.9 * (self.error_tolerance / err).powf(1.0 / f64::from(RK_ORDER + 1));
+            // debug!("Step {:}, β = {:.4e} -> δ = {:<10.3e}", step, beta, delta);
+
+            // And correspondingly adjust the error
             h *= if delta < self.step_change.decrease {
                 self.step_change.decrease
             } else if delta > self.step_change.increase {
@@ -530,26 +537,27 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                     "Step {:}, β = {:.4e} -> Step size too large, decreased h to {:.3e}",
                     step, beta, h
                 );
+
+                // If we reach the maximum step precision and the error is still
+                // too large (thus did not advance before), we advance beta
+                // regardless now to prevent the integration from getting stuck.
+                if !advanced {
+                    self.advance(&mut n, &dn[0], &mut beta, h, &c);
+                }
             } else if h < beta * self.step_precision.min {
                 h = beta * self.step_precision.min;
                 debug!(
                     "Step {:}, β = {:.4e} -> Step size too small, increased h to {:.3e}",
                     step, beta, h
                 );
-            }
 
-            Zip::from(&mut n).and(&dn[0]).apply(|n, dn| {
-                let next_n = *n + dn;
-                if next_n * (*n) >= 0.0 {
-                    *n = next_n;
-                } else {
-                    *n = 0.0;
+                // If we reach the minimum step precision and the error is still
+                // too large (thus did not advance before), we advance beta
+                // regardless now to prevent the integration from getting stuck.
+                if !advanced {
+                    self.advance(&mut n, &dn[0], &mut beta, h, &c);
                 }
-            });
-            beta += h;
-
-            // Run the logger now
-            (*self.logger)(&n, &dn[0], &c);
+            }
         }
 
         info!("Number of evaluations: {}", step);
@@ -579,12 +587,38 @@ impl<M: Model> NumberDensitySolver<M> {
         )
     }
 
+    #[inline]
+    fn advance(
+        &self,
+        n: &mut <Self as Solver>::Solution,
+        dn: &<Self as Solver>::Solution,
+        beta: &mut f64,
+        h: f64,
+        c: &<Self as Solver>::Context,
+    ) {
+        // In order to avoid over-shooting 0, we set the number density
+        // to be exactly 0 whenever it changes sign.
+        // Zip::from(&mut n).and(&(h * &dn[0])).apply(|n, dn| {
+        //     let next_n = *n + dn;
+        //     if next_n * (*n) >= 0.0 {
+        //         *n = next_n;
+        //     } else {
+        //         *n = 0.0;
+        //     }
+        // });
+        *n = &(*n) + &(dn * h);
+        *beta += h;
+
+        // Run the logger now
+        (*self.logger)(&n, dn, c);
+    }
+
     fn context<U: Universe>(
         &self,
         step: u64,
         beta: f64,
-        step_size: f64,
         universe: &U,
+        step_size: f64,
     ) -> Context<M> {
         Context {
             step,
