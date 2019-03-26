@@ -514,10 +514,10 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             let delta = 0.9 * (self.error_tolerance / err).powi(-RK_ORDER);
 
             // Adjust the step size based on the error
-            h *= if delta < 0.2 {
-                0.2
-            } else if delta > 5.0 {
-                5.0
+            h *= if delta < self.step_change.decrease {
+                self.step_change.decrease
+            } else if delta > self.step_change.increase {
+                self.step_change.increase
             } else {
                 delta
             };
@@ -525,13 +525,13 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             // Prevent h from getting too small or too big in proportion to the
             // current value of beta.
             if h > beta * self.step_precision.max {
-                h = beta * self.step_precision.max * self.step_change.decrease;
+                h = beta * self.step_precision.max;
                 debug!(
                     "Step {:}, β = {:.4e} -> Step size too large, decreased h to {:.3e}",
                     step, beta, h
                 );
             } else if h < beta * self.step_precision.min {
-                h = beta * self.step_precision.min * self.step_change.increase;
+                h = beta * self.step_precision.min;
                 debug!(
                     "Step {:}, β = {:.4e} -> Step size too small, increased h to {:.3e}",
                     step, beta, h
