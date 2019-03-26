@@ -7,30 +7,26 @@
 //! \\begin{equation}
 //!   y_{n+1} = y_n + \sum_{i = 1}^{s} b_i k_i
 //! \\end{equation}
+//!
 //! where
+//!
 //! \\begin{align}
 //!   k_1 &= h f(x_n, y_n), \\\\
 //!   k_i &= h f\left(x_n + c_i h, y_n + \sum_{j=1}^{i-1} a_{ij} k_j \right),
 //! \\end{align}
+//!
 //! and \\(a_{ij}\\), \\(b_i\\) and \\(c_i\\) are specified by the Butcher
-//! tableau.
+//! tableau.  Note that although the above notation uses 1-indexing, the
+//! parameters are defined in the submodules using 0-indexing.
 //!
-//! Note that the indexing is slightly different than usual convention (and uses
-//! 0-indexing).  In particular, for an `n`th order solver:
-//!
-//! - the Runge-Kutta matrix `a[i][j]` is an `(n-1)x(n-1)` matrix with non-zero
-//!   entries located when `i ≤ j`.
-//! - the weights vector `b[i]` is an `n` vector.
-//! - the nodes vector `c[i]` is an `n-1` vector and differs from literature
-//!   where the first (always zero) entry is omitted.  Combined with 0-indexing,
-//!   this means that `c[0]` corresponds to *c₂* in the literature.
-//!
-//! The dimension of the various arrays is determined by `RK_DIM` whilst the
-//! order of the solution is set in `RK_ORDER`.
-//!
-//! Lastly, adaptive methods with two weights vectors will be stored as
-//! `b[0][i]` and `b[1][i]`; with `b[0]` containing the higher-order weights,
-//! and `b[0]` the higher order weights.
+//! For a Runge-Kutta method of size \\(s\\), we have:
+//! - the Runge-Kutta matrix `a[i][j]` is an `s×(s-1)` matrix with non-zero
+//!   entries located when `i < j`;
+//! - the weights vector `b[i]` is an `s` vector.  Note that for adaptive
+//!   methods, `b` will instead be a `2×s` matrix with `b[0]` containing the
+//!   weights for the estimate of order `RK_ORDER` and `b[1]` containing the
+//!   weights for the estimate of order `RK_ORDER - 1`; and,
+//! - the nodes vector `c[i]` is an `s` vector.
 
 pub mod bs32;
 pub mod ck54;
@@ -61,7 +57,7 @@ mod tests {
                 use super::$method::*;
 
                 let mut dx = [Array1::zeros(x.dim()), Array1::zeros(x.dim())];
-                let mut k: [Array1<f64>; RK_DIM + 1];
+                let mut k: [Array1<f64>; RK_S];
                 unsafe {
                     k = std::mem::uninitialized();
                     for ki in &mut k[..] {
@@ -71,16 +67,15 @@ mod tests {
 
                 while t < tf {
                     k[0] = f(t, &x) * h;
-                    for i in 0..(RK_DIM - 1) {
+                    for i in 1..RK_S {
                         let t_tmp = t + RK_C[i] * h;
                         let x_tmp = (0..=i).fold(x.clone(), |total, j| total + &k[j] * RK_A[i][j]);
                         k[i + 1] = f(t_tmp, &x_tmp) * h;
                     }
 
-                    dx[0] = (0..RK_DIM)
-                        .fold(Array1::zeros(2), |total, i| total + &(&k[i] * RK_B[0][i]));
-                    dx[1] = (0..RK_DIM)
-                        .fold(Array1::zeros(2), |total, i| total + &(&k[i] * RK_B[1][i]));
+                    // Compute the two estimates
+                    dx[0] = (0..RK_S).fold(Array1::zeros(2), |total, i| total + &k[i] * RK_B[0][i]);
+                    dx[1] = (0..RK_S).fold(Array1::zeros(2), |total, i| total + &k[i] * RK_B[1][i]);
 
                     x += &dx[0];
                     t += h;

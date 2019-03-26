@@ -5,8 +5,9 @@
 #![allow(dead_code)]
 
 pub const RK_ORDER: i32 = 8;
-pub const RK_DIM: usize = 13;
-pub const RK_A: [[f64; RK_DIM - 1]; RK_DIM - 1] = [
+pub const RK_S: usize = 13;
+pub const RK_A: [[f64; RK_S - 1]; RK_S] = [
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
     [
         1.0 / 18.0,
         0.0,
@@ -176,7 +177,7 @@ pub const RK_A: [[f64; RK_DIM - 1]; RK_DIM - 1] = [
         0.0,
     ],
 ];
-pub const RK_B: [[f64; RK_DIM]; 2] = [
+pub const RK_B: [[f64; RK_S]; 2] = [
     [
         14_005_451.0 / 335_480_064.0,
         0.0,
@@ -208,7 +209,8 @@ pub const RK_B: [[f64; RK_DIM]; 2] = [
         0.0,
     ],
 ];
-pub const RK_C: [f64; RK_DIM - 1] = [
+pub const RK_C: [f64; RK_S] = [
+    0.0,
     1.0 / 18.0,
     1.0 / 12.0,
     1.0 / 8.0,
