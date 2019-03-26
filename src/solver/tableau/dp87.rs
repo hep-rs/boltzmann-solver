@@ -1,7 +1,10 @@
 //! Dormand–Prince Method
 //!
 //! From: [`doi:10.1016/0771-050X(81)90010-3`](https://doi.org/10.1016/0771-050X(81)90010-3)
-pub const RK_ORDER: usize = 8;
+
+#![allow(dead_code)]
+
+pub const RK_ORDER: i32 = 8;
 pub const RK_DIM: usize = 13;
 pub const RK_A: [[f64; RK_DIM - 1]; RK_DIM - 1] = [
     [

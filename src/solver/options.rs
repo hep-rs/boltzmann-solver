@@ -29,22 +29,6 @@ impl Default for StepPrecision {
     }
 }
 
-/// Specifies the allowed error tolerance.  If the local error tolerance falls
-/// outside the specified range, the step size is accordingly adjusted.
-pub(crate) struct ErrorTolerance {
-    pub upper: f64,
-    pub lower: f64,
-}
-
-impl Default for ErrorTolerance {
-    fn default() -> Self {
-        ErrorTolerance {
-            upper: 1e-2,
-            lower: 1e-5,
-        }
-    }
-}
-
 /// Initial conditions for a particle.
 pub enum InitialCondition {
     /// The particle's initial density is its equilibrium number with the

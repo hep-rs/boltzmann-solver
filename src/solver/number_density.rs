@@ -255,9 +255,7 @@
 //! multiple intermediate states, the mixing between these states must also be
 //! taken into account.
 
-use super::{
-    EmptyModel, ErrorTolerance, InitialCondition, Model, Solver, StepChange, StepPrecision,
-};
+use super::{EmptyModel, InitialCondition, Model, Solver, StepChange, StepPrecision};
 use crate::{particle::Particle, solver::tableau::dp87::*, universe::Universe};
 use ndarray::{prelude::*, FoldWhile, Zip};
 
@@ -296,7 +294,7 @@ pub struct NumberDensitySolver<M: Model> {
     logger: Box<Fn(&Array1<f64>, &Array1<f64>, &Context<M>)>,
     step_change: StepChange,
     step_precision: StepPrecision,
-    error_tolerance: ErrorTolerance,
+    error_tolerance: f64,
 }
 
 impl<M: Model> Solver for NumberDensitySolver<M> {
@@ -321,7 +319,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             logger: Box::new(|_, _, _| {}),
             step_change: StepChange::default(),
             step_precision: StepPrecision::default(),
-            error_tolerance: ErrorTolerance::default(),
+            error_tolerance: 1e-4,
         }
     }
 
@@ -390,12 +388,9 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         self
     }
 
-    fn error_tolerance(mut self, upper: f64, lower: f64) -> Self {
-        assert!(
-            upper > lower,
-            "The upper error tolerance must be greater than the lower tolerance"
-        );
-        self.error_tolerance = ErrorTolerance { upper, lower };
+    fn error_tolerance(mut self, tol: f64) -> Self {
+        assert!(tol > 0.0, "The tolerance must be greater than 0.");
+        self.error_tolerance = tol;
         self
     }
 
@@ -512,30 +507,20 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             // for any given element of `dn`.
             let err = Zip::from(&dn[0])
                 .and(&dn[1])
-                .fold_while(0.0, |e, a, b| {
-                    let v = ((a - b) / a).abs();
-                    if v.is_finite() && v > e {
-                        FoldWhile::Continue(v)
-                    } else {
-                        FoldWhile::Continue(e)
-                    }
-                })
-                .into_inner();
+                .fold_while(0.0, |e, a, b| FoldWhile::Continue(e + (a - b)))
+                .into_inner()
+                .abs();
+
+            let delta = 0.9 * (self.error_tolerance / err).powi(-RK_ORDER);
 
             // Adjust the step size based on the error
-            if err < self.error_tolerance.lower {
-                h *= self.step_change.increase;
-                debug!(
-                    "Step {:}, β = {:.4e} -> Error too small ({:.3e}), increased h to {:.3e}",
-                    step, beta, err, h
-                );
-            } else if err > self.error_tolerance.upper {
-                h *= self.step_change.decrease;
-                debug!(
-                    "Step {:}, β = {:.4e} -> Error too large ({:.3e}), decreased h to {:.3e}",
-                    step, beta, err, h
-                );
-            }
+            h *= if delta < 0.2 {
+                0.2
+            } else if delta > 5.0 {
+                5.0
+            } else {
+                delta
+            };
 
             // Prevent h from getting too small or too big in proportion to the
             // current value of beta.

@@ -1,5 +1,8 @@
 //! Bogacki–Shampine Method
-pub const RK_ORDER: usize = 3;
+
+#![allow(dead_code)]
+
+pub const RK_ORDER: i32 = 3;
 pub const RK_DIM: usize = 4;
 pub const RK_A: [[f64; RK_DIM - 1]; RK_DIM - 1] = [
     [1.0 / 2.0, 0.0, 0.0],
