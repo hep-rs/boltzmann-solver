@@ -23,8 +23,8 @@ pub(crate) struct StepPrecision {
 impl Default for StepPrecision {
     fn default() -> Self {
         StepPrecision {
-            min: 1e-6,
-            max: 1e-2,
+            min: 1e-4,
+            max: 1e-1,
         }
     }
 }
