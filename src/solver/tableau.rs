@@ -1,23 +1,36 @@
 //! # Butcher tableaux
 //!
-//! A Butcher tableau is as described at https://en.wikipedia.org/wiki/Butcher_tableau.
+//! A Butcher tableau is as described at
+//! https://en.wikipedia.org/wiki/Butcher_tableau.  Specifically, given
+//! \\(y_n\\), the estimate for \\(y_{n+1}\\) is:
 //!
-//! Note that the indexing is slightly different than usual convention (and uses 0-indexing).  In
-//! particular, for an `n`th order solver:
+//! \\begin{equation}
+//!   y_{n+1} = y_n + \sum_{i = 1}^{s} b_i k_i
+//! \\end{equation}
+//! where
+//! \\begin{align}
+//!   k_1 &= h f(x_n, y_n), \\\\
+//!   k_i &= h f\left(x_n + c_i h, y_n + \sum_{j=1}^{i-1} a_{ij} k_j \right),
+//! \\end{align}
+//! and \\(a_{ij}\\), \\(b_i\\) and \\(c_i\\) are specified by the Butcher
+//! tableau.
 //!
-//! - the Runge-Kutta matrix `a[i][j]` is an `(n-1)x(n-1)` matrix with non-zero entries
-//!   located when `i ≤ j`.
+//! Note that the indexing is slightly different than usual convention (and uses
+//! 0-indexing).  In particular, for an `n`th order solver:
+//!
+//! - the Runge-Kutta matrix `a[i][j]` is an `(n-1)x(n-1)` matrix with non-zero
+//!   entries located when `i ≤ j`.
 //! - the weights vector `b[i]` is an `n` vector.
-//! - the nodes vector `c[i]` is an `n-1` vector and differs from literature where
-//!   the first (always zero) entry is omitted.  Combined with 0-indexing, this
-//!   means that `c[0]` corresponds to *c₂* in the literature.
+//! - the nodes vector `c[i]` is an `n-1` vector and differs from literature
+//!   where the first (always zero) entry is omitted.  Combined with 0-indexing,
+//!   this means that `c[0]` corresponds to *c₂* in the literature.
 //!
 //! The dimension of the various arrays is determined by `RK_DIM` whilst the
 //! order of the solution is set in `RK_ORDER`.
 //!
 //! Lastly, adaptive methods with two weights vectors will be stored as
-//! `b[0][i]` and `b[1][i]`; with `b[0]` containing the higher-order weights, and
-//! `b[0]` the higher order weights.
+//! `b[0][i]` and `b[1][i]`; with `b[0]` containing the higher-order weights,
+//! and `b[0]` the higher order weights.
 
 pub mod bs32;
 pub mod ck54;
