@@ -511,7 +511,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 .into_inner()
                 .abs();
 
-            let delta = 0.9 * (self.error_tolerance / err).powi(-RK_ORDER);
+            let delta = 0.9 * (self.error_tolerance / err).powf(1.0 / f64::from(RK_ORDER));
 
             // Adjust the step size based on the error
             h *= if delta < self.step_change.decrease {
