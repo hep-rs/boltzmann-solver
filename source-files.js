@@ -1,5 +1,5 @@
 var N = null;var sourcesIndex = {};
-sourcesIndex["boltzmann_solver"] = {"name":"","dirs":[{"name":"solver","dirs":[{"name":"tableau","dirs":[],"files":["bs32.rs","ck54.rs","dp54.rs","rkf54.rs"]}],"files":["number_density.rs","options.rs","phase_space.rs","tableau.rs"]},{"name":"universe","dirs":[],"files":["standard_model.rs"]}],"files":["constants.rs","lib.rs","particle.rs","solver.rs","statistic.rs","universe.rs","utilities.rs"]};
+sourcesIndex["boltzmann_solver"] = {"name":"","dirs":[{"name":"solver","dirs":[{"name":"tableau","dirs":[],"files":["bs32.rs","ck54.rs","dp54.rs","dp87.rs","rkf54.rs"]}],"files":["number_density.rs","options.rs","tableau.rs"]},{"name":"universe","dirs":[],"files":["standard_model.rs"]}],"files":["constants.rs","lib.rs","particle.rs","solver.rs","statistic.rs","universe.rs","utilities.rs"]};
 sourcesIndex["c_vec"] = {"name":"","dirs":[],"files":["c_vec.rs"]};
 sourcesIndex["cfg_if"] = {"name":"","dirs":[],"files":["lib.rs"]};
 sourcesIndex["either"] = {"name":"","dirs":[],"files":["lib.rs"]};

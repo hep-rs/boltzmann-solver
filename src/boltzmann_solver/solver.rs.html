@@ -198,24 +198,16 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Solvers for the Boltzmann equation, or sets of Boltzmann equations</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">number_density</span>;
 <span class="kw">mod</span> <span class="ident">options</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">phase_space</span>;
+<span class="comment">// pub mod phase_space;</span>
 <span class="kw">mod</span> <span class="ident">tableau</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">options</span>::<span class="ident">InitialCondition</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="self">self</span>::<span class="ident">options</span>::{<span class="ident">ErrorTolerance</span>, <span class="ident">StepChange</span>, <span class="ident">StepPrecision</span>};
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="self">self</span>::<span class="ident">options</span>::{<span class="ident">StepChange</span>, <span class="ident">StepPrecision</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">particle</span>::<span class="ident">Particle</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">universe</span>::<span class="ident">Universe</span>;
 
@@ -337,17 +329,9 @@
 
     <span class="doccomment">/// Specify the local error tolerance.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// At each step, the solver will compare approximates the integration using</span>
-    <span class="doccomment">/// both the Euler and Runge-Kutta methods.  The error is then calculated as:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// \\begin{equation}</span>
-    <span class="doccomment">///   \mathrm{Error} = \left\lvert \frac{(\Delta y)_{\mathrm{Euler}}}{(\Delta y)_{\mathrm{RK}}} - 1 \right\rvert</span>
-    <span class="doccomment">/// \\end{equation}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the error is greater than the upper bound specified, the integration</span>
-    <span class="doccomment">/// step size is made smaller.  Conversely, if the error is smaller than the</span>
-    <span class="doccomment">/// lower bound, the integration step is increased.</span>
-    <span class="kw">fn</span> <span class="ident">error_tolerance</span>(<span class="self">self</span>, <span class="ident">upper</span>: <span class="ident">f64</span>, <span class="ident">lower</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
+    <span class="doccomment">/// If the error deviates too far from the specified tolerance, the</span>
+    <span class="doccomment">/// integration step size is adjusted accordingly.</span>
+    <span class="kw">fn</span> <span class="ident">error_tolerance</span>(<span class="self">self</span>, <span class="ident">tol</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
 
     <span class="doccomment">/// Initialize the phase space solver.</span>
     <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;

@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Context","Context provided containing pre-computed values which might be useful when evaluating interactions."],["PhaseSpaceSolver","The solver holding all the information."]]});

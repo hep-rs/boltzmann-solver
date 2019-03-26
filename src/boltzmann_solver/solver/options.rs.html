@@ -39,22 +39,6 @@
 <span id="39">39</span>
 <span id="40">40</span>
 <span id="41">41</span>
-<span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
-<span id="47">47</span>
-<span id="48">48</span>
-<span id="49">49</span>
-<span id="50">50</span>
-<span id="51">51</span>
-<span id="52">52</span>
-<span id="53">53</span>
-<span id="54">54</span>
-<span id="55">55</span>
-<span id="56">56</span>
-<span id="57">57</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">/// Determines how the step size is allowed changed, with the change being</span>
 <span class="doccomment">/// proportional: `h *= increase` or `h *= decrease`.</span>
@@ -83,22 +67,6 @@
         <span class="ident">StepPrecision</span> {
             <span class="ident">min</span>: <span class="number">1e-6</span>,
             <span class="ident">max</span>: <span class="number">1e-2</span>,
-        }
-    }
-}
-
-<span class="doccomment">/// Specifies the allowed error tolerance.  If the local error tolerance falls</span>
-<span class="doccomment">/// outside the specified range, the step size is accordingly adjusted.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ErrorTolerance</span> {
-    <span class="kw">pub</span> <span class="ident">upper</span>: <span class="ident">f64</span>,
-    <span class="kw">pub</span> <span class="ident">lower</span>: <span class="ident">f64</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ErrorTolerance</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
-        <span class="ident">ErrorTolerance</span> {
-            <span class="ident">upper</span>: <span class="number">1e-2</span>,
-            <span class="ident">lower</span>: <span class="number">1e-5</span>,
         }
     }
 }
