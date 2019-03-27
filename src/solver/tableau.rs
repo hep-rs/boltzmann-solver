@@ -100,7 +100,7 @@ mod tests {
 
                     // If the error is within the tolerance, add the result
                     if err < 1e-5 {
-                        x = x + &dx[0];
+                        x += &dx[0];
                         t += h;
                     }
 
