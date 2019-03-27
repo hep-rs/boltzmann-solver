@@ -222,6 +222,8 @@
 <span id="222">222</span>
 <span id="223">223</span>
 <span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Dormand–Prince Method</span>
 <span class="doccomment">//!</span>
@@ -230,8 +232,9 @@
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_ORDER</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">8</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_DIM</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">13</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_A</span>: [[<span class="ident">f64</span>; <span class="ident">RK_DIM</span> <span class="op">-</span> <span class="number">1</span>]; <span class="ident">RK_DIM</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">=</span> [
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_S</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">13</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_A</span>: [[<span class="ident">f64</span>; <span class="ident">RK_S</span> <span class="op">-</span> <span class="number">1</span>]; <span class="ident">RK_S</span>] <span class="op">=</span> [
+    [<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>],
     [
         <span class="number">1.0</span> <span class="op">/</span> <span class="number">18.0</span>,
         <span class="number">0.0</span>,
@@ -401,7 +404,7 @@
         <span class="number">0.0</span>,
     ],
 ];
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_B</span>: [[<span class="ident">f64</span>; <span class="ident">RK_DIM</span>]; <span class="number">2</span>] <span class="op">=</span> [
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_B</span>: [[<span class="ident">f64</span>; <span class="ident">RK_S</span>]; <span class="number">2</span>] <span class="op">=</span> [
     [
         <span class="number">14_005_451.0</span> <span class="op">/</span> <span class="number">335_480_064.0</span>,
         <span class="number">0.0</span>,
@@ -433,7 +436,8 @@
         <span class="number">0.0</span>,
     ],
 ];
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_C</span>: [<span class="ident">f64</span>; <span class="ident">RK_DIM</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">=</span> [
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_C</span>: [<span class="ident">f64</span>; <span class="ident">RK_S</span>] <span class="op">=</span> [
+    <span class="number">0.0</span>,
     <span class="number">1.0</span> <span class="op">/</span> <span class="number">18.0</span>,
     <span class="number">1.0</span> <span class="op">/</span> <span class="number">12.0</span>,
     <span class="number">1.0</span> <span class="op">/</span> <span class="number">8.0</span>,

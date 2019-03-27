@@ -617,6 +617,40 @@
 <span id="617">617</span>
 <span id="618">618</span>
 <span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Solver for the number density evolution given by integrating the Boltzmann</span>
 <span class="doccomment">//! equation.</span>
@@ -1065,16 +1099,14 @@
             <span class="string">&quot;The phase space solver has to be initialized first with the `initialize()` method.&quot;</span>
         );
 
+        <span class="comment">// Initialize all the variables that will be used in the integration</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">from_vec</span>(<span class="self">self</span>.<span class="ident">initial_conditions</span>.<span class="ident">clone</span>());
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dn</span> <span class="op">=</span> [
             <span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()),
             <span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()),
         ];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">beta</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span>;
 
-        <span class="comment">// Allocate variables which will be re-used each for loop</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k</span>: [<span class="self">Self</span>::<span class="ident">Solution</span>; <span class="ident">RK_DIM</span> <span class="op">+</span> <span class="number">1</span>];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k</span>: [<span class="self">Self</span>::<span class="ident">Solution</span>; <span class="ident">RK_S</span>];
         <span class="kw">unsafe</span> {
             <span class="ident">k</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">uninitialized</span>();
             <span class="kw">for</span> <span class="ident">ki</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">k</span>[..] {
@@ -1083,57 +1115,66 @@
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">advanced</span>: <span class="ident">bool</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">beta</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">0</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span>;
 
-        <span class="comment">// Create the initial context</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">h</span>, <span class="ident">universe</span>);
-
-        <span class="comment">// Run the logger now</span>
+        <span class="comment">// Create the initial context and log the initial conditions</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">universe</span>, <span class="ident">h</span>);
         (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">logger</span>)(<span class="kw-2">&amp;</span><span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="ident">c</span>);
 
         <span class="kw">while</span> <span class="ident">beta</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">1</span> {
             <span class="ident">step</span> <span class="op">+=</span> <span class="number">1</span>;
+            <span class="ident">advanced</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
-            <span class="comment">// Runge–Kutta method</span>
-            <span class="comment">////////////////////////////////////////</span>
-
-            <span class="comment">// 0th order term (Newton method) is always the same</span>
-            <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">h</span>, <span class="ident">universe</span>);
-            <span class="ident">k</span>[<span class="number">0</span>] <span class="op">=</span> <span class="self">self</span>
+            <span class="comment">// Compute each k[i]</span>
+            <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">universe</span>, <span class="ident">h</span>);
+            <span class="ident">k</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">h</span> <span class="op">*</span> <span class="self">self</span>
                 .<span class="ident">interactions</span>
                 .<span class="ident">iter</span>()
-                .<span class="ident">fold</span>(<span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">s</span>, <span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">s</span>, <span class="kw-2">&amp;</span><span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>))
-                <span class="op">*</span> <span class="ident">h</span>;
-
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="ident">RK_DIM</span> <span class="op">-</span> <span class="number">1</span>) {
-                <span class="kw">let</span> <span class="ident">c_tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span> <span class="op">+</span> <span class="ident">RK_C</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">h</span>, <span class="ident">h</span>, <span class="ident">universe</span>);
-                <span class="kw">let</span> <span class="ident">n_tmp</span> <span class="op">=</span> (<span class="number">0</span>..=<span class="ident">i</span>).<span class="ident">fold</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="op">|</span><span class="ident">total</span>, <span class="ident">j</span><span class="op">|</span> <span class="ident">total</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">j</span>] <span class="op">*</span> <span class="ident">RK_A</span>[<span class="ident">i</span>][<span class="ident">j</span>]);
-                <span class="ident">k</span>[<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">=</span> <span class="self">self</span>
+                .<span class="ident">fold</span>(<span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">s</span>, <span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">s</span>, <span class="kw-2">&amp;</span><span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>));
+            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">RK_S</span> {
+                <span class="kw">let</span> <span class="ident">c_tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span> <span class="op">+</span> <span class="ident">RK_C</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">h</span>, <span class="ident">universe</span>, <span class="ident">h</span>);
+                <span class="kw">let</span> <span class="ident">ai</span> <span class="op">=</span> <span class="ident">RK_A</span>[<span class="ident">i</span>];
+                <span class="kw">let</span> <span class="ident">n_tmp</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">i</span>).<span class="ident">fold</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="op">|</span><span class="ident">total</span>, <span class="ident">j</span><span class="op">|</span> <span class="ident">total</span> <span class="op">+</span> <span class="ident">h</span> <span class="op">*</span> <span class="ident">ai</span>[<span class="ident">j</span>] <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">j</span>]);
+                <span class="ident">k</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="self">self</span>
                     .<span class="ident">interactions</span>
                     .<span class="ident">iter</span>()
-                    .<span class="ident">fold</span>(<span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">s</span>, <span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">s</span>, <span class="kw-2">&amp;</span><span class="ident">n_tmp</span>, <span class="kw-2">&amp;</span><span class="ident">c_tmp</span>))
-                    <span class="op">*</span> <span class="ident">h</span>;
+                    .<span class="ident">fold</span>(<span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">s</span>, <span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">s</span>, <span class="kw-2">&amp;</span><span class="ident">n_tmp</span>, <span class="kw-2">&amp;</span><span class="ident">c_tmp</span>));
             }
 
-            <span class="comment">// Calculate dn.</span>
-            <span class="ident">dn</span>[<span class="number">0</span>] <span class="op">=</span> (<span class="number">0</span>..<span class="ident">RK_DIM</span>).<span class="ident">fold</span>(<span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">total</span>, <span class="ident">i</span><span class="op">|</span> {
-                <span class="ident">total</span> <span class="op">+</span> <span class="kw-2">&amp;</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">RK_B</span>[<span class="number">0</span>][<span class="ident">i</span>])
+            <span class="comment">// Calculate the two estimates</span>
+            <span class="ident">dn</span>[<span class="number">0</span>] <span class="op">=</span> (<span class="number">0</span>..<span class="ident">RK_S</span>).<span class="ident">fold</span>(<span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">total</span>, <span class="ident">i</span><span class="op">|</span> {
+                <span class="ident">total</span> <span class="op">+</span> <span class="ident">RK_B</span>[<span class="number">0</span>][<span class="ident">i</span>] <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">i</span>]
             });
-            <span class="ident">dn</span>[<span class="number">1</span>] <span class="op">=</span> (<span class="number">0</span>..<span class="ident">RK_DIM</span>).<span class="ident">fold</span>(<span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">total</span>, <span class="ident">i</span><span class="op">|</span> {
-                <span class="ident">total</span> <span class="op">+</span> <span class="kw-2">&amp;</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">RK_B</span>[<span class="number">1</span>][<span class="ident">i</span>])
+            <span class="ident">dn</span>[<span class="number">1</span>] <span class="op">=</span> (<span class="number">0</span>..<span class="ident">RK_S</span>).<span class="ident">fold</span>(<span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">total</span>, <span class="ident">i</span><span class="op">|</span> {
+                <span class="ident">total</span> <span class="op">+</span> <span class="ident">RK_B</span>[<span class="number">1</span>][<span class="ident">i</span>] <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">i</span>]
             });
 
-            <span class="comment">// Check the error on the RK method vs the Euler method.  If it is</span>
-            <span class="comment">// small enough, increase the step size.  We use the maximum error</span>
-            <span class="comment">// for any given element of `dn`.</span>
+            <span class="comment">// Get the error between the estimates</span>
             <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">Zip</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>])
                 .<span class="ident">and</span>(<span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">1</span>])
-                .<span class="ident">fold_while</span>(<span class="number">0.0</span>, <span class="op">|</span><span class="ident">e</span>, <span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">FoldWhile</span>::<span class="ident">Continue</span>(<span class="ident">e</span> <span class="op">+</span> (<span class="ident">a</span> <span class="op">-</span> <span class="ident">b</span>)))
-                .<span class="ident">into_inner</span>()
-                .<span class="ident">abs</span>();
+                .<span class="ident">fold_while</span>(<span class="number">0.0</span>, <span class="op">|</span><span class="ident">e</span>, <span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> {
+                    <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> (<span class="ident">a</span> <span class="op">-</span> <span class="ident">b</span>).<span class="ident">abs</span>();
+                    <span class="kw">if</span> <span class="ident">v</span> <span class="op">&gt;</span> <span class="ident">e</span> {
+                        <span class="ident">FoldWhile</span>::<span class="ident">Continue</span>(<span class="ident">v</span>)
+                    } <span class="kw">else</span> {
+                        <span class="ident">FoldWhile</span>::<span class="ident">Continue</span>(<span class="ident">e</span>)
+                    }
+                })
+                .<span class="ident">into_inner</span>();
 
-            <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="number">0.9</span> <span class="op">*</span> (<span class="self">self</span>.<span class="ident">error_tolerance</span> <span class="op">/</span> <span class="ident">err</span>).<span class="ident">powf</span>(<span class="number">1.0</span> <span class="op">/</span> <span class="ident">f64</span>::<span class="ident">from</span>(<span class="ident">RK_ORDER</span>));
+            <span class="comment">// If the error is within the tolerance, add the result</span>
+            <span class="kw">if</span> <span class="ident">err</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">error_tolerance</span> {
+                <span class="self">self</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">beta</span>, <span class="ident">h</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>);
+                <span class="ident">advanced</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            }
 
-            <span class="comment">// Adjust the step size based on the error</span>
+            <span class="comment">// Compute the change in step size based on the current error</span>
+            <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="number">0.9</span> <span class="op">*</span> (<span class="self">self</span>.<span class="ident">error_tolerance</span> <span class="op">/</span> <span class="ident">err</span>).<span class="ident">powf</span>(<span class="number">1.0</span> <span class="op">/</span> <span class="ident">f64</span>::<span class="ident">from</span>(<span class="ident">RK_ORDER</span> <span class="op">+</span> <span class="number">1</span>));
+            <span class="comment">// debug!(&quot;Step {:}, β = {:.4e} -&gt; δ = {:&lt;10.3e}&quot;, step, beta, delta);</span>
+
+            <span class="comment">// And correspondingly adjust the error</span>
             <span class="ident">h</span> <span class="op">*=</span> <span class="kw">if</span> <span class="ident">delta</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">step_change</span>.<span class="ident">decrease</span> {
                 <span class="self">self</span>.<span class="ident">step_change</span>.<span class="ident">decrease</span>
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">delta</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">step_change</span>.<span class="ident">increase</span> {
@@ -1150,26 +1191,27 @@
                     <span class="string">&quot;Step {:}, β = {:.4e} -&gt; Step size too large, decreased h to {:.3e}&quot;</span>,
                     <span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">h</span>
                 );
+
+                <span class="comment">// If we reach the maximum step precision and the error is still</span>
+                <span class="comment">// too large (thus did not advance before), we advance beta</span>
+                <span class="comment">// regardless now to prevent the integration from getting stuck.</span>
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">advanced</span> {
+                    <span class="self">self</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">beta</span>, <span class="ident">h</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>);
+                }
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">h</span> <span class="op">&lt;</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span> {
                 <span class="ident">h</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span>;
                 <span class="macro">debug</span><span class="macro">!</span>(
                     <span class="string">&quot;Step {:}, β = {:.4e} -&gt; Step size too small, increased h to {:.3e}&quot;</span>,
                     <span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">h</span>
                 );
-            }
 
-            <span class="ident">Zip</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">n</span>).<span class="ident">and</span>(<span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>]).<span class="ident">apply</span>(<span class="op">|</span><span class="ident">n</span>, <span class="ident">dn</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">next_n</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">+</span> <span class="ident">dn</span>;
-                <span class="kw">if</span> <span class="ident">next_n</span> <span class="op">*</span> (<span class="kw-2">*</span><span class="ident">n</span>) <span class="op">&gt;=</span> <span class="number">0.0</span> {
-                    <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="ident">next_n</span>;
-                } <span class="kw">else</span> {
-                    <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="number">0.0</span>;
+                <span class="comment">// If we reach the minimum step precision and the error is still</span>
+                <span class="comment">// too large (thus did not advance before), we advance beta</span>
+                <span class="comment">// regardless now to prevent the integration from getting stuck.</span>
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">advanced</span> {
+                    <span class="self">self</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">beta</span>, <span class="ident">h</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>);
                 }
-            });
-            <span class="ident">beta</span> <span class="op">+=</span> <span class="ident">h</span>;
-
-            <span class="comment">// Run the logger now</span>
-            (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">logger</span>)(<span class="kw-2">&amp;</span><span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="ident">c</span>);
+            }
         }
 
         <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Number of evaluations: {}&quot;</span>, <span class="ident">step</span>);
@@ -1199,12 +1241,38 @@
         )
     }
 
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">advance</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Solution</span>,
+        <span class="ident">dn</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Solution</span>,
+        <span class="ident">beta</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">f64</span>,
+        <span class="ident">h</span>: <span class="ident">f64</span>,
+        <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Context</span>,
+    ) {
+        <span class="comment">// In order to avoid over-shooting 0, we set the number density</span>
+        <span class="comment">// to be exactly 0 whenever it changes sign.</span>
+        <span class="ident">Zip</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">n</span>).<span class="ident">and</span>(<span class="ident">dn</span>).<span class="ident">apply</span>(<span class="op">|</span><span class="ident">n</span>, <span class="ident">dn</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">next_n</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">+</span> <span class="ident">h</span> <span class="op">*</span> <span class="ident">dn</span>;
+            <span class="kw">if</span> <span class="ident">next_n</span> <span class="op">*</span> (<span class="kw-2">*</span><span class="ident">n</span>) <span class="op">&gt;=</span> <span class="number">0.0</span> {
+                <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="ident">next_n</span>;
+            } <span class="kw">else</span> {
+                <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="number">0.0</span>;
+            }
+        });
+        <span class="comment">// *n = &amp;(*n) + &amp;(dn * h);</span>
+        <span class="kw-2">*</span><span class="ident">beta</span> <span class="op">+=</span> <span class="ident">h</span>;
+
+        <span class="comment">// Run the logger now</span>
+        (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">logger</span>)(<span class="ident">n</span>, <span class="ident">dn</span>, <span class="ident">c</span>);
+    }
+
     <span class="kw">fn</span> <span class="ident">context</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Universe</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">step</span>: <span class="ident">u64</span>,
         <span class="ident">beta</span>: <span class="ident">f64</span>,
-        <span class="ident">step_size</span>: <span class="ident">f64</span>,
         <span class="ident">universe</span>: <span class="kw-2">&amp;</span><span class="ident">U</span>,
+        <span class="ident">step_size</span>: <span class="ident">f64</span>,
     ) <span class="op">-&gt;</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
         <span class="ident">Context</span> {
             <span class="ident">step</span>,
