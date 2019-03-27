@@ -69,17 +69,20 @@ mod tests {
                 let h_max = (tf - t) / 1e1;
                 while t < tf {
                     // Computer each k[i]
-                    k[0] = f(t, &x);
-                    for i in 1..RK_S {
-                        let t_tmp = t + RK_C[i] * h;
+                    for i in 0..RK_S {
+                        let ti = t + RK_C[i] * h;
                         let ai = RK_A[i];
-                        let x_tmp = (0..i).fold(x.clone(), |total, j| total + h * ai[j] * &k[j]);
-                        k[i] = f(t_tmp, &x_tmp);
+                        let xi = (0..i).fold(x.clone(), |total, j| total + ai[j] * &k[j]);
+                        k[i] = h * f(ti, &xi);
                     }
 
                     // Compute the two estimates
-                    dx[0] = (0..RK_S).fold(Array1::zeros(2), |total, i| total + &k[i] * RK_B[0][i]);
-                    dx[1] = (0..RK_S).fold(Array1::zeros(2), |total, i| total + &k[i] * RK_B[1][i]);
+                    dx[0] = (0..RK_S).fold(Array1::zeros(x.dim()), |total, i| {
+                        total + &k[i] * RK_B[0][i]
+                    });
+                    dx[1] = (0..RK_S).fold(Array1::zeros(x.dim()), |total, i| {
+                        total + &k[i] * RK_B[1][i]
+                    });
 
                     // Get the error between the estimates
                     let err = Zip::from(&dx[0])
@@ -92,20 +95,17 @@ mod tests {
                                 FoldWhile::Continue(e)
                             }
                         })
-                        .into_inner();
+                        .into_inner()
+                        / h;
 
                     // If the error is within the tolerance, add the result
                     if err < 1e-5 {
-                        x = x + &dx[0] * h;
+                        x = x + &dx[0];
                         t += h;
                     }
 
                     // Compute the change in step size based on the current error
-                    let delta = if err > 0.0 {
-                        0.9 * (1e-5 / err).powf(1.0 / f64::from(RK_ORDER + 1))
-                    } else {
-                        1.2
-                    };
+                    let delta = 0.9 * (1e-5 / err).powf(1.0 / f64::from(RK_ORDER + 1));
 
                     // And correspondingly adjust the error
                     h *= if delta < 0.8 {
