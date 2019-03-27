@@ -474,19 +474,14 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             advanced = false;
 
             // Compute each k[i]
-            c = self.context(step, beta, universe, h);
-            k[0] = h * self
-                .interactions
-                .iter()
-                .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &n, &c));
             for i in 0..RK_S {
-                let c_tmp = self.context(step, beta + RK_C[i] * h, universe, h);
+                let ci = self.context(step, beta + RK_C[i] * h, universe, h);
                 let ai = RK_A[i];
-                let n_tmp = (0..i).fold(n.clone(), |total, j| total + h * ai[j] * &k[j]);
-                k[i] = self
+                let ni = (0..i).fold(n.clone(), |total, j| total + ai[j] * &k[j]);
+                k[i] = h * self
                     .interactions
                     .iter()
-                    .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &n_tmp, &c_tmp));
+                    .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &ni, &ci));
             }
 
             // Calculate the two estimates
@@ -508,10 +503,12 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                         FoldWhile::Continue(e)
                     }
                 })
-                .into_inner();
+                .into_inner()
+                / h;
 
             // If the error is within the tolerance, add the result
             if err < self.error_tolerance {
+                c = self.context(step, beta, universe, h);
                 self.advance(&mut n, &dn[0], &mut beta, h, &c);
                 advanced = true;
             }
@@ -542,6 +539,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 // too large (thus did not advance before), we advance beta
                 // regardless now to prevent the integration from getting stuck.
                 if !advanced {
+                    c = self.context(step, beta, universe, h);
                     self.advance(&mut n, &dn[0], &mut beta, h, &c);
                 }
             } else if h < beta * self.step_precision.min {
@@ -555,6 +553,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 // too large (thus did not advance before), we advance beta
                 // regardless now to prevent the integration from getting stuck.
                 if !advanced {
+                    c = self.context(step, beta, universe, h);
                     self.advance(&mut n, &dn[0], &mut beta, h, &c);
                 }
             }
