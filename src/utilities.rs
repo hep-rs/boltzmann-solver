@@ -1,3 +1,5 @@
+//! Module of various useful miscellaneous functions.
+
 #[cfg(test)]
 pub(crate) mod test;
 
