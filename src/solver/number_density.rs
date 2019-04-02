@@ -479,7 +479,10 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             for i in 0..RK_S {
                 let ci = self.context(step, beta + RK_C[i] * h, universe, h);
                 let ai = RK_A[i];
-                let ni = (0..i).fold(n.clone(), |total, j| total + ai[j] * &k[j]);
+                let dni = (0..i).fold(Self::Solution::zeros(n.dim()), |total, j| {
+                    total + ai[j] * &k[j]
+                });
+                let ni = n_plus_dn(n.clone(), &dni);
                 k[i] = h * self
                     .interactions
                     .iter()
@@ -511,7 +514,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             // If the error is within the tolerance, add the result
             if err < self.error_tolerance {
                 c = self.context(step, beta, universe, h);
-                self.advance(&mut n, &dn[0], &mut beta, h, &c);
+                n = self.advance(n, &dn[0], &mut beta, h, &c);
                 advanced = true;
             }
 
@@ -542,7 +545,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 // regardless now to prevent the integration from getting stuck.
                 if !advanced {
                     c = self.context(step, beta, universe, h);
-                    self.advance(&mut n, &dn[0], &mut beta, h, &c);
+                    n = self.advance(n, &dn[0], &mut beta, h, &c);
                 }
             } else if h < beta * self.step_precision.min {
                 h = beta * self.step_precision.min;
@@ -556,7 +559,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 // regardless now to prevent the integration from getting stuck.
                 if !advanced {
                     c = self.context(step, beta, universe, h);
-                    self.advance(&mut n, &dn[0], &mut beta, h, &c);
+                    n = self.advance(n, &dn[0], &mut beta, h, &c);
                 }
             }
         }
@@ -588,31 +591,28 @@ impl<M: Model> NumberDensitySolver<M> {
         )
     }
 
+    /// Advance `beta` and `n`, returning the new `n`.
     #[inline]
     fn advance(
         &self,
-        n: &mut <Self as Solver>::Solution,
+        mut n: <Self as Solver>::Solution,
         dn: &<Self as Solver>::Solution,
         beta: &mut f64,
         h: f64,
         c: &<Self as Solver>::Context,
-    ) {
-        // In order to avoid over-shooting 0, we set the number density
-        // to be exactly 0 whenever it changes sign.
-        Zip::from(&mut *n).and(dn).apply(|n, dn| {
-            let next_n = *n + h * dn;
-            if next_n * (*n) >= 0.0 {
-                *n = next_n;
-            } else {
-                *n = 0.0;
-            }
-        });
+    ) -> <Self as Solver>::Solution {
+        // Advance n and beta
+        n = n_plus_dn(n, dn);
         *beta += h;
 
         // Run the logger now
-        (*self.logger)(n, dn, c);
+        (*self.logger)(&n, dn, c);
+
+        n
     }
 
+    /// Generate the context at a given beta to pass to the logger/interaction
+    /// functions.
     fn context<U: Universe>(
         &self,
         step: u64,
@@ -629,6 +629,27 @@ impl<M: Model> NumberDensitySolver<M> {
             model: M::new(beta),
         }
     }
+}
+
+/// Add `dn` to `n`, but set the result to 0 if the number density changes sign.
+///
+/// If there is a strong process causing a particular number density to vanish,
+/// the iteration step may overshoot zero; and in the case where the process is
+/// very strong, it is possible the overshooting is so bad that it generates an
+/// even larger (opposite signed) number density.
+///
+/// To avoid this, we set the number density to 0 whenever this might occur
+/// forcing an evaluation with exactly 0 number density.
+fn n_plus_dn(mut n: Array1<f64>, dn: &Array1<f64>) -> Array1<f64> {
+    Zip::from(&mut n).and(dn).apply(|n, dn| {
+        let next_n = *n + dn;
+        if next_n * (*n) >= 0.0 {
+            *n = next_n;
+        } else {
+            *n = 0.0;
+        }
+    });
+    n
 }
 
 #[cfg(test)]
