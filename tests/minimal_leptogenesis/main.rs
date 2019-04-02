@@ -14,22 +14,13 @@ use boltzmann_solver::{
     particle::Particle,
     solver::{number_density::NumberDensitySolver, InitialCondition, Model, Solver},
     universe::StandardModel,
+    utilities::checked_div,
 };
 use itertools::iproduct;
 use model::{VanillaLeptogenesisModel, PARTICLE_NAMES};
 use quadrature::integrate;
 use special_functions::bessel;
 use std::cell::RefCell;
-
-fn checked_div(a: f64, b: f64) -> f64 {
-    if a == 0.0 {
-        0.0
-    } else if b == 0.0 {
-        1.0
-    } else {
-        a / b
-    }
-}
 
 #[test]
 fn minimal_leptogenesis() {
