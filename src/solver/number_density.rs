@@ -532,7 +532,8 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             };
 
             // Prevent h from getting too small or too big in proportion to the
-            // current value of beta.
+            // current value of beta.  Also advance the integration irrespective
+            // of the local error if we reach the maximum or minimum step size.
             if h > beta * self.step_precision.max {
                 h = beta * self.step_precision.max;
                 debug!(
@@ -540,9 +541,6 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                     step, beta, h
                 );
 
-                // If we reach the maximum step precision and the error is still
-                // too large (thus did not advance before), we advance beta
-                // regardless now to prevent the integration from getting stuck.
                 if !advanced {
                     c = self.context(step, beta, universe, h);
                     n = self.advance(n, &dn[0], &mut beta, h, &c);
@@ -554,9 +552,6 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                     step, beta, h
                 );
 
-                // If we reach the minimum step precision and the error is still
-                // too large (thus did not advance before), we advance beta
-                // regardless now to prevent the integration from getting stuck.
                 if !advanced {
                     c = self.context(step, beta, universe, h);
                     n = self.advance(n, &dn[0], &mut beta, h, &c);
