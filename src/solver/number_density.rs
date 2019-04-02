@@ -256,7 +256,7 @@
 //! taken into account.
 
 use super::{EmptyModel, InitialCondition, Model, Solver, StepChange, StepPrecision};
-use crate::{particle::Particle, solver::tableau::dp87::*, universe::Universe};
+use crate::{particle::Particle, universe::Universe};
 use ndarray::{prelude::*, FoldWhile, Zip};
 
 /// Context provided containing pre-computed values which might be useful when
@@ -440,6 +440,8 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
     where
         U: Universe,
     {
+        use crate::solver::tableau::dp87::*;
+
         assert!(
             self.initialized,
             "The phase space solver has to be initialized first with the `initialize()` method."
