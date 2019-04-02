@@ -650,6 +650,28 @@
 <span id="650">650</span>
 <span id="651">651</span>
 <span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Solver for the number density evolution given by integrating the Boltzmann</span>
 <span class="doccomment">//! equation.</span>
@@ -909,7 +931,7 @@
 <span class="doccomment">//! taken into account.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">EmptyModel</span>, <span class="ident">InitialCondition</span>, <span class="ident">Model</span>, <span class="ident">Solver</span>, <span class="ident">StepChange</span>, <span class="ident">StepPrecision</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">particle</span>::<span class="ident">Particle</span>, <span class="ident">solver</span>::<span class="ident">tableau</span>::<span class="ident">dp87</span>::<span class="kw-2">*</span>, <span class="ident">universe</span>::<span class="ident">Universe</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">particle</span>::<span class="ident">Particle</span>, <span class="ident">universe</span>::<span class="ident">Universe</span>};
 <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">FoldWhile</span>, <span class="ident">Zip</span>};
 
 <span class="doccomment">/// Context provided containing pre-computed values which might be useful when</span>
@@ -1093,6 +1115,8 @@
     <span class="kw">where</span>
         <span class="ident">U</span>: <span class="ident">Universe</span>,
     {
+        <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">solver</span>::<span class="ident">tableau</span>::<span class="ident">dp87</span>::<span class="kw-2">*</span>;
+
         <span class="macro">assert</span><span class="macro">!</span>(
             <span class="self">self</span>.<span class="ident">initialized</span>,
             <span class="string">&quot;The phase space solver has to be initialized first with the `initialize()` method.&quot;</span>
@@ -1127,19 +1151,17 @@
             <span class="ident">advanced</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
             <span class="comment">// Compute each k[i]</span>
-            <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">universe</span>, <span class="ident">h</span>);
-            <span class="ident">k</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">h</span> <span class="op">*</span> <span class="self">self</span>
-                .<span class="ident">interactions</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">fold</span>(<span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">s</span>, <span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">s</span>, <span class="kw-2">&amp;</span><span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>));
             <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">RK_S</span> {
-                <span class="kw">let</span> <span class="ident">c_tmp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span> <span class="op">+</span> <span class="ident">RK_C</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">h</span>, <span class="ident">universe</span>, <span class="ident">h</span>);
+                <span class="kw">let</span> <span class="ident">ci</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span> <span class="op">+</span> <span class="ident">RK_C</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">h</span>, <span class="ident">universe</span>, <span class="ident">h</span>);
                 <span class="kw">let</span> <span class="ident">ai</span> <span class="op">=</span> <span class="ident">RK_A</span>[<span class="ident">i</span>];
-                <span class="kw">let</span> <span class="ident">n_tmp</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">i</span>).<span class="ident">fold</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="op">|</span><span class="ident">total</span>, <span class="ident">j</span><span class="op">|</span> <span class="ident">total</span> <span class="op">+</span> <span class="ident">h</span> <span class="op">*</span> <span class="ident">ai</span>[<span class="ident">j</span>] <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">j</span>]);
-                <span class="ident">k</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="self">self</span>
+                <span class="kw">let</span> <span class="ident">dni</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">i</span>).<span class="ident">fold</span>(<span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">total</span>, <span class="ident">j</span><span class="op">|</span> {
+                    <span class="ident">total</span> <span class="op">+</span> <span class="ident">ai</span>[<span class="ident">j</span>] <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">j</span>]
+                });
+                <span class="kw">let</span> <span class="ident">ni</span> <span class="op">=</span> <span class="ident">n_plus_dn</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">dni</span>);
+                <span class="ident">k</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">h</span> <span class="op">*</span> <span class="self">self</span>
                     .<span class="ident">interactions</span>
                     .<span class="ident">iter</span>()
-                    .<span class="ident">fold</span>(<span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">s</span>, <span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">s</span>, <span class="kw-2">&amp;</span><span class="ident">n_tmp</span>, <span class="kw-2">&amp;</span><span class="ident">c_tmp</span>));
+                    .<span class="ident">fold</span>(<span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">s</span>, <span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">s</span>, <span class="kw-2">&amp;</span><span class="ident">ni</span>, <span class="kw-2">&amp;</span><span class="ident">ci</span>));
             }
 
             <span class="comment">// Calculate the two estimates</span>
@@ -1161,11 +1183,13 @@
                         <span class="ident">FoldWhile</span>::<span class="ident">Continue</span>(<span class="ident">e</span>)
                     }
                 })
-                .<span class="ident">into_inner</span>();
+                .<span class="ident">into_inner</span>()
+                <span class="op">/</span> <span class="ident">h</span>;
 
             <span class="comment">// If the error is within the tolerance, add the result</span>
             <span class="kw">if</span> <span class="ident">err</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">error_tolerance</span> {
-                <span class="self">self</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">beta</span>, <span class="ident">h</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>);
+                <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">universe</span>, <span class="ident">h</span>);
+                <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">advance</span>(<span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">beta</span>, <span class="ident">h</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>);
                 <span class="ident">advanced</span> <span class="op">=</span> <span class="bool-val">true</span>;
             }
 
@@ -1195,7 +1219,8 @@
                 <span class="comment">// too large (thus did not advance before), we advance beta</span>
                 <span class="comment">// regardless now to prevent the integration from getting stuck.</span>
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">advanced</span> {
-                    <span class="self">self</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">beta</span>, <span class="ident">h</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>);
+                    <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">universe</span>, <span class="ident">h</span>);
+                    <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">advance</span>(<span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">beta</span>, <span class="ident">h</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>);
                 }
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">h</span> <span class="op">&lt;</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span> {
                 <span class="ident">h</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span>;
@@ -1208,7 +1233,8 @@
                 <span class="comment">// too large (thus did not advance before), we advance beta</span>
                 <span class="comment">// regardless now to prevent the integration from getting stuck.</span>
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">advanced</span> {
-                    <span class="self">self</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">beta</span>, <span class="ident">h</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>);
+                    <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">universe</span>, <span class="ident">h</span>);
+                    <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">advance</span>(<span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">beta</span>, <span class="ident">h</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>);
                 }
             }
         }
@@ -1240,31 +1266,28 @@
         )
     }
 
+    <span class="doccomment">/// Advance `beta` and `n`, returning the new `n`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">advance</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Solution</span>,
+        <span class="kw-2">mut</span> <span class="ident">n</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Solution</span>,
         <span class="ident">dn</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Solution</span>,
         <span class="ident">beta</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">f64</span>,
         <span class="ident">h</span>: <span class="ident">f64</span>,
         <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Context</span>,
-    ) {
-        <span class="comment">// In order to avoid over-shooting 0, we set the number density</span>
-        <span class="comment">// to be exactly 0 whenever it changes sign.</span>
-        <span class="ident">Zip</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">n</span>).<span class="ident">and</span>(<span class="ident">dn</span>).<span class="ident">apply</span>(<span class="op">|</span><span class="ident">n</span>, <span class="ident">dn</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">next_n</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">+</span> <span class="ident">h</span> <span class="op">*</span> <span class="ident">dn</span>;
-            <span class="kw">if</span> <span class="ident">next_n</span> <span class="op">*</span> (<span class="kw-2">*</span><span class="ident">n</span>) <span class="op">&gt;=</span> <span class="number">0.0</span> {
-                <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="ident">next_n</span>;
-            } <span class="kw">else</span> {
-                <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="number">0.0</span>;
-            }
-        });
+    ) <span class="op">-&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Solution</span> {
+        <span class="comment">// Advance n and beta</span>
+        <span class="ident">n</span> <span class="op">=</span> <span class="ident">n_plus_dn</span>(<span class="ident">n</span>, <span class="ident">dn</span>);
         <span class="kw-2">*</span><span class="ident">beta</span> <span class="op">+=</span> <span class="ident">h</span>;
 
         <span class="comment">// Run the logger now</span>
-        (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">logger</span>)(<span class="ident">n</span>, <span class="ident">dn</span>, <span class="ident">c</span>);
+        (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">logger</span>)(<span class="kw-2">&amp;</span><span class="ident">n</span>, <span class="ident">dn</span>, <span class="ident">c</span>);
+
+        <span class="ident">n</span>
     }
 
+    <span class="doccomment">/// Generate the context at a given beta to pass to the logger/interaction</span>
+    <span class="doccomment">/// functions.</span>
     <span class="kw">fn</span> <span class="ident">context</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Universe</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">step</span>: <span class="ident">u64</span>,
@@ -1281,6 +1304,27 @@
             <span class="ident">model</span>: <span class="ident">M</span>::<span class="ident">new</span>(<span class="ident">beta</span>),
         }
     }
+}
+
+<span class="doccomment">/// Add `dn` to `n`, but set the result to 0 if the number density changes sign.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// If there is a strong process causing a particular number density to vanish,</span>
+<span class="doccomment">/// the iteration step may overshoot zero; and in the case where the process is</span>
+<span class="doccomment">/// very strong, it is possible the overshooting is so bad that it generates an</span>
+<span class="doccomment">/// even larger (opposite signed) number density.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// To avoid this, we set the number density to 0 whenever this might occur</span>
+<span class="doccomment">/// forcing an evaluation with exactly 0 number density.</span>
+<span class="kw">fn</span> <span class="ident">n_plus_dn</span>(<span class="kw-2">mut</span> <span class="ident">n</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">dn</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+    <span class="ident">Zip</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">n</span>).<span class="ident">and</span>(<span class="ident">dn</span>).<span class="ident">apply</span>(<span class="op">|</span><span class="ident">n</span>, <span class="ident">dn</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class="ident">next_n</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">+</span> <span class="ident">dn</span>;
+        <span class="kw">if</span> <span class="ident">next_n</span> <span class="op">*</span> (<span class="kw-2">*</span><span class="ident">n</span>) <span class="op">&gt;=</span> <span class="number">0.0</span> {
+            <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="ident">next_n</span>;
+        } <span class="kw">else</span> {
+            <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="number">0.0</span>;
+        }
+    });
+    <span class="ident">n</span>
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>

@@ -320,17 +320,20 @@
                 <span class="kw">let</span> <span class="ident">h_max</span> <span class="op">=</span> (<span class="ident">tf</span> <span class="op">-</span> <span class="ident">t</span>) <span class="op">/</span> <span class="number">1e1</span>;
                 <span class="kw">while</span> <span class="ident">t</span> <span class="op">&lt;</span> <span class="ident">tf</span> {
                     <span class="comment">// Computer each k[i]</span>
-                    <span class="ident">k</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">f</span>(<span class="ident">t</span>, <span class="kw-2">&amp;</span><span class="ident">x</span>);
-                    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">1</span>..<span class="ident">RK_S</span> {
-                        <span class="kw">let</span> <span class="ident">t_tmp</span> <span class="op">=</span> <span class="ident">t</span> <span class="op">+</span> <span class="ident">RK_C</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">h</span>;
+                    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">RK_S</span> {
+                        <span class="kw">let</span> <span class="ident">ti</span> <span class="op">=</span> <span class="ident">t</span> <span class="op">+</span> <span class="ident">RK_C</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">h</span>;
                         <span class="kw">let</span> <span class="ident">ai</span> <span class="op">=</span> <span class="ident">RK_A</span>[<span class="ident">i</span>];
-                        <span class="kw">let</span> <span class="ident">x_tmp</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">i</span>).<span class="ident">fold</span>(<span class="ident">x</span>.<span class="ident">clone</span>(), <span class="op">|</span><span class="ident">total</span>, <span class="ident">j</span><span class="op">|</span> <span class="ident">total</span> <span class="op">+</span> <span class="ident">h</span> <span class="op">*</span> <span class="ident">ai</span>[<span class="ident">j</span>] <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">j</span>]);
-                        <span class="ident">k</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">f</span>(<span class="ident">t_tmp</span>, <span class="kw-2">&amp;</span><span class="ident">x_tmp</span>);
+                        <span class="kw">let</span> <span class="ident">xi</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">i</span>).<span class="ident">fold</span>(<span class="ident">x</span>.<span class="ident">clone</span>(), <span class="op">|</span><span class="ident">total</span>, <span class="ident">j</span><span class="op">|</span> <span class="ident">total</span> <span class="op">+</span> <span class="ident">ai</span>[<span class="ident">j</span>] <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">j</span>]);
+                        <span class="ident">k</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">h</span> <span class="op">*</span> <span class="ident">f</span>(<span class="ident">ti</span>, <span class="kw-2">&amp;</span><span class="ident">xi</span>);
                     }
 
                     <span class="comment">// Compute the two estimates</span>
-                    <span class="ident">dx</span>[<span class="number">0</span>] <span class="op">=</span> (<span class="number">0</span>..<span class="ident">RK_S</span>).<span class="ident">fold</span>(<span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="number">2</span>), <span class="op">|</span><span class="ident">total</span>, <span class="ident">i</span><span class="op">|</span> <span class="ident">total</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">RK_B</span>[<span class="number">0</span>][<span class="ident">i</span>]);
-                    <span class="ident">dx</span>[<span class="number">1</span>] <span class="op">=</span> (<span class="number">0</span>..<span class="ident">RK_S</span>).<span class="ident">fold</span>(<span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="number">2</span>), <span class="op">|</span><span class="ident">total</span>, <span class="ident">i</span><span class="op">|</span> <span class="ident">total</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">RK_B</span>[<span class="number">1</span>][<span class="ident">i</span>]);
+                    <span class="ident">dx</span>[<span class="number">0</span>] <span class="op">=</span> (<span class="number">0</span>..<span class="ident">RK_S</span>).<span class="ident">fold</span>(<span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">x</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">total</span>, <span class="ident">i</span><span class="op">|</span> {
+                        <span class="ident">total</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">RK_B</span>[<span class="number">0</span>][<span class="ident">i</span>]
+                    });
+                    <span class="ident">dx</span>[<span class="number">1</span>] <span class="op">=</span> (<span class="number">0</span>..<span class="ident">RK_S</span>).<span class="ident">fold</span>(<span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">x</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">total</span>, <span class="ident">i</span><span class="op">|</span> {
+                        <span class="ident">total</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">RK_B</span>[<span class="number">1</span>][<span class="ident">i</span>]
+                    });
 
                     <span class="comment">// Get the error between the estimates</span>
                     <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">Zip</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="ident">dx</span>[<span class="number">0</span>])
@@ -343,20 +346,17 @@
                                 <span class="ident">FoldWhile</span>::<span class="ident">Continue</span>(<span class="ident">e</span>)
                             }
                         })
-                        .<span class="ident">into_inner</span>();
+                        .<span class="ident">into_inner</span>()
+                        <span class="op">/</span> <span class="ident">h</span>;
 
                     <span class="comment">// If the error is within the tolerance, add the result</span>
                     <span class="kw">if</span> <span class="ident">err</span> <span class="op">&lt;</span> <span class="number">1e-5</span> {
-                        <span class="ident">x</span> <span class="op">=</span> <span class="ident">x</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">dx</span>[<span class="number">0</span>] <span class="op">*</span> <span class="ident">h</span>;
+                        <span class="ident">x</span> <span class="op">+=</span> <span class="kw-2">&amp;</span><span class="ident">dx</span>[<span class="number">0</span>];
                         <span class="ident">t</span> <span class="op">+=</span> <span class="ident">h</span>;
                     }
 
                     <span class="comment">// Compute the change in step size based on the current error</span>
-                    <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">err</span> <span class="op">&gt;</span> <span class="number">0.0</span> {
-                        <span class="number">0.9</span> <span class="op">*</span> (<span class="number">1e-5</span> <span class="op">/</span> <span class="ident">err</span>).<span class="ident">powf</span>(<span class="number">1.0</span> <span class="op">/</span> <span class="ident">f64</span>::<span class="ident">from</span>(<span class="ident">RK_ORDER</span> <span class="op">+</span> <span class="number">1</span>))
-                    } <span class="kw">else</span> {
-                        <span class="number">1.2</span>
-                    };
+                    <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="number">0.9</span> <span class="op">*</span> (<span class="number">1e-5</span> <span class="op">/</span> <span class="ident">err</span>).<span class="ident">powf</span>(<span class="number">1.0</span> <span class="op">/</span> <span class="ident">f64</span>::<span class="ident">from</span>(<span class="ident">RK_ORDER</span> <span class="op">+</span> <span class="number">1</span>));
 
                     <span class="comment">// And correspondingly adjust the error</span>
                     <span class="ident">h</span> <span class="op">*=</span> <span class="kw">if</span> <span class="ident">delta</span> <span class="op">&lt;</span> <span class="number">0.8</span> {
