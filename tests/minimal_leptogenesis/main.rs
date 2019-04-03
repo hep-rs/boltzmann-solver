@@ -131,7 +131,7 @@ fn interaction_n_el_h(solver: &mut NumberDensitySolver<VanillaLeptogenesisModel>
         // equilibrium thus their scaling factors are irrelevant.
         let decay = n[1] * gamma_tilde;
         let inverse_decay = c.eq_n[1] * gamma_tilde;
-        let net_decay = decay - inverse_decay;
+        let net_decay = (n[1] - c.eq_n[1]) * gamma_tilde;
 
         s[0] += -c.model.epsilon * net_decay - n[0] * inverse_decay;
         s[1] -= net_decay;
@@ -201,7 +201,7 @@ fn interaction_n_el_ql_qr(solver: &mut NumberDensitySolver<VanillaLeptogenesisMo
 
         let forward = checked_div(n[1], c.eq_n[1]) * gamma;
         let backward = gamma;
-        let net_forward = forward - backward;
+        let net_forward = (checked_div(n[1], c.eq_n[1]) - 1.0) * gamma;
 
         s[0] -= n[0] * backward;
         s[1] -= net_forward;
