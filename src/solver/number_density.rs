@@ -295,6 +295,7 @@ pub struct NumberDensitySolver<M: Model> {
     step_change: StepChange,
     step_precision: StepPrecision,
     error_tolerance: f64,
+    threshold_number_density: f64,
 }
 
 impl<M: Model> Solver for NumberDensitySolver<M> {
@@ -320,6 +321,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             step_change: StepChange::default(),
             step_precision: StepPrecision::default(),
             error_tolerance: 1e-4,
+            threshold_number_density: 0.0,
         }
     }
 
@@ -482,7 +484,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 let dni = (0..i).fold(Self::Solution::zeros(n.dim()), |total, j| {
                     total + ai[j] * &k[j]
                 });
-                let ni = n_plus_dn(n.clone(), &dni);
+                let ni = self.n_plus_dn(n.clone(), &dni);
                 k[i] = h * self
                     .interactions
                     .iter()
@@ -572,6 +574,27 @@ impl Default for NumberDensitySolver<EmptyModel> {
 }
 
 impl<M: Model> NumberDensitySolver<M> {
+    /// Set the threshold number density to count as 0.
+    ///
+    /// Any number density whose absolute value is less than the threshold will
+    /// be treated as being exactly zero.  This applies to both calculated
+    /// number densities as well as equilibrium number densities.  Furthermore,
+    /// this also applies to 'abstract' number densities such as \\(B-L\\).
+    ///
+    /// This is by default set to `0.0`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the threshold is negative.
+    pub fn threshold_number_density(mut self, threshold: f64) -> Self {
+        assert!(
+            threshold >= 0.0,
+            "Threshold number density must be a non-negative number."
+        );
+        self.threshold_number_density = threshold;
+        self
+    }
+
     /// Create an array containing the initial conditions for all the particle
     /// species.
     ///
@@ -579,11 +602,14 @@ impl<M: Model> NumberDensitySolver<M> {
     /// energy, with the distribution following either the Bose–Einstein or
     /// Fermi–Dirac distribution as determined by their spin.
     fn equilibrium_number_densities(&self, beta: f64) -> Array1<f64> {
-        Array1::from_iter(
-            self.particles
-                .iter()
-                .map(|p| p.normalized_number_density(0.0, beta)),
-        )
+        Array1::from_iter(self.particles.iter().map(|p| {
+            let v = p.normalized_number_density(0.0, beta);
+            if v.abs() < self.threshold_number_density {
+                0.0
+            } else {
+                v
+            }
+        }))
     }
 
     /// Advance `beta` and `n`, returning the new `n`.
@@ -597,7 +623,7 @@ impl<M: Model> NumberDensitySolver<M> {
         c: &<Self as Solver>::Context,
     ) -> <Self as Solver>::Solution {
         // Advance n and beta
-        n = n_plus_dn(n, dn);
+        n = self.n_plus_dn(n, dn);
         *beta += h;
 
         // Run the logger now
@@ -624,27 +650,32 @@ impl<M: Model> NumberDensitySolver<M> {
             model: M::new(beta),
         }
     }
-}
 
-/// Add `dn` to `n`, but set the result to 0 if the number density changes sign.
-///
-/// If there is a strong process causing a particular number density to vanish,
-/// the iteration step may overshoot zero; and in the case where the process is
-/// very strong, it is possible the overshooting is so bad that it generates an
-/// even larger (opposite signed) number density.
-///
-/// To avoid this, we set the number density to 0 whenever this might occur
-/// forcing an evaluation with exactly 0 number density.
-fn n_plus_dn(mut n: Array1<f64>, dn: &Array1<f64>) -> Array1<f64> {
-    Zip::from(&mut n).and(dn).apply(|n, dn| {
-        let next_n = *n + dn;
-        if next_n * (*n) >= 0.0 {
-            *n = next_n;
-        } else {
-            *n = 0.0;
-        }
-    });
-    n
+    /// Add `dn` to `n`, but set the result to 0 if the number density changes sign.
+    ///
+    /// If there is a strong process causing a particular number density to vanish,
+    /// the iteration step may overshoot zero; and in the case where the process is
+    /// very strong, it is possible the overshooting is so bad that it generates an
+    /// even larger (opposite signed) number density.
+    ///
+    /// To avoid this, we set the number density to 0 whenever this might occur
+    /// forcing an evaluation with exactly 0 number density.
+    fn n_plus_dn(&self, mut n: Array1<f64>, dn: &Array1<f64>) -> Array1<f64> {
+        Zip::from(&mut n).and(dn).apply(|n, dn| {
+            let next_n = *n + dn;
+            if next_n * (*n) >= 0.0 {
+                *n = if next_n.abs() < self.threshold_number_density {
+                    0.0
+                } else {
+                    next_n
+                };
+            // *n = next_n;
+            } else {
+                *n = 0.0;
+            }
+        });
+        n
+    }
 }
 
 #[cfg(test)]
