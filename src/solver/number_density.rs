@@ -257,6 +257,7 @@
 
 use super::{EmptyModel, InitialCondition, Model, Solver, StepChange, StepPrecision};
 use crate::{particle::Particle, universe::Universe};
+use log::{debug, info};
 use ndarray::{prelude::*, FoldWhile, Zip};
 
 /// Context provided containing pre-computed values which might be useful when
