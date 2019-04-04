@@ -12,6 +12,7 @@
 //! density.
 
 use crate::constants::{PI_M2, ZETA_3};
+use log::{debug, warn};
 use quadrature::integrate;
 use special_functions::{bessel, polylog};
 use std::f64;

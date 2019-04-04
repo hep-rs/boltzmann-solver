@@ -116,22 +116,19 @@
 
 #![cfg_attr(feature = "nightly", feature(test))]
 
-#[macro_use]
+#[cfg(test)]
+extern crate csv;
 extern crate log;
 extern crate ndarray;
 extern crate quadrature;
 extern crate special_functions;
-
-#[cfg(test)]
-extern crate csv;
-
 #[cfg(feature = "nightly")]
 extern crate test;
 
 macro_rules! debug_assert_warn {
     ($cond:expr, $($arg:tt)+) => (
         if cfg!(debug_assertions) && ($cond) {
-            warn!($($arg,)*);
+            log::warn!($($arg,)*);
         }
     )
 }
@@ -141,6 +138,4 @@ pub mod particle;
 pub mod solver;
 pub mod statistic;
 pub mod universe;
-
-// pub mod common;
 pub mod utilities;
