@@ -1,6 +1,7 @@
 //! Solvers for the Boltzmann equation, or sets of Boltzmann equations
 
 pub mod number_density;
+pub mod number_density_ap;
 mod options;
 // pub mod phase_space;
 mod tableau;
