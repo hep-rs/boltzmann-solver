@@ -1,3 +1,7 @@
+//! Utility function for testing
+
+use log::debug;
+
 /// Check whether two numbers are equal to each other within the specified
 /// precision and absolute error.
 ///
