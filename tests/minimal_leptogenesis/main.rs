@@ -109,7 +109,7 @@ fn minimal_leptogenesis() {
 fn interaction_n_el_h(solver: &mut NumberDensitySolver<VanillaLeptogenesisModel>) {
     let csv = RefCell::new(csv::Writer::from_path("/tmp/minimal_leptogenesis/decay.csv").unwrap());
     csv.borrow_mut()
-        .serialize(["step", "beta", "γ̃", "N₁ → HL", "HL → N₁"])
+        .serialize(("step", "beta", PARTICLE_NAMES[0], PARTICLE_NAMES[1]))
         .unwrap();
 
     solver.add_interaction(move |mut s, n, ref c| {
@@ -129,23 +129,21 @@ fn interaction_n_el_h(solver: &mut NumberDensitySolver<VanillaLeptogenesisModel>
 
         // The full γ(e H → N).  We are assuming e and H are always in
         // equilibrium thus their scaling factors are irrelevant.
-        let decay = n[1] * gamma_tilde;
+        // let _decay = n[1] * gamma_tilde;
         let inverse_decay = c.eq_n[1] * gamma_tilde;
         let net_decay = (n[1] - c.eq_n[1]) * gamma_tilde;
 
-        s[0] += -c.model.epsilon * net_decay - n[0] * inverse_decay;
-        s[1] -= net_decay;
+        let dbl = c.model.epsilon * net_decay - n[0] * inverse_decay;
+        s[0] += dbl;
+        let dn1 = -net_decay;
+        s[1] += net_decay;
 
         {
             let mut csv = csv.borrow_mut();
             csv.write_field(format!("{}", c.step)).unwrap();
             csv.write_field(format!("{:.15e}", c.beta)).unwrap();
-            csv.write_record(&[
-                format!("{:.3e}", gamma_tilde),
-                format!("{:.3e}", decay),
-                format!("{:.3e}", inverse_decay),
-            ])
-            .unwrap();
+            csv.write_record(&[format!("{:.3e}", dbl), format!("{:.3e}", dn1)])
+                .unwrap();
         }
 
         s
