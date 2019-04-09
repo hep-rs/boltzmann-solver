@@ -488,7 +488,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         let mut step = 0;
         let mut advanced: bool;
         let mut beta = Float::with_val(self.working_precision, self.beta_range.0);
-        let mut h = Float::with_val(self.working_precision, &beta * &self.step_precision.min);
+        let mut h = Float::with_val(self.working_precision, &beta * self.step_precision.min);
 
         // Create the initial context and log the initial conditions
         let mut c = self.context(step, beta.clone(), universe, h.clone());
@@ -557,7 +557,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             if err.is_zero() {
                 h *= self.step_change.increase;
             } else {
-                let delta = 0.9 * (&self.error_tolerance / err).pow(1.0 / f64::from(RK_ORDER + 1));
+                let delta = 0.9 * (self.error_tolerance / err).pow(1.0 / f64::from(RK_ORDER + 1));
                 // debug!("Step {:}, β = {:.4e} -> δ = {:<10.3e}", step, beta, delta);
 
                 if delta < self.step_change.decrease {
@@ -572,10 +572,8 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             // Prevent h from getting too small or too big in proportion to the
             // current value of beta.  Also advance the integration irrespective
             // of the local error if we reach the maximum or minimum step size.
-            let min_step =
-                Float::with_val(self.working_precision, &beta * &self.step_precision.min);
-            let max_step =
-                Float::with_val(self.working_precision, &beta * &self.step_precision.max);
+            let min_step = Float::with_val(self.working_precision, &beta * self.step_precision.min);
+            let max_step = Float::with_val(self.working_precision, &beta * self.step_precision.max);
             if h > max_step {
                 h = max_step;
                 debug!(
