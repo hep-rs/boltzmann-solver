@@ -272,11 +272,11 @@ pub struct Context<M: Model> {
     /// Current step size
     pub step_size: Float,
     /// Hubble rate, in GeV
-    pub hubble_rate: Float,
+    pub hubble_rate: f64,
     /// Equilibrium number densities for the particles, normalized to the
     /// equilibrium number density for a massless boson with \\(g = 1\\).  This
     /// is provided in the same order as specified to the solver
-    pub eq_n: Array1<Float>,
+    pub eq_n: Array1<f64>,
     /// Model data
     pub model: M,
     /// Working precision
@@ -500,16 +500,17 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
 
             // Compute each k[i]
             for i in 0..RK_S {
-                let beta_i = Float::with_val(self.working_precision, RK_C[i] * &h) + &beta;
+                let mut beta_i = h.clone() * RK_C[i];
+                beta_i += &beta;
                 let ci = self.context(step, beta_i, universe, h.clone());
                 let ai = RK_A[i];
-                let dni = (0..i).fold(zero.clone(), |mut total, j| {
+                let mut dni = (0..i).fold(zero.clone(), |mut total, j| {
                     Zip::from(&mut total)
                         .and(&k[i])
                         .apply(|t, k| *t += Float::with_val(self.working_precision, ai[j]) * k);
                     total
                 });
-                let ni = self.n_plus_dn(n.clone(), &dni);
+                let ni = self.n_plus_dn(n.clone(), &mut dni, &ci);
                 k[i] = self
                     .interactions
                     .iter()
@@ -547,7 +548,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             // If the error is within the tolerance, add the result
             if err < self.error_tolerance {
                 c = self.context(step, beta.clone(), universe, h.clone());
-                n = self.advance(n, &dn[0], &mut beta, &h, &c);
+                n = self.advance(n, &mut dn[0], &mut beta, &h, &c);
                 advanced = true;
             }
 
@@ -584,7 +585,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
 
                 if !advanced {
                     c = self.context(step, beta.clone(), universe, h.clone());
-                    n = self.advance(n, &dn[0], &mut beta, &h, &c);
+                    n = self.advance(n, &mut dn[0], &mut beta, &h, &c);
                 }
             } else if h < min_step {
                 h = min_step;
@@ -595,7 +596,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
 
                 if !advanced {
                     c = self.context(step, beta.clone(), universe, h.clone());
-                    n = self.advance(n, &dn[0], &mut beta, &h, &c);
+                    n = self.advance(n, &mut dn[0], &mut beta, &h, &c);
                 }
             }
         }
@@ -640,13 +641,13 @@ impl<'a, M: Model> NumberDensitySolver<M> {
     /// All particles species are assumed to be in thermal equilibrium at this
     /// energy, with the distribution following either the Bose–Einstein or
     /// Fermi–Dirac distribution as determined by their spin.
-    fn equilibrium_number_densities(&self, beta: f64) -> Array1<Float> {
+    fn equilibrium_number_densities(&self, beta: f64) -> Array1<f64> {
         Array1::from_iter(self.particles.iter().map(|p| {
             let v = p.normalized_number_density(0.0, beta);
             if v.abs() < self.threshold_number_density {
-                Float::with_val(self.working_precision, 0.0)
+                0.0
             } else {
-                Float::with_val(self.working_precision, v)
+                v
             }
         }))
     }
@@ -656,13 +657,13 @@ impl<'a, M: Model> NumberDensitySolver<M> {
     fn advance(
         &self,
         mut n: <Self as Solver>::Solution,
-        dn: &<Self as Solver>::Solution,
+        dn: &mut <Self as Solver>::Solution,
         beta: &mut Float,
         h: &Float,
         c: &<Self as Solver>::Context,
     ) -> <Self as Solver>::Solution {
         // Advance n and beta
-        n = self.n_plus_dn(n, dn);
+        n = self.n_plus_dn(n, dn, c);
         *beta += h;
 
         // Run the logger now
@@ -685,39 +686,46 @@ impl<'a, M: Model> NumberDensitySolver<M> {
             step,
             beta,
             step_size,
-            hubble_rate: Float::with_val(self.working_precision, universe.hubble_rate(beta_f64)),
+            hubble_rate: universe.hubble_rate(beta_f64),
             eq_n: self.equilibrium_number_densities(beta_f64),
             model: M::new(beta_f64),
             working_precision: self.working_precision,
         }
     }
 
-    /// Add `dn` to `n`, but set the result to 0 if the number density changes sign.
+    /// Add `dn` to `n`, but set the result to the equilibrium number density if
+    /// the change overshoots it.
     ///
-    /// If there is a strong process causing a particular number density to vanish,
-    /// the iteration step may overshoot zero; and in the case where the process is
-    /// very strong, it is possible the overshooting is so bad that it generates an
-    /// even larger (opposite signed) number density.
+    /// If there is a strong process causing a particular number density to go
+    /// towards equilibrium, the iteration step may overshoot the equilibrium
+    /// point; and in the case where the process is *very* strong, it is
+    /// possible the overshooting is so bad that it generates an even larger
+    /// (opposite signed) number density.
     ///
-    /// To avoid this, we set the number density to 0 whenever this might occur
+    /// To avoid this, we set the number density to exactly the equilibrium
+    /// number density whenever this might occur forcing an evaluation with the
+    /// equilibrium number density.
     /// forcing an evaluation with exactly 0 number density.
     fn n_plus_dn(
         &self,
         mut n: <Self as Solver>::Solution,
-        dn: &<Self as Solver>::Solution,
+        dn: &mut <Self as Solver>::Solution,
+        c: &<Self as Solver>::Context,
     ) -> <Self as Solver>::Solution {
-        Zip::from(&mut n).and(dn).apply(|n, dn| {
-            let next_n = Float::with_val(self.working_precision, &*n + dn);
-            let prod = Float::with_val(self.working_precision, &next_n * &*n);
-            if prod >= 0.0 {
-                *n = if *next_n.as_abs() < self.threshold_number_density {
-                    Float::with_val(self.working_precision, 0.0)
-                } else {
-                    next_n
-                };
+        Zip::from(&mut n).and(dn).and(&c.eq_n).apply(|n, dn, eq_n| {
+            let delta_1: Float = n.clone() - eq_n;
+            let delta_2: Float = delta_1.clone() + &*dn;
+
+            if delta_1.is_sign_positive() != delta_2.is_sign_positive() {
+                *dn = n.clone() - eq_n;
+                *n = Float::with_val(self.working_precision, eq_n);
             } else {
-                *n = Float::with_val(self.working_precision, 0.0);
+                *n += &*dn;
             }
+
+            if *n.as_abs() < self.threshold_number_density {
+                *n = Float::with_val(self.working_precision, 0.0)
+            };
         });
         n
     }
