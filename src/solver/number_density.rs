@@ -482,10 +482,10 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             for i in 0..RK_S {
                 let ci = self.context(step, beta + RK_C[i] * h, universe, h);
                 let ai = RK_A[i];
-                let dni = (0..i).fold(Self::Solution::zeros(n.dim()), |total, j| {
+                let mut dni = (0..i).fold(Self::Solution::zeros(n.dim()), |total, j| {
                     total + ai[j] * &k[j]
                 });
-                let ni = self.n_plus_dn(n.clone(), &dni);
+                let ni = self.n_plus_dn(n.clone(), &mut dni, &ci);
                 k[i] = h * self
                     .interactions
                     .iter()
@@ -517,7 +517,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             // If the error is within the tolerance, add the result
             if err < self.error_tolerance {
                 c = self.context(step, beta, universe, h);
-                n = self.advance(n, &dn[0], &mut beta, h, &c);
+                n = self.advance(n, &mut dn[0], &mut beta, h, &c);
                 advanced = true;
             }
 
@@ -546,7 +546,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
 
                 if !advanced {
                     c = self.context(step, beta, universe, h);
-                    n = self.advance(n, &dn[0], &mut beta, h, &c);
+                    n = self.advance(n, &mut dn[0], &mut beta, h, &c);
                 }
             } else if h < beta * self.step_precision.min {
                 h = beta * self.step_precision.min;
@@ -557,7 +557,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
 
                 if !advanced {
                     c = self.context(step, beta, universe, h);
-                    n = self.advance(n, &dn[0], &mut beta, h, &c);
+                    n = self.advance(n, &mut dn[0], &mut beta, h, &c);
                 }
             }
         }
@@ -618,13 +618,13 @@ impl<M: Model> NumberDensitySolver<M> {
     fn advance(
         &self,
         mut n: <Self as Solver>::Solution,
-        dn: &<Self as Solver>::Solution,
+        dn: &mut <Self as Solver>::Solution,
         beta: &mut f64,
         h: f64,
         c: &<Self as Solver>::Context,
     ) -> <Self as Solver>::Solution {
         // Advance n and beta
-        n = self.n_plus_dn(n, dn);
+        n = self.n_plus_dn(n, dn, c);
         *beta += h;
 
         // Run the logger now
@@ -652,28 +652,38 @@ impl<M: Model> NumberDensitySolver<M> {
         }
     }
 
-    /// Add `dn` to `n`, but set the result to 0 if the number density changes sign.
+    /// Add `dn` to `n`, but set the result to the equilibrium number density if
+    /// the change overshoots it.
     ///
-    /// If there is a strong process causing a particular number density to vanish,
-    /// the iteration step may overshoot zero; and in the case where the process is
-    /// very strong, it is possible the overshooting is so bad that it generates an
-    /// even larger (opposite signed) number density.
+    /// If there is a strong process causing a particular number density to go
+    /// towards equilibrium, the iteration step may overshoot the equilibrium
+    /// point; and in the case where the process is *very* strong, it is
+    /// possible the overshooting is so bad that it generates an even larger
+    /// (opposite signed) number density.
     ///
-    /// To avoid this, we set the number density to 0 whenever this might occur
-    /// forcing an evaluation with exactly 0 number density.
-    fn n_plus_dn(&self, mut n: Array1<f64>, dn: &Array1<f64>) -> Array1<f64> {
-        Zip::from(&mut n).and(dn).apply(|n, dn| {
-            let next_n = *n + dn;
-            if next_n * (*n) >= 0.0 {
-                *n = if next_n.abs() < self.threshold_number_density {
-                    0.0
-                } else {
-                    next_n
-                };
-            // *n = next_n;
+    /// To avoid this, we set the number density to exactly the equilibrium
+    /// number density whenever this might occur forcing an evaluation with the
+    /// equilibrium number density.
+    fn n_plus_dn(
+        &self,
+        mut n: <Self as Solver>::Solution,
+        dn: &mut <Self as Solver>::Solution,
+        c: &<Self as Solver>::Context,
+    ) -> <Self as Solver>::Solution {
+        Zip::from(&mut n).and(dn).and(&c.eq_n).apply(|n, dn, eq_n| {
+            let delta_1 = *n - eq_n;
+            let delta_2 = delta_1 + *dn;
+
+            if delta_1.is_sign_positive() != delta_2.is_sign_positive() {
+                *dn = *n - eq_n;
+                *n = *eq_n;
             } else {
-                *n = 0.0;
+                *n += *dn;
             }
+
+            if n.abs() < self.threshold_number_density {
+                *n = 0.0
+            };
         });
         n
     }
