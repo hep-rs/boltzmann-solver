@@ -27,7 +27,7 @@ use std::cell::RefCell;
 #[test]
 fn minimal_leptogenesis_ap() {
     // Setup the directory for CSV output
-    ::std::fs::create_dir("/tmp/minimal_leptogenesis/").unwrap_or(());
+    ::std::fs::create_dir("/tmp/minimal_leptogenesis_ap/").unwrap_or(());
 
     let model = VanillaLeptogenesisModel::new(1e-15);
 
@@ -61,7 +61,7 @@ fn minimal_leptogenesis_ap() {
 
     // Logging of number densities
     ////////////////////////////////////////////////////////////////////////////////
-    let csv = RefCell::new(csv::Writer::from_path("/tmp/minimal_leptogenesis/n.csv").unwrap());
+    let csv = RefCell::new(csv::Writer::from_path("/tmp/minimal_leptogenesis_ap/n.csv").unwrap());
 
     {
         let mut csv = csv.borrow_mut();
@@ -109,7 +109,8 @@ fn minimal_leptogenesis_ap() {
 
 /// Interaction N ↔ LH
 fn interaction_n_el_h(solver: &mut NumberDensitySolver<VanillaLeptogenesisModel>) {
-    let csv = RefCell::new(csv::Writer::from_path("/tmp/minimal_leptogenesis/decay.csv").unwrap());
+    let csv =
+        RefCell::new(csv::Writer::from_path("/tmp/minimal_leptogenesis_ap/decay.csv").unwrap());
     csv.borrow_mut()
         .serialize(("step", "beta", PARTICLE_NAMES[0], PARTICLE_NAMES[1]))
         .unwrap();
@@ -157,7 +158,7 @@ fn interaction_n_el_h(solver: &mut NumberDensitySolver<VanillaLeptogenesisModel>
 /// Scattering NL ↔ Qq, NQ ↔ Lq and Nq ↔ LQ (s- and t-channel)
 fn interaction_n_el_ql_qr(solver: &mut NumberDensitySolver<VanillaLeptogenesisModel>) {
     let csv = RefCell::new(
-        csv::Writer::from_path("/tmp/minimal_leptogenesis/scattering_NLQq.csv").unwrap(),
+        csv::Writer::from_path("/tmp/minimal_leptogenesis_ap/scattering_NLQq.csv").unwrap(),
     );
     csv.borrow_mut()
         .serialize(["step", "beta", "N₁Q → Lq", "Lq → N₁Q"])
