@@ -136,7 +136,7 @@ fn interaction_n_el_h(solver: &mut NumberDensitySolver<VanillaLeptogenesisModel>
         let dbl = c.model.epsilon * net_decay - n[0] * inverse_decay;
         s[0] += dbl;
         let dn1 = -net_decay;
-        s[1] += net_decay;
+        s[1] += dn1;
 
         {
             let mut csv = csv.borrow_mut();
@@ -198,8 +198,8 @@ fn interaction_n_el_ql_qr(solver: &mut NumberDensitySolver<VanillaLeptogenesisMo
         gamma /= 512.0 * PI_5 * c.hubble_rate * c.beta;
 
         let forward = checked_div(n[1], c.eq_n[1]) * gamma;
-        let backward = gamma;
         let net_forward = (checked_div(n[1], c.eq_n[1]) - 1.0) * gamma;
+        let backward = gamma;
 
         s[0] -= n[0] * backward;
         s[1] -= net_forward;

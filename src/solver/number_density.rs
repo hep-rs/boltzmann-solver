@@ -290,9 +290,19 @@ pub struct NumberDensitySolver<M: Model> {
     particles: Vec<Particle>,
     initial_conditions: Vec<f64>,
     #[allow(clippy::type_complexity)]
-    interactions: Vec<Box<Fn(Array1<f64>, &Array1<f64>, &Context<M>) -> Array1<f64>>>,
+    interactions: Vec<
+        Box<
+            Fn(
+                <Self as Solver>::Solution,
+                &<Self as Solver>::Solution,
+                &<Self as Solver>::Context,
+            ) -> <Self as Solver>::Solution,
+        >,
+    >,
     #[allow(clippy::type_complexity)]
-    logger: Box<Fn(&Array1<f64>, &Array1<f64>, &Context<M>)>,
+    logger: Box<
+        Fn(&<Self as Solver>::Solution, &<Self as Solver>::Solution, &<Self as Solver>::Context),
+    >,
     step_change: StepChange,
     step_precision: StepPrecision,
     error_tolerance: f64,
@@ -480,7 +490,8 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
 
             // Compute each k[i]
             for i in 0..RK_S {
-                let ci = self.context(step, beta + RK_C[i] * h, universe, h);
+                let beta_i = beta + RK_C[i] * h;
+                let ci = self.context(step, beta_i, universe, h);
                 let ai = RK_A[i];
                 let mut dni = (0..i).fold(Self::Solution::zeros(n.dim()), |total, j| {
                     total + ai[j] * &k[j]
@@ -521,18 +532,22 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 advanced = true;
             }
 
-            // Compute the change in step size based on the current error
-            let delta = 0.9 * (self.error_tolerance / err).powf(1.0 / f64::from(RK_ORDER + 1));
-            // debug!("Step {:}, β = {:.4e} -> δ = {:<10.3e}", step, beta, delta);
-
-            // And correspondingly adjust the error
-            h *= if delta < self.step_change.decrease {
-                self.step_change.decrease
-            } else if delta > self.step_change.increase {
-                self.step_change.increase
+            // Compute the change in step size based on the current error And
+            // correspondingly adjust the step size
+            if err == 0.0 {
+                h *= self.step_change.increase;
             } else {
-                delta
-            };
+                let delta = 0.9 * (self.error_tolerance / err).powf(1.0 / f64::from(RK_ORDER + 1));
+                // debug!("Step {:}, β = {:.4e} -> δ = {:<10.3e}", step, beta, delta);
+
+                if delta < self.step_change.decrease {
+                    h *= self.step_change.decrease;
+                } else if delta > self.step_change.increase {
+                    h *= self.step_change.increase;
+                } else {
+                    h *= &delta;
+                }
+            }
 
             // Prevent h from getting too small or too big in proportion to the
             // current value of beta.  Also advance the integration irrespective
@@ -682,8 +697,9 @@ impl<M: Model> NumberDensitySolver<M> {
             }
 
             if n.abs() < self.threshold_number_density {
-                *n = 0.0
-            };
+                *dn = -*n;
+                *n = 0.0;
+            }
         });
         n
     }

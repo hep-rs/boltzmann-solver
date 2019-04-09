@@ -90,10 +90,6 @@ fn minimal_leptogenesis_ap() {
         }
 
         csv.write_record(None::<&[u8]>).unwrap();
-
-        if n.iter().any(|v| *v.as_abs() > 1e3) {
-            panic!("Unphysical number density reached.");
-        }
     });
 
     // Interactions
@@ -128,9 +124,7 @@ fn interaction_n_el_h(solver: &mut NumberDensitySolver<VanillaLeptogenesisModel>
                 m2 += c.model.coupling.y_v[[0, b]].norm_sqr();
             }
             m2 *= (c.model.mass2.n[0] - c.model.mass2.h)
-                * bessel::k_1_on_k_2(
-                    Float::with_val(c.working_precision, c.model.mass.n[0] * &c.beta).to_f64(),
-                );
+                * bessel::k_1_on_k_2(c.model.mass.n[0] * c.beta.to_f64());
             m2 /= 16.0 * PI_1 * c.model.mass.n[0] * c.hubble_rate;
             m2 /= &c.beta;
             m2
@@ -161,7 +155,6 @@ fn interaction_n_el_h(solver: &mut NumberDensitySolver<VanillaLeptogenesisModel>
 }
 
 /// Scattering NL ↔ Qq, NQ ↔ Lq and Nq ↔ LQ (s- and t-channel)
-#[allow(dead_code)]
 fn interaction_n_el_ql_qr(solver: &mut NumberDensitySolver<VanillaLeptogenesisModel>) {
     let csv = RefCell::new(
         csv::Writer::from_path("/tmp/minimal_leptogenesis/scattering_NLQq.csv").unwrap(),
@@ -200,7 +193,7 @@ fn interaction_n_el_ql_qr(solver: &mut NumberDensitySolver<VanillaLeptogenesisMo
                 };
 
                 integrate(t_integrand, c.model.mass2.n[0] - s, 0.0, 0.0).integral
-                    * bessel::k_1(Float::with_val(c.working_precision, sqrt_s * &c.beta).to_f64())
+                    * bessel::k_1(sqrt_s * &c.beta.to_f64())
                     / sqrt_s
                     * dsdss
             };
