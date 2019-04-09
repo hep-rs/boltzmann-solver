@@ -705,7 +705,6 @@ impl<'a, M: Model> NumberDensitySolver<M> {
     /// To avoid this, we set the number density to exactly the equilibrium
     /// number density whenever this might occur forcing an evaluation with the
     /// equilibrium number density.
-    /// forcing an evaluation with exactly 0 number density.
     fn n_plus_dn(
         &self,
         mut n: <Self as Solver>::Solution,
@@ -724,6 +723,8 @@ impl<'a, M: Model> NumberDensitySolver<M> {
             }
 
             if *n.as_abs() < self.threshold_number_density {
+                *dn = n.clone();
+                dn.neg_assign();
                 *n = Float::with_val(self.working_precision, 0.0)
             };
         });
