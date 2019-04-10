@@ -248,6 +248,8 @@
 <span id="248">248</span>
 <span id="249">249</span>
 <span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! # Butcher tableaux</span>
 <span class="doccomment">//!</span>
@@ -441,7 +443,9 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">bench</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">tests</span>::{<span class="ident">solve_ode_bs32</span>, <span class="ident">solve_ode_ck54</span>, <span class="ident">solve_ode_dp54</span>, <span class="ident">solve_ode_rkf54</span>};
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">tests</span>::{
+        <span class="ident">solve_ode_bs32</span>, <span class="ident">solve_ode_ck54</span>, <span class="ident">solve_ode_dp54</span>, <span class="ident">solve_ode_dp87</span>, <span class="ident">solve_ode_rkf54</span>,
+    };
     <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">array</span>, <span class="ident">Array1</span>};
     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">consts</span>::<span class="ident">PI</span>;
@@ -455,14 +459,13 @@
             <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
                 <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">_t</span>: <span class="ident">f64</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">|</span> <span class="op">-&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> { <span class="macro">array</span><span class="macro">!</span>[<span class="op">-</span><span class="ident">x</span>[<span class="number">1</span>], <span class="ident">x</span>[<span class="number">0</span>]] };
 
-                <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">TWO_PI</span> <span class="op">/</span> <span class="number">1e5</span>;
                 <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">||</span> {
                     <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="macro">array</span><span class="macro">!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>];
                     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="number">0.0</span>;
 
-                    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">x</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>(<span class="ident">x</span>, <span class="ident">t</span>, <span class="ident">TWO_PI</span>, <span class="ident">h</span>, <span class="ident">f</span>);
+                    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">x</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>(<span class="ident">x</span>, <span class="ident">t</span>, <span class="ident">TWO_PI</span>, <span class="ident">f</span>);
                     <span class="ident">approx_eq</span>(<span class="ident">x</span>[<span class="number">0</span>], <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>);
-                    <span class="ident">approx_eq</span>(<span class="ident">x</span>[<span class="number">1</span>], <span class="ident">h</span>, <span class="number">1.0</span>, <span class="number">0.0</span>);
+                    <span class="ident">approx_eq</span>(<span class="ident">x</span>[<span class="number">1</span>], <span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">10.0f64</span>.<span class="ident">powf</span>(<span class="op">-</span><span class="number">1.0</span>));
                 });
             }
         };
@@ -471,6 +474,7 @@
     <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_bs32</span>, <span class="ident">solve_ode_bs32</span>);
     <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_ck54</span>, <span class="ident">solve_ode_ck54</span>);
     <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_dp54</span>, <span class="ident">solve_ode_dp54</span>);
+    <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_dp87</span>, <span class="ident">solve_ode_dp87</span>);
     <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_rkf54</span>, <span class="ident">solve_ode_rkf54</span>);
 
     <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">bench_lotka_volterra</span> {
@@ -481,12 +485,11 @@
                     <span class="macro">array</span><span class="macro">!</span>[<span class="ident">x</span>[<span class="number">0</span>] <span class="op">*</span> (<span class="number">2.0</span> <span class="op">-</span> <span class="ident">x</span>[<span class="number">1</span>]), <span class="ident">x</span>[<span class="number">1</span>] <span class="op">*</span> (<span class="ident">x</span>[<span class="number">0</span>] <span class="op">-</span> <span class="number">1.0</span>)]
                 };
 
-                <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="number">10.0</span> <span class="op">/</span> <span class="number">1e5</span>;
                 <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">||</span> {
                     <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="macro">array</span><span class="macro">!</span>[<span class="number">1.0</span>, <span class="number">2.7</span>];
                     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="number">0.0</span>;
 
-                    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">x</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>(<span class="ident">x</span>, <span class="ident">t</span>, <span class="number">10.0</span>, <span class="ident">h</span>, <span class="ident">f</span>);
+                    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">x</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>(<span class="ident">x</span>, <span class="ident">t</span>, <span class="number">10.0</span>, <span class="ident">f</span>);
                     <span class="ident">approx_eq</span>(<span class="ident">x</span>[<span class="number">0</span>], <span class="number">0.622_374_063_518_922_9</span>, <span class="number">1.0</span>, <span class="number">0.0</span>);
                     <span class="ident">approx_eq</span>(<span class="ident">x</span>[<span class="number">1</span>], <span class="number">2.115_331_268_162_712_8</span>, <span class="number">1.0</span>, <span class="number">0.0</span>);
                 });
@@ -497,6 +500,7 @@
     <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_bs32</span>, <span class="ident">solve_ode_bs32</span>);
     <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_ck54</span>, <span class="ident">solve_ode_ck54</span>);
     <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_dp54</span>, <span class="ident">solve_ode_dp54</span>);
+    <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_dp87</span>, <span class="ident">solve_ode_dp87</span>);
     <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_rkf54</span>, <span class="ident">solve_ode_rkf54</span>);
 }
 </pre></div>
