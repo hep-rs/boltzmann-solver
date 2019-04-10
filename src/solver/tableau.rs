@@ -190,7 +190,9 @@ mod tests {
 #[cfg(feature = "nightly")]
 #[cfg(test)]
 mod bench {
-    use super::tests::{solve_ode_bs32, solve_ode_ck54, solve_ode_dp54, solve_ode_rkf54};
+    use super::tests::{
+        solve_ode_bs32, solve_ode_ck54, solve_ode_dp54, solve_ode_dp87, solve_ode_rkf54,
+    };
     use crate::utilities::test::*;
     use ndarray::{array, Array1};
     use std::f64::consts::PI;
@@ -204,14 +206,13 @@ mod bench {
             fn $name(b: &mut Bencher) {
                 let f = |_t: f64, x: &Array1<f64>| -> Array1<f64> { array![-x[1], x[0]] };
 
-                let h = TWO_PI / 1e5;
                 b.iter(|| {
                     let x = array![1.0, 0.0];
                     let t = 0.0;
 
-                    let (_, x) = $solver(x, t, TWO_PI, h, f);
+                    let (_, x) = $solver(x, t, TWO_PI, f);
                     approx_eq(x[0], 1.0, 1.0, 0.0);
-                    approx_eq(x[1], h, 1.0, 0.0);
+                    approx_eq(x[1], 0.0, 1.0, 10.0f64.powf(-1.0));
                 });
             }
         };
@@ -220,6 +221,7 @@ mod bench {
     bench_sine!(bench_sine_bs32, solve_ode_bs32);
     bench_sine!(bench_sine_ck54, solve_ode_ck54);
     bench_sine!(bench_sine_dp54, solve_ode_dp54);
+    bench_sine!(bench_sine_dp87, solve_ode_dp87);
     bench_sine!(bench_sine_rkf54, solve_ode_rkf54);
 
     macro_rules! bench_lotka_volterra {
@@ -230,12 +232,11 @@ mod bench {
                     array![x[0] * (2.0 - x[1]), x[1] * (x[0] - 1.0)]
                 };
 
-                let h = 10.0 / 1e5;
                 b.iter(|| {
                     let x = array![1.0, 2.7];
                     let t = 0.0;
 
-                    let (_, x) = $solver(x, t, 10.0, h, f);
+                    let (_, x) = $solver(x, t, 10.0, f);
                     approx_eq(x[0], 0.622_374_063_518_922_9, 1.0, 0.0);
                     approx_eq(x[1], 2.115_331_268_162_712_8, 1.0, 0.0);
                 });
@@ -246,5 +247,6 @@ mod bench {
     bench_lotka_volterra!(bench_lotka_volterra_bs32, solve_ode_bs32);
     bench_lotka_volterra!(bench_lotka_volterra_ck54, solve_ode_ck54);
     bench_lotka_volterra!(bench_lotka_volterra_dp54, solve_ode_dp54);
+    bench_lotka_volterra!(bench_lotka_volterra_dp87, solve_ode_dp87);
     bench_lotka_volterra!(bench_lotka_volterra_rkf54, solve_ode_rkf54);
 }
