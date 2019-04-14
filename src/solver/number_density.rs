@@ -453,7 +453,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
     where
         U: Universe,
     {
-        use crate::solver::tableau::dp87::*;
+        use super::tableau::dp87::*;
 
         assert!(
             self.initialized,
