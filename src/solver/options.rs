@@ -8,8 +8,8 @@ pub(crate) struct StepChange {
 impl Default for StepChange {
     fn default() -> Self {
         StepChange {
-            increase: 1.2,
-            decrease: 0.8,
+            increase: 4.0,
+            decrease: 0.1,
         }
     }
 }
