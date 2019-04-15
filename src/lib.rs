@@ -116,15 +116,17 @@
 
 #![cfg_attr(feature = "nightly", feature(test))]
 
-#[cfg(test)]
-extern crate csv;
 extern crate log;
 extern crate ndarray;
 extern crate quadrature;
 extern crate rug;
 extern crate special_functions;
+
 #[cfg(feature = "nightly")]
 extern crate test;
+
+#[cfg(test)]
+extern crate csv;
 
 macro_rules! debug_assert_warn {
     ($cond:expr, $($arg:tt)+) => (
