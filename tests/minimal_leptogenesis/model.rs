@@ -52,19 +52,19 @@ impl Couplings {
                 / 246.0,
             y_v: array![
                 [
-                    Complex::new(1e-4, 0.),
-                    Complex::new(1e-4, 1e-5),
-                    Complex::new(1e-4, 1e-5)
+                    Complex::new(1.0, 0.0),
+                    Complex::new(0.1, 0.1),
+                    Complex::new(0.1, 0.1)
                 ],
                 [
-                    Complex::new(1e-4, -1e-5),
-                    Complex::new(1e-4, 0.),
-                    Complex::new(1e-4, 1e-5)
+                    Complex::new(0.1, -0.1),
+                    Complex::new(1.0, 0.0),
+                    Complex::new(0.1, 0.1)
                 ],
                 [
-                    Complex::new(1e-4, -1e-5),
-                    Complex::new(1e-4, -1e-5),
-                    Complex::new(1e-4, 0.)
+                    Complex::new(0.1, -0.1),
+                    Complex::new(0.1, -0.1),
+                    Complex::new(1.0, 0.0)
                 ],
             ],
         }

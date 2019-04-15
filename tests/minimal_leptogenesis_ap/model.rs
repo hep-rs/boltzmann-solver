@@ -1,6 +1,7 @@
-use boltzmann_solver::solver::Model;
+use boltzmann_solver::solver_ap::Model;
 use ndarray::{array, Array2};
 use num::{zero, Complex};
+use rug::Float;
 use std::f64;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -30,7 +31,7 @@ pub struct Couplings {
 }
 
 impl Couplings {
-    fn new(_beta: f64) -> Self {
+    fn new(_beta: &Float) -> Self {
         Couplings {
             y_u: array![
                 [Complex::new(172.200, 0.0), zero(), zero()],
@@ -82,10 +83,10 @@ pub struct Masses {
 }
 
 impl Masses {
-    fn new(beta: f64) -> Self {
+    fn new(beta: &Float) -> Self {
         Masses {
             n: [1e10, 1e11, 1e12],
-            h: 0.4 / beta,
+            h: 0.4 / beta.to_f64(),
         }
     }
 }
@@ -97,7 +98,7 @@ pub struct SquaredMasses {
 }
 
 impl SquaredMasses {
-    fn new(beta: f64) -> Self {
+    fn new(beta: &Float) -> Self {
         let m = Masses::new(beta);
         SquaredMasses {
             n: [m.n[0].powi(2), m.n[1].powi(2), m.n[2].powi(2)],
@@ -113,7 +114,7 @@ pub struct Widths {
 }
 
 impl Widths {
-    fn new(beta: f64) -> Self {
+    fn new(beta: &Float) -> Self {
         let m = Masses::new(beta);
         Widths {
             n: [0., 0., 0.],
@@ -129,7 +130,7 @@ pub struct SquaredWidths {
 }
 
 impl SquaredWidths {
-    fn new(beta: f64) -> Self {
+    fn new(beta: &Float) -> Self {
         let w = Widths::new(beta);
         SquaredWidths {
             n: [w.n[0].powi(2), w.n[1].powi(2), w.n[2].powi(2)],
@@ -153,7 +154,7 @@ pub struct VanillaLeptogenesisModel {
 }
 
 impl Model for VanillaLeptogenesisModel {
-    fn new(beta: f64) -> Self {
+    fn new(beta: &Float) -> Self {
         VanillaLeptogenesisModel {
             coupling: Couplings::new(beta),
             mass: Masses::new(beta),
