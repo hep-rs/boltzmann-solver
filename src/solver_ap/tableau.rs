@@ -36,13 +36,11 @@ pub mod rkf54;
 
 #[cfg(test)]
 mod tests {
-    // use crate::{solver_ap::DEFAULT_WORKING_PRECISION as DWP, utilities::test::*};
     use crate::utilities::test::*;
+    use crate::{solver_ap::DEFAULT_WORKING_PRECISION as DWP, utilities::test::*};
     use ndarray::{array, prelude::*, FoldWhile, Zip};
     use rug::{ops::*, Float};
     use std::{f64::consts::PI, iter};
-
-    const DWP: u32 = 53;
 
     macro_rules! solve_ode {
         ( $name:ident, $method:ident ) => {
