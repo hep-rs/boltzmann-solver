@@ -94,21 +94,15 @@ mod tests {
                     // Get the error between the estimates
                     let err = Zip::from(&dx[0])
                         .and(&dx[1])
-                        .fold_while(0.0, |e, a, b| {
+                        .fold_while(0.0f64, |e, a, b| {
                             let v = (a - b).abs();
-                            if v > e {
-                                FoldWhile::Continue(v)
-                            } else {
-                                FoldWhile::Continue(e)
-                            }
+                            FoldWhile::Continue(e.max(v))
                         })
                         .into_inner()
                         / h;
 
                     // If the error is within the tolerance, add the result
                     if err < tol {
-                        // x += &dx[0];
-                        // t += h;
                         advance = true;
                     }
 
