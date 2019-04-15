@@ -55,6 +55,13 @@ mod tests {
             {
                 use super::$method::*;
 
+                // Fixed parameters
+                let tol = 1e-5;
+                let delta_min = 0.1;
+                let delta_max = 4.0;
+                let h_min = (tf - t) / 1e5;
+                let h_max = (tf - t) / 1e1;
+
                 let mut dx = [Array1::zeros(x.dim()), Array1::zeros(x.dim())];
                 let mut k: [Array1<f64>; RK_S];
                 unsafe {
@@ -65,9 +72,9 @@ mod tests {
                 };
 
                 let mut h = (tf - t) / 1e3;
-                let h_min = (tf - t) / 1e5;
-                let h_max = (tf - t) / 1e1;
                 while t < tf {
+                    let mut advance = false;
+
                     // Computer each k[i]
                     for i in 0..RK_S {
                         let ti = t + RK_C[i] * h;
@@ -99,34 +106,52 @@ mod tests {
                         / h;
 
                     // If the error is within the tolerance, add the result
-                    if err < 1e-5 {
+                    if err < tol {
+                        // x += &dx[0];
+                        // t += h;
+                        advance = true;
+                    }
+
+                    // Compute the change in step size based on the current error And
+                    // correspondingly adjust the step size
+                    let mut h_est = if err == 0.0 {
+                        h * delta_max
+                    } else {
+                        let delta = 0.9 * (tol / err).powf(1.0 / f64::from(RK_ORDER + 1));
+
+                        h * if delta < delta_min {
+                            delta_min
+                        } else if delta > delta_max {
+                            delta_max
+                        } else {
+                            delta
+                        }
+                    };
+
+                    // Prevent h from getting too small or too big in proportion to the
+                    // current value of beta.  Also advance the integration irrespective
+                    // of the local error if we reach the maximum or minimum step size.
+                    if h_est > h_max {
+                        h_est = h_max;
+                        advance = true;
+                    } else if h_est < h_min {
+                        h_est = h_min;
+                        advance = true;
+                    }
+
+                    // Check if the error is within the tolerance, or we are advancing
+                    // irrespective of the local error
+                    if advance {
                         x += &dx[0];
                         t += h;
                     }
 
-                    // Compute the change in step size based on the current error
-                    let delta = 0.9 * (1e-5 / err).powf(1.0 / f64::from(RK_ORDER + 1));
-
-                    // And correspondingly adjust the error
-                    h *= if delta < 0.8 {
-                        0.8
-                    } else if delta > 1.2 {
-                        1.2
-                    } else {
-                        delta
-                    };
-
-                    // Make sure the error never becomes *too* big
-                    if h < h_min {
-                        h = h_min;
-                    } else if h > h_max {
-                        h = h_max;
-                    };
-
-                    // And treat the end specially
-                    if t + h > tf {
-                        h = tf - t;
+                    // Adjust final step size if needed
+                    if t + h_est > tf {
+                        h_est = tf - t;
                     }
+
+                    h = h_est;
                 }
 
                 (t, x)
@@ -149,7 +174,7 @@ mod tests {
                 let x = array![1.0, 0.0];
                 let t = 0.0;
 
-                let (_, x) = $solver(x, t, TWO_PI, f);
+                let (_t, x) = $solver(x, t, TWO_PI, f);
                 approx_eq(x[0], 1.0, $prec, 0.0);
                 approx_eq(x[1], 0.0, $prec, 10.0f64.powf(-$prec));
             }
@@ -173,7 +198,7 @@ mod tests {
                 let x = array![1.0, 2.7];
                 let t = 0.0;
 
-                let (_, x) = $solver(x, t, 10.0, f);
+                let (_t, x) = $solver(x, t, 10.0, f);
                 approx_eq(x[0], 0.622_374_063_518_922_9, $prec, 0.0);
                 approx_eq(x[1], 2.115_331_268_162_712_8, $prec, 0.0);
             }

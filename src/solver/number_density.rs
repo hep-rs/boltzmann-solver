@@ -561,10 +561,6 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 advance = true;
             }
 
-            if beta + h_est > self.beta_range.1 {
-                h_est = self.beta_range.1 - beta;
-            }
-
             // Check if the error is within the tolerance, or we are advancing
             // irrespective of the local error
             if advance {
@@ -576,6 +572,11 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
 
                 // Run the logger now
                 (*self.logger)(&n, &dn[0], &c);
+            }
+
+            // Adjust final integration step if needed
+            if beta + h_est > self.beta_range.1 {
+                h_est = self.beta_range.1 - beta;
             }
 
             h = h_est;
