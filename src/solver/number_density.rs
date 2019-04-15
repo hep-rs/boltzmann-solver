@@ -476,7 +476,6 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         };
 
         let mut step = 0;
-        let mut advanced: bool;
         let mut beta = self.beta_range.0;
         let mut h = beta * self.step_precision.min;
 
@@ -486,7 +485,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
 
         while beta < self.beta_range.1 {
             step += 1;
-            advanced = false;
+            let mut advance = false;
 
             // Compute each k[i]
             for i in 0..RK_S {
@@ -503,7 +502,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                     .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &ni, &ci));
             }
 
-            // Calculate the two estimates
+            // Calculate the two estimates for dn
             dn[0] = (0..RK_S).fold(Self::Solution::zeros(n.dim()), |total, i| {
                 total + RK_B[0][i] * &k[i]
             });
@@ -514,70 +513,75 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             // Get the error between the estimates
             let err = Zip::from(&dn[0])
                 .and(&dn[1])
-                .fold_while(0.0, |e, a, b| {
+                .fold_while(0.0f64, |e, a, b| {
                     let v = (a - b).abs();
-                    if v > e {
-                        FoldWhile::Continue(v)
-                    } else {
-                        FoldWhile::Continue(e)
-                    }
+                    FoldWhile::Continue(e.max(v))
                 })
                 .into_inner()
                 / h;
 
-            // If the error is within the tolerance, add the result
+            // If the error is within the tolerance, we'll be advancing the
+            // iteration step
             if err < self.error_tolerance {
-                c = self.context(step, beta, universe, h);
-                n = self.advance(n, &mut dn[0], &mut beta, h, &c);
-                advanced = true;
+                advance = true;
             }
 
             // Compute the change in step size based on the current error And
             // correspondingly adjust the step size
-            if err == 0.0 {
-                h *= self.step_change.increase;
+            let mut h_est = if err == 0.0 {
+                h * self.step_change.increase
             } else {
                 let delta = 0.9 * (self.error_tolerance / err).powf(1.0 / f64::from(RK_ORDER + 1));
-                // debug!("Step {:}, β = {:.4e} -> δ = {:<10.3e}", step, beta, delta);
 
-                if delta < self.step_change.decrease {
-                    h *= self.step_change.decrease;
+                h * if delta < self.step_change.decrease {
+                    self.step_change.decrease
                 } else if delta > self.step_change.increase {
-                    h *= self.step_change.increase;
+                    self.step_change.increase
                 } else {
-                    h *= &delta;
+                    delta
                 }
-            }
+            };
 
             // Prevent h from getting too small or too big in proportion to the
             // current value of beta.  Also advance the integration irrespective
             // of the local error if we reach the maximum or minimum step size.
-            if h > beta * self.step_precision.max {
-                h = beta * self.step_precision.max;
+            if h_est > beta * self.step_precision.max {
+                h_est = beta * self.step_precision.max;
                 debug!(
                     "Step {:}, β = {:.4e} -> Step size too large, decreased h to {:.3e}",
-                    step, beta, h
+                    step, beta, h_est
                 );
-
-                if !advanced {
-                    c = self.context(step, beta, universe, h);
-                    n = self.advance(n, &mut dn[0], &mut beta, h, &c);
-                }
+                advance = true;
             } else if h < beta * self.step_precision.min {
-                h = beta * self.step_precision.min;
+                h_est = beta * self.step_precision.min;
                 debug!(
                     "Step {:}, β = {:.4e} -> Step size too small, increased h to {:.3e}",
-                    step, beta, h
+                    step, beta, h_est
                 );
-
-                if !advanced {
-                    c = self.context(step, beta, universe, h);
-                    n = self.advance(n, &mut dn[0], &mut beta, h, &c);
-                }
+                advance = true;
             }
+
+            if beta + h_est > self.beta_range.1 {
+                h_est = self.beta_range.1 - beta;
+            }
+
+            // Check if the error is within the tolerance, or we are advancing
+            // irrespective of the local error
+            if advance {
+                c = self.context(step, beta, universe, h);
+
+                // Advance n and beta
+                n = self.n_plus_dn(n, &mut dn[0], &c);
+                beta += h;
+
+                // Run the logger now
+                (*self.logger)(&n, &dn[0], &c);
+            }
+
+            h = h_est;
         }
 
-        info!("Number of evaluations: {}", step);
+        info!("Number of integration steps: {}", step);
 
         n
     }
@@ -626,26 +630,6 @@ impl<M: Model> NumberDensitySolver<M> {
                 v
             }
         }))
-    }
-
-    /// Advance `beta` and `n`, returning the new `n`.
-    #[inline]
-    fn advance(
-        &self,
-        mut n: <Self as Solver>::Solution,
-        dn: &mut <Self as Solver>::Solution,
-        beta: &mut f64,
-        h: f64,
-        c: &<Self as Solver>::Context,
-    ) -> <Self as Solver>::Solution {
-        // Advance n and beta
-        n = self.n_plus_dn(n, dn, c);
-        *beta += h;
-
-        // Run the logger now
-        (*self.logger)(&n, dn, c);
-
-        n
     }
 
     /// Generate the context at a given beta to pass to the logger/interaction
