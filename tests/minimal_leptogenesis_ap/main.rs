@@ -13,7 +13,7 @@ mod model;
 use boltzmann_solver::{
     constants::{PI_1, PI_5},
     particle::Particle,
-    solver::{number_density_ap::NumberDensitySolver, InitialCondition, Model, Solver},
+    solver_ap::{number_density::NumberDensitySolver, InitialCondition, Model, Solver},
     universe::StandardModel,
     utilities::checked_div,
 };
@@ -29,7 +29,7 @@ fn minimal_leptogenesis_ap() {
     // Setup the directory for CSV output
     ::std::fs::create_dir("/tmp/minimal_leptogenesis_ap/").unwrap_or(());
 
-    let model = VanillaLeptogenesisModel::new(1e-15);
+    let model = VanillaLeptogenesisModel::new(&Float::with_val(100, 1e-15));
 
     // Set up the universe in which we'll run the Boltzmann equations
     let universe = StandardModel::new();
