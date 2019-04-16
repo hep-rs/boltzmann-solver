@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["RandState","The state of a random number generator."]],"trait":[["RandGen","Custom random number generator to be used with [`RandState`]."]]});
