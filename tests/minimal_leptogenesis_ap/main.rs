@@ -20,8 +20,7 @@ fn minimal_leptogenesis() {
     // Setup the directory for CSV output
     ::std::fs::create_dir("/tmp/minimal_leptogenesis_ap/").unwrap_or(());
 
-    let mut model = VanillaLeptogenesisModel::new(&Float::with_val(100, 1e-15));
-    model.coupling.y_v = model.coupling.y_v * 1e-4;
+    let model = VanillaLeptogenesisModel::new(&Float::with_val(100, 1e-17));
 
     let sol = solve::solve(model);
 
