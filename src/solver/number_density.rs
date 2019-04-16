@@ -552,7 +552,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                     step, beta, h_est
                 );
                 advance = true;
-            } else if h < beta * self.step_precision.min {
+            } else if h_est < beta * self.step_precision.min {
                 h_est = beta * self.step_precision.min;
                 debug!(
                     "Step {:}, β = {:.4e} -> Step size too small, increased h to {:.3e}",

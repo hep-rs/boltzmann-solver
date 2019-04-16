@@ -524,7 +524,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 let beta_i = &beta + h.clone() * RK_C[i];
                 let ci = self.context(step, beta_i, universe, h.clone());
                 let ai = RK_A[i];
-                let mut dni = (0..i).fold(zeros.clone(), |total, j| total + &k[i] * ai[j]);
+                let mut dni = (0..i).fold(zeros.clone(), |total, j| total + &k[j] * ai[j]);
                 let ni = self.n_plus_dn(n.clone(), &mut dni, &ci);
                 k[i] = self
                     .interactions
@@ -575,7 +575,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 advance = true;
             } else {
                 let min_step: Float = beta.clone() * &self.step_precision.min;
-                if h < min_step {
+                if h_est < min_step {
                     h = min_step;
                     debug!(
                         "Step {:}, β = {:.4e} -> Step size too small, increased h to {:.3e}",
