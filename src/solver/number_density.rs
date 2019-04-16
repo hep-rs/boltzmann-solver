@@ -303,6 +303,7 @@ pub struct NumberDensitySolver<M: Model> {
     logger: Box<
         Fn(&<Self as Solver>::Solution, &<Self as Solver>::Solution, &<Self as Solver>::Context),
     >,
+    model_fn: Box<Fn(&mut M)>,
     step_change: StepChange,
     step_precision: StepPrecision,
     error_tolerance: f64,
@@ -329,6 +330,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             initial_conditions: Vec::with_capacity(20),
             interactions: Vec::with_capacity(100),
             logger: Box::new(|_, _, _| {}),
+            model_fn: Box::new(|_| {}),
             step_change: StepChange::default(),
             step_precision: StepPrecision::default(),
             error_tolerance: 1e-4,
@@ -631,6 +633,19 @@ impl<M: Model> NumberDensitySolver<M> {
                 v
             }
         }))
+    }
+
+    /// Set a model function.
+    ///
+    /// Add a function that can modify the model before it is used by the
+    /// context.  This is particularly useful if there is a baseline model with
+    /// fixed parameters and only certain parameters are changed.
+    pub fn model_fn<F: 'static>(&mut self, f: F) -> &mut Self
+    where
+        F: Fn(&mut M),
+    {
+        self.model_fn = Box::new(f);
+        self
     }
 
     /// Generate the context at a given beta to pass to the logger/interaction
