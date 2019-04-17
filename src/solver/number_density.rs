@@ -303,7 +303,7 @@ pub struct NumberDensitySolver<M: Model> {
     logger: Box<
         Fn(&<Self as Solver>::Solution, &<Self as Solver>::Solution, &<Self as Solver>::Context),
     >,
-    model_fn: Box<Fn(&mut M)>,
+    model_fn: Box<Fn(M) -> M>,
     step_change: StepChange,
     step_precision: StepPrecision,
     error_tolerance: f64,
@@ -330,7 +330,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             initial_conditions: Vec::with_capacity(20),
             interactions: Vec::with_capacity(100),
             logger: Box::new(|_, _, _| {}),
-            model_fn: Box::new(|_| {}),
+            model_fn: Box::new(|m| m),
             step_change: StepChange::default(),
             step_precision: StepPrecision::default(),
             error_tolerance: 1e-4,
@@ -642,7 +642,7 @@ impl<M: Model> NumberDensitySolver<M> {
     /// fixed parameters and only certain parameters are changed.
     pub fn model_fn<F: 'static>(&mut self, f: F) -> &mut Self
     where
-        F: Fn(&mut M),
+        F: Fn(M) -> M,
     {
         self.model_fn = Box::new(f);
         self
@@ -663,7 +663,7 @@ impl<M: Model> NumberDensitySolver<M> {
             step_size,
             hubble_rate: universe.hubble_rate(beta),
             eq_n: self.equilibrium_number_densities(beta),
-            model: M::new(beta),
+            model: (self.model_fn)(M::new(beta)),
         }
     }
 
