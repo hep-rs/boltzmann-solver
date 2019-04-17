@@ -4,7 +4,7 @@
 set -eux
 
 # Run clippy and see if it has anything to say
-clippy_lints() {
+check_lints() {
     cargo clippy $FEATURES
 }
 
@@ -20,7 +20,7 @@ build_and_test() {
 }
 
 main() {
-    clippy_lints
+    check_lints
     check_format
     build_and_test
 }
