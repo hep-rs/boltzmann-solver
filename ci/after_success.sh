@@ -1,48 +1,61 @@
-#!/usr/bin/bash
+#!/bin/bash
 
+# Echo all commands before executing them
+set -o xtrace
+# Forbid any unset variables
+set -o nounset
 # Exit on any error
-set -eux
+set -o errexit
 
-install_kcov() {
-    set -e
-    # Download and install kcov
-    wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz -O - | tar -xz
-    cd kcov-master
-    mkdir build
-    cd build
-    cmake ..
-    make -j$(nproc)
-    make install DESTDIR=../../kcov-build
-    cd ../..
-    rm -rf kcov-master
-    set +e
-}
+# We only need to run the coverage suite once
+COVERAGE_RUN=false
 
 run_kcov() {
     # Run kcov on all the test suites
-    for file in target/debug/boltzmann_solver-*[^\.d]; do
-        mkdir -p "target/cov/$(basename $file)";
-        echo "Testing $(basename $file)"
-        ./kcov-build/usr/local/bin/kcov \
-            --exclude-pattern=/.cargo,/usr/lib\
-            --verify "target/cov/$(basename $file)" \
-            "$file";
-    done
-
-    bash <(curl -s https://codecov.io/bash)
-    echo "Uploaded code coverage"
-}
-
-kcov_suite() {
-    if [[ "$TRAVIS_RUST_VERSION" == "stable" ]]; then
-        install_kcov
-        run_kcov
+    if [[ $COVERAGE_RUN != "true" ]]; then
+        cargo coveralls
+        COVERAGE_RUN=true
     fi
 }
 
-setup_git() {
+coverage_codecov() {
+    if [[ "$TRAVIS_RUST_VERSION" != "stable" ]]; then
+        return
+    fi
+
+    run_kcov
+
+    bash <(curl -s https://codecov.io/bash) -s target/kcov
+    echo "Uploaded code coverage to codecov.io"
+}
+
+coverage_coveralls() {
+    if [[ "$TRAVIS_RUST_VERSION" != "stable" ]]; then
+        return
+    fi
+
+    run_kcov
+
+    # Data is automatically uploaded by kcov
+}
+
+git_setup() {
     git config --global user.email "travis@travis-ci.org"
     git config --global user.name "Travis CI"
+}
+
+git_commit_doc() {
+    git clone --depth=1 --branch=gh-pages https://${GH_TOKEN}@github.com/$TRAVIS_REPO_SLUG.git ./target/doc-git
+
+    cd ./target/doc-git
+    for f in index.html; do
+        cp $f ../doc/
+    done
+    rm -rf *
+    cp -R ../doc/* .
+    git add -A .
+    git commit --message "Travis build: $TRAVIS_BUILD_NUMBER"
+    git push
 }
 
 make_doc() {
@@ -72,24 +85,14 @@ EOF
         find ./target/doc -type f -name "*.html" -print0 |
             xargs -0 sed -i "$MATHJAX"
 
-        setup_git
-        git clone --depth=1 --branch=gh-pages https://${GH_TOKEN}@github.com/$TRAVIS_REPO_SLUG.git ./target/doc-git
-
-        cd ./target/doc-git
-        for f in index.html; do
-            cp $f ../doc/
-        done
-        rm -rf *
-        cp -R ../doc/* .
-        git add -A .
-        git commit --message "Travis build: $TRAVIS_BUILD_NUMBER"
-        git push
-
+        git_setup
+        git_commit_doc
     fi
 }
 
 main() {
-    kcov_suite
+    coverage_coveralls
+    coverage_codecov
     make_doc
 }
 
