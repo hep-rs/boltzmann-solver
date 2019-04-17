@@ -1,7 +1,11 @@
 #!/usr/bin/bash
 
+# Echo all commands before executing them
+set -o xtrace
+# Forbid any unset variables
+set -o nounset
 # Exit on any error
-set -eux
+set -o errexit
 
 # Install clippy and rustfmt
 rustup_tools() {

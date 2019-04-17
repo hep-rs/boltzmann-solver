@@ -1,13 +1,18 @@
 #!/usr/bin/bash
 
+# Echo all commands before executing them
+set -o xtrace
+# Forbid any unset variables
+set -o nounset
 # Exit on any error
-set -eux
+set -o errexit
 
+# We only need to run the coverage suite once
 COVERAGE_RUN=false
 
 run_kcov() {
     # Run kcov on all the test suites
-    if [[  $COVERAGE_RUN != "true" ]]; then
+    if [[ $COVERAGE_RUN != "true" ]]; then
         cargo coveralls
         COVERAGE_RUN=true
     fi
