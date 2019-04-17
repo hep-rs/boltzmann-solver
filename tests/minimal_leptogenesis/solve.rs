@@ -20,6 +20,8 @@ pub fn solve(model: VanillaLeptogenesisModel) -> Array1<f64> {
     // Create the Solver and set integration parameters
     let mut solver: NumberDensitySolver<VanillaLeptogenesisModel> = NumberDensitySolver::new()
         .beta_range(1e-17, 1e0)
+        .error_tolerance(1e-1)
+        .step_precision(1e-2, 5e-1)
         .initialize();
 
     // Add the particles to the solver, using for initial condition either 0 or
