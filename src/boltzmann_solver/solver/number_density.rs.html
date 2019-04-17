@@ -710,6 +710,21 @@
 <span id="710">710</span>
 <span id="711">711</span>
 <span id="712">712</span>
+<span id="713">713</span>
+<span id="714">714</span>
+<span id="715">715</span>
+<span id="716">716</span>
+<span id="717">717</span>
+<span id="718">718</span>
+<span id="719">719</span>
+<span id="720">720</span>
+<span id="721">721</span>
+<span id="722">722</span>
+<span id="723">723</span>
+<span id="724">724</span>
+<span id="725">725</span>
+<span id="726">726</span>
+<span id="727">727</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Solver for the number density evolution given by integrating the Boltzmann</span>
 <span class="doccomment">//! equation.</span>
@@ -1016,6 +1031,7 @@
     <span class="ident">logger</span>: <span class="ident">Box</span><span class="op">&lt;</span>
         <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Solution</span>, <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Solution</span>, <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Context</span>),
     <span class="op">&gt;</span>,
+    <span class="ident">model_fn</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Fn</span>(<span class="ident">M</span>) <span class="op">-&gt;</span> <span class="ident">M</span><span class="op">&gt;</span>,
     <span class="ident">step_change</span>: <span class="ident">StepChange</span>,
     <span class="ident">step_precision</span>: <span class="ident">StepPrecision</span>,
     <span class="ident">error_tolerance</span>: <span class="ident">f64</span>,
@@ -1042,6 +1058,7 @@
             <span class="ident">initial_conditions</span>: <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="number">20</span>),
             <span class="ident">interactions</span>: <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="number">100</span>),
             <span class="ident">logger</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {}),
+            <span class="ident">model_fn</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>),
             <span class="ident">step_change</span>: <span class="ident">StepChange</span>::<span class="ident">default</span>(),
             <span class="ident">step_precision</span>: <span class="ident">StepPrecision</span>::<span class="ident">default</span>(),
             <span class="ident">error_tolerance</span>: <span class="number">1e-4</span>,
@@ -1346,6 +1363,19 @@
         }))
     }
 
+    <span class="doccomment">/// Set a model function.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Add a function that can modify the model before it is used by the</span>
+    <span class="doccomment">/// context.  This is particularly useful if there is a baseline model with</span>
+    <span class="doccomment">/// fixed parameters and only certain parameters are changed.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model_fn</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">M</span>) <span class="op">-&gt;</span> <span class="ident">M</span>,
+    {
+        <span class="self">self</span>.<span class="ident">model_fn</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">f</span>);
+        <span class="self">self</span>
+    }
+
     <span class="doccomment">/// Generate the context at a given beta to pass to the logger/interaction</span>
     <span class="doccomment">/// functions.</span>
     <span class="kw">fn</span> <span class="ident">context</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Universe</span><span class="op">&gt;</span>(
@@ -1361,7 +1391,7 @@
             <span class="ident">step_size</span>,
             <span class="ident">hubble_rate</span>: <span class="ident">universe</span>.<span class="ident">hubble_rate</span>(<span class="ident">beta</span>),
             <span class="ident">eq_n</span>: <span class="self">self</span>.<span class="ident">equilibrium_number_densities</span>(<span class="ident">beta</span>),
-            <span class="ident">model</span>: <span class="ident">M</span>::<span class="ident">new</span>(<span class="ident">beta</span>),
+            <span class="ident">model</span>: (<span class="self">self</span>.<span class="ident">model_fn</span>)(<span class="ident">M</span>::<span class="ident">new</span>(<span class="ident">beta</span>)),
         }
     }
 
