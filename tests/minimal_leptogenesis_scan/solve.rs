@@ -21,9 +21,10 @@ pub fn solve(model: VanillaLeptogenesisModel, y: f64, m: f64) -> Array1<f64> {
         .beta_range(1e-17, 1e0)
         .initialize();
 
-    solver.model_fn(move |model: &mut VanillaLeptogenesisModel| {
+    solver.model_fn(move |mut model: VanillaLeptogenesisModel| {
         model.coupling.y_v.mapv_inplace(|yi| yi * y);
-        model.mass.n[0] *= m;
+        model.mass.n[0] = m;
+        model
     });
 
     // Add the particles to the solver, using for initial condition either 0 or
