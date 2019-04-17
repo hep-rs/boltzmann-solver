@@ -14,7 +14,7 @@ run_kcov() {
 }
 
 codecov_coverage() {
-    if [[ "$TRAVIS_RUS_VERSION" != "stable" ]]; then
+    if [[ "$TRAVIS_RUST_VERSION" != "stable" ]]; then
         return
     fi
 
@@ -25,7 +25,7 @@ codecov_coverage() {
 }
 
 coveralls_coverage() {
-    if [[ "$TRAVIS_RUS_VERSION" != "stable" ]]; then
+    if [[ "$TRAVIS_RUST_VERSION" != "stable" ]]; then
         return
     fi
 
@@ -83,8 +83,9 @@ EOF
 }
 
 main() {
-    codecov_coverage
     make_doc
+    coveralls_coverage
+    codecov_coverage
 }
 
 main

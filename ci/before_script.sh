@@ -16,7 +16,6 @@ cargo_tools() {
     cargo install-update -a
 }
 
-
 main() {
     rustup_tools
     cargo_tools
