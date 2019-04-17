@@ -3,41 +3,35 @@
 # Exit on any error
 set -eux
 
-install_kcov() {
-    set -e
-    # Download and install kcov
-    wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz -O - | tar -xz
-    cd kcov-master
-    mkdir build
-    cd build
-    cmake ..
-    make -j$(nproc)
-    make install DESTDIR=../../kcov-build
-    cd ../..
-    rm -rf kcov-master
-    set +e
-}
+COVERAGE_RUN=false
 
 run_kcov() {
     # Run kcov on all the test suites
-    for file in target/debug/boltzmann_solver-*[^\.d]; do
-        mkdir -p "target/cov/$(basename $file)";
-        echo "Testing $(basename $file)"
-        ./kcov-build/usr/local/bin/kcov \
-            --exclude-pattern=/.cargo,/usr/lib\
-            --verify "target/cov/$(basename $file)" \
-            "$file";
-    done
-
-    bash <(curl -s https://codecov.io/bash)
-    echo "Uploaded code coverage"
+    if [[  $COVERAGE_RUN != "true" ]]; then
+        cargo coveralls
+        COVERAGE_RUN=true
+    fi
 }
 
-kcov_suite() {
-    if [[ "$TRAVIS_RUST_VERSION" == "stable" ]]; then
-        install_kcov
-        run_kcov
+codecov_coverage() {
+    if [[ "$TRAVIS_RUS_VERSION" != "stable" ]]; then
+        return
     fi
+
+    run_kcov
+
+    bash <(curl -s https://codecov.io/bash) -s target/kcov
+    echo "Uploaded code coverage to codecov.io"
+}
+
+coveralls_coverage() {
+    if [[ "$TRAVIS_RUS_VERSION" != "stable" ]]; then
+        return
+    fi
+
+    run_kcov
+
+    # Data is automatically uploaded by kcov
 }
 
 setup_git() {
@@ -89,7 +83,7 @@ EOF
 }
 
 main() {
-    kcov_suite
+    codecov_coverage
     make_doc
 }
 

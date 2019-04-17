@@ -8,15 +8,18 @@ rustup_tools() {
     rustup component add clippy rustfmt
 }
 
-# Remove old builds from cache
-clean() {
-    find target -type f -name "boltzmann_solver-*" -exec rm '{}' +
+# Install cargo tools
+cargo_tools() {
+    cargo install cargo-update || echo "cargo-update already installed"
+    cargo install cargo-travis || echo "cargo-travis already installed"
+    # Update cached binaries
+    cargo install-update -a
 }
 
 
 main() {
     rustup_tools
-    clean
+    cargo_tools
 }
 
 main
