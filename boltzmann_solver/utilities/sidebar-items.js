@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["checked_div","Perform a 'checked' division."],["checked_div_ap","Perform a 'checked' division."]]});
+initSidebarItems({"fn":[["checked_div","Perform a 'checked' division."]]});

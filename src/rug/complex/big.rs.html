@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/rug-1.3.0/src/complex/big.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>big.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../rug/index.html'><img src='https://tspiteri.gitlab.io/gmp-mpfr-sys/rug.svg' alt='logo' width='100'></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/rug-1.4.0/src/complex/big.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>big.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../rug/index.html'><img src='https://tspiteri.gitlab.io/gmp-mpfr-sys/rug.svg' alt='logo' width='100'></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -3950,74 +3950,6 @@
 <span id="3950">3950</span>
 <span id="3951">3951</span>
 <span id="3952">3952</span>
-<span id="3953">3953</span>
-<span id="3954">3954</span>
-<span id="3955">3955</span>
-<span id="3956">3956</span>
-<span id="3957">3957</span>
-<span id="3958">3958</span>
-<span id="3959">3959</span>
-<span id="3960">3960</span>
-<span id="3961">3961</span>
-<span id="3962">3962</span>
-<span id="3963">3963</span>
-<span id="3964">3964</span>
-<span id="3965">3965</span>
-<span id="3966">3966</span>
-<span id="3967">3967</span>
-<span id="3968">3968</span>
-<span id="3969">3969</span>
-<span id="3970">3970</span>
-<span id="3971">3971</span>
-<span id="3972">3972</span>
-<span id="3973">3973</span>
-<span id="3974">3974</span>
-<span id="3975">3975</span>
-<span id="3976">3976</span>
-<span id="3977">3977</span>
-<span id="3978">3978</span>
-<span id="3979">3979</span>
-<span id="3980">3980</span>
-<span id="3981">3981</span>
-<span id="3982">3982</span>
-<span id="3983">3983</span>
-<span id="3984">3984</span>
-<span id="3985">3985</span>
-<span id="3986">3986</span>
-<span id="3987">3987</span>
-<span id="3988">3988</span>
-<span id="3989">3989</span>
-<span id="3990">3990</span>
-<span id="3991">3991</span>
-<span id="3992">3992</span>
-<span id="3993">3993</span>
-<span id="3994">3994</span>
-<span id="3995">3995</span>
-<span id="3996">3996</span>
-<span id="3997">3997</span>
-<span id="3998">3998</span>
-<span id="3999">3999</span>
-<span id="4000">4000</span>
-<span id="4001">4001</span>
-<span id="4002">4002</span>
-<span id="4003">4003</span>
-<span id="4004">4004</span>
-<span id="4005">4005</span>
-<span id="4006">4006</span>
-<span id="4007">4007</span>
-<span id="4008">4008</span>
-<span id="4009">4009</span>
-<span id="4010">4010</span>
-<span id="4011">4011</span>
-<span id="4012">4012</span>
-<span id="4013">4013</span>
-<span id="4014">4014</span>
-<span id="4015">4015</span>
-<span id="4016">4016</span>
-<span id="4017">4017</span>
-<span id="4018">4018</span>
-<span id="4019">4019</span>
-<span id="4020">4020</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright © 2016–2019 University of Malta</span>
 
@@ -4035,35 +3967,30 @@
 <span class="comment">// License and a copy of the GNU General Public License along with</span>
 <span class="comment">// this program. If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kw">use</span> <span class="ident">cast</span>::<span class="ident">cast</span>;
-<span class="kw">use</span> <span class="ident">complex</span>::<span class="ident">arith</span>::{<span class="ident">AddMulIncomplete</span>, <span class="ident">SubMulFromIncomplete</span>};
-<span class="kw">use</span> <span class="ident">complex</span>::{<span class="ident">OrdComplex</span>, <span class="ident">Prec</span>};
-<span class="kw">use</span> <span class="ident">ext</span>::<span class="ident">mpc</span> <span class="kw">as</span> <span class="ident">xmpc</span>;
-<span class="kw">use</span> <span class="ident">float</span>::<span class="ident">big</span>::{
-    <span class="self">self</span> <span class="kw">as</span> <span class="ident">big_float</span>, <span class="ident">raw_round</span>, <span class="ident">ExpFormat</span>, <span class="ident">Format</span> <span class="kw">as</span> <span class="ident">FloatFormat</span>,
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cast</span>::<span class="ident">cast</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">complex</span>::<span class="ident">arith</span>::{<span class="ident">AddMulIncomplete</span>, <span class="ident">SubMulFromIncomplete</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">complex</span>::{<span class="ident">OrdComplex</span>, <span class="ident">Prec</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ext</span>::<span class="ident">xmpc</span>::{<span class="self">self</span>, <span class="ident">ordering2</span>, <span class="ident">raw_round2</span>, <span class="ident">Ordering2</span>, <span class="ident">Round2</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ext</span>::<span class="ident">xmpfr</span>::<span class="ident">raw_round</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">float</span>::<span class="ident">big</span>::{
+    <span class="self">self</span> <span class="kw">as</span> <span class="ident">big_float</span>, <span class="ident">ExpFormat</span>, <span class="ident">Format</span> <span class="kw">as</span> <span class="ident">FloatFormat</span>,
     <span class="ident">ParseIncomplete</span> <span class="kw">as</span> <span class="ident">FloatParseIncomplete</span>,
 };
-<span class="kw">use</span> <span class="ident">float</span>::{<span class="self">self</span>, <span class="ident">ParseFloatError</span>, <span class="ident">Round</span>, <span class="ident">Special</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">float</span>::{<span class="self">self</span>, <span class="ident">ParseFloatError</span>, <span class="ident">Round</span>, <span class="ident">Special</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">misc</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ops</span>::{<span class="ident">AddAssignRound</span>, <span class="ident">AssignRound</span>, <span class="ident">NegAssign</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rand&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">rand</span>::<span class="ident">RandState</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Assign</span>, <span class="ident">Float</span>};
 <span class="kw">use</span> <span class="ident">gmp_mpfr_sys</span>::<span class="ident">mpc</span>::{<span class="self">self</span>, <span class="ident">mpc_t</span>};
 <span class="kw">use</span> <span class="ident">gmp_mpfr_sys</span>::<span class="ident">mpfr</span>;
-<span class="kw">use</span> <span class="ident">inner</span>::{<span class="ident">Inner</span>, <span class="ident">InnerMut</span>};
-<span class="kw">use</span> <span class="ident">misc</span>;
-<span class="kw">use</span> <span class="ident">ops</span>::{<span class="ident">AddAssignRound</span>, <span class="ident">AssignRound</span>, <span class="ident">NegAssign</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rand&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">RandState</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::{<span class="self">self</span>, <span class="ident">Ordering</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">Add</span>, <span class="ident">AddAssign</span>, <span class="ident">Deref</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_int</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">slice</span>;
-<span class="kw">use</span> {<span class="ident">Assign</span>, <span class="ident">Float</span>};
-
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Round2</span> <span class="op">=</span> (<span class="ident">Round</span>, <span class="ident">Round</span>);
-
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Ordering2</span> <span class="op">=</span> (<span class="ident">Ordering</span>, <span class="ident">Ordering</span>);
 
 <span class="doccomment">/**
 A multi-precision complex number with arbitrarily large precision and
@@ -4172,14 +4099,14 @@ assert_eq!(d, (1, 1));
 [`Round`]: float/enum.Round.html
 [icv]: index.html#incomplete-computation-values
 */</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">repr_transparent</span>, <span class="ident">repr</span>(<span class="ident">transparent</span>))]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Complex</span> {
     <span class="ident">inner</span>: <span class="ident">mpc_t</span>,
 }
 
 <span class="kw">fn</span> <span class="ident">_static_assertions</span>() {
     <span class="macro">static_assert_size</span><span class="macro">!</span>(<span class="ident">Complex</span>, <span class="ident">mpc_t</span>);
-    <span class="macro">static_assert_size</span><span class="macro">!</span>(<span class="ident">BorrowComplex</span>, <span class="ident">mpc_t</span>);
+    <span class="macro">static_assert_size</span><span class="macro">!</span>(<span class="ident">BorrowComplex</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">mpc_t</span>);
 }
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">ref_math_op0_complex</span> {
@@ -4190,7 +4117,7 @@ assert_eq!(d, (1, 1));
     ) <span class="op">=&gt;</span> {
         <span class="macro">ref_math_op0_round</span><span class="macro">!</span> {
             <span class="ident">Complex</span>, <span class="ident">Round2</span> <span class="op">=&gt;</span> <span class="ident">Ordering2</span>;
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>, <span class="ident">raw_round2</span> <span class="op">=&gt;</span> <span class="ident">ordering2</span>;
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>;
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr_ref</span>]</span>)<span class="op">*</span>
             <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Incomplete</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>),<span class="op">*</span> }
         }
@@ -4211,7 +4138,7 @@ assert_eq!(d, (1, 1));
     ) <span class="op">=&gt;</span> {
         <span class="macro">math_op1_round</span><span class="macro">!</span> {
             <span class="ident">Round2</span> <span class="op">=&gt;</span> <span class="ident">Ordering2</span>;
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>, <span class="ident">raw_round2</span> <span class="op">=&gt;</span> <span class="ident">ordering2</span>;
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>;
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
             <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>),<span class="kw-2">*</span>);
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr_mut</span>]</span>)<span class="op">*</span>
@@ -4232,7 +4159,7 @@ assert_eq!(d, (1, 1));
     ) <span class="op">=&gt;</span> {
         <span class="macro">ref_math_op1_round</span><span class="macro">!</span> {
             <span class="ident">Complex</span>, <span class="ident">Round2</span> <span class="op">=&gt;</span> <span class="ident">Ordering2</span>;
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>, <span class="ident">raw_round2</span> <span class="op">=&gt;</span> <span class="ident">ordering2</span>;
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>;
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr_ref</span>]</span>)<span class="op">*</span>
             <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Incomplete</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>),<span class="op">*</span> }
         }
@@ -4253,7 +4180,7 @@ assert_eq!(d, (1, 1));
     ) <span class="op">=&gt;</span> {
         <span class="macro">math_op1_2_round</span><span class="macro">!</span> {
             <span class="ident">Round2</span> <span class="op">=&gt;</span> (<span class="ident">Ordering2</span>, <span class="ident">Ordering2</span>);
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>, <span class="ident">raw_round2</span>, <span class="ident">raw_round2</span> <span class="op">=&gt;</span> <span class="ident">ordering4</span>;
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>;
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
             <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rop</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>)<span class="kw-2">*</span>);
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr_mut</span>]</span>)<span class="op">*</span>
@@ -4274,7 +4201,7 @@ assert_eq!(d, (1, 1));
     ) <span class="op">=&gt;</span> {
         <span class="macro">ref_math_op1_2_round</span><span class="macro">!</span> {
             <span class="ident">Complex</span>, <span class="ident">Round2</span> <span class="op">=&gt;</span> (<span class="ident">Ordering2</span>, <span class="ident">Ordering2</span>);
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>, <span class="ident">raw_round2</span>, <span class="ident">raw_round2</span> <span class="op">=&gt;</span> <span class="ident">ordering4</span>;
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>;
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr_ref</span>]</span>)<span class="op">*</span>
             <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Incomplete</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>),<span class="op">*</span> }
         }
@@ -4297,7 +4224,7 @@ assert_eq!(d, (1, 1));
         );
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span>: <span class="ident">Complex</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">uninitialized</span>();
-            <span class="ident">mpc</span>::<span class="ident">init3</span>(<span class="ident">c</span>.<span class="ident">inner_mut</span>(), <span class="ident">cast</span>(<span class="ident">p</span>.<span class="number">0</span>), <span class="ident">cast</span>(<span class="ident">p</span>.<span class="number">1</span>));
+            <span class="ident">mpc</span>::<span class="ident">init3</span>(<span class="ident">c</span>.<span class="ident">as_raw_mut</span>(), <span class="ident">cast</span>(<span class="ident">p</span>.<span class="number">0</span>), <span class="ident">cast</span>(<span class="ident">p</span>.<span class="number">1</span>));
             <span class="ident">c</span>
         }
     }
@@ -4481,9 +4408,6 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # extern crate gmp_mpfr_sys;</span>
-    <span class="doccomment">/// # extern crate rug;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// use gmp_mpfr_sys::mpc;</span>
     <span class="doccomment">/// use rug::Complex;</span>
     <span class="doccomment">/// use std::mem;</span>
@@ -4496,7 +4420,6 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">/// };</span>
     <span class="doccomment">/// assert_eq!(c, (-14.5, 3.25));</span>
     <span class="doccomment">/// // since c is a Complex now, deallocation is automatic</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Complex`]: struct.Complex.html</span>
@@ -4514,9 +4437,6 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # extern crate gmp_mpfr_sys;</span>
-    <span class="doccomment">/// # extern crate rug;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// use gmp_mpfr_sys::{mpc, mpfr};</span>
     <span class="doccomment">/// use rug::Complex;</span>
     <span class="doccomment">/// let c = Complex::with_val(53, (-14.5, 3.25));</span>
@@ -4531,7 +4451,6 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">///     // free object to prevent memory leak</span>
     <span class="doccomment">///     mpc::clear(&amp;mut m);</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Complex`]: struct.Complex.html</span>
@@ -4551,9 +4470,6 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # extern crate gmp_mpfr_sys;</span>
-    <span class="doccomment">/// # extern crate rug;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// use gmp_mpfr_sys::{mpc, mpfr};</span>
     <span class="doccomment">/// use rug::Complex;</span>
     <span class="doccomment">/// let c = Complex::with_val(53, (-14.5, 3.25));</span>
@@ -4568,13 +4484,12 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// // c is still valid</span>
     <span class="doccomment">/// assert_eq!(c, (-14.5, 3.25));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`mpc_t`]: https://docs.rs/gmp-mpfr-sys/~1.1/gmp_mpfr_sys/mpc/struct.mpc_t.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">mpc_t</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>()
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
     }
 
     <span class="doccomment">/// Returns an unsafe mutable pointer to the inner</span>
@@ -4586,9 +4501,6 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # extern crate gmp_mpfr_sys;</span>
-    <span class="doccomment">/// # extern crate rug;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// use gmp_mpfr_sys::mpc;</span>
     <span class="doccomment">/// use rug::Complex;</span>
     <span class="doccomment">/// let mut c = Complex::with_val(53, (-14.5, 3.25));</span>
@@ -4597,13 +4509,12 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">///     mpc::conj(m_ptr, m_ptr, mpc::RNDNN);</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// assert_eq!(c, (-14.5, -3.25));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`mpc_t`]: https://docs.rs/gmp-mpfr-sys/~1.1/gmp_mpfr_sys/mpc/struct.mpc_t.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_raw_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">mpc_t</span> {
-        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">inner_mut</span>() }
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">inner</span>
     }
 
     <span class="doccomment">/// Parses a decimal string slice ([`&amp;str`][str]) or byte slice</span>
@@ -4813,7 +4724,7 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">/// [`Float`]: struct.Float.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">real</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Float</span> {
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">cast_ptr</span><span class="macro">!</span>(<span class="ident">mpc</span>::<span class="ident">realref_const</span>(<span class="self">self</span>.<span class="ident">inner</span>()), <span class="ident">Float</span>) }
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">cast_ptr</span><span class="macro">!</span>(<span class="ident">mpc</span>::<span class="ident">realref_const</span>(<span class="self">self</span>.<span class="ident">as_raw</span>()), <span class="ident">Float</span>) }
     }
 
     <span class="doccomment">/// Borrows the imaginary part as a [`Float`].</span>
@@ -4829,7 +4740,7 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">/// [`Float`]: struct.Float.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">imag</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Float</span> {
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">cast_ptr</span><span class="macro">!</span>(<span class="ident">mpc</span>::<span class="ident">imagref_const</span>(<span class="self">self</span>.<span class="ident">inner</span>()), <span class="ident">Float</span>) }
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">cast_ptr</span><span class="macro">!</span>(<span class="ident">mpc</span>::<span class="ident">imagref_const</span>(<span class="self">self</span>.<span class="ident">as_raw</span>()), <span class="ident">Float</span>) }
     }
 
     <span class="doccomment">/// Borrows the real part mutably.</span>
@@ -4845,7 +4756,7 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mut_real</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Float</span> {
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="macro">cast_ptr_mut</span><span class="macro">!</span>(<span class="ident">mpc</span>::<span class="ident">realref</span>(<span class="self">self</span>.<span class="ident">inner_mut</span>()), <span class="ident">Float</span>) }
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="macro">cast_ptr_mut</span><span class="macro">!</span>(<span class="ident">mpc</span>::<span class="ident">realref</span>(<span class="self">self</span>.<span class="ident">as_raw_mut</span>()), <span class="ident">Float</span>) }
     }
 
     <span class="doccomment">/// Borrows the imaginary part mutably.</span>
@@ -4861,7 +4772,7 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mut_imag</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Float</span> {
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="macro">cast_ptr_mut</span><span class="macro">!</span>(<span class="ident">mpc</span>::<span class="ident">imagref</span>(<span class="self">self</span>.<span class="ident">inner_mut</span>()), <span class="ident">Float</span>) }
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="macro">cast_ptr_mut</span><span class="macro">!</span>(<span class="ident">mpc</span>::<span class="ident">imagref</span>(<span class="self">self</span>.<span class="ident">as_raw_mut</span>()), <span class="ident">Float</span>) }
     }
 
     <span class="doccomment">/// Borrows the real and imaginary parts mutably.</span>
@@ -4884,8 +4795,8 @@ assert_eq!(d, (1, 1));
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_real_imag</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Float</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Float</span>) {
         <span class="kw">unsafe</span> {
             (
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="macro">cast_ptr_mut</span><span class="macro">!</span>(<span class="ident">mpc</span>::<span class="ident">realref</span>(<span class="self">self</span>.<span class="ident">inner_mut</span>()), <span class="ident">Float</span>),
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="macro">cast_ptr_mut</span><span class="macro">!</span>(<span class="ident">mpc</span>::<span class="ident">imagref</span>(<span class="self">self</span>.<span class="ident">inner_mut</span>()), <span class="ident">Float</span>),
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="macro">cast_ptr_mut</span><span class="macro">!</span>(<span class="ident">mpc</span>::<span class="ident">realref</span>(<span class="self">self</span>.<span class="ident">as_raw_mut</span>()), <span class="ident">Float</span>),
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="macro">cast_ptr_mut</span><span class="macro">!</span>(<span class="ident">mpc</span>::<span class="ident">imagref</span>(<span class="self">self</span>.<span class="ident">as_raw_mut</span>()), <span class="ident">Float</span>),
             )
         }
     }
@@ -4909,8 +4820,8 @@ assert_eq!(d, (1, 1));
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_real_imag</span>(<span class="self">self</span>) <span class="op">-&gt;</span> (<span class="ident">Float</span>, <span class="ident">Float</span>) {
         <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into_raw</span>();
         <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">real</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">read</span>(<span class="ident">mpc</span>::<span class="ident">realref_const</span>(<span class="kw-2">&amp;</span><span class="ident">raw</span>));
-            <span class="kw">let</span> <span class="ident">imag</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">read</span>(<span class="ident">mpc</span>::<span class="ident">imagref_const</span>(<span class="kw-2">&amp;</span><span class="ident">raw</span>));
+            <span class="kw">let</span> <span class="ident">real</span> <span class="op">=</span> <span class="ident">mpc</span>::<span class="ident">realref_const</span>(<span class="kw-2">&amp;</span><span class="ident">raw</span>).<span class="ident">read</span>();
+            <span class="kw">let</span> <span class="ident">imag</span> <span class="op">=</span> <span class="ident">mpc</span>::<span class="ident">imagref_const</span>(<span class="kw-2">&amp;</span><span class="ident">raw</span>).<span class="ident">read</span>();
             (<span class="ident">Float</span>::<span class="ident">from_raw</span>(<span class="ident">real</span>), <span class="ident">Float</span>::<span class="ident">from_raw</span>(<span class="ident">imag</span>))
         }
     }
@@ -4938,7 +4849,7 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Complex`]: struct.Complex.html</span>
     <span class="doccomment">/// [`Deref`]: https://doc.rust-lang.org/nightly/std/ops/trait.Deref.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_neg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">BorrowComplex</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_neg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">BorrowComplex</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="comment">// shallow copy</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">BorrowComplex</span> { <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">phantom</span>: <span class="ident">PhantomData</span> };
         <span class="kw">unsafe</span> {
@@ -4974,7 +4885,7 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Complex`]: struct.Complex.html</span>
     <span class="doccomment">/// [`Deref`]: https://doc.rust-lang.org/nightly/std/ops/trait.Deref.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_conj</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">BorrowComplex</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_conj</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">BorrowComplex</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">BorrowComplex</span> { <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">phantom</span>: <span class="ident">PhantomData</span> };
         <span class="kw">unsafe</span> {
             <span class="ident">NegAssign</span>::<span class="ident">neg_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span><span class="ident">mpc</span>::<span class="ident">imagref</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ret</span>.<span class="ident">inner</span>)).<span class="ident">sign</span>);
@@ -5013,18 +4924,18 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">/// [`Complex`]: struct.Complex.html</span>
     <span class="doccomment">/// [`Deref`]: https://doc.rust-lang.org/nightly/std/ops/trait.Deref.html</span>
     <span class="doccomment">/// [`mul_i`]: #method.mul_i</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mul_i</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">negative</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">BorrowComplex</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mul_i</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">negative</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">BorrowComplex</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span>: <span class="ident">mpc_t</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mem</span>::<span class="ident">uninitialized</span>() };
         <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst_re</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">read</span>(<span class="self">self</span>.<span class="ident">imag</span>().<span class="ident">inner</span>());
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst_im</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">read</span>(<span class="self">self</span>.<span class="ident">real</span>().<span class="ident">inner</span>());
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst_re</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">imag</span>().<span class="ident">as_raw</span>().<span class="ident">read</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst_im</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">real</span>().<span class="ident">as_raw</span>().<span class="ident">read</span>();
             <span class="kw">if</span> <span class="ident">negative</span> {
                 <span class="ident">NegAssign</span>::<span class="ident">neg_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dst_im</span>.<span class="ident">sign</span>);
             } <span class="kw">else</span> {
                 <span class="ident">NegAssign</span>::<span class="ident">neg_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dst_re</span>.<span class="ident">sign</span>);
             }
-            <span class="ident">ptr</span>::<span class="ident">write</span>(<span class="ident">mpc</span>::<span class="ident">realref</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">inner</span>), <span class="ident">dst_re</span>);
-            <span class="ident">ptr</span>::<span class="ident">write</span>(<span class="ident">mpc</span>::<span class="ident">imagref</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">inner</span>), <span class="ident">dst_im</span>);
+            <span class="ident">mpc</span>::<span class="ident">realref</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">inner</span>).<span class="ident">write</span>(<span class="ident">dst_re</span>);
+            <span class="ident">mpc</span>::<span class="ident">imagref</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">inner</span>).<span class="ident">write</span>(<span class="ident">dst_im</span>);
         }
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">real</span>().<span class="ident">is_nan</span>() <span class="op">||</span> <span class="self">self</span>.<span class="ident">imag</span>().<span class="ident">is_nan</span>() {
             <span class="kw">unsafe</span> {
@@ -5107,15 +5018,15 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cmp_abs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">real</span>().<span class="ident">is_nan</span>()
-                <span class="op">||</span> <span class="self">self</span>.<span class="ident">imag</span>().<span class="ident">is_nan</span>()
-                <span class="op">||</span> <span class="ident">other</span>.<span class="ident">real</span>().<span class="ident">is_nan</span>()
-                <span class="op">||</span> <span class="ident">other</span>.<span class="ident">imag</span>().<span class="ident">is_nan</span>()
-            {
-                <span class="prelude-val">None</span>
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">ordering1</span>(<span class="ident">mpc</span>::<span class="ident">cmp_abs</span>(<span class="self">self</span>.<span class="ident">inner</span>(), <span class="ident">other</span>.<span class="ident">inner</span>())))
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">real</span>().<span class="ident">is_nan</span>()
+            <span class="op">||</span> <span class="self">self</span>.<span class="ident">imag</span>().<span class="ident">is_nan</span>()
+            <span class="op">||</span> <span class="ident">other</span>.<span class="ident">real</span>().<span class="ident">is_nan</span>()
+            <span class="op">||</span> <span class="ident">other</span>.<span class="ident">imag</span>().<span class="ident">is_nan</span>()
+        {
+            <span class="prelude-val">None</span>
+        } <span class="kw">else</span> {
+            <span class="kw">unsafe</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">ordering1</span>(<span class="ident">mpc</span>::<span class="ident">cmp_abs</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">other</span>.<span class="ident">as_raw</span>())))
             }
         }
     }
@@ -5305,16 +5216,7 @@ assert_eq!(d, (1, 1));
         <span class="ident">add</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>,
         <span class="ident">round</span>: <span class="ident">Round2</span>,
     ) <span class="op">-&gt;</span> <span class="ident">Ordering2</span> {
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">mpc</span>::<span class="ident">fma</span>(
-                <span class="self">self</span>.<span class="ident">inner_mut</span>(),
-                <span class="self">self</span>.<span class="ident">inner</span>(),
-                <span class="ident">mul</span>.<span class="ident">inner</span>(),
-                <span class="ident">add</span>.<span class="ident">inner</span>(),
-                <span class="ident">raw_round2</span>(<span class="ident">round</span>),
-            )
-        };
-        <span class="ident">ordering2</span>(<span class="ident">ret</span>)
+        <span class="ident">xmpc</span>::<span class="ident">fma</span>(<span class="self">self</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">mul</span>), <span class="prelude-val">Some</span>(<span class="ident">add</span>), <span class="ident">round</span>)
     }
 
     <span class="doccomment">/// Multiplies and adds in one fused operation.</span>
@@ -5425,9 +5327,9 @@ assert_eq!(d, (1, 1));
     ) <span class="op">-&gt;</span> <span class="ident">Ordering2</span> {
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="ident">xmpc</span>::<span class="ident">mulsub</span>(
-                <span class="self">self</span>.<span class="ident">inner_mut</span>(),
-                (<span class="self">self</span>.<span class="ident">inner</span>(), <span class="ident">mul</span>.<span class="ident">inner</span>()),
-                <span class="ident">sub</span>.<span class="ident">inner</span>(),
+                <span class="self">self</span>.<span class="ident">as_raw_mut</span>(),
+                (<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">mul</span>.<span class="ident">as_raw</span>()),
+                <span class="ident">sub</span>.<span class="ident">as_raw</span>(),
                 <span class="ident">raw_round2</span>(<span class="ident">round</span>),
             )
         };
@@ -5468,7 +5370,7 @@ assert_eq!(d, (1, 1));
     }
 
     <span class="macro">math_op1_no_round</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">proj</span>, <span class="ident">raw_round2</span>;
+        <span class="ident">xmpc</span>::<span class="ident">proj</span>;
         <span class="doccomment">/// Computes a projection onto the Riemann sphere, rounding to</span>
         <span class="doccomment">/// the nearest.</span>
         <span class="doccomment">///</span>
@@ -5551,7 +5453,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">proj_ref</span> <span class="op">-&gt;</span> <span class="ident">ProjIncomplete</span>;
     }
     <span class="macro">math_op1_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">sqr</span>;
+        <span class="ident">xmpc</span>::<span class="ident">sqr</span>;
         <span class="doccomment">/// Computes the square, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -5621,7 +5523,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">square_ref</span> <span class="op">-&gt;</span> <span class="ident">SquareIncomplete</span>;
     }
     <span class="macro">math_op1_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">sqrt</span>;
+        <span class="ident">xmpc</span>::<span class="ident">sqrt</span>;
         <span class="doccomment">/// Computes the square root, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -5692,7 +5594,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">sqrt_ref</span> <span class="op">-&gt;</span> <span class="ident">SqrtIncomplete</span>;
     }
     <span class="macro">math_op1_no_round</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">conj</span>, <span class="ident">raw_round2</span>;
+        <span class="ident">xmpc</span>::<span class="ident">conj</span>;
         <span class="doccomment">/// Computes the complex conjugate.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -5795,7 +5697,7 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">/// [`Assign`]: trait.Assign.html</span>
     <span class="doccomment">/// [icv]: index.html#incomplete-computation-values</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">abs_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">AbsIncomplete</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">abs_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">AbsIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">AbsIncomplete</span> { <span class="ident">ref_self</span>: <span class="self">self</span> }
     }
 
@@ -5866,9 +5768,9 @@ assert_eq!(d, (1, 1));
         <span class="kw">let</span> (<span class="ident">re</span>, <span class="ident">im</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_mut_real_imag</span>();
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="ident">mpfr</span>::<span class="ident">atan2</span>(
-                <span class="ident">re</span>.<span class="ident">inner_mut</span>(),
-                <span class="ident">im</span>.<span class="ident">inner</span>(),
-                <span class="ident">re</span>.<span class="ident">inner</span>(),
+                <span class="ident">re</span>.<span class="ident">as_raw_mut</span>(),
+                <span class="ident">im</span>.<span class="ident">as_raw</span>(),
+                <span class="ident">re</span>.<span class="ident">as_raw</span>(),
                 <span class="ident">raw_round</span>(<span class="ident">round</span>.<span class="number">0</span>),
             )
         };
@@ -5908,7 +5810,7 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">/// [`Assign`]: trait.Assign.html</span>
     <span class="doccomment">/// [icv]: index.html#incomplete-computation-values</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arg_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">ArgIncomplete</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arg_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">ArgIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">ArgIncomplete</span> { <span class="ident">ref_self</span>: <span class="self">self</span> }
     }
 
@@ -6140,12 +6042,12 @@ assert_eq!(d, (1, 1));
     <span class="doccomment">/// [`Assign`]: trait.Assign.html</span>
     <span class="doccomment">/// [icv]: index.html#incomplete-computation-values</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">norm_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">NormIncomplete</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">norm_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">NormIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">NormIncomplete</span> { <span class="ident">ref_self</span>: <span class="self">self</span> }
     }
 
     <span class="macro">math_op1_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">log</span>;
+        <span class="ident">xmpc</span>::<span class="ident">log</span>;
         <span class="doccomment">/// Computes the natural logarithm, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -6211,7 +6113,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">ln_ref</span> <span class="op">-&gt;</span> <span class="ident">LnIncomplete</span>;
     }
     <span class="macro">math_op1_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">log10</span>;
+        <span class="ident">xmpc</span>::<span class="ident">log10</span>;
         <span class="doccomment">/// Computes the logarithm to base 10, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -6304,7 +6206,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">root_of_unity</span>(<span class="ident">n</span>: <span class="ident">u32</span>, <span class="ident">k</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="ident">RootOfUnityIncomplete</span>;
     }
     <span class="macro">math_op1_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">exp</span>;
+        <span class="ident">xmpc</span>::<span class="ident">exp</span>;
         <span class="doccomment">/// Computes the exponential, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -6370,7 +6272,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">exp_ref</span> <span class="op">-&gt;</span> <span class="ident">ExpIncomplete</span>;
     }
     <span class="macro">math_op1_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">sin</span>;
+        <span class="ident">xmpc</span>::<span class="ident">sin</span>;
         <span class="doccomment">/// Computes the sine, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -6435,7 +6337,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">sin_ref</span> <span class="op">-&gt;</span> <span class="ident">SinIncomplete</span>;
     }
     <span class="macro">math_op1_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">cos</span>;
+        <span class="ident">xmpc</span>::<span class="ident">cos</span>;
         <span class="doccomment">/// Computes the cosine, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -6500,7 +6402,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">cos_ref</span> <span class="op">-&gt;</span> <span class="ident">CosIncomplete</span>;
     }
     <span class="macro">math_op1_2_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">sin_cos</span>;
+        <span class="ident">xmpc</span>::<span class="ident">sin_cos</span>;
         <span class="doccomment">/// Computes the sine and cosine of `self`, rounding to the</span>
         <span class="doccomment">/// nearest.</span>
         <span class="doccomment">///</span>
@@ -6609,7 +6511,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">sin_cos_ref</span> <span class="op">-&gt;</span> <span class="ident">SinCosIncomplete</span>;
     }
     <span class="macro">math_op1_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">tan</span>;
+        <span class="ident">xmpc</span>::<span class="ident">tan</span>;
         <span class="doccomment">/// Computes the tangent, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -6674,7 +6576,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">tan_ref</span> <span class="op">-&gt;</span> <span class="ident">TanIncomplete</span>;
     }
     <span class="macro">math_op1_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">sinh</span>;
+        <span class="ident">xmpc</span>::<span class="ident">sinh</span>;
         <span class="doccomment">/// Computes the hyperbolic sine, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -6740,7 +6642,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">sinh_ref</span> <span class="op">-&gt;</span> <span class="ident">SinhIncomplete</span>;
     }
     <span class="macro">math_op1_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">cosh</span>;
+        <span class="ident">xmpc</span>::<span class="ident">cosh</span>;
         <span class="doccomment">/// Computes the hyperbolic cosine, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -6806,7 +6708,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">cosh_ref</span> <span class="op">-&gt;</span> <span class="ident">CoshIncomplete</span>;
     }
     <span class="macro">math_op1_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">tanh</span>;
+        <span class="ident">xmpc</span>::<span class="ident">tanh</span>;
         <span class="doccomment">/// Computes the hyperbolic tangent, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -6872,7 +6774,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">tanh_ref</span> <span class="op">-&gt;</span> <span class="ident">TanhIncomplete</span>;
     }
     <span class="macro">math_op1_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">asin</span>;
+        <span class="ident">xmpc</span>::<span class="ident">asin</span>;
         <span class="doccomment">/// Computes the inverse sine, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -6938,7 +6840,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">asin_ref</span> <span class="op">-&gt;</span> <span class="ident">AsinIncomplete</span>;
     }
     <span class="macro">math_op1_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">acos</span>;
+        <span class="ident">xmpc</span>::<span class="ident">acos</span>;
         <span class="doccomment">/// Computes the inverse cosine, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -7004,7 +6906,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">acos_ref</span> <span class="op">-&gt;</span> <span class="ident">AcosIncomplete</span>;
     }
     <span class="macro">math_op1_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">atan</span>;
+        <span class="ident">xmpc</span>::<span class="ident">atan</span>;
         <span class="doccomment">/// Computes the inverse tangent, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -7070,7 +6972,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">atan_ref</span> <span class="op">-&gt;</span> <span class="ident">AtanIncomplete</span>;
     }
     <span class="macro">math_op1_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">asinh</span>;
+        <span class="ident">xmpc</span>::<span class="ident">asinh</span>;
         <span class="doccomment">/// Computes the inverse hyperbolic sine, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -7136,7 +7038,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">asinh_ref</span> <span class="op">-&gt;</span> <span class="ident">AsinhIncomplete</span>;
     }
     <span class="macro">math_op1_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">acosh</span>;
+        <span class="ident">xmpc</span>::<span class="ident">acosh</span>;
         <span class="doccomment">/// Computes the inverse hyperbolic cosine, rounding to the</span>
         <span class="doccomment">/// nearest.</span>
         <span class="doccomment">///</span>
@@ -7204,7 +7106,7 @@ assert_eq!(d, (1, 1));
         <span class="kw">fn</span> <span class="ident">acosh_ref</span> <span class="op">-&gt;</span> <span class="ident">AcoshIncomplete</span>;
     }
     <span class="macro">math_op1_complex</span><span class="macro">!</span> {
-        <span class="ident">mpc</span>::<span class="ident">atanh</span>;
+        <span class="ident">xmpc</span>::<span class="ident">atanh</span>;
         <span class="doccomment">/// Computes the inverse hyperbolic tangent, rounding to the</span>
         <span class="doccomment">/// nearest.</span>
         <span class="doccomment">///</span>
@@ -7412,8 +7314,8 @@ assert_eq!(d, (1, 1));
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reals</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> <span class="ident">mpfr</span>::<span class="ident">mpfr_t</span><span class="op">&gt;</span>::<span class="ident">with_capacity</span>(<span class="ident">capacity</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">imags</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> <span class="ident">mpfr</span>::<span class="ident">mpfr_t</span><span class="op">&gt;</span>::<span class="ident">with_capacity</span>(<span class="ident">capacity</span>);
         <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">src</span>.<span class="ident">values</span> {
-            <span class="ident">reals</span>.<span class="ident">push</span>(<span class="ident">value</span>.<span class="ident">real</span>().<span class="ident">inner</span>());
-            <span class="ident">imags</span>.<span class="ident">push</span>(<span class="ident">value</span>.<span class="ident">imag</span>().<span class="ident">inner</span>());
+            <span class="ident">reals</span>.<span class="ident">push</span>(<span class="ident">value</span>.<span class="ident">real</span>().<span class="ident">as_raw</span>());
+            <span class="ident">imags</span>.<span class="ident">push</span>(<span class="ident">value</span>.<span class="ident">imag</span>().<span class="ident">as_raw</span>());
         }
         <span class="kw">let</span> <span class="ident">tab_real</span> <span class="op">=</span> <span class="macro">cast_ptr</span><span class="macro">!</span>(<span class="ident">reals</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">mpfr</span>::<span class="ident">mpfr_t</span>);
         <span class="kw">let</span> <span class="ident">tab_imag</span> <span class="op">=</span> <span class="macro">cast_ptr</span><span class="macro">!</span>(<span class="ident">imags</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">mpfr</span>::<span class="ident">mpfr_t</span>);
@@ -7421,8 +7323,8 @@ assert_eq!(d, (1, 1));
         <span class="kw">let</span> (<span class="ident">ord_real</span>, <span class="ident">ord_imag</span>) <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="kw">let</span> (<span class="ident">real</span>, <span class="ident">imag</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_mut_real_imag</span>();
             (
-                <span class="ident">mpfr</span>::<span class="ident">sum</span>(<span class="ident">real</span>.<span class="ident">inner_mut</span>(), <span class="ident">tab_real</span>, <span class="ident">n</span>, <span class="ident">raw_round</span>(<span class="ident">round</span>.<span class="number">0</span>)),
-                <span class="ident">mpfr</span>::<span class="ident">sum</span>(<span class="ident">imag</span>.<span class="ident">inner_mut</span>(), <span class="ident">tab_imag</span>, <span class="ident">n</span>, <span class="ident">raw_round</span>(<span class="ident">round</span>.<span class="number">1</span>)),
+                <span class="ident">mpfr</span>::<span class="ident">sum</span>(<span class="ident">real</span>.<span class="ident">as_raw_mut</span>(), <span class="ident">tab_real</span>, <span class="ident">n</span>, <span class="ident">raw_round</span>(<span class="ident">round</span>.<span class="number">0</span>)),
+                <span class="ident">mpfr</span>::<span class="ident">sum</span>(<span class="ident">imag</span>.<span class="ident">as_raw_mut</span>(), <span class="ident">tab_imag</span>, <span class="ident">n</span>, <span class="ident">raw_round</span>(<span class="ident">round</span>.<span class="number">1</span>)),
             )
         };
         (<span class="ident">ordering1</span>(<span class="ident">ord_real</span>), <span class="ident">ordering1</span>(<span class="ident">ord_imag</span>))
@@ -7468,11 +7370,11 @@ assert_eq!(d, (1, 1));
         };
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reals</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> <span class="ident">mpfr</span>::<span class="ident">mpfr_t</span><span class="op">&gt;</span>::<span class="ident">with_capacity</span>(<span class="ident">capacity</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">imags</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> <span class="ident">mpfr</span>::<span class="ident">mpfr_t</span><span class="op">&gt;</span>::<span class="ident">with_capacity</span>(<span class="ident">capacity</span>);
-        <span class="ident">reals</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">real</span>().<span class="ident">inner</span>());
-        <span class="ident">imags</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">imag</span>().<span class="ident">inner</span>());
+        <span class="ident">reals</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">real</span>().<span class="ident">as_raw</span>());
+        <span class="ident">imags</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">imag</span>().<span class="ident">as_raw</span>());
         <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">src</span>.<span class="ident">values</span> {
-            <span class="ident">reals</span>.<span class="ident">push</span>(<span class="ident">value</span>.<span class="ident">real</span>().<span class="ident">inner</span>());
-            <span class="ident">imags</span>.<span class="ident">push</span>(<span class="ident">value</span>.<span class="ident">imag</span>().<span class="ident">inner</span>());
+            <span class="ident">reals</span>.<span class="ident">push</span>(<span class="ident">value</span>.<span class="ident">real</span>().<span class="ident">as_raw</span>());
+            <span class="ident">imags</span>.<span class="ident">push</span>(<span class="ident">value</span>.<span class="ident">imag</span>().<span class="ident">as_raw</span>());
         }
         <span class="kw">let</span> <span class="ident">tab_real</span> <span class="op">=</span> <span class="macro">cast_ptr</span><span class="macro">!</span>(<span class="ident">reals</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">mpfr</span>::<span class="ident">mpfr_t</span>);
         <span class="kw">let</span> <span class="ident">tab_imag</span> <span class="op">=</span> <span class="macro">cast_ptr</span><span class="macro">!</span>(<span class="ident">imags</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">mpfr</span>::<span class="ident">mpfr_t</span>);
@@ -7480,8 +7382,8 @@ assert_eq!(d, (1, 1));
         <span class="kw">let</span> (<span class="ident">ord_real</span>, <span class="ident">ord_imag</span>) <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="kw">let</span> (<span class="ident">real</span>, <span class="ident">imag</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_mut_real_imag</span>();
             (
-                <span class="ident">mpfr</span>::<span class="ident">sum</span>(<span class="ident">real</span>.<span class="ident">inner_mut</span>(), <span class="ident">tab_real</span>, <span class="ident">n</span>, <span class="ident">raw_round</span>(<span class="ident">round</span>.<span class="number">0</span>)),
-                <span class="ident">mpfr</span>::<span class="ident">sum</span>(<span class="ident">imag</span>.<span class="ident">inner_mut</span>(), <span class="ident">tab_imag</span>, <span class="ident">n</span>, <span class="ident">raw_round</span>(<span class="ident">round</span>.<span class="number">1</span>)),
+                <span class="ident">mpfr</span>::<span class="ident">sum</span>(<span class="ident">real</span>.<span class="ident">as_raw_mut</span>(), <span class="ident">tab_real</span>, <span class="ident">n</span>, <span class="ident">raw_round</span>(<span class="ident">round</span>.<span class="number">0</span>)),
+                <span class="ident">mpfr</span>::<span class="ident">sum</span>(<span class="ident">imag</span>.<span class="ident">as_raw_mut</span>(), <span class="ident">tab_imag</span>, <span class="ident">n</span>, <span class="ident">raw_round</span>(<span class="ident">round</span>.<span class="number">1</span>)),
             )
         };
         (<span class="ident">ordering1</span>(<span class="ident">ord_real</span>), <span class="ident">ordering1</span>(<span class="ident">ord_imag</span>))
@@ -7506,13 +7408,13 @@ assert_eq!(d, (1, 1));
         <span class="kw">let</span> <span class="ident">bp</span> <span class="op">=</span> <span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">brp</span>, <span class="ident">bip</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">new</span>(<span class="ident">arp</span>.<span class="ident">checked_add</span>(<span class="ident">bp</span>).<span class="ident">expect</span>(<span class="string">&quot;overflow&quot;</span>));
         <span class="kw">unsafe</span> {
-            <span class="ident">mpfr</span>::<span class="ident">set_prec</span>(<span class="ident">r</span>.<span class="ident">inner_mut</span>(), <span class="ident">cast</span>(<span class="ident">arp</span> <span class="op">+</span> <span class="ident">brp</span>));
+            <span class="ident">mpfr</span>::<span class="ident">set_prec</span>(<span class="ident">r</span>.<span class="ident">as_raw_mut</span>(), <span class="ident">cast</span>(<span class="ident">arp</span> <span class="op">+</span> <span class="ident">brp</span>));
         }
         <span class="ident">r</span>.<span class="ident">assign</span>(<span class="ident">ar</span> <span class="op">*</span> <span class="ident">br</span>);
         <span class="ident">prods</span>.<span class="ident">push</span>(<span class="ident">r</span>);
         <span class="ident">r</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">new</span>(<span class="ident">aip</span>.<span class="ident">checked_add</span>(<span class="ident">bp</span>).<span class="ident">expect</span>(<span class="string">&quot;overflow&quot;</span>));
         <span class="kw">unsafe</span> {
-            <span class="ident">mpfr</span>::<span class="ident">set_prec</span>(<span class="ident">r</span>.<span class="ident">inner_mut</span>(), <span class="ident">cast</span>(<span class="ident">aip</span> <span class="op">+</span> <span class="ident">bip</span>));
+            <span class="ident">mpfr</span>::<span class="ident">set_prec</span>(<span class="ident">r</span>.<span class="ident">as_raw_mut</span>(), <span class="ident">cast</span>(<span class="ident">aip</span> <span class="op">+</span> <span class="ident">bip</span>));
         }
         <span class="ident">r</span>.<span class="ident">assign</span>(<span class="ident">ai</span> <span class="op">*</span> <span class="ident">bi</span>);
         <span class="ident">r</span>.<span class="ident">neg_assign</span>();
@@ -7529,12 +7431,12 @@ assert_eq!(d, (1, 1));
         <span class="kw">let</span> (<span class="ident">arp</span>, <span class="ident">aip</span>) <span class="op">=</span> (<span class="ident">ar</span>.<span class="ident">prec</span>(), <span class="ident">ai</span>.<span class="ident">prec</span>());
         <span class="kw">let</span> (<span class="ident">brp</span>, <span class="ident">bip</span>) <span class="op">=</span> (<span class="ident">br</span>.<span class="ident">prec</span>(), <span class="ident">bi</span>.<span class="ident">prec</span>());
         <span class="kw">unsafe</span> {
-            <span class="ident">mpfr</span>::<span class="ident">set_prec</span>(<span class="ident">prods</span>[<span class="ident">i</span>].<span class="ident">inner_mut</span>(), <span class="ident">cast</span>(<span class="ident">arp</span> <span class="op">+</span> <span class="ident">bip</span>));
+            <span class="ident">mpfr</span>::<span class="ident">set_prec</span>(<span class="ident">prods</span>[<span class="ident">i</span>].<span class="ident">as_raw_mut</span>(), <span class="ident">cast</span>(<span class="ident">arp</span> <span class="op">+</span> <span class="ident">bip</span>));
         }
         <span class="ident">prods</span>[<span class="ident">i</span>].<span class="ident">assign</span>(<span class="ident">ar</span> <span class="op">*</span> <span class="ident">bi</span>);
         <span class="ident">i</span> <span class="op">+=</span> <span class="number">1</span>;
         <span class="kw">unsafe</span> {
-            <span class="ident">mpfr</span>::<span class="ident">set_prec</span>(<span class="ident">prods</span>[<span class="ident">i</span>].<span class="ident">inner_mut</span>(), <span class="ident">cast</span>(<span class="ident">aip</span> <span class="op">+</span> <span class="ident">brp</span>));
+            <span class="ident">mpfr</span>::<span class="ident">set_prec</span>(<span class="ident">prods</span>[<span class="ident">i</span>].<span class="ident">as_raw_mut</span>(), <span class="ident">cast</span>(<span class="ident">aip</span> <span class="op">+</span> <span class="ident">brp</span>));
         }
         <span class="ident">prods</span>[<span class="ident">i</span>].<span class="ident">assign</span>(<span class="ident">ai</span> <span class="op">*</span> <span class="ident">br</span>);
         <span class="ident">i</span> <span class="op">+=</span> <span class="number">1</span>;
@@ -7607,23 +7509,27 @@ assert_eq!(d, (1, 1));
     }
 }
 
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">proj</span>; <span class="kw">struct</span> <span class="ident">ProjIncomplete</span> {} }
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">sqr</span>; <span class="kw">struct</span> <span class="ident">SquareIncomplete</span> {} }
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">sqrt</span>; <span class="kw">struct</span> <span class="ident">SqrtIncomplete</span> {} }
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">conj</span>; <span class="kw">struct</span> <span class="ident">ConjIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">proj</span>; <span class="kw">struct</span> <span class="ident">ProjIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">sqr</span>; <span class="kw">struct</span> <span class="ident">SquareIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">sqrt</span>; <span class="kw">struct</span> <span class="ident">SqrtIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">conj</span>; <span class="kw">struct</span> <span class="ident">ConjIncomplete</span> {} }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AbsIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">ref_self</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Complex</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">AbsIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Float</span> {
+<span class="kw">impl</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">AbsIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Float</span> {
     <span class="kw">type</span> <span class="ident">Round</span> <span class="op">=</span> <span class="ident">Round</span>;
     <span class="kw">type</span> <span class="ident">Ordering</span> <span class="op">=</span> <span class="ident">Ordering</span>;
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">assign_round</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">AbsIncomplete</span>, <span class="ident">round</span>: <span class="ident">Round</span>) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
+    <span class="kw">fn</span> <span class="ident">assign_round</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">src</span>: <span class="ident">AbsIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">round</span>: <span class="ident">Round</span>,
+    ) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">mpc</span>::<span class="ident">abs</span>(<span class="self">self</span>.<span class="ident">inner_mut</span>(), <span class="ident">src</span>.<span class="ident">ref_self</span>.<span class="ident">inner</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>))
+            <span class="ident">mpc</span>::<span class="ident">abs</span>(<span class="self">self</span>.<span class="ident">as_raw_mut</span>(), <span class="ident">src</span>.<span class="ident">ref_self</span>.<span class="ident">as_raw</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>))
         };
         <span class="ident">ret</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="number">0</span>)
     }
@@ -7634,13 +7540,17 @@ assert_eq!(d, (1, 1));
     <span class="ident">ref_self</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Complex</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">ArgIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Float</span> {
+<span class="kw">impl</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">ArgIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Float</span> {
     <span class="kw">type</span> <span class="ident">Round</span> <span class="op">=</span> <span class="ident">Round</span>;
     <span class="kw">type</span> <span class="ident">Ordering</span> <span class="op">=</span> <span class="ident">Ordering</span>;
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">assign_round</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">ArgIncomplete</span>, <span class="ident">round</span>: <span class="ident">Round</span>) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
+    <span class="kw">fn</span> <span class="ident">assign_round</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">src</span>: <span class="ident">ArgIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">round</span>: <span class="ident">Round</span>,
+    ) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">mpc</span>::<span class="ident">arg</span>(<span class="self">self</span>.<span class="ident">inner_mut</span>(), <span class="ident">src</span>.<span class="ident">ref_self</span>.<span class="ident">inner</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>))
+            <span class="ident">mpc</span>::<span class="ident">arg</span>(<span class="self">self</span>.<span class="ident">as_raw_mut</span>(), <span class="ident">src</span>.<span class="ident">ref_self</span>.<span class="ident">as_raw</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>))
         };
         <span class="ident">ret</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="number">0</span>)
     }
@@ -7654,37 +7564,45 @@ assert_eq!(d, (1, 1));
     <span class="ident">ref_self</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Complex</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">NormIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Float</span> {
+<span class="kw">impl</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">NormIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Float</span> {
     <span class="kw">type</span> <span class="ident">Round</span> <span class="op">=</span> <span class="ident">Round</span>;
     <span class="kw">type</span> <span class="ident">Ordering</span> <span class="op">=</span> <span class="ident">Ordering</span>;
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">assign_round</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">NormIncomplete</span>, <span class="ident">round</span>: <span class="ident">Round</span>) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
+    <span class="kw">fn</span> <span class="ident">assign_round</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">src</span>: <span class="ident">NormIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">round</span>: <span class="ident">Round</span>,
+    ) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">mpc</span>::<span class="ident">norm</span>(<span class="self">self</span>.<span class="ident">inner_mut</span>(), <span class="ident">src</span>.<span class="ident">ref_self</span>.<span class="ident">inner</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>))
+            <span class="ident">mpc</span>::<span class="ident">norm</span>(
+                <span class="self">self</span>.<span class="ident">as_raw_mut</span>(),
+                <span class="ident">src</span>.<span class="ident">ref_self</span>.<span class="ident">as_raw</span>(),
+                <span class="ident">raw_round</span>(<span class="ident">round</span>),
+            )
         };
         <span class="ident">ret</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="number">0</span>)
     }
 }
 
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">log</span>; <span class="kw">struct</span> <span class="ident">LnIncomplete</span> {} }
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">log10</span>; <span class="kw">struct</span> <span class="ident">Log10Incomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">log</span>; <span class="kw">struct</span> <span class="ident">LnIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">log10</span>; <span class="kw">struct</span> <span class="ident">Log10Incomplete</span> {} }
 <span class="macro">ref_math_op0_complex</span><span class="macro">!</span> {
-    <span class="ident">mpc</span>::<span class="ident">rootofunity</span>; <span class="kw">struct</span> <span class="ident">RootOfUnityIncomplete</span> { <span class="ident">n</span>: <span class="ident">u32</span>, <span class="ident">k</span>: <span class="ident">u32</span> }
+    <span class="ident">xmpc</span>::<span class="ident">rootofunity</span>; <span class="kw">struct</span> <span class="ident">RootOfUnityIncomplete</span> { <span class="ident">n</span>: <span class="ident">u32</span>, <span class="ident">k</span>: <span class="ident">u32</span> }
 }
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">exp</span>; <span class="kw">struct</span> <span class="ident">ExpIncomplete</span> {} }
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">sin</span>; <span class="kw">struct</span> <span class="ident">SinIncomplete</span> {} }
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">cos</span>; <span class="kw">struct</span> <span class="ident">CosIncomplete</span> {} }
-<span class="macro">ref_math_op1_2_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">sin_cos</span>; <span class="kw">struct</span> <span class="ident">SinCosIncomplete</span> {} }
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">tan</span>; <span class="kw">struct</span> <span class="ident">TanIncomplete</span> {} }
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">sinh</span>; <span class="kw">struct</span> <span class="ident">SinhIncomplete</span> {} }
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">cosh</span>; <span class="kw">struct</span> <span class="ident">CoshIncomplete</span> {} }
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">tanh</span>; <span class="kw">struct</span> <span class="ident">TanhIncomplete</span> {} }
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">asin</span>; <span class="kw">struct</span> <span class="ident">AsinIncomplete</span> {} }
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">acos</span>; <span class="kw">struct</span> <span class="ident">AcosIncomplete</span> {} }
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">atan</span>; <span class="kw">struct</span> <span class="ident">AtanIncomplete</span> {} }
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">asinh</span>; <span class="kw">struct</span> <span class="ident">AsinhIncomplete</span> {} }
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">acosh</span>; <span class="kw">struct</span> <span class="ident">AcoshIncomplete</span> {} }
-<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">mpc</span>::<span class="ident">atanh</span>; <span class="kw">struct</span> <span class="ident">AtanhIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">exp</span>; <span class="kw">struct</span> <span class="ident">ExpIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">sin</span>; <span class="kw">struct</span> <span class="ident">SinIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">cos</span>; <span class="kw">struct</span> <span class="ident">CosIncomplete</span> {} }
+<span class="macro">ref_math_op1_2_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">sin_cos</span>; <span class="kw">struct</span> <span class="ident">SinCosIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">tan</span>; <span class="kw">struct</span> <span class="ident">TanIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">sinh</span>; <span class="kw">struct</span> <span class="ident">SinhIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">cosh</span>; <span class="kw">struct</span> <span class="ident">CoshIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">tanh</span>; <span class="kw">struct</span> <span class="ident">TanhIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">asin</span>; <span class="kw">struct</span> <span class="ident">AsinIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">acos</span>; <span class="kw">struct</span> <span class="ident">AcosIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">atan</span>; <span class="kw">struct</span> <span class="ident">AtanIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">asinh</span>; <span class="kw">struct</span> <span class="ident">AsinhIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">acosh</span>; <span class="kw">struct</span> <span class="ident">AcoshIncomplete</span> {} }
+<span class="macro">ref_math_op1_complex</span><span class="macro">!</span> { <span class="ident">xmpc</span>::<span class="ident">atanh</span>; <span class="kw">struct</span> <span class="ident">AtanhIncomplete</span> {} }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rand&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RandomBitsIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>
@@ -7695,12 +7613,9 @@ assert_eq!(d, (1, 1));
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rand&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span><span class="op">&gt;</span> <span class="ident">Assign</span><span class="op">&lt;</span><span class="ident">RandomBitsIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Complex</span>
-<span class="kw">where</span>
-    <span class="lifetime">&#39;b</span>: <span class="lifetime">&#39;a</span>,
-{
+<span class="kw">impl</span> <span class="ident">Assign</span><span class="op">&lt;</span><span class="ident">RandomBitsIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Complex</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">RandomBitsIncomplete</span>) {
+    <span class="kw">fn</span> <span class="ident">assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">RandomBitsIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">mut_real</span>().<span class="ident">assign</span>(<span class="ident">Float</span>::<span class="ident">random_bits</span>(<span class="ident">src</span>.<span class="ident">rng</span>));
         <span class="self">self</span>.<span class="ident">mut_imag</span>().<span class="ident">assign</span>(<span class="ident">Float</span>::<span class="ident">random_bits</span>(<span class="ident">src</span>.<span class="ident">rng</span>));
     }
@@ -7715,14 +7630,15 @@ assert_eq!(d, (1, 1));
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rand&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">RandomCont</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Complex</span>
-<span class="kw">where</span>
-    <span class="lifetime">&#39;b</span>: <span class="lifetime">&#39;a</span>,
-{
+<span class="kw">impl</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">RandomCont</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Complex</span> {
     <span class="kw">type</span> <span class="ident">Round</span> <span class="op">=</span> <span class="ident">Round2</span>;
     <span class="kw">type</span> <span class="ident">Ordering</span> <span class="op">=</span> <span class="ident">Ordering2</span>;
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">assign_round</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">RandomCont</span>, <span class="ident">round</span>: <span class="ident">Round2</span>) <span class="op">-&gt;</span> <span class="ident">Ordering2</span> {
+    <span class="kw">fn</span> <span class="ident">assign_round</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">src</span>: <span class="ident">RandomCont</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">round</span>: <span class="ident">Round2</span>,
+    ) <span class="op">-&gt;</span> <span class="ident">Ordering2</span> {
         <span class="kw">let</span> <span class="ident">real_dir</span> <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">mut_real</span>().<span class="ident">assign_round</span>(<span class="ident">Float</span>::<span class="ident">random_cont</span>(<span class="ident">src</span>.<span class="ident">rng</span>), <span class="ident">round</span>.<span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">imag_dir</span> <span class="op">=</span>
@@ -7732,13 +7648,13 @@ assert_eq!(d, (1, 1));
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">repr_transparent</span>, <span class="ident">repr</span>(<span class="ident">transparent</span>))]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BorrowComplex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">inner</span>: <span class="ident">mpc_t</span>,
     <span class="ident">phantom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Complex</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">BorrowComplex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">BorrowComplex</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Complex</span>;
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Complex</span> {
@@ -7772,7 +7688,6 @@ assert_eq!(d, (1, 1));
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>, <span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">range_plus_one</span>))]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">append_to_string</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Complex</span>, <span class="ident">f</span>: <span class="ident">Format</span>) {
     <span class="kw">let</span> (<span class="ident">re</span>, <span class="ident">im</span>) <span class="op">=</span> (<span class="ident">c</span>.<span class="ident">real</span>(), <span class="ident">c</span>.<span class="ident">imag</span>());
     <span class="kw">let</span> <span class="ident">re_plus</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">sign_plus</span> <span class="op">&amp;&amp;</span> <span class="ident">re</span>.<span class="ident">is_sign_positive</span>();
@@ -7801,7 +7716,7 @@ assert_eq!(d, (1, 1));
             <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span>
                 <span class="ident">slice</span>::<span class="ident">from_raw_parts_mut</span>(<span class="ident">s</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>, <span class="ident">s</span>.<span class="ident">len</span>());
             <span class="ident">bytes</span>[<span class="ident">prefix_start</span>] <span class="op">=</span> <span class="string">b&#39;-&#39;</span>;
-            <span class="ident">bytes</span>[<span class="ident">prefix_start</span> <span class="op">+</span> <span class="number">1</span>..<span class="ident">prefix_end</span> <span class="op">+</span> <span class="number">1</span>]
+            <span class="ident">bytes</span>[<span class="ident">prefix_start</span> <span class="op">+</span> <span class="number">1</span>..=<span class="ident">prefix_end</span>]
                 .<span class="ident">copy_from_slice</span>(<span class="ident">f</span>.<span class="ident">prefix</span>.<span class="ident">as_bytes</span>());
         }
     }
@@ -7821,7 +7736,7 @@ assert_eq!(d, (1, 1));
             <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span>
                 <span class="ident">slice</span>::<span class="ident">from_raw_parts_mut</span>(<span class="ident">s</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>, <span class="ident">s</span>.<span class="ident">len</span>());
             <span class="ident">bytes</span>[<span class="ident">prefix_start</span>] <span class="op">=</span> <span class="string">b&#39;-&#39;</span>;
-            <span class="ident">bytes</span>[<span class="ident">prefix_start</span> <span class="op">+</span> <span class="number">1</span>..<span class="ident">prefix_end</span> <span class="op">+</span> <span class="number">1</span>]
+            <span class="ident">bytes</span>[<span class="ident">prefix_start</span> <span class="op">+</span> <span class="number">1</span>..=<span class="ident">prefix_end</span>]
                 .<span class="ident">copy_from_slice</span>(<span class="ident">f</span>.<span class="ident">prefix</span>.<span class="ident">as_bytes</span>());
         }
     }
@@ -7985,59 +7900,8 @@ println!(&quot;Parse error: {:?}&quot;, error);
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_round2</span>(<span class="ident">round</span>: <span class="ident">Round2</span>) <span class="op">-&gt;</span> <span class="ident">mpc</span>::<span class="ident">rnd_t</span> {
-    <span class="kw">match</span> (<span class="ident">round</span>.<span class="number">0</span>, <span class="ident">round</span>.<span class="number">1</span>) {
-        (<span class="ident">Round</span>::<span class="ident">Nearest</span>, <span class="ident">Round</span>::<span class="ident">Nearest</span>) <span class="op">=&gt;</span> <span class="ident">mpc</span>::<span class="ident">RNDNN</span>,
-        (<span class="ident">Round</span>::<span class="ident">Nearest</span>, <span class="ident">Round</span>::<span class="ident">Zero</span>) <span class="op">=&gt;</span> <span class="ident">mpc</span>::<span class="ident">RNDNZ</span>,
-        (<span class="ident">Round</span>::<span class="ident">Nearest</span>, <span class="ident">Round</span>::<span class="ident">Up</span>) <span class="op">=&gt;</span> <span class="ident">mpc</span>::<span class="ident">RNDNU</span>,
-        (<span class="ident">Round</span>::<span class="ident">Nearest</span>, <span class="ident">Round</span>::<span class="ident">Down</span>) <span class="op">=&gt;</span> <span class="ident">mpc</span>::<span class="ident">RNDND</span>,
-        (<span class="ident">Round</span>::<span class="ident">Zero</span>, <span class="ident">Round</span>::<span class="ident">Nearest</span>) <span class="op">=&gt;</span> <span class="ident">mpc</span>::<span class="ident">RNDZN</span>,
-        (<span class="ident">Round</span>::<span class="ident">Zero</span>, <span class="ident">Round</span>::<span class="ident">Zero</span>) <span class="op">=&gt;</span> <span class="ident">mpc</span>::<span class="ident">RNDZZ</span>,
-        (<span class="ident">Round</span>::<span class="ident">Zero</span>, <span class="ident">Round</span>::<span class="ident">Up</span>) <span class="op">=&gt;</span> <span class="ident">mpc</span>::<span class="ident">RNDZU</span>,
-        (<span class="ident">Round</span>::<span class="ident">Zero</span>, <span class="ident">Round</span>::<span class="ident">Down</span>) <span class="op">=&gt;</span> <span class="ident">mpc</span>::<span class="ident">RNDZD</span>,
-        (<span class="ident">Round</span>::<span class="ident">Up</span>, <span class="ident">Round</span>::<span class="ident">Nearest</span>) <span class="op">=&gt;</span> <span class="ident">mpc</span>::<span class="ident">RNDUN</span>,
-        (<span class="ident">Round</span>::<span class="ident">Up</span>, <span class="ident">Round</span>::<span class="ident">Zero</span>) <span class="op">=&gt;</span> <span class="ident">mpc</span>::<span class="ident">RNDUZ</span>,
-        (<span class="ident">Round</span>::<span class="ident">Up</span>, <span class="ident">Round</span>::<span class="ident">Up</span>) <span class="op">=&gt;</span> <span class="ident">mpc</span>::<span class="ident">RNDUU</span>,
-        (<span class="ident">Round</span>::<span class="ident">Up</span>, <span class="ident">Round</span>::<span class="ident">Down</span>) <span class="op">=&gt;</span> <span class="ident">mpc</span>::<span class="ident">RNDUD</span>,
-        (<span class="ident">Round</span>::<span class="ident">Down</span>, <span class="ident">Round</span>::<span class="ident">Nearest</span>) <span class="op">=&gt;</span> <span class="ident">mpc</span>::<span class="ident">RNDDN</span>,
-        (<span class="ident">Round</span>::<span class="ident">Down</span>, <span class="ident">Round</span>::<span class="ident">Zero</span>) <span class="op">=&gt;</span> <span class="ident">mpc</span>::<span class="ident">RNDDZ</span>,
-        (<span class="ident">Round</span>::<span class="ident">Down</span>, <span class="ident">Round</span>::<span class="ident">Up</span>) <span class="op">=&gt;</span> <span class="ident">mpc</span>::<span class="ident">RNDDU</span>,
-        (<span class="ident">Round</span>::<span class="ident">Down</span>, <span class="ident">Round</span>::<span class="ident">Down</span>) <span class="op">=&gt;</span> <span class="ident">mpc</span>::<span class="ident">RNDDD</span>,
-        <span class="kw">_</span> <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
-    }
-}
-
-<span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">fn</span> <span class="ident">ordering1</span>(<span class="ident">ord</span>: <span class="ident">c_int</span>) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
     <span class="ident">ord</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="number">0</span>)
-}
-
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">ordering2</span>(<span class="ident">ord</span>: <span class="ident">c_int</span>) <span class="op">-&gt;</span> <span class="ident">Ordering2</span> {
-    <span class="comment">// ord == first + 4 * second</span>
-    <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">mpc</span>::<span class="ident">INEX_RE</span>(<span class="ident">ord</span>).<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="number">0</span>);
-    <span class="kw">let</span> <span class="ident">second</span> <span class="op">=</span> <span class="ident">mpc</span>::<span class="ident">INEX_IM</span>(<span class="ident">ord</span>).<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="number">0</span>);
-    (<span class="ident">first</span>, <span class="ident">second</span>)
-}
-
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">ordering4</span>(<span class="ident">ord</span>: <span class="ident">c_int</span>) <span class="op">-&gt;</span> (<span class="ident">Ordering2</span>, <span class="ident">Ordering2</span>) {
-    (<span class="ident">ordering2</span>(<span class="ident">mpc</span>::<span class="ident">INEX1</span>(<span class="ident">ord</span>)), <span class="ident">ordering2</span>(<span class="ident">mpc</span>::<span class="ident">INEX2</span>(<span class="ident">ord</span>)))
-}
-
-<span class="kw">impl</span> <span class="ident">Inner</span> <span class="kw">for</span> <span class="ident">Complex</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">mpc_t</span>;
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">mpc_t</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">InnerMut</span> <span class="kw">for</span> <span class="ident">Complex</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">inner_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">mpc_t</span> {
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">inner</span>
-    }
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../";window.currentCrate = "rug";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>

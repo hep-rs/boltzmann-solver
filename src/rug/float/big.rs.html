@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/rug-1.3.0/src/float/big.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>big.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../rug/index.html'><img src='https://tspiteri.gitlab.io/gmp-mpfr-sys/rug.svg' alt='logo' width='100'></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/rug-1.4.0/src/float/big.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>big.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../rug/index.html'><img src='https://tspiteri.gitlab.io/gmp-mpfr-sys/rug.svg' alt='logo' width='100'></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -8709,19 +8709,6 @@
 <span id="8709">8709</span>
 <span id="8710">8710</span>
 <span id="8711">8711</span>
-<span id="8712">8712</span>
-<span id="8713">8713</span>
-<span id="8714">8714</span>
-<span id="8715">8715</span>
-<span id="8716">8716</span>
-<span id="8717">8717</span>
-<span id="8718">8718</span>
-<span id="8719">8719</span>
-<span id="8720">8720</span>
-<span id="8721">8721</span>
-<span id="8722">8722</span>
-<span id="8723">8723</span>
-<span id="8724">8724</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright © 2016–2019 University of Malta</span>
 
@@ -8739,25 +8726,27 @@
 <span class="comment">// License and a copy of the GNU General Public License along with</span>
 <span class="comment">// this program. If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kw">use</span> <span class="ident">cast</span>::<span class="ident">cast</span>;
-<span class="kw">use</span> <span class="ident">ext</span>::<span class="ident">mpfr</span> <span class="kw">as</span> <span class="ident">xmpfr</span>;
-<span class="kw">use</span> <span class="ident">float</span>::<span class="ident">arith</span>::{
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cast</span>::<span class="ident">cast</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ext</span>::<span class="ident">xmpfr</span>::{<span class="self">self</span>, <span class="ident">ordering1</span>, <span class="ident">raw_round</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">float</span>::<span class="ident">arith</span>::{
     <span class="ident">AddMulIncomplete</span>, <span class="ident">MulAddMulIncomplete</span>, <span class="ident">MulSubMulIncomplete</span>,
     <span class="ident">SubMulFromIncomplete</span>,
 };
-<span class="kw">use</span> <span class="ident">float</span>::{<span class="self">self</span>, <span class="ident">OrdFloat</span>, <span class="ident">Round</span>, <span class="ident">SmallFloat</span>, <span class="ident">Special</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">float</span>::{<span class="self">self</span>, <span class="ident">OrdFloat</span>, <span class="ident">Round</span>, <span class="ident">SmallFloat</span>, <span class="ident">Special</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integer&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">integer</span>::<span class="ident">big</span>::<span class="ident">BorrowInteger</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">misc</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ops</span>::{<span class="ident">AddAssignRound</span>, <span class="ident">AssignRound</span>, <span class="ident">NegAssign</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rand&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">rand</span>::<span class="ident">RandState</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Assign</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integer&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Integer</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rational&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Rational</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integer&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">gmp_mpfr_sys</span>::<span class="ident">gmp</span>;
 <span class="kw">use</span> <span class="ident">gmp_mpfr_sys</span>::<span class="ident">mpfr</span>::{<span class="self">self</span>, <span class="ident">mpfr_t</span>};
-<span class="kw">use</span> <span class="ident">inner</span>::{<span class="ident">Inner</span>, <span class="ident">InnerMut</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integer&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">integer</span>::<span class="ident">big</span>::<span class="ident">BorrowInteger</span>;
-<span class="kw">use</span> <span class="ident">misc</span>;
-<span class="kw">use</span> <span class="ident">ops</span>::{<span class="ident">AddAssignRound</span>, <span class="ident">AssignRound</span>, <span class="ident">NegAssign</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rand&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">RandState</span>;
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>, <span class="ident">unused_imports</span>)]</span>
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ascii</span>::<span class="ident">AsciiExt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">Ordering</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::{<span class="ident">CStr</span>, <span class="ident">CString</span>};
@@ -8769,45 +8758,6 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">i32</span>, <span class="ident">u32</span>};
-<span class="kw">use</span> <span class="ident">Assign</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integer&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">Integer</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rational&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">Rational</span>;
-
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">raw_round</span>(<span class="ident">round</span>: <span class="ident">Round</span>) <span class="op">-&gt;</span> <span class="ident">mpfr</span>::<span class="ident">rnd_t</span> {
-    <span class="kw">match</span> <span class="ident">round</span> {
-        <span class="ident">Round</span>::<span class="ident">Nearest</span> <span class="op">=&gt;</span> <span class="ident">mpfr</span>::<span class="ident">rnd_t</span>::<span class="ident">RNDN</span>,
-        <span class="ident">Round</span>::<span class="ident">Zero</span> <span class="op">=&gt;</span> <span class="ident">mpfr</span>::<span class="ident">rnd_t</span>::<span class="ident">RNDZ</span>,
-        <span class="ident">Round</span>::<span class="ident">Up</span> <span class="op">=&gt;</span> <span class="ident">mpfr</span>::<span class="ident">rnd_t</span>::<span class="ident">RNDU</span>,
-        <span class="ident">Round</span>::<span class="ident">Down</span> <span class="op">=&gt;</span> <span class="ident">mpfr</span>::<span class="ident">rnd_t</span>::<span class="ident">RNDD</span>,
-        <span class="kw">_</span> <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
-    }
-}
-
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">ordering1</span>(<span class="ident">ord</span>: <span class="ident">c_int</span>) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
-    <span class="ident">ord</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="number">0</span>)
-}
-
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">ordering2</span>(<span class="ident">ord</span>: <span class="ident">c_int</span>) <span class="op">-&gt;</span> (<span class="ident">Ordering</span>, <span class="ident">Ordering</span>) {
-    <span class="comment">// ord == first + 4 * second</span>
-    <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ord</span> <span class="op">&amp;</span> <span class="number">3</span> {
-        <span class="number">2</span> <span class="op">=&gt;</span> <span class="op">-</span><span class="number">1</span>,
-        <span class="number">0</span> <span class="op">=&gt;</span> <span class="number">0</span>,
-        <span class="number">1</span> <span class="op">=&gt;</span> <span class="number">1</span>,
-        <span class="kw">_</span> <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
-    };
-    <span class="kw">let</span> <span class="ident">second</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ord</span> <span class="op">&gt;&gt;</span> <span class="number">2</span> {
-        <span class="number">2</span> <span class="op">=&gt;</span> <span class="op">-</span><span class="number">1</span>,
-        <span class="number">0</span> <span class="op">=&gt;</span> <span class="number">0</span>,
-        <span class="number">1</span> <span class="op">=&gt;</span> <span class="number">1</span>,
-        <span class="kw">_</span> <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
-    };
-    (<span class="ident">ordering1</span>(<span class="ident">first</span>), <span class="ident">ordering1</span>(<span class="ident">second</span>))
-}
 
 <span class="doccomment">/**
 A multi-precision floating-point number with arbitrarily large
@@ -8963,7 +8913,6 @@ the MPFR website. The program computes a lower bound on 1 + 1/1! +
 `Sum is 2.7182818284590452353602874713526624977572470936999595749669131`
 
 ```rust
-# extern crate rug;
 use rug::float::{Round};
 use rug::ops::{AddAssignRound, AssignRound, MulAssignRound};
 use rug::Float;
@@ -8993,14 +8942,23 @@ println!(&quot;Sum is {}&quot;, sr);
 [MPFR sample]: https://www.mpfr.org/sample.html
 [icv]: index.html#incomplete-computation-values
 */</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">repr_transparent</span>, <span class="ident">repr</span>(<span class="ident">transparent</span>))]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Float</span> {
     <span class="ident">inner</span>: <span class="ident">mpfr_t</span>,
 }
 
+<span class="kw">impl</span> <span class="ident">Float</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">mpfr_t</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
+    }
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">inner_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">mpfr_t</span> {
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">inner</span>
+    }
+}
+
 <span class="kw">fn</span> <span class="ident">_static_assertions</span>() {
     <span class="macro">static_assert_size</span><span class="macro">!</span>(<span class="ident">Float</span>, <span class="ident">mpfr_t</span>);
-    <span class="macro">static_assert_size</span><span class="macro">!</span>(<span class="ident">BorrowFloat</span>, <span class="ident">mpfr_t</span>);
+    <span class="macro">static_assert_size</span><span class="macro">!</span>(<span class="ident">BorrowFloat</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">mpfr_t</span>);
 }
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">ref_math_op0_float</span> {
@@ -9011,7 +8969,7 @@ println!(&quot;Sum is {}&quot;, sr);
     ) <span class="op">=&gt;</span> {
         <span class="macro">ref_math_op0_round</span><span class="macro">!</span> {
             <span class="ident">Float</span>, <span class="ident">Round</span> <span class="op">=&gt;</span> <span class="ident">Ordering</span>;
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>, <span class="ident">raw_round</span> <span class="op">=&gt;</span> <span class="ident">ordering1</span>;
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>;
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr_ref</span>]</span>)<span class="op">*</span>
             <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Incomplete</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>),<span class="op">*</span> }
         }
@@ -9032,7 +8990,7 @@ println!(&quot;Sum is {}&quot;, sr);
     ) <span class="op">=&gt;</span> {
         <span class="macro">math_op1_round</span><span class="macro">!</span> {
             <span class="ident">Round</span> <span class="op">=&gt;</span> <span class="ident">Ordering</span>;
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>, <span class="ident">raw_round</span> <span class="op">=&gt;</span> <span class="ident">ordering1</span>;
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>;
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
             <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>),<span class="kw-2">*</span>);
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr_mut</span>]</span>)<span class="op">*</span>
@@ -9053,7 +9011,7 @@ println!(&quot;Sum is {}&quot;, sr);
     ) <span class="op">=&gt;</span> {
         <span class="macro">ref_math_op1_round</span><span class="macro">!</span> {
             <span class="ident">Float</span>, <span class="ident">Round</span> <span class="op">=&gt;</span> <span class="ident">Ordering</span>;
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>, <span class="ident">raw_round</span> <span class="op">=&gt;</span> <span class="ident">ordering1</span>;
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>;
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr_ref</span>]</span>)<span class="op">*</span>
             <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Incomplete</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>),<span class="op">*</span> }
         }
@@ -9074,7 +9032,7 @@ println!(&quot;Sum is {}&quot;, sr);
     ) <span class="op">=&gt;</span> {
         <span class="macro">math_op1_2_round</span><span class="macro">!</span> {
             <span class="ident">Round</span> <span class="op">=&gt;</span> (<span class="ident">Ordering</span>, <span class="ident">Ordering</span>);
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>, <span class="ident">raw_round</span> <span class="op">=&gt;</span> <span class="ident">ordering2</span>;
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>;
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
             <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rop</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>)<span class="kw-2">*</span>);
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr_mut</span>]</span>)<span class="op">*</span>
@@ -9095,7 +9053,7 @@ println!(&quot;Sum is {}&quot;, sr);
     ) <span class="op">=&gt;</span> {
         <span class="macro">ref_math_op1_2_round</span><span class="macro">!</span> {
             <span class="ident">Float</span>, <span class="ident">Round</span> <span class="op">=&gt;</span> (<span class="ident">Ordering</span>, <span class="ident">Ordering</span>);
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>, <span class="ident">raw_round</span> <span class="op">=&gt;</span> <span class="ident">ordering2</span>;
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>;
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr_ref</span>]</span>)<span class="op">*</span>
             <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Incomplete</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>),<span class="op">*</span> }
         }
@@ -9116,7 +9074,7 @@ println!(&quot;Sum is {}&quot;, sr);
     ) <span class="op">=&gt;</span> {
         <span class="macro">math_op2_round</span><span class="macro">!</span> {
             <span class="ident">Round</span> <span class="op">=&gt;</span> <span class="ident">Ordering</span>;
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>, <span class="ident">raw_round</span> <span class="op">=&gt;</span> <span class="ident">ordering1</span>;
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>;
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
             <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>)<span class="kw-2">*</span>);
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr_mut</span>]</span>)<span class="op">*</span>
@@ -9137,7 +9095,7 @@ println!(&quot;Sum is {}&quot;, sr);
     ) <span class="op">=&gt;</span> {
         <span class="macro">ref_math_op2_round</span><span class="macro">!</span> {
             <span class="ident">Float</span>, <span class="ident">Round</span> <span class="op">=&gt;</span> <span class="ident">Ordering</span>;
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>, <span class="ident">raw_round</span> <span class="op">=&gt;</span> <span class="ident">ordering1</span>;
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>;
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr_ref</span>]</span>)<span class="op">*</span>
             <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Incomplete</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>)<span class="op">*</span> }
         }
@@ -9242,7 +9200,7 @@ println!(&quot;Sum is {}&quot;, sr);
         );
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">uninitialized</span>();
-            <span class="ident">mpfr</span>::<span class="ident">init2</span>(<span class="ident">ret</span>.<span class="ident">inner_mut</span>(), <span class="ident">cast</span>(<span class="ident">prec</span>));
+            <span class="ident">mpfr</span>::<span class="ident">init2</span>(<span class="ident">ret</span>.<span class="ident">as_raw_mut</span>(), <span class="ident">cast</span>(<span class="ident">prec</span>));
             <span class="ident">ret</span>
         }
     }
@@ -9258,7 +9216,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">cast</span>(<span class="ident">mpfr</span>::<span class="ident">get_prec</span>(<span class="self">self</span>.<span class="ident">inner</span>())) }
+        <span class="kw">unsafe</span> { <span class="ident">cast</span>(<span class="ident">mpfr</span>::<span class="ident">get_prec</span>(<span class="self">self</span>.<span class="ident">as_raw</span>())) }
     }
 
     <span class="doccomment">/// Sets the precision, rounding to the nearest.</span>
@@ -9308,7 +9266,7 @@ println!(&quot;Sum is {}&quot;, sr);
             <span class="string">&quot;precision out of range&quot;</span>
         );
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">mpfr</span>::<span class="ident">prec_round</span>(<span class="self">self</span>.<span class="ident">inner_mut</span>(), <span class="ident">cast</span>(<span class="ident">prec</span>), <span class="ident">raw_round</span>(<span class="ident">round</span>))
+            <span class="ident">mpfr</span>::<span class="ident">prec_round</span>(<span class="self">self</span>.<span class="ident">as_raw_mut</span>(), <span class="ident">cast</span>(<span class="ident">prec</span>), <span class="ident">raw_round</span>(<span class="ident">round</span>))
         };
         <span class="ident">ordering1</span>(<span class="ident">ret</span>)
     }
@@ -9327,9 +9285,6 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # extern crate gmp_mpfr_sys;</span>
-    <span class="doccomment">/// # extern crate rug;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// use gmp_mpfr_sys::mpfr;</span>
     <span class="doccomment">/// use rug::Float;</span>
     <span class="doccomment">/// use std::mem;</span>
@@ -9342,7 +9297,6 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// };</span>
     <span class="doccomment">/// assert_eq!(f, -14.5);</span>
     <span class="doccomment">/// // since f is a Float now, deallocation is automatic</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Float`]: struct.Float.html</span>
@@ -9360,9 +9314,6 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # extern crate gmp_mpfr_sys;</span>
-    <span class="doccomment">/// # extern crate rug;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// use gmp_mpfr_sys::mpfr;</span>
     <span class="doccomment">/// use rug::Float;</span>
     <span class="doccomment">/// let f = Float::with_val(53, -14.5);</span>
@@ -9373,7 +9324,6 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">///     // free object to prevent memory leak</span>
     <span class="doccomment">///     mpfr::clear(&amp;mut m);</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Float`]: struct.Float.html</span>
@@ -9394,9 +9344,6 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # extern crate gmp_mpfr_sys;</span>
-    <span class="doccomment">/// # extern crate rug;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// use gmp_mpfr_sys::mpfr;</span>
     <span class="doccomment">/// use rug::Float;</span>
     <span class="doccomment">/// let f = Float::with_val(53, -14.5);</span>
@@ -9407,13 +9354,12 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// // f is still valid</span>
     <span class="doccomment">/// assert_eq!(f, -14.5);</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`mpfr_t`]: https://docs.rs/gmp-mpfr-sys/~1.1/gmp_mpfr_sys/mpfr/struct.mpfr_t.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">mpfr_t</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>()
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
     }
 
     <span class="doccomment">/// Returns an unsafe mutable pointer to the inner</span>
@@ -9425,9 +9371,6 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # extern crate gmp_mpfr_sys;</span>
-    <span class="doccomment">/// # extern crate rug;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// use gmp_mpfr_sys::mpfr;</span>
     <span class="doccomment">/// use rug::Float;</span>
     <span class="doccomment">/// let mut f = Float::with_val(53, -14.5);</span>
@@ -9436,13 +9379,12 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">///     mpfr::add_ui(m_ptr, m_ptr, 10, mpfr::rnd_t::RNDN);</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// assert_eq!(f, -4.5);</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`mpfr_t`]: https://docs.rs/gmp-mpfr-sys/~1.1/gmp_mpfr_sys/mpfr/struct.mpfr_t.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_raw_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">mpfr_t</span> {
-        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">inner_mut</span>() }
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">inner</span>
     }
 
     <span class="doccomment">/// Parses a decimal string slice ([`&amp;str`][str]) or byte slice</span>
@@ -9621,7 +9563,7 @@ println!(&quot;Sum is {}&quot;, sr);
         }
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">Integer</span>::<span class="ident">new</span>();
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">mpfr</span>::<span class="ident">get_z</span>(<span class="ident">i</span>.<span class="ident">inner_mut</span>(), <span class="self">self</span>.<span class="ident">inner</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>))
+            <span class="ident">mpfr</span>::<span class="ident">get_z</span>(<span class="ident">i</span>.<span class="ident">as_raw_mut</span>(), <span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>))
         };
         <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">ordering1</span>(<span class="ident">ret</span>)))
     }
@@ -9660,7 +9602,7 @@ println!(&quot;Sum is {}&quot;, sr);
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">Integer</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="ident">exp</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">get_z_2exp</span>(<span class="ident">i</span>.<span class="ident">inner_mut</span>(), <span class="self">self</span>.<span class="ident">inner</span>()) };
+        <span class="kw">let</span> <span class="ident">exp</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">get_z_2exp</span>(<span class="ident">i</span>.<span class="ident">as_raw_mut</span>(), <span class="self">self</span>.<span class="ident">as_raw</span>()) };
         <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">cast</span>(<span class="ident">exp</span>)))
     }
 
@@ -9723,7 +9665,7 @@ println!(&quot;Sum is {}&quot;, sr);
         }
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Rational</span>::<span class="ident">new</span>();
         <span class="kw">unsafe</span> {
-            <span class="ident">mpfr</span>::<span class="ident">get_q</span>(<span class="ident">r</span>.<span class="ident">inner_mut</span>(), <span class="self">self</span>.<span class="ident">inner</span>());
+            <span class="ident">mpfr</span>::<span class="ident">get_q</span>(<span class="ident">r</span>.<span class="ident">as_raw_mut</span>(), <span class="self">self</span>.<span class="ident">as_raw</span>());
         }
         <span class="prelude-val">Some</span>(<span class="ident">r</span>)
     }
@@ -9776,7 +9718,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_nan</span>() {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
-        <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">get_si</span>(<span class="self">self</span>.<span class="ident">inner</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>)) };
+        <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">get_si</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>)) };
         <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;=</span> <span class="ident">c_long</span>::<span class="ident">from</span>(<span class="ident">i32</span>::<span class="ident">MAX</span>) {
             <span class="prelude-val">Some</span>(<span class="ident">i32</span>::<span class="ident">MAX</span>)
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;=</span> <span class="ident">c_long</span>::<span class="ident">from</span>(<span class="ident">i32</span>::<span class="ident">MIN</span>) {
@@ -9834,7 +9776,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_nan</span>() {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
-        <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">get_ui</span>(<span class="self">self</span>.<span class="ident">inner</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>)) };
+        <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">get_ui</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>)) };
         <span class="kw">if</span> <span class="ident">u</span> <span class="op">&gt;=</span> <span class="ident">c_ulong</span>::<span class="ident">from</span>(<span class="ident">u32</span>::<span class="ident">MAX</span>) {
             <span class="prelude-val">Some</span>(<span class="ident">u32</span>::<span class="ident">MAX</span>)
         } <span class="kw">else</span> {
@@ -9885,7 +9827,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// [`f32`]: https://doc.rust-lang.org/nightly/std/primitive.f32.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_f32_round</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">round</span>: <span class="ident">Round</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">xmpfr</span>::<span class="ident">get_f32</span>(<span class="self">self</span>.<span class="ident">inner</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>)) }
+        <span class="kw">unsafe</span> { <span class="ident">xmpfr</span>::<span class="ident">get_f32</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>)) }
     }
 
     <span class="doccomment">/// Converts to an [`f64`], rounding to the nearest.</span>
@@ -9931,7 +9873,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// [`f64`]: https://doc.rust-lang.org/nightly/std/primitive.f64.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_f64_round</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">round</span>: <span class="ident">Round</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
-        <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">get_d</span>(<span class="self">self</span>.<span class="ident">inner</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>)) }
+        <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">get_d</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>)) }
     }
 
     <span class="doccomment">/// Converts to an [`f32`] and an exponent, rounding to the</span>
@@ -9991,11 +9933,11 @@ println!(&quot;Sum is {}&quot;, sr);
             <span class="comment">// mpfr::set will not change precision of sf, so we can</span>
             <span class="comment">// use the unsafe as_nonreallocating_float function</span>
             <span class="ident">mpfr</span>::<span class="ident">set</span>(
-                <span class="ident">sf</span>.<span class="ident">as_nonreallocating_float</span>().<span class="ident">inner_mut</span>(),
-                <span class="self">self</span>.<span class="ident">inner</span>(),
+                <span class="ident">sf</span>.<span class="ident">as_nonreallocating_float</span>().<span class="ident">as_raw_mut</span>(),
+                <span class="self">self</span>.<span class="ident">as_raw</span>(),
                 <span class="ident">raw_round</span>(<span class="ident">round</span>),
             );
-            <span class="ident">mpfr</span>::<span class="ident">get_d_2exp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">exp</span>, <span class="ident">sf</span>.<span class="ident">inner</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>))
+            <span class="ident">mpfr</span>::<span class="ident">get_d_2exp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">exp</span>, <span class="ident">sf</span>.<span class="ident">as_raw</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>))
         };
         (<span class="ident">f</span> <span class="kw">as</span> <span class="ident">f32</span>, <span class="ident">cast</span>(<span class="ident">exp</span>))
     }
@@ -10051,7 +9993,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_f64_exp_round</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">round</span>: <span class="ident">Round</span>) <span class="op">-&gt;</span> (<span class="ident">f64</span>, <span class="ident">i32</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exp</span>: <span class="ident">c_long</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">mpfr</span>::<span class="ident">get_d_2exp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">exp</span>, <span class="self">self</span>.<span class="ident">inner</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>))
+            <span class="ident">mpfr</span>::<span class="ident">get_d_2exp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">exp</span>, <span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">raw_round</span>(<span class="ident">round</span>))
         };
         (<span class="ident">f</span>, <span class="ident">cast</span>(<span class="ident">exp</span>))
     }
@@ -10149,7 +10091,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Deref`]: https://doc.rust-lang.org/nightly/std/ops/trait.Deref.html</span>
     <span class="doccomment">/// [`Float`]: struct.Float.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_neg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">BorrowFloat</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_neg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">BorrowFloat</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">BorrowFloat</span> { <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">phantom</span>: <span class="ident">PhantomData</span> };
         <span class="ident">NegAssign</span>::<span class="ident">neg_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ret</span>.<span class="ident">inner</span>.<span class="ident">sign</span>);
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_nan</span>() {
@@ -10183,7 +10125,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Deref`]: https://doc.rust-lang.org/nightly/std/ops/trait.Deref.html</span>
     <span class="doccomment">/// [`Float`]: struct.Float.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_abs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">BorrowFloat</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_abs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">BorrowFloat</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">BorrowFloat</span> { <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">phantom</span>: <span class="ident">PhantomData</span> };
         <span class="ident">ret</span>.<span class="ident">inner</span>.<span class="ident">sign</span> <span class="op">=</span> <span class="number">1</span>;
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_nan</span>() {
@@ -10241,7 +10183,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// [`true`]: https://doc.rust-lang.org/nightly/std/primitive.bool.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_integer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">integer_p</span>(<span class="self">self</span>.<span class="ident">inner</span>()) <span class="op">!=</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">integer_p</span>(<span class="self">self</span>.<span class="ident">as_raw</span>()) <span class="op">!=</span> <span class="number">0</span> }
     }
 
     <span class="doccomment">/// Returns [`true`] if `self` is not a number.</span>
@@ -10259,7 +10201,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// [`true`]: https://doc.rust-lang.org/nightly/std/primitive.bool.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_nan</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">nan_p</span>(<span class="self">self</span>.<span class="ident">inner</span>()) <span class="op">!=</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">nan_p</span>(<span class="self">self</span>.<span class="ident">as_raw</span>()) <span class="op">!=</span> <span class="number">0</span> }
     }
 
     <span class="doccomment">/// Returns [`true`] if `self` is plus or minus infinity.</span>
@@ -10277,7 +10219,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// [`true`]: https://doc.rust-lang.org/nightly/std/primitive.bool.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_infinite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">inf_p</span>(<span class="self">self</span>.<span class="ident">inner</span>()) <span class="op">!=</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">inf_p</span>(<span class="self">self</span>.<span class="ident">as_raw</span>()) <span class="op">!=</span> <span class="number">0</span> }
     }
 
     <span class="doccomment">/// Returns [`true`] if `self` is a finite number, that is neither</span>
@@ -10296,7 +10238,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// [`true`]: https://doc.rust-lang.org/nightly/std/primitive.bool.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_finite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">number_p</span>(<span class="self">self</span>.<span class="ident">inner</span>()) <span class="op">!=</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">number_p</span>(<span class="self">self</span>.<span class="ident">as_raw</span>()) <span class="op">!=</span> <span class="number">0</span> }
     }
 
     <span class="doccomment">/// Returns [`true`] if `self` is plus or minus zero.</span>
@@ -10317,7 +10259,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// [`true`]: https://doc.rust-lang.org/nightly/std/primitive.bool.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_zero</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">zero_p</span>(<span class="self">self</span>.<span class="ident">inner</span>()) <span class="op">!=</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">zero_p</span>(<span class="self">self</span>.<span class="ident">as_raw</span>()) <span class="op">!=</span> <span class="number">0</span> }
     }
 
     <span class="doccomment">/// Returns [`true`] if `self` is a normal number, that is neither</span>
@@ -10343,7 +10285,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// [`true`]: https://doc.rust-lang.org/nightly/std/primitive.bool.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_normal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">regular_p</span>(<span class="self">self</span>.<span class="ident">inner</span>()) <span class="op">!=</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">regular_p</span>(<span class="self">self</span>.<span class="ident">as_raw</span>()) <span class="op">!=</span> <span class="number">0</span> }
     }
 
     <span class="doccomment">/// Returns the floating-point category of the number. Note that</span>
@@ -10368,7 +10310,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// [`Float`]: struct.Float.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">classify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">FpCategory</span> {
-        <span class="kw">let</span> <span class="ident">inner</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">mpfr_t</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>();
+        <span class="kw">let</span> <span class="ident">inner</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">mpfr_t</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_raw</span>();
         <span class="kw">unsafe</span> {
             <span class="kw">if</span> <span class="ident">mpfr</span>::<span class="ident">nan_p</span>(<span class="ident">inner</span>) <span class="op">!=</span> <span class="number">0</span> {
                 <span class="ident">FpCategory</span>::<span class="ident">Nan</span>
@@ -10407,7 +10349,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_nan</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">sgn</span>(<span class="self">self</span>.<span class="ident">inner</span>()) };
+            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">sgn</span>(<span class="self">self</span>.<span class="ident">as_raw</span>()) };
             <span class="prelude-val">Some</span>(<span class="ident">ordering1</span>(<span class="ident">ret</span>))
         }
     }
@@ -10427,8 +10369,10 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cmp_abs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
-            <span class="kw">match</span> <span class="ident">mpfr</span>::<span class="ident">unordered_p</span>(<span class="self">self</span>.<span class="ident">inner</span>(), <span class="ident">other</span>.<span class="ident">inner</span>()) {
-                <span class="number">0</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ordering1</span>(<span class="ident">mpfr</span>::<span class="ident">cmpabs</span>(<span class="self">self</span>.<span class="ident">inner</span>(), <span class="ident">other</span>.<span class="ident">inner</span>()))),
+            <span class="kw">match</span> <span class="ident">mpfr</span>::<span class="ident">unordered_p</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">other</span>.<span class="ident">as_raw</span>()) {
+                <span class="number">0</span> <span class="op">=&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">ordering1</span>(<span class="ident">mpfr</span>::<span class="ident">cmpabs</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">other</span>.<span class="ident">as_raw</span>())))
+                }
                 <span class="kw">_</span> <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
             }
         }
@@ -10457,7 +10401,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_exp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_normal</span>() {
-            <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">get_exp</span>(<span class="self">self</span>.<span class="ident">inner</span>()) };
+            <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">get_exp</span>(<span class="self">self</span>.<span class="ident">as_raw</span>()) };
             <span class="prelude-val">Some</span>(<span class="ident">cast</span>(<span class="ident">e</span>))
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
@@ -10510,7 +10454,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// [`significant_bits`]: struct.Integer.html#method.significant_bits</span>
     <span class="doccomment">/// [`to_integer_exp`]: #method.to_integer_exp</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_significand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BorrowInteger</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_significand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BorrowInteger</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_normal</span>() {
             <span class="kw">let</span> <span class="ident">limb_bits</span> <span class="op">=</span> <span class="ident">mpfr</span>::<span class="ident">prec_t</span>::<span class="ident">from</span>(<span class="ident">gmp</span>::<span class="ident">LIMB_BITS</span>);
             <span class="kw">let</span> <span class="ident">limbs</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">prec</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">/</span> <span class="ident">limb_bits</span> <span class="op">+</span> <span class="number">1</span>;
@@ -10562,7 +10506,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// [`true`]: https://doc.rust-lang.org/nightly/std/primitive.bool.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_sign_negative</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">signbit</span>(<span class="self">self</span>.<span class="ident">inner</span>()) <span class="op">!=</span> <span class="number">0</span> }
+        <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">signbit</span>(<span class="self">self</span>.<span class="ident">as_raw</span>()) <span class="op">!=</span> <span class="number">0</span> }
     }
 
     <span class="doccomment">/// Sets to the next value towards `to`.</span>
@@ -10581,7 +10525,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_toward</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">to</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) {
         <span class="kw">unsafe</span> {
-            <span class="ident">mpfr</span>::<span class="ident">nexttoward</span>(<span class="self">self</span>.<span class="ident">inner_mut</span>(), <span class="ident">to</span>.<span class="ident">inner</span>());
+            <span class="ident">mpfr</span>::<span class="ident">nexttoward</span>(<span class="self">self</span>.<span class="ident">as_raw_mut</span>(), <span class="ident">to</span>.<span class="ident">as_raw</span>());
         }
     }
 
@@ -10600,7 +10544,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_up</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">unsafe</span> {
-            <span class="ident">mpfr</span>::<span class="ident">nextabove</span>(<span class="self">self</span>.<span class="ident">inner_mut</span>());
+            <span class="ident">mpfr</span>::<span class="ident">nextabove</span>(<span class="self">self</span>.<span class="ident">as_raw_mut</span>());
         }
     }
 
@@ -10619,7 +10563,7 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_down</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">unsafe</span> {
-            <span class="ident">mpfr</span>::<span class="ident">nextbelow</span>(<span class="self">self</span>.<span class="ident">inner_mut</span>());
+            <span class="ident">mpfr</span>::<span class="ident">nextbelow</span>(<span class="self">self</span>.<span class="ident">as_raw_mut</span>());
         }
     }
 
@@ -10793,7 +10737,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">let</span> <span class="ident">sub_exp_min</span> <span class="op">=</span> <span class="ident">exp_min</span>
             .<span class="ident">checked_sub</span>(<span class="ident">cast</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">mpfr</span>::<span class="ident">exp_t</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">prec</span>() <span class="op">-</span> <span class="number">1</span>))
             .<span class="ident">expect</span>(<span class="string">&quot;overflow&quot;</span>);
-        <span class="kw">let</span> <span class="ident">exp</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">get_exp</span>(<span class="self">self</span>.<span class="ident">inner</span>()) };
+        <span class="kw">let</span> <span class="ident">exp</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">get_exp</span>(<span class="self">self</span>.<span class="ident">as_raw</span>()) };
         <span class="kw">if</span> <span class="ident">exp</span> <span class="op">&lt;</span> <span class="ident">sub_exp_min</span> <span class="op">||</span> <span class="ident">exp</span> <span class="op">&gt;=</span> <span class="ident">exp_min</span> {
             <span class="kw">return</span> <span class="ident">prev_rounding</span>;
         }
@@ -10809,7 +10753,7 @@ println!(&quot;Sum is {}&quot;, sr);
             <span class="ident">mpfr</span>::<span class="ident">set_emin</span>(<span class="ident">sub_exp_min</span>);
             <span class="ident">mpfr</span>::<span class="ident">set_emax</span>(<span class="ident">exp_min</span>);
             <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span>
-                <span class="ident">mpfr</span>::<span class="ident">subnormalize</span>(<span class="self">self</span>.<span class="ident">inner_mut</span>(), <span class="ident">prev</span>, <span class="ident">raw_round</span>(<span class="ident">round</span>));
+                <span class="ident">mpfr</span>::<span class="ident">subnormalize</span>(<span class="self">self</span>.<span class="ident">as_raw_mut</span>(), <span class="ident">prev</span>, <span class="ident">raw_round</span>(<span class="ident">round</span>));
             <span class="ident">mpfr</span>::<span class="ident">set_emin</span>(<span class="ident">save_emin</span>);
             <span class="ident">mpfr</span>::<span class="ident">set_emax</span>(<span class="ident">save_emax</span>);
             <span class="ident">ordering1</span>(<span class="ident">ret</span>)
@@ -11002,10 +10946,10 @@ println!(&quot;Sum is {}&quot;, sr);
     ) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="ident">mpfr</span>::<span class="ident">fma</span>(
-                <span class="self">self</span>.<span class="ident">inner_mut</span>(),
-                <span class="self">self</span>.<span class="ident">inner</span>(),
-                <span class="ident">mul</span>.<span class="ident">inner</span>(),
-                <span class="ident">add</span>.<span class="ident">inner</span>(),
+                <span class="self">self</span>.<span class="ident">as_raw_mut</span>(),
+                <span class="self">self</span>.<span class="ident">as_raw</span>(),
+                <span class="ident">mul</span>.<span class="ident">as_raw</span>(),
+                <span class="ident">add</span>.<span class="ident">as_raw</span>(),
                 <span class="ident">raw_round</span>(<span class="ident">round</span>),
             )
         };
@@ -11140,10 +11084,10 @@ println!(&quot;Sum is {}&quot;, sr);
     ) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="ident">mpfr</span>::<span class="ident">fms</span>(
-                <span class="self">self</span>.<span class="ident">inner_mut</span>(),
-                <span class="self">self</span>.<span class="ident">inner</span>(),
-                <span class="ident">mul</span>.<span class="ident">inner</span>(),
-                <span class="ident">sub</span>.<span class="ident">inner</span>(),
+                <span class="self">self</span>.<span class="ident">as_raw_mut</span>(),
+                <span class="self">self</span>.<span class="ident">as_raw</span>(),
+                <span class="ident">mul</span>.<span class="ident">as_raw</span>(),
+                <span class="ident">sub</span>.<span class="ident">as_raw</span>(),
                 <span class="ident">raw_round</span>(<span class="ident">round</span>),
             )
         };
@@ -11280,11 +11224,11 @@ println!(&quot;Sum is {}&quot;, sr);
     ) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="ident">mpfr</span>::<span class="ident">fmma</span>(
-                <span class="self">self</span>.<span class="ident">inner_mut</span>(),
-                <span class="self">self</span>.<span class="ident">inner</span>(),
-                <span class="ident">mul</span>.<span class="ident">inner</span>(),
-                <span class="ident">add_mul1</span>.<span class="ident">inner</span>(),
-                <span class="ident">add_mul2</span>.<span class="ident">inner</span>(),
+                <span class="self">self</span>.<span class="ident">as_raw_mut</span>(),
+                <span class="self">self</span>.<span class="ident">as_raw</span>(),
+                <span class="ident">mul</span>.<span class="ident">as_raw</span>(),
+                <span class="ident">add_mul1</span>.<span class="ident">as_raw</span>(),
+                <span class="ident">add_mul2</span>.<span class="ident">as_raw</span>(),
                 <span class="ident">raw_round</span>(<span class="ident">round</span>),
             )
         };
@@ -11420,11 +11364,11 @@ println!(&quot;Sum is {}&quot;, sr);
     ) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="ident">mpfr</span>::<span class="ident">fmms</span>(
-                <span class="self">self</span>.<span class="ident">inner_mut</span>(),
-                <span class="self">self</span>.<span class="ident">inner</span>(),
-                <span class="ident">mul</span>.<span class="ident">inner</span>(),
-                <span class="ident">sub_mul1</span>.<span class="ident">inner</span>(),
-                <span class="ident">sub_mul2</span>.<span class="ident">inner</span>(),
+                <span class="self">self</span>.<span class="ident">as_raw_mut</span>(),
+                <span class="self">self</span>.<span class="ident">as_raw</span>(),
+                <span class="ident">mul</span>.<span class="ident">as_raw</span>(),
+                <span class="ident">sub_mul1</span>.<span class="ident">as_raw</span>(),
+                <span class="ident">sub_mul2</span>.<span class="ident">as_raw</span>(),
                 <span class="ident">raw_round</span>(<span class="ident">round</span>),
             )
         };
@@ -11512,7 +11456,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">i_pow_u</span>(<span class="ident">base</span>: <span class="ident">i32</span>, <span class="ident">exponent</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="ident">IPowUIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">sqr</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">sqr</span>;
         <span class="doccomment">/// Computes the square, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -11575,7 +11519,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">square_ref</span> <span class="op">-&gt;</span> <span class="ident">SquareIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">sqrt</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">sqrt</span>;
         <span class="doccomment">/// Computes the square root, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -11662,7 +11606,7 @@ println!(&quot;Sum is {}&quot;, sr);
     }
 
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">rec_sqrt</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">rec_sqrt</span>;
         <span class="doccomment">/// Computes the reciprocal square root, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -11726,7 +11670,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">recip_sqrt_ref</span> <span class="op">-&gt;</span> <span class="ident">RecipSqrtIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">cbrt</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">cbrt</span>;
         <span class="doccomment">/// Computes the cube root, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -11790,7 +11734,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">cbrt_ref</span> <span class="op">-&gt;</span> <span class="ident">CbrtIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">rootn_ui</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">rootn_ui</span>;
         <span class="doccomment">/// Computes the &lt;i&gt;k&lt;/i&gt;th root, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -11854,7 +11798,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">root_ref</span> <span class="op">-&gt;</span> <span class="ident">RootIncomplete</span>;
     }
     <span class="macro">math_op1_no_round</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">abs</span>, <span class="ident">raw_round</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">abs</span>;
         <span class="doccomment">/// Computes the absolute value.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -11900,7 +11844,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">abs_ref</span> <span class="op">-&gt;</span> <span class="ident">AbsIncomplete</span>;
     }
     <span class="macro">math_op1_no_round</span><span class="macro">!</span> {
-        <span class="ident">xmpfr</span>::<span class="ident">signum</span>, <span class="ident">raw_round</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">signum</span>;
         <span class="doccomment">/// Computes the signum.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">///   * 1.0 if the value is positive, +0.0 or +∞</span>
@@ -11957,6 +11901,58 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="doccomment">/// [`Assign`]: trait.Assign.html</span>
         <span class="doccomment">/// [icv]: index.html#incomplete-computation-values</span>
         <span class="kw">fn</span> <span class="ident">signum_ref</span> <span class="op">-&gt;</span> <span class="ident">SignumIncomplete</span>;
+    }
+    <span class="macro">math_op2_no_round</span><span class="macro">!</span> {
+        <span class="ident">xmpfr</span>::<span class="ident">copysign</span>;
+        <span class="doccomment">/// Returns a number with the magnitude of `self` and the sign</span>
+        <span class="doccomment">/// of `y`.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// # Examples</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// ```rust</span>
+        <span class="doccomment">/// use rug::Float;</span>
+        <span class="doccomment">/// let x = Float::with_val(53, 23.0);</span>
+        <span class="doccomment">/// let y = Float::with_val(53, -1.0);</span>
+        <span class="doccomment">/// let copysign = x.copysign(&amp;y);</span>
+        <span class="doccomment">/// assert_eq!(copysign, -23.0);</span>
+        <span class="doccomment">/// ```</span>
+        <span class="kw">fn</span> <span class="ident">copysign</span>(<span class="ident">y</span>);
+        <span class="doccomment">/// Retains the magnitude of `self` and copies the sign of</span>
+        <span class="doccomment">/// `y`.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// # Examples</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// ```rust</span>
+        <span class="doccomment">/// use rug::Float;</span>
+        <span class="doccomment">/// let mut x = Float::with_val(53, 23.0);</span>
+        <span class="doccomment">/// let y = Float::with_val(53, -1.0);</span>
+        <span class="doccomment">/// x.copysign_mut(&amp;y);</span>
+        <span class="doccomment">/// assert_eq!(x, -23.0);</span>
+        <span class="doccomment">/// ```</span>
+        <span class="kw">fn</span> <span class="ident">copysign_mut</span>;
+        <span class="doccomment">/// Computes a number with the magnitude of `self` and the</span>
+        <span class="doccomment">/// sign of `y`.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// [`Assign&lt;Src&gt; for Float`][`Assign`] and</span>
+        <span class="doccomment">/// [`AssignRound&lt;Src&gt; for Float`][`AssignRound`] are</span>
+        <span class="doccomment">/// implemented with the returned</span>
+        <span class="doccomment">/// [incomplete-computation value][icv] as `Src`.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// # Examples</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// ```rust</span>
+        <span class="doccomment">/// use rug::Float;</span>
+        <span class="doccomment">/// let x = Float::with_val(53, 23.0);</span>
+        <span class="doccomment">/// let y = Float::with_val(53, -1.0);</span>
+        <span class="doccomment">/// let r = x.copysign_ref(&amp;y);</span>
+        <span class="doccomment">/// let copysign = Float::with_val(53, r);</span>
+        <span class="doccomment">/// assert_eq!(copysign, -23.0);</span>
+        <span class="doccomment">/// ```</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// [`AssignRound`]: ops/trait.AssignRound.html</span>
+        <span class="doccomment">/// [`Assign`]: trait.Assign.html</span>
+        <span class="doccomment">/// [icv]: index.html#incomplete-computation-values</span>
+        <span class="kw">fn</span> <span class="ident">copysign_ref</span> <span class="op">-&gt;</span> <span class="ident">CopysignIncomplete</span>;
     }
 
     <span class="doccomment">/// Clamps the value within the specified bounds, rounding to the</span>
@@ -12210,7 +12206,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">recip_ref</span> <span class="op">-&gt;</span> <span class="ident">RecipIncomplete</span>;
     }
     <span class="macro">math_op2_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">min</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">min</span>;
         <span class="doccomment">/// Finds the minimum, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -12274,7 +12270,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">min_ref</span> <span class="op">-&gt;</span> <span class="ident">MinIncomplete</span>;
     }
     <span class="macro">math_op2_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">max</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">max</span>;
         <span class="doccomment">/// Finds the maximum, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -12338,7 +12334,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">max_ref</span> <span class="op">-&gt;</span> <span class="ident">MaxIncomplete</span>;
     }
     <span class="macro">math_op2_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">dim</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">dim</span>;
         <span class="doccomment">/// Computes the positive difference between `self` and</span>
         <span class="doccomment">/// `other`, rounding to the nearest.</span>
         <span class="doccomment">///</span>
@@ -12432,7 +12428,7 @@ println!(&quot;Sum is {}&quot;, sr);
     }
 
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">log</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">log</span>;
         <span class="doccomment">/// Computes the natural logarithm, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -12522,7 +12518,7 @@ println!(&quot;Sum is {}&quot;, sr);
     }
 
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">log2</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">log2</span>;
         <span class="doccomment">/// Computes the logarithm to base 2, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -12588,7 +12584,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">log2_ref</span> <span class="op">-&gt;</span> <span class="ident">Log2Incomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">log10</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">log10</span>;
         <span class="doccomment">/// Computes the logarithm to base 10, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -12654,7 +12650,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">log10_ref</span> <span class="op">-&gt;</span> <span class="ident">Log10Incomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">exp</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">exp</span>;
         <span class="doccomment">/// Computes the exponential, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -12720,7 +12716,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">exp_ref</span> <span class="op">-&gt;</span> <span class="ident">ExpIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">exp2</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">exp2</span>;
         <span class="doccomment">/// Computes 2 to the power of `self`, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -12786,7 +12782,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">exp2_ref</span> <span class="op">-&gt;</span> <span class="ident">Exp2Incomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">exp10</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">exp10</span>;
         <span class="doccomment">/// Computes 10 to the power of `self`, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -12852,7 +12848,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">exp10_ref</span> <span class="op">-&gt;</span> <span class="ident">Exp10Incomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">sin</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">sin</span>;
         <span class="doccomment">/// Computes the sine, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -12917,7 +12913,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">sin_ref</span> <span class="op">-&gt;</span> <span class="ident">SinIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">cos</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">cos</span>;
         <span class="doccomment">/// Computes the cosine, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -12982,7 +12978,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">cos_ref</span> <span class="op">-&gt;</span> <span class="ident">CosIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">tan</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">tan</span>;
         <span class="doccomment">/// Computes the tangent, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -13047,7 +13043,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">tan_ref</span> <span class="op">-&gt;</span> <span class="ident">TanIncomplete</span>;
     }
     <span class="macro">math_op1_2_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">sin_cos</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">sin_cos</span>;
         <span class="doccomment">/// Computes the sine and cosine of `self`, rounding to the</span>
         <span class="doccomment">/// nearest.</span>
         <span class="doccomment">///</span>
@@ -13154,7 +13150,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">sin_cos_ref</span> <span class="op">-&gt;</span> <span class="ident">SinCosIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">sec</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">sec</span>;
         <span class="doccomment">/// Computes the secant, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -13219,7 +13215,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">sec_ref</span> <span class="op">-&gt;</span> <span class="ident">SecIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">csc</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">csc</span>;
         <span class="doccomment">/// Computes the cosecant, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -13284,7 +13280,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">csc_ref</span> <span class="op">-&gt;</span> <span class="ident">CscIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">cot</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">cot</span>;
         <span class="doccomment">/// Computes the cotangent, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -13350,7 +13346,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">cot_ref</span> <span class="op">-&gt;</span> <span class="ident">CotIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">asin</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">asin</span>;
         <span class="doccomment">/// Computes the arc-sine, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -13415,7 +13411,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">asin_ref</span> <span class="op">-&gt;</span> <span class="ident">AsinIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">acos</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">acos</span>;
         <span class="doccomment">/// Computes the arc-cosine, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -13481,7 +13477,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">acos_ref</span> <span class="op">-&gt;</span> <span class="ident">AcosIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">atan</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">atan</span>;
         <span class="doccomment">/// Computes the arc-tangent, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -13547,7 +13543,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">atan_ref</span> <span class="op">-&gt;</span> <span class="ident">AtanIncomplete</span>;
     }
     <span class="macro">math_op2_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">atan2</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">atan2</span>;
         <span class="doccomment">/// Computes the arc-tangent2 of `self` and `x`, rounding to</span>
         <span class="doccomment">/// the nearest.</span>
         <span class="doccomment">///</span>
@@ -13632,7 +13628,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">atan2_ref</span> <span class="op">-&gt;</span> <span class="ident">Atan2Incomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">sinh</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">sinh</span>;
         <span class="doccomment">/// Computes the hyperbolic sine, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -13698,7 +13694,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">sinh_ref</span> <span class="op">-&gt;</span> <span class="ident">SinhIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">cosh</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">cosh</span>;
         <span class="doccomment">/// Computes the hyperbolic cosine, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -13764,7 +13760,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">cosh_ref</span> <span class="op">-&gt;</span> <span class="ident">CoshIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">tanh</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">tanh</span>;
         <span class="doccomment">/// Computes the hyperbolic tangent, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -13830,7 +13826,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">tanh_ref</span> <span class="op">-&gt;</span> <span class="ident">TanhIncomplete</span>;
     }
     <span class="macro">math_op1_2_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">sinh_cosh</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">sinh_cosh</span>;
         <span class="doccomment">/// Computes the hyperbolic sine and cosine of `self`,</span>
         <span class="doccomment">/// rounding to the nearest.</span>
         <span class="doccomment">///</span>
@@ -13937,7 +13933,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">sinh_cosh_ref</span> <span class="op">-&gt;</span> <span class="ident">SinhCoshIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">sech</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">sech</span>;
         <span class="doccomment">/// Computes the hyperbolic secant, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -14003,7 +13999,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">sech_ref</span> <span class="op">-&gt;</span> <span class="ident">SechIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">csch</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">csch</span>;
         <span class="doccomment">/// Computes the hyperbolic cosecant, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -14069,7 +14065,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">csch_ref</span> <span class="op">-&gt;</span> <span class="ident">CschIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">coth</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">coth</span>;
         <span class="doccomment">/// Computes the hyperbolic cotangent, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -14135,7 +14131,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">coth_ref</span> <span class="op">-&gt;</span> <span class="ident">CothIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">asinh</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">asinh</span>;
         <span class="doccomment">/// Computes the inverse hyperbolic sine, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -14201,7 +14197,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">asinh_ref</span> <span class="op">-&gt;</span> <span class="ident">AsinhIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">acosh</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">acosh</span>;
         <span class="doccomment">/// Computes the inverse hyperbolic cosine, rounding to the</span>
         <span class="doccomment">/// nearest.</span>
         <span class="doccomment">///</span>
@@ -14269,7 +14265,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">acosh_ref</span> <span class="op">-&gt;</span> <span class="ident">AcoshIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">atanh</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">atanh</span>;
         <span class="doccomment">/// Computes the inverse hyperbolic tangent, rounding to the</span>
         <span class="doccomment">/// nearest.</span>
         <span class="doccomment">///</span>
@@ -14361,7 +14357,7 @@ println!(&quot;Sum is {}&quot;, sr);
     }
 
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">log1p</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">log1p</span>;
         <span class="doccomment">/// Computes the natural logarithm of one plus `self`, rounding to</span>
         <span class="doccomment">/// the nearest.</span>
         <span class="doccomment">///</span>
@@ -14433,7 +14429,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">ln_1p_ref</span> <span class="op">-&gt;</span> <span class="ident">Ln1pIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">expm1</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">expm1</span>;
         <span class="doccomment">/// Subtracts one from the exponential of `self`, rounding to the</span>
         <span class="doccomment">/// nearest.</span>
         <span class="doccomment">///</span>
@@ -14506,7 +14502,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">exp_m1_ref</span> <span class="op">-&gt;</span> <span class="ident">ExpM1Incomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">eint</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">eint</span>;
         <span class="doccomment">/// Computes the exponential integral, rounding to the nearest.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -14572,7 +14568,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">eint_ref</span> <span class="op">-&gt;</span> <span class="ident">EintIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">li2</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">li2</span>;
         <span class="doccomment">/// Computes the real part of the dilogarithm of `self`, rounding</span>
         <span class="doccomment">/// to the nearest.</span>
         <span class="doccomment">///</span>
@@ -14641,7 +14637,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">li2_ref</span> <span class="op">-&gt;</span> <span class="ident">Li2Incomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">gamma</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">gamma</span>;
         <span class="doccomment">/// Computes the value of the gamma function on `self`, rounding</span>
         <span class="doccomment">/// to the nearest.</span>
         <span class="doccomment">///</span>
@@ -14709,7 +14705,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">gamma_ref</span> <span class="op">-&gt;</span> <span class="ident">GammaIncomplete</span>;
     }
     <span class="macro">math_op2_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">gamma_inc</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">gamma_inc</span>;
         <span class="doccomment">/// Computes the value of the upper incomplete gamma function</span>
         <span class="doccomment">/// on `self` and `x`, rounding to the nearest.</span>
         <span class="doccomment">///</span>
@@ -14781,7 +14777,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">gamma_inc_ref</span> <span class="op">-&gt;</span> <span class="ident">GammaIncIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">lngamma</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">lngamma</span>;
         <span class="doccomment">/// Computes the logarithm of the gamma function on `self`,</span>
         <span class="doccomment">/// rounding to the nearest.</span>
         <span class="doccomment">///</span>
@@ -14963,9 +14959,9 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">let</span> <span class="ident">sign_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_int</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sign</span>;
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="ident">mpfr</span>::<span class="ident">lgamma</span>(
-                <span class="self">self</span>.<span class="ident">inner_mut</span>(),
+                <span class="self">self</span>.<span class="ident">as_raw_mut</span>(),
                 <span class="ident">sign_ptr</span>,
-                <span class="self">self</span>.<span class="ident">inner</span>(),
+                <span class="self">self</span>.<span class="ident">as_raw</span>(),
                 <span class="ident">raw_round</span>(<span class="ident">round</span>),
             )
         };
@@ -15010,12 +15006,12 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="doccomment">/// [`Assign`]: trait.Assign.html</span>
     <span class="doccomment">/// [icv]: index.html#incomplete-computation-values</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ln_abs_gamma_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">LnAbsGammaIncomplete</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ln_abs_gamma_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">LnAbsGammaIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">LnAbsGammaIncomplete</span> { <span class="ident">ref_self</span>: <span class="self">self</span> }
     }
 
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">digamma</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">digamma</span>;
         <span class="doccomment">/// Computes the value of the Digamma function on `self`, rounding</span>
         <span class="doccomment">/// to the nearest.</span>
         <span class="doccomment">///</span>
@@ -15083,7 +15079,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">digamma_ref</span> <span class="op">-&gt;</span> <span class="ident">DigammaIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">zeta</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">zeta</span>;
         <span class="doccomment">/// Computes the value of the Riemann Zeta function on `self`,</span>
         <span class="doccomment">/// rounding to the nearest.</span>
         <span class="doccomment">///</span>
@@ -15174,7 +15170,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">zeta_u</span>(<span class="ident">u</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="ident">ZetaUIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">erf</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">erf</span>;
         <span class="doccomment">/// Computes the value of the error function, rounding to the</span>
         <span class="doccomment">/// nearest.</span>
         <span class="doccomment">///</span>
@@ -15242,7 +15238,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">erf_ref</span> <span class="op">-&gt;</span> <span class="ident">ErfIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">erfc</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">erfc</span>;
         <span class="doccomment">/// Computes the value of the complementary error function,</span>
         <span class="doccomment">/// rounding to the nearest.</span>
         <span class="doccomment">///</span>
@@ -15310,7 +15306,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">erfc_ref</span> <span class="op">-&gt;</span> <span class="ident">ErfcIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">j0</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">j0</span>;
         <span class="doccomment">/// Computes the value of the first kind Bessel function of</span>
         <span class="doccomment">/// order 0, rounding to the nearest.</span>
         <span class="doccomment">///</span>
@@ -15378,7 +15374,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">j0_ref</span> <span class="op">-&gt;</span> <span class="ident">J0Incomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">j1</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">j1</span>;
         <span class="doccomment">/// Computes the value of the first kind Bessel function of</span>
         <span class="doccomment">/// order 1, rounding to the nearest.</span>
         <span class="doccomment">///</span>
@@ -15514,7 +15510,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">jn_ref</span> <span class="op">-&gt;</span> <span class="ident">JnIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">y0</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">y0</span>;
         <span class="doccomment">/// Computes the value of the second kind Bessel function of</span>
         <span class="doccomment">/// order 0, rounding to the nearest.</span>
         <span class="doccomment">///</span>
@@ -15582,7 +15578,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">y0_ref</span> <span class="op">-&gt;</span> <span class="ident">Y0Incomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">y1</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">y1</span>;
         <span class="doccomment">/// Computes the value of the second kind Bessel function of</span>
         <span class="doccomment">/// order 1, rounding to the nearest.</span>
         <span class="doccomment">///</span>
@@ -15718,7 +15714,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">yn_ref</span> <span class="op">-&gt;</span> <span class="ident">YnIncomplete</span>;
     }
     <span class="macro">math_op2_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">agm</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">agm</span>;
         <span class="doccomment">/// Computes the arithmetic-geometric mean of `self` and `other`,</span>
         <span class="doccomment">/// rounding to the nearest.</span>
         <span class="doccomment">///</span>
@@ -15790,7 +15786,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">agm_ref</span> <span class="op">-&gt;</span> <span class="ident">AgmIncomplete</span>;
     }
     <span class="macro">math_op2_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">hypot</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">hypot</span>;
         <span class="doccomment">/// Computes the Euclidean norm of `self` and `other`, rounding to</span>
         <span class="doccomment">/// the nearest.</span>
         <span class="doccomment">///</span>
@@ -15862,7 +15858,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">hypot_ref</span> <span class="op">-&gt;</span> <span class="ident">HypotIncomplete</span>;
     }
     <span class="macro">math_op1_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">ai</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">ai</span>;
         <span class="doccomment">/// Computes the value of the Airy function Ai on `self`, rounding</span>
         <span class="doccomment">/// to the nearest.</span>
         <span class="doccomment">///</span>
@@ -15930,7 +15926,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">ai_ref</span> <span class="op">-&gt;</span> <span class="ident">AiIncomplete</span>;
     }
     <span class="macro">math_op1_no_round</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">rint_ceil</span>, <span class="ident">raw_round</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">rint_ceil</span>;
         <span class="doccomment">/// Rounds up to the next higher integer.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -15985,7 +15981,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">ceil_ref</span> <span class="op">-&gt;</span> <span class="ident">CeilIncomplete</span>;
     }
     <span class="macro">math_op1_no_round</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">rint_floor</span>, <span class="ident">raw_round</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">rint_floor</span>;
         <span class="doccomment">/// Rounds down to the next lower integer.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -16040,7 +16036,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">floor_ref</span> <span class="op">-&gt;</span> <span class="ident">FloorIncomplete</span>;
     }
     <span class="macro">math_op1_no_round</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">rint_round</span>, <span class="ident">raw_round</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">rint_round</span>;
         <span class="doccomment">/// Rounds to the nearest integer, rounding half-way cases</span>
         <span class="doccomment">/// away from zero.</span>
         <span class="doccomment">///</span>
@@ -16118,7 +16114,7 @@ println!(&quot;Sum is {}&quot;, sr);
        <span class="kw">fn</span> <span class="ident">round_ref</span> <span class="op">-&gt;</span> <span class="ident">RoundIncomplete</span>;
     }
     <span class="macro">math_op1_no_round</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">rint_roundeven</span>, <span class="ident">raw_round</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">rint_roundeven</span>;
         <span class="doccomment">/// Rounds to the nearest integer, rounding half-way cases to</span>
         <span class="doccomment">/// even.</span>
         <span class="doccomment">///</span>
@@ -16176,7 +16172,7 @@ println!(&quot;Sum is {}&quot;, sr);
        <span class="kw">fn</span> <span class="ident">round_even_ref</span> <span class="op">-&gt;</span> <span class="ident">RoundEvenIncomplete</span>;
     }
     <span class="macro">math_op1_no_round</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">rint_trunc</span>, <span class="ident">raw_round</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">rint_trunc</span>;
         <span class="doccomment">/// Rounds to the next integer towards zero.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -16231,7 +16227,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">trunc_ref</span> <span class="op">-&gt;</span> <span class="ident">TruncIncomplete</span>;
     }
     <span class="macro">math_op1_no_round</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">frac</span>, <span class="ident">raw_round</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">frac</span>;
         <span class="doccomment">/// Gets the fractional part of the number.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
@@ -16285,7 +16281,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">fn</span> <span class="ident">fract_ref</span> <span class="op">-&gt;</span> <span class="ident">FractIncomplete</span>;
     }
     <span class="macro">math_op1_2_float</span><span class="macro">!</span> {
-        <span class="ident">mpfr</span>::<span class="ident">modf</span>;
+        <span class="ident">xmpfr</span>::<span class="ident">modf</span>;
         <span class="doccomment">/// Gets the integer and fractional parts of the number,</span>
         <span class="doccomment">/// rounding to the nearest.</span>
         <span class="doccomment">///</span>
@@ -16582,12 +16578,12 @@ println!(&quot;Sum is {}&quot;, sr);
     ) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
         <span class="kw">let</span> <span class="ident">refs</span> <span class="op">=</span> <span class="ident">src</span>
             .<span class="ident">values</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">mpfr_t</span> { <span class="ident">r</span>.<span class="ident">inner</span>() })
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">mpfr_t</span> { <span class="ident">r</span>.<span class="ident">as_raw</span>() })
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;&gt;</span>();
         <span class="kw">let</span> <span class="ident">tab</span> <span class="op">=</span> <span class="macro">cast_ptr</span><span class="macro">!</span>(<span class="ident">refs</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">mpfr_t</span>);
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">cast</span>(<span class="ident">refs</span>.<span class="ident">len</span>());
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span>
-            <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">sum</span>(<span class="self">self</span>.<span class="ident">inner_mut</span>(), <span class="ident">tab</span>, <span class="ident">n</span>, <span class="ident">raw_round</span>(<span class="ident">round</span>)) };
+            <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">sum</span>(<span class="self">self</span>.<span class="ident">as_raw_mut</span>(), <span class="ident">tab</span>, <span class="ident">n</span>, <span class="ident">raw_round</span>(<span class="ident">round</span>)) };
         <span class="ident">ordering1</span>(<span class="ident">ret</span>)
     }
 }
@@ -16630,12 +16626,12 @@ println!(&quot;Sum is {}&quot;, sr);
             (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">upper</span>)) <span class="op">=&gt;</span> <span class="ident">upper</span> <span class="op">+</span> <span class="number">1</span>,
         };
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">refs</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> <span class="ident">mpfr_t</span><span class="op">&gt;</span>::<span class="ident">with_capacity</span>(<span class="ident">capacity</span>);
-        <span class="ident">refs</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">inner</span>());
-        <span class="ident">refs</span>.<span class="ident">extend</span>(<span class="ident">src</span>.<span class="ident">values</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">mpfr_t</span> { <span class="ident">r</span>.<span class="ident">inner</span>() }));
+        <span class="ident">refs</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">as_raw</span>());
+        <span class="ident">refs</span>.<span class="ident">extend</span>(<span class="ident">src</span>.<span class="ident">values</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">mpfr_t</span> { <span class="ident">r</span>.<span class="ident">as_raw</span>() }));
         <span class="kw">let</span> <span class="ident">tab</span> <span class="op">=</span> <span class="macro">cast_ptr</span><span class="macro">!</span>(<span class="ident">refs</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">mpfr_t</span>);
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">cast</span>(<span class="ident">refs</span>.<span class="ident">len</span>());
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span>
-            <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">sum</span>(<span class="self">self</span>.<span class="ident">inner_mut</span>(), <span class="ident">tab</span>, <span class="ident">n</span>, <span class="ident">raw_round</span>(<span class="ident">round</span>)) };
+            <span class="kw">unsafe</span> { <span class="ident">mpfr</span>::<span class="ident">sum</span>(<span class="self">self</span>.<span class="ident">as_raw_mut</span>(), <span class="ident">tab</span>, <span class="ident">n</span>, <span class="ident">raw_round</span>(<span class="ident">round</span>)) };
         <span class="ident">ordering1</span>(<span class="ident">ret</span>)
     }
 }
@@ -16716,19 +16712,20 @@ println!(&quot;Sum is {}&quot;, sr);
 }
 
 <span class="macro">ref_math_op0_float</span><span class="macro">!</span> {
-    <span class="ident">mpfr</span>::<span class="ident">ui_pow_ui</span>; <span class="kw">struct</span> <span class="ident">UPowUIncomplete</span> { <span class="ident">base</span>: <span class="ident">u32</span>, <span class="ident">exponent</span>: <span class="ident">u32</span> }
+    <span class="ident">xmpfr</span>::<span class="ident">ui_pow_ui</span>; <span class="kw">struct</span> <span class="ident">UPowUIncomplete</span> { <span class="ident">base</span>: <span class="ident">u32</span>, <span class="ident">exponent</span>: <span class="ident">u32</span> }
 }
 <span class="macro">ref_math_op0_float</span><span class="macro">!</span> {
     <span class="ident">xmpfr</span>::<span class="ident">si_pow_ui</span>; <span class="kw">struct</span> <span class="ident">IPowUIncomplete</span> { <span class="ident">base</span>: <span class="ident">i32</span>, <span class="ident">exponent</span>: <span class="ident">u32</span> }
 }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">sqr</span>; <span class="kw">struct</span> <span class="ident">SquareIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">sqrt</span>; <span class="kw">struct</span> <span class="ident">SqrtIncomplete</span> {} }
-<span class="macro">ref_math_op0_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">sqrt_ui</span>; <span class="kw">struct</span> <span class="ident">SqrtUIncomplete</span> { <span class="ident">u</span>: <span class="ident">u32</span> } }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">rec_sqrt</span>; <span class="kw">struct</span> <span class="ident">RecipSqrtIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">cbrt</span>; <span class="kw">struct</span> <span class="ident">CbrtIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">rootn_ui</span>; <span class="kw">struct</span> <span class="ident">RootIncomplete</span> { <span class="ident">k</span>: <span class="ident">u32</span> } }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">abs</span>; <span class="kw">struct</span> <span class="ident">AbsIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">sqr</span>; <span class="kw">struct</span> <span class="ident">SquareIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">sqrt</span>; <span class="kw">struct</span> <span class="ident">SqrtIncomplete</span> {} }
+<span class="macro">ref_math_op0_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">sqrt_ui</span>; <span class="kw">struct</span> <span class="ident">SqrtUIncomplete</span> { <span class="ident">u</span>: <span class="ident">u32</span> } }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">rec_sqrt</span>; <span class="kw">struct</span> <span class="ident">RecipSqrtIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">cbrt</span>; <span class="kw">struct</span> <span class="ident">CbrtIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">rootn_ui</span>; <span class="kw">struct</span> <span class="ident">RootIncomplete</span> { <span class="ident">k</span>: <span class="ident">u32</span> } }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">abs</span>; <span class="kw">struct</span> <span class="ident">AbsIncomplete</span> {} }
 <span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">signum</span>; <span class="kw">struct</span> <span class="ident">SignumIncomplete</span> {} }
+<span class="macro">ref_math_op2_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">copysign</span>; <span class="kw">struct</span> <span class="ident">CopysignIncomplete</span> { <span class="ident">y</span> } }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClampIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Min</span>, <span class="ident">Max</span><span class="op">&gt;</span>
@@ -16737,8 +16734,6 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="op">+</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">Max</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Min</span>, <span class="ident">Round</span> <span class="op">=</span> <span class="ident">Round</span>, <span class="ident">Ordering</span> <span class="op">=</span> <span class="ident">Ordering</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Max</span>, <span class="ident">Round</span> <span class="op">=</span> <span class="ident">Round</span>, <span class="ident">Ordering</span> <span class="op">=</span> <span class="ident">Ordering</span><span class="op">&gt;</span>,
-    <span class="ident">Min</span>: <span class="lifetime">&#39;a</span>,
-    <span class="ident">Max</span>: <span class="lifetime">&#39;a</span>,
 {
     <span class="ident">ref_self</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Float</span>,
     <span class="ident">min</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Min</span>,
@@ -16751,8 +16746,6 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="op">+</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">Max</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Min</span>, <span class="ident">Round</span> <span class="op">=</span> <span class="ident">Round</span>, <span class="ident">Ordering</span> <span class="op">=</span> <span class="ident">Ordering</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Max</span>, <span class="ident">Round</span> <span class="op">=</span> <span class="ident">Round</span>, <span class="ident">Ordering</span> <span class="op">=</span> <span class="ident">Ordering</span><span class="op">&gt;</span>,
-    <span class="ident">Min</span>: <span class="lifetime">&#39;a</span>,
-    <span class="ident">Max</span>: <span class="lifetime">&#39;a</span>,
 {
     <span class="kw">type</span> <span class="ident">Round</span> <span class="op">=</span> <span class="ident">Round</span>;
     <span class="kw">type</span> <span class="ident">Ordering</span> <span class="op">=</span> <span class="ident">Ordering</span>;
@@ -16793,68 +16786,66 @@ println!(&quot;Sum is {}&quot;, sr);
 }
 
 <span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">recip</span>; <span class="kw">struct</span> <span class="ident">RecipIncomplete</span> {} }
-<span class="macro">ref_math_op2_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">min</span>; <span class="kw">struct</span> <span class="ident">MinIncomplete</span> { <span class="ident">other</span> } }
-<span class="macro">ref_math_op2_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">max</span>; <span class="kw">struct</span> <span class="ident">MaxIncomplete</span> { <span class="ident">other</span> } }
-<span class="macro">ref_math_op2_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">dim</span>; <span class="kw">struct</span> <span class="ident">PositiveDiffIncomplete</span> { <span class="ident">other</span> } }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">log</span>; <span class="kw">struct</span> <span class="ident">LnIncomplete</span> {} }
-<span class="macro">ref_math_op0_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">log_ui</span>; <span class="kw">struct</span> <span class="ident">LnUIncomplete</span> { <span class="ident">u</span>: <span class="ident">u32</span> } }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">log2</span>; <span class="kw">struct</span> <span class="ident">Log2Incomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">log10</span>; <span class="kw">struct</span> <span class="ident">Log10Incomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">exp</span>; <span class="kw">struct</span> <span class="ident">ExpIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">exp2</span>; <span class="kw">struct</span> <span class="ident">Exp2Incomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">exp10</span>; <span class="kw">struct</span> <span class="ident">Exp10Incomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">sin</span>; <span class="kw">struct</span> <span class="ident">SinIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">cos</span>; <span class="kw">struct</span> <span class="ident">CosIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">tan</span>; <span class="kw">struct</span> <span class="ident">TanIncomplete</span> {} }
-<span class="macro">ref_math_op1_2_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">sin_cos</span>; <span class="kw">struct</span> <span class="ident">SinCosIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">sec</span>; <span class="kw">struct</span> <span class="ident">SecIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">csc</span>; <span class="kw">struct</span> <span class="ident">CscIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">cot</span>; <span class="kw">struct</span> <span class="ident">CotIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">acos</span>; <span class="kw">struct</span> <span class="ident">AcosIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">asin</span>; <span class="kw">struct</span> <span class="ident">AsinIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">atan</span>; <span class="kw">struct</span> <span class="ident">AtanIncomplete</span> {} }
-<span class="macro">ref_math_op2_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">atan2</span>; <span class="kw">struct</span> <span class="ident">Atan2Incomplete</span> { <span class="ident">x</span> } }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">cosh</span>; <span class="kw">struct</span> <span class="ident">CoshIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">sinh</span>; <span class="kw">struct</span> <span class="ident">SinhIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">tanh</span>; <span class="kw">struct</span> <span class="ident">TanhIncomplete</span> {} }
-<span class="macro">ref_math_op1_2_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">sinh_cosh</span>; <span class="kw">struct</span> <span class="ident">SinhCoshIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">sech</span>; <span class="kw">struct</span> <span class="ident">SechIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">csch</span>; <span class="kw">struct</span> <span class="ident">CschIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">coth</span>; <span class="kw">struct</span> <span class="ident">CothIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">acosh</span>; <span class="kw">struct</span> <span class="ident">AcoshIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">asinh</span>; <span class="kw">struct</span> <span class="ident">AsinhIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">atanh</span>; <span class="kw">struct</span> <span class="ident">AtanhIncomplete</span> {} }
-<span class="macro">ref_math_op0_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">fac_ui</span>; <span class="kw">struct</span> <span class="ident">FactorialIncomplete</span> { <span class="ident">n</span>: <span class="ident">u32</span> } }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">log1p</span>; <span class="kw">struct</span> <span class="ident">Ln1pIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">expm1</span>; <span class="kw">struct</span> <span class="ident">ExpM1Incomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">eint</span>; <span class="kw">struct</span> <span class="ident">EintIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">li2</span>; <span class="kw">struct</span> <span class="ident">Li2Incomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">gamma</span>; <span class="kw">struct</span> <span class="ident">GammaIncomplete</span> {} }
-<span class="macro">ref_math_op2_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">gamma_inc</span>; <span class="kw">struct</span> <span class="ident">GammaIncIncomplete</span> { <span class="ident">x</span> } }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">lngamma</span>; <span class="kw">struct</span> <span class="ident">LnGammaIncomplete</span> {} }
+<span class="macro">ref_math_op2_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">min</span>; <span class="kw">struct</span> <span class="ident">MinIncomplete</span> { <span class="ident">other</span> } }
+<span class="macro">ref_math_op2_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">max</span>; <span class="kw">struct</span> <span class="ident">MaxIncomplete</span> { <span class="ident">other</span> } }
+<span class="macro">ref_math_op2_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">dim</span>; <span class="kw">struct</span> <span class="ident">PositiveDiffIncomplete</span> { <span class="ident">other</span> } }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">log</span>; <span class="kw">struct</span> <span class="ident">LnIncomplete</span> {} }
+<span class="macro">ref_math_op0_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">log_ui</span>; <span class="kw">struct</span> <span class="ident">LnUIncomplete</span> { <span class="ident">u</span>: <span class="ident">u32</span> } }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">log2</span>; <span class="kw">struct</span> <span class="ident">Log2Incomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">log10</span>; <span class="kw">struct</span> <span class="ident">Log10Incomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">exp</span>; <span class="kw">struct</span> <span class="ident">ExpIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">exp2</span>; <span class="kw">struct</span> <span class="ident">Exp2Incomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">exp10</span>; <span class="kw">struct</span> <span class="ident">Exp10Incomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">sin</span>; <span class="kw">struct</span> <span class="ident">SinIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">cos</span>; <span class="kw">struct</span> <span class="ident">CosIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">tan</span>; <span class="kw">struct</span> <span class="ident">TanIncomplete</span> {} }
+<span class="macro">ref_math_op1_2_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">sin_cos</span>; <span class="kw">struct</span> <span class="ident">SinCosIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">sec</span>; <span class="kw">struct</span> <span class="ident">SecIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">csc</span>; <span class="kw">struct</span> <span class="ident">CscIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">cot</span>; <span class="kw">struct</span> <span class="ident">CotIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">acos</span>; <span class="kw">struct</span> <span class="ident">AcosIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">asin</span>; <span class="kw">struct</span> <span class="ident">AsinIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">atan</span>; <span class="kw">struct</span> <span class="ident">AtanIncomplete</span> {} }
+<span class="macro">ref_math_op2_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">atan2</span>; <span class="kw">struct</span> <span class="ident">Atan2Incomplete</span> { <span class="ident">x</span> } }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">cosh</span>; <span class="kw">struct</span> <span class="ident">CoshIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">sinh</span>; <span class="kw">struct</span> <span class="ident">SinhIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">tanh</span>; <span class="kw">struct</span> <span class="ident">TanhIncomplete</span> {} }
+<span class="macro">ref_math_op1_2_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">sinh_cosh</span>; <span class="kw">struct</span> <span class="ident">SinhCoshIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">sech</span>; <span class="kw">struct</span> <span class="ident">SechIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">csch</span>; <span class="kw">struct</span> <span class="ident">CschIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">coth</span>; <span class="kw">struct</span> <span class="ident">CothIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">acosh</span>; <span class="kw">struct</span> <span class="ident">AcoshIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">asinh</span>; <span class="kw">struct</span> <span class="ident">AsinhIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">atanh</span>; <span class="kw">struct</span> <span class="ident">AtanhIncomplete</span> {} }
+<span class="macro">ref_math_op0_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">fac_ui</span>; <span class="kw">struct</span> <span class="ident">FactorialIncomplete</span> { <span class="ident">n</span>: <span class="ident">u32</span> } }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">log1p</span>; <span class="kw">struct</span> <span class="ident">Ln1pIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">expm1</span>; <span class="kw">struct</span> <span class="ident">ExpM1Incomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">eint</span>; <span class="kw">struct</span> <span class="ident">EintIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">li2</span>; <span class="kw">struct</span> <span class="ident">Li2Incomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">gamma</span>; <span class="kw">struct</span> <span class="ident">GammaIncomplete</span> {} }
+<span class="macro">ref_math_op2_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">gamma_inc</span>; <span class="kw">struct</span> <span class="ident">GammaIncIncomplete</span> { <span class="ident">x</span> } }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">lngamma</span>; <span class="kw">struct</span> <span class="ident">LnGammaIncomplete</span> {} }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LnAbsGammaIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">ref_self</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Float</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span><span class="op">&gt;</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">LnAbsGammaIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span>
-    <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">Float</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;c</span> <span class="kw-2">mut</span> <span class="ident">Ordering</span>)
-{
+<span class="kw">impl</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">LnAbsGammaIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Float</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Ordering</span>) {
     <span class="kw">type</span> <span class="ident">Round</span> <span class="op">=</span> <span class="ident">Round</span>;
     <span class="kw">type</span> <span class="ident">Ordering</span> <span class="op">=</span> <span class="ident">Ordering</span>;
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">assign_round</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">src</span>: <span class="ident">LnAbsGammaIncomplete</span>,
+        <span class="ident">src</span>: <span class="ident">LnAbsGammaIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">round</span>: <span class="ident">Round</span>,
     ) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sign</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">sign_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_int</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sign</span>;
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="ident">mpfr</span>::<span class="ident">lgamma</span>(
-                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">inner_mut</span>(),
+                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_raw_mut</span>(),
                 <span class="ident">sign_ptr</span>,
-                <span class="ident">src</span>.<span class="ident">ref_self</span>.<span class="ident">inner</span>(),
+                <span class="ident">src</span>.<span class="ident">ref_self</span>.<span class="ident">as_raw</span>(),
                 <span class="ident">raw_round</span>(<span class="ident">round</span>),
             )
         };
@@ -16863,56 +16854,54 @@ println!(&quot;Sum is {}&quot;, sr);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">LnAbsGammaIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> (<span class="ident">Float</span>, <span class="ident">Ordering</span>) {
+<span class="kw">impl</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">LnAbsGammaIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> (<span class="ident">Float</span>, <span class="ident">Ordering</span>) {
     <span class="kw">type</span> <span class="ident">Round</span> <span class="op">=</span> <span class="ident">Round</span>;
     <span class="kw">type</span> <span class="ident">Ordering</span> <span class="op">=</span> <span class="ident">Ordering</span>;
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">assign_round</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">src</span>: <span class="ident">LnAbsGammaIncomplete</span>,
+        <span class="ident">src</span>: <span class="ident">LnAbsGammaIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">round</span>: <span class="ident">Round</span>,
     ) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
         (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">1</span>).<span class="ident">assign_round</span>(<span class="ident">src</span>, <span class="ident">round</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span><span class="op">&gt;</span> <span class="ident">Assign</span><span class="op">&lt;</span><span class="ident">LnAbsGammaIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span>
-    <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">Float</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;c</span> <span class="kw-2">mut</span> <span class="ident">Ordering</span>)
-{
+<span class="kw">impl</span> <span class="ident">Assign</span><span class="op">&lt;</span><span class="ident">LnAbsGammaIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Float</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Ordering</span>) {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">LnAbsGammaIncomplete</span>) {
+    <span class="kw">fn</span> <span class="ident">assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">LnAbsGammaIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">assign_round</span>(<span class="ident">src</span>, <span class="ident">Default</span>::<span class="ident">default</span>());
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Assign</span><span class="op">&lt;</span><span class="ident">LnAbsGammaIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> (<span class="ident">Float</span>, <span class="ident">Ordering</span>) {
+<span class="kw">impl</span> <span class="ident">Assign</span><span class="op">&lt;</span><span class="ident">LnAbsGammaIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> (<span class="ident">Float</span>, <span class="ident">Ordering</span>) {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">LnAbsGammaIncomplete</span>) {
+    <span class="kw">fn</span> <span class="ident">assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">LnAbsGammaIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
         (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">1</span>).<span class="ident">assign_round</span>(<span class="ident">src</span>, <span class="ident">Default</span>::<span class="ident">default</span>());
     }
 }
 
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">digamma</span>; <span class="kw">struct</span> <span class="ident">DigammaIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">zeta</span>; <span class="kw">struct</span> <span class="ident">ZetaIncomplete</span> {} }
-<span class="macro">ref_math_op0_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">zeta_ui</span>; <span class="kw">struct</span> <span class="ident">ZetaUIncomplete</span> { <span class="ident">u</span>: <span class="ident">u32</span> } }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">erf</span>; <span class="kw">struct</span> <span class="ident">ErfIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">erfc</span>; <span class="kw">struct</span> <span class="ident">ErfcIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">j0</span>; <span class="kw">struct</span> <span class="ident">J0Incomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">j1</span>; <span class="kw">struct</span> <span class="ident">J1Incomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">digamma</span>; <span class="kw">struct</span> <span class="ident">DigammaIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">zeta</span>; <span class="kw">struct</span> <span class="ident">ZetaIncomplete</span> {} }
+<span class="macro">ref_math_op0_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">zeta_ui</span>; <span class="kw">struct</span> <span class="ident">ZetaUIncomplete</span> { <span class="ident">u</span>: <span class="ident">u32</span> } }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">erf</span>; <span class="kw">struct</span> <span class="ident">ErfIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">erfc</span>; <span class="kw">struct</span> <span class="ident">ErfcIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">j0</span>; <span class="kw">struct</span> <span class="ident">J0Incomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">j1</span>; <span class="kw">struct</span> <span class="ident">J1Incomplete</span> {} }
 <span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">jn</span>; <span class="kw">struct</span> <span class="ident">JnIncomplete</span> { <span class="ident">n</span>: <span class="ident">i32</span> } }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">y0</span>; <span class="kw">struct</span> <span class="ident">Y0Incomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">y1</span>; <span class="kw">struct</span> <span class="ident">Y1Incomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">y0</span>; <span class="kw">struct</span> <span class="ident">Y0Incomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">y1</span>; <span class="kw">struct</span> <span class="ident">Y1Incomplete</span> {} }
 <span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">yn</span>; <span class="kw">struct</span> <span class="ident">YnIncomplete</span> { <span class="ident">n</span>: <span class="ident">i32</span> } }
-<span class="macro">ref_math_op2_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">agm</span>; <span class="kw">struct</span> <span class="ident">AgmIncomplete</span> { <span class="ident">other</span> } }
-<span class="macro">ref_math_op2_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">hypot</span>; <span class="kw">struct</span> <span class="ident">HypotIncomplete</span> { <span class="ident">other</span> } }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">ai</span>; <span class="kw">struct</span> <span class="ident">AiIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">rint_ceil</span>; <span class="kw">struct</span> <span class="ident">CeilIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">rint_floor</span>; <span class="kw">struct</span> <span class="ident">FloorIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">rint_round</span>; <span class="kw">struct</span> <span class="ident">RoundIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">rint_roundeven</span>; <span class="kw">struct</span> <span class="ident">RoundEvenIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">rint_trunc</span>; <span class="kw">struct</span> <span class="ident">TruncIncomplete</span> {} }
-<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">frac</span>; <span class="kw">struct</span> <span class="ident">FractIncomplete</span> {} }
-<span class="macro">ref_math_op1_2_float</span><span class="macro">!</span> { <span class="ident">mpfr</span>::<span class="ident">modf</span>; <span class="kw">struct</span> <span class="ident">TruncFractIncomplete</span> {} }
+<span class="macro">ref_math_op2_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">agm</span>; <span class="kw">struct</span> <span class="ident">AgmIncomplete</span> { <span class="ident">other</span> } }
+<span class="macro">ref_math_op2_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">hypot</span>; <span class="kw">struct</span> <span class="ident">HypotIncomplete</span> { <span class="ident">other</span> } }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">ai</span>; <span class="kw">struct</span> <span class="ident">AiIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">rint_ceil</span>; <span class="kw">struct</span> <span class="ident">CeilIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">rint_floor</span>; <span class="kw">struct</span> <span class="ident">FloorIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">rint_round</span>; <span class="kw">struct</span> <span class="ident">RoundIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">rint_roundeven</span>; <span class="kw">struct</span> <span class="ident">RoundEvenIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">rint_trunc</span>; <span class="kw">struct</span> <span class="ident">TruncIncomplete</span> {} }
+<span class="macro">ref_math_op1_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">frac</span>; <span class="kw">struct</span> <span class="ident">FractIncomplete</span> {} }
+<span class="macro">ref_math_op1_2_float</span><span class="macro">!</span> { <span class="ident">xmpfr</span>::<span class="ident">modf</span>; <span class="kw">struct</span> <span class="ident">TruncFractIncomplete</span> {} }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rand&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RandomBitsIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>
@@ -16923,14 +16912,11 @@ println!(&quot;Sum is {}&quot;, sr);
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rand&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span><span class="op">&gt;</span> <span class="ident">Assign</span><span class="op">&lt;</span><span class="ident">RandomBitsIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Float</span>
-<span class="kw">where</span>
-    <span class="lifetime">&#39;b</span>: <span class="lifetime">&#39;a</span>,
-{
+<span class="kw">impl</span> <span class="ident">Assign</span><span class="op">&lt;</span><span class="ident">RandomBitsIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Float</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">RandomBitsIncomplete</span>) {
+    <span class="kw">fn</span> <span class="ident">assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">RandomBitsIncomplete</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
         <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">mpfr</span>::<span class="ident">urandomb</span>(<span class="self">self</span>.<span class="ident">inner_mut</span>(), <span class="ident">src</span>.<span class="ident">rng</span>.<span class="ident">inner_mut</span>());
+            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">mpfr</span>::<span class="ident">urandomb</span>(<span class="self">self</span>.<span class="ident">as_raw_mut</span>(), <span class="ident">src</span>.<span class="ident">rng</span>.<span class="ident">as_raw_mut</span>());
             <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">is_nan</span>(), <span class="ident">err</span> <span class="op">!=</span> <span class="number">0</span>);
         }
     }
@@ -16945,18 +16931,19 @@ println!(&quot;Sum is {}&quot;, sr);
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rand&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">RandomCont</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Float</span>
-<span class="kw">where</span>
-    <span class="lifetime">&#39;b</span>: <span class="lifetime">&#39;a</span>,
-{
+<span class="kw">impl</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">RandomCont</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Float</span> {
     <span class="kw">type</span> <span class="ident">Round</span> <span class="op">=</span> <span class="ident">Round</span>;
     <span class="kw">type</span> <span class="ident">Ordering</span> <span class="op">=</span> <span class="ident">Ordering</span>;
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">assign_round</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">RandomCont</span>, <span class="ident">round</span>: <span class="ident">Round</span>) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
+    <span class="kw">fn</span> <span class="ident">assign_round</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">src</span>: <span class="ident">RandomCont</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">round</span>: <span class="ident">Round</span>,
+    ) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="ident">mpfr</span>::<span class="ident">urandom</span>(
-                <span class="self">self</span>.<span class="ident">inner_mut</span>(),
-                <span class="ident">src</span>.<span class="ident">rng</span>.<span class="ident">inner_mut</span>(),
+                <span class="self">self</span>.<span class="ident">as_raw_mut</span>(),
+                <span class="ident">src</span>.<span class="ident">rng</span>.<span class="ident">as_raw_mut</span>(),
                 <span class="ident">raw_round</span>(<span class="ident">round</span>),
             )
         };
@@ -16973,18 +16960,19 @@ println!(&quot;Sum is {}&quot;, sr);
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rand&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">RandomNormal</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Float</span>
-<span class="kw">where</span>
-    <span class="lifetime">&#39;b</span>: <span class="lifetime">&#39;a</span>,
-{
+<span class="kw">impl</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">RandomNormal</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Float</span> {
     <span class="kw">type</span> <span class="ident">Round</span> <span class="op">=</span> <span class="ident">Round</span>;
     <span class="kw">type</span> <span class="ident">Ordering</span> <span class="op">=</span> <span class="ident">Ordering</span>;
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">assign_round</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">RandomNormal</span>, <span class="ident">round</span>: <span class="ident">Round</span>) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
+    <span class="kw">fn</span> <span class="ident">assign_round</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">src</span>: <span class="ident">RandomNormal</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">round</span>: <span class="ident">Round</span>,
+    ) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="ident">mpfr</span>::<span class="ident">nrandom</span>(
-                <span class="self">self</span>.<span class="ident">inner_mut</span>(),
-                <span class="ident">src</span>.<span class="ident">rng</span>.<span class="ident">inner_mut</span>(),
+                <span class="self">self</span>.<span class="ident">as_raw_mut</span>(),
+                <span class="ident">src</span>.<span class="ident">rng</span>.<span class="ident">as_raw_mut</span>(),
                 <span class="ident">raw_round</span>(<span class="ident">round</span>),
             )
         };
@@ -17001,18 +16989,19 @@ println!(&quot;Sum is {}&quot;, sr);
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rand&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">RandomExp</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Float</span>
-<span class="kw">where</span>
-    <span class="lifetime">&#39;b</span>: <span class="lifetime">&#39;a</span>,
-{
+<span class="kw">impl</span> <span class="ident">AssignRound</span><span class="op">&lt;</span><span class="ident">RandomExp</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">Float</span> {
     <span class="kw">type</span> <span class="ident">Round</span> <span class="op">=</span> <span class="ident">Round</span>;
     <span class="kw">type</span> <span class="ident">Ordering</span> <span class="op">=</span> <span class="ident">Ordering</span>;
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">assign_round</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">RandomExp</span>, <span class="ident">round</span>: <span class="ident">Round</span>) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
+    <span class="kw">fn</span> <span class="ident">assign_round</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">src</span>: <span class="ident">RandomExp</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">round</span>: <span class="ident">Round</span>,
+    ) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="ident">mpfr</span>::<span class="ident">erandom</span>(
-                <span class="self">self</span>.<span class="ident">inner_mut</span>(),
-                <span class="ident">src</span>.<span class="ident">rng</span>.<span class="ident">inner_mut</span>(),
+                <span class="self">self</span>.<span class="ident">as_raw_mut</span>(),
+                <span class="ident">src</span>.<span class="ident">rng</span>.<span class="ident">as_raw_mut</span>(),
                 <span class="ident">raw_round</span>(<span class="ident">round</span>),
             )
         };
@@ -17021,13 +17010,13 @@ println!(&quot;Sum is {}&quot;, sr);
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">repr_transparent</span>, <span class="ident">repr</span>(<span class="ident">transparent</span>))]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BorrowFloat</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">inner</span>: <span class="ident">mpfr_t</span>,
     <span class="ident">phantom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Float</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">BorrowFloat</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">BorrowFloat</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Float</span>;
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Float</span> {
@@ -17103,7 +17092,7 @@ println!(&quot;Sum is {}&quot;, sr);
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">exp</span>,
             <span class="ident">cast</span>(<span class="ident">format</span>.<span class="ident">radix</span>),
             <span class="ident">digits</span>,
-            <span class="ident">f</span>.<span class="ident">inner</span>(),
+            <span class="ident">f</span>.<span class="ident">as_raw</span>(),
             <span class="ident">raw_round</span>(<span class="ident">format</span>.<span class="ident">round</span>),
         );
         <span class="kw">let</span> <span class="ident">c_str</span> <span class="op">=</span> <span class="ident">CStr</span>::<span class="ident">from_ptr</span>(<span class="ident">c_buf</span>);
@@ -17161,7 +17150,7 @@ println!(&quot;Sum is {}&quot;, sr);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c_str_end</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">null</span>();
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="ident">mpfr</span>::<span class="ident">strtofr</span>(
-                <span class="self">self</span>.<span class="ident">inner_mut</span>(),
+                <span class="self">self</span>.<span class="ident">as_raw_mut</span>(),
                 <span class="ident">c_string</span>.<span class="ident">as_ptr</span>(),
                 <span class="macro">cast_ptr_mut</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c_str_end</span>, <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_char</span>),
                 <span class="ident">cast</span>(<span class="ident">radix</span>),
@@ -17252,9 +17241,9 @@ println!(&quot;Sum is {}&quot;, sr);
             <span class="string">b&#39;_&#39;</span> <span class="kw">if</span> <span class="ident">has_digits</span> <span class="op">=&gt;</span> <span class="kw">continue</span>,
             <span class="string">b&#39; &#39;</span> <span class="op">|</span> <span class="string">b&#39;\t&#39;</span> <span class="op">|</span> <span class="string">b&#39;\n&#39;</span> <span class="op">|</span> <span class="number">0x0b</span> <span class="op">|</span> <span class="number">0x0c</span> <span class="op">|</span> <span class="number">0x0d</span> <span class="op">=&gt;</span> <span class="kw">continue</span>,
 
-            <span class="string">b&#39;0&#39;</span>...<span class="string">b&#39;9&#39;</span> <span class="op">=&gt;</span> <span class="ident">exp</span> <span class="op">||</span> <span class="ident">b</span> <span class="op">&lt;</span> <span class="ident">digit_bound</span>,
-            <span class="string">b&#39;a&#39;</span>...<span class="string">b&#39;z&#39;</span> <span class="op">=&gt;</span> <span class="op">!</span><span class="ident">exp</span> <span class="op">&amp;&amp;</span> <span class="ident">b</span> <span class="op">&lt;</span> <span class="ident">small_bound</span>,
-            <span class="string">b&#39;A&#39;</span>...<span class="string">b&#39;Z&#39;</span> <span class="op">=&gt;</span> <span class="op">!</span><span class="ident">exp</span> <span class="op">&amp;&amp;</span> <span class="ident">b</span> <span class="op">&lt;</span> <span class="ident">capital_bound</span>,
+            <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39;</span> <span class="op">=&gt;</span> <span class="ident">exp</span> <span class="op">||</span> <span class="ident">b</span> <span class="op">&lt;</span> <span class="ident">digit_bound</span>,
+            <span class="string">b&#39;a&#39;</span>..=<span class="string">b&#39;z&#39;</span> <span class="op">=&gt;</span> <span class="op">!</span><span class="ident">exp</span> <span class="op">&amp;&amp;</span> <span class="ident">b</span> <span class="op">&lt;</span> <span class="ident">small_bound</span>,
+            <span class="string">b&#39;A&#39;</span>..=<span class="string">b&#39;Z&#39;</span> <span class="op">=&gt;</span> <span class="op">!</span><span class="ident">exp</span> <span class="op">&amp;&amp;</span> <span class="ident">b</span> <span class="op">&lt;</span> <span class="ident">capital_bound</span>,
             <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>,
         };
         <span class="kw">if</span> <span class="op">!</span><span class="ident">valid_digit</span> {
@@ -17336,9 +17325,9 @@ println!(&quot;Sum is {}&quot;, sr);
     <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>) <span class="kw">in</span> <span class="ident">iter</span> {
         <span class="kw">match</span> <span class="ident">b</span> {
             <span class="string">b&#39;)&#39;</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>..]),
-            <span class="string">b&#39;0&#39;</span>...<span class="string">b&#39;9&#39;</span>
-            <span class="op">|</span> <span class="string">b&#39;a&#39;</span>...<span class="string">b&#39;z&#39;</span>
-            <span class="op">|</span> <span class="string">b&#39;A&#39;</span>...<span class="string">b&#39;Z&#39;</span>
+            <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39;</span>
+            <span class="op">|</span> <span class="string">b&#39;a&#39;</span>..=<span class="string">b&#39;z&#39;</span>
+            <span class="op">|</span> <span class="string">b&#39;A&#39;</span>..=<span class="string">b&#39;Z&#39;</span>
             <span class="op">|</span> <span class="string">b&#39;_&#39;</span>
             <span class="op">|</span> <span class="string">b&#39; &#39;</span>
             <span class="op">|</span> <span class="string">b&#39;\t&#39;</span>
@@ -17430,21 +17419,6 @@ println!(&quot;Parse error: {:?}&quot;, error);
         <span class="prelude-val">Some</span>(<span class="ident">k</span>)
     } <span class="kw">else</span> {
         <span class="prelude-val">None</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Inner</span> <span class="kw">for</span> <span class="ident">Float</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">mpfr_t</span>;
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">mpfr_t</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">InnerMut</span> <span class="kw">for</span> <span class="ident">Float</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">inner_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">mpfr_t</span> {
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">inner</span>
     }
 }
 </pre></div>

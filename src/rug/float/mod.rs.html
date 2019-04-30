@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/rug-1.3.0/src/float/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../rug/index.html'><img src='https://tspiteri.gitlab.io/gmp-mpfr-sys/rug.svg' alt='logo' width='100'></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/rug-1.4.0/src/float/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../rug/index.html'><img src='https://tspiteri.gitlab.io/gmp-mpfr-sys/rug.svg' alt='logo' width='100'></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -496,14 +496,6 @@
 <span id="496">496</span>
 <span id="497">497</span>
 <span id="498">498</span>
-<span id="499">499</span>
-<span id="500">500</span>
-<span id="501">501</span>
-<span id="502">502</span>
-<span id="503">503</span>
-<span id="504">504</span>
-<span id="505">505</span>
-<span id="506">506</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright © 2016–2019 University of Malta</span>
 
@@ -539,12 +531,10 @@ This module provides support for floating-point numbers of type
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">small</span>;
 <span class="kw">mod</span> <span class="ident">traits</span>;
 
-<span class="kw">use</span> <span class="ident">cast</span>::<span class="ident">cast</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">float</span>::<span class="ident">big</span>::<span class="ident">ParseFloatError</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">float</span>::<span class="ident">ord</span>::<span class="ident">OrdFloat</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">float</span>::<span class="ident">small</span>::{<span class="ident">SmallFloat</span>, <span class="ident">ToSmall</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">float</span>::<span class="ident">big</span>::<span class="ident">ParseFloatError</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">float</span>::<span class="ident">ord</span>::<span class="ident">OrdFloat</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">float</span>::<span class="ident">small</span>::{<span class="ident">SmallFloat</span>, <span class="ident">ToSmall</span>};
 <span class="kw">use</span> <span class="ident">gmp_mpfr_sys</span>::<span class="ident">mpfr</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">i32</span>, <span class="ident">u32</span>};
 
 <span class="doccomment">/**
@@ -598,8 +588,8 @@ println!(&quot;Minimum precision is {}&quot;, float::prec_min());
 ```
 */</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prec_min</span>() <span class="op">-&gt;</span> <span class="ident">u32</span> {
-    <span class="ident">cast</span>(<span class="ident">mpfr</span>::<span class="ident">PREC_MIN</span>)
+<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">prec_min</span>() <span class="op">-&gt;</span> <span class="ident">u32</span> {
+    <span class="ident">mpfr</span>::<span class="ident">PREC_MIN</span> <span class="kw">as</span> <span class="ident">u32</span>
 }
 
 <span class="doccomment">/**
@@ -613,15 +603,10 @@ println!(&quot;Maximum precision is {}&quot;, float::prec_max());
 ```
 */</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prec_max</span>() <span class="op">-&gt;</span> <span class="ident">u32</span> {
-    <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">mpfr</span>::<span class="ident">PREC_MAX</span>;
-    <span class="kw">if</span> <span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">mpfr</span>::<span class="ident">prec_t</span><span class="op">&gt;</span>() <span class="op">&lt;=</span> <span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>()
-        <span class="op">||</span> <span class="ident">max</span> <span class="op">&lt;</span> <span class="ident">cast</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">mpfr</span>::<span class="ident">prec_t</span><span class="op">&gt;</span>(<span class="ident">u32</span>::<span class="ident">MAX</span>)
-    {
-        <span class="ident">max</span> <span class="kw">as</span> <span class="ident">u32</span>
-    } <span class="kw">else</span> {
-        <span class="ident">u32</span>::<span class="ident">MAX</span>
-    }
+<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">prec_max</span>() <span class="op">-&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">const</span> <span class="ident">MAX_FITS</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident">mpfr</span>::<span class="ident">PREC_MAX</span> <span class="op">&lt;</span> <span class="ident">u32</span>::<span class="ident">MAX</span> <span class="kw">as</span> <span class="ident">mpfr</span>::<span class="ident">prec_t</span>;
+    <span class="kw">const</span> <span class="ident">VALUES</span>: [<span class="ident">u32</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="ident">u32</span>::<span class="ident">MAX</span>, <span class="ident">mpfr</span>::<span class="ident">PREC_MAX</span> <span class="kw">as</span> <span class="ident">u32</span>];
+    <span class="ident">VALUES</span>[<span class="ident">MAX_FITS</span> <span class="kw">as</span> <span class="ident">usize</span>]
 }
 
 <span class="doccomment">/**
@@ -765,17 +750,16 @@ assert!(nan.is_nan());
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>, <span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">cyclomatic_complexity</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>, <span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">float_cmp</span>))]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">cognitive_complexity</span>, <span class="ident">clippy</span>::<span class="ident">float_cmp</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">float</span>::{<span class="ident">Round</span>, <span class="ident">Special</span>};
-    <span class="kw">use</span> <span class="ident">gmp_mpfr_sys</span>::{<span class="ident">gmp</span>, <span class="ident">mpfr</span>};
+    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">float</span>::{<span class="ident">Round</span>, <span class="ident">Special</span>};
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rand&quot;</span>)]</span>
-    <span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">RandGen</span>, <span class="ident">RandState</span>};
+    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">rand</span>::{<span class="ident">RandGen</span>, <span class="ident">RandState</span>};
+    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Assign</span>, <span class="ident">Float</span>};
+    <span class="kw">use</span> <span class="ident">gmp_mpfr_sys</span>::{<span class="ident">gmp</span>, <span class="ident">mpfr</span>};
     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">Ordering</span>;
     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f64</span>;
     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">FmtError</span>, <span class="ident">Formatter</span>};
-    <span class="kw">use</span> {<span class="ident">Assign</span>, <span class="ident">Float</span>};
 
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
     <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Cmp</span> {
@@ -790,7 +774,7 @@ assert!(nan.is_nan());
     }
 
     <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Cmp</span> {
-        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">FmtError</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">FmtError</span><span class="op">&gt;</span> {
             <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
                 <span class="ident">Cmp</span>::<span class="ident">F64</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=&gt;</span> <span class="ident">val</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
                 <span class="ident">Cmp</span>::<span class="ident">Nan</span>(<span class="ident">negative</span>) <span class="op">=&gt;</span> {
