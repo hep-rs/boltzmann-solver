@@ -34,9 +34,9 @@ addons:
 before_script:
   - |
     if [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then
-        export FEATURES="--features nightly";
+        export FEATURES="--features arbitrary-precision nightly";
     else
-        export FEATURES="";
+        export FEATURES="--features arbitrary-precision";
     fi
   - ./ci/before_script.sh
 
