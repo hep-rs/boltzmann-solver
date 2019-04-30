@@ -175,6 +175,27 @@
 <span id="175">175</span>
 <span id="176">176</span>
 <span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Module of various useful miscellaneous functions.</span>
 
@@ -221,6 +242,15 @@
     }
 }
 
+<span class="doccomment">/// Kallen lambda function:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// \\begin{equation}</span>
+<span class="doccomment">///   \lambda(a, b, c) = a^2 + b^2 + c^2 - 2ab - 2ac - 2bc</span>
+<span class="doccomment">/// \\end{equation}</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kallen_lambda</span>(<span class="ident">a</span>: <span class="ident">f64</span>, <span class="ident">b</span>: <span class="ident">f64</span>, <span class="ident">c</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
+    <span class="ident">a</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">b</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">c</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="number">2.0</span> <span class="op">*</span> (<span class="ident">a</span> <span class="op">*</span> <span class="ident">b</span> <span class="op">+</span> <span class="ident">a</span> <span class="op">*</span> <span class="ident">c</span> <span class="op">+</span> <span class="ident">b</span> <span class="op">*</span> <span class="ident">c</span>)
+}
+
 <span class="doccomment">/// Return the minimum and maximum value of the Mandelstam variable \\(t\\)</span>
 <span class="doccomment">/// based on the four particle masses \\(m_1\\), \\(m_2\\), \\(m_3\\) and</span>
 <span class="doccomment">/// \\(m_4\\), where particles 1 and 2 are initial state and particles 3 and 4</span>
@@ -264,7 +294,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">t_min_max</span>;
+    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">kallen_lambda</span>, <span class="ident">t_min_max</span>};
     <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident">ndarray</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 
@@ -351,6 +381,18 @@
             <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">t_min</span>.<span class="ident">is_finite</span>() <span class="op">&amp;&amp;</span> <span class="ident">t_max</span>.<span class="ident">is_finite</span>());
             <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">t_min</span> <span class="op">&lt;=</span> <span class="ident">t_max</span>);
         }
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">kallen</span>() {
+        <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>) <span class="op">=</span> (<span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">kallen_lambda</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>), <span class="op">-</span><span class="number">8.0</span>);
+
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">kallen_lambda</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>), <span class="ident">kallen_lambda</span>(<span class="ident">a</span>, <span class="ident">c</span>, <span class="ident">b</span>));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">kallen_lambda</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>), <span class="ident">kallen_lambda</span>(<span class="ident">b</span>, <span class="ident">a</span>, <span class="ident">c</span>));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">kallen_lambda</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>), <span class="ident">kallen_lambda</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">a</span>));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">kallen_lambda</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>), <span class="ident">kallen_lambda</span>(<span class="ident">c</span>, <span class="ident">a</span>, <span class="ident">b</span>));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">kallen_lambda</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>), <span class="ident">kallen_lambda</span>(<span class="ident">c</span>, <span class="ident">b</span>, <span class="ident">a</span>));
     }
 }
 </pre></div>
