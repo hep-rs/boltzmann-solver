@@ -43,6 +43,15 @@ pub fn checked_div_ap(a: &Float, b: &Float) -> Float {
     }
 }
 
+/// Kallen lambda function:
+///
+/// \\begin{equation}
+///   \lambda(a, b, c) = a^2 + b^2 + c^2 - 2ab - 2ac - 2bc
+/// \\end{equation}
+pub fn kallen_lambda(a: f64, b: f64, c: f64) -> f64 {
+    a.powi(2) + b.powi(2) + c.powi(2) - 2.0 * (a * b + a * c + b * c)
+}
+
 /// Return the minimum and maximum value of the Mandelstam variable \\(t\\)
 /// based on the four particle masses \\(m_1\\), \\(m_2\\), \\(m_3\\) and
 /// \\(m_4\\), where particles 1 and 2 are initial state and particles 3 and 4
@@ -86,7 +95,7 @@ pub fn t_min_max(s: f64, m1: f64, m2: f64, m3: f64, m4: f64) -> (f64, f64) {
 
 #[cfg(test)]
 mod tests {
-    use super::t_min_max;
+    use super::{kallen_lambda, t_min_max};
     use crate::utilities::test::*;
     use ndarray::prelude::*;
 
@@ -173,5 +182,17 @@ mod tests {
             assert!(t_min.is_finite() && t_max.is_finite());
             assert!(t_min <= t_max);
         }
+    }
+
+    #[test]
+    fn kallen() {
+        let (a, b, c) = (1.0, 2.0, 3.0);
+        assert_eq!(kallen_lambda(a, b, c), -8.0);
+
+        assert_eq!(kallen_lambda(a, b, c), kallen_lambda(a, c, b));
+        assert_eq!(kallen_lambda(a, b, c), kallen_lambda(b, a, c));
+        assert_eq!(kallen_lambda(a, b, c), kallen_lambda(b, c, a));
+        assert_eq!(kallen_lambda(a, b, c), kallen_lambda(c, a, b));
+        assert_eq!(kallen_lambda(a, b, c), kallen_lambda(c, b, a));
     }
 }
