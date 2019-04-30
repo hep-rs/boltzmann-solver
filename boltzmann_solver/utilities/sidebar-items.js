@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["checked_div","Perform a 'checked' division."]]});
+initSidebarItems({"fn":[["checked_div","Perform a 'checked' division."],["t_min_max","Return the minimum and maximum value of the Mandelstam variable \\(t\\) based on the four particle masses \\(m_1\\), \\(m_2\\), \\(m_3\\) and \\(m_4\\), where particles 1 and 2 are initial state and particles 3 and 4 are the final state particles."]]});
