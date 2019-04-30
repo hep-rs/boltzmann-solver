@@ -79,6 +79,9 @@ EOF
         MATHJAX="${MATHJAX//\\/\\\\\\\\}"
 
         find ./target/doc -type f -name "*.html" -print0 |
+            xargs -0 sed -i 's/\\<br \/>/\\\\/g'
+
+        find ./target/doc -type f -name "*.html" -print0 |
             xargs -0 sed -i "$GTM_HEADER"
         find ./target/doc -type f -name "*.html" -print0 |
             xargs -0 sed -i "$GTM_BODY"
