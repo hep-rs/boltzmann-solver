@@ -119,8 +119,10 @@
 extern crate log;
 extern crate ndarray;
 extern crate quadrature;
-extern crate rug;
 extern crate special_functions;
+
+#[cfg(arbitrary_precision)]
+extern crate rug;
 
 #[cfg(feature = "nightly")]
 extern crate test;
@@ -139,7 +141,9 @@ macro_rules! debug_assert_warn {
 pub mod constants;
 pub mod particle;
 pub mod solver;
-pub mod solver_ap;
 pub mod statistic;
 pub mod universe;
 pub mod utilities;
+
+#[cfg(arbitrary_precision)]
+pub mod solver_ap;

@@ -1,5 +1,6 @@
 //! Module of various useful miscellaneous functions.
 
+#[cfg(arbitrary_precision)]
 use rug::Float;
 
 #[cfg(test)]
@@ -31,6 +32,7 @@ pub fn checked_div(a: f64, b: f64) -> f64 {
 /// - If `b == 0.0`, returns `1.0` irrespective of the value of `a` (unless `a
 ///   == 0`);
 #[inline]
+#[cfg(arbitrary_precision)]
 pub fn checked_div_ap(a: &Float, b: &Float) -> Float {
     if a.is_zero() {
         Float::with_val(a.prec(), 0.0)

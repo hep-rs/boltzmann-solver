@@ -1,3 +1,5 @@
+#![cfg(arbitrary_precision)]
+
 extern crate boltzmann_solver;
 extern crate csv;
 extern crate itertools;
