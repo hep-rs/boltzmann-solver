@@ -139,8 +139,6 @@ mod tests {
     use ndarray::prelude::*;
 
     #[cfg(feature = "arbitrary-precision")]
-    use super::checked_div_ap;
-    #[cfg(feature = "arbitrary-precision")]
     use rug::Float;
 
     #[allow(clippy::float_cmp)]
