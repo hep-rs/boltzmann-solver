@@ -1,6 +1,6 @@
 //! The effects of the Universe's evolution play an important role in the
 //! Boltzmann equation.  This information is provided by implementations of the
-//! [`Universe`] trait.
+//! [`Universe`](universe::Universe) trait.
 
 mod standard_model;
 
