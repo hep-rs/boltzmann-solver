@@ -13,7 +13,7 @@ COVERAGE_RUN=false
 run_kcov() {
     # Run kcov on all the test suites
     if [[ $COVERAGE_RUN != "true" ]]; then
-        cargo coveralls --features $FEATURES
+        cargo coveralls --features "$FEATURES"
         COVERAGE_RUN=true
     fi
 }

@@ -10,9 +10,9 @@ set -o errexit
 # Ensure there are no outstanding lints.
 check_lints() {
     if [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then
-        cargo clippy --tests --benches --features $FEATURES
+        cargo clippy --tests --benches --features "$FEATURES"
     else
-        cargo clippy --tests --features $FEATURES
+        cargo clippy --tests --features "$FEATURES"
     fi
 }
 
@@ -23,7 +23,7 @@ check_format() {
 
 # Run the test suite.
 check_tests() {
-    cargo test --features $FEATURES
+    cargo test --features "$FEATURES"
 }
 
 main() {
