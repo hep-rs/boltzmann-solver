@@ -449,9 +449,8 @@ mod tests {
     }
 }
 
-#[cfg(feature = "nightly")]
-#[cfg(test)]
-mod bench {
+#[cfg(all(test, feature = "nightly"))]
+mod benches {
     use super::*;
     use csv;
     use test::{black_box, Bencher};
