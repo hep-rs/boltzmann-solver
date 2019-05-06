@@ -134,7 +134,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{checked_div, kallen_lambda, t_min_max};
+    use super::t_min_max;
     use crate::utilities::test::*;
     use ndarray::prelude::*;
 
@@ -144,25 +144,25 @@ mod tests {
     use rug::Float;
 
     #[test]
-    fn checked_devision() {
-        assert_eq!(checked_div(0.0, 0.0), 0.0);
-        assert_eq!(checked_div(1.0, 0.0), 1.0);
-        assert_eq!(checked_div(0.0, 1.0), 0.0);
-        assert_eq!(checked_div(1.0, 2.0), 0.5);
+    fn checked_div() {
+        assert_eq!(super::checked_div(0.0, 0.0), 0.0);
+        assert_eq!(super::checked_div(1.0, 0.0), 1.0);
+        assert_eq!(super::checked_div(0.0, 1.0), 0.0);
+        assert_eq!(super::checked_div(1.0, 2.0), 0.5);
     }
 
     #[cfg(feature = "arbitrary-precision")]
     #[test]
-    fn checked_devision_ap() {
+    fn checked_div_ap() {
         let zero = Float::with_val(30, 0);
         let one = Float::with_val(30, 1);
         let two = Float::with_val(30, 2);
         let half = Float::with_val(30, 0.5);
 
-        assert_eq!(checked_div_ap(&zero, &zero), zero);
-        assert_eq!(checked_div_ap(&one, &zero), one);
-        assert_eq!(checked_div_ap(&zero, &one), zero);
-        assert_eq!(checked_div_ap(&one, &two), half);
+        assert_eq!(super::checked_div_ap(&zero, &zero), zero);
+        assert_eq!(super::checked_div_ap(&one, &zero), one);
+        assert_eq!(super::checked_div_ap(&zero, &one), zero);
+        assert_eq!(super::checked_div_ap(&one, &two), half);
     }
 
     #[test]
@@ -251,14 +251,17 @@ mod tests {
     }
 
     #[test]
-    fn kallen() {
+    fn kallen_lambda() {
         let (a, b, c) = (1.0, 2.0, 3.0);
-        assert_eq!(kallen_lambda(a, b, c), -8.0);
+        assert_eq!(super::kallen_lambda(a, b, c), -8.0);
 
-        assert_eq!(kallen_lambda(a, b, c), kallen_lambda(a, c, b));
-        assert_eq!(kallen_lambda(a, b, c), kallen_lambda(b, a, c));
-        assert_eq!(kallen_lambda(a, b, c), kallen_lambda(b, c, a));
-        assert_eq!(kallen_lambda(a, b, c), kallen_lambda(c, a, b));
-        assert_eq!(kallen_lambda(a, b, c), kallen_lambda(c, b, a));
+        assert_eq!(super::kallen_lambda(a, b, c), super::kallen_lambda(a, c, b));
+        assert_eq!(super::kallen_lambda(a, b, c), super::kallen_lambda(b, a, c));
+        assert_eq!(super::kallen_lambda(a, b, c), super::kallen_lambda(b, c, a));
+        assert_eq!(super::kallen_lambda(a, b, c), super::kallen_lambda(c, a, b));
+        assert_eq!(super::kallen_lambda(a, b, c), super::kallen_lambda(c, b, a));
     }
+
+    #[test]
+    fn integrate_st() {}
 }
