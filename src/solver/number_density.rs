@@ -263,17 +263,16 @@ use ndarray::{prelude::*, FoldWhile, Zip};
 /// Context provided containing pre-computed values which might be useful when
 /// evaluating interactions.
 pub struct Context<M: Model> {
-    /// Evaluation step
+    /// Current evaluation step
     pub step: u64,
-    /// Inverse temperature in GeV^{-1}
+    /// Inverse temperature in GeV\\(^{-1}\\)
     pub beta: f64,
-    /// Current step size
-    pub step_size: f64,
     /// Hubble rate, in GeV
     pub hubble_rate: f64,
     /// Equilibrium number densities for the particles, normalized to the
-    /// equilibrium number density for a massless boson with \\(g = 1\\).  This
-    /// is provided in the same order as specified to the solver
+    /// equilibrium number density for a massless boson with \\(g = 1\\).  The
+    /// particle species are provided in the same order as when specified to the
+    /// solver
     pub eq_n: Array1<f64>,
     /// Model data
     pub model: M,
@@ -482,7 +481,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         let mut h = beta * self.step_precision.min;
 
         // Create the initial context and log the initial conditions
-        let mut c = self.context(step, beta, universe, h);
+        let mut c = self.context(step, beta, universe);
         (*self.logger)(&n, &dn[0], &c);
 
         while beta < self.beta_range.1 {
@@ -492,7 +491,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             // Compute each k[i]
             for i in 0..RK_S {
                 let beta_i = beta + RK_C[i] * h;
-                let ci = self.context(step, beta_i, universe, h);
+                let ci = self.context(step, beta_i, universe);
                 let ai = RK_A[i];
                 let mut dni = (0..i).fold(Self::Solution::zeros(n.dim()), |total, j| {
                     total + ai[j] * &k[j]
@@ -566,7 +565,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             // Check if the error is within the tolerance, or we are advancing
             // irrespective of the local error
             if advance {
-                c = self.context(step, beta, universe, h);
+                c = self.context(step, beta, universe);
 
                 // Advance n and beta
                 n = self.n_plus_dn(n, &mut dn[0], &c);
@@ -650,17 +649,10 @@ impl<M: Model> NumberDensitySolver<M> {
 
     /// Generate the context at a given beta to pass to the logger/interaction
     /// functions.
-    fn context<U: Universe>(
-        &self,
-        step: u64,
-        beta: f64,
-        universe: &U,
-        step_size: f64,
-    ) -> Context<M> {
+    fn context<U: Universe>(&self, step: u64, beta: f64, universe: &U) -> Context<M> {
         Context {
             step,
             beta,
-            step_size,
             hubble_rate: universe.hubble_rate(beta),
             eq_n: self.equilibrium_number_densities(beta),
             model: (self.model_fn)(M::new(beta)),

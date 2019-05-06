@@ -18,17 +18,16 @@ use std::iter;
 /// Context provided containing pre-computed values which might be useful when
 /// evaluating interactions.
 pub struct Context<M: Model> {
-    /// Evaluation step
+    /// Current evaluation step
     pub step: u64,
-    /// Inverse temperature in GeV^{-1}
+    /// Inverse temperature in GeV\\(^{-1}\\)
     pub beta: Float,
-    /// Current step size
-    pub step_size: Float,
     /// Hubble rate, in GeV
     pub hubble_rate: f64,
     /// Equilibrium number densities for the particles, normalized to the
-    /// equilibrium number density for a massless boson with \\(g = 1\\).  This
-    /// is provided in the same order as specified to the solver
+    /// equilibrium number density for a massless boson with \\(g = 1\\).  The
+    /// particle species are provided in the same order as when specified to the
+    /// solver
     pub eq_n: Array1<f64>,
     /// Model data
     pub model: M,
@@ -262,7 +261,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         let mut h = Float::with_val(self.working_precision, &beta * &self.step_precision.min);
 
         // Create the initial context and log the initial conditions
-        let mut c = self.context(step, beta.clone(), universe, h.clone());
+        let mut c = self.context(step, beta.clone(), universe);
         (*self.logger)(&n, &dn[0], &c);
 
         while beta < self.beta_range.1 {
@@ -272,7 +271,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             // Compute each k[i]
             for i in 0..RK_S {
                 let beta_i = &beta + h.clone() * RK_C[i];
-                let ci = self.context(step, beta_i, universe, h.clone());
+                let ci = self.context(step, beta_i, universe);
                 let ai = RK_A[i];
                 let mut dni = (0..i).fold(zeros.clone(), |total, j| total + &k[j] * ai[j]);
                 let ni = self.n_plus_dn(n.clone(), &mut dni, &ci);
@@ -338,7 +337,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             // Check if the error is within the tolerance, or we are advancing
             // irrespective of the local error
             if advance {
-                c = self.context(step, beta.clone(), universe, h.clone());
+                c = self.context(step, beta.clone(), universe);
 
                 // Advance n and beta
                 n = self.n_plus_dn(n, &mut dn[0], &c);
@@ -410,19 +409,12 @@ impl<'a, M: Model> NumberDensitySolver<M> {
 
     /// Generate the context at a given beta to pass to the logger/interaction
     /// functions.
-    fn context<U: Universe>(
-        &self,
-        step: u64,
-        beta: Float,
-        universe: &U,
-        step_size: Float,
-    ) -> Context<M> {
+    fn context<U: Universe>(&self, step: u64, beta: Float, universe: &U) -> Context<M> {
         let beta_f64 = beta.to_f64();
         let model = M::new(&beta);
         Context {
             step,
             beta,
-            step_size,
             hubble_rate: universe.hubble_rate(beta_f64),
             eq_n: self.equilibrium_number_densities(beta_f64),
             model,
