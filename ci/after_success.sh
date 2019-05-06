@@ -13,7 +13,7 @@ COVERAGE_RUN=false
 run_kcov() {
     # Run kcov on all the test suites
     if [[ $COVERAGE_RUN != "true" ]]; then
-        cargo coveralls
+        cargo coveralls --features $FEATURES
         COVERAGE_RUN=true
     fi
 }
@@ -65,7 +65,7 @@ make_doc() {
        && "$TRAVIS_EVENT_TYPE" == "push"
        && "$TRAVIS_BRANCH" == "master" ]]; then
 
-        cargo doc $FEATURES
+        cargo doc --features "$FEATURES"
 
         read -r GTM_HEADER <<EOF
 s#<head>#<head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager -->#

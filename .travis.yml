@@ -15,6 +15,7 @@ matrix:
 env:
   global:
   - RUSTFLAGS="-C link-dead-code -D warnings -D missing_docs"
+  - FEATURES="arbitrary-precision"
 
 cache: cargo
 
@@ -34,9 +35,7 @@ addons:
 before_script:
   - |
     if [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then
-        export FEATURES="--features arbitrary-precision nightly";
-    else
-        export FEATURES="--features arbitrary-precision";
+        export FEATURES="$FEATURES nightly";
     fi
   - ./ci/before_script.sh
 
