@@ -2,10 +2,9 @@ use crate::model::{VanillaLeptogenesisModel, PARTICLE_NAMES};
 use boltzmann_solver::{
     constants::{PI_1, PI_5},
     solver_ap::{number_density::NumberDensitySolver, Solver},
-    utilities::checked_div,
+    utilities::{checked_div, integrate_st},
 };
 use itertools::iproduct;
-use quadrature::integrate;
 use rug::Float;
 use special_functions::bessel;
 use std::cell::RefCell;
@@ -67,43 +66,34 @@ pub fn n_el_ql_qr(solver: &mut NumberDensitySolver<VanillaLeptogenesisModel>) {
         .unwrap();
 
     solver.add_interaction(move |mut s, n, ref c| {
-        let mut gamma = {
-            let mut m2 = Float::with_val(100, 0.0);
-            for (a2, b1, b2) in iproduct!(0..3, 0..3, 0..3) {
-                m2 += 9.0
-                    * c.model.coupling.y_v[[0, a2]].norm_sqr()
-                    * (c.model.coupling.y_d[[b1, b2]].norm_sqr()
-                        + c.model.coupling.y_u[[b1, b2]].norm_sqr());
-            }
-
-            let s_integrand = |ss: f64| {
-                let s = c.model.mass2.n[0] + (1.0 - ss) / ss;
-                let dsdss = ss.powi(-2);
-                let sqrt_s = s.sqrt();
-
-                let t_integrand = |t: f64| {
-                    (
-                        // s-channel
-                        s * (s - c.model.mass2.n[0]) * (s - c.model.mass2.h).powi(2)
-                            / ((s - c.model.mass2.h).powi(2) + c.model.width2.h * c.model.mass2.h)
-                                .powi(2)
-                    ) + (
-                        // t-channel
-                        2.0 * (t + c.model.mass2.n[0]) * (t + c.model.mass2.h).powi(2)
-                            / ((t + c.model.mass2.h).powi(2) + c.model.width2.h * c.model.mass2.h)
-                                .powi(2)
-                    )
-                };
-
-                integrate(t_integrand, c.model.mass2.n[0] - s, 0.0, 0.0).integral
-                    * bessel::k_1(sqrt_s * c.beta.to_f64())
-                    / sqrt_s
-                    * dsdss
+        let gamma = {
+            let m2_prefactor = iproduct!(0..3, 0..3, 0..3).fold(
+                Float::with_val(c.precision, 0.0),
+                |s, (a2, b1, b2)| {
+                    s + 9.0
+                        * c.model.coupling.y_v[[0, a2]].norm_sqr()
+                        * (c.model.coupling.y_d[[b1, b2]].norm_sqr()
+                            + c.model.coupling.y_u[[b1, b2]].norm_sqr())
+                },
+            );
+            let m2_st = |s: f64, t: f64| {
+                (
+                    // s-channel
+                    s * (s - c.model.mass2.n[0]) * (s - c.model.mass2.h).powi(2)
+                        / ((s - c.model.mass2.h).powi(2) + c.model.width2.h * c.model.mass2.h)
+                            .powi(2)
+                ) + (
+                    // t-channel
+                    2.0 * (t + c.model.mass2.n[0]) * (t + c.model.mass2.h).powi(2)
+                        / ((t + c.model.mass2.h).powi(2) + c.model.width2.h * c.model.mass2.h)
+                            .powi(2)
+                )
             };
-            m2 * integrate(s_integrand, 0.0, 1.0, 0.0).integral
+
+            m2_prefactor * integrate_st(m2_st, c.beta.to_f64(), c.model.mass.n[0], 0.0, 0.0, 0.0)
+                / (512.0 * PI_5 * c.hubble_rate)
+                / &c.beta
         };
-        gamma /= 512.0 * PI_5 * c.hubble_rate;
-        gamma /= &c.beta;
 
         let forward = checked_div(n[1].to_f64(), c.eq_n[1]) * gamma.clone();
         let net_forward = (checked_div(n[1].to_f64(), c.eq_n[1]) - 1.0) * gamma.clone();
