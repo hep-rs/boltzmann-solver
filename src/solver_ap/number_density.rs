@@ -18,6 +18,8 @@ use std::iter;
 /// Context provided containing pre-computed values which might be useful when
 /// evaluating interactions.
 pub struct Context<M: Model> {
+    /// Working precision used by the integrator
+    pub precision: u32,
     /// Current evaluation step
     pub step: u64,
     /// Inverse temperature in GeV\\(^{-1}\\)
@@ -413,6 +415,7 @@ impl<'a, M: Model> NumberDensitySolver<M> {
         let beta_f64 = beta.to_f64();
         let model = M::new(&beta);
         Context {
+            precision: beta.prec(),
             step,
             beta,
             hubble_rate: universe.hubble_rate(beta_f64),
