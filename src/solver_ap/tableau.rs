@@ -211,9 +211,8 @@ mod tests {
     test_lotka_volterra!(test_lotka_volterra_rkf54, solve_ode_rkf54, 4.0);
 }
 
-#[cfg(feature = "nightly")]
-#[cfg(test)]
-mod bench {
+#[cfg(all(test, feature = "nightly"))]
+mod benches {
     use super::tests::{
         solve_ode_bs32, solve_ode_ck54, solve_ode_dp54, solve_ode_dp87, solve_ode_rkf54,
     };

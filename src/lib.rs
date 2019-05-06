@@ -114,6 +114,7 @@
 //! The above collision term accounts for a single interaction and in general a
 //! sum over all possible interactions must be done.
 
+// Enable feature(test) on nightly builds to make use of the `test` crate.
 #![cfg_attr(feature = "nightly", feature(test))]
 
 extern crate log;
@@ -121,7 +122,7 @@ extern crate ndarray;
 extern crate quadrature;
 extern crate special_functions;
 
-#[cfg(arbitrary_precision)]
+#[cfg(feature = "arbitrary-precision")]
 extern crate rug;
 
 #[cfg(feature = "nightly")]
@@ -145,5 +146,5 @@ pub mod statistic;
 pub mod universe;
 pub mod utilities;
 
-#[cfg(arbitrary_precision)]
+#[cfg(feature = "arbitrary-precision")]
 pub mod solver_ap;

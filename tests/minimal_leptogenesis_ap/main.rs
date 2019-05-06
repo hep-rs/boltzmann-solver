@@ -1,4 +1,4 @@
-#![cfg(arbitrary_precision)]
+#![cfg(feature = "arbitrary-precision")]
 
 extern crate boltzmann_solver;
 extern crate csv;
