@@ -143,6 +143,7 @@ mod tests {
     #[cfg(feature = "arbitrary-precision")]
     use rug::Float;
 
+    #[allow(clippy::float_cmp)]
     #[test]
     fn checked_div() {
         assert_eq!(super::checked_div(0.0, 0.0), 0.0);
@@ -250,6 +251,7 @@ mod tests {
         }
     }
 
+    #[allow(clippy::float_cmp)]
     #[test]
     fn kallen_lambda() {
         let (a, b, c) = (1.0, 2.0, 3.0);
@@ -263,5 +265,29 @@ mod tests {
     }
 
     #[test]
-    fn integrate_st() {}
+    fn integrate_st() {
+        // |M|² = 1
+        approx_eq(
+            super::integrate_st(|_, _| 1.0, 1.0, 0.0, 0.0, 0.0, 0.0),
+            4.0,
+            8.0,
+            0.0,
+        );
+
+        // |M|² = sqrt(s)
+        approx_eq(
+            super::integrate_st(|s, _| s.sqrt(), 1.0, 0.0, 0.0, 0.0, 0.0),
+            9.424_777_960_769_38,
+            8.0,
+            0.0,
+        );
+
+        // |M|² = sqrt(s) t
+        approx_eq(
+            super::integrate_st(|s, t| s.sqrt() * t, 1.0, 0.0, 0.0, 0.0, 0.0),
+            -70.685_834_705_770_35,
+            8.0,
+            0.0,
+        );
+    }
 }
