@@ -1,5 +1,8 @@
 //! Module of various useful miscellaneous functions.
 
+use quadrature::integrate;
+use special_functions::bessel;
+
 #[cfg(feature = "arbitrary-precision")]
 use rug::Float;
 
@@ -91,6 +94,42 @@ pub fn t_min_max(s: f64, m1: f64, m2: f64, m3: f64, m4: f64) -> (f64, f64) {
         / (2.0 * s);
 
     (t_const - t_cos, t_const + t_cos)
+}
+
+/// Integrate the amplitude with respect to the Mandelstam variable \\(s\\) and
+/// \\(t\\):
+///
+/// \\begin{equation}
+///   \int_{s_\text{min}}^{\infty} \int_{t_\text{min}}^{t_\text{max}}
+///       \abs{\mathcal{M}(s, t)}^2 \frac{K_1(\sqrt{s} \beta)}{\sqrt{s}}
+///   \dd t \dd s
+/// \\end{equation}
+///
+/// where \\(s_\text{min} = \mathop{\text{max}}(m_1^2 + m_2^2, m_3^2 + m_4^2)\\)
+/// and \\(t_{\text{min},\text{max}}\\) are determined from [`t_min_max`].
+pub fn integrate_st<F>(amplitude: F, beta: f64, m1: f64, m2: f64, m3: f64, m4: f64) -> f64
+where
+    F: Fn(f64, f64) -> f64,
+{
+    let s_min = if m1.powi(2) + m2.powi(2) > m3.powi(2) + m4.powi(4) {
+        m1.powi(2) + m2.powi(2)
+    } else {
+        m3.powi(2) + m4.powi(4)
+    };
+
+    let s_integrand = |ss: f64| {
+        let s = (1.0 - ss) / ss + s_min;
+        let dsdss = ss.powi(-2);
+        let sqrt_s = s.sqrt();
+
+        let (t_min, t_max) = t_min_max(s, m1, m2, m3, m4);
+        let t_integrand = |t: f64| amplitude(s, t);
+
+        integrate(t_integrand, t_min, t_max, 0.0).integral * bessel::k_1(sqrt_s * beta) / sqrt_s
+            * dsdss
+    };
+
+    integrate(s_integrand, 0.0, 1.0, 0.0).integral
 }
 
 #[cfg(test)]
