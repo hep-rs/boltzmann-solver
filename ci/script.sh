@@ -9,7 +9,7 @@ set -o errexit
 
 # Ensure there are no outstanding lints.
 check_lints() {
-    cargo clippy $FEATURES
+    cargo clippy --features $FEATURES
 }
 
 # Ensure the code is correctly formatted.
@@ -19,7 +19,7 @@ check_format() {
 
 # Run the test suite.
 check_tests() {
-    cargo test $FEATURES
+    cargo test --features $FEATURES
 }
 
 main() {
