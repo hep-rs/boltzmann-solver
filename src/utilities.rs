@@ -95,9 +95,36 @@ pub fn t_min_max(s: f64, m1: f64, m2: f64, m3: f64, m4: f64) -> (f64, f64) {
 
 #[cfg(test)]
 mod tests {
-    use super::{kallen_lambda, t_min_max};
+    use super::{checked_div, kallen_lambda, t_min_max};
     use crate::utilities::test::*;
     use ndarray::prelude::*;
+
+    #[cfg(feature = "arbitrary-precision")]
+    use super::checked_div_ap;
+    #[cfg(feature = "arbitrary-precision")]
+    use rug::Float;
+
+    #[test]
+    fn checked_devision() {
+        assert_eq!(checked_div(0.0, 0.0), 0.0);
+        assert_eq!(checked_div(1.0, 0.0), 1.0);
+        assert_eq!(checked_div(0.0, 1.0), 0.0);
+        assert_eq!(checked_div(1.0, 2.0), 0.5);
+    }
+
+    #[cfg(feature = "arbitrary-precision")]
+    #[test]
+    fn checked_devision_ap() {
+        let zero = Float::with_val(30, 0);
+        let one = Float::with_val(30, 1);
+        let two = Float::with_val(30, 2);
+        let half = Float::with_val(30, 0.5);
+
+        assert_eq!(checked_div_ap(&zero, &zero), zero);
+        assert_eq!(checked_div_ap(&one, &zero), one);
+        assert_eq!(checked_div_ap(&zero, &one), zero);
+        assert_eq!(checked_div_ap(&one, &two), half);
+    }
 
     #[test]
     fn t_min_max_zero() {
