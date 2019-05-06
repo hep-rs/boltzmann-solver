@@ -1,19 +1,24 @@
-mod interaction;
+//! Setup the solver, adding the particles and interactions to it, setting up
+//! the logger(s), and running it before returning the result.
 
-use crate::model::{VanillaLeptogenesisModel, PARTICLE_NAMES};
+use super::{
+    interaction,
+    model::{VanillaLeptogenesisModel, PARTICLE_NAMES},
+};
 use boltzmann_solver::{
     particle::Particle,
-    solver::{number_density::NumberDensitySolver, InitialCondition, Solver},
+    solver_ap::{number_density::NumberDensitySolver, InitialCondition, Solver},
     universe::StandardModel,
 };
 use ndarray::prelude::*;
+use rug::Float;
 use std::cell::RefCell;
 
 /// Solve the Boltzmann equations for the given model.
 ///
 /// This routine sets up the solve, runs it and returns the final array of
 /// number densities.
-pub fn solve(model: VanillaLeptogenesisModel) -> Array1<f64> {
+pub fn solve(model: VanillaLeptogenesisModel) -> Array1<Float> {
     // Set up the universe in which we'll run the Boltzmann equations
     let universe = StandardModel::new();
 
@@ -32,21 +37,21 @@ pub fn solve(model: VanillaLeptogenesisModel) -> Array1<f64> {
     );
 
     solver.add_particle(
-        Particle::new(PARTICLE_NAMES[1].to_string(), 1, model.mass.n[0]),
+        Particle::new(PARTICLE_NAMES[1].to_string(), 1, model.m_n[0]),
         InitialCondition::Equilibrium(0.0),
     );
     solver.add_particle(
-        Particle::new(PARTICLE_NAMES[2].to_string(), 1, model.mass.n[1]),
+        Particle::new(PARTICLE_NAMES[2].to_string(), 1, model.m_n[1]),
         InitialCondition::Equilibrium(0.0),
     );
     solver.add_particle(
-        Particle::new(PARTICLE_NAMES[3].to_string(), 1, model.mass.n[2]),
+        Particle::new(PARTICLE_NAMES[3].to_string(), 1, model.m_n[2]),
         InitialCondition::Equilibrium(0.0),
     );
 
     // Logging of number densities
     ////////////////////////////////////////////////////////////////////////////////
-    let csv = RefCell::new(csv::Writer::from_path("/tmp/minimal_leptogenesis/n.csv").unwrap());
+    let csv = RefCell::new(csv::Writer::from_path("/tmp/leptogenesis_ap/n.csv").unwrap());
 
     {
         let mut csv = csv.borrow_mut();

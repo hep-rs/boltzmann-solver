@@ -1,4 +1,6 @@
-use crate::model::{VanillaLeptogenesisModel, PARTICLE_NAMES};
+//! Define the various interactions involved in leptogenesis.
+
+use super::model::{VanillaLeptogenesisModel, PARTICLE_NAMES};
 use boltzmann_solver::{
     constants::{PI_1, PI_5},
     solver_ap::{number_density::NumberDensitySolver, Solver},
@@ -11,8 +13,7 @@ use std::cell::RefCell;
 
 /// Interaction N ↔ LH
 pub fn n_el_h(solver: &mut NumberDensitySolver<VanillaLeptogenesisModel>) {
-    let csv =
-        RefCell::new(csv::Writer::from_path("/tmp/minimal_leptogenesis_ap/decay.csv").unwrap());
+    let csv = RefCell::new(csv::Writer::from_path("/tmp/leptogenesis_ap/decay.csv").unwrap());
     csv.borrow_mut()
         .serialize(("step", "beta", PARTICLE_NAMES[0], PARTICLE_NAMES[1]))
         .unwrap();
@@ -24,11 +25,11 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<VanillaLeptogenesisModel>) {
         let gamma_tilde = {
             let mut m2 = Float::with_val(100, 0.0);
             for b in 0..3 {
-                m2 += c.model.coupling.y_v[[0, b]].norm_sqr();
+                m2 += c.model.y_v[[0, b]].norm_sqr();
             }
-            m2 *= (c.model.mass2.n[0] - c.model.mass2.h)
-                * bessel::k_1_on_k_2(c.model.mass.n[0] * c.beta.to_f64());
-            m2 /= c.hubble_rate * 16.0 * PI_1 * c.model.mass.n[0];
+            m2 *= (c.model.m_n[0].powi(2) - c.model.m_h.powi(2))
+                * bessel::k_1_on_k_2(c.model.m_n[0] * c.beta.to_f64());
+            m2 /= c.hubble_rate * 16.0 * PI_1 * c.model.m_n[0];
             m2 /= &c.beta;
             m2
         };
@@ -58,9 +59,8 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<VanillaLeptogenesisModel>) {
 
 /// Scattering NL ↔ Qq, NQ ↔ Lq and Nq ↔ LQ (s- and t-channel)
 pub fn n_el_ql_qr(solver: &mut NumberDensitySolver<VanillaLeptogenesisModel>) {
-    let csv = RefCell::new(
-        csv::Writer::from_path("/tmp/minimal_leptogenesis_ap/scattering_NLQq.csv").unwrap(),
-    );
+    let csv =
+        RefCell::new(csv::Writer::from_path("/tmp/leptogenesis_ap/scattering_NLQq.csv").unwrap());
     csv.borrow_mut()
         .serialize(["step", "beta", "N₁Q → Lq", "Lq → N₁Q"])
         .unwrap();
@@ -71,26 +71,27 @@ pub fn n_el_ql_qr(solver: &mut NumberDensitySolver<VanillaLeptogenesisModel>) {
                 Float::with_val(c.precision, 0.0),
                 |s, (a2, b1, b2)| {
                     s + 9.0
-                        * c.model.coupling.y_v[[0, a2]].norm_sqr()
-                        * (c.model.coupling.y_d[[b1, b2]].norm_sqr()
-                            + c.model.coupling.y_u[[b1, b2]].norm_sqr())
+                        * c.model.y_v[[0, a2]].norm_sqr()
+                        * (c.model.y_d[[b1, b2]].norm_sqr() + c.model.y_u[[b1, b2]].norm_sqr())
                 },
             );
+
+            let m2_n = c.model.m_n[0].powi(2);
+            let m2_h = c.model.m_h.powi(2);
+            let w2_h = c.model.w_h.powi(2);
+
             let m2_st = |s: f64, t: f64| {
                 (
                     // s-channel
-                    s * (s - c.model.mass2.n[0]) * (s - c.model.mass2.h).powi(2)
-                        / ((s - c.model.mass2.h).powi(2) + c.model.width2.h * c.model.mass2.h)
-                            .powi(2)
+                    s * (s - m2_n) * (s - m2_h).powi(2) / ((s - m2_h).powi(2) + w2_h * m2_h).powi(2)
                 ) + (
                     // t-channel
-                    2.0 * (t + c.model.mass2.n[0]) * (t + c.model.mass2.h).powi(2)
-                        / ((t + c.model.mass2.h).powi(2) + c.model.width2.h * c.model.mass2.h)
-                            .powi(2)
+                    2.0 * (t + m2_n) * (t + m2_h).powi(2)
+                        / ((t + m2_h).powi(2) + w2_h * m2_h).powi(2)
                 )
             };
 
-            m2_prefactor * integrate_st(m2_st, c.beta.to_f64(), c.model.mass.n[0], 0.0, 0.0, 0.0)
+            m2_prefactor * integrate_st(m2_st, c.beta.to_f64(), c.model.m_n[0], 0.0, 0.0, 0.0)
                 / (512.0 * PI_5 * c.hubble_rate)
                 / &c.beta
         };
