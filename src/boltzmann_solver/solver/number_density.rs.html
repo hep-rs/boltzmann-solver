@@ -717,14 +717,6 @@
 <span id="717">717</span>
 <span id="718">718</span>
 <span id="719">719</span>
-<span id="720">720</span>
-<span id="721">721</span>
-<span id="722">722</span>
-<span id="723">723</span>
-<span id="724">724</span>
-<span id="725">725</span>
-<span id="726">726</span>
-<span id="727">727</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Solver for the number density evolution given by integrating the Boltzmann</span>
 <span class="doccomment">//! equation.</span>
@@ -991,17 +983,16 @@
 <span class="doccomment">/// Context provided containing pre-computed values which might be useful when</span>
 <span class="doccomment">/// evaluating interactions.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Evaluation step</span>
+    <span class="doccomment">/// Current evaluation step</span>
     <span class="kw">pub</span> <span class="ident">step</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Inverse temperature in GeV^{-1}</span>
+    <span class="doccomment">/// Inverse temperature in GeV\\(^{-1}\\)</span>
     <span class="kw">pub</span> <span class="ident">beta</span>: <span class="ident">f64</span>,
-    <span class="doccomment">/// Current step size</span>
-    <span class="kw">pub</span> <span class="ident">step_size</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// Hubble rate, in GeV</span>
     <span class="kw">pub</span> <span class="ident">hubble_rate</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// Equilibrium number densities for the particles, normalized to the</span>
-    <span class="doccomment">/// equilibrium number density for a massless boson with \\(g = 1\\).  This</span>
-    <span class="doccomment">/// is provided in the same order as specified to the solver</span>
+    <span class="doccomment">/// equilibrium number density for a massless boson with \\(g = 1\\).  The</span>
+    <span class="doccomment">/// particle species are provided in the same order as when specified to the</span>
+    <span class="doccomment">/// solver</span>
     <span class="kw">pub</span> <span class="ident">eq_n</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Model data</span>
     <span class="kw">pub</span> <span class="ident">model</span>: <span class="ident">M</span>,
@@ -1210,7 +1201,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span>;
 
         <span class="comment">// Create the initial context and log the initial conditions</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">universe</span>, <span class="ident">h</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">universe</span>);
         (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">logger</span>)(<span class="kw-2">&amp;</span><span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="ident">c</span>);
 
         <span class="kw">while</span> <span class="ident">beta</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">1</span> {
@@ -1220,7 +1211,7 @@
             <span class="comment">// Compute each k[i]</span>
             <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">RK_S</span> {
                 <span class="kw">let</span> <span class="ident">beta_i</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">+</span> <span class="ident">RK_C</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">h</span>;
-                <span class="kw">let</span> <span class="ident">ci</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta_i</span>, <span class="ident">universe</span>, <span class="ident">h</span>);
+                <span class="kw">let</span> <span class="ident">ci</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta_i</span>, <span class="ident">universe</span>);
                 <span class="kw">let</span> <span class="ident">ai</span> <span class="op">=</span> <span class="ident">RK_A</span>[<span class="ident">i</span>];
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dni</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">i</span>).<span class="ident">fold</span>(<span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">total</span>, <span class="ident">j</span><span class="op">|</span> {
                     <span class="ident">total</span> <span class="op">+</span> <span class="ident">ai</span>[<span class="ident">j</span>] <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">j</span>]
@@ -1294,7 +1285,7 @@
             <span class="comment">// Check if the error is within the tolerance, or we are advancing</span>
             <span class="comment">// irrespective of the local error</span>
             <span class="kw">if</span> <span class="ident">advance</span> {
-                <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">universe</span>, <span class="ident">h</span>);
+                <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">universe</span>);
 
                 <span class="comment">// Advance n and beta</span>
                 <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">n_plus_dn</span>(<span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dn</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="ident">c</span>);
@@ -1378,17 +1369,10 @@
 
     <span class="doccomment">/// Generate the context at a given beta to pass to the logger/interaction</span>
     <span class="doccomment">/// functions.</span>
-    <span class="kw">fn</span> <span class="ident">context</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Universe</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">step</span>: <span class="ident">u64</span>,
-        <span class="ident">beta</span>: <span class="ident">f64</span>,
-        <span class="ident">universe</span>: <span class="kw-2">&amp;</span><span class="ident">U</span>,
-        <span class="ident">step_size</span>: <span class="ident">f64</span>,
-    ) <span class="op">-&gt;</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">context</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Universe</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">step</span>: <span class="ident">u64</span>, <span class="ident">beta</span>: <span class="ident">f64</span>, <span class="ident">universe</span>: <span class="kw-2">&amp;</span><span class="ident">U</span>) <span class="op">-&gt;</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
         <span class="ident">Context</span> {
             <span class="ident">step</span>,
             <span class="ident">beta</span>,
-            <span class="ident">step_size</span>,
             <span class="ident">hubble_rate</span>: <span class="ident">universe</span>.<span class="ident">hubble_rate</span>(<span class="ident">beta</span>),
             <span class="ident">eq_n</span>: <span class="self">self</span>.<span class="ident">equilibrium_number_densities</span>(<span class="ident">beta</span>),
             <span class="ident">model</span>: (<span class="self">self</span>.<span class="ident">model_fn</span>)(<span class="ident">M</span>::<span class="ident">new</span>(<span class="ident">beta</span>)),

@@ -268,7 +268,6 @@
 <span id="268">268</span>
 <span id="269">269</span>
 <span id="270">270</span>
-<span id="271">271</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! # Butcher tableaux</span>
 <span class="doccomment">//!</span>
@@ -478,9 +477,8 @@
     <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_rkf54</span>, <span class="ident">solve_ode_rkf54</span>, <span class="number">4.0</span>);
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">bench</span> {
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>))]</span>
+<span class="kw">mod</span> <span class="ident">benches</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">tests</span>::{
         <span class="ident">solve_ode_bs32</span>, <span class="ident">solve_ode_ck54</span>, <span class="ident">solve_ode_dp54</span>, <span class="ident">solve_ode_dp87</span>, <span class="ident">solve_ode_rkf54</span>,
     };
