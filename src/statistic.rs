@@ -453,6 +453,7 @@ mod tests {
 mod benches {
     use super::*;
     use csv;
+    use std::result::Result;
     use test::{black_box, Bencher};
 
     type Row6 = (f64, f64, f64, f64, f64, f64);
@@ -467,7 +468,7 @@ mod benches {
         let data: Vec<Row7> = rdr
             .into_deserialize()
             .step_by(STEP_SIZE)
-            .map(|r| r.unwrap())
+            .map(Result::unwrap)
             .collect();
 
         b.iter(|| {
@@ -485,7 +486,7 @@ mod benches {
         let data: Vec<Row7> = rdr
             .into_deserialize()
             .step_by(STEP_SIZE)
-            .map(|r| r.unwrap())
+            .map(Result::unwrap)
             .collect();
 
         b.iter(|| {
@@ -507,7 +508,7 @@ mod benches {
         let data: Vec<Row7> = rdr
             .into_deserialize()
             .step_by(STEP_SIZE)
-            .map(|r| r.unwrap())
+            .map(Result::unwrap)
             .collect();
 
         b.iter(|| {
@@ -525,7 +526,7 @@ mod benches {
         let data: Vec<Row7> = rdr
             .into_deserialize()
             .step_by(STEP_SIZE)
-            .map(|r| r.unwrap())
+            .map(Result::unwrap)
             .collect();
 
         b.iter(|| {
@@ -543,7 +544,7 @@ mod benches {
         let data: Vec<Row6> = rdr
             .into_deserialize()
             .step_by(STEP_SIZE)
-            .map(|r| r.unwrap())
+            .map(Result::unwrap)
             .collect();
 
         b.iter(|| {
@@ -561,7 +562,7 @@ mod benches {
         let data: Vec<Row6> = rdr
             .into_deserialize()
             .step_by(STEP_SIZE)
-            .map(|r| r.unwrap())
+            .map(Result::unwrap)
             .collect();
 
         b.iter(|| {
@@ -579,7 +580,7 @@ mod benches {
         let data: Vec<Row6> = rdr
             .into_deserialize()
             .step_by(STEP_SIZE)
-            .map(|r| r.unwrap())
+            .map(Result::unwrap)
             .collect();
 
         b.iter(|| {
@@ -597,7 +598,7 @@ mod benches {
         let data: Vec<Row6> = rdr
             .into_deserialize()
             .step_by(STEP_SIZE)
-            .map(|r| r.unwrap())
+            .map(Result::unwrap)
             .collect();
 
         b.iter(|| {
