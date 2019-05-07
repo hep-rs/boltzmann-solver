@@ -7,7 +7,7 @@ pub mod solve;
 
 use boltzmann_solver::solver::Model;
 use itertools::iproduct;
-use model::VanillaLeptogenesisModel;
+use model::LeptogenesisModel;
 use ndarray::prelude::*;
 use rayon::prelude::*;
 use std::sync::RwLock;
@@ -18,7 +18,7 @@ pub fn run() {
     // Setup the directory for CSV output
     ::std::fs::create_dir("/tmp/leptogenesis_sp/").unwrap_or(());
 
-    let model = VanillaLeptogenesisModel::new(1e-17);
+    let model = LeptogenesisModel::new(1e-17);
 
     let sol = solve::solve(model, |m| m);
 
@@ -43,10 +43,10 @@ pub fn scan() {
     .collect();
 
     ym.into_par_iter().for_each(|(y, n0)| {
-        let model = VanillaLeptogenesisModel::new(1e-17);
-        let f = move |mut m: VanillaLeptogenesisModel| {
-            m.y_v.mapv_inplace(|yi| yi * y);
-            m.m_n[0] = n0;
+        let model = LeptogenesisModel::new(1e-17);
+        let f = move |mut m: LeptogenesisModel| {
+            m.coupling.y_v.mapv_inplace(|yi| yi * y);
+            m.mass.n[0] = n0;
             m
         };
         let sol = solve::solve(model, f);
