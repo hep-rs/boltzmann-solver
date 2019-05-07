@@ -16,17 +16,17 @@ use std::f64;
 
 /// All the particle names in the same order as they are added to the solver.
 #[rustfmt::skip]
-pub const PARTICLE_NAMES: [&str; 4] = [
+pub const NAMES: [&str; 4] = [
     "B-L",
     "N₁", "N₂", "N₃",
 ];
 
 ////////////////////////////////////////////////////////////////////////////////
-// Model
+// Model Parameter Sub-cateogories
 ////////////////////////////////////////////////////////////////////////////////
 
-/// Leptogenesis model parameters.
-pub struct VanillaLeptogenesisModel {
+/// Struct containing all the Lagrangian coupling parameters.
+pub struct Couplings {
     /// Yukawa coupling: [H, Q, u]
     pub y_u: Array2<Complex<f64>>,
     /// Yukawa coupling: [H, Q, d]
@@ -35,25 +35,57 @@ pub struct VanillaLeptogenesisModel {
     pub y_e: Array2<Complex<f64>>,
     /// Yukawa coupling: [H, ν, L]
     pub y_v: Array2<Complex<f64>>,
+}
 
-    /// Right handed neutrinos mass (in GeV)
-    pub m_n: [f64; 3],
-    /// Higgs mass (in GeV)
-    pub m_h: f64,
+/// Particle masses (in GeV)
+pub struct Masses {
+    /// Right-handed neutrinos
+    pub n: [f64; 3],
+    /// Higgs
+    pub h: f64,
+}
 
-    /// Right handed neutrinos width (in GeV)
-    pub w_n: [f64; 3],
-    /// Higgs width (in GeV)
-    pub w_h: f64,
+/// Particle squared masses (in GeV\\(^2\\))
+pub struct SquaredMasses {
+    /// Right-handed neutrinos
+    pub n: [f64; 3],
+    /// Higgs
+    pub h: f64,
+}
 
-    /// Epsilon parameter
+/// Particle widths (in GeV)
+pub struct Widths {
+    /// Right-handed neutrinos
+    pub n: [f64; 3],
+    /// Higgs
+    pub h: f64,
+}
+
+/// Particle squared widths (in GeV\\(^2\\))
+pub struct SquaredWidths {
+    /// Right-handed neutrinos
+    pub n: [f64; 3],
+    /// Higgs
+    pub h: f64,
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Model
+////////////////////////////////////////////////////////////////////////////////
+
+/// Leptogenesis model parameters
+pub struct LeptogenesisModel {
+    pub coupling: Couplings,
+    pub mass: Masses,
+    pub mass2: SquaredMasses,
+    pub width: Widths,
+    pub width2: SquaredWidths,
     pub epsilon: f64,
 }
 
-impl Model for VanillaLeptogenesisModel {
+impl Model for LeptogenesisModel {
     fn new(beta: f64) -> Self {
-        VanillaLeptogenesisModel {
-            // Yukawa couplings
+        let coupling = Couplings {
             y_u: array![
                 [Complex::new(172.200, 0.0), zero(), zero()],
                 [zero(), Complex::new(95e-3, 0.0), zero()],
@@ -89,16 +121,31 @@ impl Model for VanillaLeptogenesisModel {
                     Complex::new(1.0, 0.0)
                 ],
             ] * 1e-4,
+        };
 
-            // Masses
-            m_n: [1e10, 1e11, 1e12],
-            m_h: 0.4 / beta,
+        let mass = Masses {
+            n: [1e10, 1e11, 1e12],
+            h: 0.4 / beta,
+        };
+        let mass2 = SquaredMasses {
+            n: [mass.n[0].powi(2), mass.n[1].powi(2), mass.n[2].powi(2)],
+            h: mass.h.powi(2),
+        };
+        let width = Widths {
+            n: [0.0, 0.0, 0.0],
+            h: 0.1 * mass.h,
+        };
+        let width2 = SquaredWidths {
+            n: [width.n[0].powi(2), width.n[1].powi(2), width.n[2].powi(2)],
+            h: width.h.powi(2),
+        };
 
-            // Widths
-            w_n: [0., 0., 0.],
-            w_h: 0.1 * 0.4 / beta,
-
-            // Epsilon
+        LeptogenesisModel {
+            coupling,
+            mass,
+            mass2,
+            width,
+            width2,
             epsilon: 1e-6,
         }
     }

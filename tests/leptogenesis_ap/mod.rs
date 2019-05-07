@@ -6,7 +6,7 @@ pub mod model;
 pub mod solve;
 
 use boltzmann_solver::solver_ap::Model;
-use model::VanillaLeptogenesisModel;
+use model::LeptogenesisModel;
 use rug::Float;
 
 /// Test a single fiducial data point
@@ -15,7 +15,7 @@ pub fn run() {
     // Setup the directory for CSV output
     ::std::fs::create_dir("/tmp/leptogenesis_ap/").unwrap_or(());
 
-    let model = VanillaLeptogenesisModel::new(&Float::with_val(100, 1e-17));
+    let model = LeptogenesisModel::new(&Float::with_val(100, 1e-17));
 
     let sol = solve::solve(model);
 
