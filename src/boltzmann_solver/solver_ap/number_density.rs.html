@@ -484,6 +484,14 @@
 <span id="484">484</span>
 <span id="485">485</span>
 <span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Solver for the number density evolution given by integrating the Boltzmann</span>
 <span class="doccomment">//! equation using arbitrary precision.</span>
@@ -807,7 +815,7 @@
             <span class="kw">if</span> <span class="ident">h_est</span> <span class="op">&gt;</span> <span class="ident">max_step</span> {
                 <span class="ident">h_est</span> <span class="op">=</span> <span class="ident">max_step</span>;
                 <span class="macro">debug</span><span class="macro">!</span>(
-                    <span class="string">&quot;Step {:}, β = {:.4e} -&gt; Step size too large, decreased h to {:.3e}&quot;</span>,
+                    <span class="string">&quot;[Step {:}, β = {:.4e}] Step size too large, decreased h to {:.3e}&quot;</span>,
                     <span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">h_est</span>
                 );
                 <span class="ident">advance</span> <span class="op">=</span> <span class="bool-val">true</span>;
@@ -816,7 +824,7 @@
                 <span class="kw">if</span> <span class="ident">h_est</span> <span class="op">&lt;</span> <span class="ident">min_step</span> {
                     <span class="ident">h</span> <span class="op">=</span> <span class="ident">min_step</span>;
                     <span class="macro">debug</span><span class="macro">!</span>(
-                        <span class="string">&quot;Step {:}, β = {:.4e} -&gt; Step size too small, increased h to {:.3e}&quot;</span>,
+                        <span class="string">&quot;[Step {:}, β = {:.4e}] Step size too small, increased h to {:.3e}&quot;</span>,
                         <span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">h</span>
                     );
                     <span class="ident">advance</span> <span class="op">=</span> <span class="bool-val">true</span>;
@@ -935,6 +943,10 @@
             <span class="kw">let</span> <span class="ident">delta_2</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="ident">delta_1</span>.<span class="ident">clone</span>() <span class="op">+</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">dn</span>;
 
             <span class="kw">if</span> <span class="ident">delta_1</span>.<span class="ident">is_sign_positive</span>() <span class="op">!=</span> <span class="ident">delta_2</span>.<span class="ident">is_sign_positive</span>() {
+                <span class="macro">debug</span><span class="macro">!</span>(
+                    <span class="string">&quot;[Step {:}, β = {:.4e}] Δn overshoots equilibrium.  Removing overshoot.&quot;</span>,
+                    <span class="ident">c</span>.<span class="ident">step</span>, <span class="ident">c</span>.<span class="ident">beta</span>,
+                );
                 <span class="kw-2">*</span><span class="ident">dn</span> <span class="op">=</span> <span class="ident">n</span>.<span class="ident">clone</span>() <span class="op">-</span> <span class="ident">eq_n</span>;
                 <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="self">self</span>.<span class="ident">working_precision</span>, <span class="ident">eq_n</span>);
             } <span class="kw">else</span> {
@@ -942,6 +954,10 @@
             }
 
             <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span>.<span class="ident">as_abs</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">threshold_number_density</span> {
+                <span class="macro">debug</span><span class="macro">!</span>(
+                    <span class="string">&quot;[Step {:}, β = {:.4e}] n going below threshold number density, setting to zero.&quot;</span>,
+                    <span class="ident">c</span>.<span class="ident">step</span>, <span class="ident">c</span>.<span class="ident">beta</span>,
+                );
                 <span class="kw-2">*</span><span class="ident">dn</span> <span class="op">=</span> <span class="ident">n</span>.<span class="ident">clone</span>();
                 <span class="ident">dn</span>.<span class="ident">neg_assign</span>();
                 <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="self">self</span>.<span class="ident">working_precision</span>, <span class="number">0.0</span>)

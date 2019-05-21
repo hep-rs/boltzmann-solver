@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/gmp-mpfr-sys-1.1.12/src/gmp.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>gmp.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../gmp_mpfr_sys/index.html'><img src='https://tspiteri.gitlab.io/gmp-mpfr-sys/rug.svg' alt='logo' width='100'></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/gmp-mpfr-sys-1.1.13/src/gmp.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>gmp.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../gmp_mpfr_sys/index.html'><img src='https://tspiteri.gitlab.io/gmp-mpfr-sys/rug.svg' alt='logo' width='100'></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1691,6 +1691,52 @@
 <span id="1691">1691</span>
 <span id="1692">1692</span>
 <span id="1693">1693</span>
+<span id="1694">1694</span>
+<span id="1695">1695</span>
+<span id="1696">1696</span>
+<span id="1697">1697</span>
+<span id="1698">1698</span>
+<span id="1699">1699</span>
+<span id="1700">1700</span>
+<span id="1701">1701</span>
+<span id="1702">1702</span>
+<span id="1703">1703</span>
+<span id="1704">1704</span>
+<span id="1705">1705</span>
+<span id="1706">1706</span>
+<span id="1707">1707</span>
+<span id="1708">1708</span>
+<span id="1709">1709</span>
+<span id="1710">1710</span>
+<span id="1711">1711</span>
+<span id="1712">1712</span>
+<span id="1713">1713</span>
+<span id="1714">1714</span>
+<span id="1715">1715</span>
+<span id="1716">1716</span>
+<span id="1717">1717</span>
+<span id="1718">1718</span>
+<span id="1719">1719</span>
+<span id="1720">1720</span>
+<span id="1721">1721</span>
+<span id="1722">1722</span>
+<span id="1723">1723</span>
+<span id="1724">1724</span>
+<span id="1725">1725</span>
+<span id="1726">1726</span>
+<span id="1727">1727</span>
+<span id="1728">1728</span>
+<span id="1729">1729</span>
+<span id="1730">1730</span>
+<span id="1731">1731</span>
+<span id="1732">1732</span>
+<span id="1733">1733</span>
+<span id="1734">1734</span>
+<span id="1735">1735</span>
+<span id="1736">1736</span>
+<span id="1737">1737</span>
+<span id="1738">1738</span>
+<span id="1739">1739</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright © 2017–2019 University of Malta</span>
 
@@ -1781,6 +1827,16 @@ unsafe {
 
 <span class="doccomment">/// See: [`mpz_t`](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/GMP-Basics.html#index-mpz_005ft)</span>
 <span class="doccomment">/// and [Integer Internals](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/Internals.html#Integer-Internals)</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Compatibility note</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The fields listed here are considered internal details. These</span>
+<span class="doccomment">/// internals may change in new minor releases of this crate, though</span>
+<span class="doccomment">/// they will be kept unchanged for patch releases. Any code that</span>
+<span class="doccomment">/// makes use of these internals should list the dependency as</span>
+<span class="doccomment">/// `version = &quot;~1.1&quot;` inside [*Cargo.toml*], *not* `version = &quot;1.1&quot;`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [*Cargo.toml*]: https://doc.rust-lang.org/cargo/guide/dependencies.html</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">mpz_t</span> {
@@ -1794,15 +1850,38 @@ unsafe {
 
 <span class="doccomment">/// See: [`mpq_t`](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/GMP-Basics.html#index-mpq_005ft)</span>
 <span class="doccomment">/// and [Rational Internals](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/Internals.html#Rational-Internals)</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Compatibility note</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The fields listed here are considered internal details. These</span>
+<span class="doccomment">/// internals may change in new minor releases of this crate, though</span>
+<span class="doccomment">/// they will be kept unchanged for patch releases. Any code that</span>
+<span class="doccomment">/// makes use of these internals should list the dependency as</span>
+<span class="doccomment">/// `version = &quot;~1.1&quot;` inside [*Cargo.toml*], *not* `version = &quot;1.1&quot;`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [*Cargo.toml*]: https://doc.rust-lang.org/cargo/guide/dependencies.html</span>
+<span class="doccomment">///</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">mpq_t</span> {
-    <span class="ident">num</span>: <span class="ident">mpz_t</span>,
-    <span class="ident">den</span>: <span class="ident">mpz_t</span>,
+    <span class="doccomment">/// Internal implementation detail: numerator.</span>
+    <span class="kw">pub</span> <span class="ident">num</span>: <span class="ident">mpz_t</span>,
+    <span class="doccomment">/// Internal implementation detail: denominator.</span>
+    <span class="kw">pub</span> <span class="ident">den</span>: <span class="ident">mpz_t</span>,
 }
 
 <span class="doccomment">/// See: [`mpf_t`](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/GMP-Basics.html#index-mpf_005ft)</span>
 <span class="doccomment">/// and [Float Internals](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/Internals.html#Float-Internals)</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Compatibility note</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The fields listed here are considered internal details. These</span>
+<span class="doccomment">/// internals may change in new minor releases of this crate, though</span>
+<span class="doccomment">/// they will be kept unchanged for patch releases. Any code that</span>
+<span class="doccomment">/// makes use of these internals should list the dependency as</span>
+<span class="doccomment">/// `version = &quot;~1.1&quot;` inside [*Cargo.toml*], *not* `version = &quot;1.1&quot;`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [*Cargo.toml*]: https://doc.rust-lang.org/cargo/guide/dependencies.html</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">mpf_t</span> {
@@ -1817,12 +1896,25 @@ unsafe {
 }
 
 <span class="doccomment">/// See: [`gmp_randstate_t`](https://tspiteri.gitlab.io/gmp-mpfr-sys/gmp/GMP-Basics.html#index-gmp_005frandstate_005ft)</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Compatibility note</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The fields listed here are considered internal details. These</span>
+<span class="doccomment">/// internals may change in new minor releases of this crate, though</span>
+<span class="doccomment">/// they will be kept unchanged for patch releases. Any code that</span>
+<span class="doccomment">/// makes use of these internals should list the dependency as</span>
+<span class="doccomment">/// `version = &quot;~1.1&quot;` inside [*Cargo.toml*], *not* `version = &quot;1.1&quot;`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [*Cargo.toml*]: https://doc.rust-lang.org/cargo/guide/dependencies.html</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">randstate_t</span> {
-    <span class="ident">seed</span>: <span class="ident">mpz_t</span>,
-    <span class="ident">alg</span>: <span class="ident">c_int</span>,
-    <span class="ident">algdata</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="doccomment">/// Internal implementation detail: state of the generator.</span>
+    <span class="kw">pub</span> <span class="ident">seed</span>: <span class="ident">mpz_t</span>,
+    <span class="doccomment">/// Internal implementation detail: unused.</span>
+    <span class="kw">pub</span> <span class="ident">alg</span>: <span class="ident">c_int</span>,
+    <span class="doccomment">/// Internal implementation detail: pointer to function pointers structure.</span>
+    <span class="kw">pub</span> <span class="ident">algdata</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
 }
 
 <span class="comment">// Types for function declarations in this file.</span>
