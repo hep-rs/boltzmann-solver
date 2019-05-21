@@ -16,14 +16,20 @@ pub(crate) mod test;
 /// - If `a == 0.0`, returns `0.0` irrespective of the value of `b`;
 /// - If `b == 0.0`, returns `1.0` irrespective of the value of `a` (unless `a
 ///   == 0`);
+/// - Otherwise, return the result `a / b` capped to be at most `100.0` in magnitude.
 #[inline]
 pub fn checked_div(a: f64, b: f64) -> f64 {
     if a == 0.0 {
         0.0
     } else if b == 0.0 {
-        1.0
+        a.signum()
     } else {
-        a / b
+        let v = a / b;
+        if v.abs() > 100.0 {
+            100.0 * v.signum()
+        } else {
+            v
+        }
     }
 }
 
@@ -34,15 +40,21 @@ pub fn checked_div(a: f64, b: f64) -> f64 {
 /// - If `a == 0.0`, returns `0.0` irrespective of the value of `b`;
 /// - If `b == 0.0`, returns `1.0` irrespective of the value of `a` (unless `a
 ///   == 0`);
+/// - Otherwise, return the result `a / b` capped to be at most `100.0` in magnitude.
 #[cfg(feature = "arbitrary-precision")]
 #[inline]
 pub fn checked_div_ap(a: &Float, b: &Float) -> Float {
     if a.is_zero() {
         Float::with_val(a.prec(), 0.0)
     } else if b.is_zero() {
-        Float::with_val(a.prec(), 1.0)
+        Float::with_val(a.prec(), 1.0).copysign(a)
     } else {
-        Float::with_val(a.prec(), a / b)
+        let v = Float::with_val(a.prec(), a / b);
+        if v.as_abs().to_f64() > 100.0 {
+            Float::with_val(a.prec(), 100.0).copysign(&v)
+        } else {
+            v
+        }
     }
 }
 
@@ -145,9 +157,22 @@ mod tests {
     #[test]
     fn checked_div() {
         assert_eq!(super::checked_div(0.0, 0.0), 0.0);
+
         assert_eq!(super::checked_div(1.0, 0.0), 1.0);
+        assert_eq!(super::checked_div(-1.0, 0.0), -1.0);
+
         assert_eq!(super::checked_div(0.0, 1.0), 0.0);
+        assert_eq!(super::checked_div(0.0, -1.0), 0.0);
+
         assert_eq!(super::checked_div(1.0, 2.0), 0.5);
+        assert_eq!(super::checked_div(-1.0, 2.0), -0.5);
+        assert_eq!(super::checked_div(1.0, -2.0), -0.5);
+        assert_eq!(super::checked_div(-1.0, -2.0), 0.5);
+
+        assert_eq!(super::checked_div(1.0, 1e-5), 100.0);
+        assert_eq!(super::checked_div(-1.0, 1e-5), -100.0);
+        assert_eq!(super::checked_div(1.0, -1e-5), -100.0);
+        assert_eq!(super::checked_div(-1.0, -1e-5), 100.0);
     }
 
     #[cfg(feature = "arbitrary-precision")]
@@ -157,11 +182,31 @@ mod tests {
         let one = Float::with_val(30, 1);
         let two = Float::with_val(30, 2);
         let half = Float::with_val(30, 0.5);
+        let en5 = Float::with_val(30, 1e-5);
+        let hundred = Float::with_val(30, 1e2);
+        let neg_one = Float::with_val(30, -1);
+        let neg_two = Float::with_val(30, -2);
+        let neg_half = Float::with_val(30, -0.5);
+        let neg_en5 = Float::with_val(30, -1e-5);
+        let neg_hundred = Float::with_val(30, -1e2);
 
         assert_eq!(super::checked_div_ap(&zero, &zero), zero);
+
         assert_eq!(super::checked_div_ap(&one, &zero), one);
+        assert_eq!(super::checked_div_ap(&neg_one, &zero), neg_one);
+
         assert_eq!(super::checked_div_ap(&zero, &one), zero);
+        assert_eq!(super::checked_div_ap(&zero, &neg_one), zero);
+
         assert_eq!(super::checked_div_ap(&one, &two), half);
+        assert_eq!(super::checked_div_ap(&neg_one, &two), neg_half);
+        assert_eq!(super::checked_div_ap(&one, &neg_two), neg_half);
+        assert_eq!(super::checked_div_ap(&neg_one, &neg_two), half);
+
+        assert_eq!(super::checked_div_ap(&one, &en5), hundred);
+        assert_eq!(super::checked_div_ap(&neg_one, &en5), neg_hundred);
+        assert_eq!(super::checked_div_ap(&one, &neg_en5), neg_hundred);
+        assert_eq!(super::checked_div_ap(&neg_one, &neg_en5), hundred);
     }
 
     #[test]
