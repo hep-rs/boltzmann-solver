@@ -549,14 +549,14 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             if h_est > beta * self.step_precision.max {
                 h_est = beta * self.step_precision.max;
                 debug!(
-                    "Step {:}, β = {:.4e} -> Step size too large, decreased h to {:.3e}",
+                    "[Step {:}, β = {:.4e}] Step size too large, decreased h to {:.3e}",
                     step, beta, h_est
                 );
                 advance = true;
             } else if h_est < beta * self.step_precision.min {
                 h_est = beta * self.step_precision.min;
                 debug!(
-                    "Step {:}, β = {:.4e} -> Step size too small, increased h to {:.3e}",
+                    "[Step {:}, β = {:.4e}] Step size too small, increased h to {:.3e}",
                     step, beta, h_est
                 );
                 advance = true;
@@ -577,6 +577,10 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
 
             // Adjust final integration step if needed
             if beta + h_est > self.beta_range.1 {
+                debug!(
+                    "[Step {:}, β = {:.4e}] Fixing overshoot of last integration step.",
+                    step, beta
+                );
                 h_est = self.beta_range.1 - beta;
             }
 
@@ -682,6 +686,10 @@ impl<M: Model> NumberDensitySolver<M> {
             let delta_2 = delta_1 + *dn;
 
             if delta_1.is_sign_positive() != delta_2.is_sign_positive() {
+                debug!(
+                    "[Step {:}, β = {:.4e}] Δn overshoots equilibrium.  Removing overshoot.",
+                    c.step, c.beta,
+                );
                 *dn = *n - eq_n;
                 *n = *eq_n;
             } else {
@@ -689,6 +697,10 @@ impl<M: Model> NumberDensitySolver<M> {
             }
 
             if n.abs() < self.threshold_number_density {
+                debug!(
+                    "[Step {:}, β = {:.4e}] n going below threshold number density, setting to zero.",
+                    c.step, c.beta,
+                );
                 *dn = -*n;
                 *n = 0.0;
             }

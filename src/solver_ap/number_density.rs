@@ -320,7 +320,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             if h_est > max_step {
                 h_est = max_step;
                 debug!(
-                    "Step {:}, β = {:.4e} -> Step size too large, decreased h to {:.3e}",
+                    "[Step {:}, β = {:.4e}] Step size too large, decreased h to {:.3e}",
                     step, beta, h_est
                 );
                 advance = true;
@@ -329,7 +329,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 if h_est < min_step {
                     h = min_step;
                     debug!(
-                        "Step {:}, β = {:.4e} -> Step size too small, increased h to {:.3e}",
+                        "[Step {:}, β = {:.4e}] Step size too small, increased h to {:.3e}",
                         step, beta, h
                     );
                     advance = true;
@@ -448,6 +448,10 @@ impl<'a, M: Model> NumberDensitySolver<M> {
             let delta_2: Float = delta_1.clone() + &*dn;
 
             if delta_1.is_sign_positive() != delta_2.is_sign_positive() {
+                debug!(
+                    "[Step {:}, β = {:.4e}] Δn overshoots equilibrium.  Removing overshoot.",
+                    c.step, c.beta,
+                );
                 *dn = n.clone() - eq_n;
                 *n = Float::with_val(self.working_precision, eq_n);
             } else {
@@ -455,6 +459,10 @@ impl<'a, M: Model> NumberDensitySolver<M> {
             }
 
             if *n.as_abs() < self.threshold_number_density {
+                debug!(
+                    "[Step {:}, β = {:.4e}] n going below threshold number density, setting to zero.",
+                    c.step, c.beta,
+                );
                 *dn = n.clone();
                 dn.neg_assign();
                 *n = Float::with_val(self.working_precision, 0.0)
