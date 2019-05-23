@@ -334,6 +334,11 @@
 <span id="334">334</span>
 <span id="335">335</span>
 <span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Module of various useful miscellaneous functions.</span>
 
@@ -359,14 +364,17 @@
     <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="number">0.0</span> {
         <span class="number">0.0</span>
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">b</span> <span class="op">==</span> <span class="number">0.0</span> {
-        <span class="ident">a</span>.<span class="ident">signum</span>()
+        <span class="number">100.0</span> <span class="op">*</span> <span class="ident">a</span>.<span class="ident">signum</span>()
     } <span class="kw">else</span> {
+        <span class="comment">// let v = a / b;</span>
+        <span class="comment">// if v.abs() &gt; 100.0 {</span>
+        <span class="comment">//     100.0 * v.signum()</span>
+        <span class="comment">// } else {</span>
+        <span class="comment">//     v</span>
+        <span class="comment">// }</span>
+        <span class="comment">// Use a sigmoid to have bounds on the division</span>
         <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">/</span> <span class="ident">b</span>;
-        <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="number">100.0</span> {
-            <span class="number">100.0</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">signum</span>()
-        } <span class="kw">else</span> {
-            <span class="ident">v</span>
-        }
+        <span class="number">100.0</span> <span class="op">*</span> (<span class="ident">v</span> <span class="op">/</span> <span class="number">100.0</span>).<span class="ident">tanh</span>()
     }
 }
 
@@ -384,14 +392,16 @@
     <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">is_zero</span>() {
         <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="ident">a</span>.<span class="ident">prec</span>(), <span class="number">0.0</span>)
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">is_zero</span>() {
-        <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="ident">a</span>.<span class="ident">prec</span>(), <span class="number">1.0</span>).<span class="ident">copysign</span>(<span class="ident">a</span>)
+        <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="ident">a</span>.<span class="ident">prec</span>(), <span class="number">100.0</span>).<span class="ident">copysign</span>(<span class="ident">a</span>)
     } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="ident">a</span>.<span class="ident">prec</span>(), <span class="ident">a</span> <span class="op">/</span> <span class="ident">b</span>);
-        <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">as_abs</span>().<span class="ident">to_f64</span>() <span class="op">&gt;</span> <span class="number">100.0</span> {
-            <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="ident">a</span>.<span class="ident">prec</span>(), <span class="number">100.0</span>).<span class="ident">copysign</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">v</span>
-        }
+        <span class="comment">// let v = Float::with_val(a.prec(), a / b);</span>
+        <span class="comment">// if v.as_abs().to_f64() &gt; 100.0 {</span>
+        <span class="comment">//     Float::with_val(a.prec(), 100.0).copysign(&amp;v)</span>
+        <span class="comment">// } else {</span>
+        <span class="comment">//     v</span>
+        <span class="comment">// }</span>
+        <span class="kw">let</span> <span class="ident">v</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="ident">a</span>.<span class="ident">prec</span>(), <span class="ident">a</span> <span class="op">/</span> <span class="ident">b</span>) <span class="op">/</span> <span class="number">100</span>;
+        <span class="number">100.0</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">tanh</span>()
     }
 }
 
@@ -495,16 +505,16 @@
     <span class="kw">fn</span> <span class="ident">checked_div</span>() {
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">0.0</span>, <span class="number">0.0</span>), <span class="number">0.0</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">1.0</span>, <span class="number">0.0</span>), <span class="number">1.0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.0</span>), <span class="op">-</span><span class="number">1.0</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">1.0</span>, <span class="number">0.0</span>), <span class="number">100.0</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.0</span>), <span class="op">-</span><span class="number">100.0</span>);
 
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">0.0</span>, <span class="number">1.0</span>), <span class="number">0.0</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">0.0</span>, <span class="op">-</span><span class="number">1.0</span>), <span class="number">0.0</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">1.0</span>, <span class="number">2.0</span>), <span class="number">0.5</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="number">2.0</span>), <span class="op">-</span><span class="number">0.5</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">1.0</span>, <span class="op">-</span><span class="number">2.0</span>), <span class="op">-</span><span class="number">0.5</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">2.0</span>), <span class="number">0.5</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">1.0</span>, <span class="number">2.0</span>), <span class="number">0.499_995_833_374_999_6</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="number">2.0</span>), <span class="op">-</span><span class="number">0.499_995_833_374_999_6</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">1.0</span>, <span class="op">-</span><span class="number">2.0</span>), <span class="op">-</span><span class="number">0.499_995_833_374_999_6</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">2.0</span>), <span class="number">0.499_995_833_374_999_6</span>);
 
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">1.0</span>, <span class="number">1e-5</span>), <span class="number">100.0</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="number">1e-5</span>), <span class="op">-</span><span class="number">100.0</span>);
@@ -518,19 +528,19 @@
         <span class="kw">let</span> <span class="ident">zero</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">one</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="number">1</span>);
         <span class="kw">let</span> <span class="ident">two</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">half</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="number">0.5</span>);
+        <span class="kw">let</span> <span class="ident">half</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="number">0.499_995_832_80</span>);
         <span class="kw">let</span> <span class="ident">en5</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="number">1e-5</span>);
         <span class="kw">let</span> <span class="ident">hundred</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="number">1e2</span>);
         <span class="kw">let</span> <span class="ident">neg_one</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="op">-</span><span class="number">1</span>);
         <span class="kw">let</span> <span class="ident">neg_two</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="op">-</span><span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">neg_half</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="op">-</span><span class="number">0.5</span>);
+        <span class="kw">let</span> <span class="ident">neg_half</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="op">-</span><span class="number">0.499_995_832_80</span>);
         <span class="kw">let</span> <span class="ident">neg_en5</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="op">-</span><span class="number">1e-5</span>);
         <span class="kw">let</span> <span class="ident">neg_hundred</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="op">-</span><span class="number">1e2</span>);
 
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">zero</span>, <span class="kw-2">&amp;</span><span class="ident">zero</span>), <span class="ident">zero</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">one</span>, <span class="kw-2">&amp;</span><span class="ident">zero</span>), <span class="ident">one</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">neg_one</span>, <span class="kw-2">&amp;</span><span class="ident">zero</span>), <span class="ident">neg_one</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">one</span>, <span class="kw-2">&amp;</span><span class="ident">zero</span>), <span class="ident">hundred</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">neg_one</span>, <span class="kw-2">&amp;</span><span class="ident">zero</span>), <span class="ident">neg_hundred</span>);
 
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">zero</span>, <span class="kw-2">&amp;</span><span class="ident">one</span>), <span class="ident">zero</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">zero</span>, <span class="kw-2">&amp;</span><span class="ident">neg_one</span>), <span class="ident">zero</span>);
