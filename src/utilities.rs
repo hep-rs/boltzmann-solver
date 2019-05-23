@@ -22,14 +22,17 @@ pub fn checked_div(a: f64, b: f64) -> f64 {
     if a == 0.0 {
         0.0
     } else if b == 0.0 {
-        a.signum()
+        100.0 * a.signum()
     } else {
+        // let v = a / b;
+        // if v.abs() > 100.0 {
+        //     100.0 * v.signum()
+        // } else {
+        //     v
+        // }
+        // Use a sigmoid to have bounds on the division
         let v = a / b;
-        if v.abs() > 100.0 {
-            100.0 * v.signum()
-        } else {
-            v
-        }
+        100.0 * (v / 100.0).tanh()
     }
 }
 
@@ -47,14 +50,16 @@ pub fn checked_div_ap(a: &Float, b: &Float) -> Float {
     if a.is_zero() {
         Float::with_val(a.prec(), 0.0)
     } else if b.is_zero() {
-        Float::with_val(a.prec(), 1.0).copysign(a)
+        Float::with_val(a.prec(), 100.0).copysign(a)
     } else {
-        let v = Float::with_val(a.prec(), a / b);
-        if v.as_abs().to_f64() > 100.0 {
-            Float::with_val(a.prec(), 100.0).copysign(&v)
-        } else {
-            v
-        }
+        // let v = Float::with_val(a.prec(), a / b);
+        // if v.as_abs().to_f64() > 100.0 {
+        //     Float::with_val(a.prec(), 100.0).copysign(&v)
+        // } else {
+        //     v
+        // }
+        let v: Float = Float::with_val(a.prec(), a / b) / 100;
+        100.0 * v.tanh()
     }
 }
 
@@ -158,16 +163,16 @@ mod tests {
     fn checked_div() {
         assert_eq!(super::checked_div(0.0, 0.0), 0.0);
 
-        assert_eq!(super::checked_div(1.0, 0.0), 1.0);
-        assert_eq!(super::checked_div(-1.0, 0.0), -1.0);
+        assert_eq!(super::checked_div(1.0, 0.0), 100.0);
+        assert_eq!(super::checked_div(-1.0, 0.0), -100.0);
 
         assert_eq!(super::checked_div(0.0, 1.0), 0.0);
         assert_eq!(super::checked_div(0.0, -1.0), 0.0);
 
-        assert_eq!(super::checked_div(1.0, 2.0), 0.5);
-        assert_eq!(super::checked_div(-1.0, 2.0), -0.5);
-        assert_eq!(super::checked_div(1.0, -2.0), -0.5);
-        assert_eq!(super::checked_div(-1.0, -2.0), 0.5);
+        assert_eq!(super::checked_div(1.0, 2.0), 0.499_995_833_374_999_6);
+        assert_eq!(super::checked_div(-1.0, 2.0), -0.499_995_833_374_999_6);
+        assert_eq!(super::checked_div(1.0, -2.0), -0.499_995_833_374_999_6);
+        assert_eq!(super::checked_div(-1.0, -2.0), 0.499_995_833_374_999_6);
 
         assert_eq!(super::checked_div(1.0, 1e-5), 100.0);
         assert_eq!(super::checked_div(-1.0, 1e-5), -100.0);
@@ -181,19 +186,19 @@ mod tests {
         let zero = Float::with_val(30, 0);
         let one = Float::with_val(30, 1);
         let two = Float::with_val(30, 2);
-        let half = Float::with_val(30, 0.5);
+        let half = Float::with_val(30, 0.499_995_832_80);
         let en5 = Float::with_val(30, 1e-5);
         let hundred = Float::with_val(30, 1e2);
         let neg_one = Float::with_val(30, -1);
         let neg_two = Float::with_val(30, -2);
-        let neg_half = Float::with_val(30, -0.5);
+        let neg_half = Float::with_val(30, -0.499_995_832_80);
         let neg_en5 = Float::with_val(30, -1e-5);
         let neg_hundred = Float::with_val(30, -1e2);
 
         assert_eq!(super::checked_div_ap(&zero, &zero), zero);
 
-        assert_eq!(super::checked_div_ap(&one, &zero), one);
-        assert_eq!(super::checked_div_ap(&neg_one, &zero), neg_one);
+        assert_eq!(super::checked_div_ap(&one, &zero), hundred);
+        assert_eq!(super::checked_div_ap(&neg_one, &zero), neg_hundred);
 
         assert_eq!(super::checked_div_ap(&zero, &one), zero);
         assert_eq!(super::checked_div_ap(&zero, &neg_one), zero);
