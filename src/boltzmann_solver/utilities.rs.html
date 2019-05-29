@@ -339,6 +339,28 @@
 <span id="339">339</span>
 <span id="340">340</span>
 <span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Module of various useful miscellaneous functions.</span>
 
@@ -348,60 +370,69 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;arbitrary-precision&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">rug</span>::<span class="ident">Float</span>;
 
+<span class="kw">const</span> <span class="ident">CHECKED_DIV_MAX</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">10.0</span>;
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">test</span>;
 
-<span class="doccomment">/// Perform a &#39;checked&#39; division.</span>
+<span class="doccomment">/// Perform a &#39;checked&#39; division for number densities.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Computes the result `a / b` with the following special conditions:</span>
+<span class="doccomment">/// As the number densities can become quite small (especially the equilibrium</span>
+<span class="doccomment">/// number densities), computing `n / n_eq` can cause certain issues.  As a</span>
+<span class="doccomment">/// result, this function provides a &#39;well-behaved&#39; division that handles small</span>
+<span class="doccomment">/// values of `n_eq`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// - If `a == 0.0`, returns `0.0` irrespective of the value of `b`;</span>
-<span class="doccomment">/// - If `b == 0.0`, returns `1.0` irrespective of the value of `a` (unless `a</span>
-<span class="doccomment">///   == 0`);</span>
-<span class="doccomment">/// - Otherwise, return the result `a / b` capped to be at most `100.0` in magnitude.</span>
+<span class="doccomment">/// # Implementation</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// - If the numerator is 0, 0 is returned.</span>
+<span class="doccomment">/// - If the denominator is 0, a maximum value is returned with the same sign as</span>
+<span class="doccomment">///   the numerator.</span>
+<span class="doccomment">/// - For all other values, the value returned is:</span>
+<span class="doccomment">///   \\begin{equation}</span>
+<span class="doccomment">///     M \tanh\left( \frac{1}{M} \frac{a}{b} \right)</span>
+<span class="doccomment">///   \\end{equation}</span>
+<span class="doccomment">///   where \\(M\\) is the maximum value allowed (typically set to 10).</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_div</span>(<span class="ident">a</span>: <span class="ident">f64</span>, <span class="ident">b</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
     <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="number">0.0</span> {
         <span class="number">0.0</span>
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">b</span> <span class="op">==</span> <span class="number">0.0</span> {
-        <span class="number">100.0</span> <span class="op">*</span> <span class="ident">a</span>.<span class="ident">signum</span>()
+        <span class="ident">CHECKED_DIV_MAX</span>.<span class="ident">copysign</span>(<span class="ident">a</span>)
     } <span class="kw">else</span> {
-        <span class="comment">// let v = a / b;</span>
-        <span class="comment">// if v.abs() &gt; 100.0 {</span>
-        <span class="comment">//     100.0 * v.signum()</span>
-        <span class="comment">// } else {</span>
-        <span class="comment">//     v</span>
-        <span class="comment">// }</span>
-        <span class="comment">// Use a sigmoid to have bounds on the division</span>
+        <span class="comment">// Use a sigmoid to have bounds on the division to prevent very small</span>
+        <span class="comment">// denominators from blowing up.</span>
         <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">/</span> <span class="ident">b</span>;
-        <span class="number">100.0</span> <span class="op">*</span> (<span class="ident">v</span> <span class="op">/</span> <span class="number">100.0</span>).<span class="ident">tanh</span>()
+        <span class="ident">CHECKED_DIV_MAX</span> <span class="op">*</span> (<span class="ident">v</span> <span class="op">/</span> <span class="ident">CHECKED_DIV_MAX</span>).<span class="ident">tanh</span>()
     }
 }
 
-<span class="doccomment">/// Perform a &#39;checked&#39; division.</span>
+<span class="doccomment">/// Perform a &#39;checked&#39; division for number densities.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Computes the result `a / b` with the following special conditions:</span>
+<span class="doccomment">/// As the number densities can become quite small (especially the equilibrium</span>
+<span class="doccomment">/// number densities), computing `n / n_eq` can cause certain issues.  As a</span>
+<span class="doccomment">/// result, this function provides a &#39;well-behaved&#39; division that handles small</span>
+<span class="doccomment">/// values of `n_eq`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// - If `a == 0.0`, returns `0.0` irrespective of the value of `b`;</span>
-<span class="doccomment">/// - If `b == 0.0`, returns `1.0` irrespective of the value of `a` (unless `a</span>
-<span class="doccomment">///   == 0`);</span>
-<span class="doccomment">/// - Otherwise, return the result `a / b` capped to be at most `100.0` in magnitude.</span>
+<span class="doccomment">/// # Implementation</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// - If the numerator is 0, 0 is returned.</span>
+<span class="doccomment">/// - If the denominator is 0, a maximum value is returned with the same sign as</span>
+<span class="doccomment">///   the numerator.</span>
+<span class="doccomment">/// - For all other values, the value returned is:</span>
+<span class="doccomment">///   \\begin{equation}</span>
+<span class="doccomment">///     M \tanh\left( \frac{1}{M} \frac{a}{b} \right)</span>
+<span class="doccomment">///   \\end{equation}</span>
+<span class="doccomment">///   where \\(M\\) is the maximum value allowed (typically set to 10).</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;arbitrary-precision&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_div_ap</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Float</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">Float</span>) <span class="op">-&gt;</span> <span class="ident">Float</span> {
     <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">is_zero</span>() {
         <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="ident">a</span>.<span class="ident">prec</span>(), <span class="number">0.0</span>)
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">is_zero</span>() {
-        <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="ident">a</span>.<span class="ident">prec</span>(), <span class="number">100.0</span>).<span class="ident">copysign</span>(<span class="ident">a</span>)
+        <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="ident">a</span>.<span class="ident">prec</span>(), <span class="ident">CHECKED_DIV_MAX</span>).<span class="ident">copysign</span>(<span class="ident">a</span>)
     } <span class="kw">else</span> {
-        <span class="comment">// let v = Float::with_val(a.prec(), a / b);</span>
-        <span class="comment">// if v.as_abs().to_f64() &gt; 100.0 {</span>
-        <span class="comment">//     Float::with_val(a.prec(), 100.0).copysign(&amp;v)</span>
-        <span class="comment">// } else {</span>
-        <span class="comment">//     v</span>
-        <span class="comment">// }</span>
-        <span class="kw">let</span> <span class="ident">v</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="ident">a</span>.<span class="ident">prec</span>(), <span class="ident">a</span> <span class="op">/</span> <span class="ident">b</span>) <span class="op">/</span> <span class="number">100</span>;
-        <span class="number">100.0</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">tanh</span>()
+        <span class="kw">let</span> <span class="ident">v</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="ident">a</span>.<span class="ident">prec</span>(), <span class="ident">a</span> <span class="op">/</span> <span class="ident">b</span>) <span class="op">/</span> <span class="ident">CHECKED_DIV_MAX</span>;
+        <span class="ident">CHECKED_DIV_MAX</span> <span class="op">*</span> <span class="ident">v</span>.<span class="ident">tanh</span>()
     }
 }
 
@@ -493,7 +524,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">t_min_max</span>;
+    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">t_min_max</span>, <span class="ident">CHECKED_DIV_MAX</span>};
     <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident">ndarray</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 
@@ -505,21 +536,21 @@
     <span class="kw">fn</span> <span class="ident">checked_div</span>() {
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">0.0</span>, <span class="number">0.0</span>), <span class="number">0.0</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">1.0</span>, <span class="number">0.0</span>), <span class="number">100.0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.0</span>), <span class="op">-</span><span class="number">100.0</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">1.0</span>, <span class="number">0.0</span>), <span class="ident">CHECKED_DIV_MAX</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="number">0.0</span>), <span class="op">-</span><span class="ident">CHECKED_DIV_MAX</span>);
 
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">0.0</span>, <span class="number">1.0</span>), <span class="number">0.0</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">0.0</span>, <span class="op">-</span><span class="number">1.0</span>), <span class="number">0.0</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">1.0</span>, <span class="number">2.0</span>), <span class="number">0.499_995_833_374_999_6</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="number">2.0</span>), <span class="op">-</span><span class="number">0.499_995_833_374_999_6</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">1.0</span>, <span class="op">-</span><span class="number">2.0</span>), <span class="op">-</span><span class="number">0.499_995_833_374_999_6</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">2.0</span>), <span class="number">0.499_995_833_374_999_6</span>);
+        <span class="ident">approx_eq</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">1.0</span>, <span class="number">2.0</span>), <span class="number">0.5</span>, <span class="number">2.0</span>, <span class="number">0.0</span>);
+        <span class="ident">approx_eq</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="number">2.0</span>), <span class="op">-</span><span class="number">0.5</span>, <span class="number">2.0</span>, <span class="number">0.0</span>);
+        <span class="ident">approx_eq</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">1.0</span>, <span class="op">-</span><span class="number">2.0</span>), <span class="op">-</span><span class="number">0.5</span>, <span class="number">2.0</span>, <span class="number">0.0</span>);
+        <span class="ident">approx_eq</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">2.0</span>), <span class="number">0.5</span>, <span class="number">2.0</span>, <span class="number">0.0</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">1.0</span>, <span class="number">1e-5</span>), <span class="number">100.0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="number">1e-5</span>), <span class="op">-</span><span class="number">100.0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">1.0</span>, <span class="op">-</span><span class="number">1e-5</span>), <span class="op">-</span><span class="number">100.0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">1e-5</span>), <span class="number">100.0</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">1.0</span>, <span class="number">1e-5</span>), <span class="ident">CHECKED_DIV_MAX</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="number">1e-5</span>), <span class="op">-</span><span class="ident">CHECKED_DIV_MAX</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="number">1.0</span>, <span class="op">-</span><span class="number">1e-5</span>), <span class="op">-</span><span class="ident">CHECKED_DIV_MAX</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div</span>(<span class="op">-</span><span class="number">1.0</span>, <span class="op">-</span><span class="number">1e-5</span>), <span class="ident">CHECKED_DIV_MAX</span>);
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;arbitrary-precision&quot;</span>)]</span>
@@ -528,32 +559,45 @@
         <span class="kw">let</span> <span class="ident">zero</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">one</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="number">1</span>);
         <span class="kw">let</span> <span class="ident">two</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">half</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="number">0.499_995_832_80</span>);
         <span class="kw">let</span> <span class="ident">en5</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="number">1e-5</span>);
-        <span class="kw">let</span> <span class="ident">hundred</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="number">1e2</span>);
+        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="ident">CHECKED_DIV_MAX</span>);
         <span class="kw">let</span> <span class="ident">neg_one</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="op">-</span><span class="number">1</span>);
         <span class="kw">let</span> <span class="ident">neg_two</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="op">-</span><span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">neg_half</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="op">-</span><span class="number">0.499_995_832_80</span>);
         <span class="kw">let</span> <span class="ident">neg_en5</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="op">-</span><span class="number">1e-5</span>);
-        <span class="kw">let</span> <span class="ident">neg_hundred</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="op">-</span><span class="number">1e2</span>);
+        <span class="kw">let</span> <span class="ident">neg_max</span> <span class="op">=</span> <span class="ident">Float</span>::<span class="ident">with_val</span>(<span class="number">30</span>, <span class="op">-</span><span class="ident">CHECKED_DIV_MAX</span>);
 
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">zero</span>, <span class="kw-2">&amp;</span><span class="ident">zero</span>), <span class="ident">zero</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">one</span>, <span class="kw-2">&amp;</span><span class="ident">zero</span>), <span class="ident">hundred</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">neg_one</span>, <span class="kw-2">&amp;</span><span class="ident">zero</span>), <span class="ident">neg_hundred</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">one</span>, <span class="kw-2">&amp;</span><span class="ident">zero</span>), <span class="ident">max</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">neg_one</span>, <span class="kw-2">&amp;</span><span class="ident">zero</span>), <span class="ident">neg_max</span>);
 
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">zero</span>, <span class="kw-2">&amp;</span><span class="ident">one</span>), <span class="ident">zero</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">zero</span>, <span class="kw-2">&amp;</span><span class="ident">neg_one</span>), <span class="ident">zero</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">one</span>, <span class="kw-2">&amp;</span><span class="ident">two</span>), <span class="ident">half</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">neg_one</span>, <span class="kw-2">&amp;</span><span class="ident">two</span>), <span class="ident">neg_half</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">one</span>, <span class="kw-2">&amp;</span><span class="ident">neg_two</span>), <span class="ident">neg_half</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">neg_one</span>, <span class="kw-2">&amp;</span><span class="ident">neg_two</span>), <span class="ident">half</span>);
+        <span class="ident">approx_eq</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">one</span>, <span class="kw-2">&amp;</span><span class="ident">two</span>).<span class="ident">to_f64</span>(), <span class="number">0.5</span>, <span class="number">2.0</span>, <span class="number">0.0</span>);
+        <span class="ident">approx_eq</span>(
+            <span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">neg_one</span>, <span class="kw-2">&amp;</span><span class="ident">two</span>).<span class="ident">to_f64</span>(),
+            <span class="op">-</span><span class="number">0.5</span>,
+            <span class="number">2.0</span>,
+            <span class="number">0.0</span>,
+        );
+        <span class="ident">approx_eq</span>(
+            <span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">one</span>, <span class="kw-2">&amp;</span><span class="ident">neg_two</span>).<span class="ident">to_f64</span>(),
+            <span class="op">-</span><span class="number">0.5</span>,
+            <span class="number">2.0</span>,
+            <span class="number">0.0</span>,
+        );
+        <span class="ident">approx_eq</span>(
+            <span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">neg_one</span>, <span class="kw-2">&amp;</span><span class="ident">neg_two</span>).<span class="ident">to_f64</span>(),
+            <span class="number">0.5</span>,
+            <span class="number">2.0</span>,
+            <span class="number">0.0</span>,
+        );
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">one</span>, <span class="kw-2">&amp;</span><span class="ident">en5</span>), <span class="ident">hundred</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">neg_one</span>, <span class="kw-2">&amp;</span><span class="ident">en5</span>), <span class="ident">neg_hundred</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">one</span>, <span class="kw-2">&amp;</span><span class="ident">neg_en5</span>), <span class="ident">neg_hundred</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">neg_one</span>, <span class="kw-2">&amp;</span><span class="ident">neg_en5</span>), <span class="ident">hundred</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">one</span>, <span class="kw-2">&amp;</span><span class="ident">en5</span>), <span class="ident">max</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">neg_one</span>, <span class="kw-2">&amp;</span><span class="ident">en5</span>), <span class="ident">neg_max</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">one</span>, <span class="kw-2">&amp;</span><span class="ident">neg_en5</span>), <span class="ident">neg_max</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">checked_div_ap</span>(<span class="kw-2">&amp;</span><span class="ident">neg_one</span>, <span class="kw-2">&amp;</span><span class="ident">neg_en5</span>), <span class="ident">max</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
