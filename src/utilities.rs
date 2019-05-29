@@ -67,7 +67,7 @@ pub fn checked_div_ap(a: &Float, b: &Float) -> Float {
     } else if b.is_zero() {
         Float::with_val(a.prec(), CHECKED_DIV_MAX).copysign(a)
     } else {
-        let v: Float = Float::with_val(a.prec(), a / b / CHECKED_DIV_MAX);
+        let v: Float = Float::with_val(a.prec(), a / b) / CHECKED_DIV_MAX;
         CHECKED_DIV_MAX * v.tanh()
     }
 }
@@ -195,19 +195,17 @@ mod tests {
         let zero = Float::with_val(30, 0);
         let one = Float::with_val(30, 1);
         let two = Float::with_val(30, 2);
-        let half = Float::with_val(30, 0.499_995_832_80);
         let en5 = Float::with_val(30, 1e-5);
         let max = Float::with_val(30, CHECKED_DIV_MAX);
         let neg_one = Float::with_val(30, -1);
         let neg_two = Float::with_val(30, -2);
-        let neg_half = Float::with_val(30, -0.499_995_832_80);
         let neg_en5 = Float::with_val(30, -1e-5);
         let neg_max = Float::with_val(30, -CHECKED_DIV_MAX);
 
         assert_eq!(super::checked_div_ap(&zero, &zero), zero);
 
-        assert_eq!(super::checked_div_ap(&one, &zero), hundred);
-        assert_eq!(super::checked_div_ap(&neg_one, &zero), neg_hundred);
+        assert_eq!(super::checked_div_ap(&one, &zero), max);
+        assert_eq!(super::checked_div_ap(&neg_one, &zero), neg_max);
 
         assert_eq!(super::checked_div_ap(&zero, &one), zero);
         assert_eq!(super::checked_div_ap(&zero, &neg_one), zero);
@@ -232,10 +230,10 @@ mod tests {
             0.0,
         );
 
-        assert_eq!(super::checked_div_ap(&one, &en5), hundred);
-        assert_eq!(super::checked_div_ap(&neg_one, &en5), neg_hundred);
-        assert_eq!(super::checked_div_ap(&one, &neg_en5), neg_hundred);
-        assert_eq!(super::checked_div_ap(&neg_one, &neg_en5), hundred);
+        assert_eq!(super::checked_div_ap(&one, &en5), max);
+        assert_eq!(super::checked_div_ap(&neg_one, &en5), neg_max);
+        assert_eq!(super::checked_div_ap(&one, &neg_en5), neg_max);
+        assert_eq!(super::checked_div_ap(&neg_one, &neg_en5), max);
     }
 
     #[test]
