@@ -1,13 +1,9 @@
 //! Setup the solver, adding the particles and interactions to it, setting up
 //! the logger(s), and running it before returning the result.
 
-use super::{
-    interaction, model,
-    model::{p_i, LeptogenesisModel},
-};
+use super::{interaction, model, model::LeptogenesisModel};
 use boltzmann_solver::{
-    particle::Particle,
-    solver::{number_density::NumberDensitySolver, InitialCondition, Solver},
+    solver::{number_density::NumberDensitySolver, Solver},
     universe::StandardModel,
 };
 use ndarray::prelude::*;
@@ -17,9 +13,9 @@ use std::cell::RefCell;
 ///
 /// This routine sets up the solve, runs it and returns the final array of
 /// number densities.
-pub fn solve<F: 'static>(model: LeptogenesisModel, f: F) -> Array1<f64>
+pub fn solve<F: 'static>(f: F) -> Array1<f64>
 where
-    F: Fn(LeptogenesisModel) -> LeptogenesisModel,
+    F: Fn(f64) -> LeptogenesisModel,
 {
     // Set up the universe in which we'll run the Boltzmann equations
     let universe = StandardModel::new();
@@ -32,26 +28,6 @@ where
         .initialize();
 
     solver.model_fn(f);
-
-    // Add the particles to the solver, using for initial condition either 0 or
-    // equilibrium number density.
-    solver.add_particle(
-        Particle::new(model::NAMES[0].to_string(), 0, 0.0).set_dof(0.0),
-        InitialCondition::Zero,
-    );
-
-    solver.add_particle(
-        Particle::new(model::NAMES[1].to_string(), 1, model.mass[p_i("N", 0)]),
-        InitialCondition::Equilibrium(0.0),
-    );
-    solver.add_particle(
-        Particle::new(model::NAMES[2].to_string(), 1, model.mass[p_i("N", 1)]),
-        InitialCondition::Equilibrium(0.0),
-    );
-    solver.add_particle(
-        Particle::new(model::NAMES[3].to_string(), 1, model.mass[p_i("N", 2)]),
-        InitialCondition::Equilibrium(0.0),
-    );
 
     // Logging of number densities
     ////////////////////////////////////////////////////////////////////////////////
