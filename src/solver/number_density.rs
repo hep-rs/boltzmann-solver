@@ -255,10 +255,10 @@
 //! multiple intermediate states, the mixing between these states must also be
 //! taken into account.
 
-use super::{EmptyModel, InitialCondition, Model, Solver, StepChange, StepPrecision};
-use crate::{particle::Particle, universe::Universe};
+use super::{EmptyModel, Model, Solver, StepChange, StepPrecision};
+use crate::{statistic::Statistics, universe::Universe};
 use log::{debug, info};
-use ndarray::{prelude::*, FoldWhile, Zip};
+use ndarray::{array, prelude::*, FoldWhile, Zip};
 
 /// Context provided containing pre-computed values which might be useful when
 /// evaluating interactions.
@@ -286,8 +286,7 @@ pub struct Context<M: Model> {
 pub struct NumberDensitySolver<M: Model> {
     initialized: bool,
     beta_range: (f64, f64),
-    particles: Vec<Particle>,
-    initial_conditions: Vec<f64>,
+    initial_conditions: Array1<f64>,
     #[allow(clippy::type_complexity)]
     interactions: Vec<
         Box<
@@ -302,7 +301,7 @@ pub struct NumberDensitySolver<M: Model> {
     logger: Box<
         Fn(&<Self as Solver>::Solution, &<Self as Solver>::Solution, &<Self as Solver>::Context),
     >,
-    model_fn: Box<Fn(M) -> M>,
+    model_fn: Box<Fn(f64) -> M>,
     step_change: StepChange,
     step_precision: StepPrecision,
     error_tolerance: f64,
@@ -325,11 +324,10 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         Self {
             initialized: false,
             beta_range: (1e-20, 1e0),
-            particles: Vec::with_capacity(20),
-            initial_conditions: Vec::with_capacity(20),
+            initial_conditions: array![],
             interactions: Vec::with_capacity(100),
             logger: Box::new(|_, _, _| {}),
-            model_fn: Box::new(|m| m),
+            model_fn: Box::new(|beta| M::new(beta)),
             step_change: StepChange::default(),
             step_precision: StepPrecision::default(),
             error_tolerance: 1e-4,
@@ -408,29 +406,16 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         self
     }
 
-    fn initialize(mut self) -> Self {
-        self.initialized = true;
+    fn initial_conditions(mut self, v: Vec<f64>) -> Self {
+        self.initial_conditions = Array1::from_vec(v);
 
         self
     }
 
-    fn add_particle(&mut self, s: Particle, initial_condition: InitialCondition) {
-        match initial_condition {
-            InitialCondition::Equilibrium(mu) => self
-                .initial_conditions
-                .push(s.normalized_number_density(mu, self.beta_range.0)),
-            InitialCondition::Fixed(n) => self.initial_conditions.push(n),
-            InitialCondition::Zero => self.initial_conditions.push(0.0),
-        }
+    fn initialize(mut self) -> Self {
+        self.initialized = true;
 
-        self.particles.push(s);
-    }
-
-    fn add_particles<I>(&mut self, iter: I)
-    where
-        I: IntoIterator<Item = Particle>,
-    {
-        self.particles.extend(iter);
+        self
     }
 
     fn add_interaction<F: 'static>(&mut self, f: F) -> &mut Self
@@ -462,7 +447,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         );
 
         // Initialize all the variables that will be used in the integration
-        let mut n = Array1::from_vec(self.initial_conditions.clone());
+        let mut n = self.initial_conditions.clone();
         let mut dn = [
             Self::Solution::zeros(n.dim()),
             Self::Solution::zeros(n.dim()),
@@ -627,15 +612,15 @@ impl<M: Model> NumberDensitySolver<M> {
     /// All particles species are assumed to be in thermal equilibrium at this
     /// energy, with the distribution following either the Bose–Einstein or
     /// Fermi–Dirac distribution as determined by their spin.
-    fn equilibrium_number_densities(&self, beta: f64) -> Array1<f64> {
-        Array1::from_iter(self.particles.iter().map(|p| {
-            let v = p.normalized_number_density(0.0, beta);
-            if v.abs() < self.threshold_number_density {
-                0.0
-            } else {
-                v
-            }
-        }))
+    fn equilibrium_number_densities(&self, beta: f64, model: &M) -> Array1<f64> {
+        let mut n = Array1::zeros(model.statistic().len());
+        Zip::from(&mut n)
+            .and(model.statistic())
+            .and(model.mass())
+            .apply(|n, &(ref s, dof), &m| {
+                *n = dof * s.normalized_number_density(m, 0.0, beta);
+            });
+        n
     }
 
     /// Set a model function.
@@ -645,7 +630,7 @@ impl<M: Model> NumberDensitySolver<M> {
     /// fixed parameters and only certain parameters are changed.
     pub fn model_fn<F: 'static>(&mut self, f: F) -> &mut Self
     where
-        F: Fn(M) -> M,
+        F: Fn(f64) -> M,
     {
         self.model_fn = Box::new(f);
         self
@@ -654,12 +639,13 @@ impl<M: Model> NumberDensitySolver<M> {
     /// Generate the context at a given beta to pass to the logger/interaction
     /// functions.
     fn context<U: Universe>(&self, step: u64, beta: f64, universe: &U) -> Context<M> {
+        let model = (self.model_fn)(beta);
         Context {
             step,
             beta,
             hubble_rate: universe.hubble_rate(beta),
-            eq_n: self.equilibrium_number_densities(beta),
-            model: (self.model_fn)(M::new(beta)),
+            eq_n: self.equilibrium_number_densities(beta, &model),
+            model,
         }
     }
 
@@ -706,26 +692,5 @@ impl<M: Model> NumberDensitySolver<M> {
             }
         });
         n
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::universe::StandardModel;
-    use crate::utilities::test::*;
-
-    /// The most trivial example with a single particle and no interactions.
-    #[test]
-    fn no_interaction() {
-        let phi = Particle::new("φ".to_string(), 0, 1e3);
-        let mut solver = NumberDensitySolver::default()
-            .temperature_range(1e20, 1e-10)
-            .initialize();
-
-        solver.add_particle(phi, InitialCondition::Equilibrium(0.0));
-
-        let sol = solver.solve(&StandardModel::new());
-        approx_eq(sol[0], 1.0, 8.0, 0.0);
     }
 }
