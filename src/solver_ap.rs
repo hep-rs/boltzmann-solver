@@ -22,15 +22,65 @@ pub trait Model {
     /// Instantiate a new instance of the model parameters with the values
     /// calculated at the inverse temperature \\(\beta\\).
     fn new(beta: &Float) -> Self;
+
+    /// Return a list of masses (in unit of GeV).
+    ///
+    /// # Implementation
+    ///
+    /// The list must be in the *same* order as the order in which they are
+    /// added to the [`Solver`].
+    fn mass(&self) -> &Array1<Float>;
+
+    /// Return a list of squared masses (in units of GeV\\(^{2}\\)).
+    ///
+    /// # Implementation
+    ///
+    /// The list must be in the *same* order as the order in which they are
+    /// added to the [`Solver`].
+    fn mass2(&self) -> &Array1<Float>;
+
+    /// Return a list of widths (in unit of GeV).
+    ///
+    /// # Implementation
+    ///
+    /// The list must be in the *same* order as the order in which they are
+    /// added to the [`Solver`].
+    fn width(&self) -> &Array1<Float>;
+
+    /// Return a list of squared widths (in units of GeV\\(^{2}\\)).
+    ///
+    /// # Implementation
+    ///
+    /// The list must be in the *same* order as the order in which they are
+    /// added to the [`Solver`].
+    fn width2(&self) -> &Array1<Float>;
 }
 
 /// An empty model containing no couplings, masses, etc.  This is can be used
 /// for very simple implementations of the Boltzmann solver.
-pub struct EmptyModel;
+pub struct EmptyModel {
+    empty_array: Array1<Float>,
+}
 
 impl Model for EmptyModel {
     fn new(_: &Float) -> Self {
         EmptyModel
+    }
+
+    fn mass(&self) -> &Array1<f64> {
+        &self.empty_array
+    }
+
+    fn mass2(&self) -> &Array1<f64> {
+        &self.empty_array
+    }
+
+    fn width(&self) -> &Array1<f64> {
+        &self.empty_array
+    }
+
+    fn width2(&self) -> &Array1<f64> {
+        &self.empty_array
     }
 }
 
