@@ -5,7 +5,7 @@
 // compute and ultimately not used, it would be preferable to comment these out.
 #![allow(dead_code)]
 
-use boltzmann_solver::solver::Model;
+use boltzmann_solver::{solver::Model, statistic::Statistic};
 use ndarray::{array, prelude::*};
 use num::{zero, Complex};
 use std::f64;
@@ -59,6 +59,7 @@ pub struct Couplings {
 /// Leptogenesis model parameters
 pub struct LeptogenesisModel {
     pub coupling: Couplings,
+    pub statistic: Array1<(Statistic, f64)>,
     pub mass: Array1<f64>,
     pub mass2: Array1<f64>,
     pub width: Array1<f64>,
@@ -106,6 +107,14 @@ impl Model for LeptogenesisModel {
             ] * 1e-4,
         };
 
+        let statistic = array![
+            (Statistic::BoseEinstein, 0.0), // B-L
+            (Statistic::FermiDirac, 1.0),   // N1
+            (Statistic::FermiDirac, 1.0),   // N2
+            (Statistic::FermiDirac, 1.0),   // N3
+            (Statistic::BoseEinstein, 1.0), // Higgs
+        ];
+
         let mass = array![
             0.0,        // B-L
             1e10,       // N1
@@ -125,12 +134,17 @@ impl Model for LeptogenesisModel {
 
         LeptogenesisModel {
             coupling,
+            statistic,
             mass,
             mass2,
             width,
             width2,
             epsilon: 1e-6,
         }
+    }
+
+    fn statistic(&self) -> &Array1<(Statistic, f64)> {
+        &self.statistic
     }
 
     fn mass(&self) -> &Array1<f64> {

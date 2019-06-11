@@ -18,9 +18,7 @@ pub fn run() {
     // Setup the directory for CSV output
     ::std::fs::create_dir("/tmp/leptogenesis_sp/").unwrap_or(());
 
-    let model = LeptogenesisModel::new(1e-17);
-
-    let sol = solve::solve(model, |m| m);
+    let sol = solve::solve(|beta| LeptogenesisModel::new(beta));
 
     assert!(1e-10 < sol[0].abs() && sol[0].abs() < 1e-5);
     assert!(sol[1] < 1e-20);
@@ -43,13 +41,13 @@ pub fn scan() {
     .collect();
 
     ym.into_par_iter().for_each(|(y, n0)| {
-        let model = LeptogenesisModel::new(1e-17);
-        let f = move |mut m: LeptogenesisModel| {
+        let f = move |beta: f64| {
+            let mut m = LeptogenesisModel::new(beta);
             m.coupling.y_v.mapv_inplace(|yi| yi * y);
             m.mass[p_i("N", 0)] = n0;
             m
         };
-        let sol = solve::solve(model, f);
+        let sol = solve::solve(f);
 
         csv.write()
             .unwrap()
