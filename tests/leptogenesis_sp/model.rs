@@ -6,7 +6,7 @@
 #![allow(dead_code)]
 
 use boltzmann_solver::solver::Model;
-use ndarray::{array, Array2};
+use ndarray::{array, prelude::*};
 use num::{zero, Complex};
 use std::f64;
 
@@ -16,10 +16,25 @@ use std::f64;
 
 /// All the particle names in the same order as they are added to the solver.
 #[rustfmt::skip]
-pub const NAMES: [&str; 4] = [
+pub const NAMES: [&str; 5] = [
     "B-L",
     "N₁", "N₂", "N₃",
+    "H",
 ];
+
+/// Function to map a more memorable name to the array index for the number
+/// density, mass, etc.
+///
+/// We are using the programming convention of 0-indexing all particles; thus
+/// the index of "N₁" is obtained with `p_i("N", 0)`.
+pub fn p_i(p: &str, n: usize) -> usize {
+    match (p, n) {
+        ("BL", _) | ("B-L", _) => 0,
+        ("N", n) => n + 1,
+        ("H", _) => 4,
+        _ => unreachable!(),
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Model Parameter Sub-cateogories
@@ -37,38 +52,6 @@ pub struct Couplings {
     pub y_v: Array2<Complex<f64>>,
 }
 
-/// Particle masses (in GeV)
-pub struct Masses {
-    /// Right-handed neutrinos
-    pub n: [f64; 3],
-    /// Higgs
-    pub h: f64,
-}
-
-/// Particle squared masses (in GeV\\(^2\\))
-pub struct SquaredMasses {
-    /// Right-handed neutrinos
-    pub n: [f64; 3],
-    /// Higgs
-    pub h: f64,
-}
-
-/// Particle widths (in GeV)
-pub struct Widths {
-    /// Right-handed neutrinos
-    pub n: [f64; 3],
-    /// Higgs
-    pub h: f64,
-}
-
-/// Particle squared widths (in GeV\\(^2\\))
-pub struct SquaredWidths {
-    /// Right-handed neutrinos
-    pub n: [f64; 3],
-    /// Higgs
-    pub h: f64,
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Model
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,10 +59,10 @@ pub struct SquaredWidths {
 /// Leptogenesis model parameters
 pub struct LeptogenesisModel {
     pub coupling: Couplings,
-    pub mass: Masses,
-    pub mass2: SquaredMasses,
-    pub width: Widths,
-    pub width2: SquaredWidths,
+    pub mass: Array1<f64>,
+    pub mass2: Array1<f64>,
+    pub width: Array1<f64>,
+    pub width2: Array1<f64>,
     pub epsilon: f64,
 }
 
@@ -123,22 +106,22 @@ impl Model for LeptogenesisModel {
             ] * 1e-4,
         };
 
-        let mass = Masses {
-            n: [1e10, 1e11, 1e12],
-            h: 0.4 / beta,
-        };
-        let mass2 = SquaredMasses {
-            n: [mass.n[0].powi(2), mass.n[1].powi(2), mass.n[2].powi(2)],
-            h: mass.h.powi(2),
-        };
-        let width = Widths {
-            n: [0.0, 0.0, 0.0],
-            h: 0.1 * mass.h,
-        };
-        let width2 = SquaredWidths {
-            n: [width.n[0].powi(2), width.n[1].powi(2), width.n[2].powi(2)],
-            h: width.h.powi(2),
-        };
+        let mass = array![
+            0.0,        // B-L
+            1e10,       // N1
+            1e11,       // N2
+            1e12,       // N3
+            0.4 / beta, // Higgs
+        ];
+        let mass2 = mass.map(|v| v.powi(2));
+        let width = array![
+            0.0,           // B-L
+            0.0,           // N1
+            0.0,           // N2
+            0.0,           // N3
+            0.1 * mass[4], // Higgs
+        ];
+        let width2 = width.map(|v| v.powi(2));
 
         LeptogenesisModel {
             coupling,
@@ -148,5 +131,21 @@ impl Model for LeptogenesisModel {
             width2,
             epsilon: 1e-6,
         }
+    }
+
+    fn mass(&self) -> &Array1<f64> {
+        &self.mass
+    }
+
+    fn mass2(&self) -> &Array1<f64> {
+        &self.mass2
+    }
+
+    fn width(&self) -> &Array1<f64> {
+        &self.width
+    }
+
+    fn width2(&self) -> &Array1<f64> {
+        &self.width2
     }
 }

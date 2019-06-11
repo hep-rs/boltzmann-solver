@@ -7,7 +7,7 @@ pub mod solve;
 
 use boltzmann_solver::solver::Model;
 use itertools::iproduct;
-use model::LeptogenesisModel;
+use model::{p_i, LeptogenesisModel};
 use ndarray::prelude::*;
 use rayon::prelude::*;
 use std::sync::RwLock;
@@ -46,7 +46,7 @@ pub fn scan() {
         let model = LeptogenesisModel::new(1e-17);
         let f = move |mut m: LeptogenesisModel| {
             m.coupling.y_v.mapv_inplace(|yi| yi * y);
-            m.mass.n[0] = n0;
+            m.mass[p_i("N", 0)] = n0;
             m
         };
         let sol = solve::solve(model, f);
