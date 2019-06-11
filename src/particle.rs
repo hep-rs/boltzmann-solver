@@ -61,32 +61,28 @@ impl Particle {
     }
 
     /// Set the mass of the particle.
-    pub fn set_mass(mut self, mass: f64) -> Self {
+    pub fn set_mass(&mut self, mass: f64) {
         self.mass = mass;
         self.mass2 = mass.powi(2);
-        self
     }
 
     /// Set the width of the particle.
-    pub fn set_width(mut self, width: f64) -> Self {
+    pub fn set_width(&mut self, width: f64) {
         self.width = width;
         self.width2 = width.powi(2);
-        self
     }
 
     /// Indicate that the particle is complex.
-    pub fn set_complex(mut self) -> Self {
+    pub fn set_complex(&mut self) {
         self.complex = true;
-        self
     }
 
     /// Specify how many internal degrees of freedom this particle has.
     ///
     /// This is a multiplicative factor to the degrees of freedom.  For a
     /// 'pseudo' particle such as \\(B-L\\), this should be set to zero.
-    pub fn set_dof(mut self, dof: f64) -> Self {
+    pub fn set_dof(&mut self, dof: f64) {
         self.dof = dof;
-        self
     }
 
     /// Returns true if the particle is complex.
@@ -210,7 +206,8 @@ mod tests {
 
     #[test]
     fn complex_scalar() {
-        let particle = Particle::new(0, 1.0, 0.1).set_complex();
+        let mut particle = Particle::new(0, 1.0, 0.1);
+        particle.set_complex();
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
@@ -267,7 +264,9 @@ mod tests {
 
     #[test]
     fn complex_scalar_dof() {
-        let particle = Particle::new(0, 1.0, 0.1).set_complex().set_dof(2.5);
+        let mut particle = Particle::new(0, 1.0, 0.1);
+        particle.set_complex();
+        particle.set_dof(2.5);
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
@@ -286,7 +285,8 @@ mod tests {
 
     #[test]
     fn fermion_dof() {
-        let particle = Particle::new(1, 1.0, 0.1).set_dof(1.2);
+        let mut particle = Particle::new(1, 1.0, 0.1);
+        particle.set_dof(1.2);
 
         assert!(!particle.is_bosonic());
         assert!(particle.is_fermionic());
