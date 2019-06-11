@@ -29,9 +29,9 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
             for b in 0..3 {
                 m2 += c.model.coupling.y_v[[0, b]].norm_sqr();
             }
-            m2 *= (c.model.mass2[ptcl_a] - c.model.mass2[ptcl_b])
-                * bessel::k_1_on_k_2(c.model.mass[ptcl_a] * c.beta);
-            m2 /= c.hubble_rate * c.beta * 16.0 * PI_1 * c.model.mass[ptcl_a];
+            m2 *= (c.model.particles[ptcl_a].mass2 - c.model.particles[ptcl_b].mass2)
+                * bessel::k_1_on_k_2(c.model.particles[ptcl_a].mass * c.beta);
+            m2 /= c.hubble_rate * c.beta * 16.0 * PI_1 * c.model.particles[ptcl_a].mass;
             m2
         };
 
@@ -66,8 +66,9 @@ pub fn n_el_ql_qr(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
         .unwrap();
 
     solver.add_interaction(move |mut s, n, ref c| {
-        let ptcl_c = p_i("N", 0);
-        let ptcl_h = p_i("H", 0);
+        let p_c = p_i("N", 0);
+        let p_z = p_i("H", 0);
+
         let gamma = {
             let m2_prefactor: f64 = iproduct!(0..3, 0..3, 0..3)
                 .map(|(a2, b1, b2)| {
@@ -80,20 +81,22 @@ pub fn n_el_ql_qr(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
             let m2_st = |s: f64, t: f64| {
                 (
                     // s-channel
-                    s * (s - c.model.mass2[ptcl_c]) * (s - c.model.mass2[ptcl_h]).powi(2)
-                        / ((s - c.model.mass2[ptcl_h]).powi(2)
-                            + c.model.width2[ptcl_h] * c.model.mass2[ptcl_h])
+                    s * (s - c.model.particles[p_c].mass2)
+                        * (s - c.model.particles[p_z].mass2).powi(2)
+                        / ((s - c.model.particles[p_z].mass2).powi(2)
+                            + c.model.particles[p_z].width2 * c.model.particles[p_z].mass2)
                             .powi(2)
                 ) + (
                     // t-channel
-                    2.0 * (t + c.model.mass2[ptcl_c]) * (t + c.model.mass2[ptcl_h]).powi(2)
-                        / ((t + c.model.mass2[ptcl_h]).powi(2)
-                            + c.model.width2[ptcl_h] * c.model.mass2[ptcl_h])
+                    2.0 * (t + c.model.particles[p_c].mass2)
+                        * (t + c.model.particles[p_z].mass2).powi(2)
+                        / ((t + c.model.particles[p_z].mass2).powi(2)
+                            + c.model.particles[p_z].width2 * c.model.particles[p_z].mass2)
                             .powi(2)
                 )
             };
 
-            m2_prefactor * integrate_st(m2_st, c.beta, c.model.mass[ptcl_c], 0.0, 0.0, 0.0)
+            m2_prefactor * integrate_st(m2_st, c.beta, c.model.particles[p_c].mass, 0.0, 0.0, 0.0)
                 / (512.0 * PI_5 * c.hubble_rate * c.beta)
         };
 
