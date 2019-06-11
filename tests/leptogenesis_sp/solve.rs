@@ -1,7 +1,10 @@
 //! Setup the solver, adding the particles and interactions to it, setting up
 //! the logger(s), and running it before returning the result.
 
-use super::{interaction, model, model::LeptogenesisModel};
+use super::{
+    interaction, model,
+    model::{p_i, LeptogenesisModel},
+};
 use boltzmann_solver::{
     particle::Particle,
     solver::{number_density::NumberDensitySolver, InitialCondition, Solver},
@@ -38,15 +41,15 @@ where
     );
 
     solver.add_particle(
-        Particle::new(model::NAMES[1].to_string(), 1, model.mass.n[0]),
+        Particle::new(model::NAMES[1].to_string(), 1, model.mass[p_i("N", 0)]),
         InitialCondition::Equilibrium(0.0),
     );
     solver.add_particle(
-        Particle::new(model::NAMES[2].to_string(), 1, model.mass.n[1]),
+        Particle::new(model::NAMES[2].to_string(), 1, model.mass[p_i("N", 1)]),
         InitialCondition::Equilibrium(0.0),
     );
     solver.add_particle(
-        Particle::new(model::NAMES[3].to_string(), 1, model.mass.n[2]),
+        Particle::new(model::NAMES[3].to_string(), 1, model.mass[p_i("N", 2)]),
         InitialCondition::Equilibrium(0.0),
     );
 
@@ -69,7 +72,6 @@ where
     }
 
     solver.set_logger(move |n, dn, c| {
-        // if BETA_RANGE.0 < c.beta && c.beta < BETA_RANGE.1 {
         let mut csv = csv.borrow_mut();
         csv.write_field(format!("{}", c.step)).unwrap();
         csv.write_field(format!("{:.15e}", c.beta)).unwrap();
