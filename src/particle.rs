@@ -6,7 +6,7 @@ use crate::{
     universe::Universe,
 };
 use special_functions::interpolation;
-use std::{f64, hash};
+use std::f64;
 
 /// Particle type
 ///
@@ -25,15 +25,21 @@ use std::{f64, hash};
 /// In the long run, it is intended that this type be replaced by another one.
 #[derive(Debug, Clone)]
 pub struct Particle {
-    /// Name of the particle.  This is used in order to hash the particle.
-    pub name: String,
-    /// The spin is stored as twice the spin, so a spin-½ particle has `spin ==
-    /// 1` and a spin-1 particle has `spin == 2`
-    pub spin: u8,
+    // The spin is stored as twice the spin, so a spin-½ particle has `spin ==
+    // 1` and a spin-1 particle has `spin == 2`
+    spin: u8,
     /// Mass of the particle in GeV
     pub mass: f64,
+    /// Squared mass of the particle in GeV²
+    pub mass2: f64,
+    /// Width of the particle in GeV
+    pub width: f64,
+    /// Squared width of the particle in GeV²
+    pub width2: f64,
+    // Whether the particle is complex or not
     complex: bool,
-    dof: Option<f64>,
+    // Internal degrees of freedom of the particle
+    dof: f64,
 }
 
 impl Particle {
@@ -42,14 +48,30 @@ impl Particle {
     /// The mass is specified in units of GeV, and the spin is multiplied by a
     /// factor of two such that a spin-½ particle has `spin == 1` and a spin-1
     /// particle has `spin == 2`.
-    pub fn new(name: String, spin: u8, mass: f64) -> Self {
+    pub fn new(spin: u8, mass: f64, width: f64) -> Self {
         Self {
-            name,
             spin,
             mass,
+            mass2: mass.powi(2),
+            width,
+            width2: width.powi(2),
             complex: false,
-            dof: None,
+            dof: 1.0,
         }
+    }
+
+    /// Set the mass of the particle.
+    pub fn set_mass(mut self, mass: f64) -> Self {
+        self.mass = mass;
+        self.mass2 = mass.powi(2);
+        self
+    }
+
+    /// Set the width of the particle.
+    pub fn set_width(mut self, width: f64) -> Self {
+        self.width = width;
+        self.width2 = width.powi(2);
+        self
     }
 
     /// Indicate that the particle is complex.
@@ -58,12 +80,12 @@ impl Particle {
         self
     }
 
-    /// Specify how many degrees of freedom this particle has.  This overwrites
-    /// completely the default calculation (that is, the maximum degrees of
-    /// freedom will be independent of the spin of the particle and whether it
-    /// is complex or not).
+    /// Specify how many internal degrees of freedom this particle has.
+    ///
+    /// This is a multiplicative factor to the degrees of freedom.  For a
+    /// 'pseudo' particle such as \\(B-L\\), this should be set to zero.
     pub fn set_dof(mut self, dof: f64) -> Self {
-        self.dof = Some(dof);
+        self.dof = dof;
         self
     }
 
@@ -86,12 +108,35 @@ impl Particle {
     }
 
     /// Return the number of degrees of freedom for the underlying particle.
+    ///
+    /// The general formula is:
+    ///
+    /// \\begin{equation}
+    ///   N_\text{int} \times N_\text{spin} \times N_\text{complex}
+    /// \\end{equation}
+    ///
+    /// where \\(N_\text{int}\\) are the internal degrees of freedom,
+    /// \\(N_\text{spin}\\) are the spin degrees of freedom, and
+    /// \\(N_\text{complex}\\) are the degrees of freedom for complex particle.
+    ///
+    /// The spin degrees of freedom are:
+    /// - spin-0: 1
+    /// - spin-1/2: 2
+    /// - spin-1: 2 for massless, 3 for massive
+    /// - spin-3/2: 4
+    /// - spin-2: ?? for massless, 5 for massive
+    // TODO: What are the massless degrees of freedom of a spin-2 particle?
     #[inline]
     pub fn degrees_of_freedom(&self) -> f64 {
-        if let Some(dof) = self.dof {
-            dof
-        } else {
-            f64::from(self.spin + 1) * if self.complex { 2.0 } else { 1.0 }
+        let dof = self.dof * if self.complex { 2.0 } else { 1.0 };
+        match (self.spin, self.mass) {
+            (0, _) => dof,
+            (1, _) => 2.0 * dof,
+            (2, x) if x == 0.0 => 2.0 * dof,
+            (2, x) if x != 0.0 => 3.0 * dof,
+            (3, _) => 4.0 * dof,
+            (4, _) => 5.0 * dof,
+            _ => unimplemented!("Particles with spin greater than 2 are not supported."),
         }
     }
 
@@ -139,12 +184,6 @@ impl Universe for Particle {
     }
 }
 
-impl hash::Hash for Particle {
-    fn hash<H: hash::Hasher>(&self, state: &mut H) {
-        self.name.hash(state);
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -152,7 +191,7 @@ mod tests {
 
     #[test]
     fn real_scalar() {
-        let particle = Particle::new("S".to_string(), 0, 1.0);
+        let particle = Particle::new(0, 1.0, 0.1);
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
@@ -171,7 +210,7 @@ mod tests {
 
     #[test]
     fn complex_scalar() {
-        let particle = Particle::new("φ".to_string(), 0, 1.0).set_complex();
+        let particle = Particle::new(0, 1.0, 0.1).set_complex();
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
@@ -190,7 +229,7 @@ mod tests {
 
     #[test]
     fn fermion() {
-        let particle = Particle::new("ψ".to_string(), 1, 1.0);
+        let particle = Particle::new(1, 1.0, 0.1);
 
         assert!(!particle.is_bosonic());
         assert!(particle.is_fermionic());
@@ -209,7 +248,7 @@ mod tests {
 
     #[test]
     fn gauge_boson() {
-        let particle = Particle::new("A".to_string(), 2, 1.0);
+        let particle = Particle::new(2, 1.0, 0.1);
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
@@ -228,20 +267,18 @@ mod tests {
 
     #[test]
     fn complex_scalar_dof() {
-        let particle = Particle::new("φ".to_string(), 0, 1.0)
-            .set_complex()
-            .set_dof(2.5);
+        let particle = Particle::new(0, 1.0, 0.1).set_complex().set_dof(2.5);
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
         assert!(particle.is_complex());
 
-        approx_eq(particle.entropy_dof(1e-10), 2.5, 8.0, 0.0);
+        approx_eq(particle.entropy_dof(1e-10), 5.0, 8.0, 0.0);
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
             particle.normalized_number_density(0.0, 1e-10),
-            2.5,
+            5.0,
             8.0,
             0.0,
         );
@@ -249,18 +286,18 @@ mod tests {
 
     #[test]
     fn fermion_dof() {
-        let particle = Particle::new("ψ".to_string(), 1, 1.0).set_dof(1.2);
+        let particle = Particle::new(1, 1.0, 0.1).set_dof(1.2);
 
         assert!(!particle.is_bosonic());
         assert!(particle.is_fermionic());
         assert!(!particle.is_complex());
 
-        approx_eq(particle.entropy_dof(1e-10), 1.2 * 0.875, 8.0, 0.0);
+        approx_eq(particle.entropy_dof(1e-10), 2.0 * 1.2 * 0.875, 8.0, 0.0);
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
             particle.normalized_number_density(0.0, 1e-10),
-            1.2 * 0.75,
+            2.0 * 1.2 * 0.75,
             8.0,
             0.0,
         );
