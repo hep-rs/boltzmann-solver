@@ -8,7 +8,7 @@ mod tableau;
 pub use self::options::InitialCondition;
 pub(crate) use self::options::{StepChange, StepPrecision};
 
-use crate::{statistic::Statistic, universe::Universe};
+use crate::{particle::Particle, statistic::Statistic, universe::Universe};
 use ndarray::{array, prelude::*};
 
 /// Contains all the information relevant to a particular model, including
@@ -19,81 +19,25 @@ pub trait Model {
     /// calculated at the inverse temperature \\(\beta\\).
     fn new(beta: f64) -> Self;
 
-    /// Return the statistic obeyed by the particle and the degrees of freedom
-    /// associated with it.
-    ///
-    /// This is used to compute the equilibrium number density of the respective
-    /// particles.
-    fn statistic(&self) -> &Array1<(Statistic, f64)>;
-
-    /// Return a list of masses (in unit of GeV).
-    ///
-    /// # Implementation
-    ///
-    /// The list must be in the *same* order as the order of the particles.
-    fn mass(&self) -> &Array1<f64>;
-
-    /// Return a list of squared masses (in units of GeV\\(^{2}\\)).
-    ///
-    /// # Implementation
-    ///
-    /// The list must be in the *same* order as the order of the particles.
-    fn mass2(&self) -> &Array1<f64>;
-
-    /// Return a list of widths (in unit of GeV).
-    ///
-    /// # Implementation
-    ///
-    /// The list must be in the *same* order as the order of the particles.
-    fn width(&self) -> &Array1<f64>;
-
-    /// Return a list of squared widths (in units of GeV\\(^{2}\\)).
-    ///
-    /// # Implementation
-    ///
-    /// The list must be in the *same* order as the order of the particles.
-    fn width2(&self) -> &Array1<f64>;
+    /// Return list of particles in the model.
+    fn particles(&self) -> &Array1<Particle>;
 }
 
 /// An empty model containing no couplings, masses, etc.  This is can be used
 /// for very simple implementations of the Boltzmann solver.
 pub struct EmptyModel {
-    statistic: Array1<(Statistic, f64)>,
-    mass: Array1<f64>,
-    mass2: Array1<f64>,
-    width: Array1<f64>,
-    width2: Array1<f64>,
+    particles: Array1<Particle>,
 }
 
 impl Model for EmptyModel {
     fn new(_: f64) -> Self {
         EmptyModel {
-            statistic: array![],
-            mass: array![],
-            mass2: array![],
-            width: array![],
-            width2: array![],
+            particles: array![],
         }
     }
 
-    fn statistic(&self) -> &Array1<(Statistic, f64)> {
-        &self.statistic
-    }
-
-    fn mass(&self) -> &Array1<f64> {
-        &self.mass
-    }
-
-    fn mass2(&self) -> &Array1<f64> {
-        &self.mass2
-    }
-
-    fn width(&self) -> &Array1<f64> {
-        &self.width
-    }
-
-    fn width2(&self) -> &Array1<f64> {
-        &self.width2
+    fn particles(&self) -> &Array1<Particle> {
+        &self.particles
     }
 }
 
