@@ -256,7 +256,7 @@
 //! taken into account.
 
 use super::{EmptyModel, Model, Solver, StepChange, StepPrecision};
-use crate::{statistic::Statistics, universe::Universe};
+use crate::universe::Universe;
 use log::{debug, info};
 use ndarray::{array, prelude::*, FoldWhile, Zip};
 
@@ -613,14 +613,12 @@ impl<M: Model> NumberDensitySolver<M> {
     /// energy, with the distribution following either the Bose–Einstein or
     /// Fermi–Dirac distribution as determined by their spin.
     fn equilibrium_number_densities(&self, beta: f64, model: &M) -> Array1<f64> {
-        let mut n = Array1::zeros(model.statistic().len());
-        Zip::from(&mut n)
-            .and(model.statistic())
-            .and(model.mass())
-            .apply(|n, &(ref s, dof), &m| {
-                *n = dof * s.normalized_number_density(m, 0.0, beta);
-            });
-        n
+        Array1::from_iter(
+            model
+                .particles()
+                .iter()
+                .map(|p| p.normalized_number_density(0.0, beta)),
+        )
     }
 
     /// Set a model function.
