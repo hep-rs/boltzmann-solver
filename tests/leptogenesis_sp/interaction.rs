@@ -1,6 +1,6 @@
 //! Define the various interactions involved in leptogenesis.
 
-use super::model::{p_i, LeptogenesisModel, NAMES};
+use super::model::{p_i, LeptogenesisModel};
 use boltzmann_solver::{
     constants::{PI_1, PI_5},
     solver::{number_density::NumberDensitySolver, Solver},
@@ -10,48 +10,103 @@ use itertools::iproduct;
 use special_functions::bessel;
 use std::cell::RefCell;
 
-/// Interaction N ↔ LH
+/// Interactions that maintain certain particles in equilibrium number density.
+///
+/// We are keeping H, L1, L2 and L3 at equilibrium.
+pub fn equilibrium(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
+    solver.add_interaction(|mut s, n, ref c| {
+        for &(p, i) in &[("H", 0), ("L", 0), ("L", 1), ("L", 2)] {
+            let pi = p_i(p, i);
+
+            s[pi] = 1e15 * (c.eq_n[pi] - n[pi]);
+        }
+
+        s
+    });
+}
+
+/// Interaction H ↔ -L(i2), N(i3)
 pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
     let csv = RefCell::new(csv::Writer::from_path("/tmp/leptogenesis_sp/decay.csv").unwrap());
-    csv.borrow_mut()
-        .serialize(("step", "beta", NAMES[0], NAMES[1]))
-        .unwrap();
+    {
+        let mut csv = csv.borrow_mut();
+        csv.write_field("step").unwrap();
+        csv.write_field("beta").unwrap();
+        for (i2, i3) in iproduct!(0..3, 0..3) {
+            csv.write_field(format!("p[{}.{}]", i2, i3)).unwrap();
+            csv.write_field(format!("γ[{}.{}]", i2, i3)).unwrap();
+            csv.write_field(format!("d[{}.{}]", i2, i3)).unwrap();
+            csv.write_field(format!("i[{}.{}]", i2, i3)).unwrap();
+            csv.write_field(format!("n[{}.{}]", i2, i3)).unwrap();
+        }
+        csv.write_record(None::<&[u8]>).unwrap();
+    }
 
     solver.add_interaction(move |mut s, n, ref c| {
-        let ptcl_a = p_i("N", 0);
-        let ptcl_b = p_i("H", 0);
+        let mut csv = csv.borrow_mut();
 
-        // Note that this is *not* exactly gamma and differs in the
-        // normalization.  It actually just needs to be multiplied by n for
-        // the decay, and eq_n for the inverse decay.
-        let gamma_tilde = {
-            let mut m2 = 0.0;
-            for b in 0..3 {
-                m2 += c.model.coupling.y_v[[0, b]].norm_sqr();
-            }
-            m2 *= (c.model.particles[ptcl_a].mass2 - c.model.particles[ptcl_b].mass2)
-                * bessel::k_1_on_k_2(c.model.particles[ptcl_a].mass * c.beta);
-            m2 /= c.hubble_rate * c.beta * 16.0 * PI_1 * c.model.particles[ptcl_a].mass;
-            m2
-        };
+        csv.write_field(format!("{}", c.step)).unwrap();
+        csv.write_field(format!("{:.15e}", c.beta)).unwrap();
 
-        // The full γ(e H → N).  We are assuming e and H are always in
-        // equilibrium thus their scaling factors are irrelevant.
-        // let _decay = n[1] * gamma_tilde;
-        let inverse_decay = c.eq_n[ptcl_a] * gamma_tilde;
-        let net_decay = (n[ptcl_a] - c.eq_n[ptcl_a]) * gamma_tilde;
+        // Create short hands to access the masses and couplings
+        let mass = &c.model.mass;
+        let mass2 = &c.model.mass2;
+        let coupling = &c.model.coupling;
 
-        let dbl = c.model.epsilon * net_decay - n[0] * inverse_decay;
-        s[0] += dbl;
-        s[ptcl_a] -= net_decay;
+        // Iterate over all combinations of particles
+        for (i2, i3) in iproduct!(0..3, 0..3) {
+            let max_m = mass.h.max(mass.n[i3]);
+            let p1;
+            let p2;
+            let p3;
 
-        {
-            let mut csv = csv.borrow_mut();
-            csv.write_field(format!("{}", c.step)).unwrap();
-            csv.write_field(format!("{:.15e}", c.beta)).unwrap();
-            csv.write_record(&[format!("{:.3e}", dbl), format!("{:.3e}", -net_decay)])
+            // Store the index of the parent and daughter particles in p1 and p2,
+            // p3 respectively.
+            match (max_m == mass.h, max_m == mass.n[i3]) {
+                (true, _) => {
+                    p1 = p_i("H", 0);
+                    p2 = p_i("L", i2);
+                    p3 = p_i("N", i3);
+                }
+                (_, true) => {
+                    p1 = p_i("N", i3);
+                    p2 = p_i("H", 0);
+                    p3 = p_i("L", i2);
+                }
+                (false, false) => unreachable!(),
+            };
+
+            // Amplitude squared
+            let m2 = coupling.y_v[[i3, i2]].norm_sqr() * (mass2.h - mass2.n[i3]);
+            // Phase space integration
+            let phase_space =
+                bessel::k_1_on_k_2(max_m * c.beta) / (c.hubble_rate * c.beta * 16.0 * PI_1 * max_m);
+            // Factor of 2 to account to both SU(2) processes
+            let gamma_tilde = -2.0 * m2 * phase_space;
+
+            // Calculate the decay and inverse decay rates
+            let decay = n[p1] * gamma_tilde;
+            let inverse_decay =
+                c.eq_n[p1] * checked_div(n[p2] * n[p3], c.eq_n[p2] * c.eq_n[p3]) * gamma_tilde;
+            let net_decay = decay - inverse_decay;
+
+            s[p_i("BL", 0)] += c.model.epsilon * net_decay - n[p_i("BL", 0)] * inverse_decay;
+
+            s[p1] -= net_decay;
+            s[p2] += net_decay;
+            s[p3] += net_decay;
+
+            csv.write_field(format!("{}", p1)).unwrap();
+            csv.write_field(format!("{:.3e}", gamma_tilde)).unwrap();
+            csv.write_field(format!("{:.3e}", decay / gamma_tilde))
+                .unwrap();
+            csv.write_field(format!("{:.3e}", inverse_decay / gamma_tilde))
+                .unwrap();
+            csv.write_field(format!("{:.3e}", net_decay / gamma_tilde))
                 .unwrap();
         }
+
+        csv.write_record(None::<&[u8]>).unwrap();
 
         s
     });

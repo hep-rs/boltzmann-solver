@@ -8,7 +8,7 @@ mod tableau;
 pub use self::options::InitialCondition;
 pub(crate) use self::options::{StepChange, StepPrecision};
 
-use crate::{particle::Particle, statistic::Statistic, universe::Universe};
+use crate::{particle::Particle, universe::Universe};
 use ndarray::{array, prelude::*};
 
 /// Contains all the information relevant to a particular model, including
