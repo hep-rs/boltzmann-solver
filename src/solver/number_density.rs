@@ -413,6 +413,16 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
     }
 
     fn initialize(mut self) -> Self {
+        let model = (self.model_fn)(1e-3);
+        let particles = model.particles();
+        assert_eq!(
+            self.initial_conditions.len(),
+            particles.len(),
+            "The number of particles in the model ({}) is different to the number of initial conditions ({}).",
+            particles.len(),
+            self.initial_conditions.len(),
+        );
+
         self.initialized = true;
 
         self
