@@ -5,7 +5,7 @@
 // compute and ultimately not used, it would be preferable to comment these out.
 #![allow(dead_code)]
 
-use boltzmann_solver::{solver::Model, statistic::Statistic};
+use boltzmann_solver::{particle::Particle, solver::Model};
 use ndarray::{array, prelude::*};
 use num::{zero, Complex};
 use std::f64;
@@ -16,10 +16,11 @@ use std::f64;
 
 /// All the particle names in the same order as they are added to the solver.
 #[rustfmt::skip]
-pub const NAMES: [&str; 5] = [
+pub const NAMES: [&str; 8] = [
     "B-L",
-    "N₁", "N₂", "N₃",
     "H",
+    "N₁", "N₂", "N₃",
+    "L₁", "L₂", "L₃",
 ];
 
 /// Function to map a more memorable name to the array index for the number
@@ -27,11 +28,13 @@ pub const NAMES: [&str; 5] = [
 ///
 /// We are using the programming convention of 0-indexing all particles; thus
 /// the index of "N₁" is obtained with `p_i("N", 0)`.
+#[inline]
 pub fn p_i(p: &str, n: usize) -> usize {
     match (p, n) {
         ("BL", _) | ("B-L", _) => 0,
-        ("N", n) => n + 1,
-        ("H", _) => 4,
+        ("H", _) => 1,
+        ("N", n) if n < 3 => n + 2,
+        ("L", n) if n < 3 => n + 5,
         _ => unreachable!(),
     }
 }
@@ -52,6 +55,78 @@ pub struct Couplings {
     pub y_v: Array2<Complex<f64>>,
 }
 
+/// Particle masses (in GeV)
+pub struct Masses {
+    /// Right-handed neutrinos
+    pub n: [f64; 3],
+    /// Higgs
+    pub h: f64,
+}
+
+impl Masses {
+    fn new(particles: &Array1<Particle>) -> Self {
+        Masses {
+            n: [particles[1].mass, particles[2].mass, particles[3].mass],
+            h: particles[4].mass,
+        }
+    }
+}
+
+/// Particle squared masses (in GeV\\(^2\\))
+pub struct SquaredMasses {
+    /// Right-handed neutrinos
+    pub n: [f64; 3],
+    /// Higgs
+    pub h: f64,
+}
+
+impl SquaredMasses {
+    fn new(particles: &Array1<Particle>) -> Self {
+        SquaredMasses {
+            n: [particles[1].mass2, particles[2].mass2, particles[3].mass2],
+            h: particles[4].mass2,
+        }
+    }
+}
+
+/// Particle widths (in GeV)
+pub struct Widths {
+    /// Right-handed neutrinos
+    pub n: [f64; 3],
+    /// Higgs
+    pub h: f64,
+}
+
+impl Widths {
+    fn new(particles: &Array1<Particle>) -> Self {
+        Widths {
+            n: [particles[1].width, particles[2].width, particles[3].width],
+            h: particles[4].width,
+        }
+    }
+}
+
+/// Particle squared widths (in GeV\\(^2\\))
+pub struct SquaredWidths {
+    /// Right-handed neutrinos
+    pub n: [f64; 3],
+    /// Higgs
+    pub h: f64,
+}
+
+impl SquaredWidths {
+    fn new(particles: &Array1<Particle>) -> Self {
+        SquaredWidths {
+            n: [
+                particles[1].width2,
+                particles[2].width2,
+                particles[3].width2,
+            ],
+            h: particles[4].width2,
+        }
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Model
 ////////////////////////////////////////////////////////////////////////////////
@@ -59,11 +134,11 @@ pub struct Couplings {
 /// Leptogenesis model parameters
 pub struct LeptogenesisModel {
     pub coupling: Couplings,
-    pub statistic: Array1<(Statistic, f64)>,
-    pub mass: Array1<f64>,
-    pub mass2: Array1<f64>,
-    pub width: Array1<f64>,
-    pub width2: Array1<f64>,
+    pub particles: Array1<Particle>,
+    pub mass: Masses,
+    pub mass2: SquaredMasses,
+    pub width: Widths,
+    pub width2: SquaredWidths,
     pub epsilon: f64,
 }
 
@@ -107,34 +182,27 @@ impl Model for LeptogenesisModel {
             ] * 1e-4,
         };
 
-        let statistic = array![
-            (Statistic::BoseEinstein, 0.0), // B-L
-            (Statistic::FermiDirac, 1.0),   // N1
-            (Statistic::FermiDirac, 1.0),   // N2
-            (Statistic::FermiDirac, 1.0),   // N3
-            (Statistic::BoseEinstein, 1.0), // Higgs
+        let particles = array![
+            Particle::new(0, 0.0, 0.0).dof(0.0), // B-L
+            Particle::new(0, 0.4 / beta, 0.1 * 0.4 / beta)
+                .complex()
+                .dof(2.0), // Higgs
+            Particle::new(1, 1e10, 0.0),         // N1
+            Particle::new(1, 1e11, 0.0),         // N2
+            Particle::new(1, 1e12, 0.0),         // N3
+            Particle::new(1, 0.0, 0.0).dof(2.0), // L1
+            Particle::new(1, 0.0, 0.0).dof(2.0), // L2
+            Particle::new(1, 0.0, 0.0).dof(2.0), // L3
         ];
 
-        let mass = array![
-            0.0,        // B-L
-            1e10,       // N1
-            1e11,       // N2
-            1e12,       // N3
-            0.4 / beta, // Higgs
-        ];
-        let mass2 = mass.map(|v| v.powi(2));
-        let width = array![
-            0.0,           // B-L
-            0.0,           // N1
-            0.0,           // N2
-            0.0,           // N3
-            0.1 * mass[4], // Higgs
-        ];
-        let width2 = width.map(|v| v.powi(2));
+        let mass = Masses::new(&particles);
+        let mass2 = SquaredMasses::new(&particles);
+        let width = Widths::new(&particles);
+        let width2 = SquaredWidths::new(&particles);
 
         LeptogenesisModel {
             coupling,
-            statistic,
+            particles,
             mass,
             mass2,
             width,
@@ -143,23 +211,7 @@ impl Model for LeptogenesisModel {
         }
     }
 
-    fn statistic(&self) -> &Array1<(Statistic, f64)> {
-        &self.statistic
-    }
-
-    fn mass(&self) -> &Array1<f64> {
-        &self.mass
-    }
-
-    fn mass2(&self) -> &Array1<f64> {
-        &self.mass2
-    }
-
-    fn width(&self) -> &Array1<f64> {
-        &self.width
-    }
-
-    fn width2(&self) -> &Array1<f64> {
-        &self.width2
+    fn particles(&self) -> &Array1<Particle> {
+        &self.particles
     }
 }
