@@ -3,7 +3,7 @@
 
 use super::{interaction, model, model::LeptogenesisModel};
 use boltzmann_solver::{
-    solver::{number_density::NumberDensitySolver, Solver},
+    solver::{number_density::NumberDensitySolver, Model, Solver},
     universe::StandardModel,
 };
 use ndarray::prelude::*;
@@ -19,12 +19,22 @@ where
 {
     // Set up the universe in which we'll run the Boltzmann equations
     let universe = StandardModel::new();
+    let beta_start = 1e-17;
+    let beta_end = 1e-3;
+    let model = f(beta_start);
+
+    let initial_conditions = model
+        .particles()
+        .iter()
+        .map(|p| p.normalized_number_density(0.0, beta_start))
+        .collect();
 
     // Create the Solver and set integration parameters
     let mut solver: NumberDensitySolver<LeptogenesisModel> = NumberDensitySolver::new()
-        .beta_range(1e-17, 1e0)
+        .beta_range(beta_start, beta_end)
         .error_tolerance(1e-1)
         .step_precision(1e-2, 5e-1)
+        .initial_conditions(initial_conditions)
         .initialize();
 
     solver.model_fn(f);
@@ -66,6 +76,7 @@ where
 
     interaction::n_el_h(&mut solver);
     interaction::n_el_ql_qr(&mut solver);
+    interaction::equilibrium(&mut solver);
 
     // Run solver
     ////////////////////////////////////////////////////////////////////////////////
