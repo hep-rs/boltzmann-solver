@@ -85,6 +85,25 @@ impl Particle {
         self.dof = dof;
     }
 
+    /// Indicate that the particle is complex.
+    ///
+    /// This function returns self and should be used in constructors.
+    pub fn complex(mut self) -> Self {
+        self.complex = true;
+        self
+    }
+
+    /// Specify how many internal degrees of freedom this particle has.
+    ///
+    /// This is a multiplicative factor to the degrees of freedom.  For a
+    /// 'pseudo' particle such as \\(B-L\\), this should be set to zero.
+    ///
+    /// This function returns self and should be used in constructors.
+    pub fn dof(mut self, dof: f64) -> Self {
+        self.dof = dof;
+        self
+    }
+
     /// Returns true if the particle is complex.
     #[inline]
     pub fn is_complex(&self) -> bool {
