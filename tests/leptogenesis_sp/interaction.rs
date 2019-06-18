@@ -14,14 +14,14 @@ use std::cell::RefCell;
 ///
 /// We are keeping H, L1, L2 and L3 at equilibrium.
 pub fn equilibrium(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
-    solver.add_interaction(|mut s, n, ref c| {
+    solver.add_interaction(|mut dn, n, ref c| {
         for &(p, i) in &[("H", 0), ("L", 0), ("L", 1), ("L", 2)] {
             let pi = p_i(p, i);
 
-            s[pi] = 1e15 * (c.eq_n[pi] - n[pi]);
+            dn[pi] = (c.eq_n[pi] - n[pi]) / c.step_size;
         }
 
-        s
+        dn
     });
 }
 
@@ -42,7 +42,7 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
         csv.write_record(None::<&[u8]>).unwrap();
     }
 
-    solver.add_interaction(move |mut s, n, ref c| {
+    solver.add_interaction(move |mut dn, n, ref c| {
         let mut csv = csv.borrow_mut();
 
         csv.write_field(format!("{}", c.step)).unwrap();
@@ -90,11 +90,11 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
                 c.eq_n[p1] * checked_div(n[p2] * n[p3], c.eq_n[p2] * c.eq_n[p3]) * gamma_tilde;
             let net_decay = decay - inverse_decay;
 
-            s[p_i("BL", 0)] += c.model.epsilon * net_decay - n[p_i("BL", 0)] * inverse_decay;
+            dn[p_i("BL", 0)] += c.model.epsilon * net_decay - n[p_i("BL", 0)] * inverse_decay;
 
-            s[p1] -= net_decay;
-            s[p2] += net_decay;
-            s[p3] += net_decay;
+            dn[p1] -= net_decay;
+            dn[p2] += net_decay;
+            dn[p3] += net_decay;
 
             csv.write_field(format!("{}", p1)).unwrap();
             csv.write_field(format!("{:.3e}", gamma_tilde)).unwrap();
@@ -108,7 +108,7 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
 
         csv.write_record(None::<&[u8]>).unwrap();
 
-        s
+        dn
     });
 }
 
@@ -120,7 +120,7 @@ pub fn n_el_ql_qr(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
         .serialize(["step", "beta", "N₁Q → Lq", "Lq → N₁Q"])
         .unwrap();
 
-    solver.add_interaction(move |mut s, n, ref c| {
+    solver.add_interaction(move |mut dn, n, ref c| {
         let p_c = p_i("N", 0);
         let p_z = p_i("H", 0);
 
@@ -159,8 +159,8 @@ pub fn n_el_ql_qr(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
         let net_forward = (checked_div(n[1], c.eq_n[1]) - 1.0) * gamma;
         let backward = gamma;
 
-        s[0] -= n[0] * backward;
-        s[1] -= net_forward;
+        dn[0] -= n[0] * backward;
+        dn[1] -= net_forward;
 
         {
             let mut csv = csv.borrow_mut();
@@ -170,6 +170,6 @@ pub fn n_el_ql_qr(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
                 .unwrap();
         }
 
-        s
+        dn
     });
 }
