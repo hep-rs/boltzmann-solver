@@ -265,6 +265,8 @@ use ndarray::{array, prelude::*, FoldWhile, Zip};
 pub struct Context<M: Model> {
     /// Current evaluation step
     pub step: u64,
+    /// Current step size
+    pub step_size: f64,
     /// Inverse temperature in GeV\\(^{-1}\\)
     pub beta: f64,
     /// Hubble rate, in GeV
@@ -476,7 +478,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         let mut h = beta * self.step_precision.min;
 
         // Create the initial context and log the initial conditions
-        let mut c = self.context(step, beta, universe);
+        let mut c = self.context(step, h, beta, universe);
         (*self.logger)(&n, &dn[0], &c);
 
         while beta < self.beta_range.1 {
@@ -486,7 +488,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             // Compute each k[i]
             for i in 0..RK_S {
                 let beta_i = beta + RK_C[i] * h;
-                let ci = self.context(step, beta_i, universe);
+                let ci = self.context(step, h, beta_i, universe);
                 let ai = RK_A[i];
                 let mut dni = (0..i).fold(Self::Solution::zeros(n.dim()), |total, j| {
                     total + ai[j] * &k[j]
@@ -560,7 +562,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             // Check if the error is within the tolerance, or we are advancing
             // irrespective of the local error
             if advance {
-                c = self.context(step, beta, universe);
+                c = self.context(step, h, beta, universe);
 
                 // Advance n and beta
                 n = self.n_plus_dn(n, &mut dn[0], &c);
@@ -646,10 +648,17 @@ impl<M: Model> NumberDensitySolver<M> {
 
     /// Generate the context at a given beta to pass to the logger/interaction
     /// functions.
-    fn context<U: Universe>(&self, step: u64, beta: f64, universe: &U) -> Context<M> {
+    fn context<U: Universe>(
+        &self,
+        step: u64,
+        step_size: f64,
+        beta: f64,
+        universe: &U,
+    ) -> Context<M> {
         let model = (self.model_fn)(beta);
         Context {
             step,
+            step_size,
             beta,
             hubble_rate: universe.hubble_rate(beta),
             eq_n: self.equilibrium_number_densities(beta, &model),
