@@ -29,6 +29,8 @@ pub fn run() {
 /// Provide an example of a very simple scan over parameter space.
 #[test]
 pub fn scan() {
+    super::setup_logging();
+
     // Setup the directory for CSV output
     ::std::fs::create_dir("/tmp/leptogenesis_sp/").unwrap_or(());
 
@@ -46,7 +48,9 @@ pub fn scan() {
         let f = move |beta: f64| {
             let mut m = LeptogenesisModel::new(beta);
             m.coupling.y_v.mapv_inplace(|yi| yi * y);
-            m.mass[p_i("N", 0)] = n0;
+            m.particles[p_i("N", 0)].set_mass(n0);
+            m.mass.n[0] = n0;
+            m.mass2.n[0] = n0;
             m
         };
         let sol = solve::solve(f);
