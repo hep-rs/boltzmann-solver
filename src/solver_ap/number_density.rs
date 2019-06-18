@@ -5,13 +5,10 @@
 //! solver](crate::solver::number_density) to see what assumptions
 //! are made.
 
-use super::{
-    EmptyModel, InitialCondition, Model, Solver, StepChange, StepPrecision,
-    DEFAULT_WORKING_PRECISION,
-};
-use crate::{particle::Particle, universe::Universe};
+use super::{EmptyModel, Model, Solver, StepChange, StepPrecision, DEFAULT_WORKING_PRECISION};
+use crate::universe::Universe;
 use log::{debug, info};
-use ndarray::{prelude::*, FoldWhile, Zip};
+use ndarray::{array, prelude::*, FoldWhile, Zip};
 use rug::{ops::*, Float};
 use std::iter;
 
@@ -22,6 +19,8 @@ pub struct Context<M: Model> {
     pub precision: u32,
     /// Current evaluation step
     pub step: u64,
+    /// Current evaluation step size
+    pub step_size: Float,
     /// Inverse temperature in GeV\\(^{-1}\\)
     pub beta: Float,
     /// Hubble rate, in GeV
@@ -45,8 +44,7 @@ pub struct Context<M: Model> {
 pub struct NumberDensitySolver<M: Model> {
     initialized: bool,
     beta_range: (Float, Float),
-    particles: Vec<Particle>,
-    initial_conditions: Vec<Float>,
+    initial_conditions: Array1<Float>,
     #[allow(clippy::type_complexity)]
     interactions: Vec<
         Box<
@@ -61,6 +59,7 @@ pub struct NumberDensitySolver<M: Model> {
     logger: Box<
         Fn(&<Self as Solver>::Solution, &<Self as Solver>::Solution, &<Self as Solver>::Context),
     >,
+    model_fn: Box<Fn(&Float) -> M>,
     step_change: StepChange,
     step_precision: StepPrecision,
     error_tolerance: Float,
@@ -87,10 +86,10 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 Float::with_val(DEFAULT_WORKING_PRECISION, 1e-20),
                 Float::with_val(DEFAULT_WORKING_PRECISION, 1e0),
             ),
-            particles: Vec::with_capacity(20),
-            initial_conditions: Vec::with_capacity(20),
+            initial_conditions: array![],
             interactions: Vec::with_capacity(100),
             logger: Box::new(|_, _, _| {}),
+            model_fn: Box::new(|beta| M::new(beta)),
             step_change: StepChange::default(),
             step_precision: StepPrecision::default(),
             error_tolerance: Float::with_val(DEFAULT_WORKING_PRECISION, 1e-4),
@@ -182,31 +181,25 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         self
     }
 
-    fn initialize(mut self) -> Self {
-        self.initialized = true;
+    fn initial_conditions(mut self, v: Vec<Float>) -> Self {
+        self.initial_conditions = Array1::from_vec(v);
 
         self
     }
 
-    fn add_particle(&mut self, s: Particle, initial_condition: InitialCondition) {
-        let v = match initial_condition {
-            InitialCondition::Equilibrium(mu) => Float::with_val(
-                self.working_precision,
-                s.normalized_number_density(mu, self.beta_range.0.to_f64()),
-            ),
-            InitialCondition::Fixed(n) => n,
-            InitialCondition::Zero => Float::with_val(self.working_precision, 0.0),
-        };
-        self.initial_conditions.push(v);
+    fn initialize(mut self) -> Self {
+        let model = (self.model_fn)(&Float::with_val(20, 1e-3));
+        let particles = model.particles();
+        assert_eq!(
+            self.initial_conditions.len(),
+            particles.len(),
+            "The number of particles in the model ({}) is different to the number of initial conditions ({}).",
+            particles.len(),
+            self.initial_conditions.len(),
+        );
+        self.initialized = true;
 
-        self.particles.push(s);
-    }
-
-    fn add_particles<I>(&mut self, iter: I)
-    where
-        I: IntoIterator<Item = Particle>,
-    {
-        self.particles.extend(iter);
+        self
     }
 
     fn add_interaction<F: 'static>(&mut self, f: F) -> &mut Self
@@ -263,25 +256,28 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
         let mut h = Float::with_val(self.working_precision, &beta * &self.step_precision.min);
 
         // Create the initial context and log the initial conditions
-        let mut c = self.context(step, beta.clone(), universe);
+        let mut c = self.context(step, &h, &beta, universe);
         (*self.logger)(&n, &dn[0], &c);
 
         while beta < self.beta_range.1 {
             step += 1;
             let mut advance = false;
+            debug!("Step {:}, β = {:.4e}", step, beta);
 
             // Compute each k[i]
             for i in 0..RK_S {
                 let beta_i = &beta + h.clone() * RK_C[i];
-                let ci = self.context(step, beta_i, universe);
+                let ci = self.context(step, &h, &beta_i, universe);
                 let ai = RK_A[i];
-                let mut dni = (0..i).fold(zeros.clone(), |total, j| total + &k[j] * ai[j]);
-                let ni = self.n_plus_dn(n.clone(), &mut dni, &ci);
+                let ni = (0..i).fold(n.clone(), |total, j| total + &k[j] * ai[j]);
                 k[i] = self
                     .interactions
                     .iter()
                     .fold(zeros.clone(), |s, f| f(s, &ni, &ci));
                 k[i].mapv_inplace(|v| v * &h);
+                // Apply the `n_plus_dn` check here (even though we are
+                // discarding `ni`) to place a limit on `k[i]`.
+                self.n_plus_dn(ni, &mut k[i], &ci);
             }
 
             // Calculate the two estimates
@@ -319,19 +315,13 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             let max_step: Float = beta.clone() * &self.step_precision.max;
             if h_est > max_step {
                 h_est = max_step;
-                debug!(
-                    "[Step {:}, β = {:.4e}] Step size too large, decreased h to {:.3e}",
-                    step, beta, h_est
-                );
+                debug!("Step size too large, decreased h to {:.3e}", h_est);
                 advance = true;
             } else {
                 let min_step: Float = beta.clone() * &self.step_precision.min;
                 if h_est < min_step {
                     h = min_step;
-                    debug!(
-                        "[Step {:}, β = {:.4e}] Step size too small, increased h to {:.3e}",
-                        step, beta, h
-                    );
+                    debug!("Step size too small, increased h to {:.3e}", h);
                     advance = true;
                 }
             }
@@ -339,7 +329,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             // Check if the error is within the tolerance, or we are advancing
             // irrespective of the local error
             if advance {
-                c = self.context(step, beta.clone(), universe);
+                c = self.context(step, &h, &beta, universe);
 
                 // Advance n and beta
                 n = self.n_plus_dn(n, &mut dn[0], &c);
@@ -352,13 +342,14 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
             // Adjust final integration step if needed
             let next_beta: Float = beta.clone() + &h_est;
             if next_beta > self.beta_range.1 {
+                debug!("Fixing overshoot of last integration step.");
                 h_est = &self.beta_range.1 - beta.clone();
             }
 
             h = h_est;
         }
 
-        info!("Number of evaluations: {}", step);
+        info!("Number of integration steps: {}", step);
 
         n
     }
@@ -398,28 +389,46 @@ impl<'a, M: Model> NumberDensitySolver<M> {
     /// All particles species are assumed to be in thermal equilibrium at this
     /// energy, with the distribution following either the Bose–Einstein or
     /// Fermi–Dirac distribution as determined by their spin.
-    fn equilibrium_number_densities(&self, beta: f64) -> Array1<f64> {
-        Array1::from_iter(self.particles.iter().map(|p| {
-            let v = p.normalized_number_density(0.0, beta);
-            if v.abs() < self.threshold_number_density {
-                0.0
-            } else {
-                v
-            }
-        }))
+    fn equilibrium_number_densities(&self, beta: f64, model: &M) -> Array1<f64> {
+        Array1::from_iter(
+            model
+                .particles()
+                .iter()
+                .map(|p| p.normalized_number_density(0.0, beta)),
+        )
+    }
+
+    /// Set a model function.
+    ///
+    /// Add a function that can modify the model before it is used by the
+    /// context.  This is particularly useful if there is a baseline model with
+    /// fixed parameters and only certain parameters are changed.
+    pub fn model_fn<F: 'static>(&mut self, f: F) -> &mut Self
+    where
+        F: Fn(&Float) -> M,
+    {
+        self.model_fn = Box::new(f);
+        self
     }
 
     /// Generate the context at a given beta to pass to the logger/interaction
     /// functions.
-    fn context<U: Universe>(&self, step: u64, beta: Float, universe: &U) -> Context<M> {
+    fn context<U: Universe>(
+        &self,
+        step: u64,
+        step_size: &Float,
+        beta: &Float,
+        universe: &U,
+    ) -> Context<M> {
         let beta_f64 = beta.to_f64();
         let model = M::new(&beta);
         Context {
             precision: beta.prec(),
             step,
-            beta,
+            step_size: step_size.clone(),
+            beta: beta.clone(),
             hubble_rate: universe.hubble_rate(beta_f64),
-            eq_n: self.equilibrium_number_densities(beta_f64),
+            eq_n: self.equilibrium_number_densities(beta_f64, &model),
             model,
             working_precision: self.working_precision,
         }
@@ -444,51 +453,22 @@ impl<'a, M: Model> NumberDensitySolver<M> {
         c: &<Self as Solver>::Context,
     ) -> <Self as Solver>::Solution {
         Zip::from(&mut n).and(dn).and(&c.eq_n).apply(|n, dn, eq_n| {
-            let delta_1: Float = n.clone() - eq_n;
-            let delta_2: Float = delta_1.clone() + &*dn;
+            let new_n = n.clone() + &*dn;
 
-            if delta_1.is_sign_positive() != delta_2.is_sign_positive() {
-                debug!(
-                    "[Step {:}, β = {:.4e}] Δn overshoots equilibrium.  Removing overshoot.",
-                    c.step, c.beta,
-                );
-                *dn = n.clone() - eq_n;
+            if (*n > *eq_n) ^ (new_n > *eq_n) {
+                *dn = -n.clone() + eq_n;
                 *n = Float::with_val(self.working_precision, eq_n);
             } else {
-                *n += &*dn;
+                *n = new_n;
             }
 
             if *n.as_abs() < self.threshold_number_density {
-                debug!(
-                    "[Step {:}, β = {:.4e}] n going below threshold number density, setting to zero.",
-                    c.step, c.beta,
-                );
+                debug!("n going below threshold number density, setting to zero.",);
                 *dn = n.clone();
                 dn.neg_assign();
                 *n = Float::with_val(self.working_precision, 0.0)
             };
         });
         n
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::universe::StandardModel;
-    use crate::utilities::test::*;
-
-    /// The most trivial example with a single particle and no interactions.
-    #[test]
-    fn no_interaction() {
-        let phi = Particle::new("φ".to_string(), 0, 1e3);
-        let mut solver = NumberDensitySolver::default()
-            .temperature_range(1e20, 1e-10)
-            .initialize();
-
-        solver.add_particle(phi, InitialCondition::Equilibrium(0.0));
-
-        let sol = solver.solve(&StandardModel::new());
-        approx_eq(sol[0].to_f64(), 1.0, 8.0, 0.0);
     }
 }

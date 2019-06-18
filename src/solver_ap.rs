@@ -9,8 +9,8 @@ mod tableau;
 pub use self::options::InitialCondition;
 pub(crate) use self::options::{StepChange, StepPrecision};
 
-use crate::particle::Particle;
-use crate::universe::Universe;
+use crate::{particle::Particle, universe::Universe};
+use ndarray::{array, prelude::*};
 use rug::Float;
 
 pub(crate) const DEFAULT_WORKING_PRECISION: u32 = 100;
@@ -23,64 +23,25 @@ pub trait Model {
     /// calculated at the inverse temperature \\(\beta\\).
     fn new(beta: &Float) -> Self;
 
-    /// Return a list of masses (in unit of GeV).
-    ///
-    /// # Implementation
-    ///
-    /// The list must be in the *same* order as the order in which they are
-    /// added to the [`Solver`].
-    fn mass(&self) -> &Array1<Float>;
-
-    /// Return a list of squared masses (in units of GeV\\(^{2}\\)).
-    ///
-    /// # Implementation
-    ///
-    /// The list must be in the *same* order as the order in which they are
-    /// added to the [`Solver`].
-    fn mass2(&self) -> &Array1<Float>;
-
-    /// Return a list of widths (in unit of GeV).
-    ///
-    /// # Implementation
-    ///
-    /// The list must be in the *same* order as the order in which they are
-    /// added to the [`Solver`].
-    fn width(&self) -> &Array1<Float>;
-
-    /// Return a list of squared widths (in units of GeV\\(^{2}\\)).
-    ///
-    /// # Implementation
-    ///
-    /// The list must be in the *same* order as the order in which they are
-    /// added to the [`Solver`].
-    fn width2(&self) -> &Array1<Float>;
+    /// Return list of particles in the model.
+    fn particles(&self) -> &Array1<Particle>;
 }
 
 /// An empty model containing no couplings, masses, etc.  This is can be used
 /// for very simple implementations of the Boltzmann solver.
 pub struct EmptyModel {
-    empty_array: Array1<Float>,
+    particles: Array1<Particle>,
 }
 
 impl Model for EmptyModel {
     fn new(_: &Float) -> Self {
-        EmptyModel
+        EmptyModel {
+            particles: array![],
+        }
     }
 
-    fn mass(&self) -> &Array1<f64> {
-        &self.empty_array
-    }
-
-    fn mass2(&self) -> &Array1<f64> {
-        &self.empty_array
-    }
-
-    fn width(&self) -> &Array1<f64> {
-        &self.empty_array
-    }
-
-    fn width2(&self) -> &Array1<f64> {
-        &self.empty_array
+    fn particles(&self) -> &Array1<Particle> {
+        &self.particles
     }
 }
 
@@ -187,23 +148,11 @@ pub trait Solver {
     /// integration step size is adjusted accordingly.
     fn error_tolerance(self, tol: f64) -> Self;
 
+    /// Specify initial conditions for the number densities.
+    fn initial_conditions(self, cond: Vec<Float>) -> Self;
+
     /// Initialize the phase space solver.
     fn initialize(self) -> Self;
-
-    /// Add a particle species.
-    ///
-    /// The initial conditions for this particle are generated assuming the
-    /// particle to be in thermal and chemical equilibrium at the initial
-    /// temperature.
-    ///
-    /// If the particle and anti-particle are to be treated separately, the two
-    /// species have to be added.
-    fn add_particle(&mut self, p: Particle, initial_condition: InitialCondition);
-
-    /// Add a multiple particles from a vector or slice.
-    fn add_particles<I>(&mut self, iter: I)
-    where
-        I: IntoIterator<Item = Particle>;
 
     /// Add an interaction.
     ///
