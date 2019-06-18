@@ -15,6 +15,8 @@ use std::sync::RwLock;
 /// Test a single fiducial data point
 #[test]
 pub fn run() {
+    super::setup_logging();
+
     // Setup the directory for CSV output
     ::std::fs::create_dir("/tmp/leptogenesis_sp/").unwrap_or(());
 
