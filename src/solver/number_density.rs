@@ -496,7 +496,8 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                     .interactions
                     .iter()
                     .fold(Self::Solution::zeros(n.dim()), |dn, f| f(dn, &ni, &ci));
-                // Apply the `n_plus_dn` check here (even though we are discarding `ni`) to place a limit on `k[i]`.
+                // Apply the `n_plus_dn` check here (even though we are
+                // discarding `ni`) to place a limit on `k[i]`.
                 self.n_plus_dn(ni, &mut k[i], &ci);
             }
 
