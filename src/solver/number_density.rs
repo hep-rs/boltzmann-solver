@@ -676,25 +676,22 @@ impl<M: Model> NumberDensitySolver<M> {
         c: &<Self as Solver>::Context,
     ) -> <Self as Solver>::Solution {
         Zip::from(&mut n).and(dn).and(&c.eq_n).apply(|n, dn, eq_n| {
-            let delta_1 = *n - eq_n;
-            let delta_2 = delta_1 + *dn;
+            let new_n = *n + *dn;
 
-            if delta_1.is_sign_positive() != delta_2.is_sign_positive() {
-                *dn = *n - eq_n;
+            if (*n > *eq_n) ^ (new_n > *eq_n) {
+                *dn = eq_n - *n;
                 *n = *eq_n;
             } else {
-                *n += *dn;
+                *n = new_n;
             }
 
             if n.abs() < self.threshold_number_density {
-                debug!(
-                    "[Step {:}, β = {:.4e}] n going below threshold number density, setting to zero.",
-                    c.step, c.beta,
-                );
+                debug!("n going below threshold number density, setting to zero.",);
                 *dn = -*n;
                 *n = 0.0;
             }
         });
+
         n
     }
 }
