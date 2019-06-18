@@ -491,14 +491,13 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 let beta_i = beta + RK_C[i] * h;
                 let ci = self.context(step, h, beta_i, universe);
                 let ai = RK_A[i];
-                let mut dni = (0..i).fold(Self::Solution::zeros(n.dim()), |total, j| {
-                    total + ai[j] * &k[j]
-                });
-                let ni = self.n_plus_dn(n.clone(), &mut dni, &ci);
+                let ni = (0..i).fold(n.clone(), |total, j| total + ai[j] * &k[j]);
                 k[i] = h * self
                     .interactions
                     .iter()
-                    .fold(Self::Solution::zeros(n.dim()), |s, f| f(s, &ni, &ci));
+                    .fold(Self::Solution::zeros(n.dim()), |dn, f| f(dn, &ni, &ci));
+                // Apply the `n_plus_dn` check here (even though we are discarding `ni`) to place a limit on `k[i]`.
+                self.n_plus_dn(ni, &mut k[i], &ci);
             }
 
             // Calculate the two estimates for dn
