@@ -323,6 +323,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
     ///
     /// The default range of temperatures span 1 GeV through to 10^{20} GeV.
     fn new() -> Self {
+        #[allow(clippy::redundant_closure)]
         Self {
             initialized: false,
             beta_range: (1e-20, 1e0),
