@@ -1,9 +1,16 @@
-//! Use the standard precision Boltzmann solver with the vanilla leptogenesis
-//! scenario.
+//! Test `boltzmann-solver` to calculate the baryon asymmetry generated through
+//! leptogenesis in the standard type-I seesaw.
 
-pub mod interaction;
-pub mod model;
-pub mod solve;
+extern crate boltzmann_solver;
+extern crate chrono;
+extern crate csv;
+extern crate fern;
+extern crate itertools;
+extern crate ndarray;
+extern crate num;
+extern crate quadrature;
+extern crate rgsl;
+extern crate special_functions;
 
 use boltzmann_solver::solver::Model;
 use itertools::iproduct;
@@ -11,8 +18,51 @@ use log::info;
 use model::{p_i, LeptogenesisModel};
 use ndarray::prelude::*;
 use rayon::prelude::*;
-use std::sync::RwLock;
+use std::{env::temp_dir, fs, io, path::PathBuf, sync::RwLock};
 
+pub mod interaction;
+pub mod model;
+pub mod solve;
+
+/// Setup logging
+fn setup_logging() {
+    let mut base_config = fern::Dispatch::new();
+
+    base_config = base_config.level(log::LevelFilter::Info);
+
+    let stderr_config = fern::Dispatch::new()
+        .format(|out, message, record| {
+            out.finish(format_args!(
+                "{} {} {} - {}",
+                chrono::Local::now().format("%H:%M:%S%.3f"),
+                record.target(),
+                record.level(),
+                message
+            ))
+        })
+        .chain(io::stderr());
+
+    base_config.chain(stderr_config).apply().unwrap_or(());
+}
+
+/// Output directory
+fn output_dir() -> PathBuf {
+    let mut dir = temp_dir();
+    dir.push("leptogenesis");
+    if !dir.is_dir() {
+        log::info!("Creating output directory: {}", dir.display());
+    }
+
+    match fs::create_dir_all(&dir) {
+        Ok(()) => (),
+        Err(e) => {
+            log::error!("Unable to created directory: {}", e);
+            panic!()
+        }
+    }
+
+    dir
+}
 /// Test a single fiducial data point
 #[test]
 pub fn run() {
@@ -34,7 +84,7 @@ pub fn scan() {
     crate::setup_logging();
 
     // Setup the directory for CSV output
-    let output_dir = crate::output_dir().join("sp");
+    let output_dir = crate::output_dir();
     let csv = RwLock::new(csv::Writer::from_path(output_dir.join("scan.csv")).unwrap());
     csv.write().unwrap().serialize(("y", "m", "B-L")).unwrap();
 

@@ -3,9 +3,6 @@
 use quadrature::integrate;
 use special_functions::bessel;
 
-#[cfg(feature = "arbitrary-precision")]
-use rug::Float;
-
 const CHECKED_DIV_MAX: f64 = 10.0;
 
 #[cfg(test)]
@@ -43,35 +40,6 @@ pub fn checked_div(a: f64, b: f64) -> f64 {
         } else {
             v
         }
-    }
-}
-
-/// Perform a 'checked' division for number densities.
-///
-/// As the number densities can become quite small (especially the equilibrium
-/// number densities), computing `n / n_eq` can cause certain issues.  As a
-/// result, this function provides a 'well-behaved' division that handles small
-/// values of `n_eq`.
-///
-/// # Implementation
-///
-/// - If the numerator is 0, 0 is returned.
-/// - If the denominator is 0, a maximum value is returned with the same sign as
-///   the numerator.
-/// - For all other values, the value returned is:
-///   \\begin{equation}
-///     M \tanh\left( \frac{1}{M} \frac{a}{b} \right)
-///   \\end{equation}
-///   where \\(M\\) is the maximum value allowed (typically set to 10).
-#[cfg(feature = "arbitrary-precision")]
-#[inline]
-pub fn checked_div_ap(a: &Float, b: &Float) -> Float {
-    if a.is_zero() {
-        Float::with_val(a.prec(), 0.0)
-    } else if b.is_zero() {
-        Float::with_val(a.prec(), CHECKED_DIV_MAX).copysign(a)
-    } else {
-        Float::with_val(a.prec(), a / b).clamp(&-CHECKED_DIV_MAX, &CHECKED_DIV_MAX)
     }
 }
 
@@ -167,9 +135,6 @@ mod tests {
     use crate::utilities::test::*;
     use ndarray::prelude::*;
 
-    #[cfg(feature = "arbitrary-precision")]
-    use rug::Float;
-
     #[allow(clippy::float_cmp)]
     #[test]
     fn checked_div() {
@@ -190,53 +155,6 @@ mod tests {
         assert_eq!(super::checked_div(-1.0, 1e-5), -CHECKED_DIV_MAX);
         assert_eq!(super::checked_div(1.0, -1e-5), -CHECKED_DIV_MAX);
         assert_eq!(super::checked_div(-1.0, -1e-5), CHECKED_DIV_MAX);
-    }
-
-    #[cfg(feature = "arbitrary-precision")]
-    #[test]
-    fn checked_div_ap() {
-        let zero = Float::with_val(30, 0);
-        let one = Float::with_val(30, 1);
-        let two = Float::with_val(30, 2);
-        let en5 = Float::with_val(30, 1e-5);
-        let max = Float::with_val(30, CHECKED_DIV_MAX);
-        let neg_one = Float::with_val(30, -1);
-        let neg_two = Float::with_val(30, -2);
-        let neg_en5 = Float::with_val(30, -1e-5);
-        let neg_max = Float::with_val(30, -CHECKED_DIV_MAX);
-
-        assert_eq!(super::checked_div_ap(&zero, &zero), zero);
-
-        assert_eq!(super::checked_div_ap(&one, &zero), max);
-        assert_eq!(super::checked_div_ap(&neg_one, &zero), neg_max);
-
-        assert_eq!(super::checked_div_ap(&zero, &one), zero);
-        assert_eq!(super::checked_div_ap(&zero, &neg_one), zero);
-
-        approx_eq(super::checked_div_ap(&one, &two).to_f64(), 0.5, 2.0, 0.0);
-        approx_eq(
-            super::checked_div_ap(&neg_one, &two).to_f64(),
-            -0.5,
-            2.0,
-            0.0,
-        );
-        approx_eq(
-            super::checked_div_ap(&one, &neg_two).to_f64(),
-            -0.5,
-            2.0,
-            0.0,
-        );
-        approx_eq(
-            super::checked_div_ap(&neg_one, &neg_two).to_f64(),
-            0.5,
-            2.0,
-            0.0,
-        );
-
-        assert_eq!(super::checked_div_ap(&one, &en5), max);
-        assert_eq!(super::checked_div_ap(&neg_one, &en5), neg_max);
-        assert_eq!(super::checked_div_ap(&one, &neg_en5), neg_max);
-        assert_eq!(super::checked_div_ap(&neg_one, &neg_en5), max);
     }
 
     #[test]

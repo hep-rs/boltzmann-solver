@@ -3,32 +3,30 @@
 
 use super::{interaction, model, model::LeptogenesisModel};
 use boltzmann_solver::{
-    solver_ap::{number_density::NumberDensitySolver, Model, Solver},
+    solver::{number_density::NumberDensitySolver, Model, Solver},
     universe::StandardModel,
 };
 use ndarray::prelude::*;
-use rug::Float;
 use std::cell::RefCell;
 
 /// Solve the Boltzmann equations for the given model.
 ///
 /// This routine sets up the solve, runs it and returns the final array of
 /// number densities.
-pub fn solve<F: 'static>(f: F) -> Array1<Float>
+pub fn solve<F: 'static>(f: F) -> Array1<f64>
 where
-    F: Fn(&Float) -> LeptogenesisModel,
+    F: Fn(f64) -> LeptogenesisModel,
 {
     // Set up the universe in which we'll run the Boltzmann equations
     let universe = StandardModel::new();
     let beta_start = 1e-17;
     let beta_end = 1e-3;
-    let model = f(&Float::with_val(50, beta_start));
+    let model = f(beta_start);
 
     let initial_conditions = model
         .particles()
         .iter()
         .map(|p| p.normalized_number_density(0.0, beta_start))
-        .map(|n| Float::with_val(50, n))
         .collect();
 
     // Create the Solver and set integration parameters
@@ -39,11 +37,12 @@ where
         .initial_conditions(initial_conditions)
         .initialize();
 
+    solver.model_fn(f);
+
     // Logging of number densities
     ////////////////////////////////////////////////////////////////////////////////
-    let output_dir = crate::output_dir().join("ap");
+    let output_dir = crate::output_dir();
     let csv = RefCell::new(csv::Writer::from_path(output_dir.join("n.csv")).unwrap());
-
     {
         let mut csv = csv.borrow_mut();
         csv.write_field("step").unwrap();
@@ -59,15 +58,14 @@ where
     }
 
     solver.set_logger(move |n, dn, c| {
-        // if BETA_RANGE.0 < c.beta && c.beta < BETA_RANGE.1 {
         let mut csv = csv.borrow_mut();
         csv.write_field(format!("{}", c.step)).unwrap();
         csv.write_field(format!("{:.15e}", c.beta)).unwrap();
 
         for i in 0..n.len() {
-            csv.write_field(format!("{:.3e}", n[i].to_f64())).unwrap();
+            csv.write_field(format!("{:.3e}", n[i])).unwrap();
             csv.write_field(format!("{:.3e}", c.eq_n[i])).unwrap();
-            csv.write_field(format!("{:.3e}", dn[i].to_f64())).unwrap();
+            csv.write_field(format!("{:.3e}", dn[i])).unwrap();
         }
 
         csv.write_record(None::<&[u8]>).unwrap();
