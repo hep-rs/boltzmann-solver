@@ -3,8 +3,7 @@
 
 use super::{interaction, model, model::LeptogenesisModel};
 use boltzmann_solver::{
-    particle::Particle,
-    solver_ap::{number_density::NumberDensitySolver, InitialCondition, Solver},
+    solver_ap::{number_density::NumberDensitySolver, Model, Solver},
     universe::StandardModel,
 };
 use ndarray::prelude::*;
@@ -15,40 +14,35 @@ use std::cell::RefCell;
 ///
 /// This routine sets up the solve, runs it and returns the final array of
 /// number densities.
-pub fn solve(model: LeptogenesisModel) -> Array1<Float> {
+pub fn solve<F: 'static>(f: F) -> Array1<Float>
+where
+    F: Fn(&Float) -> LeptogenesisModel,
+{
     // Set up the universe in which we'll run the Boltzmann equations
     let universe = StandardModel::new();
+    let beta_start = 1e-17;
+    let beta_end = 1e-3;
+    let model = f(&Float::with_val(50, beta_start));
+
+    let initial_conditions = model
+        .particles()
+        .iter()
+        .map(|p| p.normalized_number_density(0.0, beta_start))
+        .map(|n| Float::with_val(50, n))
+        .collect();
 
     // Create the Solver and set integration parameters
     let mut solver: NumberDensitySolver<LeptogenesisModel> = NumberDensitySolver::new()
-        .beta_range(1e-17, 1e0)
+        .beta_range(beta_start, beta_end)
         .error_tolerance(1e-1)
         .step_precision(1e-2, 5e-1)
+        .initial_conditions(initial_conditions)
         .initialize();
-
-    // Add the particles to the solver, using for initial condition either 0 or
-    // equilibrium number density.
-    solver.add_particle(
-        Particle::new(model::NAMES[0].to_string(), 0, 0.0).set_dof(0.0),
-        InitialCondition::Zero,
-    );
-
-    solver.add_particle(
-        Particle::new(model::NAMES[1].to_string(), 1, model.mass.n[0]),
-        InitialCondition::Equilibrium(0.0),
-    );
-    solver.add_particle(
-        Particle::new(model::NAMES[2].to_string(), 1, model.mass.n[1]),
-        InitialCondition::Equilibrium(0.0),
-    );
-    solver.add_particle(
-        Particle::new(model::NAMES[3].to_string(), 1, model.mass.n[2]),
-        InitialCondition::Equilibrium(0.0),
-    );
 
     // Logging of number densities
     ////////////////////////////////////////////////////////////////////////////////
-    let csv = RefCell::new(csv::Writer::from_path("/tmp/leptogenesis_ap/n.csv").unwrap());
+    let output_dir = crate::output_dir().join("ap");
+    let csv = RefCell::new(csv::Writer::from_path(output_dir.join("n.csv")).unwrap());
 
     {
         let mut csv = csv.borrow_mut();
@@ -71,9 +65,9 @@ pub fn solve(model: LeptogenesisModel) -> Array1<Float> {
         csv.write_field(format!("{:.15e}", c.beta)).unwrap();
 
         for i in 0..n.len() {
-            csv.write_field(format!("{:.3e}", n[i])).unwrap();
+            csv.write_field(format!("{:.3e}", n[i].to_f64())).unwrap();
             csv.write_field(format!("{:.3e}", c.eq_n[i])).unwrap();
-            csv.write_field(format!("{:.3e}", dn[i])).unwrap();
+            csv.write_field(format!("{:.3e}", dn[i].to_f64())).unwrap();
         }
 
         csv.write_record(None::<&[u8]>).unwrap();
@@ -84,6 +78,7 @@ pub fn solve(model: LeptogenesisModel) -> Array1<Float> {
 
     interaction::n_el_h(&mut solver);
     interaction::n_el_ql_qr(&mut solver);
+    interaction::equilibrium(&mut solver);
 
     // Run solver
     ////////////////////////////////////////////////////////////////////////////////
