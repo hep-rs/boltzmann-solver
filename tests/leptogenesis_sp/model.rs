@@ -146,15 +146,15 @@ impl Model for LeptogenesisModel {
     fn new(beta: f64) -> Self {
         let coupling = Couplings {
             y_u: array![
-                [Complex::new(172.200, 0.0), zero(), zero()],
+                [Complex::new(2.2e-3, 0.0), zero(), zero()],
                 [zero(), Complex::new(95e-3, 0.0), zero()],
-                [zero(), zero(), Complex::new(2.2e-3, 0.0)],
+                [zero(), zero(), Complex::new(172.200, 0.0)],
             ] * f64::sqrt(2.0)
                 / 246.0,
             y_d: array![
-                [Complex::new(4.2, 0.0), zero(), zero()],
+                [Complex::new(5e-3, 0.0), zero(), zero()],
                 [zero(), Complex::new(1.25, 0.0), zero()],
-                [zero(), zero(), Complex::new(5e-3, 0.0)],
+                [zero(), zero(), Complex::new(4.2, 0.0)],
             ] * f64::sqrt(2.0)
                 / 246.0,
             y_e: array![
