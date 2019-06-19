@@ -7,6 +7,7 @@ pub mod solve;
 
 use boltzmann_solver::solver::Model;
 use itertools::iproduct;
+use log::info;
 use model::{p_i, LeptogenesisModel};
 use ndarray::prelude::*;
 use rayon::prelude::*;
@@ -19,8 +20,12 @@ pub fn run() {
 
     let sol = solve::solve(|beta| LeptogenesisModel::new(beta));
 
-    assert!(1e-10 < sol[0].abs() && sol[0].abs() < 1e-5);
-    assert!(sol[1] < 1e-20);
+    info!("Final number density: {:.3e}", sol);
+
+    assert!(1e-10 < sol[p_i("B-L", 0)].abs() && sol[p_i("B-L", 0)].abs() < 1e-5);
+    for i in 0..3 {
+        assert!(sol[p_i("N", i)] < 1e-20);
+    }
 }
 
 /// Provide an example of a very simple scan over parameter space.
