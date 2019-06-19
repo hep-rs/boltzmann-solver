@@ -27,7 +27,8 @@ pub fn equilibrium(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
 
 /// Interaction H ↔ -L(i2), N(i3)
 pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
-    let csv = RefCell::new(csv::Writer::from_path("/tmp/leptogenesis_sp/decay.csv").unwrap());
+    let output_dir = crate::output_dir().join("sp");
+    let csv = RefCell::new(csv::Writer::from_path(output_dir.join("n_el_h.csv")).unwrap());
     {
         let mut csv = csv.borrow_mut();
         csv.write_field("step").unwrap();
@@ -44,7 +45,6 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
 
     solver.add_interaction(move |mut dn, n, ref c| {
         let mut csv = csv.borrow_mut();
-
         csv.write_field(format!("{}", c.step)).unwrap();
         csv.write_field(format!("{:.15e}", c.beta)).unwrap();
 
@@ -114,8 +114,8 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
 
 /// Scattering NL ↔ Qq, NQ ↔ Lq and Nq ↔ LQ (s- and t-channel)
 pub fn n_el_ql_qr(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
-    let csv =
-        RefCell::new(csv::Writer::from_path("/tmp/leptogenesis_sp/scattering_NLQq.csv").unwrap());
+    let output_dir = crate::output_dir().join("sp");
+    let csv = RefCell::new(csv::Writer::from_path(output_dir.join("n_el_ql_qr.csv")).unwrap());
     csv.borrow_mut()
         .serialize(["step", "beta", "N₁Q → Lq", "Lq → N₁Q"])
         .unwrap();

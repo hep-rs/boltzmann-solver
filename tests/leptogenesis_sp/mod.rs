@@ -15,10 +15,7 @@ use std::sync::RwLock;
 /// Test a single fiducial data point
 #[test]
 pub fn run() {
-    super::setup_logging();
-
-    // Setup the directory for CSV output
-    ::std::fs::create_dir("/tmp/leptogenesis_sp/").unwrap_or(());
+    crate::setup_logging();
 
     let sol = solve::solve(|beta| LeptogenesisModel::new(beta));
 
@@ -29,16 +26,15 @@ pub fn run() {
 /// Provide an example of a very simple scan over parameter space.
 #[test]
 pub fn scan() {
-    super::setup_logging();
+    crate::setup_logging();
 
     // Setup the directory for CSV output
-    ::std::fs::create_dir("/tmp/leptogenesis_sp/").unwrap_or(());
-
-    let csv = RwLock::new(csv::Writer::from_path("/tmp/leptogenesis_sp/scan.csv").unwrap());
+    let output_dir = crate::output_dir().join("sp");
+    let csv = RwLock::new(csv::Writer::from_path(output_dir.join("scan.csv")).unwrap());
     csv.write().unwrap().serialize(("y", "m", "B-L")).unwrap();
 
     let ym: Vec<_> = iproduct!(
-        Array1::linspace(-8.0, -4.0, 2).into_iter(),
+        Array1::linspace(-8.0, 0.0, 2).into_iter(),
         Array1::linspace(6.0, 14.0, 2).into_iter()
     )
     .map(|(&y, &m)| (10.0f64.powf(y), 10.0f64.powf(m)))
@@ -47,10 +43,10 @@ pub fn scan() {
     ym.into_par_iter().for_each(|(y, n0)| {
         let f = move |beta: f64| {
             let mut m = LeptogenesisModel::new(beta);
-            m.coupling.y_v.mapv_inplace(|yi| yi * y);
+            m.coupling.y_v.mapv_inplace(|yi| yi / 1e-4 * y);
             m.particles[p_i("N", 0)].set_mass(n0);
             m.mass.n[0] = n0;
-            m.mass2.n[0] = n0;
+            m.mass2.n[0] = n0.powi(2);
             m
         };
         let sol = solve::solve(f);
@@ -60,7 +56,7 @@ pub fn scan() {
             .serialize((
                 format!("{:.10e}", y),
                 format!("{:.10e}", n0),
-                format!("{:.10e}", sol[0]),
+                format!("{:.10e}", sol[p_i("B-L", 0)]),
             ))
             .unwrap();
     });

@@ -41,8 +41,8 @@ where
 
     // Logging of number densities
     ////////////////////////////////////////////////////////////////////////////////
-    let csv = RefCell::new(csv::Writer::from_path("/tmp/leptogenesis_sp/n.csv").unwrap());
-
+    let output_dir = crate::output_dir().join("sp");
+    let csv = RefCell::new(csv::Writer::from_path(output_dir.join("n.csv")).unwrap());
     {
         let mut csv = csv.borrow_mut();
         csv.write_field("step").unwrap();
