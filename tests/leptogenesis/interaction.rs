@@ -3,12 +3,10 @@
 use super::model::{p_i, LeptogenesisModel};
 use boltzmann_solver::{
     constants::{PI_1, PI_5},
-    solver_ap::{number_density::NumberDensitySolver, Solver},
-    utilities::{checked_div, checked_div_ap, integrate_st},
+    solver::{number_density::NumberDensitySolver, Solver},
+    utilities::{checked_div, integrate_st},
 };
 use itertools::iproduct;
-use num::ToPrimitive;
-use rug::Float;
 use special_functions::bessel;
 use std::cell::RefCell;
 
@@ -20,7 +18,7 @@ pub fn equilibrium(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
         for &(p, i) in &[("H", 0), ("L", 0), ("L", 1), ("L", 2)] {
             let pi = p_i(p, i);
 
-            dn[pi] = (c.eq_n[pi] - n[pi].clone()) / &c.step_size;
+            dn[pi] = (c.eq_n[pi] - n[pi]) / c.step_size;
         }
 
         dn
@@ -29,7 +27,7 @@ pub fn equilibrium(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
 
 /// Interaction H ↔ -L(i2), N(i3)
 pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
-    let output_dir = crate::output_dir().join("ap");
+    let output_dir = crate::output_dir();
     let csv = RefCell::new(csv::Writer::from_path(output_dir.join("n_el_h.csv")).unwrap());
     {
         let mut csv = csv.borrow_mut();
@@ -81,36 +79,30 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
             // Amplitude squared
             let m2 = coupling.y_v[[i3, i2]].norm_sqr() * (mass2.h - mass2.n[i3]);
             // Phase space integration
-            let phase_space = bessel::k_1_on_k_2(max_m * c.beta.to_f64())
-                / (c.hubble_rate * c.beta.to_f64() * 16.0 * PI_1 * max_m);
+            let phase_space =
+                bessel::k_1_on_k_2(max_m * c.beta) / (c.hubble_rate * c.beta * 16.0 * PI_1 * max_m);
             // Factor of 2 to account to both SU(2) processes
             let gamma_tilde = -2.0 * m2 * phase_space;
 
             // Calculate the decay and inverse decay rates
-            let decay = n[p1].clone() * &gamma_tilde;
-            let inverse_decay = c.eq_n[p1]
-                * checked_div_ap(
-                    &(n[p2].clone() * &n[p3]),
-                    &Float::with_val(n[p2].prec(), c.eq_n[p2] * c.eq_n[p3]),
-                )
-                * gamma_tilde;
-            let net_decay = decay.clone() - &inverse_decay;
+            let decay = n[p1] * gamma_tilde;
+            let inverse_decay =
+                c.eq_n[p1] * checked_div(n[p2] * n[p3], c.eq_n[p2] * c.eq_n[p3]) * gamma_tilde;
+            let net_decay = decay - inverse_decay;
 
-            dn[p_i("BL", 0)] +=
-                -c.model.epsilon * net_decay.clone() - n[p_i("BL", 0)].clone() * &inverse_decay;
+            dn[p_i("BL", 0)] += -c.model.epsilon * net_decay - n[p_i("BL", 0)] * inverse_decay;
 
-            dn[p1] -= &net_decay;
-            dn[p2] += &net_decay;
-            dn[p3] += &net_decay;
+            dn[p1] -= net_decay;
+            dn[p2] += net_decay;
+            dn[p3] += net_decay;
 
             csv.write_field(format!("{}", p1)).unwrap();
-            csv.write_field(format!("{:.3e}", gamma_tilde.to_f64().unwrap()))
+            csv.write_field(format!("{:.3e}", gamma_tilde)).unwrap();
+            csv.write_field(format!("{:.3e}", decay / gamma_tilde))
                 .unwrap();
-            csv.write_field(format!("{:.3e}", (decay / gamma_tilde).to_f64()))
+            csv.write_field(format!("{:.3e}", inverse_decay / gamma_tilde))
                 .unwrap();
-            csv.write_field(format!("{:.3e}", (inverse_decay / gamma_tilde).to_f64()))
-                .unwrap();
-            csv.write_field(format!("{:.3e}", (net_decay / gamma_tilde).to_f64()))
+            csv.write_field(format!("{:.3e}", net_decay / gamma_tilde))
                 .unwrap();
         }
 
@@ -122,49 +114,53 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
 
 /// Scattering NL ↔ Qq, NQ ↔ Lq and Nq ↔ LQ (s- and t-channel)
 pub fn n_el_ql_qr(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
-    let output_dir = crate::output_dir().join("ap");
+    let output_dir = crate::output_dir();
     let csv = RefCell::new(csv::Writer::from_path(output_dir.join("n_el_ql_qr.csv")).unwrap());
     csv.borrow_mut()
         .serialize(["step", "beta", "N₁Q → Lq", "Lq → N₁Q"])
         .unwrap();
 
-    solver.add_interaction(move |mut s, n, ref c| {
+    solver.add_interaction(move |mut dn, n, ref c| {
+        let p_c = p_i("N", 0);
+        let p_z = p_i("H", 0);
+
         let gamma = {
-            let m2_prefactor = iproduct!(0..3, 0..3, 0..3).fold(
-                Float::with_val(c.precision, 0.0),
-                |s, (a2, b1, b2)| {
-                    s + 9.0
-                        * c.model.coupling.y_v[[0, a2]].norm_sqr()
+            let m2_prefactor: f64 = iproduct!(0..3, 0..3, 0..3)
+                .map(|(a2, b1, b2)| {
+                    9.0 * c.model.coupling.y_v[[0, a2]].norm_sqr()
                         * (c.model.coupling.y_d[[b1, b2]].norm_sqr()
                             + c.model.coupling.y_u[[b1, b2]].norm_sqr())
-                },
-            );
+                })
+                .sum();
 
             let m2_st = |s: f64, t: f64| {
                 (
                     // s-channel
-                    s * (s - c.model.mass2.n[0]) * (s - c.model.mass2.h).powi(2)
-                        / ((s - c.model.mass2.h).powi(2) + c.model.width2.h * c.model.mass2.h)
+                    s * (s - c.model.particles[p_c].mass2)
+                        * (s - c.model.particles[p_z].mass2).powi(2)
+                        / ((s - c.model.particles[p_z].mass2).powi(2)
+                            + c.model.particles[p_z].width2 * c.model.particles[p_z].mass2)
                             .powi(2)
                 ) + (
                     // t-channel
-                    2.0 * (t + c.model.mass2.n[0]) * (t + c.model.mass2.h).powi(2)
-                        / ((t + c.model.mass2.h).powi(2) + c.model.width2.h * c.model.mass2.h)
+                    2.0 * (t + c.model.particles[p_c].mass2)
+                        * (t + c.model.particles[p_z].mass2).powi(2)
+                        / ((t + c.model.particles[p_z].mass2).powi(2)
+                            + c.model.particles[p_z].width2 * c.model.particles[p_z].mass2)
                             .powi(2)
                 )
             };
 
-            m2_prefactor * integrate_st(m2_st, c.beta.to_f64(), c.model.mass.n[0], 0.0, 0.0, 0.0)
-                / (512.0 * PI_5 * c.hubble_rate)
-                / &c.beta
+            m2_prefactor * integrate_st(m2_st, c.beta, c.model.particles[p_c].mass, 0.0, 0.0, 0.0)
+                / (512.0 * PI_5 * c.hubble_rate * c.beta)
         };
 
-        let forward = checked_div(n[1].to_f64(), c.eq_n[1]) * gamma.clone();
-        let net_forward = (checked_div(n[1].to_f64(), c.eq_n[1]) - 1.0) * gamma.clone();
+        let forward = checked_div(n[1], c.eq_n[1]) * gamma;
+        let net_forward = (checked_div(n[1], c.eq_n[1]) - 1.0) * gamma;
         let backward = gamma;
 
-        s[0] -= &n[0] * &backward;
-        s[1] -= net_forward;
+        dn[0] -= n[0] * backward;
+        dn[1] -= net_forward;
 
         {
             let mut csv = csv.borrow_mut();
@@ -174,6 +170,6 @@ pub fn n_el_ql_qr(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
                 .unwrap();
         }
 
-        s
+        dn
     });
 }
