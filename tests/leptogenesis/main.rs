@@ -89,7 +89,7 @@ pub fn scan() {
     csv.write().unwrap().serialize(("y", "m", "B-L")).unwrap();
 
     let ym: Vec<_> = iproduct!(
-        Array1::linspace(-8.0, 0.0, 2).into_iter(),
+        Array1::linspace(-8.0, -4.0, 2).into_iter(),
         Array1::linspace(6.0, 14.0, 2).into_iter()
     )
     .map(|(&y, &m)| (10.0f64.powf(y), 10.0f64.powf(m)))
