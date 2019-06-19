@@ -6,19 +6,20 @@ pub mod model;
 pub mod solve;
 
 use boltzmann_solver::solver_ap::Model;
-use model::LeptogenesisModel;
-use rug::Float;
+use log::info;
+use model::{p_i, LeptogenesisModel};
 
 /// Test a single fiducial data point
 #[test]
 pub fn run() {
-    // Setup the directory for CSV output
-    ::std::fs::create_dir("/tmp/leptogenesis_ap/").unwrap_or(());
+    super::setup_logging();
 
-    let model = LeptogenesisModel::new(&Float::with_val(100, 1e-17));
+    let sol = solve::solve(|beta| LeptogenesisModel::new(beta));
 
-    let sol = solve::solve(model);
+    info!("Final number density: {:.3e}", sol);
 
-    assert!(1e-10 < sol[0].to_f64().abs() && sol[0].to_f64().abs() < 1e-5);
-    assert!(sol[1] < 1e-20);
+    assert!(1e-10 < *sol[p_i("B-L", 0)].as_abs() && *sol[p_i("B-L", 0)].as_abs() < 1e-5);
+    for i in 0..3 {
+        assert!(sol[p_i("N", i)] < 1e-20);
+    }
 }
