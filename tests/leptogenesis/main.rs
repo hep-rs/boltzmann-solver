@@ -68,7 +68,7 @@ fn output_dir() -> PathBuf {
 pub fn run() {
     crate::setup_logging();
 
-    let sol = solve::solve(|beta| LeptogenesisModel::new(beta));
+    let sol = solve::solve(LeptogenesisModel::new);
 
     info!("Final number density: {:.3e}", sol);
 

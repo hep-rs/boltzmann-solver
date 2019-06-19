@@ -62,6 +62,7 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
 
             // Store the index of the parent and daughter particles in p1 and p2,
             // p3 respectively.
+            #[allow(clippy::float_cmp)]
             match (max_m == mass.h, max_m == mass.n[i3]) {
                 (true, false) => {
                     p1 = p_i("H", 0);
