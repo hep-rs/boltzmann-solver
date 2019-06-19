@@ -66,8 +66,8 @@ pub struct Masses {
 impl Masses {
     fn new(particles: &Array1<Particle>) -> Self {
         Masses {
-            n: [particles[1].mass, particles[2].mass, particles[3].mass],
-            h: particles[4].mass,
+            n: [particles[2].mass, particles[3].mass, particles[4].mass],
+            h: particles[1].mass,
         }
     }
 }
@@ -83,8 +83,8 @@ pub struct SquaredMasses {
 impl SquaredMasses {
     fn new(particles: &Array1<Particle>) -> Self {
         SquaredMasses {
-            n: [particles[1].mass2, particles[2].mass2, particles[3].mass2],
-            h: particles[4].mass2,
+            n: [particles[2].mass2, particles[3].mass2, particles[4].mass2],
+            h: particles[1].mass2,
         }
     }
 }
@@ -100,8 +100,8 @@ pub struct Widths {
 impl Widths {
     fn new(particles: &Array1<Particle>) -> Self {
         Widths {
-            n: [particles[1].width, particles[2].width, particles[3].width],
-            h: particles[4].width,
+            n: [particles[2].width, particles[3].width, particles[4].width],
+            h: particles[1].width,
         }
     }
 }
@@ -118,11 +118,11 @@ impl SquaredWidths {
     fn new(particles: &Array1<Particle>) -> Self {
         SquaredWidths {
             n: [
-                particles[1].width2,
                 particles[2].width2,
                 particles[3].width2,
+                particles[4].width2,
             ],
-            h: particles[4].width2,
+            h: particles[1].width2,
         }
     }
 }
@@ -188,8 +188,8 @@ impl Model for LeptogenesisModel {
                 .complex()
                 .dof(2.0), // Higgs
             Particle::new(1, 1e10, 0.0),         // N1
-            Particle::new(1, 1e11, 0.0),         // N2
-            Particle::new(1, 1e12, 0.0),         // N3
+            Particle::new(1, 1e15, 0.0),         // N2
+            Particle::new(1, 1e16, 0.0),         // N3
             Particle::new(1, 0.0, 0.0).dof(2.0), // L1
             Particle::new(1, 0.0, 0.0).dof(2.0), // L2
             Particle::new(1, 0.0, 0.0).dof(2.0), // L3

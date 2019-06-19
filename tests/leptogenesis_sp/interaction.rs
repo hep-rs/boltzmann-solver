@@ -63,17 +63,17 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
             // Store the index of the parent and daughter particles in p1 and p2,
             // p3 respectively.
             match (max_m == mass.h, max_m == mass.n[i3]) {
-                (true, _) => {
+                (true, false) => {
                     p1 = p_i("H", 0);
                     p2 = p_i("L", i2);
                     p3 = p_i("N", i3);
                 }
-                (_, true) => {
+                (false, true) => {
                     p1 = p_i("N", i3);
                     p2 = p_i("H", 0);
                     p3 = p_i("L", i2);
                 }
-                (false, false) => unreachable!(),
+                _ => unreachable!(),
             };
 
             // Amplitude squared
@@ -90,7 +90,7 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
                 c.eq_n[p1] * checked_div(n[p2] * n[p3], c.eq_n[p2] * c.eq_n[p3]) * gamma_tilde;
             let net_decay = decay - inverse_decay;
 
-            dn[p_i("BL", 0)] += c.model.epsilon * net_decay - n[p_i("BL", 0)] * inverse_decay;
+            dn[p_i("BL", 0)] += -c.model.epsilon * net_decay - n[p_i("BL", 0)] * inverse_decay;
 
             dn[p1] -= net_decay;
             dn[p2] += net_decay;
