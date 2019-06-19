@@ -4,7 +4,7 @@ use quadrature::integrate;
 use special_functions::bessel;
 
 #[cfg(feature = "arbitrary-precision")]
-use rug::{Assign, Float};
+use rug::Float;
 
 const CHECKED_DIV_MAX: f64 = 10.0;
 
@@ -71,13 +71,7 @@ pub fn checked_div_ap(a: &Float, b: &Float) -> Float {
     } else if b.is_zero() {
         Float::with_val(a.prec(), CHECKED_DIV_MAX).copysign(a)
     } else {
-        let mut v: Float = Float::with_val(a.prec(), a / b) / CHECKED_DIV_MAX;
-        if *v.as_abs() > CHECKED_DIV_MAX {
-            v.assign(CHECKED_DIV_MAX);
-            v.copysign(a)
-        } else {
-            v
-        }
+        Float::with_val(a.prec(), a / b).clamp(&-CHECKED_DIV_MAX, &CHECKED_DIV_MAX)
     }
 }
 
