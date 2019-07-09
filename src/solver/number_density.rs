@@ -259,6 +259,7 @@ use super::{EmptyModel, Model, Solver, StepChange, StepPrecision};
 use crate::universe::Universe;
 use log::{debug, info};
 use ndarray::{array, prelude::*, FoldWhile, Zip};
+use rayon::prelude::*;
 
 /// Context provided containing pre-computed values which might be useful when
 /// evaluating interactions.
@@ -285,7 +286,7 @@ pub struct Context<M: Model> {
 /// All number densities are normalized to that of a massless boson with a
 /// single degree of freedom (\\(g = 1\\)).  As a result of this convention,
 /// \\(n_\gamma = 2\\) as the photon has two degrees of freedom.
-pub struct NumberDensitySolver<M: Model> {
+pub struct NumberDensitySolver<M: Model + Sync> {
     initialized: bool,
     beta_range: (f64, f64),
     initial_conditions: Array1<f64>,
@@ -293,10 +294,10 @@ pub struct NumberDensitySolver<M: Model> {
     interactions: Vec<
         Box<
             Fn(
-                <Self as Solver>::Solution,
-                &<Self as Solver>::Solution,
-                &<Self as Solver>::Context,
-            ) -> <Self as Solver>::Solution,
+                    &<Self as Solver>::Solution,
+                    &<Self as Solver>::Context,
+                ) -> <Self as Solver>::Solution
+                + Sync,
         >,
     >,
     #[allow(clippy::type_complexity)]
@@ -310,7 +311,7 @@ pub struct NumberDensitySolver<M: Model> {
     threshold_number_density: f64,
 }
 
-impl<M: Model> Solver for NumberDensitySolver<M> {
+impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
     /// The solution is a one-dimensional array of number densities for each
     /// particle species (or aggregated number density in the case of
     /// \\(n_{\mathsc{b-l}}\\)), in the same order as [`Solver::add_particle`]
@@ -433,7 +434,7 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
 
     fn add_interaction<F: 'static>(&mut self, f: F) -> &mut Self
     where
-        F: Fn(Self::Solution, &Self::Solution, &Self::Context) -> Self::Solution,
+        F: Fn(&Self::Solution, &Self::Context) -> Self::Solution + Sync,
     {
         self.interactions.push(Box::new(f));
         self
@@ -495,8 +496,9 @@ impl<M: Model> Solver for NumberDensitySolver<M> {
                 let ni = (0..i).fold(n.clone(), |total, j| total + ai[j] * &k[j]);
                 k[i] = h * self
                     .interactions
-                    .iter()
-                    .fold(Self::Solution::zeros(n.dim()), |dn, f| f(dn, &ni, &ci));
+                    .par_iter()
+                    .map(|f| f(&ni, &ci))
+                    .reduce(|| Self::Solution::zeros(n.dim()), |sum, a| sum + a);
                 // Apply the `n_plus_dn` check here (even though we are
                 // discarding `ni`) to place a limit on `k[i]`.
                 self.n_plus_dn(ni, &mut k[i], &ci);
@@ -589,7 +591,7 @@ impl Default for NumberDensitySolver<EmptyModel> {
     }
 }
 
-impl<M: Model> NumberDensitySolver<M> {
+impl<M: Model + Sync> NumberDensitySolver<M> {
     /// Set the threshold number density to count as 0.
     ///
     /// Any number density whose absolute value is less than the threshold will
