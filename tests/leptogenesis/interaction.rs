@@ -7,14 +7,16 @@ use boltzmann_solver::{
     utilities::{checked_div, integrate_st},
 };
 use itertools::iproduct;
+use ndarray::prelude::*;
 use special_functions::bessel;
-use std::cell::RefCell;
+use std::sync::RwLock;
 
 /// Interactions that maintain certain particles in equilibrium number density.
 ///
 /// We are keeping H, L1, L2 and L3 at equilibrium.
 pub fn equilibrium(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
-    solver.add_interaction(|mut dn, n, ref c| {
+    solver.add_interaction(|n, ref c| {
+        let mut dn = Array1::zeros(n.dim());
         for &(p, i) in &[("H", 0), ("L", 0), ("L", 1), ("L", 2)] {
             let pi = p_i(p, i);
 
@@ -28,9 +30,9 @@ pub fn equilibrium(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
 /// Interaction H ↔ -L(i2), N(i3)
 pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
     let output_dir = crate::output_dir();
-    let csv = RefCell::new(csv::Writer::from_path(output_dir.join("n_el_h.csv")).unwrap());
+    let csv = RwLock::new(csv::Writer::from_path(output_dir.join("n_el_h.csv")).unwrap());
     {
-        let mut csv = csv.borrow_mut();
+        let mut csv = csv.write().unwrap();
         csv.write_field("step").unwrap();
         csv.write_field("beta").unwrap();
         for (i2, i3) in iproduct!(0..3, 0..3) {
@@ -43,10 +45,14 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
         csv.write_record(None::<&[u8]>).unwrap();
     }
 
-    solver.add_interaction(move |mut dn, n, ref c| {
-        let mut csv = csv.borrow_mut();
-        csv.write_field(format!("{}", c.step)).unwrap();
-        csv.write_field(format!("{:.15e}", c.beta)).unwrap();
+    solver.add_interaction(move |n, ref c| {
+        {
+            let mut csv = csv.write().unwrap();
+            csv.write_field(format!("{}", c.step)).unwrap();
+            csv.write_field(format!("{:.15e}", c.beta)).unwrap();
+        }
+
+        let mut dn = Array1::zeros(n.dim());
 
         // Create short hands to access the masses and couplings
         let mass = &c.model.mass;
@@ -97,17 +103,23 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
             dn[p2] += net_decay;
             dn[p3] += net_decay;
 
-            csv.write_field(format!("{}", p1)).unwrap();
-            csv.write_field(format!("{:.3e}", gamma_tilde)).unwrap();
-            csv.write_field(format!("{:.3e}", decay / gamma_tilde))
-                .unwrap();
-            csv.write_field(format!("{:.3e}", inverse_decay / gamma_tilde))
-                .unwrap();
-            csv.write_field(format!("{:.3e}", net_decay / gamma_tilde))
-                .unwrap();
+            {
+                let mut csv = csv.write().unwrap();
+                csv.write_field(format!("{}", p1)).unwrap();
+                csv.write_field(format!("{:.3e}", gamma_tilde)).unwrap();
+                csv.write_field(format!("{:.3e}", decay / gamma_tilde))
+                    .unwrap();
+                csv.write_field(format!("{:.3e}", inverse_decay / gamma_tilde))
+                    .unwrap();
+                csv.write_field(format!("{:.3e}", net_decay / gamma_tilde))
+                    .unwrap();
+            }
         }
 
-        csv.write_record(None::<&[u8]>).unwrap();
+        {
+            let mut csv = csv.write().unwrap();
+            csv.write_record(None::<&[u8]>).unwrap();
+        }
 
         dn
     });
@@ -116,12 +128,15 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
 /// Scattering NL ↔ Qq, NQ ↔ Lq and Nq ↔ LQ (s- and t-channel)
 pub fn n_el_ql_qr(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
     let output_dir = crate::output_dir();
-    let csv = RefCell::new(csv::Writer::from_path(output_dir.join("n_el_ql_qr.csv")).unwrap());
-    csv.borrow_mut()
-        .serialize(["step", "beta", "N₁Q → Lq", "Lq → N₁Q"])
-        .unwrap();
+    let csv = RwLock::new(csv::Writer::from_path(output_dir.join("n_el_ql_qr.csv")).unwrap());
+    {
+        let mut csv = csv.write().unwrap();
+        csv.serialize(["step", "beta", "N₁Q → Lq", "Lq → N₁Q"])
+            .unwrap();
+    }
 
-    solver.add_interaction(move |mut dn, n, ref c| {
+    solver.add_interaction(move |n, ref c| {
+        let mut dn = Array1::zeros(n.dim());
         let p_c = p_i("N", 0);
         let p_z = p_i("H", 0);
 
@@ -164,7 +179,7 @@ pub fn n_el_ql_qr(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
         dn[1] -= net_forward;
 
         {
-            let mut csv = csv.borrow_mut();
+            let mut csv = csv.write().unwrap();
             csv.write_field(format!("{}", c.step)).unwrap();
             csv.write_field(format!("{:.15e}", c.beta)).unwrap();
             csv.write_record(&[format!("{:.3e}", forward), format!("{:.3e}", backward)])
