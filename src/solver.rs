@@ -156,24 +156,15 @@ pub trait Solver {
     /// temperature.  The function is of the following form:
     ///
     /// ```ignore
-    /// f(sum: Self::Solution, densities: &Self::Solution, beta: f64) -> Self::Solution
+    /// f(densities: &Self::Solution, context: &Self::Context) -> Self::Solution
     /// ```
     ///
-    /// The first argument, `sum`, contains the sum of all interactions and the
-    /// second argument, `densities`, contains the values of the various
-    /// number densities at the specified `beta`.  The `sum` is moved into the
-    /// function and is expected to be returned.  For example:
-    ///
-    /// ```ignore
-    /// fn f(sum: mut Array1<f64>, densities: Array1<f64>, beta: f64) -> Array1<f64> {
-    ///     sum[0] += - densities[1] * beta;
-    ///     sum[1] += - densities[0] * beta;
-    ///     sum
-    /// }
-    /// ```
-    fn add_interaction<F: 'static>(&mut self, int: F) -> &mut Self
+    /// The first argument, `densities`, contains the values of the various
+    /// number densities calculated so far, with the context being given in
+    /// `context`.
+    fn add_interaction<F: 'static>(&mut self, f: F) -> &mut Self
     where
-        F: Fn(Self::Solution, &Self::Solution, &Self::Context) -> Self::Solution;
+        F: Fn(&Self::Solution, &Self::Context) -> Self::Solution + Sync;
 
     /// Set the logger.
     ///
