@@ -257,7 +257,6 @@
 
 use super::{EmptyModel, Model, Solver, StepChange, StepPrecision};
 use crate::universe::Universe;
-use log::{debug, info};
 use ndarray::{array, prelude::*, FoldWhile, Zip};
 use rayon::prelude::*;
 
@@ -486,7 +485,11 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
         while beta < self.beta_range.1 {
             step += 1;
             let mut advance = false;
-            debug!("Step {:}, β = {:.4e}", step, beta);
+            c = self.context(step, h, beta, universe);
+            log::debug!("Step {:}, β = {:.4e}", step, beta);
+            if step % 1000 == 0 {
+                log::info!("Step {:}, β = {:.4e}", step, beta);
+            }
 
             // Compute each k[i]
             for i in 0..RK_S {
@@ -549,21 +552,19 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
             // of the local error if we reach the maximum or minimum step size.
             if h_est > beta * self.step_precision.max {
                 h_est = beta * self.step_precision.max;
-                debug!("Step size too large, decreased h to {:.3e}", h_est);
+                log::debug!("Step size too large, decreased h to {:.3e}", h_est);
                 advance = true;
             } else if h_est < beta * self.step_precision.min {
                 h_est = beta * self.step_precision.min;
-                debug!("Step size too small, increased h to {:.3e}", h_est);
+                log::debug!("Step size too small, increased h to {:.3e}", h_est);
                 advance = true;
             }
 
             // Check if the error is within the tolerance, or we are advancing
             // irrespective of the local error
             if advance {
-                c = self.context(step, h, beta, universe);
-
                 // Advance n and beta
-                n = self.n_plus_dn(n, &mut dn[0], &c);
+                self.n_plus_dn(&mut n, &mut dn[0], &c);
                 beta += h;
 
                 // Run the logger now
@@ -572,14 +573,14 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
 
             // Adjust final integration step if needed
             if beta + h_est > self.beta_range.1 {
-                debug!("Fixing overshoot of last integration step.");
+                log::debug!("Fixing overshoot of last integration step.");
                 h_est = self.beta_range.1 - beta;
             }
 
             h = h_est;
         }
 
-        info!("Number of integration steps: {}", step);
+        log::info!("Number of integration steps: {}", step);
 
         n
     }
