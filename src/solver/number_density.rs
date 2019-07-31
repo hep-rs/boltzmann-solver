@@ -497,14 +497,18 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
                 let ci = self.context(step, h, beta_i, universe);
                 let ai = RK_A[i];
                 let ni = (0..i).fold(n.clone(), |total, j| total + ai[j] * &k[j]);
-                k[i] = h * self
+                k[i] = self
                     .interactions
                     .par_iter()
-                    .map(|f| f(&ni, &ci))
+                    .map(|f| h * f(&ni, &ci))
+                    .map(|mut dn| {
+                        Self::adjust_dn(&ni, &mut dn, &ci.eq_n);
+                        dn
+                    })
                     .reduce(|| Self::Solution::zeros(n.dim()), |sum, a| sum + a);
                 // Apply the `n_plus_dn` check here (even though we are
                 // discarding `ni`) to place a limit on `k[i]`.
-                self.n_plus_dn(ni, &mut k[i], &ci);
+                Self::adjust_dn(&ni, &mut k[i], &ci.eq_n);
             }
 
             // Calculate the two estimates for dn
@@ -514,6 +518,8 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
             dn[1] = (0..RK_S).fold(Self::Solution::zeros(n.dim()), |total, i| {
                 total + RK_B[1][i] * &k[i]
             });
+            Self::adjust_dn(&n, &mut dn[0], &c.eq_n);
+            Self::adjust_dn(&n, &mut dn[1], &c.eq_n);
 
             // Get the error between the estimates
             let err = Zip::from(&dn[0])
@@ -673,30 +679,51 @@ impl<M: Model + Sync> NumberDensitySolver<M> {
     ///
     /// To avoid this, we set the number density to exactly the equilibrium
     /// number density whenever this might occur forcing an evaluation with the
-    /// equilibrium number density.
+    /// equilibrium number density.  We also check for crossing 0 in order to
+    /// avoid negative number densities.
     fn n_plus_dn(
         &self,
-        mut n: <Self as Solver>::Solution,
+        n: &mut <Self as Solver>::Solution,
         dn: &mut <Self as Solver>::Solution,
         c: &<Self as Solver>::Context,
-    ) -> <Self as Solver>::Solution {
-        Zip::from(&mut n).and(dn).and(&c.eq_n).apply(|n, dn, eq_n| {
+    ) {
+        Zip::from(n).and(dn).and(&c.eq_n).apply(|n, dn, eq_n| {
             let new_n = *n + *dn;
 
             if (*n > *eq_n) ^ (new_n > *eq_n) {
                 *dn = eq_n - *n;
                 *n = *eq_n;
+            } else if n.signum() != new_n.signum() {
+                *dn = -*n;
+                *n = 0.0;
             } else {
                 *n = new_n;
             }
 
             if n.abs() < self.threshold_number_density {
-                debug!("n going below threshold number density, setting to zero.",);
+                log::debug!("n going below threshold number density, setting to zero.",);
                 *dn = -*n;
                 *n = 0.0;
             }
         });
+    }
 
-        n
+    /// Adjust `dn` with respect to `n` in the same was as `n_plus_dn`, except
+    /// this does *not* alter the number density.  This also does *not* take
+    /// into account the threshold number density.
+    fn adjust_dn(
+        n: &<Self as Solver>::Solution,
+        dn: &mut <Self as Solver>::Solution,
+        eq_n: &<Self as Solver>::Solution,
+    ) {
+        Zip::from(n).and(dn).and(eq_n).apply(|n, dn, eq_n| {
+            let new_n = *n + *dn;
+
+            if (*n > *eq_n) ^ (new_n > *eq_n) {
+                *dn = eq_n - *n;
+            } else if n.signum() != new_n.signum() {
+                *dn = -*n;
+            }
+        });
     }
 }
