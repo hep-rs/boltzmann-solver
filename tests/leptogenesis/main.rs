@@ -33,10 +33,9 @@ fn setup_logging() {
     let stderr_config = fern::Dispatch::new()
         .format(|out, message, record| {
             out.finish(format_args!(
-                "{} {} {} - {}",
-                chrono::Local::now().format("%H:%M:%S%.3f"),
-                record.target(),
+                "[{}] {} - {}",
                 record.level(),
+                record.target(),
                 message
             ))
         })
