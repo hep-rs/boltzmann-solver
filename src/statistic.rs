@@ -11,10 +11,9 @@
 //! The statistics are implemented, as well as calculations of the number
 //! density.
 
-use crate::constants::{PI_M2, ZETA_3};
-use log::{debug, warn};
+use crate::constants::PI_M2;
 use quadrature::integrate;
-use special_functions::{bessel, polylog};
+use special_functions::{bessel, particle_statistics};
 use std::f64;
 
 /// Equilibrium number density for massless bosons, normalized to the
@@ -86,9 +85,11 @@ pub trait Statistics {
             1.0,
             1e-12,
         );
-        debug!(
+        log::debug!(
             "Phase space integral: {:e} ± {:e} ({} function evaluations)",
-            integral.integral, integral.error_estimate, integral.num_function_evaluations
+            integral.integral,
+            integral.error_estimate,
+            integral.num_function_evaluations
         );
         // 1/(2 π²) ≅ 0.050_660_591_821_168_89
         0.050_660_591_821_168_89 * integral.integral
@@ -142,7 +143,7 @@ impl Statistics for Statistic {
                     // we use the more precise (but equivalent) form: `e *
                     // f64::sqrt(1.0 - (m / e).powi(2))`.
                     beta * e.powi(2) * f64::sqrt(1.0 - (m / e).powi(2))
-                        / (f64::exp(e * beta) * m * bessel::k_2(m * beta))
+                        / (f64::exp(e * beta) * m * bessel::k2(m * beta))
                 }
             }
         }
@@ -167,7 +168,7 @@ impl Statistics for Statistic {
         match *self {
             Statistic::FermiDirac => {
                 if mass * beta < 1e-4 {
-                    debug!("Mass is below threshold, using massless_number_density instead.");
+                    log::debug!("Mass is below threshold, using massless_number_density instead.");
                     return self.massless_number_density(mu, beta);
                 }
 
@@ -185,12 +186,14 @@ impl Statistics for Statistic {
                     1.0,
                     1e-12,
                 );
-                debug!(
+                log::debug!(
                     "Fermi–Dirac integral: {:e} ± {:e} ({} function evaluations)",
-                    integral.integral, integral.error_estimate, integral.num_function_evaluations
+                    integral.integral,
+                    integral.error_estimate,
+                    integral.num_function_evaluations
                 );
                 if cfg!(debug_assertions) && integral.error_estimate > 0.01 * integral.integral {
-                    warn!(
+                    log::warn!(
                         "Fermi–Dirac integral has a relative error of {:0.2}%",
                         integral.error_estimate / integral.integral.abs()
                     );
@@ -200,7 +203,7 @@ impl Statistics for Statistic {
             }
             Statistic::BoseEinstein => {
                 if mass * beta < 1e-4 {
-                    debug!("Mass is below threshold, using massless_number_density instead.");
+                    log::debug!("Mass is below threshold, using massless_number_density instead.");
                     return self.massless_number_density(mu, beta);
                 }
 
@@ -218,12 +221,14 @@ impl Statistics for Statistic {
                     1.0,
                     1e-12,
                 );
-                debug!(
+                log::debug!(
                     "Bose–Einstein integral: {:e} ± {:e} ({} function evaluations)",
-                    integral.integral, integral.error_estimate, integral.num_function_evaluations
+                    integral.integral,
+                    integral.error_estimate,
+                    integral.num_function_evaluations
                 );
                 if cfg!(debug_assertions) && integral.error_estimate > 0.01 * integral.integral {
-                    warn!(
+                    log::warn!(
                         "Bose–Einstein integral has a relative error of {:0.2}%",
                         integral.error_estimate / integral.integral.abs()
                     );
@@ -233,21 +238,21 @@ impl Statistics for Statistic {
             }
             Statistic::MaxwellBoltzmann => {
                 if mass * beta < 1e-4 {
-                    debug!("Mass is below threshold, using massless_number_density instead.");
+                    log::debug!("Mass is below threshold, using massless_number_density instead.");
                     return self.massless_number_density(mu, beta);
                 }
 
                 // 1/(2 π²) ≅ 0.050_660_591_821_168_89
                 0.050_660_591_821_168_89
                     * mass.powi(2)
-                    * bessel::k_2(mass * beta)
+                    * bessel::k2(mass * beta)
                     * f64::exp(mu * beta)
                     / beta
             }
             Statistic::MaxwellJuttner => {
                 let m_beta = mass * beta;
                 PI_M2 * (m_beta + 2.0) * (m_beta * (m_beta + 3.0) + 6.0)
-                    / (beta.powi(4) * mass * f64::exp(m_beta) * bessel::k_2(m_beta))
+                    / (beta.powi(4) * mass * f64::exp(m_beta) * bessel::k2(m_beta))
             }
         }
     }
@@ -262,48 +267,20 @@ impl Statistics for Statistic {
     fn normalized_number_density(&self, mass: f64, mu: f64, beta: f64) -> f64 {
         debug_assert!(mass >= 0.0, "mass must be positive.");
         debug_assert!(beta >= 0.0, "β must be positive.");
-        if cfg!(debug_assertions) && mu > 0.01 * mass {
-            warn!(
-                "The chemical potential should be negligible.  The result may not be
-    reliable."
-            );
-        }
-
-        match *self {
-            Statistic::FermiDirac => {
-                let m_beta = mass * beta;
-                if m_beta < 1e-4 {
-                    0.75
-                } else if m_beta > 1e4 {
-                    0.0
-                } else {
-                    0.75 * f64::exp(-m_beta - (2.75612 + 2.11777 * m_beta.powf(-0.920_114)).recip())
-                        * (1.0 + m_beta.powf(1.5))
-                        * (1.0
-                            + 0.390_466
-                                * f64::exp(-(0.460_648 * m_beta.ln() - 0.011_632_3).powi(2)))
+        if mu == 0.0 {
+            match *self {
+                Statistic::BoseEinstein => {
+                    particle_statistics::bose_einstein_normalized(mass, beta)
+                }
+                Statistic::FermiDirac => particle_statistics::fermi_dirac_normalized(mass, beta),
+                Statistic::MaxwellBoltzmann | Statistic::MaxwellJuttner => {
+                    self.number_density(mass, mu, beta)
+                        / Statistic::BoseEinstein.massless_number_density(0.0, beta)
                 }
             }
-            Statistic::BoseEinstein => {
-                let m_beta = mass * beta;
-                if m_beta < 1e-4 {
-                    1.0
-                } else if m_beta > 1e4 {
-                    0.0
-                } else {
-                    f64::exp(-m_beta - (1.53451 + 1.3537 * m_beta.powf(-1.17357)).recip())
-                        * (1.0 + m_beta.powf(1.5))
-                }
-            }
-            Statistic::MaxwellBoltzmann => {
-                // 1/(2 ζ(3)) ≅ 0.415_953_686_290_353_734_34
-                0.415_953_686_290_353_73 * mass.powi(2) * bessel::k_2(mass * beta) * beta.powi(2)
-            }
-            Statistic::MaxwellJuttner => {
-                let m_beta = mass * beta;
-                (m_beta + 2.0) * (m_beta * (m_beta + 3.0) + 6.0)
-                    / (ZETA_3 * m_beta * f64::exp(m_beta) * bessel::k_2(m_beta))
-            }
+        } else {
+            self.number_density(mass, mu, beta)
+                / Statistic::BoseEinstein.massless_number_density(0.0, beta)
         }
     }
 
@@ -322,13 +299,13 @@ impl Statistics for Statistic {
         debug_assert!(beta >= 0.0, "β must be positive.");
 
         match *self {
-            Statistic::FermiDirac => PI_M2 * polylog::fermi_dirac(mu * beta) * beta.powi(-3),
+            Statistic::FermiDirac => particle_statistics::fermi_dirac(mu, beta),
             Statistic::BoseEinstein => {
                 debug_assert!(
                     mu <= 0.0,
                     "Bose–Einstein condensates (μ > 0) are not supported."
                 );
-                PI_M2 * polylog::bose_einstein(mu * beta) * beta.powi(-3)
+                particle_statistics::bose_einstein(mu, beta)
             }
             Statistic::MaxwellBoltzmann => PI_M2 * f64::exp(mu * beta) * beta.powi(-3),
             Statistic::MaxwellJuttner => 0.0,

@@ -5,7 +5,7 @@ use crate::{
     statistic::{Statistic, Statistics},
     universe::Universe,
 };
-use special_functions::interpolation;
+use special_functions::approximations::interpolation;
 use std::f64;
 
 /// Particle type

@@ -3,7 +3,7 @@
 use quadrature::integrate;
 use special_functions::bessel;
 
-const CHECKED_DIV_MAX: f64 = 10.0;
+const CHECKED_DIV_MAX: f64 = 1e3;
 
 #[cfg(test)]
 pub(crate) mod test;
@@ -122,7 +122,7 @@ where
         let (t_min, t_max) = t_min_max(s, m1, m2, m3, m4);
         let t_integrand = |t: f64| amplitude(s, t);
 
-        integrate(t_integrand, t_min, t_max, 0.0).integral * bessel::k_1(sqrt_s * beta) / sqrt_s
+        integrate(t_integrand, t_min, t_max, 0.0).integral * bessel::k1(sqrt_s * beta) / sqrt_s
             * dsdss
     };
 

@@ -1,5 +1,5 @@
 use crate::{constants::STANDARD_MODEL_GSTAR, universe::Universe};
-use special_functions::interpolation;
+use special_functions::approximations::interpolation;
 
 /// Implementation of [`Universe`] for the Standard Model.
 ///
