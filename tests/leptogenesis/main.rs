@@ -13,6 +13,7 @@ extern crate rgsl;
 extern crate special_functions;
 
 use boltzmann_solver::solver::Model;
+use fern::colors;
 use itertools::iproduct;
 use log::info;
 use model::{p_i, LeptogenesisModel};
@@ -25,28 +26,52 @@ pub mod model;
 pub mod solve;
 
 /// Setup logging
-fn setup_logging() {
+fn setup_logging() -> Result<(), log::SetLoggerError> {
     let mut base_config = fern::Dispatch::new();
 
-    base_config = base_config.level(log::LevelFilter::Info);
+    let colors = colors::ColoredLevelConfig::new()
+        .error(colors::Color::Red)
+        .warn(colors::Color::Yellow)
+        .info(colors::Color::Green)
+        .debug(colors::Color::White)
+        .trace(colors::Color::Black);
+
+    let verbosity = 1;
+
+    let lvl = match verbosity {
+        0 => log::LevelFilter::Warn,
+        1 => log::LevelFilter::Info,
+        2 => log::LevelFilter::Debug,
+        _3_or_more => log::LevelFilter::Trace,
+    };
+    base_config = base_config.level(lvl);
 
     let stderr_config = fern::Dispatch::new()
-        .format(|out, message, record| {
+        .format(move |out, message, record| {
             out.finish(format_args!(
-                "[{}] {} - {}",
-                record.level(),
-                record.target(),
-                message
+                "[{level}] {target} - {message}",
+                target = record.target(),
+                level = colors.color(record.level()),
+                message = message
             ))
         })
         .chain(io::stderr());
 
-    base_config.chain(stderr_config).apply().unwrap_or(());
+    base_config.chain(stderr_config).apply()?;
+
+    log::debug!("Verbosity set to Debug.");
+    log::trace!("Verbosity set to Trace.");
+
+    Ok(())
 }
 
 /// Output directory
 fn output_dir() -> PathBuf {
-    let mut dir = temp_dir();
+    let mut dir = if false {
+        temp_dir()
+    } else {
+        PathBuf::from("./output/")
+    };
     dir.push("leptogenesis");
     if !dir.is_dir() {
         log::info!("Creating output directory: {}", dir.display());
@@ -88,19 +113,19 @@ pub fn scan() {
     csv.write().unwrap().serialize(("y", "m", "B-L")).unwrap();
 
     let ym: Vec<_> = iproduct!(
-        Array1::linspace(-8.0, -4.0, 2).into_iter(),
-        Array1::linspace(6.0, 14.0, 2).into_iter()
+        Array1::linspace(-8.0, -4.0, 4).into_iter(),
+        Array1::linspace(6.0, 14.0, 4).into_iter()
     )
     .map(|(&y, &m)| (10.0f64.powf(y), 10.0f64.powf(m)))
     .collect();
 
-    ym.into_par_iter().for_each(|(y, n0)| {
+    ym.into_par_iter().for_each(|(y, mass_n)| {
         let f = move |beta: f64| {
             let mut m = LeptogenesisModel::new(beta);
             m.coupling.y_v.mapv_inplace(|yi| yi / 1e-4 * y);
-            m.particles[p_i("N", 0)].set_mass(n0);
-            m.mass.n[0] = n0;
-            m.mass2.n[0] = n0.powi(2);
+            m.particles[p_i("N", 0)].set_mass(mass_n);
+            m.mass.n[0] = mass_n;
+            m.mass2.n[0] = mass_n.powi(2);
             m
         };
         let sol = solve::solve(f);
@@ -109,7 +134,7 @@ pub fn scan() {
             .unwrap()
             .serialize((
                 format!("{:.10e}", y),
-                format!("{:.10e}", n0),
+                format!("{:.10e}", mass_n),
                 format!("{:.10e}", sol[p_i("B-L", 0)]),
             ))
             .unwrap();
