@@ -16,11 +16,10 @@ use std::f64;
 
 /// All the particle names in the same order as they are added to the solver.
 #[rustfmt::skip]
-pub const NAMES: [&str; 8] = [
+pub const NAMES: [&str; 5] = [
     "B-L",
     "H",
     "N₁", "N₂", "N₃",
-    "L₁", "L₂", "L₃",
 ];
 
 /// Function to map a more memorable name to the array index for the number
@@ -34,7 +33,6 @@ pub fn p_i(p: &str, n: usize) -> usize {
         ("BL", _) | ("B-L", _) => 0,
         ("H", _) => 1,
         ("N", n) if n < 3 => n + 2,
-        ("L", n) if n < 3 => n + 5,
         _ => unreachable!(),
     }
 }
@@ -190,9 +188,6 @@ impl Model for LeptogenesisModel {
             Particle::new(1, 1e10, 0.0),         // N1
             Particle::new(1, 1e15, 0.0),         // N2
             Particle::new(1, 1e16, 0.0),         // N3
-            Particle::new(1, 0.0, 0.0).dof(2.0), // L1
-            Particle::new(1, 0.0, 0.0).dof(2.0), // L2
-            Particle::new(1, 0.0, 0.0).dof(2.0), // L3
         ];
 
         let mass = Masses::new(&particles);
