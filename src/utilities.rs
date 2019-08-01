@@ -129,6 +129,20 @@ where
     integrate(s_integrand, 0.0, 1.0, 0.0).integral
 }
 
+/// Adjust `dn` with respect to `n` and `eq_n`.  Specifically, it adjusts the
+/// change in number density so as to avoid overshooting the equilibrium number
+/// density or a 0 number density.
+pub fn adjust_dn(n: f64, dn: f64, eq_n: f64) -> f64 {
+    let new_n = n + dn;
+    if (n > eq_n) ^ (new_n > eq_n) {
+        eq_n - n
+    } else if (n > 0.0) ^ (new_n > 0.0) {
+        -n
+    } else {
+        dn
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::{t_min_max, CHECKED_DIV_MAX};
