@@ -506,8 +506,6 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
                         dn
                     })
                     .reduce(|| Self::Solution::zeros(n.dim()), |sum, a| sum + a);
-                // Apply the `n_plus_dn` check here (even though we are
-                // discarding `ni`) to place a limit on `k[i]`.
                 Self::adjust_dn(&ni, &mut k[i], &ci.eq_n);
             }
 
@@ -687,25 +685,28 @@ impl<M: Model + Sync> NumberDensitySolver<M> {
         dn: &mut <Self as Solver>::Solution,
         c: &<Self as Solver>::Context,
     ) {
-        Zip::from(n).and(dn).and(&c.eq_n).apply(|n, dn, eq_n| {
-            let new_n = *n + *dn;
+        let new_n = &*n + &*dn;
+        Zip::from(n)
+            .and(dn)
+            .and(&c.eq_n)
+            .and(&new_n)
+            .apply(|n, dn, eq_n, new_n| {
+                if (*n > *eq_n) ^ (new_n > eq_n) {
+                    *dn = eq_n - *n;
+                    *n = *eq_n;
+                } else if (*n > 0.0) ^ (*new_n > 0.0) {
+                    *dn = -*n;
+                    *n = 0.0;
+                } else {
+                    *n = *new_n;
+                }
 
-            if (*n > *eq_n) ^ (new_n > *eq_n) {
-                *dn = eq_n - *n;
-                *n = *eq_n;
-            } else if n.signum() != new_n.signum() {
-                *dn = -*n;
-                *n = 0.0;
-            } else {
-                *n = new_n;
-            }
-
-            if n.abs() < self.threshold_number_density {
-                log::debug!("n going below threshold number density, setting to zero.",);
-                *dn = -*n;
-                *n = 0.0;
-            }
-        });
+                if n.abs() < self.threshold_number_density {
+                    log::debug!("n going below threshold number density, setting to zero.",);
+                    *dn = -*n;
+                    *n = 0.0;
+                }
+            });
     }
 
     /// Adjust `dn` with respect to `n` in the same was as `n_plus_dn`, except
@@ -716,14 +717,17 @@ impl<M: Model + Sync> NumberDensitySolver<M> {
         dn: &mut <Self as Solver>::Solution,
         eq_n: &<Self as Solver>::Solution,
     ) {
-        Zip::from(n).and(dn).and(eq_n).apply(|n, dn, eq_n| {
-            let new_n = *n + *dn;
-
-            if (*n > *eq_n) ^ (new_n > *eq_n) {
-                *dn = eq_n - *n;
-            } else if n.signum() != new_n.signum() {
-                *dn = -*n;
-            }
-        });
+        let new_n = n + &*dn;
+        Zip::from(n)
+            .and(dn)
+            .and(eq_n)
+            .and(&new_n)
+            .apply(|n, dn, eq_n, new_n| {
+                if (n > eq_n) ^ (new_n > eq_n) {
+                    *dn = eq_n - *n;
+                } else if (*n > 0.0) ^ (*new_n > 0.0) {
+                    *dn = -*n;
+                }
+            });
     }
 }
