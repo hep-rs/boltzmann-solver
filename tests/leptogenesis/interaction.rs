@@ -17,7 +17,7 @@ use std::sync::RwLock;
 pub fn equilibrium(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
     solver.add_interaction(|n, ref c| {
         let mut dn = Array1::zeros(n.dim());
-        for &(p, i) in &[("H", 0), ("L", 0), ("L", 1), ("L", 2)] {
+        for &(p, i) in &[("H", 0)] {
             let pi = p_i(p, i);
 
             dn[pi] = (c.eq_n[pi] - n[pi]) / c.step_size;
@@ -68,8 +68,7 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
             let m2 = coupling.y_v[[i3, i2]].norm_sqr() * (mass2.h - mass2.n[i3]);
             let phase_space = max_m * bessel::k1(max_m * c.beta) / (32.0 * PI_3 * c.beta);
             // Factor of 2 to account to both SU(2) processes
-            let gamma = -2.0 * m2 * phase_space / (c.hubble_rate * c.beta);
-            let gamma = gamma.abs();
+            let gamma = 2.0 * m2.abs() * phase_space / (c.hubble_rate * c.beta);
 
             let (p1, p2);
 
@@ -89,11 +88,11 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
             };
 
             // Calculate the decay and inverse decay rates
-            let inverse_decay = checked_div(n[p2], c.eq_n[p2]) * gamma;
             let net_decay =
                 (checked_div(n[p1], c.eq_n[p1]) - checked_div(n[p2], c.eq_n[p2])) * gamma;
 
-            dn[p_i("BL", 0)] += c.model.epsilon * net_decay - n[p_i("BL", 0)] * inverse_decay;
+            dn[p_i("BL", 0)] += c.model.epsilon * net_decay
+                - n[p_i("BL", 0)] * checked_div(n[p_i("N", i3)], c.eq_n[p_i("N", i3)]) * gamma;
 
             dn[p1] -= net_decay;
             dn[p2] += net_decay;
@@ -165,7 +164,7 @@ pub fn n_el_ql_qr(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
         let net_forward = (checked_div(n[1], c.eq_n[1]) - 1.0) * gamma;
         let backward = gamma;
 
-        dn[0] -= n[0] * backward;
+        dn[p_i("BL", 0)] -= n[p_i("BL", 0)] * backward;
         dn[1] -= net_forward;
 
         {
