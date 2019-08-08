@@ -20,7 +20,7 @@ pub fn equilibrium(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
         for &(p, i) in &[("H", 0)] {
             let pi = p_i(p, i);
 
-            dn[pi] = (c.eq_n[pi] - n[pi]) / c.step_size;
+            dn[pi] = 2.0 * (c.eq_n[pi] - n[pi]) / c.normalization / c.step_size;
         }
 
         dn
@@ -35,12 +35,10 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
         let mut csv = csv.write().unwrap();
         csv.write_field("step").unwrap();
         csv.write_field("beta").unwrap();
-        let i1 = 0;
-        for (i2, i3) in iproduct!(0..3, 0..3) {
-            csv.write_field(format!("p[{}.{}.{}]", i1, i2, i3)).unwrap();
-            csv.write_field(format!("γ[{}.{}.{}]", i1, i2, i3))
-                .unwrap();
-            csv.write_field(format!("n[{}.{}.{}]", i1, i2, i3)).unwrap();
+        for i3 in 0..3 {
+            csv.write_field(format!("p[{}]", i3)).unwrap();
+            csv.write_field(format!("γ[{}]", i3)).unwrap();
+            csv.write_field(format!("n[{}]", i3)).unwrap();
         }
         csv.write_record(None::<&[u8]>).unwrap();
     }
@@ -61,15 +59,8 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
 
         // Iterate over all combinations of particles
         let i1 = 0;
-        for (i2, i3) in iproduct!(0..3, 0..3) {
+        for i3 in 0..3 {
             let max_m = mass.h.max(mass.n[i3]);
-
-            // Amplitude squared and phase space
-            let m2 = coupling.y_v[[i3, i2]].norm_sqr() * (mass2.h - mass2.n[i3]);
-            let phase_space = max_m * bessel::k1(max_m * c.beta) / (32.0 * PI_3 * c.beta);
-            // Factor of 2 to account to both SU(2) processes
-            let gamma = 2.0 * m2.abs() * phase_space / (c.hubble_rate * c.beta);
-
             let (p1, p2);
 
             // Store the index of the parent and daughter particles in p1 and
@@ -87,12 +78,20 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
                 _ => unreachable!(),
             };
 
-            // Calculate the decay and inverse decay rates
+            // Amplitude squared and phase space
+            let m2 = (0..3)
+                .map(|i2| coupling.y_v[[i3, i2]].norm_sqr())
+                .sum::<f64>()
+                * (mass2.h - mass2.n[i3]);
+            let phase_space = max_m * bessel::k1(max_m * c.beta) / (32.0 * PI_3 * c.beta);
+            // Factor of 2 to account to both SU(2) processes
+            let gamma = 2.0 * m2.abs() * phase_space;
+
+            // Calculate the net decay rate
             let net_decay =
                 (checked_div(n[p1], c.eq_n[p1]) - checked_div(n[p2], c.eq_n[p2])) * gamma;
 
-            dn[p_i("BL", 0)] += c.model.epsilon * net_decay
-                - n[p_i("BL", 0)] * checked_div(n[p_i("N", i3)], c.eq_n[p_i("N", i3)]) * gamma;
+            dn[p_i("BL", 0)] += c.model.epsilon * net_decay - n[p_i("BL", 0)] * gamma;
 
             dn[p1] -= net_decay;
             dn[p2] += net_decay;
@@ -100,8 +99,10 @@ pub fn n_el_h(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
             {
                 let mut csv = csv.write().unwrap();
                 csv.write_field(format!("{}", p1)).unwrap();
-                csv.write_field(format!("{:.3e}", gamma)).unwrap();
-                csv.write_field(format!("{:.3e}", net_decay)).unwrap();
+                csv.write_field(format!("{:.3e}", c.normalization * gamma))
+                    .unwrap();
+                csv.write_field(format!("{:.3e}", c.normalization * net_decay))
+                    .unwrap();
             }
         }
 
@@ -157,7 +158,7 @@ pub fn n_el_ql_qr(solver: &mut NumberDensitySolver<LeptogenesisModel>) {
             };
 
             m2_prefactor * integrate_st(m2_st, c.beta, c.model.particles[p_c].mass, 0.0, 0.0, 0.0)
-                / (512.0 * PI_5 * c.hubble_rate * c.beta)
+                / (512.0 * PI_5)
         };
 
         let forward = checked_div(n[1], c.eq_n[1]) * gamma;
