@@ -117,6 +117,9 @@
 // Enable feature(test) on nightly builds to make use of the `test` crate.
 #![cfg_attr(feature = "nightly", feature(test))]
 
+#[cfg(feature = "nightly")]
+extern crate test;
+
 macro_rules! debug_assert_warn {
     ($cond:expr, $($arg:tt)+) => (
         if cfg!(debug_assertions) && ($cond) {
