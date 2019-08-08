@@ -61,7 +61,7 @@ pub trait Solver {
     ///
     /// ```ignore
     /// let solver = Solver::new()
-    ///              .temperate_range(1e10, 1e3)
+    ///              .temperature_range(1e10, 1e3)
     ///              // Other settings
     ///              .initialize();
     /// ```
