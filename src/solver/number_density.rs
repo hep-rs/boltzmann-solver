@@ -773,28 +773,46 @@ impl<M: Model + Sync> NumberDensitySolver<M> {
         }
     }
 
+    /// Adjust `dn` by an overall factor.
     ///
+    /// The factor is calculated such that the *biggest* change does not cause
+    /// an the DE solver to overshoot the equilibrium number.
     ///
-
-    /// Adjust `dn` with respect to `n` in the same was as `n_plus_dn`, except
-    /// this does *not* alter the number density.  This also does *not* take
-    /// into account the threshold number density.
+    /// # Example
+    ///
+    /// Suppose we have the following scenario:
+    /// - Current number density: `[1.1, 2.0]`
+    /// - Number density change: `[-0.5, +1.0]`
+    /// - Equilibrium number density: `[1.0, 2.0]`
+    ///
+    /// Then change will be adjusted to `[-0.1, +0.2]` so that the equilibrium
+    /// number density of the first species is not overshot.
     fn adjust_dn(
         n: &<Self as Solver>::Solution,
         dn: &mut <Self as Solver>::Solution,
         eq_n: &<Self as Solver>::Solution,
-    ) {
+    ) -> f64 {
         let new_n = n + &*dn;
-        Zip::from(n)
-            .and(dn)
+        let factor = Zip::from(n)
+            .and(&*dn)
             .and(eq_n)
             .and(&new_n)
-            .apply(|n, dn, eq_n, new_n| {
-                if (n > eq_n) ^ (new_n > eq_n) {
-                    *dn = eq_n - *n;
-                } else if (*n > 0.0) ^ (*new_n > 0.0) {
-                    *dn = -*n;
+            .fold_while(1.0f64, |factor, n, dn, eq_n, new_n| {
+                let factor_i = if (n > eq_n) ^ (new_n > eq_n) {
+                    (eq_n - *n) / *dn
+                } else {
+                    1.0
+                };
+
+                if factor_i > 0.0 {
+                    FoldWhile::Continue(factor.min(factor_i))
+                } else {
+                    FoldWhile::Continue(factor)
                 }
-            });
+            })
+            .into_inner();
+
+        *dn *= factor;
+        factor
     }
 }
