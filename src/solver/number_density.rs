@@ -452,7 +452,7 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
     where
         U: Universe,
     {
-        use super::tableau::dp87::*;
+        use super::tableau::rk76::*;
 
         assert!(
             self.initialized,
