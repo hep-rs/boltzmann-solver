@@ -32,8 +32,6 @@ where
     // Create the Solver and set integration parameters
     let mut solver: NumberDensitySolver<LeptogenesisModel> = NumberDensitySolver::new()
         .beta_range(beta_start, beta_end)
-        .error_tolerance(1e-1)
-        .step_precision(1e-2, 5e-1)
         .initial_conditions(initial_conditions)
         .initialize();
 
