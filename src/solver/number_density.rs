@@ -537,10 +537,8 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
 
         // Initialize all the variables that will be used in the integration
         let mut n = self.initial_conditions.clone();
-        let mut dn = [
-            Self::Solution::zeros(n.dim()),
-            Self::Solution::zeros(n.dim()),
-        ];
+        let mut dn = Self::Solution::zeros(n.dim());
+        let mut dn_err = Self::Solution::zeros(n.dim());
 
         let mut k: [Self::Solution; RK_S];
         unsafe {
@@ -556,7 +554,7 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
 
         // Create the initial context and log the initial conditions
         let mut c = self.context(step, h, beta, universe);
-        (*self.logger)(&n, &dn[0], &c);
+        (*self.logger)(&n, &Self::Solution::zeros(n.dim()), &c);
 
         while beta < self.beta_range.1 {
             step += 1;
@@ -568,42 +566,45 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
             }
 
             // Compute each k[i]
+            dn.fill(0.0);
+            dn_err.fill(0.0);
             for i in 0..RK_S {
                 let beta_i = beta + RK_C[i] * h;
                 let ci = self.context(step, h, beta_i, universe);
                 let ai = RK_A[i];
                 let ni = (0..i).fold(n.clone(), |total, j| total + ai[j] * &k[j]);
-                k[i] = self
-                    .interactions
-                    .par_iter()
-                    .map(|f| h * f(&ni, &ci))
-                    .map(|mut dn| {
-                        Self::adjust_dn(&ni, &mut dn, &ci.eq_n);
-                        dn
-                    })
-                    .reduce(|| Self::Solution::zeros(n.dim()), |sum, a| sum + a);
-                Self::adjust_dn(&ni, &mut k[i], &ci.eq_n);
+                log::trace!(" n[{:0>2}] = {:>10.3e}", i, ni);
+                log::trace!("eq[{:0>2}] = {:>10.3e}", i, ci.eq_n);
+                k[i] = if self.normalized {
+                    self.interactions
+                        .par_iter()
+                        .map(|f| ci.normalization * h * f(&ni, &ci))
+                        // .map(|mut dn| {
+                        //     Self::adjust_dn(&ni, &mut dn, &ci.eq_n);
+                        //     dn
+                        // })
+                        .reduce(|| Self::Solution::zeros(n.dim()), |sum, a| sum + a)
+                } else {
+                    self.interactions
+                        .par_iter()
+                        .map(|f| ci.normalization * h * (f(&ni, &ci) - 3.0 * ci.hubble_rate * &ni))
+                        // .map(|mut dn| {
+                        //     Self::adjust_dn(&ni, &mut dn, &ci.eq_n);
+                        //     dn
+                        // })
+                        .reduce(|| Self::Solution::zeros(n.dim()), |sum, a| sum + a)
+                };
+                log::trace!(" k[{:0>2}] = {:>10.3e}", i, k[i]);
+                dn = dn + RK_B[i] * &k[i];
+                dn_err = dn_err + RK_E[i] * &k[i];
             }
 
-            // Calculate the two estimates for dn
-            dn[0] = (0..RK_S).fold(Self::Solution::zeros(n.dim()), |total, i| {
-                total + RK_B[0][i] * &k[i]
-            });
-            dn[1] = (0..RK_S).fold(Self::Solution::zeros(n.dim()), |total, i| {
-                total + RK_B[1][i] * &k[i]
-            });
-            Self::adjust_dn(&n, &mut dn[0], &c.eq_n);
-            Self::adjust_dn(&n, &mut dn[1], &c.eq_n);
+            log::trace!("    dn = {:.3e}", dn);
+            log::trace!("dn_err = {:.3e}", dn_err);
 
             // Get the error between the estimates
-            let err = Zip::from(&dn[0])
-                .and(&dn[1])
-                .fold_while(0.0f64, |e, a, b| {
-                    let v = (a - b).abs();
-                    FoldWhile::Continue(e.max(v))
-                })
-                .into_inner()
-                / h;
+            let err = dn_err.iter().fold(0f64, |e, v| e.max(v.abs()));
+            log::trace!("Error = {:.3e}", err);
 
             // If the error is within the tolerance, we'll be advancing the
             // iteration step
@@ -701,12 +702,21 @@ impl<M: Model + Sync> NumberDensitySolver<M> {
     /// energy, with the distribution following either the Bose–Einstein or
     /// Fermi–Dirac distribution as determined by their spin.
     fn equilibrium_number_densities(&self, beta: f64, model: &M) -> Array1<f64> {
-        Array1::from_iter(
-            model
-                .particles()
-                .iter()
-                .map(|p| p.normalized_number_density(0.0, beta)),
-        )
+        if self.normalized {
+            Array1::from_iter(
+                model
+                    .particles()
+                    .iter()
+                    .map(|p| p.normalized_number_density(0.0, beta)),
+            )
+        } else {
+            Array1::from_iter(
+                model
+                    .particles()
+                    .iter()
+                    .map(|p| p.number_density(0.0, beta)),
+            )
+        }
     }
 
     /// Set a model function.
