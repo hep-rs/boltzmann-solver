@@ -560,9 +560,15 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
             step += 1;
             let mut advance = false;
             c = self.context(step, h, beta, universe);
-            log::debug!("Step {:}, β = {:.4e}", step, beta);
             if step % 1000 == 0 {
-                log::info!("Step {:}, β = {:.4e}", step, beta);
+                log::info!("Step {}, β = {:.4e}", step, beta);
+                log::info!("n = {:.3e}", n);
+            } else if step % 100 == 0 {
+                log::debug!("Step {}, , β = {:.4e}", step, beta);
+                log::debug!("n = {:.3e}", n);
+            } else {
+                log::trace!("Step {}, β = {:.4e}, h = {:.4e}", step, beta, h);
+                log::trace!("n = {:.3e}", n);
             }
 
             // Compute each k[i]
@@ -614,12 +620,12 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
 
             // Compute the change in step size based on the current error And
             // correspondingly adjust the step size
-            let mut h_est = if err == 0.0 {
-                h * self.step_change.increase
+            let delta = if err == 0.0 {
+                self.step_change.increase
             } else {
                 let delta = 0.9 * (self.error_tolerance / err).powf(1.0 / f64::from(RK_ORDER + 1));
 
-                h * if delta < self.step_change.decrease {
+                if delta < self.step_change.decrease {
                     self.step_change.decrease
                 } else if delta > self.step_change.increase {
                     self.step_change.increase
@@ -627,6 +633,8 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
                     delta
                 }
             };
+            log::trace!("Δ = {:.3e}", delta);
+            let mut h_est = h * delta;
 
             // Prevent h from getting too small or too big in proportion to the
             // current value of beta.  Also advance the integration irrespective
@@ -645,11 +653,16 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
             // irrespective of the local error
             if advance {
                 // Advance n and beta
-                self.n_plus_dn(&mut n, &mut dn[0], &c);
+                n += &dn;
                 beta += h;
 
+                if beta == beta + h_est {
+                    log::error!("Step size too small and no longer increments β.  Aborting.");
+                    std::process::exit(1);
+                }
+
                 // Run the logger now
-                (*self.logger)(&n, &dn[0], &c);
+                (*self.logger)(&n, &dn, &c);
             }
 
             // Adjust final integration step if needed
@@ -760,48 +773,8 @@ impl<M: Model + Sync> NumberDensitySolver<M> {
         }
     }
 
-    /// Add `dn` to `n`, but set the result to the equilibrium number density if
-    /// the change overshoots it.
     ///
-    /// If there is a strong process causing a particular number density to go
-    /// towards equilibrium, the iteration step may overshoot the equilibrium
-    /// point; and in the case where the process is *very* strong, it is
-    /// possible the overshooting is so bad that it generates an even larger
-    /// (opposite signed) number density.
     ///
-    /// To avoid this, we set the number density to exactly the equilibrium
-    /// number density whenever this might occur forcing an evaluation with the
-    /// equilibrium number density.  We also check for crossing 0 in order to
-    /// avoid negative number densities.
-    fn n_plus_dn(
-        &self,
-        n: &mut <Self as Solver>::Solution,
-        dn: &mut <Self as Solver>::Solution,
-        c: &<Self as Solver>::Context,
-    ) {
-        let new_n = &*n + &*dn;
-        Zip::from(n)
-            .and(dn)
-            .and(&c.eq_n)
-            .and(&new_n)
-            .apply(|n, dn, eq_n, new_n| {
-                if (*n > *eq_n) ^ (new_n > eq_n) {
-                    *dn = eq_n - *n;
-                    *n = *eq_n;
-                } else if (*n > 0.0) ^ (*new_n > 0.0) {
-                    *dn = -*n;
-                    *n = 0.0;
-                } else {
-                    *n = *new_n;
-                }
-
-                if n.abs() < self.threshold_number_density {
-                    log::debug!("n going below threshold number density, setting to zero.",);
-                    *dn = -*n;
-                    *n = 0.0;
-                }
-            });
-    }
 
     /// Adjust `dn` with respect to `n` in the same was as `n_plus_dn`, except
     /// this does *not* alter the number density.  This also does *not* take
