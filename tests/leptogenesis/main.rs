@@ -26,7 +26,7 @@ pub mod model;
 pub mod solve;
 
 /// Setup logging
-fn setup_logging() -> Result<(), log::SetLoggerError> {
+fn setup_logging() {
     let mut base_config = fern::Dispatch::new();
 
     let colors = colors::ColoredLevelConfig::new()
@@ -57,12 +57,10 @@ fn setup_logging() -> Result<(), log::SetLoggerError> {
         })
         .chain(io::stderr());
 
-    base_config.chain(stderr_config).apply()?;
+    base_config.chain(stderr_config).apply().unwrap_or(());
 
     log::debug!("Verbosity set to Debug.");
     log::trace!("Verbosity set to Trace.");
-
-    Ok(())
 }
 
 /// Output directory
