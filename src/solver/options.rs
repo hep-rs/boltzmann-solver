@@ -24,7 +24,7 @@ impl Default for StepPrecision {
     fn default() -> Self {
         StepPrecision {
             min: 1e-4,
-            max: 1e-1,
+            max: 1e-0,
         }
     }
 }
