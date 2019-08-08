@@ -144,6 +144,9 @@ pub trait Solver {
     /// integration step size is adjusted accordingly.
     fn error_tolerance(self, tol: f64) -> Self;
 
+    /// Specify whether the solver is dealing with normalized quantities or not.
+    fn normalized(self, val: bool) -> Self;
+
     /// Specify initial conditions for the number densities.
     fn initial_conditions(self, cond: Vec<f64>) -> Self;
 

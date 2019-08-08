@@ -254,9 +254,69 @@
 //! factorization in separate squared amplitude.  Furthermore if there are
 //! multiple intermediate states, the mixing between these states must also be
 //! taken into account.
+//!
+//! # Temperature Evolution
+//!
+//! Although it is most intuitive to describe the interaction rates in terms of
+//! time, most quantities depend on the temperature of the Universe at a
+//! particular time.  We therefore make the change of variables from \\(t\\) to
+//! \\(\beta\\) which introduces a factor of \\(H(\beta) \beta\\):
+//!
+//! \\begin{equation}
+//!   \pfrac{n}{t} + 3 H n \equiv H \beta \pfrac{n}{\beta} + 3 H n.
+//! \\end{equation}
+//!
+//! As a result, the actual change in the number density, it becomes
+//!
+//! \\begin{equation}
+//!   \pfrac{n}{\beta} = \frac{1}{H \beta} \left[\vt C[n] - 3 H n\right]
+//! \\end{equation}
+//!
+//! and one must only input \\(\vt C[n]\\) in the interaction.
+//!
+//! # Normalized Number Density
+//!
+//! The number densities themselves can be often quite large (especially in the
+//! early Universe), and often are compared to other number densities; as a
+//! result, they are often normalized to either the photon number density
+//! \\(n_\gamma\\) or the entropy density \\(s\\).  This library uses a
+//! equilibrium number density of a single massless bosonic degree of freedom
+//! (and thus differs from using the photon number density by a factor of 2).
+//!
+//! When dealing with number densities, the Liouville operator is:
+//!
+//! \\begin{equation}
+//!   \pfrac{n}{t} + 3 H n = \vt C[n]
+//! \\end{equation}
+//!
+//! where \\(\vt C[n]\\) is the change in the number density.  If we now define
+//!
+//! \\begin{equation}
+//!   Y \defeq \frac{n}{n_{\text{eq}}},
+//! \\end{equation}
+//!
+//! then the change in this normalized number density is:
+//!
+//! \\begin{equation}
+//!   \pfrac{Y}{t} = \frac{1}{n_{\text{eq}}} \vt C[n]
+//! \\end{equation}
+//!
+//! with \\(n_{\text{eq}}\\) having the simple analytic form \\(3 \zeta(3) / 4
+//! \pi^2 \beta^3\\).  Furthermore, make the change of variable from time
+//! \\(t\\) to inverse temperature \\(\beta\\), we get:
+//!
+//! \\begin{equation}
+//!   \pfrac{Y}{\beta} = \frac{1}{H \beta n_{\text{eq}}} \vt C[n].
+//! \\end{equation}
+//!
+//! As with the non-normalized number density calculations, only \\(\vt C[n]\\)
+//! must be inputted in the interaction.
 
 use super::{EmptyModel, Model, Solver, StepChange, StepPrecision};
-use crate::universe::Universe;
+use crate::{
+    statistic::{Statistic, Statistics},
+    universe::Universe,
+};
 use ndarray::{array, prelude::*, FoldWhile, Zip};
 use rayon::prelude::*;
 
@@ -271,6 +331,14 @@ pub struct Context<M: Model> {
     pub beta: f64,
     /// Hubble rate, in GeV
     pub hubble_rate: f64,
+    /// Normalization factor, which may be either
+    /// \\begin{equation}
+    ///   \frac{1}{H \beta} \quad \text{or} \quad \frac{1}{H \beta n_1}
+    /// \\end{equation}
+    /// depending on whether it is the plain number density or normalized number
+    /// density (respectively), and where \\(n_1\\) is the number density of a
+    /// single massless bosonic degree of freedom.
+    pub normalization: f64,
     /// Equilibrium number densities for the particles, normalized to the
     /// equilibrium number density for a massless boson with \\(g = 1\\).  The
     /// particle species are provided in the same order as when specified to the
@@ -288,6 +356,7 @@ pub struct Context<M: Model> {
 pub struct NumberDensitySolver<M: Model + Sync> {
     initialized: bool,
     beta_range: (f64, f64),
+    normalized: bool,
     initial_conditions: Array1<f64>,
     #[allow(clippy::type_complexity)]
     interactions: Vec<
@@ -321,12 +390,14 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
 
     /// Create a new instance of the number density solver.
     ///
-    /// The default range of temperatures span 1 GeV through to 10^{20} GeV.
+    /// The default range of temperatures span 1 GeV through to 10^{20} GeV, and
+    /// it uses normalization by default.
     fn new() -> Self {
         #[allow(clippy::redundant_closure)]
         Self {
             initialized: false,
             beta_range: (1e-20, 1e0),
+            normalized: true,
             initial_conditions: array![],
             interactions: Vec::with_capacity(100),
             logger: Box::new(|_, _, _| {}),
@@ -406,6 +477,11 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
     fn error_tolerance(mut self, tol: f64) -> Self {
         assert!(tol > 0.0, "The tolerance must be greater than 0.");
         self.error_tolerance = tol;
+        self
+    }
+
+    fn normalized(mut self, val: bool) -> Self {
+        self.normalized = val;
         self
     }
 
@@ -656,11 +732,19 @@ impl<M: Model + Sync> NumberDensitySolver<M> {
         universe: &U,
     ) -> Context<M> {
         let model = (self.model_fn)(beta);
+        let hubble_rate = universe.hubble_rate(beta);
+        let normalization = if self.normalized {
+            (hubble_rate * beta * Statistic::BoseEinstein.massless_number_density(0.0, beta))
+                .recip()
+        } else {
+            (hubble_rate * beta).recip()
+        };
         Context {
             step,
             step_size,
             beta,
-            hubble_rate: universe.hubble_rate(beta),
+            hubble_rate,
+            normalization,
             eq_n: self.equilibrium_number_densities(beta, &model),
             model,
         }
