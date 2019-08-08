@@ -11,33 +11,34 @@
 //! where
 //!
 //! \\begin{align}
-//!   k_1 &= h f(x_n, y_n), \\\\
-//!   k_i &= h f\left(x_n + c_i h, y_n + \sum_{j=1}^{i-1} a_{ij} k_j \right),
+//!   k_1 &= h f(t_n, y_n), \\\\
+//!   k_i &= h f\left(t_n + c_i h, y_n + \sum_{j=1}^{i-1} a_{ij} k_j \right),
 //! \\end{align}
 //!
-//! and \\(a_{ij}\\), \\(b_i\\) and \\(c_i\\) are specified by the Butcher
-//! tableau.  Note that although the above notation uses 1-indexing, the
-//! parameters are defined in the submodules using 0-indexing.
+//! and he local error is given by
 //!
-//! For a Runge-Kutta method of size \\(s\\), we have:
-//! - the Runge-Kutta matrix `a[i][j]` is an `s×(s-1)` matrix with non-zero
-//!   entries located when `i < j`;
-//! - the weights vector `b[i]` is an `s` vector.  Note that for adaptive
-//!   methods, `b` will instead be a `2×s` matrix with `b[0]` containing the
-//!   weights for the estimate of order `RK_ORDER` and `b[1]` containing the
-//!   weights for the estimate of order `RK_ORDER - 1`; and,
-//! - the nodes vector `c[i]` is an `s` vector.
+//! \\begin{equation}
+//!   e = \sum_{i = 1}^{s} e_i k_i.
+//! \\end{equation}
+//!
+//! Each \\(a_{ij}\\), \\(b_i\\) and \\(c_i\\) are specified by the Butcher
+//! tableau, and \\(e_i = b_i - \hat b_i\\).  Note that although the above
+//! notation uses 1-indexing, the parameters are defined in the submodules using
+//! 0-indexing.
 
-pub mod bs32;
-pub mod ck54;
-pub mod dp54;
-pub mod dp87;
-pub mod rkf54;
+pub mod rk21;
+pub mod rk32;
+pub mod rk43;
+pub mod rk54;
+pub mod rk65;
+pub mod rk76;
+pub mod rk87;
+pub mod rk98;
 
 #[cfg(test)]
 mod tests {
     use crate::utilities::test::*;
-    use ndarray::{array, prelude::*, FoldWhile, Zip};
+    use ndarray::{array, prelude::*};
     use std::f64::consts::PI;
 
     const TWO_PI: f64 = 2.0 * PI;
@@ -45,7 +46,7 @@ mod tests {
     macro_rules! solve_ode {
         ( $name:ident, $method:ident ) => {
             pub(crate) fn $name<F>(
-                mut x: Array1<f64>,
+                mut y: Array1<f64>,
                 mut t: f64,
                 tf: f64,
                 f: F,
@@ -56,18 +57,19 @@ mod tests {
                 use super::$method::*;
 
                 // Fixed parameters
-                let tol = 1e-5;
+                let tol = 1e-6;
                 let delta_min = 0.1;
                 let delta_max = 4.0;
                 let h_min = (tf - t) / 1e5;
                 let h_max = (tf - t) / 1e1;
 
-                let mut dx = [Array1::zeros(x.dim()), Array1::zeros(x.dim())];
+                let mut dy;
+                let mut dy_err;
                 let mut k: [Array1<f64>; RK_S];
                 unsafe {
                     k = std::mem::uninitialized();
                     for ki in &mut k[..] {
-                        std::ptr::write(ki, Array1::zeros(x.dim()));
+                        std::ptr::write(ki, Array1::zeros(y.dim()));
                     }
                 };
 
@@ -79,28 +81,16 @@ mod tests {
                     for i in 0..RK_S {
                         let ti = t + RK_C[i] * h;
                         let ai = RK_A[i];
-                        let xi = (0..i).fold(x.clone(), |total, j| total + ai[j] * &k[j]);
-                        k[i] = h * f(ti, &xi);
+                        let yi = (0..i).fold(y.clone(), |total, j| total + ai[j] * &k[j]);
+                        k[i] = h * f(ti, &yi);
                     }
 
                     // Compute the two estimates
-                    dx[0] = (0..RK_S).fold(Array1::zeros(x.dim()), |total, i| {
-                        total + &k[i] * RK_B[0][i]
-                    });
-                    dx[1] = (0..RK_S).fold(Array1::zeros(x.dim()), |total, i| {
-                        total + &k[i] * RK_B[1][i]
-                    });
+                    dy = (0..RK_S).fold(Array1::zeros(y.dim()), |total, i| total + &k[i] * RK_B[i]);
+                    dy_err =
+                        (0..RK_S).fold(Array1::zeros(y.dim()), |total, i| total + &k[i] * RK_E[i]);
 
-                    // Get the error between the estimates
-                    let err = Zip::from(&dx[0])
-                        .and(&dx[1])
-                        .fold_while(0.0f64, |e, a, b| {
-                            let v = (a - b).abs();
-                            FoldWhile::Continue(e.max(v))
-                        })
-                        .into_inner()
-                        / h;
-
+                    let err = dy_err.iter().fold(0f64, |e, v| e.max(v.abs()));
                     // If the error is within the tolerance, add the result
                     if err < tol {
                         advance = true;
@@ -136,8 +126,10 @@ mod tests {
                     // Check if the error is within the tolerance, or we are advancing
                     // irrespective of the local error
                     if advance {
-                        x += &dx[0];
+                        y += &dy;
                         t += h;
+                    } else {
+                        log::trace!("Not incrementing step.");
                     }
 
                     // Adjust final step size if needed
@@ -148,16 +140,19 @@ mod tests {
                     h = h_est;
                 }
 
-                (t, x)
+                (t, y)
             }
         };
     }
 
-    solve_ode!(solve_ode_bs32, bs32);
-    solve_ode!(solve_ode_ck54, ck54);
-    solve_ode!(solve_ode_dp54, dp54);
-    solve_ode!(solve_ode_dp87, dp87);
-    solve_ode!(solve_ode_rkf54, rkf54);
+    solve_ode!(solve_ode_rk21, rk21);
+    solve_ode!(solve_ode_rk32, rk32);
+    solve_ode!(solve_ode_rk43, rk43);
+    solve_ode!(solve_ode_rk54, rk54);
+    solve_ode!(solve_ode_rk65, rk65);
+    solve_ode!(solve_ode_rk76, rk76);
+    solve_ode!(solve_ode_rk87, rk87);
+    solve_ode!(solve_ode_rk98, rk98);
 
     macro_rules! test_sine {
         ( $name:ident, $solver:ident, $prec:expr ) => {
@@ -175,11 +170,14 @@ mod tests {
         };
     }
 
-    test_sine!(test_sine_bs32, solve_ode_bs32, 4.0);
-    test_sine!(test_sine_ck54, solve_ode_ck54, 4.0);
-    test_sine!(test_sine_dp54, solve_ode_dp54, 4.0);
-    test_sine!(test_sine_dp87, solve_ode_dp87, 4.0);
-    test_sine!(test_sine_rkf54, solve_ode_rkf54, 4.0);
+    test_sine!(test_sine_rk21, solve_ode_rk21, 4.0);
+    test_sine!(test_sine_rk32, solve_ode_rk32, 4.0);
+    test_sine!(test_sine_rk43, solve_ode_rk43, 4.0);
+    test_sine!(test_sine_rk54, solve_ode_rk54, 4.0);
+    test_sine!(test_sine_rk65, solve_ode_rk65, 4.0);
+    test_sine!(test_sine_rk76, solve_ode_rk76, 4.0);
+    test_sine!(test_sine_rk87, solve_ode_rk87, 4.0);
+    test_sine!(test_sine_rk98, solve_ode_rk98, 4.0);
 
     macro_rules! test_lotka_volterra {
         ( $name:ident, $solver:ident, $prec:expr ) => {
@@ -199,17 +197,21 @@ mod tests {
         };
     }
 
-    test_lotka_volterra!(test_lotka_volterra_bs32, solve_ode_bs32, 4.0);
-    test_lotka_volterra!(test_lotka_volterra_ck54, solve_ode_ck54, 4.0);
-    test_lotka_volterra!(test_lotka_volterra_dp54, solve_ode_dp54, 4.0);
-    test_lotka_volterra!(test_lotka_volterra_dp87, solve_ode_dp87, 4.0);
-    test_lotka_volterra!(test_lotka_volterra_rkf54, solve_ode_rkf54, 4.0);
+    test_lotka_volterra!(test_lotka_volterra_rk21, solve_ode_rk21, 4.0);
+    test_lotka_volterra!(test_lotka_volterra_rk32, solve_ode_rk32, 4.0);
+    test_lotka_volterra!(test_lotka_volterra_rk43, solve_ode_rk43, 4.0);
+    test_lotka_volterra!(test_lotka_volterra_rk54, solve_ode_rk54, 4.0);
+    test_lotka_volterra!(test_lotka_volterra_rk65, solve_ode_rk65, 4.0);
+    test_lotka_volterra!(test_lotka_volterra_rk76, solve_ode_rk76, 4.0);
+    test_lotka_volterra!(test_lotka_volterra_rk87, solve_ode_rk87, 4.0);
+    test_lotka_volterra!(test_lotka_volterra_rk98, solve_ode_rk98, 4.0);
 }
 
 #[cfg(all(test, feature = "nightly"))]
 mod benches {
     use super::tests::{
-        solve_ode_bs32, solve_ode_ck54, solve_ode_dp54, solve_ode_dp87, solve_ode_rkf54,
+        solve_ode_rk21, solve_ode_rk32, solve_ode_rk43, solve_ode_rk54, solve_ode_rk65,
+        solve_ode_rk76, solve_ode_rk87, solve_ode_rk98,
     };
     use crate::utilities::test::*;
     use ndarray::{array, Array1};
@@ -236,11 +238,14 @@ mod benches {
         };
     }
 
-    bench_sine!(bench_sine_bs32, solve_ode_bs32);
-    bench_sine!(bench_sine_ck54, solve_ode_ck54);
-    bench_sine!(bench_sine_dp54, solve_ode_dp54);
-    bench_sine!(bench_sine_dp87, solve_ode_dp87);
-    bench_sine!(bench_sine_rkf54, solve_ode_rkf54);
+    bench_sine!(bench_sine_rk21, solve_ode_rk21);
+    bench_sine!(bench_sine_rk32, solve_ode_rk32);
+    bench_sine!(bench_sine_rk43, solve_ode_rk43);
+    bench_sine!(bench_sine_rk54, solve_ode_rk54);
+    bench_sine!(bench_sine_rk65, solve_ode_rk65);
+    bench_sine!(bench_sine_rk76, solve_ode_rk76);
+    bench_sine!(bench_sine_rk87, solve_ode_rk87);
+    bench_sine!(bench_sine_rk98, solve_ode_rk98);
 
     macro_rules! bench_lotka_volterra {
         ( $name:ident, $solver:ident ) => {
@@ -262,9 +267,12 @@ mod benches {
         };
     }
 
-    bench_lotka_volterra!(bench_lotka_volterra_bs32, solve_ode_bs32);
-    bench_lotka_volterra!(bench_lotka_volterra_ck54, solve_ode_ck54);
-    bench_lotka_volterra!(bench_lotka_volterra_dp54, solve_ode_dp54);
-    bench_lotka_volterra!(bench_lotka_volterra_dp87, solve_ode_dp87);
-    bench_lotka_volterra!(bench_lotka_volterra_rkf54, solve_ode_rkf54);
+    bench_lotka_volterra!(bench_lotka_volterra_rk21, solve_ode_rk21);
+    bench_lotka_volterra!(bench_lotka_volterra_rk32, solve_ode_rk32);
+    bench_lotka_volterra!(bench_lotka_volterra_rk43, solve_ode_rk43);
+    bench_lotka_volterra!(bench_lotka_volterra_rk54, solve_ode_rk54);
+    bench_lotka_volterra!(bench_lotka_volterra_rk65, solve_ode_rk65);
+    bench_lotka_volterra!(bench_lotka_volterra_rk76, solve_ode_rk76);
+    bench_lotka_volterra!(bench_lotka_volterra_rk87, solve_ode_rk87);
+    bench_lotka_volterra!(bench_lotka_volterra_rk98, solve_ode_rk98);
 }
