@@ -361,7 +361,7 @@ pub struct NumberDensitySolver<M: Model + Sync> {
     #[allow(clippy::type_complexity)]
     interactions: Vec<
         Box<
-            Fn(
+            dyn Fn(
                     &<Self as Solver>::Solution,
                     &<Self as Solver>::Context,
                 ) -> <Self as Solver>::Solution
@@ -370,9 +370,13 @@ pub struct NumberDensitySolver<M: Model + Sync> {
     >,
     #[allow(clippy::type_complexity)]
     logger: Box<
-        Fn(&<Self as Solver>::Solution, &<Self as Solver>::Solution, &<Self as Solver>::Context),
+        dyn Fn(
+            &<Self as Solver>::Solution,
+            &<Self as Solver>::Solution,
+            &<Self as Solver>::Context,
+        ),
     >,
-    model_fn: Box<Fn(f64) -> M>,
+    model_fn: Box<dyn Fn(f64) -> M>,
     step_change: StepChange,
     step_precision: StepPrecision,
     error_tolerance: f64,
