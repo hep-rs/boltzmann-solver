@@ -27,7 +27,7 @@ fn setup_logging() {
         .debug(colors::Color::White)
         .trace(colors::Color::Black);
 
-    let verbosity = 3;
+    let verbosity = 1;
 
     let lvl = match verbosity {
         0 => log::LevelFilter::Warn,
