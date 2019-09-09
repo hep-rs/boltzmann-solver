@@ -640,6 +640,12 @@ impl<M: Model + Sync> SolverBuilder<M> {
     }
 }
 
+impl<M: Model + Sync> Default for SolverBuilder<M> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<M: Model + Sync> Solver<M> {
     /// Evolve the initial conditions by solving the PDEs.
     ///

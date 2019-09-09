@@ -177,7 +177,7 @@ impl Model for LeptogenesisModel {
                     Complex::new(0.1, -0.1),
                     Complex::new(1.0, 0.0)
                 ],
-            ] * 1e-4,
+            ] * 1e-8,
         };
 
         let particles = array![

@@ -58,30 +58,6 @@ impl Interacting {
             Interacting::Other(i, ..) => i,
         }
     }
-
-    /// Determine whether the particle is an initial particle or not.
-    fn is_initial(&self) -> bool {
-        match self {
-            Interacting::Initial(..) => true,
-            _ => false,
-        }
-    }
-
-    /// Determine whether the particle is an initial particle or not.
-    fn is_final(&self) -> bool {
-        match self {
-            Interacting::Final(..) => true,
-            _ => false,
-        }
-    }
-
-    /// Determine whether the particle is an initial particle or not.
-    fn is_other(&self) -> bool {
-        match self {
-            Interacting::Other(..) => true,
-            _ => false,
-        }
-    }
 }
 
 /// Equality is based *only* on the particle index.
@@ -224,9 +200,10 @@ impl Interaction {
             let i = self.particles[0].index();
             let m = c.model.particles()[i].mass;
 
-            // 0.0024230112251823004 = ζ(3) / 16 π³
-            let gamma_tilde =
-                0.0024230112251823004 * m2 * bessel::k1_on_k2(m * c.beta) / c.beta.powi(3) / m;
+            // 0.002_423_011_225_182_300_4 = ζ(3) / 16 π³
+            let gamma_tilde = 0.002_423_011_225_182_300_4 * m2 * bessel::k1_on_k2(m * c.beta)
+                / c.beta.powi(3)
+                / m;
             log::trace!("̃γ: {:.3e}", gamma_tilde);
 
             rf = gamma_tilde;
