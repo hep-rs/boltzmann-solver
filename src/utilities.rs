@@ -3,45 +3,8 @@
 use quadrature::integrate;
 use special_functions::bessel;
 
-const CHECKED_DIV_MAX: f64 = 1e3;
-
 #[cfg(test)]
 pub(crate) mod test;
-
-/// Perform a 'checked' division for number densities.
-///
-/// As the number densities can become quite small (especially the equilibrium
-/// number densities), computing `n / n_eq` can cause certain issues.  As a
-/// result, this function provides a 'well-behaved' division that handles small
-/// values of `n_eq`.
-///
-/// # Implementation
-///
-/// - If the numerator is 0, 0 is returned.
-/// - If the denominator is 0, a maximum value is returned with the same sign as
-///   the numerator.
-/// - For all other values, the value returned is:
-///   \\begin{equation}
-///     M \tanh\left( \frac{1}{M} \frac{a}{b} \right)
-///   \\end{equation}
-///   where \\(M\\) is the maximum value allowed (typically set to 10).
-#[inline]
-pub fn checked_div(a: f64, b: f64) -> f64 {
-    if a == 0.0 {
-        0.0
-    } else if b == 0.0 {
-        CHECKED_DIV_MAX.copysign(a)
-    } else {
-        // Use a sigmoid to have bounds on the division to prevent very small
-        // denominators from blowing up.
-        let v = a / b;
-        if v.abs() > CHECKED_DIV_MAX {
-            CHECKED_DIV_MAX.copysign(v)
-        } else {
-            v
-        }
-    }
-}
 
 /// Kallen lambda function:
 ///
@@ -131,31 +94,9 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{t_min_max, CHECKED_DIV_MAX};
+    use super::t_min_max;
     use crate::utilities::test::*;
     use ndarray::prelude::*;
-
-    #[allow(clippy::float_cmp)]
-    #[test]
-    fn checked_div() {
-        assert_eq!(super::checked_div(0.0, 0.0), 0.0);
-
-        assert_eq!(super::checked_div(1.0, 0.0), CHECKED_DIV_MAX);
-        assert_eq!(super::checked_div(-1.0, 0.0), -CHECKED_DIV_MAX);
-
-        assert_eq!(super::checked_div(0.0, 1.0), 0.0);
-        assert_eq!(super::checked_div(0.0, -1.0), 0.0);
-
-        approx_eq(super::checked_div(1.0, 2.0), 0.5, 2.0, 0.0);
-        approx_eq(super::checked_div(-1.0, 2.0), -0.5, 2.0, 0.0);
-        approx_eq(super::checked_div(1.0, -2.0), -0.5, 2.0, 0.0);
-        approx_eq(super::checked_div(-1.0, -2.0), 0.5, 2.0, 0.0);
-
-        assert_eq!(super::checked_div(1.0, 1e-5), CHECKED_DIV_MAX);
-        assert_eq!(super::checked_div(-1.0, 1e-5), -CHECKED_DIV_MAX);
-        assert_eq!(super::checked_div(1.0, -1e-5), -CHECKED_DIV_MAX);
-        assert_eq!(super::checked_div(-1.0, -1e-5), CHECKED_DIV_MAX);
-    }
 
     #[test]
     fn t_min_max_zero() {
