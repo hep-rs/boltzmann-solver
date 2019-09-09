@@ -393,13 +393,16 @@ impl<M: Model + Sync> SolverBuilder<M> {
     /// [`SolverBuilder::logger`].
     ///
     /// ```
-    /// let mut solver_builder = SolverBuilder::new()
-    ///     .initial_conditions(&[1.2, 1.3])
+    /// use boltzmann_solver::solver::{EmptyModel, number_density::SolverBuilder};
+    ///
+    /// let mut solver_builder: SolverBuilder<EmptyModel> = SolverBuilder::new()
+    ///     .initial_conditions(vec![1.2, 1.3])
     ///     .beta_range(1e-10, 1e-6)
-    ///     .equilibrium(&[0]);
+    ///     .equilibrium(vec![0]);
+    ///
     /// // builder.add_interaction(..);
     /// // builder.logger(..);
-    /// let solver = solver_builder.build();
+    /// // let solver = solver_builder.build();
     /// ```
     pub fn new() -> Self {
         Self {
