@@ -658,7 +658,7 @@ impl<M: Model + Sync> Solver<M> {
     where
         U: Universe,
     {
-        use super::tableau::rk76::*;
+        use super::tableau::rk87::*;
 
         // Initialize all the variables that will be used in the integration
         let mut n = self.initial_conditions.clone();
@@ -674,6 +674,7 @@ impl<M: Model + Sync> Solver<M> {
         };
 
         let mut step = 0;
+        let mut evals = 0;
         let mut beta = self.beta_range.0;
         let mut h = beta * self.step_precision.min;
         let mut advance;
@@ -714,6 +715,8 @@ impl<M: Model + Sync> Solver<M> {
             }
 
             for i in 0..RK_S {
+                evals += 1;
+
                 // Compute the sub-step values
                 let beta_i = beta + RK_C[i] * h;
                 let ai = RK_A[i];
@@ -808,6 +811,7 @@ impl<M: Model + Sync> Solver<M> {
         }
 
         log::info!("Number of integration steps: {}", step);
+        log::info!("Number of evaluations: {}", evals);
 
         n
     }
