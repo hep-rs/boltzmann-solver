@@ -88,7 +88,7 @@ pub fn run() {
 
     assert!(1e-10 < sol[p_i("B-L", 0)].abs() && sol[p_i("B-L", 0)].abs() < 1e-5);
     for i in 0..3 {
-        assert!(sol[p_i("N", i)] < 1e-20);
+        assert!(sol[p_i("N", i)] < 1e-9);
     }
 }
 
