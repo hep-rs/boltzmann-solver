@@ -43,31 +43,31 @@ mod tests {
 
     const TWO_PI: f64 = 2.0 * PI;
 
-    macro_rules! solve_ode {
+    macro_rules! solve_rk {
         ( $name:ident, $method:ident ) => {
             pub(crate) fn $name<F>(
                 mut y: Array1<f64>,
                 mut t: f64,
                 tf: f64,
-                f: F,
+                mut f: F,
             ) -> (f64, Array1<f64>)
             where
-                F: Fn(f64, &Array1<f64>) -> Array1<f64>,
+                F: FnMut(f64, &Array1<f64>) -> Array1<f64>,
             {
                 use super::$method::*;
 
                 // Fixed parameters
-                let tol = 1e-6;
+                let tol = 1e-8;
                 let delta_min = 0.1;
                 let delta_max = 4.0;
-                let h_min = (tf - t) / 1e5;
+                let h_min = (tf - t) / 1e14;
                 let h_max = (tf - t) / 1e1;
 
                 let mut dy;
                 let mut dy_err;
                 let mut k: [Array1<f64>; RK_S];
                 unsafe {
-                    k = std::mem::uninitialized();
+                    k = std::mem::MaybeUninit::uninit().assume_init();
                     for ki in &mut k[..] {
                         std::ptr::write(ki, Array1::zeros(y.dim()));
                     }
@@ -145,14 +145,14 @@ mod tests {
         };
     }
 
-    solve_ode!(solve_ode_rk21, rk21);
-    solve_ode!(solve_ode_rk32, rk32);
-    solve_ode!(solve_ode_rk43, rk43);
-    solve_ode!(solve_ode_rk54, rk54);
-    solve_ode!(solve_ode_rk65, rk65);
-    solve_ode!(solve_ode_rk76, rk76);
-    solve_ode!(solve_ode_rk87, rk87);
-    solve_ode!(solve_ode_rk98, rk98);
+    solve_rk!(solve_rk21, rk21);
+    solve_rk!(solve_rk32, rk32);
+    solve_rk!(solve_rk43, rk43);
+    solve_rk!(solve_rk54, rk54);
+    solve_rk!(solve_rk65, rk65);
+    solve_rk!(solve_rk76, rk76);
+    solve_rk!(solve_rk87, rk87);
+    solve_rk!(solve_rk98, rk98);
 
     macro_rules! test_sine {
         ( $name:ident, $solver:ident, $prec:expr ) => {
@@ -170,14 +170,14 @@ mod tests {
         };
     }
 
-    test_sine!(test_sine_rk21, solve_ode_rk21, 4.0);
-    test_sine!(test_sine_rk32, solve_ode_rk32, 4.0);
-    test_sine!(test_sine_rk43, solve_ode_rk43, 4.0);
-    test_sine!(test_sine_rk54, solve_ode_rk54, 4.0);
-    test_sine!(test_sine_rk65, solve_ode_rk65, 4.0);
-    test_sine!(test_sine_rk76, solve_ode_rk76, 4.0);
-    test_sine!(test_sine_rk87, solve_ode_rk87, 4.0);
-    test_sine!(test_sine_rk98, solve_ode_rk98, 4.0);
+    test_sine!(test_sine_rk21, solve_rk21, 6.0);
+    test_sine!(test_sine_rk32, solve_rk32, 6.0);
+    test_sine!(test_sine_rk43, solve_rk43, 6.0);
+    test_sine!(test_sine_rk54, solve_rk54, 6.0);
+    test_sine!(test_sine_rk65, solve_rk65, 6.0);
+    test_sine!(test_sine_rk76, solve_rk76, 6.0);
+    test_sine!(test_sine_rk87, solve_rk87, 6.0);
+    test_sine!(test_sine_rk98, solve_rk98, 6.0);
 
     macro_rules! test_lotka_volterra {
         ( $name:ident, $solver:ident, $prec:expr ) => {
@@ -197,23 +197,22 @@ mod tests {
         };
     }
 
-    test_lotka_volterra!(test_lotka_volterra_rk21, solve_ode_rk21, 4.0);
-    test_lotka_volterra!(test_lotka_volterra_rk32, solve_ode_rk32, 4.0);
-    test_lotka_volterra!(test_lotka_volterra_rk43, solve_ode_rk43, 4.0);
-    test_lotka_volterra!(test_lotka_volterra_rk54, solve_ode_rk54, 4.0);
-    test_lotka_volterra!(test_lotka_volterra_rk65, solve_ode_rk65, 4.0);
-    test_lotka_volterra!(test_lotka_volterra_rk76, solve_ode_rk76, 4.0);
-    test_lotka_volterra!(test_lotka_volterra_rk87, solve_ode_rk87, 4.0);
-    test_lotka_volterra!(test_lotka_volterra_rk98, solve_ode_rk98, 4.0);
+    test_lotka_volterra!(test_lotka_volterra_rk21, solve_rk21, 6.0);
+    test_lotka_volterra!(test_lotka_volterra_rk32, solve_rk32, 6.0);
+    test_lotka_volterra!(test_lotka_volterra_rk43, solve_rk43, 6.0);
+    test_lotka_volterra!(test_lotka_volterra_rk54, solve_rk54, 6.0);
+    test_lotka_volterra!(test_lotka_volterra_rk65, solve_rk65, 6.0);
+    test_lotka_volterra!(test_lotka_volterra_rk76, solve_rk76, 6.0);
+    test_lotka_volterra!(test_lotka_volterra_rk87, solve_rk87, 6.0);
+    test_lotka_volterra!(test_lotka_volterra_rk98, solve_rk98, 6.0);
 }
 
 #[cfg(all(test, feature = "nightly"))]
 mod benches {
     use super::tests::{
-        solve_ode_rk21, solve_ode_rk32, solve_ode_rk43, solve_ode_rk54, solve_ode_rk65,
-        solve_ode_rk76, solve_ode_rk87, solve_ode_rk98,
+        solve_rk21, solve_rk32, solve_rk43, solve_rk54, solve_rk65, solve_rk76, solve_rk87,
+        solve_rk98,
     };
-    use crate::utilities::test::*;
     use ndarray::{array, Array1};
     use std::f64::consts::PI;
     use test::Bencher;
@@ -230,22 +229,21 @@ mod benches {
                     let x = array![1.0, 0.0];
                     let t = 0.0;
 
-                    let (_, x) = $solver(x, t, TWO_PI, f);
-                    approx_eq(x[0], 1.0, 1.0, 0.0);
-                    approx_eq(x[1], 0.0, 1.0, 10.0f64.powf(-1.0));
+                    let r = $solver(x, t, TWO_PI, f);
+                    test::black_box(r)
                 });
             }
         };
     }
 
-    bench_sine!(bench_sine_rk21, solve_ode_rk21);
-    bench_sine!(bench_sine_rk32, solve_ode_rk32);
-    bench_sine!(bench_sine_rk43, solve_ode_rk43);
-    bench_sine!(bench_sine_rk54, solve_ode_rk54);
-    bench_sine!(bench_sine_rk65, solve_ode_rk65);
-    bench_sine!(bench_sine_rk76, solve_ode_rk76);
-    bench_sine!(bench_sine_rk87, solve_ode_rk87);
-    bench_sine!(bench_sine_rk98, solve_ode_rk98);
+    bench_sine!(bench_sine_rk21, solve_rk21);
+    bench_sine!(bench_sine_rk32, solve_rk32);
+    bench_sine!(bench_sine_rk43, solve_rk43);
+    bench_sine!(bench_sine_rk54, solve_rk54);
+    bench_sine!(bench_sine_rk65, solve_rk65);
+    bench_sine!(bench_sine_rk76, solve_rk76);
+    bench_sine!(bench_sine_rk87, solve_rk87);
+    bench_sine!(bench_sine_rk98, solve_rk98);
 
     macro_rules! bench_lotka_volterra {
         ( $name:ident, $solver:ident ) => {
@@ -259,20 +257,19 @@ mod benches {
                     let x = array![1.0, 2.7];
                     let t = 0.0;
 
-                    let (_, x) = $solver(x, t, 10.0, f);
-                    approx_eq(x[0], 0.622_374_063_518_922_9, 1.0, 0.0);
-                    approx_eq(x[1], 2.115_331_268_162_712_8, 1.0, 0.0);
+                    let r = $solver(x, t, 10.0, f);
+                    test::black_box(r)
                 });
             }
         };
     }
 
-    bench_lotka_volterra!(bench_lotka_volterra_rk21, solve_ode_rk21);
-    bench_lotka_volterra!(bench_lotka_volterra_rk32, solve_ode_rk32);
-    bench_lotka_volterra!(bench_lotka_volterra_rk43, solve_ode_rk43);
-    bench_lotka_volterra!(bench_lotka_volterra_rk54, solve_ode_rk54);
-    bench_lotka_volterra!(bench_lotka_volterra_rk65, solve_ode_rk65);
-    bench_lotka_volterra!(bench_lotka_volterra_rk76, solve_ode_rk76);
-    bench_lotka_volterra!(bench_lotka_volterra_rk87, solve_ode_rk87);
-    bench_lotka_volterra!(bench_lotka_volterra_rk98, solve_ode_rk98);
+    bench_lotka_volterra!(bench_lotka_volterra_rk21, solve_rk21);
+    bench_lotka_volterra!(bench_lotka_volterra_rk32, solve_rk32);
+    bench_lotka_volterra!(bench_lotka_volterra_rk43, solve_rk43);
+    bench_lotka_volterra!(bench_lotka_volterra_rk54, solve_rk54);
+    bench_lotka_volterra!(bench_lotka_volterra_rk65, solve_rk65);
+    bench_lotka_volterra!(bench_lotka_volterra_rk76, solve_rk76);
+    bench_lotka_volterra!(bench_lotka_volterra_rk87, solve_rk87);
+    bench_lotka_volterra!(bench_lotka_volterra_rk98, solve_rk98);
 }
