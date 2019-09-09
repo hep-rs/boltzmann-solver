@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/tableau.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tableau.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../boltzmann_solver/index.html'><img src='../../../rust-logo.png' alt='logo' width='100'></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/tableau.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tableau.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -268,6 +268,11 @@
 <span id="268">268</span>
 <span id="269">269</span>
 <span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! # Butcher tableaux</span>
 <span class="doccomment">//!</span>
@@ -282,63 +287,65 @@
 <span class="doccomment">//! where</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! \\begin{align}</span>
-<span class="doccomment">//!   k_1 &amp;= h f(x_n, y_n), \\\\</span>
-<span class="doccomment">//!   k_i &amp;= h f\left(x_n + c_i h, y_n + \sum_{j=1}^{i-1} a_{ij} k_j \right),</span>
+<span class="doccomment">//!   k_1 &amp;= h f(t_n, y_n), \\\\</span>
+<span class="doccomment">//!   k_i &amp;= h f\left(t_n + c_i h, y_n + \sum_{j=1}^{i-1} a_{ij} k_j \right),</span>
 <span class="doccomment">//! \\end{align}</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! and \\(a_{ij}\\), \\(b_i\\) and \\(c_i\\) are specified by the Butcher</span>
-<span class="doccomment">//! tableau.  Note that although the above notation uses 1-indexing, the</span>
-<span class="doccomment">//! parameters are defined in the submodules using 0-indexing.</span>
+<span class="doccomment">//! and he local error is given by</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! For a Runge-Kutta method of size \\(s\\), we have:</span>
-<span class="doccomment">//! - the Runge-Kutta matrix `a[i][j]` is an `s×(s-1)` matrix with non-zero</span>
-<span class="doccomment">//!   entries located when `i &lt; j`;</span>
-<span class="doccomment">//! - the weights vector `b[i]` is an `s` vector.  Note that for adaptive</span>
-<span class="doccomment">//!   methods, `b` will instead be a `2×s` matrix with `b[0]` containing the</span>
-<span class="doccomment">//!   weights for the estimate of order `RK_ORDER` and `b[1]` containing the</span>
-<span class="doccomment">//!   weights for the estimate of order `RK_ORDER - 1`; and,</span>
-<span class="doccomment">//! - the nodes vector `c[i]` is an `s` vector.</span>
+<span class="doccomment">//! \\begin{equation}</span>
+<span class="doccomment">//!   e = \sum_{i = 1}^{s} e_i k_i.</span>
+<span class="doccomment">//! \\end{equation}</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Each \\(a_{ij}\\), \\(b_i\\) and \\(c_i\\) are specified by the Butcher</span>
+<span class="doccomment">//! tableau, and \\(e_i = b_i - \hat b_i\\).  Note that although the above</span>
+<span class="doccomment">//! notation uses 1-indexing, the parameters are defined in the submodules using</span>
+<span class="doccomment">//! 0-indexing.</span>
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bs32</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ck54</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dp54</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dp87</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rkf54</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rk21</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rk32</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rk43</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rk54</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rk65</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rk76</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rk87</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rk98</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">array</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">FoldWhile</span>, <span class="ident">Zip</span>};
+    <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">array</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">consts</span>::<span class="ident">PI</span>;
 
     <span class="kw">const</span> <span class="ident">TWO_PI</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">PI</span>;
 
-    <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">solve_ode</span> {
+    <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">solve_rk</span> {
         ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span> ) <span class="op">=&gt;</span> {
             <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
-                <span class="kw-2">mut</span> <span class="ident">x</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+                <span class="kw-2">mut</span> <span class="ident">y</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
                 <span class="kw-2">mut</span> <span class="ident">t</span>: <span class="ident">f64</span>,
                 <span class="ident">tf</span>: <span class="ident">f64</span>,
-                <span class="ident">f</span>: <span class="ident">F</span>,
+                <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>,
             ) <span class="op">-&gt;</span> (<span class="ident">f64</span>, <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>)
             <span class="kw">where</span>
-                <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">f64</span>, <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+                <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">f64</span>, <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
             {
                 <span class="kw">use</span> <span class="kw">super</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>::<span class="kw-2">*</span>;
 
                 <span class="comment">// Fixed parameters</span>
-                <span class="kw">let</span> <span class="ident">tol</span> <span class="op">=</span> <span class="number">1e-5</span>;
+                <span class="kw">let</span> <span class="ident">tol</span> <span class="op">=</span> <span class="number">1e-8</span>;
                 <span class="kw">let</span> <span class="ident">delta_min</span> <span class="op">=</span> <span class="number">0.1</span>;
                 <span class="kw">let</span> <span class="ident">delta_max</span> <span class="op">=</span> <span class="number">4.0</span>;
-                <span class="kw">let</span> <span class="ident">h_min</span> <span class="op">=</span> (<span class="ident">tf</span> <span class="op">-</span> <span class="ident">t</span>) <span class="op">/</span> <span class="number">1e5</span>;
+                <span class="kw">let</span> <span class="ident">h_min</span> <span class="op">=</span> (<span class="ident">tf</span> <span class="op">-</span> <span class="ident">t</span>) <span class="op">/</span> <span class="number">1e14</span>;
                 <span class="kw">let</span> <span class="ident">h_max</span> <span class="op">=</span> (<span class="ident">tf</span> <span class="op">-</span> <span class="ident">t</span>) <span class="op">/</span> <span class="number">1e1</span>;
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dx</span> <span class="op">=</span> [<span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">x</span>.<span class="ident">dim</span>()), <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">x</span>.<span class="ident">dim</span>())];
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dy</span>;
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dy_err</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k</span>: [<span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>; <span class="ident">RK_S</span>];
                 <span class="kw">unsafe</span> {
-                    <span class="ident">k</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">uninitialized</span>();
+                    <span class="ident">k</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>().<span class="ident">assume_init</span>();
                     <span class="kw">for</span> <span class="ident">ki</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">k</span>[..] {
-                        <span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">write</span>(<span class="ident">ki</span>, <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">x</span>.<span class="ident">dim</span>()));
+                        <span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">write</span>(<span class="ident">ki</span>, <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">y</span>.<span class="ident">dim</span>()));
                     }
                 };
 
@@ -350,28 +357,16 @@
                     <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">RK_S</span> {
                         <span class="kw">let</span> <span class="ident">ti</span> <span class="op">=</span> <span class="ident">t</span> <span class="op">+</span> <span class="ident">RK_C</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">h</span>;
                         <span class="kw">let</span> <span class="ident">ai</span> <span class="op">=</span> <span class="ident">RK_A</span>[<span class="ident">i</span>];
-                        <span class="kw">let</span> <span class="ident">xi</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">i</span>).<span class="ident">fold</span>(<span class="ident">x</span>.<span class="ident">clone</span>(), <span class="op">|</span><span class="ident">total</span>, <span class="ident">j</span><span class="op">|</span> <span class="ident">total</span> <span class="op">+</span> <span class="ident">ai</span>[<span class="ident">j</span>] <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">j</span>]);
-                        <span class="ident">k</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">h</span> <span class="op">*</span> <span class="ident">f</span>(<span class="ident">ti</span>, <span class="kw-2">&amp;</span><span class="ident">xi</span>);
+                        <span class="kw">let</span> <span class="ident">yi</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">i</span>).<span class="ident">fold</span>(<span class="ident">y</span>.<span class="ident">clone</span>(), <span class="op">|</span><span class="ident">total</span>, <span class="ident">j</span><span class="op">|</span> <span class="ident">total</span> <span class="op">+</span> <span class="ident">ai</span>[<span class="ident">j</span>] <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">j</span>]);
+                        <span class="ident">k</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">h</span> <span class="op">*</span> <span class="ident">f</span>(<span class="ident">ti</span>, <span class="kw-2">&amp;</span><span class="ident">yi</span>);
                     }
 
                     <span class="comment">// Compute the two estimates</span>
-                    <span class="ident">dx</span>[<span class="number">0</span>] <span class="op">=</span> (<span class="number">0</span>..<span class="ident">RK_S</span>).<span class="ident">fold</span>(<span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">x</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">total</span>, <span class="ident">i</span><span class="op">|</span> {
-                        <span class="ident">total</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">RK_B</span>[<span class="number">0</span>][<span class="ident">i</span>]
-                    });
-                    <span class="ident">dx</span>[<span class="number">1</span>] <span class="op">=</span> (<span class="number">0</span>..<span class="ident">RK_S</span>).<span class="ident">fold</span>(<span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">x</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">total</span>, <span class="ident">i</span><span class="op">|</span> {
-                        <span class="ident">total</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">RK_B</span>[<span class="number">1</span>][<span class="ident">i</span>]
-                    });
+                    <span class="ident">dy</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">RK_S</span>).<span class="ident">fold</span>(<span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">y</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">total</span>, <span class="ident">i</span><span class="op">|</span> <span class="ident">total</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">RK_B</span>[<span class="ident">i</span>]);
+                    <span class="ident">dy_err</span> <span class="op">=</span>
+                        (<span class="number">0</span>..<span class="ident">RK_S</span>).<span class="ident">fold</span>(<span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">y</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">total</span>, <span class="ident">i</span><span class="op">|</span> <span class="ident">total</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">RK_E</span>[<span class="ident">i</span>]);
 
-                    <span class="comment">// Get the error between the estimates</span>
-                    <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">Zip</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="ident">dx</span>[<span class="number">0</span>])
-                        .<span class="ident">and</span>(<span class="kw-2">&amp;</span><span class="ident">dx</span>[<span class="number">1</span>])
-                        .<span class="ident">fold_while</span>(<span class="number">0.0f64</span>, <span class="op">|</span><span class="ident">e</span>, <span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> {
-                            <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> (<span class="ident">a</span> <span class="op">-</span> <span class="ident">b</span>).<span class="ident">abs</span>();
-                            <span class="ident">FoldWhile</span>::<span class="ident">Continue</span>(<span class="ident">e</span>.<span class="ident">max</span>(<span class="ident">v</span>))
-                        })
-                        .<span class="ident">into_inner</span>()
-                        <span class="op">/</span> <span class="ident">h</span>;
-
+                    <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">dy_err</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="number">0f64</span>, <span class="op">|</span><span class="ident">e</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">max</span>(<span class="ident">v</span>.<span class="ident">abs</span>()));
                     <span class="comment">// If the error is within the tolerance, add the result</span>
                     <span class="kw">if</span> <span class="ident">err</span> <span class="op">&lt;</span> <span class="ident">tol</span> {
                         <span class="ident">advance</span> <span class="op">=</span> <span class="bool-val">true</span>;
@@ -407,8 +402,10 @@
                     <span class="comment">// Check if the error is within the tolerance, or we are advancing</span>
                     <span class="comment">// irrespective of the local error</span>
                     <span class="kw">if</span> <span class="ident">advance</span> {
-                        <span class="ident">x</span> <span class="op">+=</span> <span class="kw-2">&amp;</span><span class="ident">dx</span>[<span class="number">0</span>];
+                        <span class="ident">y</span> <span class="op">+=</span> <span class="kw-2">&amp;</span><span class="ident">dy</span>;
                         <span class="ident">t</span> <span class="op">+=</span> <span class="ident">h</span>;
+                    } <span class="kw">else</span> {
+                        <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Not incrementing step.&quot;</span>);
                     }
 
                     <span class="comment">// Adjust final step size if needed</span>
@@ -419,16 +416,19 @@
                     <span class="ident">h</span> <span class="op">=</span> <span class="ident">h_est</span>;
                 }
 
-                (<span class="ident">t</span>, <span class="ident">x</span>)
+                (<span class="ident">t</span>, <span class="ident">y</span>)
             }
         };
     }
 
-    <span class="macro">solve_ode</span><span class="macro">!</span>(<span class="ident">solve_ode_bs32</span>, <span class="ident">bs32</span>);
-    <span class="macro">solve_ode</span><span class="macro">!</span>(<span class="ident">solve_ode_ck54</span>, <span class="ident">ck54</span>);
-    <span class="macro">solve_ode</span><span class="macro">!</span>(<span class="ident">solve_ode_dp54</span>, <span class="ident">dp54</span>);
-    <span class="macro">solve_ode</span><span class="macro">!</span>(<span class="ident">solve_ode_dp87</span>, <span class="ident">dp87</span>);
-    <span class="macro">solve_ode</span><span class="macro">!</span>(<span class="ident">solve_ode_rkf54</span>, <span class="ident">rkf54</span>);
+    <span class="macro">solve_rk</span><span class="macro">!</span>(<span class="ident">solve_rk21</span>, <span class="ident">rk21</span>);
+    <span class="macro">solve_rk</span><span class="macro">!</span>(<span class="ident">solve_rk32</span>, <span class="ident">rk32</span>);
+    <span class="macro">solve_rk</span><span class="macro">!</span>(<span class="ident">solve_rk43</span>, <span class="ident">rk43</span>);
+    <span class="macro">solve_rk</span><span class="macro">!</span>(<span class="ident">solve_rk54</span>, <span class="ident">rk54</span>);
+    <span class="macro">solve_rk</span><span class="macro">!</span>(<span class="ident">solve_rk65</span>, <span class="ident">rk65</span>);
+    <span class="macro">solve_rk</span><span class="macro">!</span>(<span class="ident">solve_rk76</span>, <span class="ident">rk76</span>);
+    <span class="macro">solve_rk</span><span class="macro">!</span>(<span class="ident">solve_rk87</span>, <span class="ident">rk87</span>);
+    <span class="macro">solve_rk</span><span class="macro">!</span>(<span class="ident">solve_rk98</span>, <span class="ident">rk98</span>);
 
     <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">test_sine</span> {
         ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prec</span>:<span class="ident">expr</span> ) <span class="op">=&gt;</span> {
@@ -446,11 +446,14 @@
         };
     }
 
-    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_bs32</span>, <span class="ident">solve_ode_bs32</span>, <span class="number">4.0</span>);
-    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_ck54</span>, <span class="ident">solve_ode_ck54</span>, <span class="number">4.0</span>);
-    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_dp54</span>, <span class="ident">solve_ode_dp54</span>, <span class="number">4.0</span>);
-    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_dp87</span>, <span class="ident">solve_ode_dp87</span>, <span class="number">4.0</span>);
-    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_rkf54</span>, <span class="ident">solve_ode_rkf54</span>, <span class="number">4.0</span>);
+    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_rk21</span>, <span class="ident">solve_rk21</span>, <span class="number">6.0</span>);
+    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_rk32</span>, <span class="ident">solve_rk32</span>, <span class="number">6.0</span>);
+    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_rk43</span>, <span class="ident">solve_rk43</span>, <span class="number">6.0</span>);
+    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_rk54</span>, <span class="ident">solve_rk54</span>, <span class="number">6.0</span>);
+    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_rk65</span>, <span class="ident">solve_rk65</span>, <span class="number">6.0</span>);
+    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_rk76</span>, <span class="ident">solve_rk76</span>, <span class="number">6.0</span>);
+    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_rk87</span>, <span class="ident">solve_rk87</span>, <span class="number">6.0</span>);
+    <span class="macro">test_sine</span><span class="macro">!</span>(<span class="ident">test_sine_rk98</span>, <span class="ident">solve_rk98</span>, <span class="number">6.0</span>);
 
     <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">test_lotka_volterra</span> {
         ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prec</span>:<span class="ident">expr</span> ) <span class="op">=&gt;</span> {
@@ -470,19 +473,22 @@
         };
     }
 
-    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_bs32</span>, <span class="ident">solve_ode_bs32</span>, <span class="number">4.0</span>);
-    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_ck54</span>, <span class="ident">solve_ode_ck54</span>, <span class="number">4.0</span>);
-    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_dp54</span>, <span class="ident">solve_ode_dp54</span>, <span class="number">4.0</span>);
-    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_dp87</span>, <span class="ident">solve_ode_dp87</span>, <span class="number">4.0</span>);
-    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_rkf54</span>, <span class="ident">solve_ode_rkf54</span>, <span class="number">4.0</span>);
+    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_rk21</span>, <span class="ident">solve_rk21</span>, <span class="number">6.0</span>);
+    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_rk32</span>, <span class="ident">solve_rk32</span>, <span class="number">6.0</span>);
+    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_rk43</span>, <span class="ident">solve_rk43</span>, <span class="number">6.0</span>);
+    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_rk54</span>, <span class="ident">solve_rk54</span>, <span class="number">6.0</span>);
+    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_rk65</span>, <span class="ident">solve_rk65</span>, <span class="number">6.0</span>);
+    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_rk76</span>, <span class="ident">solve_rk76</span>, <span class="number">6.0</span>);
+    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_rk87</span>, <span class="ident">solve_rk87</span>, <span class="number">6.0</span>);
+    <span class="macro">test_lotka_volterra</span><span class="macro">!</span>(<span class="ident">test_lotka_volterra_rk98</span>, <span class="ident">solve_rk98</span>, <span class="number">6.0</span>);
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>))]</span>
 <span class="kw">mod</span> <span class="ident">benches</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">tests</span>::{
-        <span class="ident">solve_ode_bs32</span>, <span class="ident">solve_ode_ck54</span>, <span class="ident">solve_ode_dp54</span>, <span class="ident">solve_ode_dp87</span>, <span class="ident">solve_ode_rkf54</span>,
+        <span class="ident">solve_rk21</span>, <span class="ident">solve_rk32</span>, <span class="ident">solve_rk43</span>, <span class="ident">solve_rk54</span>, <span class="ident">solve_rk65</span>, <span class="ident">solve_rk76</span>, <span class="ident">solve_rk87</span>,
+        <span class="ident">solve_rk98</span>,
     };
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">array</span>, <span class="ident">Array1</span>};
     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">consts</span>::<span class="ident">PI</span>;
     <span class="kw">use</span> <span class="ident">test</span>::<span class="ident">Bencher</span>;
@@ -499,19 +505,21 @@
                     <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="macro">array</span><span class="macro">!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>];
                     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="number">0.0</span>;
 
-                    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">x</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>(<span class="ident">x</span>, <span class="ident">t</span>, <span class="ident">TWO_PI</span>, <span class="ident">f</span>);
-                    <span class="ident">approx_eq</span>(<span class="ident">x</span>[<span class="number">0</span>], <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>);
-                    <span class="ident">approx_eq</span>(<span class="ident">x</span>[<span class="number">1</span>], <span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">10.0f64</span>.<span class="ident">powf</span>(<span class="op">-</span><span class="number">1.0</span>));
+                    <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>(<span class="ident">x</span>, <span class="ident">t</span>, <span class="ident">TWO_PI</span>, <span class="ident">f</span>);
+                    <span class="ident">test</span>::<span class="ident">black_box</span>(<span class="ident">r</span>)
                 });
             }
         };
     }
 
-    <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_bs32</span>, <span class="ident">solve_ode_bs32</span>);
-    <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_ck54</span>, <span class="ident">solve_ode_ck54</span>);
-    <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_dp54</span>, <span class="ident">solve_ode_dp54</span>);
-    <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_dp87</span>, <span class="ident">solve_ode_dp87</span>);
-    <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_rkf54</span>, <span class="ident">solve_ode_rkf54</span>);
+    <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_rk21</span>, <span class="ident">solve_rk21</span>);
+    <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_rk32</span>, <span class="ident">solve_rk32</span>);
+    <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_rk43</span>, <span class="ident">solve_rk43</span>);
+    <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_rk54</span>, <span class="ident">solve_rk54</span>);
+    <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_rk65</span>, <span class="ident">solve_rk65</span>);
+    <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_rk76</span>, <span class="ident">solve_rk76</span>);
+    <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_rk87</span>, <span class="ident">solve_rk87</span>);
+    <span class="macro">bench_sine</span><span class="macro">!</span>(<span class="ident">bench_sine_rk98</span>, <span class="ident">solve_rk98</span>);
 
     <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">bench_lotka_volterra</span> {
         ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>:<span class="ident">ident</span> ) <span class="op">=&gt;</span> {
@@ -525,19 +533,21 @@
                     <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="macro">array</span><span class="macro">!</span>[<span class="number">1.0</span>, <span class="number">2.7</span>];
                     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="number">0.0</span>;
 
-                    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">x</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>(<span class="ident">x</span>, <span class="ident">t</span>, <span class="number">10.0</span>, <span class="ident">f</span>);
-                    <span class="ident">approx_eq</span>(<span class="ident">x</span>[<span class="number">0</span>], <span class="number">0.622_374_063_518_922_9</span>, <span class="number">1.0</span>, <span class="number">0.0</span>);
-                    <span class="ident">approx_eq</span>(<span class="ident">x</span>[<span class="number">1</span>], <span class="number">2.115_331_268_162_712_8</span>, <span class="number">1.0</span>, <span class="number">0.0</span>);
+                    <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>(<span class="ident">x</span>, <span class="ident">t</span>, <span class="number">10.0</span>, <span class="ident">f</span>);
+                    <span class="ident">test</span>::<span class="ident">black_box</span>(<span class="ident">r</span>)
                 });
             }
         };
     }
 
-    <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_bs32</span>, <span class="ident">solve_ode_bs32</span>);
-    <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_ck54</span>, <span class="ident">solve_ode_ck54</span>);
-    <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_dp54</span>, <span class="ident">solve_ode_dp54</span>);
-    <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_dp87</span>, <span class="ident">solve_ode_dp87</span>);
-    <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_rkf54</span>, <span class="ident">solve_ode_rkf54</span>);
+    <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_rk21</span>, <span class="ident">solve_rk21</span>);
+    <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_rk32</span>, <span class="ident">solve_rk32</span>);
+    <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_rk43</span>, <span class="ident">solve_rk43</span>);
+    <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_rk54</span>, <span class="ident">solve_rk54</span>);
+    <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_rk65</span>, <span class="ident">solve_rk65</span>);
+    <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_rk76</span>, <span class="ident">solve_rk76</span>);
+    <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_rk87</span>, <span class="ident">solve_rk87</span>);
+    <span class="macro">bench_lotka_volterra</span><span class="macro">!</span>(<span class="ident">bench_lotka_volterra_rk98</span>, <span class="ident">solve_rk98</span>);
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../";window.currentCrate = "boltzmann_solver";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>

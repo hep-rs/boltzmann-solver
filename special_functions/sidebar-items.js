@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["bessel","Bessel functions"],["interpolation","Interpolation functions"],["polylog","Polylogarithms"],["polynomial","Utilities to handle polynomials"]]});
+initSidebarItems({"macro":[["approx_fn","Create a function from a module containing all the information for the split."]],"mod":[["approximations","Approximations"],["basic","Basic functions."],["bessel","Bessel functions"],["particle_statistics","Particle statistics"],["polylog","Polylogarithms functions"]]});

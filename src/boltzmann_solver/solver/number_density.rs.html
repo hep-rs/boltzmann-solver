@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/number_density.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>number_density.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../boltzmann_solver/index.html'><img src='../../../rust-logo.png' alt='logo' width='100'></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/number_density.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>number_density.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -729,6 +729,159 @@
 <span id="729">729</span>
 <span id="730">730</span>
 <span id="731">731</span>
+<span id="732">732</span>
+<span id="733">733</span>
+<span id="734">734</span>
+<span id="735">735</span>
+<span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Solver for the number density evolution given by integrating the Boltzmann</span>
 <span class="doccomment">//! equation.</span>
@@ -986,102 +1139,219 @@
 <span class="doccomment">//! factorization in separate squared amplitude.  Furthermore if there are</span>
 <span class="doccomment">//! multiple intermediate states, the mixing between these states must also be</span>
 <span class="doccomment">//! taken into account.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Temperature Evolution</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Although it is most intuitive to describe the interaction rates in terms of</span>
+<span class="doccomment">//! time, most quantities depend on the temperature of the Universe at a</span>
+<span class="doccomment">//! particular time.  We therefore make the change of variables from \\(t\\) to</span>
+<span class="doccomment">//! \\(\beta\\) which introduces a factor of \\(H(\beta) \beta\\):</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! \\begin{equation}</span>
+<span class="doccomment">//!   \pfrac{n}{t} + 3 H n \equiv H \beta \pfrac{n}{\beta} + 3 H n.</span>
+<span class="doccomment">//! \\end{equation}</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! As a result, the actual change in the number density, it becomes</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! \\begin{equation}</span>
+<span class="doccomment">//!   \pfrac{n}{\beta} = \frac{1}{H \beta} \left[\vt C\[n\] - 3 H n\right]</span>
+<span class="doccomment">//! \\end{equation}</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! and one must only input \\(\vt C\[n\]\\) in the interaction.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Normalized Number Density</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The number densities themselves can be often quite large (especially in the</span>
+<span class="doccomment">//! early Universe), and often are compared to other number densities; as a</span>
+<span class="doccomment">//! result, they are often normalized to either the photon number density</span>
+<span class="doccomment">//! \\(n_\gamma\\) or the entropy density \\(s\\).  This library uses a</span>
+<span class="doccomment">//! equilibrium number density of a single massless bosonic degree of freedom</span>
+<span class="doccomment">//! (and thus differs from using the photon number density by a factor of 2).</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! When dealing with number densities, the Liouville operator is:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! \\begin{equation}</span>
+<span class="doccomment">//!   \pfrac{n}{t} + 3 H n = \vt C\[n\]</span>
+<span class="doccomment">//! \\end{equation}</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! where \\(\vt C\[n\]\\) is the change in the number density.  If we now</span>
+<span class="doccomment">//! define</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! \\begin{equation}</span>
+<span class="doccomment">//!   Y \defeq \frac{n}{n_{\text{eq}}},</span>
+<span class="doccomment">//! \\end{equation}</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! then the change in this normalized number density is:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! \\begin{equation}</span>
+<span class="doccomment">//!   \pfrac{Y}{t} = \frac{1}{n_{\text{eq}}} \vt C\[n\]</span>
+<span class="doccomment">//! \\end{equation}</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! with \\(n_{\text{eq}}\\) having the simple analytic form \\(3 \zeta(3) / 4</span>
+<span class="doccomment">//! \pi^2 \beta^3\\).  Furthermore, make the change of variable from time</span>
+<span class="doccomment">//! \\(t\\) to inverse temperature \\(\beta\\), we get:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! \\begin{equation}</span>
+<span class="doccomment">//!   \pfrac{Y}{\beta} = \frac{1}{H \beta n_{\text{eq}}} \vt C\[n\].</span>
+<span class="doccomment">//! \\end{equation}</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! As with the non-normalized number density calculations, only \\(\vt</span>
+<span class="doccomment">//! C\[n\]\\) must be inputted in the interaction.</span>
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">EmptyModel</span>, <span class="ident">InitialCondition</span>, <span class="ident">Model</span>, <span class="ident">Solver</span>, <span class="ident">StepChange</span>, <span class="ident">StepPrecision</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">particle</span>::<span class="ident">Particle</span>, <span class="ident">universe</span>::<span class="ident">Universe</span>};
-<span class="kw">use</span> <span class="ident">log</span>::{<span class="ident">debug</span>, <span class="ident">info</span>};
-<span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">FoldWhile</span>, <span class="ident">Zip</span>};
+<span class="kw">mod</span> <span class="ident">interaction</span>;
+
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">solver</span>::{<span class="ident">Model</span>, <span class="ident">StepPrecision</span>},
+    <span class="ident">statistic</span>::{<span class="ident">Statistic</span>, <span class="ident">Statistics</span>},
+    <span class="ident">universe</span>::<span class="ident">Universe</span>,
+};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">interaction</span>::{<span class="ident">Interacting</span>, <span class="ident">Interaction</span>};
+<span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">array</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">Zip</span>};
+<span class="kw">use</span> <span class="ident">rayon</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Context provided containing pre-computed values which might be useful when</span>
 <span class="doccomment">/// evaluating interactions.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Current evaluation step</span>
     <span class="kw">pub</span> <span class="ident">step</span>: <span class="ident">u64</span>,
+    <span class="doccomment">/// Current step size</span>
+    <span class="kw">pub</span> <span class="ident">step_size</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// Inverse temperature in GeV\\(^{-1}\\)</span>
     <span class="kw">pub</span> <span class="ident">beta</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// Hubble rate, in GeV</span>
     <span class="kw">pub</span> <span class="ident">hubble_rate</span>: <span class="ident">f64</span>,
-    <span class="doccomment">/// Equilibrium number densities for the particles, normalized to the</span>
-    <span class="doccomment">/// equilibrium number density for a massless boson with \\(g = 1\\).  The</span>
-    <span class="doccomment">/// particle species are provided in the same order as when specified to the</span>
-    <span class="doccomment">/// solver</span>
-    <span class="kw">pub</span> <span class="ident">eq_n</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Normalization factor, which may be either</span>
+    <span class="doccomment">/// \\begin{equation}</span>
+    <span class="doccomment">///   \frac{1}{H \beta} \quad \text{or} \quad \frac{1}{H \beta n_1}</span>
+    <span class="doccomment">/// \\end{equation}</span>
+    <span class="doccomment">/// depending on whether it is the plain number density or normalized number</span>
+    <span class="doccomment">/// density (respectively), and where \\(n_1\\) is the number density of a</span>
+    <span class="doccomment">/// single massless bosonic degree of freedom.</span>
+    <span class="kw">pub</span> <span class="ident">normalization</span>: <span class="ident">f64</span>,
+    <span class="doccomment">/// Equilibrium number densities for the particles.</span>
+    <span class="kw">pub</span> <span class="ident">eq</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Model data</span>
     <span class="kw">pub</span> <span class="ident">model</span>: <span class="ident">M</span>,
 }
 
-<span class="doccomment">/// Boltzmann equation solver for the number density.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// All number densities are normalized to that of a massless boson with a</span>
-<span class="doccomment">/// single degree of freedom (\\(g = 1\\)).  As a result of this convention,</span>
-<span class="doccomment">/// \\(n_\gamma = 2\\) as the photon has two degrees of freedom.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NumberDensitySolver</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span><span class="op">&gt;</span> {
-    <span class="ident">initialized</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Boltzmann solver builder</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SolverBuilder</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> {
+    <span class="ident">normalized</span>: <span class="ident">bool</span>,
+    <span class="ident">model</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">M</span><span class="op">&gt;</span>,
+    <span class="ident">initial_conditions</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
     <span class="ident">beta_range</span>: (<span class="ident">f64</span>, <span class="ident">f64</span>),
-    <span class="ident">particles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Particle</span><span class="op">&gt;</span>,
-    <span class="ident">initial_conditions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">type_complexity</span>)]</span>
-    <span class="ident">interactions</span>: <span class="ident">Vec</span><span class="op">&lt;</span>
-        <span class="ident">Box</span><span class="op">&lt;</span>
-            <span class="ident">Fn</span>(
-                <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Solution</span>,
-                <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Solution</span>,
-                <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Context</span>,
-            ) <span class="op">-&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Solution</span>,
-        <span class="op">&gt;</span>,
-    <span class="op">&gt;</span>,
+    <span class="ident">interactions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Interaction</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">equilibrium</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">type_complexity</span>)]</span>
-    <span class="ident">logger</span>: <span class="ident">Box</span><span class="op">&lt;</span>
-        <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Solution</span>, <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Solution</span>, <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Context</span>),
-    <span class="op">&gt;</span>,
-    <span class="ident">model_fn</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Fn</span>(<span class="ident">M</span>) <span class="op">-&gt;</span> <span class="ident">M</span><span class="op">&gt;</span>,
-    <span class="ident">step_change</span>: <span class="ident">StepChange</span>,
+    <span class="ident">logger</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
     <span class="ident">step_precision</span>: <span class="ident">StepPrecision</span>,
     <span class="ident">error_tolerance</span>: <span class="ident">f64</span>,
     <span class="ident">threshold_number_density</span>: <span class="ident">f64</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span><span class="op">&gt;</span> <span class="ident">Solver</span> <span class="kw">for</span> <span class="ident">NumberDensitySolver</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The solution is a one-dimensional array of number densities for each</span>
-    <span class="doccomment">/// particle species (or aggregated number density in the case of</span>
-    <span class="doccomment">/// \\(n_{\mathsc{b-l}}\\)), in the same order as [`Solver::add_particle`]</span>
-    <span class="doccomment">/// is invoked.</span>
-    <span class="kw">type</span> <span class="ident">Solution</span> <span class="op">=</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Boltzmann solver</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> {
+    <span class="ident">normalized</span>: <span class="ident">bool</span>,
+    <span class="ident">model</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">M</span><span class="op">&gt;</span>,
+    <span class="ident">initial_conditions</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">beta_range</span>: (<span class="ident">f64</span>, <span class="ident">f64</span>),
+    <span class="ident">equilibrium</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">type_complexity</span>)]</span>
+    <span class="ident">interactions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Interaction</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>,
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">type_complexity</span>)]</span>
+    <span class="ident">logger</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">step_precision</span>: <span class="ident">StepPrecision</span>,
+    <span class="ident">error_tolerance</span>: <span class="ident">f64</span>,
+    <span class="ident">threshold_number_density</span>: <span class="ident">f64</span>,
+}
 
-    <span class="kw">type</span> <span class="ident">Context</span> <span class="op">=</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Create a new instance of the number density solver.</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">SolverBuilder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Creates a new builder for the Boltzmann solver.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The default range of temperatures span 1 GeV through to 10^{20} GeV.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="doccomment">/// The default range of temperatures span 1 GeV through to 10^{20} GeV, and</span>
+    <span class="doccomment">/// it uses normalization by default.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Most of the method for the builder are intended to be chained one after</span>
+    <span class="doccomment">/// the other.  The two notable exceptions which use the builder by</span>
+    <span class="doccomment">/// reference are [`SolverBuilder::add_interaction`] and</span>
+    <span class="doccomment">/// [`SolverBuilder::logger`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use boltzmann_solver::solver::{EmptyModel, number_density::SolverBuilder};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut solver_builder: SolverBuilder&lt;EmptyModel&gt; = SolverBuilder::new()</span>
+    <span class="doccomment">///     .initial_conditions(vec![1.2, 1.3])</span>
+    <span class="doccomment">///     .beta_range(1e-10, 1e-6)</span>
+    <span class="doccomment">///     .equilibrium(vec![0]);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // builder.add_interaction(..);</span>
+    <span class="doccomment">/// // builder.logger(..);</span>
+    <span class="doccomment">/// // let solver = solver_builder.build();</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
-            <span class="ident">initialized</span>: <span class="bool-val">false</span>,
+            <span class="ident">normalized</span>: <span class="bool-val">true</span>,
+            <span class="ident">model</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="op">|</span><span class="ident">beta</span><span class="op">|</span> <span class="ident">M</span>::<span class="ident">new</span>(<span class="ident">beta</span>)),
+            <span class="ident">initial_conditions</span>: <span class="macro">array</span><span class="macro">!</span>[],
             <span class="ident">beta_range</span>: (<span class="number">1e-20</span>, <span class="number">1e0</span>),
-            <span class="ident">particles</span>: <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="number">20</span>),
-            <span class="ident">initial_conditions</span>: <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="number">20</span>),
-            <span class="ident">interactions</span>: <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="number">100</span>),
+            <span class="ident">equilibrium</span>: <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="number">128</span>),
+            <span class="ident">interactions</span>: <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="number">128</span>),
             <span class="ident">logger</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {}),
-            <span class="ident">model_fn</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>),
-            <span class="ident">step_change</span>: <span class="ident">StepChange</span>::<span class="ident">default</span>(),
             <span class="ident">step_precision</span>: <span class="ident">StepPrecision</span>::<span class="ident">default</span>(),
             <span class="ident">error_tolerance</span>: <span class="number">1e-4</span>,
             <span class="ident">threshold_number_density</span>: <span class="number">0.0</span>,
         }
     }
 
-    <span class="doccomment">/// Set the range of inverse temperature values over which the phase space</span>
-    <span class="doccomment">/// is evolved.</span>
+    <span class="doccomment">/// Specify whether the solver is dealing with normalized quantities or not.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If normalized, the number densities are normalized to the number density</span>
+    <span class="doccomment">/// of a single massless bosonic degree of freedom.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normalized</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">normalized</span> <span class="op">=</span> <span class="ident">val</span>;
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Set a model function.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Add a function that can modify the model before it is used by the</span>
+    <span class="doccomment">/// context.  This is particularly useful if there is a baseline model with</span>
+    <span class="doccomment">/// fixed parameters and only certain parameters are changed.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-&gt;</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">M</span>,
+    {
+        <span class="self">self</span>.<span class="ident">model</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">f</span>);
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Specify initial conditions explicitly for the number densities.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The list of number densities must be in the same order as the particles</span>
+    <span class="doccomment">/// in the model.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initial_conditions</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">I</span>) <span class="op">-&gt;</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span>,
+    {
+        <span class="self">self</span>.<span class="ident">initial_conditions</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">from_iter</span>(<span class="ident">v</span>);
+
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Set the range of inverse temperature values over which the solution is</span>
+    <span class="doccomment">/// calculated.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Inverse temperature must be provided in units of GeV^{-1}.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This function has a convenience alternative called</span>
-    <span class="doccomment">/// [`Solver::temperature_range`] allowing for the limits to be specified as</span>
+    <span class="doccomment">/// [`SolverBuilder::temperature_range`] allowing for the limits to be specified as</span>
     <span class="doccomment">/// temperature in the units of GeV.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if the starting value is larger than the final value.</span>
-    <span class="kw">fn</span> <span class="ident">beta_range</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">start</span>: <span class="ident">f64</span>, <span class="ident">end</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">beta_range</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">start</span>: <span class="ident">f64</span>, <span class="ident">end</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="macro">assert</span><span class="macro">!</span>(
             <span class="ident">start</span> <span class="op">&lt;</span> <span class="ident">end</span>,
             <span class="string">&quot;The initial β must be smaller than the final β value.&quot;</span>
@@ -1095,13 +1365,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Temperature must be provided in units of GeV.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is a convenience alternative to</span>
-    <span class="doccomment">/// [`NumberDensitySolver::beta_range`].</span>
+    <span class="doccomment">/// This function is a convenience alternative to [`Solver::beta_range`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if the starting value is smaller than the final value.</span>
-    <span class="kw">fn</span> <span class="ident">temperature_range</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">start</span>: <span class="ident">f64</span>, <span class="ident">end</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">temperature_range</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">start</span>: <span class="ident">f64</span>, <span class="ident">end</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="macro">assert</span><span class="macro">!</span>(
             <span class="ident">start</span> <span class="op">&gt;</span> <span class="ident">end</span>,
             <span class="string">&quot;The initial temperature must be larger than the final temperature.&quot;</span>
@@ -1110,22 +1379,82 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">step_change</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">increase</span>: <span class="ident">f64</span>, <span class="ident">decrease</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
-        <span class="macro">assert</span><span class="macro">!</span>(
-            <span class="ident">increase</span> <span class="op">&gt;</span> <span class="number">1.0</span>,
-            <span class="string">&quot;The multiplicative factor to increase the step size must be greater
-            than 1.&quot;</span>
-        );
-        <span class="macro">assert</span><span class="macro">!</span>(
-            <span class="ident">decrease</span> <span class="op">&lt;</span> <span class="number">1.0</span>,
-            <span class="string">&quot;The multiplicative factor to decrease the step size must be greater
-            than 1.&quot;</span>
-        );
-        <span class="self">self</span>.<span class="ident">step_change</span> <span class="op">=</span> <span class="ident">StepChange</span> { <span class="ident">increase</span>, <span class="ident">decrease</span> };
+    <span class="doccomment">/// Specify the particles which must remain in equilibrium.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// These particles are specified by index, with these particles remaining</span>
+    <span class="doccomment">/// in equilibrium no matter what the interactions are.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">equilibrium</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">eq</span>: <span class="ident">I</span>) <span class="op">-&gt;</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">usize</span><span class="op">&gt;</span>,
+    {
+        <span class="self">self</span>.<span class="ident">equilibrium</span> <span class="op">=</span> <span class="ident">eq</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">step_precision</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">min</span>: <span class="ident">f64</span>, <span class="ident">max</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="doccomment">/// Add an interaction.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The interaction is a functional of the solution at a particular inverse</span>
+    <span class="doccomment">/// temperature.  The function is of the following form:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// f(n: &amp;Array1&lt;f64&gt;, c: &amp;Context) -&gt; Interaction</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The first argument contains the values of the various</span>
+    <span class="doccomment">/// number densities calculated so far, with the context being given in</span>
+    <span class="doccomment">/// the second argument.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The returned value is an instance of `Interaction`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_interaction</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>)
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Interaction</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Sync</span>,
+    {
+        <span class="self">self</span>.<span class="ident">interactions</span>.<span class="ident">push</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">f</span>));
+    }
+
+    <span class="doccomment">/// Set the logger.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The logger provides some insight into the numerical integration &#39;black</span>
+    <span class="doccomment">/// box&#39;.  Specifically, it is run at the start of each integration step and</span>
+    <span class="doccomment">/// has access to the current value as a `&amp;Array1`, the change from this</span>
+    <span class="doccomment">/// step as a `&amp;Solution`, and the current `Context` at the start of the</span>
+    <span class="doccomment">/// integration step.  As a result, for the first step, the solution will be</span>
+    <span class="doccomment">/// equal to the initial conditions.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is useful if one wants to track the evolution of the solutions and</span>
+    <span class="doccomment">/// log these in a CSV file.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">logger</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>)
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>),
+    {
+        <span class="self">self</span>.<span class="ident">logger</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">f</span>);
+    }
+
+    <span class="doccomment">/// Specify how large or small the step size is allowed to become.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The evolution of number densities are discretized in steps of \\(h\\)</span>
+    <span class="doccomment">/// such that \\(\beta_{i+1} = \beta_{i} + h\\).  The algorithm will</span>
+    <span class="doccomment">/// determine automatically the optimal step size \\(h\\) such that the</span>
+    <span class="doccomment">/// error is deemed acceptable; however, one may wish to override this to</span>
+    <span class="doccomment">/// prevent step sizes which are either too large or too small.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The step precision sets the range of allowed values of \\(h\\) in</span>
+    <span class="doccomment">/// proportion to the current value of \\(\beta\\):</span>
+    <span class="doccomment">/// \\begin{equation}</span>
+    <span class="doccomment">///   p_\text{min} \beta &lt; h &lt; p_\text{max} \beta</span>
+    <span class="doccomment">/// \\end{equation}</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The default values are `min = 1e-10` and `max = 1.0`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The relative step precision has a higher priority on the step size than</span>
+    <span class="doccomment">/// the error.  That is, the step size will never be less than</span>
+    <span class="doccomment">/// \\(p_\text{min} \beta\\) even if this results in a larger local error</span>
+    <span class="doccomment">/// than desired.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Panic</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This will panic if `min &gt;= max`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">step_precision</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">min</span>: <span class="ident">f64</span>, <span class="ident">max</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="macro">assert</span><span class="macro">!</span>(
             <span class="ident">min</span> <span class="op">&lt;</span> <span class="ident">max</span>,
             <span class="string">&quot;Minimum step precision must be smaller than the maximum step precision.&quot;</span>
@@ -1134,204 +1463,21 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">error_tolerance</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="doccomment">/// Specify the local error tolerance.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The algorithm will adjust the evolution step size such that the local</span>
+    <span class="doccomment">/// error remains less than the specified the error tolerance.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that the error is only ever estimated and thus may occasionally be</span>
+    <span class="doccomment">/// inaccurate.  Furthermore, the [`Solver::step_precision`] takes</span>
+    <span class="doccomment">/// precedence and thus if a large minimum step precision is requested, the</span>
+    <span class="doccomment">/// local error may be larger than the error tolerance.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_tolerance</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">tol</span> <span class="op">&gt;</span> <span class="number">0.0</span>, <span class="string">&quot;The tolerance must be greater than 0.&quot;</span>);
         <span class="self">self</span>.<span class="ident">error_tolerance</span> <span class="op">=</span> <span class="ident">tol</span>;
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">initialized</span> <span class="op">=</span> <span class="bool-val">true</span>;
-
-        <span class="self">self</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">add_particle</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="ident">Particle</span>, <span class="ident">initial_condition</span>: <span class="ident">InitialCondition</span>) {
-        <span class="kw">match</span> <span class="ident">initial_condition</span> {
-            <span class="ident">InitialCondition</span>::<span class="ident">Equilibrium</span>(<span class="ident">mu</span>) <span class="op">=&gt;</span> <span class="self">self</span>
-                .<span class="ident">initial_conditions</span>
-                .<span class="ident">push</span>(<span class="ident">s</span>.<span class="ident">normalized_number_density</span>(<span class="ident">mu</span>, <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">0</span>)),
-            <span class="ident">InitialCondition</span>::<span class="ident">Fixed</span>(<span class="ident">n</span>) <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">initial_conditions</span>.<span class="ident">push</span>(<span class="ident">n</span>),
-            <span class="ident">InitialCondition</span>::<span class="ident">Zero</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">initial_conditions</span>.<span class="ident">push</span>(<span class="number">0.0</span>),
-        }
-
-        <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">push</span>(<span class="ident">s</span>);
-    }
-
-    <span class="kw">fn</span> <span class="ident">add_particles</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">I</span>)
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Particle</span><span class="op">&gt;</span>,
-    {
-        <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">extend</span>(<span class="ident">iter</span>);
-    }
-
-    <span class="kw">fn</span> <span class="ident">add_interaction</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="self">Self</span>::<span class="ident">Solution</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Solution</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Context</span>) <span class="op">-&gt;</span> <span class="self">Self</span>::<span class="ident">Solution</span>,
-    {
-        <span class="self">self</span>.<span class="ident">interactions</span>.<span class="ident">push</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">f</span>));
-        <span class="self">self</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">set_logger</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Solution</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Solution</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Context</span>),
-    {
-        <span class="self">self</span>.<span class="ident">logger</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">f</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">many_single_char_names</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">solve</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">universe</span>: <span class="kw-2">&amp;</span><span class="ident">U</span>) <span class="op">-&gt;</span> <span class="self">Self</span>::<span class="ident">Solution</span>
-    <span class="kw">where</span>
-        <span class="ident">U</span>: <span class="ident">Universe</span>,
-    {
-        <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">tableau</span>::<span class="ident">dp87</span>::<span class="kw-2">*</span>;
-
-        <span class="macro">assert</span><span class="macro">!</span>(
-            <span class="self">self</span>.<span class="ident">initialized</span>,
-            <span class="string">&quot;The phase space solver has to be initialized first with the `initialize()` method.&quot;</span>
-        );
-
-        <span class="comment">// Initialize all the variables that will be used in the integration</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">from_vec</span>(<span class="self">self</span>.<span class="ident">initial_conditions</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dn</span> <span class="op">=</span> [
-            <span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()),
-            <span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()),
-        ];
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k</span>: [<span class="self">Self</span>::<span class="ident">Solution</span>; <span class="ident">RK_S</span>];
-        <span class="kw">unsafe</span> {
-            <span class="ident">k</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">uninitialized</span>();
-            <span class="kw">for</span> <span class="ident">ki</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">k</span>[..] {
-                <span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">write</span>(<span class="ident">ki</span>, <span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()));
-            }
-        };
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">beta</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span>;
-
-        <span class="comment">// Create the initial context and log the initial conditions</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">universe</span>);
-        (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">logger</span>)(<span class="kw-2">&amp;</span><span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="ident">c</span>);
-
-        <span class="kw">while</span> <span class="ident">beta</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">1</span> {
-            <span class="ident">step</span> <span class="op">+=</span> <span class="number">1</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">advance</span> <span class="op">=</span> <span class="bool-val">false</span>;
-
-            <span class="comment">// Compute each k[i]</span>
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">RK_S</span> {
-                <span class="kw">let</span> <span class="ident">beta_i</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">+</span> <span class="ident">RK_C</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">h</span>;
-                <span class="kw">let</span> <span class="ident">ci</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta_i</span>, <span class="ident">universe</span>);
-                <span class="kw">let</span> <span class="ident">ai</span> <span class="op">=</span> <span class="ident">RK_A</span>[<span class="ident">i</span>];
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dni</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">i</span>).<span class="ident">fold</span>(<span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">total</span>, <span class="ident">j</span><span class="op">|</span> {
-                    <span class="ident">total</span> <span class="op">+</span> <span class="ident">ai</span>[<span class="ident">j</span>] <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">j</span>]
-                });
-                <span class="kw">let</span> <span class="ident">ni</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">n_plus_dn</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dni</span>, <span class="kw-2">&amp;</span><span class="ident">ci</span>);
-                <span class="ident">k</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">h</span> <span class="op">*</span> <span class="self">self</span>
-                    .<span class="ident">interactions</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">fold</span>(<span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">s</span>, <span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">s</span>, <span class="kw-2">&amp;</span><span class="ident">ni</span>, <span class="kw-2">&amp;</span><span class="ident">ci</span>));
-            }
-
-            <span class="comment">// Calculate the two estimates for dn</span>
-            <span class="ident">dn</span>[<span class="number">0</span>] <span class="op">=</span> (<span class="number">0</span>..<span class="ident">RK_S</span>).<span class="ident">fold</span>(<span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">total</span>, <span class="ident">i</span><span class="op">|</span> {
-                <span class="ident">total</span> <span class="op">+</span> <span class="ident">RK_B</span>[<span class="number">0</span>][<span class="ident">i</span>] <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">i</span>]
-            });
-            <span class="ident">dn</span>[<span class="number">1</span>] <span class="op">=</span> (<span class="number">0</span>..<span class="ident">RK_S</span>).<span class="ident">fold</span>(<span class="self">Self</span>::<span class="ident">Solution</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">total</span>, <span class="ident">i</span><span class="op">|</span> {
-                <span class="ident">total</span> <span class="op">+</span> <span class="ident">RK_B</span>[<span class="number">1</span>][<span class="ident">i</span>] <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">i</span>]
-            });
-
-            <span class="comment">// Get the error between the estimates</span>
-            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">Zip</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>])
-                .<span class="ident">and</span>(<span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">1</span>])
-                .<span class="ident">fold_while</span>(<span class="number">0.0f64</span>, <span class="op">|</span><span class="ident">e</span>, <span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> (<span class="ident">a</span> <span class="op">-</span> <span class="ident">b</span>).<span class="ident">abs</span>();
-                    <span class="ident">FoldWhile</span>::<span class="ident">Continue</span>(<span class="ident">e</span>.<span class="ident">max</span>(<span class="ident">v</span>))
-                })
-                .<span class="ident">into_inner</span>()
-                <span class="op">/</span> <span class="ident">h</span>;
-
-            <span class="comment">// If the error is within the tolerance, we&#39;ll be advancing the</span>
-            <span class="comment">// iteration step</span>
-            <span class="kw">if</span> <span class="ident">err</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">error_tolerance</span> {
-                <span class="ident">advance</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            }
-
-            <span class="comment">// Compute the change in step size based on the current error And</span>
-            <span class="comment">// correspondingly adjust the step size</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h_est</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">err</span> <span class="op">==</span> <span class="number">0.0</span> {
-                <span class="ident">h</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_change</span>.<span class="ident">increase</span>
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="number">0.9</span> <span class="op">*</span> (<span class="self">self</span>.<span class="ident">error_tolerance</span> <span class="op">/</span> <span class="ident">err</span>).<span class="ident">powf</span>(<span class="number">1.0</span> <span class="op">/</span> <span class="ident">f64</span>::<span class="ident">from</span>(<span class="ident">RK_ORDER</span> <span class="op">+</span> <span class="number">1</span>));
-
-                <span class="ident">h</span> <span class="op">*</span> <span class="kw">if</span> <span class="ident">delta</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">step_change</span>.<span class="ident">decrease</span> {
-                    <span class="self">self</span>.<span class="ident">step_change</span>.<span class="ident">decrease</span>
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">delta</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">step_change</span>.<span class="ident">increase</span> {
-                    <span class="self">self</span>.<span class="ident">step_change</span>.<span class="ident">increase</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">delta</span>
-                }
-            };
-
-            <span class="comment">// Prevent h from getting too small or too big in proportion to the</span>
-            <span class="comment">// current value of beta.  Also advance the integration irrespective</span>
-            <span class="comment">// of the local error if we reach the maximum or minimum step size.</span>
-            <span class="kw">if</span> <span class="ident">h_est</span> <span class="op">&gt;</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">max</span> {
-                <span class="ident">h_est</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">max</span>;
-                <span class="macro">debug</span><span class="macro">!</span>(
-                    <span class="string">&quot;[Step {:}, β = {:.4e}] Step size too large, decreased h to {:.3e}&quot;</span>,
-                    <span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">h_est</span>
-                );
-                <span class="ident">advance</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">h_est</span> <span class="op">&lt;</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span> {
-                <span class="ident">h_est</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span>;
-                <span class="macro">debug</span><span class="macro">!</span>(
-                    <span class="string">&quot;[Step {:}, β = {:.4e}] Step size too small, increased h to {:.3e}&quot;</span>,
-                    <span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">h_est</span>
-                );
-                <span class="ident">advance</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            }
-
-            <span class="comment">// Check if the error is within the tolerance, or we are advancing</span>
-            <span class="comment">// irrespective of the local error</span>
-            <span class="kw">if</span> <span class="ident">advance</span> {
-                <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">universe</span>);
-
-                <span class="comment">// Advance n and beta</span>
-                <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">n_plus_dn</span>(<span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dn</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="ident">c</span>);
-                <span class="ident">beta</span> <span class="op">+=</span> <span class="ident">h</span>;
-
-                <span class="comment">// Run the logger now</span>
-                (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">logger</span>)(<span class="kw-2">&amp;</span><span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">dn</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="ident">c</span>);
-            }
-
-            <span class="comment">// Adjust final integration step if needed</span>
-            <span class="kw">if</span> <span class="ident">beta</span> <span class="op">+</span> <span class="ident">h_est</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">1</span> {
-                <span class="macro">debug</span><span class="macro">!</span>(
-                    <span class="string">&quot;[Step {:}, β = {:.4e}] Fixing overshoot of last integration step.&quot;</span>,
-                    <span class="ident">step</span>, <span class="ident">beta</span>
-                );
-                <span class="ident">h_est</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">1</span> <span class="op">-</span> <span class="ident">beta</span>;
-            }
-
-            <span class="ident">h</span> <span class="op">=</span> <span class="ident">h_est</span>;
-        }
-
-        <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Number of integration steps: {}&quot;</span>, <span class="ident">step</span>);
-
-        <span class="ident">n</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">NumberDensitySolver</span><span class="op">&lt;</span><span class="ident">EmptyModel</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>()
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span><span class="op">&gt;</span> <span class="ident">NumberDensitySolver</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Set the threshold number density to count as 0.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Any number density whose absolute value is less than the threshold will</span>
@@ -1339,7 +1485,9 @@
     <span class="doccomment">/// number densities as well as equilibrium number densities.  Furthermore,</span>
     <span class="doccomment">/// this also applies to &#39;abstract&#39; number densities such as \\(B-L\\).</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is by default set to `0.0`.</span>
+    <span class="doccomment">/// This is by default set to `1e-20` for normalized number density, or</span>
+    <span class="doccomment">/// `1e-20 * n` for non-normalized number densities, where `n` is the number</span>
+    <span class="doccomment">/// density of a massless bosonic degree of freedom.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
@@ -1353,112 +1501,270 @@
         <span class="self">self</span>
     }
 
+    <span class="doccomment">/// Build the Boltzmann solver.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">model</span>)((<span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">0</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">1</span>).<span class="ident">sqrt</span>());
+        <span class="kw">let</span> <span class="ident">particles</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">particles</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="self">self</span>.<span class="ident">initial_conditions</span>.<span class="ident">len</span>(),
+            <span class="ident">particles</span>.<span class="ident">len</span>(),
+            <span class="string">&quot;The number of particles in the model ({}) is different to the number of initial conditions ({}).&quot;</span>,
+            <span class="ident">particles</span>.<span class="ident">len</span>(),
+            <span class="self">self</span>.<span class="ident">initial_conditions</span>.<span class="ident">len</span>(),
+        );
+
+        <span class="ident">Solver</span> {
+            <span class="ident">normalized</span>: <span class="self">self</span>.<span class="ident">normalized</span>,
+            <span class="ident">initial_conditions</span>: <span class="self">self</span>.<span class="ident">initial_conditions</span>,
+            <span class="ident">beta_range</span>: <span class="self">self</span>.<span class="ident">beta_range</span>,
+            <span class="ident">model</span>: <span class="self">self</span>.<span class="ident">model</span>,
+            <span class="ident">interactions</span>: <span class="self">self</span>.<span class="ident">interactions</span>,
+            <span class="ident">equilibrium</span>: <span class="self">self</span>.<span class="ident">equilibrium</span>,
+            <span class="ident">logger</span>: <span class="self">self</span>.<span class="ident">logger</span>,
+            <span class="ident">step_precision</span>: <span class="self">self</span>.<span class="ident">step_precision</span>,
+            <span class="ident">error_tolerance</span>: <span class="self">self</span>.<span class="ident">error_tolerance</span>,
+            <span class="ident">threshold_number_density</span>: <span class="self">self</span>.<span class="ident">threshold_number_density</span>,
+        }
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SolverBuilder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span>::<span class="ident">new</span>()
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Evolve the initial conditions by solving the PDEs.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that this is not a true PDE solver, but instead converts the PDE</span>
+    <span class="doccomment">/// into an ODE in time (or inverse temperature in this case), with the</span>
+    <span class="doccomment">/// derivative in energy being calculated solely from the previous</span>
+    <span class="doccomment">/// time-step.</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">cognitive_complexity</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">solve</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">universe</span>: <span class="kw-2">&amp;</span><span class="ident">U</span>) <span class="op">-&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">U</span>: <span class="ident">Universe</span>,
+    {
+        <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">tableau</span>::<span class="ident">rk87</span>::<span class="kw-2">*</span>;
+
+        <span class="comment">// Initialize all the variables that will be used in the integration</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">initial_conditions</span>.<span class="ident">clone</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dn</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dn_err</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>());
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k</span>: [<span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>; <span class="ident">RK_S</span>];
+        <span class="kw">unsafe</span> {
+            <span class="ident">k</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>().<span class="ident">assume_init</span>();
+            <span class="kw">for</span> <span class="ident">ki</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">k</span>[..] {
+                <span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">write</span>(<span class="ident">ki</span>, <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()));
+            }
+        };
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">evals</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">beta</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">0</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">advance</span>;
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">h</span>, <span class="ident">beta</span>, <span class="ident">universe</span>);
+        (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">logger</span>)(<span class="kw-2">&amp;</span><span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">dn</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>);
+
+        <span class="kw">while</span> <span class="ident">beta</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">1</span> {
+            <span class="ident">step</span> <span class="op">+=</span> <span class="number">1</span>;
+            <span class="ident">advance</span> <span class="op">=</span> <span class="bool-val">false</span>;
+            <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">h</span>, <span class="ident">beta</span>, <span class="ident">universe</span>);
+            <span class="ident">dn</span>.<span class="ident">fill</span>(<span class="number">0.0</span>);
+            <span class="ident">dn_err</span>.<span class="ident">fill</span>(<span class="number">0.0</span>);
+
+            <span class="comment">// Ensure that h is within the desired range of step sizes.</span>
+            <span class="kw">let</span> <span class="ident">h_on_beta</span> <span class="op">=</span> <span class="ident">h</span> <span class="op">/</span> <span class="ident">beta</span>;
+            <span class="kw">if</span> <span class="ident">h_on_beta</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">max</span> {
+                <span class="ident">h</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">max</span>;
+                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Step size too large, decreased h to {:.3e}&quot;</span>, <span class="ident">h</span>);
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">h_on_beta</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span> {
+                <span class="ident">h</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span>;
+                <span class="ident">log</span>::<span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Step size too small, increased h to {:.3e}&quot;</span>, <span class="ident">h</span>);
+                <span class="comment">// Irrespective of the local error, if we&#39;re at the minimum step</span>
+                <span class="comment">// size we&#39;ll be integrating this step.</span>
+                <span class="ident">advance</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            }
+
+            <span class="comment">// Log the progress of the integration</span>
+            <span class="kw">if</span> <span class="ident">step</span> <span class="op">%</span> <span class="number">1000</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="ident">log</span>::<span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Step {}, β = {:.4e}&quot;</span>, <span class="ident">step</span>, <span class="ident">beta</span>);
+                <span class="ident">log</span>::<span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;n = {:.3e}&quot;</span>, <span class="ident">n</span>);
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">step</span> <span class="op">%</span> <span class="number">100</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="ident">log</span>::<span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Step {}, , β = {:.4e}&quot;</span>, <span class="ident">step</span>, <span class="ident">beta</span>);
+                <span class="ident">log</span>::<span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;n = {:.3e}&quot;</span>, <span class="ident">n</span>);
+            } <span class="kw">else</span> {
+                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Step {}, β = {:.4e}, h = {:.4e}&quot;</span>, <span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">h</span>);
+                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;n = {:.3e}&quot;</span>, <span class="ident">n</span>);
+            }
+
+            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">RK_S</span> {
+                <span class="ident">evals</span> <span class="op">+=</span> <span class="number">1</span>;
+
+                <span class="comment">// Compute the sub-step values</span>
+                <span class="kw">let</span> <span class="ident">beta_i</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">+</span> <span class="ident">RK_C</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">h</span>;
+                <span class="kw">let</span> <span class="ident">ai</span> <span class="op">=</span> <span class="ident">RK_A</span>[<span class="ident">i</span>];
+                <span class="kw">let</span> <span class="ident">ni</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">i</span>).<span class="ident">fold</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="op">|</span><span class="ident">total</span>, <span class="ident">j</span><span class="op">|</span> <span class="ident">total</span> <span class="op">+</span> <span class="ident">ai</span>[<span class="ident">j</span>] <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">j</span>]);
+                <span class="kw">let</span> <span class="ident">ci</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">h</span>, <span class="ident">beta_i</span>, <span class="ident">universe</span>);
+                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot; n[{:0&gt;2}] = {:&gt;10.3e}&quot;</span>, <span class="ident">i</span>, <span class="ident">ni</span>);
+                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;eq[{:0&gt;2}] = {:&gt;10.3e}&quot;</span>, <span class="ident">i</span>, <span class="ident">ci</span>.<span class="ident">eq</span>);
+
+                <span class="comment">// Compute k[i] from each interaction</span>
+                <span class="kw">let</span> <span class="ident">ki</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">k</span>[<span class="ident">i</span>];
+                <span class="kw-2">*</span><span class="ident">ki</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">normalized</span> {
+                    <span class="self">self</span>.<span class="ident">interactions</span>
+                        .<span class="ident">par_iter</span>()
+                        .<span class="ident">fold</span>(
+                            <span class="op">||</span> <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()),
+                            <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">dn</span>, <span class="ident">f</span><span class="op">|</span> {
+                                <span class="kw">for</span> <span class="kw-2">mut</span> <span class="ident">interaction</span> <span class="kw">in</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">ni</span>, <span class="kw-2">&amp;</span><span class="ident">ci</span>) {
+                                    <span class="ident">interaction</span> <span class="op">*=</span> <span class="ident">ci</span>.<span class="ident">normalization</span> <span class="op">*</span> <span class="ident">h</span>;
+                                    <span class="ident">dn</span> <span class="op">=</span> <span class="ident">interaction</span>.<span class="ident">dn</span>(<span class="ident">dn</span>, <span class="kw-2">&amp;</span><span class="ident">ni</span>, <span class="kw-2">&amp;</span><span class="ident">ci</span>);
+                                }
+                                <span class="ident">dn</span>
+                            },
+                        )
+                        .<span class="ident">reduce</span>(<span class="op">||</span> <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()), <span class="op">|</span><span class="ident">dn</span>, <span class="ident">dni</span><span class="op">|</span> <span class="ident">dn</span> <span class="op">+</span> <span class="ident">dni</span>)
+                } <span class="kw">else</span> {
+                    <span class="macro">unimplemented</span><span class="macro">!</span>()
+                };
+                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot; k[{:0&gt;2}] = {:&gt;10.3e}&quot;</span>, <span class="ident">i</span>, <span class="ident">ki</span>);
+
+                <span class="comment">// Set changes to zero for those particles in equilibrium</span>
+                <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">eq</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">equilibrium</span> {
+                    <span class="ident">ki</span>[<span class="ident">eq</span>] <span class="op">=</span> <span class="number">0.0</span>;
+                }
+
+                <span class="kw">let</span> <span class="ident">bi</span> <span class="op">=</span> <span class="ident">RK_B</span>[<span class="ident">i</span>];
+                <span class="kw">let</span> <span class="ident">ei</span> <span class="op">=</span> <span class="ident">RK_E</span>[<span class="ident">i</span>];
+                <span class="ident">Zip</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dn</span>)
+                    .<span class="ident">and</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dn_err</span>)
+                    .<span class="ident">and</span>(<span class="ident">ki</span>)
+                    .<span class="ident">apply</span>(<span class="op">|</span><span class="ident">dn</span>, <span class="ident">dn_err</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ki</span><span class="op">|</span> {
+                        <span class="kw-2">*</span><span class="ident">dn</span> <span class="op">+=</span> <span class="ident">bi</span> <span class="op">*</span> <span class="ident">ki</span>;
+                        <span class="kw-2">*</span><span class="ident">dn_err</span> <span class="op">+=</span> <span class="ident">ei</span> <span class="op">*</span> <span class="ident">ki</span>;
+                    })
+            }
+
+            <span class="comment">// Adjust dn for those particles in equilibrium</span>
+            <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">eq</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">equilibrium</span> {
+                <span class="ident">dn</span>[<span class="ident">eq</span>] <span class="op">=</span> <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">eq</span>] <span class="op">-</span> <span class="ident">n</span>[<span class="ident">eq</span>];
+            }
+
+            <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;    dn = {:&gt;10.3e}&quot;</span>, <span class="ident">dn</span>);
+            <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;dn_err = {:&gt;10.3e}&quot;</span>, <span class="ident">dn_err</span>);
+
+            <span class="comment">// Get the local error using L∞-norm</span>
+            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">dn_err</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="number">0f64</span>, <span class="op">|</span><span class="ident">e</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">max</span>(<span class="ident">v</span>.<span class="ident">abs</span>()));
+            <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Error = {:.3e}&quot;</span>, <span class="ident">err</span>);
+
+            <span class="comment">// If the error is within the tolerance, we&#39;ll be advancing the</span>
+            <span class="comment">// iteration step</span>
+            <span class="kw">if</span> <span class="ident">err</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">error_tolerance</span> {
+                <span class="ident">advance</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            } <span class="kw">else</span> {
+                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Error is not within tolerance.&quot;</span>);
+            }
+
+            <span class="comment">// Compute the change in step size based on the current error and</span>
+            <span class="comment">// correspondingly adjust the step size</span>
+            <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">err</span> <span class="op">==</span> <span class="number">0.0</span> {
+                <span class="number">10.0</span>
+            } <span class="kw">else</span> {
+                <span class="number">0.9</span> <span class="op">*</span> (<span class="self">self</span>.<span class="ident">error_tolerance</span> <span class="op">/</span> <span class="ident">err</span>).<span class="ident">powf</span>(<span class="number">1.0</span> <span class="op">/</span> <span class="ident">f64</span>::<span class="ident">from</span>(<span class="ident">RK_ORDER</span> <span class="op">+</span> <span class="number">1</span>))
+            };
+            <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Δ = {:.3e}&quot;</span>, <span class="ident">delta</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h_est</span> <span class="op">=</span> <span class="ident">h</span> <span class="op">*</span> <span class="ident">delta</span>;
+
+            <span class="comment">// Update n and beta</span>
+            <span class="kw">if</span> <span class="ident">advance</span> {
+                <span class="comment">// Advance n and beta</span>
+                <span class="ident">n</span> <span class="op">+=</span> <span class="kw-2">&amp;</span><span class="ident">dn</span>;
+                <span class="ident">beta</span> <span class="op">+=</span> <span class="ident">h</span>;
+
+                (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">logger</span>)(<span class="kw-2">&amp;</span><span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">dn</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>);
+            }
+
+            <span class="comment">// Adjust final integration step if needed</span>
+            <span class="kw">if</span> <span class="ident">beta</span> <span class="op">+</span> <span class="ident">h_est</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">1</span> {
+                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Fixing overshoot of last integration step.&quot;</span>);
+                <span class="ident">h_est</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">1</span> <span class="op">-</span> <span class="ident">beta</span>;
+            }
+
+            <span class="ident">h</span> <span class="op">=</span> <span class="ident">h_est</span>;
+        }
+
+        <span class="ident">log</span>::<span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Number of integration steps: {}&quot;</span>, <span class="ident">step</span>);
+        <span class="ident">log</span>::<span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Number of evaluations: {}&quot;</span>, <span class="ident">evals</span>);
+
+        <span class="ident">n</span>
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">apply_threshold</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">normalized</span> {
+            <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="ident">n</span> {
+                <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">threshold_number_density</span> {
+                    <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="number">0.0</span>
+                }
+            }
+        } <span class="kw">else</span> {
+            <span class="macro">unimplemented</span><span class="macro">!</span>()
+        }
+    }
+
     <span class="doccomment">/// Create an array containing the initial conditions for all the particle</span>
     <span class="doccomment">/// species.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// All particles species are assumed to be in thermal equilibrium at this</span>
     <span class="doccomment">/// energy, with the distribution following either the Bose–Einstein or</span>
     <span class="doccomment">/// Fermi–Dirac distribution as determined by their spin.</span>
-    <span class="kw">fn</span> <span class="ident">equilibrium_number_densities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-        <span class="ident">Array1</span>::<span class="ident">from_iter</span>(<span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">normalized_number_density</span>(<span class="number">0.0</span>, <span class="ident">beta</span>);
-            <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">threshold_number_density</span> {
-                <span class="number">0.0</span>
-            } <span class="kw">else</span> {
-                <span class="ident">v</span>
-            }
-        }))
-    }
-
-    <span class="doccomment">/// Set a model function.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Add a function that can modify the model before it is used by the</span>
-    <span class="doccomment">/// context.  This is particularly useful if there is a baseline model with</span>
-    <span class="doccomment">/// fixed parameters and only certain parameters are changed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model_fn</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">M</span>) <span class="op">-&gt;</span> <span class="ident">M</span>,
-    {
-        <span class="self">self</span>.<span class="ident">model_fn</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">f</span>);
-        <span class="self">self</span>
+    <span class="kw">fn</span> <span class="ident">equilibrium_number_densities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">beta</span>: <span class="ident">f64</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">M</span>) <span class="op">-&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">eq</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">normalized</span> {
+            <span class="ident">Array1</span>::<span class="ident">from_iter</span>(
+                <span class="ident">model</span>
+                    .<span class="ident">particles</span>()
+                    .<span class="ident">iter</span>()
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">normalized_number_density</span>(<span class="number">0.0</span>, <span class="ident">beta</span>)),
+            )
+        } <span class="kw">else</span> {
+            <span class="macro">unimplemented</span><span class="macro">!</span>()
+        };
+        <span class="self">self</span>.<span class="ident">apply_threshold</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">eq</span>);
+        <span class="ident">eq</span>
     }
 
     <span class="doccomment">/// Generate the context at a given beta to pass to the logger/interaction</span>
     <span class="doccomment">/// functions.</span>
-    <span class="kw">fn</span> <span class="ident">context</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Universe</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">step</span>: <span class="ident">u64</span>, <span class="ident">beta</span>: <span class="ident">f64</span>, <span class="ident">universe</span>: <span class="kw-2">&amp;</span><span class="ident">U</span>) <span class="op">-&gt;</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">context</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Universe</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">step</span>: <span class="ident">u64</span>,
+        <span class="ident">step_size</span>: <span class="ident">f64</span>,
+        <span class="ident">beta</span>: <span class="ident">f64</span>,
+        <span class="ident">universe</span>: <span class="kw-2">&amp;</span><span class="ident">U</span>,
+    ) <span class="op">-&gt;</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">model</span>)(<span class="ident">beta</span>);
+        <span class="kw">let</span> <span class="ident">hubble_rate</span> <span class="op">=</span> <span class="ident">universe</span>.<span class="ident">hubble_rate</span>(<span class="ident">beta</span>);
+        <span class="kw">let</span> <span class="ident">normalization</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">normalized</span> {
+            <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span>.<span class="ident">massless_number_density</span>(<span class="number">0.0</span>, <span class="ident">beta</span>);
+            (<span class="ident">hubble_rate</span> <span class="op">*</span> <span class="ident">beta</span> <span class="op">*</span> <span class="ident">n</span>).<span class="ident">recip</span>()
+        } <span class="kw">else</span> {
+            (<span class="ident">hubble_rate</span> <span class="op">*</span> <span class="ident">beta</span>).<span class="ident">recip</span>()
+        };
         <span class="ident">Context</span> {
             <span class="ident">step</span>,
+            <span class="ident">step_size</span>,
             <span class="ident">beta</span>,
-            <span class="ident">hubble_rate</span>: <span class="ident">universe</span>.<span class="ident">hubble_rate</span>(<span class="ident">beta</span>),
-            <span class="ident">eq_n</span>: <span class="self">self</span>.<span class="ident">equilibrium_number_densities</span>(<span class="ident">beta</span>),
-            <span class="ident">model</span>: (<span class="self">self</span>.<span class="ident">model_fn</span>)(<span class="ident">M</span>::<span class="ident">new</span>(<span class="ident">beta</span>)),
+            <span class="ident">hubble_rate</span>,
+            <span class="ident">normalization</span>,
+            <span class="ident">eq</span>: <span class="self">self</span>.<span class="ident">equilibrium_number_densities</span>(<span class="ident">beta</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>),
+            <span class="ident">model</span>,
         }
-    }
-
-    <span class="doccomment">/// Add `dn` to `n`, but set the result to the equilibrium number density if</span>
-    <span class="doccomment">/// the change overshoots it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is a strong process causing a particular number density to go</span>
-    <span class="doccomment">/// towards equilibrium, the iteration step may overshoot the equilibrium</span>
-    <span class="doccomment">/// point; and in the case where the process is *very* strong, it is</span>
-    <span class="doccomment">/// possible the overshooting is so bad that it generates an even larger</span>
-    <span class="doccomment">/// (opposite signed) number density.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// To avoid this, we set the number density to exactly the equilibrium</span>
-    <span class="doccomment">/// number density whenever this might occur forcing an evaluation with the</span>
-    <span class="doccomment">/// equilibrium number density.</span>
-    <span class="kw">fn</span> <span class="ident">n_plus_dn</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="kw-2">mut</span> <span class="ident">n</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Solution</span>,
-        <span class="ident">dn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Solution</span>,
-        <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Context</span>,
-    ) <span class="op">-&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Solver</span><span class="op">&gt;</span>::<span class="ident">Solution</span> {
-        <span class="ident">Zip</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">n</span>).<span class="ident">and</span>(<span class="ident">dn</span>).<span class="ident">and</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">eq_n</span>).<span class="ident">apply</span>(<span class="op">|</span><span class="ident">n</span>, <span class="ident">dn</span>, <span class="ident">eq_n</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">delta_1</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">-</span> <span class="ident">eq_n</span>;
-            <span class="kw">let</span> <span class="ident">delta_2</span> <span class="op">=</span> <span class="ident">delta_1</span> <span class="op">+</span> <span class="kw-2">*</span><span class="ident">dn</span>;
-
-            <span class="kw">if</span> <span class="ident">delta_1</span>.<span class="ident">is_sign_positive</span>() <span class="op">!=</span> <span class="ident">delta_2</span>.<span class="ident">is_sign_positive</span>() {
-                <span class="macro">debug</span><span class="macro">!</span>(
-                    <span class="string">&quot;[Step {:}, β = {:.4e}] Δn overshoots equilibrium.  Removing overshoot.&quot;</span>,
-                    <span class="ident">c</span>.<span class="ident">step</span>, <span class="ident">c</span>.<span class="ident">beta</span>,
-                );
-                <span class="kw-2">*</span><span class="ident">dn</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">-</span> <span class="ident">eq_n</span>;
-                <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">eq_n</span>;
-            } <span class="kw">else</span> {
-                <span class="kw-2">*</span><span class="ident">n</span> <span class="op">+=</span> <span class="kw-2">*</span><span class="ident">dn</span>;
-            }
-
-            <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">threshold_number_density</span> {
-                <span class="macro">debug</span><span class="macro">!</span>(
-                    <span class="string">&quot;[Step {:}, β = {:.4e}] n going below threshold number density, setting to zero.&quot;</span>,
-                    <span class="ident">c</span>.<span class="ident">step</span>, <span class="ident">c</span>.<span class="ident">beta</span>,
-                );
-                <span class="kw-2">*</span><span class="ident">dn</span> <span class="op">=</span> <span class="op">-</span><span class="kw-2">*</span><span class="ident">n</span>;
-                <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="number">0.0</span>;
-            }
-        });
-        <span class="ident">n</span>
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">universe</span>::<span class="ident">StandardModel</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
-
-    <span class="doccomment">/// The most trivial example with a single particle and no interactions.</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">no_interaction</span>() {
-        <span class="kw">let</span> <span class="ident">phi</span> <span class="op">=</span> <span class="ident">Particle</span>::<span class="ident">new</span>(<span class="string">&quot;φ&quot;</span>.<span class="ident">to_string</span>(), <span class="number">0</span>, <span class="number">1e3</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">solver</span> <span class="op">=</span> <span class="ident">NumberDensitySolver</span>::<span class="ident">default</span>()
-            .<span class="ident">temperature_range</span>(<span class="number">1e20</span>, <span class="number">1e-10</span>)
-            .<span class="ident">initialize</span>();
-
-        <span class="ident">solver</span>.<span class="ident">add_particle</span>(<span class="ident">phi</span>, <span class="ident">InitialCondition</span>::<span class="ident">Equilibrium</span>(<span class="number">0.0</span>));
-
-        <span class="kw">let</span> <span class="ident">sol</span> <span class="op">=</span> <span class="ident">solver</span>.<span class="ident">solve</span>(<span class="kw-2">&amp;</span><span class="ident">StandardModel</span>::<span class="ident">new</span>());
-        <span class="ident">approx_eq</span>(<span class="ident">sol</span>[<span class="number">0</span>], <span class="number">1.0</span>, <span class="number">8.0</span>, <span class="number">0.0</span>);
     }
 }
 </pre></div>

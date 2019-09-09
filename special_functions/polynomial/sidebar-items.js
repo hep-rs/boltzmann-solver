@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["polynomial","Evaluates an arbitrary single-variable polynomial at a particular point."]]});

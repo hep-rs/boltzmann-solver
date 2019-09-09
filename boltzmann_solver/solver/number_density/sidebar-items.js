@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Context","Context provided containing pre-computed values which might be useful when evaluating interactions."],["NumberDensitySolver","Boltzmann equation solver for the number density."]]});
+initSidebarItems({"enum":[["Interacting","Indicates how a particle participates in an interaction."]],"struct":[["Context","Context provided containing pre-computed values which might be useful when evaluating interactions."],["Interaction","Store an interaction."],["Solver","Boltzmann solver"],["SolverBuilder","Boltzmann solver builder"]]});

@@ -1,0 +1,259 @@
+<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/tableau/rk76.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rk76.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="doccomment">//! Runge-Kutta method of order 7 in 10 stages.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Coefficients are exported from Mathematica and can be obtained from</span>
+<span class="doccomment">//! references therein.</span>
+
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">all</span>)]</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_ORDER</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">7</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_S</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">10</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_A</span>: [[<span class="ident">f64</span>; <span class="ident">RK_S</span> <span class="op">-</span> <span class="number">1</span>]; <span class="ident">RK_S</span>] <span class="op">=</span> [
+    [<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>],
+    [<span class="number">0.005</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>],
+    [
+        <span class="op">-</span><span class="number">1.07679012345679</span>,
+        <span class="number">1.185679012345679</span>,
+        <span class="number">0.</span>,
+        <span class="number">0.</span>,
+        <span class="number">0.</span>,
+        <span class="number">0.</span>,
+        <span class="number">0.</span>,
+        <span class="number">0.</span>,
+        <span class="number">0.</span>,
+    ],
+    [<span class="number">0.04083333333333333</span>, <span class="number">0.</span>, <span class="number">0.1225</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>],
+    [
+        <span class="number">0.6360714285714286</span>,
+        <span class="number">0.</span>,
+        <span class="op">-</span><span class="number">2.4444642857142855</span>,
+        <span class="number">2.263392857142857</span>,
+        <span class="number">0.</span>,
+        <span class="number">0.</span>,
+        <span class="number">0.</span>,
+        <span class="number">0.</span>,
+        <span class="number">0.</span>,
+    ],
+    [
+        <span class="op">-</span><span class="number">2.5351211079349243</span>,
+        <span class="number">0.</span>,
+        <span class="number">10.299374654449268</span>,
+        <span class="op">-</span><span class="number">7.951303288599059</span>,
+        <span class="number">0.793011489231006</span>,
+        <span class="number">0.</span>,
+        <span class="number">0.</span>,
+        <span class="number">0.</span>,
+        <span class="number">0.</span>,
+    ],
+    [
+        <span class="number">1.0018765812524633</span>,
+        <span class="number">0.</span>,
+        <span class="op">-</span><span class="number">4.16657128244238</span>,
+        <span class="number">3.8343432929128642</span>,
+        <span class="op">-</span><span class="number">0.5023333356071085</span>,
+        <span class="number">0.6676847438841608</span>,
+        <span class="number">0.</span>,
+        <span class="number">0.</span>,
+        <span class="number">0.</span>,
+    ],
+    [
+        <span class="number">27.255018354630767</span>,
+        <span class="number">0.</span>,
+        <span class="op">-</span><span class="number">42.00461727841064</span>,
+        <span class="op">-</span><span class="number">10.53571312661949</span>,
+        <span class="number">80.49553671141194</span>,
+        <span class="op">-</span><span class="number">67.34388227179052</span>,
+        <span class="number">13.048657610777939</span>,
+        <span class="number">0.</span>,
+        <span class="number">0.</span>,
+    ],
+    [
+        <span class="op">-</span><span class="number">3.0397378057114963</span>,
+        <span class="number">0.</span>,
+        <span class="number">10.1381614103298</span>,
+        <span class="op">-</span><span class="number">6.429305674864722</span>,
+        <span class="op">-</span><span class="number">1.5864371483408275</span>,
+        <span class="number">1.8921781841968426</span>,
+        <span class="number">0.01969933540760887</span>,
+        <span class="number">0.005441698982793324</span>,
+        <span class="number">0.</span>,
+    ],
+    [
+        <span class="op">-</span><span class="number">1.4449518916777735</span>,
+        <span class="number">0.</span>,
+        <span class="number">8.031891385995593</span>,
+        <span class="op">-</span><span class="number">7.583174166340134</span>,
+        <span class="number">3.5816169353190075</span>,
+        <span class="op">-</span><span class="number">2.436972263219953</span>,
+        <span class="number">0.8515899999232618</span>,
+        <span class="number">0.</span>,
+        <span class="number">0.</span>,
+    ],
+];
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_B</span>: [<span class="ident">f64</span>; <span class="ident">RK_S</span>] <span class="op">=</span> [
+    <span class="number">0.047425837833706755</span>,
+    <span class="number">0.</span>,
+    <span class="number">0.</span>,
+    <span class="number">0.2562236165937056</span>,
+    <span class="number">0.2695137683307421</span>,
+    <span class="number">0.12686622409092785</span>,
+    <span class="number">0.2488722594206007</span>,
+    <span class="number">0.003074483740820063</span>,
+    <span class="number">0.04802380998949694</span>,
+    <span class="number">0.</span>,
+];
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_C</span>: [<span class="ident">f64</span>; <span class="ident">RK_S</span>] <span class="op">=</span> [
+    <span class="number">0.</span>,
+    <span class="number">0.005</span>,
+    <span class="number">0.10888888888888888</span>,
+    <span class="number">0.16333333333333333</span>,
+    <span class="number">0.455</span>,
+    <span class="number">0.6059617471462914</span>,
+    <span class="number">0.835</span>,
+    <span class="number">0.915</span>,
+    <span class="number">1.</span>,
+    <span class="number">1.</span>,
+];
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_E</span>: [<span class="ident">f64</span>; <span class="ident">RK_S</span>] <span class="op">=</span> [
+    <span class="op">-</span><span class="number">0.00005940986559287495</span>,
+    <span class="number">0.</span>,
+    <span class="number">0.</span>,
+    <span class="number">0.00022949070679929363</span>,
+    <span class="op">-</span><span class="number">0.0010710124799348211</span>,
+    <span class="number">0.0018100372466678992</span>,
+    <span class="op">-</span><span class="number">0.003172427816837889</span>,
+    <span class="number">0.003074483740820063</span>,
+    <span class="number">0.04802380998949694</span>,
+    <span class="op">-</span><span class="number">0.048834971521418614</span>,
+];
+</pre></div>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../";window.currentCrate = "boltzmann_solver";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>
