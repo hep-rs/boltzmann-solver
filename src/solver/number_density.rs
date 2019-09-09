@@ -269,10 +269,10 @@
 //! As a result, the actual change in the number density, it becomes
 //!
 //! \\begin{equation}
-//!   \pfrac{n}{\beta} = \frac{1}{H \beta} \left[\vt C[n] - 3 H n\right]
+//!   \pfrac{n}{\beta} = \frac{1}{H \beta} \left[\vt C\[n\] - 3 H n\right]
 //! \\end{equation}
 //!
-//! and one must only input \\(\vt C[n]\\) in the interaction.
+//! and one must only input \\(\vt C\[n\]\\) in the interaction.
 //!
 //! # Normalized Number Density
 //!
@@ -286,10 +286,11 @@
 //! When dealing with number densities, the Liouville operator is:
 //!
 //! \\begin{equation}
-//!   \pfrac{n}{t} + 3 H n = \vt C[n]
+//!   \pfrac{n}{t} + 3 H n = \vt C\[n\]
 //! \\end{equation}
 //!
-//! where \\(\vt C[n]\\) is the change in the number density.  If we now define
+//! where \\(\vt C\[n\]\\) is the change in the number density.  If we now
+//! define
 //!
 //! \\begin{equation}
 //!   Y \defeq \frac{n}{n_{\text{eq}}},
@@ -298,7 +299,7 @@
 //! then the change in this normalized number density is:
 //!
 //! \\begin{equation}
-//!   \pfrac{Y}{t} = \frac{1}{n_{\text{eq}}} \vt C[n]
+//!   \pfrac{Y}{t} = \frac{1}{n_{\text{eq}}} \vt C\[n\]
 //! \\end{equation}
 //!
 //! with \\(n_{\text{eq}}\\) having the simple analytic form \\(3 \zeta(3) / 4
@@ -306,11 +307,11 @@
 //! \\(t\\) to inverse temperature \\(\beta\\), we get:
 //!
 //! \\begin{equation}
-//!   \pfrac{Y}{\beta} = \frac{1}{H \beta n_{\text{eq}}} \vt C[n].
+//!   \pfrac{Y}{\beta} = \frac{1}{H \beta n_{\text{eq}}} \vt C\[n\].
 //! \\end{equation}
 //!
-//! As with the non-normalized number density calculations, only \\(\vt C[n]\\)
-//! must be inputted in the interaction.
+//! As with the non-normalized number density calculations, only \\(\vt
+//! C\[n\]\\) must be inputted in the interaction.
 
 use super::{EmptyModel, Model, Solver, StepChange, StepPrecision};
 use crate::{
@@ -339,11 +340,9 @@ pub struct Context<M: Model> {
     /// density (respectively), and where \\(n_1\\) is the number density of a
     /// single massless bosonic degree of freedom.
     pub normalization: f64,
-    /// Equilibrium number densities for the particles, normalized to the
-    /// equilibrium number density for a massless boson with \\(g = 1\\).  The
-    /// particle species are provided in the same order as when specified to the
-    /// solver
     pub eq_n: Array1<f64>,
+    /// Equilibrium number densities for the particles.
+    pub eq: Array1<f64>,
     /// Model data
     pub model: M,
 }
