@@ -1,19 +1,3 @@
-/// Determines how the step size is allowed changed, with the change being
-/// proportional: `h *= increase` or `h *= decrease`.
-pub(crate) struct StepChange {
-    pub increase: f64,
-    pub decrease: f64,
-}
-
-impl Default for StepChange {
-    fn default() -> Self {
-        StepChange {
-            increase: 4.0,
-            decrease: 0.1,
-        }
-    }
-}
-
 /// Determines the range of step sizes allowed: `min * beta < h < max * beta`.
 pub(crate) struct StepPrecision {
     pub min: f64,
@@ -23,7 +7,7 @@ pub(crate) struct StepPrecision {
 impl Default for StepPrecision {
     fn default() -> Self {
         StepPrecision {
-            min: 1e-4,
+            min: 1e-10,
             max: 1e-0,
         }
     }
