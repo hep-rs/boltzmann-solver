@@ -313,17 +313,20 @@
 //! As with the non-normalized number density calculations, only \\(\vt
 //! C\[n\]\\) must be inputted in the interaction.
 
-use super::{EmptyModel, Model, Solver, StepChange, StepPrecision};
+mod interaction;
+
 use crate::{
+    solver::{Model, StepPrecision},
     statistic::{Statistic, Statistics},
     universe::Universe,
 };
-use ndarray::{array, prelude::*, FoldWhile, Zip};
+pub use interaction::{Interacting, Interaction};
+use ndarray::{array, prelude::*, Zip};
 use rayon::prelude::*;
 
 /// Context provided containing pre-computed values which might be useful when
 /// evaluating interactions.
-pub struct Context<M: Model> {
+pub struct Context<M: Model + Sync> {
     /// Current evaluation step
     pub step: u64,
     /// Current step size
@@ -340,91 +343,127 @@ pub struct Context<M: Model> {
     /// density (respectively), and where \\(n_1\\) is the number density of a
     /// single massless bosonic degree of freedom.
     pub normalization: f64,
-    pub eq_n: Array1<f64>,
     /// Equilibrium number densities for the particles.
     pub eq: Array1<f64>,
     /// Model data
     pub model: M,
 }
 
-/// Boltzmann equation solver for the number density.
-///
-/// All number densities are normalized to that of a massless boson with a
-/// single degree of freedom (\\(g = 1\\)).  As a result of this convention,
-/// \\(n_\gamma = 2\\) as the photon has two degrees of freedom.
-pub struct NumberDensitySolver<M: Model + Sync> {
-    initialized: bool,
-    beta_range: (f64, f64),
+/// Boltzmann solver builder
+pub struct SolverBuilder<M: Model + Sync> {
     normalized: bool,
+    model: Box<dyn Fn(f64) -> M>,
     initial_conditions: Array1<f64>,
+    beta_range: (f64, f64),
     #[allow(clippy::type_complexity)]
-    interactions: Vec<
-        Box<
-            dyn Fn(
-                    &<Self as Solver>::Solution,
-                    &<Self as Solver>::Context,
-                ) -> <Self as Solver>::Solution
-                + Sync,
-        >,
-    >,
+    interactions: Vec<Box<dyn Fn(&Array1<f64>, &Context<M>) -> Vec<Interaction> + Sync>>,
+    equilibrium: Vec<usize>,
     #[allow(clippy::type_complexity)]
-    logger: Box<
-        dyn Fn(
-            &<Self as Solver>::Solution,
-            &<Self as Solver>::Solution,
-            &<Self as Solver>::Context,
-        ),
-    >,
-    model_fn: Box<dyn Fn(f64) -> M>,
-    step_change: StepChange,
+    logger: Box<dyn Fn(&Array1<f64>, &Array1<f64>, &Context<M>)>,
     step_precision: StepPrecision,
     error_tolerance: f64,
     threshold_number_density: f64,
 }
 
-impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
-    /// The solution is a one-dimensional array of number densities for each
-    /// particle species (or aggregated number density in the case of
-    /// \\(n_{\mathsc{b-l}}\\)), in the same order as [`Solver::add_particle`]
-    /// is invoked.
-    type Solution = Array1<f64>;
+/// Boltzmann solver
+pub struct Solver<M: Model + Sync> {
+    normalized: bool,
+    model: Box<dyn Fn(f64) -> M>,
+    initial_conditions: Array1<f64>,
+    beta_range: (f64, f64),
+    equilibrium: Vec<usize>,
+    #[allow(clippy::type_complexity)]
+    interactions: Vec<Box<dyn Fn(&Array1<f64>, &Context<M>) -> Vec<Interaction> + Sync>>,
+    #[allow(clippy::type_complexity)]
+    logger: Box<dyn Fn(&Array1<f64>, &Array1<f64>, &Context<M>)>,
+    step_precision: StepPrecision,
+    error_tolerance: f64,
+    threshold_number_density: f64,
+}
 
-    type Context = Context<M>;
-
-    /// Create a new instance of the number density solver.
+impl<M: Model + Sync> SolverBuilder<M> {
+    /// Creates a new builder for the Boltzmann solver.
     ///
     /// The default range of temperatures span 1 GeV through to 10^{20} GeV, and
     /// it uses normalization by default.
-    fn new() -> Self {
-        #[allow(clippy::redundant_closure)]
+    ///
+    /// Most of the method for the builder are intended to be chained one after
+    /// the other.  The two notable exceptions which use the builder by
+    /// reference are [`SolverBuilder::add_interaction`] and
+    /// [`SolverBuilder::logger`].
+    ///
+    /// ```
+    /// let mut solver_builder = SolverBuilder::new()
+    ///     .initial_conditions(&[1.2, 1.3])
+    ///     .beta_range(1e-10, 1e-6)
+    ///     .equilibrium(&[0]);
+    /// // builder.add_interaction(..);
+    /// // builder.logger(..);
+    /// let solver = solver_builder.build();
+    /// ```
+    pub fn new() -> Self {
         Self {
-            initialized: false,
-            beta_range: (1e-20, 1e0),
             normalized: true,
+            model: Box::new(|beta| M::new(beta)),
             initial_conditions: array![],
-            interactions: Vec::with_capacity(100),
+            beta_range: (1e-20, 1e0),
+            equilibrium: Vec::with_capacity(128),
+            interactions: Vec::with_capacity(128),
             logger: Box::new(|_, _, _| {}),
-            model_fn: Box::new(|beta| M::new(beta)),
-            step_change: StepChange::default(),
             step_precision: StepPrecision::default(),
             error_tolerance: 1e-4,
             threshold_number_density: 0.0,
         }
     }
 
-    /// Set the range of inverse temperature values over which the phase space
-    /// is evolved.
+    /// Specify whether the solver is dealing with normalized quantities or not.
+    ///
+    /// If normalized, the number densities are normalized to the number density
+    /// of a single massless bosonic degree of freedom.
+    pub fn normalized(mut self, val: bool) -> Self {
+        self.normalized = val;
+        self
+    }
+
+    /// Set a model function.
+    ///
+    /// Add a function that can modify the model before it is used by the
+    /// context.  This is particularly useful if there is a baseline model with
+    /// fixed parameters and only certain parameters are changed.
+    pub fn model<F: 'static>(mut self, f: F) -> Self
+    where
+        F: Fn(f64) -> M,
+    {
+        self.model = Box::new(f);
+        self
+    }
+
+    /// Specify initial conditions explicitly for the number densities.
+    ///
+    /// The list of number densities must be in the same order as the particles
+    /// in the model.
+    pub fn initial_conditions<I>(mut self, v: I) -> Self
+    where
+        I: IntoIterator<Item = f64>,
+    {
+        self.initial_conditions = Array1::from_iter(v);
+
+        self
+    }
+
+    /// Set the range of inverse temperature values over which the solution is
+    /// calculated.
     ///
     /// Inverse temperature must be provided in units of GeV^{-1}.
     ///
     /// This function has a convenience alternative called
-    /// [`Solver::temperature_range`] allowing for the limits to be specified as
+    /// [`SolverBuilder::temperature_range`] allowing for the limits to be specified as
     /// temperature in the units of GeV.
     ///
     /// # Panics
     ///
     /// Panics if the starting value is larger than the final value.
-    fn beta_range(mut self, start: f64, end: f64) -> Self {
+    pub fn beta_range(mut self, start: f64, end: f64) -> Self {
         assert!(
             start < end,
             "The initial β must be smaller than the final β value."
@@ -438,13 +477,12 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
     ///
     /// Temperature must be provided in units of GeV.
     ///
-    /// This function is a convenience alternative to
-    /// [`NumberDensitySolver::beta_range`].
+    /// This function is a convenience alternative to [`Solver::beta_range`].
     ///
     /// # Panics
     ///
     /// Panics if the starting value is smaller than the final value.
-    fn temperature_range(mut self, start: f64, end: f64) -> Self {
+    pub fn temperature_range(mut self, start: f64, end: f64) -> Self {
         assert!(
             start > end,
             "The initial temperature must be larger than the final temperature."
@@ -453,22 +491,82 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
         self
     }
 
-    fn step_change(mut self, increase: f64, decrease: f64) -> Self {
-        assert!(
-            increase > 1.0,
-            "The multiplicative factor to increase the step size must be greater
-            than 1."
-        );
-        assert!(
-            decrease < 1.0,
-            "The multiplicative factor to decrease the step size must be greater
-            than 1."
-        );
-        self.step_change = StepChange { increase, decrease };
+    /// Specify the particles which must remain in equilibrium.
+    ///
+    /// These particles are specified by index, with these particles remaining
+    /// in equilibrium no matter what the interactions are.
+    pub fn equilibrium<I>(mut self, eq: I) -> Self
+    where
+        I: IntoIterator<Item = usize>,
+    {
+        self.equilibrium = eq.into_iter().collect();
         self
     }
 
-    fn step_precision(mut self, min: f64, max: f64) -> Self {
+    /// Add an interaction.
+    ///
+    /// The interaction is a functional of the solution at a particular inverse
+    /// temperature.  The function is of the following form:
+    ///
+    /// ```ignore
+    /// f(n: &Array1<f64>, c: &Context) -> Interaction
+    /// ```
+    ///
+    /// The first argument contains the values of the various
+    /// number densities calculated so far, with the context being given in
+    /// the second argument.
+    ///
+    /// The returned value is an instance of `Interaction`.
+    pub fn add_interaction<F>(&mut self, f: F)
+    where
+        F: 'static + Fn(&Array1<f64>, &Context<M>) -> Vec<Interaction> + Sync,
+    {
+        self.interactions.push(Box::new(f));
+    }
+
+    /// Set the logger.
+    ///
+    /// The logger provides some insight into the numerical integration 'black
+    /// box'.  Specifically, it is run at the start of each integration step and
+    /// has access to the current value as a `&Array1`, the change from this
+    /// step as a `&Solution`, and the current `Context` at the start of the
+    /// integration step.  As a result, for the first step, the solution will be
+    /// equal to the initial conditions.
+    ///
+    /// This is useful if one wants to track the evolution of the solutions and
+    /// log these in a CSV file.
+    pub fn logger<F: 'static>(&mut self, f: F)
+    where
+        F: Fn(&Array1<f64>, &Array1<f64>, &Context<M>),
+    {
+        self.logger = Box::new(f);
+    }
+
+    /// Specify how large or small the step size is allowed to become.
+    ///
+    /// The evolution of number densities are discretized in steps of \\(h\\)
+    /// such that \\(\beta_{i+1} = \beta_{i} + h\\).  The algorithm will
+    /// determine automatically the optimal step size \\(h\\) such that the
+    /// error is deemed acceptable; however, one may wish to override this to
+    /// prevent step sizes which are either too large or too small.
+    ///
+    /// The step precision sets the range of allowed values of \\(h\\) in
+    /// proportion to the current value of \\(\beta\\):
+    /// \\begin{equation}
+    ///   p_\text{min} \beta < h < p_\text{max} \beta
+    /// \\end{equation}
+    ///
+    /// The default values are `min = 1e-10` and `max = 1.0`.
+    ///
+    /// The relative step precision has a higher priority on the step size than
+    /// the error.  That is, the step size will never be less than
+    /// \\(p_\text{min} \beta\\) even if this results in a larger local error
+    /// than desired.
+    ///
+    /// # Panic
+    ///
+    /// This will panic if `min >= max`.
+    pub fn step_precision(mut self, min: f64, max: f64) -> Self {
         assert!(
             min < max,
             "Minimum step precision must be smaller than the maximum step precision."
@@ -477,219 +575,21 @@ impl<M: Model + Sync> Solver for NumberDensitySolver<M> {
         self
     }
 
-    fn error_tolerance(mut self, tol: f64) -> Self {
+    /// Specify the local error tolerance.
+    ///
+    /// The algorithm will adjust the evolution step size such that the local
+    /// error remains less than the specified the error tolerance.
+    ///
+    /// Note that the error is only ever estimated and thus may occasionally be
+    /// inaccurate.  Furthermore, the [`Solver::step_precision`] takes
+    /// precedence and thus if a large minimum step precision is requested, the
+    /// local error may be larger than the error tolerance.
+    pub fn error_tolerance(mut self, tol: f64) -> Self {
         assert!(tol > 0.0, "The tolerance must be greater than 0.");
         self.error_tolerance = tol;
         self
     }
 
-    fn normalized(mut self, val: bool) -> Self {
-        self.normalized = val;
-        self
-    }
-
-    fn initial_conditions(mut self, v: Vec<f64>) -> Self {
-        self.initial_conditions = Array1::from_vec(v);
-
-        self
-    }
-
-    fn initialize(mut self) -> Self {
-        let model = (self.model_fn)(1e-3);
-        let particles = model.particles();
-        assert_eq!(
-            self.initial_conditions.len(),
-            particles.len(),
-            "The number of particles in the model ({}) is different to the number of initial conditions ({}).",
-            particles.len(),
-            self.initial_conditions.len(),
-        );
-
-        self.initialized = true;
-
-        self
-    }
-
-    fn add_interaction<F: 'static>(&mut self, f: F) -> &mut Self
-    where
-        F: Fn(&Self::Solution, &Self::Context) -> Self::Solution + Sync,
-    {
-        self.interactions.push(Box::new(f));
-        self
-    }
-
-    fn set_logger<F: 'static>(&mut self, f: F) -> &mut Self
-    where
-        F: Fn(&Self::Solution, &Self::Solution, &Self::Context),
-    {
-        self.logger = Box::new(f);
-        self
-    }
-
-    #[allow(clippy::many_single_char_names)]
-    fn solve<U>(&self, universe: &U) -> Self::Solution
-    where
-        U: Universe,
-    {
-        use super::tableau::rk76::*;
-
-        assert!(
-            self.initialized,
-            "The phase space solver has to be initialized first with the `initialize()` method."
-        );
-
-        // Initialize all the variables that will be used in the integration
-        let mut n = self.initial_conditions.clone();
-        let mut dn = Self::Solution::zeros(n.dim());
-        let mut dn_err = Self::Solution::zeros(n.dim());
-
-        let mut k: [Self::Solution; RK_S];
-        unsafe {
-            k = std::mem::uninitialized();
-            for ki in &mut k[..] {
-                std::ptr::write(ki, Self::Solution::zeros(n.dim()));
-            }
-        };
-
-        let mut step = 0;
-        let mut beta = self.beta_range.0;
-        let mut h = beta * self.step_precision.min;
-
-        // Create the initial context and log the initial conditions
-        let mut c = self.context(step, h, beta, universe);
-        (*self.logger)(&n, &Self::Solution::zeros(n.dim()), &c);
-
-        while beta < self.beta_range.1 {
-            step += 1;
-            let mut advance = false;
-            c = self.context(step, h, beta, universe);
-            if step % 1000 == 0 {
-                log::info!("Step {}, β = {:.4e}", step, beta);
-                log::info!("n = {:.3e}", n);
-            } else if step % 100 == 0 {
-                log::debug!("Step {}, , β = {:.4e}", step, beta);
-                log::debug!("n = {:.3e}", n);
-            } else {
-                log::trace!("Step {}, β = {:.4e}, h = {:.4e}", step, beta, h);
-                log::trace!("n = {:.3e}", n);
-            }
-
-            // Compute each k[i]
-            dn.fill(0.0);
-            dn_err.fill(0.0);
-            for i in 0..RK_S {
-                let beta_i = beta + RK_C[i] * h;
-                let ci = self.context(step, h, beta_i, universe);
-                let ai = RK_A[i];
-                let ni = (0..i).fold(n.clone(), |total, j| total + ai[j] * &k[j]);
-                log::trace!(" n[{:0>2}] = {:>10.3e}", i, ni);
-                log::trace!("eq[{:0>2}] = {:>10.3e}", i, ci.eq_n);
-                k[i] = if self.normalized {
-                    self.interactions
-                        .par_iter()
-                        .map(|f| ci.normalization * h * f(&ni, &ci))
-                        // .map(|mut dn| {
-                        //     Self::adjust_dn(&ni, &mut dn, &ci.eq_n);
-                        //     dn
-                        // })
-                        .reduce(|| Self::Solution::zeros(n.dim()), |sum, a| sum + a)
-                } else {
-                    self.interactions
-                        .par_iter()
-                        .map(|f| ci.normalization * h * (f(&ni, &ci) - 3.0 * ci.hubble_rate * &ni))
-                        // .map(|mut dn| {
-                        //     Self::adjust_dn(&ni, &mut dn, &ci.eq_n);
-                        //     dn
-                        // })
-                        .reduce(|| Self::Solution::zeros(n.dim()), |sum, a| sum + a)
-                };
-                log::trace!(" k[{:0>2}] = {:>10.3e}", i, k[i]);
-                dn = dn + RK_B[i] * &k[i];
-                dn_err = dn_err + RK_E[i] * &k[i];
-            }
-
-            log::trace!("    dn = {:.3e}", dn);
-            log::trace!("dn_err = {:.3e}", dn_err);
-
-            // Get the error between the estimates
-            let err = dn_err.iter().fold(0f64, |e, v| e.max(v.abs()));
-            log::trace!("Error = {:.3e}", err);
-
-            // If the error is within the tolerance, we'll be advancing the
-            // iteration step
-            if err < self.error_tolerance {
-                advance = true;
-            }
-
-            // Compute the change in step size based on the current error And
-            // correspondingly adjust the step size
-            let delta = if err == 0.0 {
-                self.step_change.increase
-            } else {
-                let delta = 0.9 * (self.error_tolerance / err).powf(1.0 / f64::from(RK_ORDER + 1));
-
-                if delta < self.step_change.decrease {
-                    self.step_change.decrease
-                } else if delta > self.step_change.increase {
-                    self.step_change.increase
-                } else {
-                    delta
-                }
-            };
-            log::trace!("Δ = {:.3e}", delta);
-            let mut h_est = h * delta;
-
-            // Prevent h from getting too small or too big in proportion to the
-            // current value of beta.  Also advance the integration irrespective
-            // of the local error if we reach the maximum or minimum step size.
-            if h_est > beta * self.step_precision.max {
-                h_est = beta * self.step_precision.max;
-                log::debug!("Step size too large, decreased h to {:.3e}", h_est);
-                advance = true;
-            } else if h_est < beta * self.step_precision.min {
-                h_est = beta * self.step_precision.min;
-                log::debug!("Step size too small, increased h to {:.3e}", h_est);
-                advance = true;
-            }
-
-            // Check if the error is within the tolerance, or we are advancing
-            // irrespective of the local error
-            if advance {
-                // Advance n and beta
-                n += &dn;
-                beta += h;
-
-                if beta == beta + h_est {
-                    log::error!("Step size too small and no longer increments β.  Aborting.");
-                    std::process::exit(1);
-                }
-
-                // Run the logger now
-                (*self.logger)(&n, &dn, &c);
-            }
-
-            // Adjust final integration step if needed
-            if beta + h_est > self.beta_range.1 {
-                log::debug!("Fixing overshoot of last integration step.");
-                h_est = self.beta_range.1 - beta;
-            }
-
-            h = h_est;
-        }
-
-        log::info!("Number of integration steps: {}", step);
-
-        n
-    }
-}
-
-impl Default for NumberDensitySolver<EmptyModel> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl<M: Model + Sync> NumberDensitySolver<M> {
     /// Set the threshold number density to count as 0.
     ///
     /// Any number density whose absolute value is less than the threshold will
@@ -697,7 +597,9 @@ impl<M: Model + Sync> NumberDensitySolver<M> {
     /// number densities as well as equilibrium number densities.  Furthermore,
     /// this also applies to 'abstract' number densities such as \\(B-L\\).
     ///
-    /// This is by default set to `0.0`.
+    /// This is by default set to `1e-20` for normalized number density, or
+    /// `1e-20 * n` for non-normalized number densities, where `n` is the number
+    /// density of a massless bosonic degree of freedom.
     ///
     /// # Panics
     ///
@@ -711,6 +613,213 @@ impl<M: Model + Sync> NumberDensitySolver<M> {
         self
     }
 
+    /// Build the Boltzmann solver.
+    pub fn build(self) -> Solver<M> {
+        let model = (self.model)((self.beta_range.0 * self.beta_range.1).sqrt());
+        let particles = model.particles();
+        assert_eq!(
+            self.initial_conditions.len(),
+            particles.len(),
+            "The number of particles in the model ({}) is different to the number of initial conditions ({}).",
+            particles.len(),
+            self.initial_conditions.len(),
+        );
+
+        Solver {
+            normalized: self.normalized,
+            initial_conditions: self.initial_conditions,
+            beta_range: self.beta_range,
+            model: self.model,
+            interactions: self.interactions,
+            equilibrium: self.equilibrium,
+            logger: self.logger,
+            step_precision: self.step_precision,
+            error_tolerance: self.error_tolerance,
+            threshold_number_density: self.threshold_number_density,
+        }
+    }
+}
+
+impl<M: Model + Sync> Solver<M> {
+    /// Evolve the initial conditions by solving the PDEs.
+    ///
+    /// Note that this is not a true PDE solver, but instead converts the PDE
+    /// into an ODE in time (or inverse temperature in this case), with the
+    /// derivative in energy being calculated solely from the previous
+    /// time-step.
+    #[allow(clippy::cognitive_complexity)]
+    pub fn solve<U>(&self, universe: &U) -> Array1<f64>
+    where
+        U: Universe,
+    {
+        use super::tableau::rk76::*;
+
+        // Initialize all the variables that will be used in the integration
+        let mut n = self.initial_conditions.clone();
+        let mut dn = Array1::zeros(n.dim());
+        let mut dn_err = Array1::zeros(n.dim());
+
+        let mut k: [Array1<f64>; RK_S];
+        unsafe {
+            k = std::mem::MaybeUninit::uninit().assume_init();
+            for ki in &mut k[..] {
+                std::ptr::write(ki, Array1::zeros(n.dim()));
+            }
+        };
+
+        let mut step = 0;
+        let mut beta = self.beta_range.0;
+        let mut h = beta * self.step_precision.min;
+        let mut advance;
+
+        let mut c = self.context(step, h, beta, universe);
+        (*self.logger)(&n, &dn, &c);
+
+        while beta < self.beta_range.1 {
+            step += 1;
+            advance = false;
+            c = self.context(step, h, beta, universe);
+            dn.fill(0.0);
+            dn_err.fill(0.0);
+
+            // Ensure that h is within the desired range of step sizes.
+            let h_on_beta = h / beta;
+            if h_on_beta > self.step_precision.max {
+                h = beta * self.step_precision.max;
+                log::trace!("Step size too large, decreased h to {:.3e}", h);
+            } else if h_on_beta < self.step_precision.min {
+                h = beta * self.step_precision.min;
+                log::debug!("Step size too small, increased h to {:.3e}", h);
+                // Irrespective of the local error, if we're at the minimum step
+                // size we'll be integrating this step.
+                advance = true;
+            }
+
+            // Log the progress of the integration
+            if step % 1000 == 0 {
+                log::info!("Step {}, β = {:.4e}", step, beta);
+                log::info!("n = {:.3e}", n);
+            } else if step % 100 == 0 {
+                log::debug!("Step {}, , β = {:.4e}", step, beta);
+                log::debug!("n = {:.3e}", n);
+            } else {
+                log::trace!("Step {}, β = {:.4e}, h = {:.4e}", step, beta, h);
+                log::trace!("n = {:.3e}", n);
+            }
+
+            for i in 0..RK_S {
+                // Compute the sub-step values
+                let beta_i = beta + RK_C[i] * h;
+                let ai = RK_A[i];
+                let ni = (0..i).fold(n.clone(), |total, j| total + ai[j] * &k[j]);
+                let ci = self.context(step, h, beta_i, universe);
+                log::trace!(" n[{:0>2}] = {:>10.3e}", i, ni);
+                log::trace!("eq[{:0>2}] = {:>10.3e}", i, ci.eq);
+
+                // Compute k[i] from each interaction
+                let ki = &mut k[i];
+                *ki = if self.normalized {
+                    self.interactions
+                        .par_iter()
+                        .fold(
+                            || Array1::zeros(n.dim()),
+                            |mut dn, f| {
+                                for mut interaction in f(&ni, &ci) {
+                                    interaction *= ci.normalization * h;
+                                    dn = interaction.dn(dn, &ni, &ci);
+                                }
+                                dn
+                            },
+                        )
+                        .reduce(|| Array1::zeros(n.dim()), |dn, dni| dn + dni)
+                } else {
+                    unimplemented!()
+                };
+                log::trace!(" k[{:0>2}] = {:>10.3e}", i, ki);
+
+                // Set changes to zero for those particles in equilibrium
+                for &eq in &self.equilibrium {
+                    ki[eq] = 0.0;
+                }
+
+                let bi = RK_B[i];
+                let ei = RK_E[i];
+                Zip::from(&mut dn)
+                    .and(&mut dn_err)
+                    .and(ki)
+                    .apply(|dn, dn_err, &mut ki| {
+                        *dn += bi * ki;
+                        *dn_err += ei * ki;
+                    })
+            }
+
+            // Adjust dn for those particles in equilibrium
+            for &eq in &self.equilibrium {
+                dn[eq] = c.eq[eq] - n[eq];
+            }
+
+            log::trace!("    dn = {:>10.3e}", dn);
+            log::trace!("dn_err = {:>10.3e}", dn_err);
+
+            // Get the local error using L∞-norm
+            let err = dn_err.iter().fold(0f64, |e, v| e.max(v.abs()));
+            log::trace!("Error = {:.3e}", err);
+
+            // If the error is within the tolerance, we'll be advancing the
+            // iteration step
+            if err < self.error_tolerance {
+                advance = true;
+            } else {
+                log::trace!("Error is not within tolerance.");
+            }
+
+            // Compute the change in step size based on the current error and
+            // correspondingly adjust the step size
+            let delta = if err == 0.0 {
+                10.0
+            } else {
+                0.9 * (self.error_tolerance / err).powf(1.0 / f64::from(RK_ORDER + 1))
+            };
+            log::trace!("Δ = {:.3e}", delta);
+            let mut h_est = h * delta;
+
+            // Update n and beta
+            if advance {
+                // Advance n and beta
+                n += &dn;
+                beta += h;
+
+                (*self.logger)(&n, &dn, &c);
+            }
+
+            // Adjust final integration step if needed
+            if beta + h_est > self.beta_range.1 {
+                log::trace!("Fixing overshoot of last integration step.");
+                h_est = self.beta_range.1 - beta;
+            }
+
+            h = h_est;
+        }
+
+        log::info!("Number of integration steps: {}", step);
+
+        n
+    }
+}
+
+impl<M: Model + Sync> Solver<M> {
+    fn apply_threshold(&self, n: &mut Array1<f64>) {
+        if self.normalized {
+            for n in n {
+                if n.abs() < self.threshold_number_density {
+                    *n = 0.0
+                }
+            }
+        } else {
+            unimplemented!()
+        }
+    }
+
     /// Create an array containing the initial conditions for all the particle
     /// species.
     ///
@@ -718,7 +827,7 @@ impl<M: Model + Sync> NumberDensitySolver<M> {
     /// energy, with the distribution following either the Bose–Einstein or
     /// Fermi–Dirac distribution as determined by their spin.
     fn equilibrium_number_densities(&self, beta: f64, model: &M) -> Array1<f64> {
-        if self.normalized {
+        let mut eq = if self.normalized {
             Array1::from_iter(
                 model
                     .particles()
@@ -726,26 +835,10 @@ impl<M: Model + Sync> NumberDensitySolver<M> {
                     .map(|p| p.normalized_number_density(0.0, beta)),
             )
         } else {
-            Array1::from_iter(
-                model
-                    .particles()
-                    .iter()
-                    .map(|p| p.number_density(0.0, beta)),
-            )
-        }
-    }
-
-    /// Set a model function.
-    ///
-    /// Add a function that can modify the model before it is used by the
-    /// context.  This is particularly useful if there is a baseline model with
-    /// fixed parameters and only certain parameters are changed.
-    pub fn model_fn<F: 'static>(&mut self, f: F) -> &mut Self
-    where
-        F: Fn(f64) -> M,
-    {
-        self.model_fn = Box::new(f);
-        self
+            unimplemented!()
+        };
+        self.apply_threshold(&mut eq);
+        eq
     }
 
     /// Generate the context at a given beta to pass to the logger/interaction
@@ -757,11 +850,11 @@ impl<M: Model + Sync> NumberDensitySolver<M> {
         beta: f64,
         universe: &U,
     ) -> Context<M> {
-        let model = (self.model_fn)(beta);
+        let model = (self.model)(beta);
         let hubble_rate = universe.hubble_rate(beta);
         let normalization = if self.normalized {
-            (hubble_rate * beta * Statistic::BoseEinstein.massless_number_density(0.0, beta))
-                .recip()
+            let n = Statistic::BoseEinstein.massless_number_density(0.0, beta);
+            (hubble_rate * beta * n).recip()
         } else {
             (hubble_rate * beta).recip()
         };
@@ -771,51 +864,8 @@ impl<M: Model + Sync> NumberDensitySolver<M> {
             beta,
             hubble_rate,
             normalization,
-            eq_n: self.equilibrium_number_densities(beta, &model),
+            eq: self.equilibrium_number_densities(beta, &model),
             model,
         }
-    }
-
-    /// Adjust `dn` by an overall factor.
-    ///
-    /// The factor is calculated such that the *biggest* change does not cause
-    /// an the DE solver to overshoot the equilibrium number.
-    ///
-    /// # Example
-    ///
-    /// Suppose we have the following scenario:
-    /// - Current number density: `[1.1, 2.0]`
-    /// - Number density change: `[-0.5, +1.0]`
-    /// - Equilibrium number density: `[1.0, 2.0]`
-    ///
-    /// Then change will be adjusted to `[-0.1, +0.2]` so that the equilibrium
-    /// number density of the first species is not overshot.
-    fn adjust_dn(
-        n: &<Self as Solver>::Solution,
-        dn: &mut <Self as Solver>::Solution,
-        eq_n: &<Self as Solver>::Solution,
-    ) -> f64 {
-        let new_n = n + &*dn;
-        let factor = Zip::from(n)
-            .and(&*dn)
-            .and(eq_n)
-            .and(&new_n)
-            .fold_while(1.0f64, |factor, n, dn, eq_n, new_n| {
-                let factor_i = if (n > eq_n) ^ (new_n > eq_n) {
-                    (eq_n - *n) / *dn
-                } else {
-                    1.0
-                };
-
-                if factor_i > 0.0 {
-                    FoldWhile::Continue(factor.min(factor_i))
-                } else {
-                    FoldWhile::Continue(factor)
-                }
-            })
-            .into_inner();
-
-        *dn *= factor;
-        factor
     }
 }
