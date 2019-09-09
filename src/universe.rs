@@ -4,7 +4,7 @@
 
 mod standard_model;
 
-pub use self::standard_model::StandardModel;
+pub use standard_model::StandardModel;
 
 use crate::{constants, statistic::Statistic};
 use special_functions::approximations::interpolation;
