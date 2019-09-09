@@ -3,6 +3,7 @@
 //! Coefficients are exported from Mathematica and can be obtained from
 //! references therein.
 
+#![allow(clippy::all)]
 #![allow(dead_code)]
 
 pub const RK_ORDER: i32 = 2;
