@@ -5,7 +5,7 @@ use std::{cmp, ops};
 
 /// If an overshoot of the interaction rate is detected, the rate is adjusted such that `dn` satisfies:
 ///
-/// ```
+/// ```text
 /// n + dn = (eq + (ALPHA - 1) * n) / ALPHA
 /// ```
 ///

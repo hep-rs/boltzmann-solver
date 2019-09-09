@@ -190,9 +190,9 @@ where
 
         csv.write_record(None::<&[u8]>).unwrap();
 
-        if n.iter().any(|n| !n.is_finite()) {
-            panic!("Obtained a non-finite number.")
-        }
+        // if n.iter().any(|n| !n.is_finite()) {
+        //     panic!("Obtained a non-finite number.")
+        // }
     });
 
     // Interactions
