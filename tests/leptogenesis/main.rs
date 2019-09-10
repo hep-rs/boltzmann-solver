@@ -119,6 +119,10 @@ pub fn scan() {
             m
         };
         let sol = solve(f);
+        assert!(1e-20 < sol[p_i("B-L", 0)].abs() && sol[p_i("B-L", 0)].abs() < 1e-1);
+        for i in 1..3 {
+            assert!(sol[p_i("N", i)] < 1e-15);
+        }
 
         csv.write()
             .unwrap()
@@ -190,9 +194,9 @@ where
 
         csv.write_record(None::<&[u8]>).unwrap();
 
-        // if n.iter().any(|n| !n.is_finite()) {
-        //     panic!("Obtained a non-finite number.")
-        // }
+        if n.iter().any(|n| !n.is_finite()) {
+            panic!("Obtained a non-finite number.")
+        }
     });
 
     // Interactions
