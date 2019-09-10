@@ -4,7 +4,6 @@ use super::model::{p_i, LeptogenesisModel};
 use boltzmann_solver::{
     constants::PI_3,
     solver::number_density::{Interacting::*, Interaction, SolverBuilder},
-    // utilities::{four, integrate_st, three},
 };
 use special_functions::bessel;
 

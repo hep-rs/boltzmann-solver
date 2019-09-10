@@ -1,213 +1,166 @@
 //! Test `boltzmann-solver` to calculate the baryon asymmetry generated through
 //! leptogenesis in the standard type-I seesaw.
 
-pub mod interaction;
-pub mod model;
+mod common;
+mod interaction;
+mod model;
 
 use boltzmann_solver::{
     solver::{number_density::SolverBuilder, Model},
     universe::StandardModel,
 };
-use fern::colors;
 use itertools::iproduct;
-use log::info;
 use model::{p_i, LeptogenesisModel};
 use ndarray::prelude::*;
-use rayon::prelude::*;
-use std::{cell::RefCell, env::temp_dir, fs, io, path::PathBuf, sync::RwLock};
+use std::{fs::File, io, sync::RwLock};
 
-/// Setup logging
-fn setup_logging() {
-    let mut base_config = fern::Dispatch::new();
+/// Solve the Boltzmann equations and return the final values.
+///
+/// The model function is specified by `model`, and optionally a CSV writer can
+/// be given to record the progress of Boltzmann equations.
+pub fn solve<F, W>(model: F, csv: Option<csv::Writer<W>>) -> Array1<f64>
+where
+    F: Fn(f64) -> LeptogenesisModel + 'static,
+    W: io::Write + 'static,
+{
+    // Set up the universe in which we'll run the Boltzmann equations
+    let universe = StandardModel::new();
+    let beta_start = 1e-17;
+    let beta_end = 1e-3;
+    let model_start = model(beta_start);
 
-    let colors = colors::ColoredLevelConfig::new()
-        .error(colors::Color::Red)
-        .warn(colors::Color::Yellow)
-        .info(colors::Color::Green)
-        .debug(colors::Color::White)
-        .trace(colors::Color::Black);
+    // Create the SolverBuilder and set base parameters
+    let mut solver_builder = SolverBuilder::new()
+        .model(model)
+        .equilibrium(vec![1])
+        .beta_range(beta_start, beta_end)
+        .initial_conditions(
+            model_start
+                .particles()
+                .iter()
+                .map(|p| p.normalized_number_density(0.0, beta_start)),
+        );
 
-    let verbosity = 1;
+    if let Some(mut csv) = csv {
+        // If we have a CSV file to write to, track the number densities as they
+        // evolve.
 
-    let lvl = match verbosity {
-        0 => log::LevelFilter::Warn,
-        1 => log::LevelFilter::Info,
-        2 => log::LevelFilter::Debug,
-        _3_or_more => log::LevelFilter::Trace,
-    };
-    base_config = base_config.level(lvl);
-
-    let stderr_config = fern::Dispatch::new()
-        .format(move |out, message, record| {
-            out.finish(format_args!(
-                "[{level}] {target} - {message}",
-                target = record.target(),
-                level = colors.color(record.level()),
-                message = message
-            ))
-        })
-        .chain(io::stderr());
-
-    base_config.chain(stderr_config).apply().unwrap_or(());
-
-    log::debug!("Verbosity set to Debug.");
-    log::trace!("Verbosity set to Trace.");
-}
-
-/// Output directory
-fn output_dir() -> PathBuf {
-    let mut dir = if false {
-        temp_dir()
-    } else {
-        PathBuf::from("./output/")
-    };
-    dir.push("leptogenesis");
-    if !dir.is_dir() {
-        log::info!("Creating output directory: {}", dir.display());
-    }
-
-    match fs::create_dir_all(&dir) {
-        Ok(()) => (),
-        Err(e) => {
-            log::error!("Unable to created directory: {}", e);
-            panic!()
+        // Write the headers
+        csv.write_field("step").unwrap();
+        csv.write_field("beta").unwrap();
+        for name in &model::NAMES {
+            csv.write_field(name).unwrap();
+            csv.write_field(format!("({})", name)).unwrap();
+            csv.write_field(format!("Δ{}", name)).unwrap();
         }
+        csv.write_record(None::<&[u8]>).unwrap();
+
+        // Wrap the CSV into a RefCell as the logger is shared across threads
+        // and offers mutability to the CSV.
+        let csv = RwLock::new(csv);
+
+        solver_builder.logger(move |n, dn, c| {
+            // Write out the current step and inverse temperature
+            let mut csv = csv.write().unwrap();
+            csv.write_field(format!("{}", c.step)).unwrap();
+            csv.write_field(format!("{:e}", c.beta)).unwrap();
+            // Write all the number densities
+            for i in 0..n.len() {
+                csv.write_field(format!("{:e}", n[i])).unwrap();
+                csv.write_field(format!("{:e}", c.eq[i])).unwrap();
+                csv.write_field(format!("{:e}", dn[i])).unwrap();
+            }
+            csv.write_record(None::<&[u8]>).unwrap();
+
+            if n.iter().any(|n| !n.is_finite()) {
+                panic!("Obtained a non-finite number.")
+            }
+        });
+    } else {
+        // If we're not tracking the number density, simply make sure that all
+        // the number densities are always finite, or quite.
+        solver_builder.logger(|n, _, c| {
+            if n.iter().any(|n| !n.is_finite()) {
+                log::error!("Non-finite number density at step {}.", c.step);
+                panic!("Obtained a non-finite number.")
+            }
+        })
     }
 
-    dir
+    // Add each interaction to the solver.
+    interaction::n_el_h(&mut solver_builder);
+
+    // Build and run the solver
+    let solver = solver_builder
+        .build()
+        .expect("Error while building the solver.");
+    solver.solve(&universe)
 }
 
-/// Test a single fiducial data point
+/// Test a single run, and log the evolution in a CSV file.
 #[test]
 pub fn run() {
-    crate::setup_logging();
+    // common::setup_logging(2);
 
-    let sol = solve(LeptogenesisModel::new);
+    // Create the CSV file
+    let output_dir = common::output_dir("leptogenesis");
+    let csv = csv::Writer::from_path(output_dir.join("n.csv")).unwrap();
 
-    info!("Final number density: {:.3e}", sol);
+    // Get the solution
+    let sol = solve(LeptogenesisModel::new, Some(csv));
 
+    // Check that the solution is fine
+    log::info!("Final number density: {:.3e}", sol);
     assert!(1e-10 < sol[p_i("B-L", 0)].abs() && sol[p_i("B-L", 0)].abs() < 1e-5);
     for i in 0..3 {
         assert!(sol[p_i("N", i)] < 1e-9);
     }
 }
 
-/// Provide an example of a very simple scan over parameter space.
+/// Scan some parameter space and store the B-L from the scan in a CSV file.
 #[test]
 pub fn scan() {
-    crate::setup_logging();
+    // common::setup_logging(2);
 
-    // Setup the directory for CSV output
-    let output_dir = crate::output_dir();
-    let csv = RwLock::new(csv::Writer::from_path(output_dir.join("scan.csv")).unwrap());
-    csv.write().unwrap().serialize(("y", "m", "B-L")).unwrap();
+    // Create the CSV file
+    let output_dir = common::output_dir("leptogenesis");
+    let mut csv = csv::Writer::from_path(output_dir.join("scan.csv")).unwrap();
 
-    let ym: Vec<_> = iproduct!(
+    // Write the header for the CSV
+    csv.serialize(("y", "m", "B-L", "N1")).unwrap();
+
+    for (&y, &m) in iproduct!(
         Array1::linspace(-8.0, -2.0, 8).into_iter(),
         Array1::linspace(6.0, 14.0, 8).into_iter()
-    )
-    .map(|(&y, &m)| (10.0f64.powf(y), 10.0f64.powf(m)))
-    .collect();
+    ) {
+        // Convert y and m from the exponent to their actual values
+        let y = 10f64.powf(y);
+        let m = 10f64.powf(m);
 
-    ym.into_par_iter().for_each(|(y, mass_n)| {
-        let f = move |beta: f64| {
-            let mut m = LeptogenesisModel::new(beta);
-            m.coupling.y_v.mapv_inplace(|yi| yi / 1e-4 * y);
-            m.particles[p_i("N", 0)].set_mass(mass_n);
-            m.mass.n[0] = mass_n;
-            m.mass2.n[0] = mass_n.powi(2);
-            m
+        // Adjust the model with the necessary Yukawa and mass
+        let model = move |beta: f64| {
+            let mut model = LeptogenesisModel::new(beta);
+            model.coupling.y_v.mapv_inplace(|yi| yi / 1e-4 * y);
+            model.particles[p_i("N", 0)].set_mass(m);
+            model.mass.n[0] = m;
+            model.mass2.n[0] = m.powi(2);
+            model
         };
-        let sol = solve(f);
+        let sol = solve(model, None::<csv::Writer<File>>);
+
+        // Verify that the solution is fine
         assert!(1e-20 < sol[p_i("B-L", 0)].abs() && sol[p_i("B-L", 0)].abs() < 1e-1);
         for i in 1..3 {
             assert!(sol[p_i("N", i)] < 1e-15);
         }
 
-        csv.write()
-            .unwrap()
-            .serialize((
-                format!("{:.10e}", y),
-                format!("{:.10e}", mass_n),
-                format!("{:.10e}", sol[p_i("B-L", 0)]),
-            ))
-            .unwrap();
-    });
-}
-
-/// Solve the Boltzmann equations for the given model.
-///
-/// This routine sets up the solve, runs it and returns the final array of
-/// number densities.
-pub fn solve<F: 'static>(f: F) -> Array1<f64>
-where
-    F: Fn(f64) -> LeptogenesisModel,
-{
-    // Set up the universe in which we'll run the Boltzmann equations
-    let universe = StandardModel::new();
-    let beta_start = 1e-17;
-    let beta_end = 1e-3;
-    let model = f(beta_start);
-
-    // Create the SolverBuilder and set base parameters
-    let mut solver_builder: SolverBuilder<LeptogenesisModel> = SolverBuilder::new()
-        .model(f)
-        .equilibrium(vec![1])
-        .beta_range(beta_start, beta_end)
-        // .error_tolerance(1e-1)
-        // .step_precision(1e-2, 5e-1)
-        .initial_conditions(
-            model
-                .particles()
-                .iter()
-                .map(|p| p.normalized_number_density(0.0, beta_start)),
-        );
-
-    // Logging of number densities
-    ////////////////////////////////////////////////////////////////////////////////
-    let output_dir = crate::output_dir();
-    let csv = RefCell::new(csv::Writer::from_path(output_dir.join("n.csv")).unwrap());
-    {
-        let mut csv = csv.borrow_mut();
-        csv.write_field("step").unwrap();
-        csv.write_field("beta").unwrap();
-
-        for name in &model::NAMES {
-            csv.write_field(name).unwrap();
-            csv.write_field(format!("({})", name)).unwrap();
-            csv.write_field(format!("Δ{}", name)).unwrap();
-        }
-
-        csv.write_record(None::<&[u8]>).unwrap();
+        // Write to the CSV file
+        csv.serialize((
+            format!("{:e}", y),
+            format!("{:e}", m),
+            format!("{:e}", sol[p_i("B-L", 0)]),
+            format!("{:e}", sol[p_i("N", 0)]),
+        ))
+        .unwrap();
     }
-
-    solver_builder.logger(move |n, dn, c| {
-        let mut csv = csv.borrow_mut();
-        csv.write_field(format!("{}", c.step)).unwrap();
-        csv.write_field(format!("{:.15e}", c.beta)).unwrap();
-
-        for i in 0..n.len() {
-            csv.write_field(format!("{:.3e}", n[i])).unwrap();
-            csv.write_field(format!("{:.3e}", c.eq[i])).unwrap();
-            csv.write_field(format!("{:.3e}", dn[i])).unwrap();
-        }
-
-        csv.write_record(None::<&[u8]>).unwrap();
-
-        if n.iter().any(|n| !n.is_finite()) {
-            panic!("Obtained a non-finite number.")
-        }
-    });
-
-    // Interactions
-    ////////////////////////////////////////////////////////////////////////////////
-
-    interaction::n_el_h(&mut solver_builder);
-
-    // Build and run the solver
-    ////////////////////////////////////////////////////////////////////////////////
-
-    let solver = solver_builder.build();
-
-    solver.solve(&universe)
 }
