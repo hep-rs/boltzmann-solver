@@ -323,9 +323,38 @@ use crate::{
 pub use interaction::{Interacting, Interaction};
 use ndarray::{array, prelude::*, Zip};
 use rayon::prelude::*;
+use std::{error, fmt};
+
+#[derive(Debug)]
+pub enum Error {
+    TooManyInitialConditions,
+    NanInitialConditions,
+    TooManyInEquilibrium,
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Error::TooManyInitialConditions => {
+                write!(f, "too many initial conditions for the model")
+            }
+            Error::NanInitialConditions => write!(f, "non-finite (nan or ∞) initial conditions"),
+            Error::TooManyInEquilibrium => {
+                write!(f, "too many particles held in equilibrium for the model")
+            }
+        }
+    }
+}
+
+impl error::Error for Error {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        None
+    }
+}
 
 /// Context provided containing pre-computed values which might be useful when
 /// evaluating interactions.
+#[derive(Debug)]
 pub struct Context<M: Model + Sync> {
     /// Current evaluation step
     pub step: u64,
@@ -617,28 +646,36 @@ impl<M: Model + Sync> SolverBuilder<M> {
     }
 
     /// Build the Boltzmann solver.
-    pub fn build(self) -> Solver<M> {
+    pub fn build(self) -> Result<Solver<M>, Error> {
         let model = (self.model)((self.beta_range.0 * self.beta_range.1).sqrt());
         let particles = model.particles();
-        assert_eq!(
-            self.initial_conditions.len(),
-            particles.len(),
-            "The number of particles in the model ({}) is different to the number of initial conditions ({}).",
-            particles.len(),
-            self.initial_conditions.len(),
-        );
 
-        Solver {
-            normalized: self.normalized,
-            initial_conditions: self.initial_conditions,
-            beta_range: self.beta_range,
-            model: self.model,
-            interactions: self.interactions,
-            equilibrium: self.equilibrium,
-            logger: self.logger,
-            step_precision: self.step_precision,
-            error_tolerance: self.error_tolerance,
-            threshold_number_density: self.threshold_number_density,
+        if self.initial_conditions.len() != particles.len() {
+            log::error!(
+                "The number of particles in the model ({}) is different to the number of initial conditions ({}).",
+                particles.len(),
+                self.initial_conditions.len()
+            );
+            Err(Error::TooManyInitialConditions)
+        } else if self.initial_conditions.iter().any(|v| !v.is_finite()) {
+            log::error!("Initial conditions must all be finite.",);
+            Err(Error::NanInitialConditions)
+        } else if self.equilibrium.len() > particles.len() {
+            log::error!("There are more particles held in equilibrium ({}) than particles in the model ({}).", self.equilibrium.len(), particles.len());
+            Err(Error::TooManyInEquilibrium)
+        } else {
+            Ok(Solver {
+                normalized: self.normalized,
+                initial_conditions: self.initial_conditions,
+                beta_range: self.beta_range,
+                model: self.model,
+                interactions: self.interactions,
+                equilibrium: self.equilibrium,
+                logger: self.logger,
+                step_precision: self.step_precision,
+                error_tolerance: self.error_tolerance,
+                threshold_number_density: self.threshold_number_density,
+            })
         }
     }
 }
