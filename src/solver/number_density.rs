@@ -325,19 +325,25 @@ use ndarray::{array, prelude::*, Zip};
 use rayon::prelude::*;
 use std::{error, fmt};
 
+/// Error type returned by the solver builder in case there is an error.
 #[derive(Debug)]
 pub enum Error {
-    TooManyInitialConditions,
+    /// The number of initial conditions does not match the number of particles.
+    InvalidInitialConditions,
+    /// One or more of the initial conditions is either NaN or infinite.
     NanInitialConditions,
+    /// The number of particles held in equilibrium exceeds the number of
+    /// particles in the model.
     TooManyInEquilibrium,
 }
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::TooManyInitialConditions => {
-                write!(f, "too many initial conditions for the model")
-            }
+            Error::InvalidInitialConditions => write!(
+                f,
+                "number of initial conditions does not match number of particles"
+            ),
             Error::NanInitialConditions => write!(f, "non-finite (nan or ∞) initial conditions"),
             Error::TooManyInEquilibrium => {
                 write!(f, "too many particles held in equilibrium for the model")
@@ -656,7 +662,7 @@ impl<M: Model + Sync> SolverBuilder<M> {
                 particles.len(),
                 self.initial_conditions.len()
             );
-            Err(Error::TooManyInitialConditions)
+            Err(Error::InvalidInitialConditions)
         } else if self.initial_conditions.iter().any(|v| !v.is_finite()) {
             log::error!("Initial conditions must all be finite.",);
             Err(Error::NanInitialConditions)
