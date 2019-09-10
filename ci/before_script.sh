@@ -15,7 +15,7 @@ rustup_tools() {
 # Install cargo tools
 cargo_tools() {
     cargo install cargo-update || echo "cargo-update already installed"
-    cargo install cargo-travis || echo "cargo-travis already installed"
+    cargo install cargo-tarpaulin || echo "cargo-tarpaulin already installed"
     # Update cached binaries
     cargo install-update -a
 }
