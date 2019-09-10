@@ -204,7 +204,7 @@ impl Interaction {
             let gamma_tilde = 0.002_423_011_225_182_300_4 * m2 * bessel::k1_on_k2(m * c.beta)
                 / c.beta.powi(3)
                 / m;
-            log::trace!("̃γ: {:.3e}", gamma_tilde);
+            log::trace!("Using explicit decay: ̃γ = {:.3e}", gamma_tilde);
 
             rf = gamma_tilde;
             rb = gamma_tilde;
@@ -221,6 +221,8 @@ impl Interaction {
                 }
             }
         } else {
+            log::trace!("Using conventional rate calculation.");
+
             // Calculate the forward and backward rates the conventional way.
             rf = self.rate;
             rb = self.rate;
@@ -282,7 +284,7 @@ impl Interaction {
                 }
                 Interacting::Other(i, net, forward, backward, custom) => {
                     let base = (*forward + *net) * rf + (*backward - *net) * rb;
-                    if check_overshoot(*i, base + *custom * self.rate) {
+                    if self.rate != 0.0 && check_overshoot(*i, base + *custom * self.rate) {
                         log::trace!(
                             "Scaling custom rate from {:.3e} to {:.3e}",
                             custom,
