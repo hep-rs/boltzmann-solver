@@ -882,6 +882,49 @@
 <span id="882">882</span>
 <span id="883">883</span>
 <span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
+<span id="922">922</span>
+<span id="923">923</span>
+<span id="924">924</span>
+<span id="925">925</span>
+<span id="926">926</span>
+<span id="927">927</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Solver for the number density evolution given by integrating the Boltzmann</span>
 <span class="doccomment">//! equation.</span>
@@ -1208,9 +1251,44 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">interaction</span>::{<span class="ident">Interacting</span>, <span class="ident">Interaction</span>};
 <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">array</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">Zip</span>};
 <span class="kw">use</span> <span class="ident">rayon</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">error</span>, <span class="ident">fmt</span>};
+
+<span class="doccomment">/// Error type returned by the solver builder in case there is an error.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
+    <span class="doccomment">/// The number of initial conditions does not match the number of particles.</span>
+    <span class="ident">InvalidInitialConditions</span>,
+    <span class="doccomment">/// One or more of the initial conditions is either NaN or infinite.</span>
+    <span class="ident">NanInitialConditions</span>,
+    <span class="doccomment">/// The number of particles held in equilibrium exceeds the number of</span>
+    <span class="doccomment">/// particles in the model.</span>
+    <span class="ident">TooManyInEquilibrium</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">Error</span>::<span class="ident">InvalidInitialConditions</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(
+                <span class="ident">f</span>,
+                <span class="string">&quot;number of initial conditions does not match number of particles&quot;</span>
+            ),
+            <span class="ident">Error</span>::<span class="ident">NanInitialConditions</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;non-finite (nan or ∞) initial conditions&quot;</span>),
+            <span class="ident">Error</span>::<span class="ident">TooManyInEquilibrium</span> <span class="op">=&gt;</span> {
+                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;too many particles held in equilibrium for the model&quot;</span>)
+            }
+        }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+        <span class="prelude-val">None</span>
+    }
+}
 
 <span class="doccomment">/// Context provided containing pre-computed values which might be useful when</span>
 <span class="doccomment">/// evaluating interactions.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Current evaluation step</span>
     <span class="kw">pub</span> <span class="ident">step</span>: <span class="ident">u64</span>,
@@ -1502,28 +1580,36 @@
     }
 
     <span class="doccomment">/// Build the Boltzmann solver.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">model</span>)((<span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">0</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">1</span>).<span class="ident">sqrt</span>());
         <span class="kw">let</span> <span class="ident">particles</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">particles</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="self">self</span>.<span class="ident">initial_conditions</span>.<span class="ident">len</span>(),
-            <span class="ident">particles</span>.<span class="ident">len</span>(),
-            <span class="string">&quot;The number of particles in the model ({}) is different to the number of initial conditions ({}).&quot;</span>,
-            <span class="ident">particles</span>.<span class="ident">len</span>(),
-            <span class="self">self</span>.<span class="ident">initial_conditions</span>.<span class="ident">len</span>(),
-        );
 
-        <span class="ident">Solver</span> {
-            <span class="ident">normalized</span>: <span class="self">self</span>.<span class="ident">normalized</span>,
-            <span class="ident">initial_conditions</span>: <span class="self">self</span>.<span class="ident">initial_conditions</span>,
-            <span class="ident">beta_range</span>: <span class="self">self</span>.<span class="ident">beta_range</span>,
-            <span class="ident">model</span>: <span class="self">self</span>.<span class="ident">model</span>,
-            <span class="ident">interactions</span>: <span class="self">self</span>.<span class="ident">interactions</span>,
-            <span class="ident">equilibrium</span>: <span class="self">self</span>.<span class="ident">equilibrium</span>,
-            <span class="ident">logger</span>: <span class="self">self</span>.<span class="ident">logger</span>,
-            <span class="ident">step_precision</span>: <span class="self">self</span>.<span class="ident">step_precision</span>,
-            <span class="ident">error_tolerance</span>: <span class="self">self</span>.<span class="ident">error_tolerance</span>,
-            <span class="ident">threshold_number_density</span>: <span class="self">self</span>.<span class="ident">threshold_number_density</span>,
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">initial_conditions</span>.<span class="ident">len</span>() <span class="op">!=</span> <span class="ident">particles</span>.<span class="ident">len</span>() {
+            <span class="ident">log</span>::<span class="macro">error</span><span class="macro">!</span>(
+                <span class="string">&quot;The number of particles in the model ({}) is different to the number of initial conditions ({}).&quot;</span>,
+                <span class="ident">particles</span>.<span class="ident">len</span>(),
+                <span class="self">self</span>.<span class="ident">initial_conditions</span>.<span class="ident">len</span>()
+            );
+            <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">InvalidInitialConditions</span>)
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">initial_conditions</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="op">!</span><span class="ident">v</span>.<span class="ident">is_finite</span>()) {
+            <span class="ident">log</span>::<span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;Initial conditions must all be finite.&quot;</span>,);
+            <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">NanInitialConditions</span>)
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">equilibrium</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">particles</span>.<span class="ident">len</span>() {
+            <span class="ident">log</span>::<span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;There are more particles held in equilibrium ({}) than particles in the model ({}).&quot;</span>, <span class="self">self</span>.<span class="ident">equilibrium</span>.<span class="ident">len</span>(), <span class="ident">particles</span>.<span class="ident">len</span>());
+            <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">TooManyInEquilibrium</span>)
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">Solver</span> {
+                <span class="ident">normalized</span>: <span class="self">self</span>.<span class="ident">normalized</span>,
+                <span class="ident">initial_conditions</span>: <span class="self">self</span>.<span class="ident">initial_conditions</span>,
+                <span class="ident">beta_range</span>: <span class="self">self</span>.<span class="ident">beta_range</span>,
+                <span class="ident">model</span>: <span class="self">self</span>.<span class="ident">model</span>,
+                <span class="ident">interactions</span>: <span class="self">self</span>.<span class="ident">interactions</span>,
+                <span class="ident">equilibrium</span>: <span class="self">self</span>.<span class="ident">equilibrium</span>,
+                <span class="ident">logger</span>: <span class="self">self</span>.<span class="ident">logger</span>,
+                <span class="ident">step_precision</span>: <span class="self">self</span>.<span class="ident">step_precision</span>,
+                <span class="ident">error_tolerance</span>: <span class="self">self</span>.<span class="ident">error_tolerance</span>,
+                <span class="ident">threshold_number_density</span>: <span class="self">self</span>.<span class="ident">threshold_number_density</span>,
+            })
         }
     }
 }
