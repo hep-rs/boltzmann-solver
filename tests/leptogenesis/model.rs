@@ -5,125 +5,12 @@
 // compute and ultimately not used, it would be preferable to comment these out.
 #![allow(dead_code)]
 
-use boltzmann_solver::{particle::Particle, solver::Model};
+mod interaction;
+
+use boltzmann_solver::{constants::PI, prelude::*};
 use ndarray::{array, prelude::*};
-use num::{zero, Complex};
+use num::Complex;
 use std::f64;
-
-////////////////////////////////////////////////////////////////////////////////
-// Particle Names
-////////////////////////////////////////////////////////////////////////////////
-
-/// All the particle names in the same order as they are added to the solver.
-#[rustfmt::skip]
-pub const NAMES: [&str; 5] = [
-    "B-L",
-    "H",
-    "N₁", "N₂", "N₃",
-];
-
-/// Function to map a more memorable name to the array index for the number
-/// density, mass, etc.
-///
-/// We are using the programming convention of 0-indexing all particles; thus
-/// the index of "N₁" is obtained with `p_i("N", 0)`.
-#[inline]
-pub fn p_i(p: &str, n: usize) -> usize {
-    match (p, n) {
-        ("BL", _) | ("B-L", _) => 0,
-        ("H", _) => 1,
-        ("N", n) if n < 3 => n + 2,
-        _ => unreachable!(),
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Model Parameters
-////////////////////////////////////////////////////////////////////////////////
-
-/// Struct containing all the Lagrangian coupling parameters.
-pub struct Couplings {
-    /// Yukawa coupling: [H, Q, u]
-    pub y_u: Array2<Complex<f64>>,
-    /// Yukawa coupling: [H, Q, d]
-    pub y_d: Array2<Complex<f64>>,
-    /// Yukawa coupling: [H, L, e]
-    pub y_e: Array2<Complex<f64>>,
-    /// Yukawa coupling: [H, ν, L]
-    pub y_v: Array2<Complex<f64>>,
-}
-
-/// Particle masses (in GeV)
-pub struct Masses {
-    /// Right-handed neutrinos
-    pub n: [f64; 3],
-    /// Higgs
-    pub h: f64,
-}
-
-impl Masses {
-    fn new(particles: &Array1<Particle>) -> Self {
-        Masses {
-            n: [particles[2].mass, particles[3].mass, particles[4].mass],
-            h: particles[1].mass,
-        }
-    }
-}
-
-/// Particle squared masses (in GeV\\(^2\\))
-pub struct SquaredMasses {
-    /// Right-handed neutrinos
-    pub n: [f64; 3],
-    /// Higgs
-    pub h: f64,
-}
-
-impl SquaredMasses {
-    fn new(particles: &Array1<Particle>) -> Self {
-        SquaredMasses {
-            n: [particles[2].mass2, particles[3].mass2, particles[4].mass2],
-            h: particles[1].mass2,
-        }
-    }
-}
-
-/// Particle widths (in GeV)
-pub struct Widths {
-    /// Right-handed neutrinos
-    pub n: [f64; 3],
-    /// Higgs
-    pub h: f64,
-}
-
-impl Widths {
-    fn new(particles: &Array1<Particle>) -> Self {
-        Widths {
-            n: [particles[2].width, particles[3].width, particles[4].width],
-            h: particles[1].width,
-        }
-    }
-}
-
-/// Particle squared widths (in GeV\\(^2\\))
-pub struct SquaredWidths {
-    /// Right-handed neutrinos
-    pub n: [f64; 3],
-    /// Higgs
-    pub h: f64,
-}
-
-impl SquaredWidths {
-    fn new(particles: &Array1<Particle>) -> Self {
-        SquaredWidths {
-            n: [
-                particles[2].width2,
-                particles[3].width2,
-                particles[4].width2,
-            ],
-            h: particles[1].width2,
-        }
-    }
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Model
@@ -131,82 +18,115 @@ impl SquaredWidths {
 
 /// Leptogenesis model parameters
 pub struct LeptogenesisModel {
-    pub coupling: Couplings,
-    pub particles: Array1<Particle>,
-    pub mass: Masses,
-    pub mass2: SquaredMasses,
-    pub width: Widths,
-    pub width2: SquaredWidths,
-    pub epsilon: f64,
+    pub sm: StandardModel,
+    pub yv: Array2<Complex<f64>>,
+    pub mn: Array1<f64>,
+    pub particles: Vec<Particle>,
+    pub interactions: Vec<Interaction<Self>>,
+    pub epsilon: Array2<f64>,
 }
 
 impl Model for LeptogenesisModel {
-    fn new(beta: f64) -> Self {
-        let coupling = Couplings {
-            y_u: array![
-                [Complex::new(2.2e-3, 0.0), zero(), zero()],
-                [zero(), Complex::new(95e-3, 0.0), zero()],
-                [zero(), zero(), Complex::new(172.200, 0.0)],
-            ] * f64::sqrt(2.0)
-                / 246.0,
-            y_d: array![
-                [Complex::new(5e-3, 0.0), zero(), zero()],
-                [zero(), Complex::new(1.25, 0.0), zero()],
-                [zero(), zero(), Complex::new(4.2, 0.0)],
-            ] * f64::sqrt(2.0)
-                / 246.0,
-            y_e: array![
-                [Complex::new(5.109_989e-4, 0.0), zero(), zero()],
-                [zero(), Complex::new(1.056_583_7e-1, 0.0), zero()],
-                [zero(), zero(), Complex::new(1.77699, 0.0)],
-            ] * f64::sqrt(2.0)
-                / 246.0,
-            y_v: array![
-                [
-                    Complex::new(1.0, 0.0),
-                    Complex::new(0.1, 0.1),
-                    Complex::new(0.1, 0.1)
-                ],
-                [
-                    Complex::new(0.1, -0.1),
-                    Complex::new(1.0, 0.0),
-                    Complex::new(0.1, 0.1)
-                ],
-                [
-                    Complex::new(0.1, -0.1),
-                    Complex::new(0.1, -0.1),
-                    Complex::new(1.0, 0.0)
-                ],
-            ] * 1e-4,
-        };
+    fn new() -> Self {
+        let sm = StandardModel::new();
 
-        let particles = array![
-            Particle::new(0, 0.0, 0.0).dof(0.0), // B-L
-            Particle::new(0, 0.4 / beta, 0.1 * 0.4 / beta)
-                .complex()
-                .dof(2.0), // Higgs
-            Particle::new(1, 1e10, 0.0),         // N1
-            Particle::new(1, 1e15, 0.0),         // N2
-            Particle::new(1, 1e16, 0.0),         // N3
-        ];
+        let yv = array![
+            [
+                Complex::new(1.0, 0.0),
+                Complex::new(0.1, 0.1),
+                Complex::new(0.2, 0.2)
+            ],
+            [
+                Complex::new(0.1, -0.1),
+                Complex::new(2.0, 0.0),
+                Complex::new(0.3, 0.3)
+            ],
+            [
+                Complex::new(0.2, -0.2),
+                Complex::new(0.3, -0.3),
+                Complex::new(3.0, 0.0)
+            ],
+        ] * 1e-4;
 
-        let mass = Masses::new(&particles);
-        let mass2 = SquaredMasses::new(&particles);
-        let width = Widths::new(&particles);
-        let width2 = SquaredWidths::new(&particles);
+        let mn = array![1e10, 1e15, 5e15];
+
+        let mut particles = sm.particles.clone();
+        particles.push(Particle::new(1, mn[0], 0.0).name("N1"));
+        particles.push(Particle::new(1, mn[1], 0.0).name("N2"));
+        particles.push(Particle::new(1, mn[2], 0.0).name("N3"));
+
+        // epsilon[[i, j]] is the asymmetry in Ni -> H Lj.
+        let yvd_yv: Array2<Complex<f64>> = Array2::from_shape_fn((3, 3), |(i, j)| {
+            (0..3).map(|k| yv[[k, i]].conj() * yv[[k, j]]).sum()
+        });
+        let epsilon = Array2::from_shape_fn((3, 3), |(i, a)| {
+            (0..3)
+                .map(|j| {
+                    if j == i {
+                        0.0
+                    } else {
+                        let x = (mn[j] / mn[i]).powi(2);
+                        let g =
+                            x.sqrt() * (1.0 / (1.0 - x) + 1.0 - (1.0 + x) * f64::ln((1.0 + x) / x));
+
+                        (yv[[a, i]].conj() * yvd_yv[[i, j]] * yv[[a, j]]).im * (g + 1.0 / (1.0 - x))
+                    }
+                })
+                .sum::<f64>()
+                / (8.0 * PI * yvd_yv[[i, i]].re)
+        });
+
+        let mut interactions = Vec::new();
+        // interactions.append(&mut interaction::nn());
+        interactions.append(&mut interaction::hln());
+        interactions.append(&mut interaction::hhll1());
+        interactions.append(&mut interaction::hhll2());
+        // interactions.append(&mut interaction::nlqd());
+        // interactions.append(&mut interaction::nlqu());
+
+        log::info!("Interactions in model: {}", interactions.len());
 
         LeptogenesisModel {
-            coupling,
+            sm,
+            yv,
+            mn,
             particles,
-            mass,
-            mass2,
-            width,
-            width2,
-            epsilon: 1e-6,
+            interactions,
+            epsilon,
         }
     }
 
-    fn particles(&self) -> &Array1<Particle> {
+    fn beta(&mut self, beta: f64) {
+        self.sm.beta(beta);
+
+        self.particles = self.sm.particles.clone();
+        let yv = self.yv.diag().mapv(|v| v.norm_sqr() / 16.0);
+        for i in 0..3 {
+            self.particles
+                .push(Particle::new(1, self.mn[i] + f64::sqrt(yv[i]) / beta, 0.0))
+        }
+    }
+
+    fn entropy_dof(&self, beta: f64) -> f64 {
+        self.sm.entropy_dof(beta)
+    }
+
+    fn particles(&self) -> &Vec<Particle> {
         &self.particles
+    }
+
+    fn particles_mut(&mut self) -> &mut Vec<Particle> {
+        &mut self.particles
+    }
+
+    fn particle_idx(name: &str, i: usize) -> Result<usize, (&str, usize)> {
+        StandardModel::particle_idx(name, i).or_else(|(name, i)| match (name, i) {
+            ("N", i) if i < 3 => Ok(17 + i),
+            (name, i) => Err((name, i)),
+        })
+    }
+
+    fn interactions(&self) -> &Vec<Interaction<Self>> {
+        &self.interactions
     }
 }

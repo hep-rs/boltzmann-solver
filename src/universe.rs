@@ -4,51 +4,8 @@
 
 mod standard_model;
 
-pub use standard_model::StandardModel;
-
 use crate::{constants, statistic::Statistic};
 use special_functions::approximations::interpolation;
-
-/// Collection of properties which determine the evolution of a Universe.
-///
-/// Some of these values can be constant, though in general they will change
-/// over time.  As these properties often have a clearer explicit dependence on
-/// temperature, the inverse temperature \\(\beta\\) is used as the dependent
-/// variable (specified in units of inverse gigaelectronvolts).
-pub trait Universe {
-    /// Return the effective degrees of freedom contributing to the entropy
-    /// density of the Universe at the specified inverse temperature.
-    fn entropy_dof(&self, beta: f64) -> f64;
-
-    /// Return the Hubble rate at the specified inverse temperature.
-    ///
-    /// The default implementation assumes the Universe to be radiation
-    /// dominated such that
-    ///
-    /// \\begin{equation}
-    ///    H(\beta) = \sqrt{\frac{\pi^2}{90}} g_{*}^{1/2}(\beta) \frac{1}{m_{\text{Pl}}} \frac{1}{\beta^2}.
-    /// \\end{equation}
-    ///
-    /// Which is valid provided that the entropy density of the Universe does
-    /// not change too rapidly.
-    ///
-    /// # Warning
-    ///
-    /// The dominated epoch in the Standard Model of cosmology ends at the
-    /// matter–radiation equality, which occurs at an inverse temperature of
-    /// \\(\beta \approx 10^{9}\\) GeV^{-1}.
-    fn hubble_rate(&self, beta: f64) -> f64 {
-        debug_assert_warn!(
-            beta > 1e8,
-            "For β > 10⁸ GeV⁻¹, our Universe transitions into the matter
-            dominated epoch where this implementation of the Hubble rate no
-            longer applies."
-        );
-
-        // Prefactor: sqrt(pi^2 / 90) / REDUCED_PLANCK_MASS ≅ 1.35977e-19
-        1.35977e-19 * self.entropy_dof(beta).sqrt() * beta.powi(-2)
-    }
-}
 
 /// Contribution from a single particle in the Universe.
 ///

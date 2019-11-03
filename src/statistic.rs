@@ -11,7 +11,7 @@
 //! The statistics are implemented, as well as calculations of the number
 //! density.
 
-use crate::constants::PI_M2;
+use crate::constants::PI_N2;
 use quadrature::integrate;
 use special_functions::{bessel, particle_statistics};
 use std::f64;
@@ -251,7 +251,7 @@ impl Statistics for Statistic {
             }
             Statistic::MaxwellJuttner => {
                 let m_beta = mass * beta;
-                PI_M2 * (m_beta + 2.0) * (m_beta * (m_beta + 3.0) + 6.0)
+                PI_N2 * (m_beta + 2.0) * (m_beta * (m_beta + 3.0) + 6.0)
                     / (beta.powi(4) * mass * f64::exp(m_beta) * bessel::k2(m_beta))
             }
         }
@@ -307,7 +307,7 @@ impl Statistics for Statistic {
                 );
                 particle_statistics::bose_einstein(mu, beta)
             }
-            Statistic::MaxwellBoltzmann => PI_M2 * f64::exp(mu * beta) * beta.powi(-3),
+            Statistic::MaxwellBoltzmann => PI_N2 * f64::exp(mu * beta) * beta.powi(-3),
             Statistic::MaxwellJuttner => 0.0,
         }
     }
