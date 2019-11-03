@@ -1,4 +1,4 @@
-use crate::{constants::STANDARD_MODEL_GSTAR, universe::Universe};
+use crate::{constants::STANDARD_MODEL_GSTAR, model::StandardModel, universe::Universe};
 use special_functions::approximations::interpolation;
 
 /// Implementation of [`Universe`] for the Standard Model.
@@ -8,21 +8,6 @@ use special_functions::approximations::interpolation;
 /// particular, it implements the evolution of \\(g_{*}\\) as described in [*On
 /// Effective Degrees of Freedom in the Early Universe* by Lars
 /// Husdal](https://arxiv.org/abs/1609.04979).
-///
-/// Due to the intricacies of the transition from the quark–gluon plasma to
-/// hadrons, none of the individual particles of the Standard Model are included
-/// here.  In the future, the interactions from the leptons, the Higgs doublet
-/// and electromagnetic and weak bosons might be included.
-#[derive(Debug, Default, Clone, Copy)]
-pub struct StandardModel;
-
-impl StandardModel {
-    /// Create an instance of the Standard Model.
-    pub fn new() -> Self {
-        StandardModel::default()
-    }
-}
-
 impl Universe for StandardModel {
     fn entropy_dof(&self, beta: f64) -> f64 {
         debug_assert!(beta > 0.0, "beta must be positive.");
@@ -33,8 +18,7 @@ impl Universe for StandardModel {
 #[cfg(test)]
 mod tests {
     use super::StandardModel;
-    use crate::universe::Universe;
-    use crate::utilities::test::*;
+    use crate::{model::Model, universe::Universe, utilities::test::*};
 
     #[test]
     fn dof() {

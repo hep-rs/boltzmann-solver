@@ -87,8 +87,9 @@ mod tests {
 
                     // Compute the two estimates
                     dy = (0..RK_S).fold(Array1::zeros(y.dim()), |total, i| total + &k[i] * RK_B[i]);
-                    dy_err =
-                        (0..RK_S).fold(Array1::zeros(y.dim()), |total, i| total + &k[i] * RK_E[i]);
+                    dy_err = (0..RK_S).fold(Array1::<f64>::zeros(y.dim()), |total, i| {
+                        total + &k[i] * RK_E[i]
+                    });
 
                     let err = dy_err.iter().fold(0f64, |e, v| e.max(v.abs()));
                     // If the error is within the tolerance, add the result

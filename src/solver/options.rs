@@ -12,14 +12,3 @@ impl Default for StepPrecision {
         }
     }
 }
-
-/// Initial conditions for a particle.
-pub enum InitialCondition {
-    /// The particle's initial density is its equilibrium number with the
-    /// provided value of the chemical potential (in GeV)
-    Equilibrium(f64),
-    /// The particle's initial density begins with a fixed (arbitrary) value.
-    Fixed(f64),
-    /// The particle's initial abundance is zero.
-    Zero,
-}
