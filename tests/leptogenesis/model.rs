@@ -80,7 +80,7 @@ impl Model for LeptogenesisModel {
         // interactions.append(&mut interaction::nn());
         interactions.append(&mut interaction::hln());
         interactions.append(&mut interaction::hhll1());
-        interactions.append(&mut interaction::hhll2());
+        // interactions.append(&mut interaction::hhll2());
         // interactions.append(&mut interaction::nlqd());
         // interactions.append(&mut interaction::nlqu());
 

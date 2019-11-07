@@ -1,10 +1,11 @@
 //! Module of various useful miscellaneous functions.
 
-use quadrature::integrate;
-use special_functions::bessel;
-
+pub(crate) mod spline;
 #[cfg(test)]
 pub(crate) mod test;
+
+use quadrature::integrate;
+use special_functions::bessel;
 
 /// Kallen lambda function:
 ///
