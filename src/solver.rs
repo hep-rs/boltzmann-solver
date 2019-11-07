@@ -315,6 +315,7 @@
 
 mod context;
 mod options;
+#[allow(clippy::module_inception)]
 mod solver;
 mod tableau;
 

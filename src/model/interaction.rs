@@ -13,6 +13,7 @@ use std::{convert::TryFrom, sync::RwLock};
 /// This can be either a three-body or four-body interaction.  See the
 /// documentation of [`Interaction::three_body`] and [`Interaction::four_body`]
 /// for more details as to their implementations.
+#[allow(clippy::large_enum_variant)]
 pub enum Interaction<M: Model> {
     TwoParticle {
         particles: [usize; 2],
@@ -232,9 +233,7 @@ impl<M: Model> Interaction<M> {
 
                 // Iterate over the three possible configurations (though only 1
                 // will be non-zero)
-                for i in 0..3 {
-                    let [p0, _, _] = particles[i];
-
+                for &[p0, _, _] in particles {
                     #[allow(clippy::float_cmp)]
                     let decaying = ptcl[p0].mass == max_m;
                     if decaying {
@@ -330,15 +329,14 @@ impl<M: Model> Interaction<M> {
                 let &[a0, a1] = antiparticles;
                 let gamma = gamma[0];
 
-                let rate_forward;
-                let rate_backward;
-                if p0 != p1 {
-                    rate_forward = gamma * nan_to_zero(c.n[p0] / c.eq[p0]);
-                    rate_backward = gamma * nan_to_zero(c.n[p1] / c.eq[p1]);
+                let (rate_forward, rate_backward) = if p0 != p1 {
+                    (
+                        gamma * nan_to_zero(c.n[p0] / c.eq[p0]),
+                        gamma * nan_to_zero(c.n[p1] / c.eq[p1]),
+                    )
                 } else {
-                    rate_forward = 0.0;
-                    rate_backward = 0.0;
-                }
+                    (0.0, 0.0)
+                };
 
                 let arate_forward = gamma * nan_to_zero(a0 * c.na[p0] / c.eq[p0]);
                 let arate_backward = gamma * nan_to_zero(a1 * c.na[p1] / c.eq[p1]);
