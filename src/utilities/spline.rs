@@ -181,6 +181,28 @@ pub(crate) fn rec_geomspace(start: f64, end: f64, pow: u32) -> Vec<f64> {
     v
 }
 
+#[allow(unused)]
+pub(crate) fn rec_linspace(start: f64, end: f64, pow: u32) -> Vec<f64> {
+    let mut v = Vec::with_capacity(2usize.pow(pow));
+
+    v.push(start);
+    v.push(end);
+
+    let mut base = 2.0;
+    for i in 2..2u64.pow(pow) {
+        let i = i as f64;
+        if i > base {
+            base *= 2.0;
+        }
+
+        let b = 2.0 * i - base - 1.0;
+        let a = base - b;
+
+        v.push((a * start + b * end) / base)
+    }
+    v
+}
+
 #[cfg(test)]
 mod test {
     use ndarray::prelude::*;
@@ -193,8 +215,11 @@ mod test {
     #[test]
     fn spline() {
         let mut spline = super::CubicHermiteSpline::empty();
-        let mut sampled = BufWriter::new(fs::File::create("sampled.csv").unwrap());
-        for x in super::rec_geomspace(1e-10, 1.0, 14) {
+
+        let mut path = std::env::temp_dir();
+        path.push("sampled.csv");
+        let mut sampled = BufWriter::new(fs::File::create(path).unwrap());
+        for x in super::rec_linspace(0.0, 1.0, 14) {
             if !spline.accurate(x) {
                 writeln!(sampled, "{:e},{:e}", x, f(x)).unwrap();
                 spline.add(x, f(x))
@@ -203,7 +228,9 @@ mod test {
 
         println!("Points in spline: {}", spline.len());
 
-        let mut output = BufWriter::new(fs::File::create("spline.csv").unwrap());
+        let mut path = std::env::temp_dir();
+        path.push("spline.csv");
+        let mut output = BufWriter::new(fs::File::create(path).unwrap());
         for &x in Array1::linspace(0.0, 1.0, 2048).iter() {
             writeln!(output, "{:e},{:e}", x, spline.sample(x)).unwrap();
         }
