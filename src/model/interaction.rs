@@ -1,7 +1,11 @@
-use crate::{model::Model, solver::Context, utilities::integrate_st};
+use crate::{
+    model::Model,
+    solver::Context,
+    utilities::{integrate_st, spline::CubicHermiteSpline},
+};
 use ndarray::prelude::*;
 use special_functions::bessel;
-use std::convert::TryFrom;
+use std::{convert::TryFrom, sync::RwLock};
 // use std::ops;
 
 /// Interaction between particles.
@@ -14,24 +18,46 @@ pub enum Interaction<M: Model> {
         particles: [usize; 2],
         antiparticles: [f64; 2],
         m2: Box<dyn Fn(&M) -> f64>,
-        gamma: f64,
     },
     ThreeParticle {
         particles: [[usize; 3]; 3],
         antiparticles: [[f64; 3]; 3],
         m2: Box<dyn Fn(&M) -> f64>,
         asymmetry: Option<Box<dyn Fn(&M) -> f64>>,
-        gamma: f64,
     },
     FourParticle {
         particles: [[usize; 4]; 3],
         antiparticles: [[f64; 4]; 3],
         m2: Box<dyn Fn(&M, f64, f64, f64) -> f64>,
-        gamma: [f64; 3],
+        gamma: [RwLock<CubicHermiteSpline>; 3],
     },
 }
 
 impl<M: Model> Interaction<M> {
+    /// Return `true` if the interaction is a two-particle interaction.
+    pub fn is_two_body(&self) -> bool {
+        match &self {
+            Interaction::TwoParticle { .. } => true,
+            _ => false,
+        }
+    }
+
+    /// Return `true` if the interaction is a three-particle interaction.
+    pub fn is_three_body(&self) -> bool {
+        match &self {
+            Interaction::ThreeParticle { .. } => true,
+            _ => false,
+        }
+    }
+
+    /// Return `true` if the interaction is a four-particle interaction.
+    pub fn is_four_body(&self) -> bool {
+        match &self {
+            Interaction::FourParticle { .. } => true,
+            _ => false,
+        }
+    }
+
     /// Create a new two-particle interaction.
     ///
     /// This will calculate the interaction between the particles \\(p_1\\) and
@@ -52,7 +78,6 @@ impl<M: Model> Interaction<M> {
             particles: [u1, u2],
             antiparticles: [p1.signum() as f64, p2.signum() as f64],
             m2: Box::new(m2),
-            gamma: 0.0,
         }
     }
 
@@ -87,7 +112,6 @@ impl<M: Model> Interaction<M> {
             ],
             m2: Box::new(m2),
             asymmetry: None,
-            gamma: 0.0,
         }
     }
 
@@ -153,7 +177,11 @@ impl<M: Model> Interaction<M> {
                 ],
             ],
             m2: Box::new(m2),
-            gamma: [0.0, 0.0, 0.0],
+            gamma: [
+                RwLock::new(CubicHermiteSpline::empty()),
+                RwLock::new(CubicHermiteSpline::empty()),
+                RwLock::new(CubicHermiteSpline::empty()),
+            ],
         }
     }
 
@@ -185,6 +213,99 @@ impl<M: Model> Interaction<M> {
         self
     }
 
+    /// Calculate the value(s) of `gamma`.
+    pub(crate) fn gamma(&self, c: &Context<M>) -> Vec<f64> {
+        let mut gammas = Vec::with_capacity(3);
+
+        match self {
+            Interaction::TwoParticle { m2, .. } => {
+                let gamma =
+                    1e10 * m2(&c.model).abs() / c.beta.powi(2) * c.normalization * c.step_size;
+                gammas.push(gamma);
+            }
+            Interaction::ThreeParticle { particles, m2, .. } => {
+                let ptcl = c.model.particles();
+                let max_m = ptcl[particles[0][0]]
+                    .mass
+                    .max(ptcl[particles[0][1]].mass)
+                    .max(ptcl[particles[0][2]].mass);
+
+                // Iterate over the three possible configurations (though only 1
+                // will be non-zero)
+                for i in 0..3 {
+                    let [p0, _, _] = particles[i];
+
+                    #[allow(clippy::float_cmp)]
+                    let decaying = ptcl[p0].mass == max_m;
+                    if decaying {
+                        // 0.002_423_011_225_182_300_4 = ζ(3) / 16 π³
+                        let gamma_tilde = 0.002_423_011_225_182_300_4
+                            * m2(&c.model).abs()
+                            * bessel::k1_on_k2(ptcl[p0].mass * c.beta)
+                            / c.beta.powi(3)
+                            / ptcl[p0].mass
+                            * c.normalization
+                            * c.step_size;
+
+                        gammas.push(gamma_tilde);
+                    } else {
+                        gammas.push(0.0);
+                    }
+                }
+            }
+            Interaction::FourParticle {
+                particles,
+                m2,
+                gamma,
+                ..
+            } => {
+                let ptcl = c.model.particles();
+                let mass2_sum: f64 = particles[0].iter().map(|&pi| ptcl[pi].mass2).sum();
+
+                let ln_beta = c.beta.ln();
+
+                // Iterator over the three possible configurations
+                for i in 0..3 {
+                    {
+                        let spline = gamma[i].read().unwrap();
+                        if spline.accurate(ln_beta) {
+                            gammas.push(spline.sample(ln_beta));
+                            continue;
+                        }
+                    }
+
+                    let [p0, p1, p2, p3] = particles[i];
+
+                    let m2: Box<dyn Fn(&M, f64, f64, f64) -> f64> = match i {
+                        0 => Box::new(|c, s, t, u| m2(c, s, t, u)),
+                        1 => Box::new(|c, s, t, u| m2(c, t, s, u)),
+                        2 => Box::new(|c, s, t, u| m2(c, u, t, s)),
+                        _ => unreachable!(),
+                    };
+
+                    let value = integrate_st(
+                        |s, t| {
+                            let u = mass2_sum - s - t;
+                            m2(&c.model, s, t, u)
+                        },
+                        c.beta,
+                        ptcl[p0].mass2,
+                        ptcl[p1].mass2,
+                        ptcl[p2].mass2,
+                        ptcl[p3].mass2,
+                    ) * c.normalization
+                        * c.step_size;
+                    gammas.push(value);
+
+                    let mut spline = gamma[i].write().unwrap();
+                    spline.add(ln_beta, value);
+                }
+            }
+        }
+
+        gammas
+    }
+
     /// Calculate the interaction rates.
     ///
     /// This returns a vector of
@@ -197,17 +318,17 @@ impl<M: Model> Interaction<M> {
     /// produce an array of length 3.
     fn calculate_rate(&self, c: &Context<M>) -> Vec<[(f64, f64); 2]> {
         let mut rates = Vec::with_capacity(3);
+        let gamma = self.gamma(c);
+
         match self {
             Interaction::TwoParticle {
                 particles,
                 antiparticles,
-                m2,
                 ..
             } => {
                 let &[p0, p1] = particles;
                 let &[a0, a1] = antiparticles;
-                let gamma =
-                    1e10 * m2(&c.model).abs() / c.beta.powi(2) * c.normalization * c.step_size;
+                let gamma = gamma[0];
 
                 let rate_forward;
                 let rate_backward;
@@ -230,7 +351,6 @@ impl<M: Model> Interaction<M> {
             Interaction::ThreeParticle {
                 particles,
                 antiparticles,
-                m2,
                 ..
             } => {
                 let ptcl = c.model.particles();
@@ -248,14 +368,7 @@ impl<M: Model> Interaction<M> {
                     #[allow(clippy::float_cmp)]
                     let decaying = ptcl[p0].mass == max_m;
                     if decaying {
-                        // 0.002_423_011_225_182_300_4 = ζ(3) / 16 π³
-                        let gamma_tilde = 0.002_423_011_225_182_300_4
-                            * m2(&c.model).abs()
-                            * bessel::k1_on_k2(ptcl[p0].mass * c.beta)
-                            / c.beta.powi(3)
-                            / ptcl[p0].mass
-                            * c.normalization
-                            * c.step_size;
+                        let gamma_tilde = gamma[i];
 
                         let rate_forward = gamma_tilde * c.n[p0];
                         let rate_backward = gamma_tilde
@@ -283,36 +396,13 @@ impl<M: Model> Interaction<M> {
             Interaction::FourParticle {
                 particles,
                 antiparticles,
-                m2,
                 ..
             } => {
-                let ptcl = c.model.particles();
-                let mass2_sum: f64 = particles[0].iter().map(|&pi| ptcl[pi].mass2).sum();
-
                 // Iterator over the three possible configurations
                 for i in 0..3 {
                     let [p0, p1, p2, p3] = particles[i];
                     let [a0, a1, a2, a3] = antiparticles[i];
-
-                    let m2: Box<dyn Fn(&M, f64, f64, f64) -> f64> = match i {
-                        0 => Box::new(|c, s, t, u| m2(c, s, t, u)),
-                        1 => Box::new(|c, s, t, u| m2(c, t, s, u)),
-                        2 => Box::new(|c, s, t, u| m2(c, u, t, s)),
-                        _ => unreachable!(),
-                    };
-
-                    let gamma = integrate_st(
-                        |s, t| {
-                            let u = mass2_sum - s - t;
-                            m2(&c.model, s, t, u)
-                        },
-                        c.beta,
-                        ptcl[p0].mass2,
-                        ptcl[p1].mass2,
-                        ptcl[p2].mass2,
-                        ptcl[p3].mass2,
-                    ) * c.normalization
-                        * c.step_size;
+                    let gamma = gamma[i];
 
                     // A NaN can occur from `0.0 / 0.0`, in which case the
                     // correct value ought to be 0.
