@@ -37,7 +37,7 @@ impl Model for StandardModel {
             Particle::new(1, 0.0, 0.0).name("d2").dof(3.0),   // d2
             Particle::new(1, 0.0, 0.0).name("d3").dof(3.0),   // d3
         ];
-        let interactions = Vec::with_capacity(128);
+        let interactions = Vec::new();
 
         StandardModel {
             g1: 3.585e-01,
