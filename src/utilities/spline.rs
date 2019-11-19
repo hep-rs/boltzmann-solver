@@ -1,7 +1,37 @@
 //! Cubic Hermite interpolation
 
-/// Perform a cubic Hermite interpolation
-pub struct CubicHermiteSpline {
+/// Cubic Hermite spline interpolator using constant data
+pub(crate) struct ConstCubicHermiteSpline {
+    data: &'static [(f64, f64, f64)],
+}
+
+impl ConstCubicHermiteSpline {
+    pub fn sample(&self, x: f64) -> f64 {
+        match self
+            .data
+            .binary_search_by(|&(xi, _, _)| xi.partial_cmp(&x).unwrap())
+        {
+            Ok(i) => self.data[i].1,
+            Err(0) => self.data[0].1,
+            Err(i) if i == self.data.len() => self.data[i - 1].1,
+            Err(i) => {
+                let (x0, y0, m0) = self.data[i - 1];
+                let (x1, y1, m1) = self.data[i];
+
+                let t = (x - x0) / (x1 - x0);
+                let t2 = t.powi(2);
+                let t3 = t.powi(3);
+                y0 * (2.0 * t3 - 3.0 * t2 + 1.0)
+                    + m0 * (t3 - 2.0 * t2 + t)
+                    + y1 * (-2.0 * t3 + 3.0 * t2)
+                    + m1 * (t3 - t2)
+            }
+        }
+    }
+}
+
+/// Cubic Hermite spline interpolator
+pub(crate) struct CubicHermiteSpline {
     data: Vec<(f64, f64)>,
     gradients: Vec<f64>,
     accurate: Vec<bool>,
