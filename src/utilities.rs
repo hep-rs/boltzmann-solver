@@ -88,6 +88,11 @@ where
     integrate(s_integrand, 0.0, 1.0, 0.0).integral / (512.0 * PI_5 * beta)
 }
 
+/// Propagator with squared momentum `q2` involving particle `p`, defined as
+pub fn propagator(q2: f64, p: &Particle) -> Complex<f64> {
+    1.0 / (q2 - p.mass2 + Complex::i() * p.mass * p.width)
+}
+
 #[cfg(test)]
 mod tests {
     use crate::utilities::test::*;
