@@ -4,6 +4,8 @@ pub(crate) mod spline;
 #[cfg(test)]
 pub(crate) mod test;
 
+use crate::{constants::PI_5, model::Particle};
+use num_complex::Complex;
 use quadrature::integrate;
 use special_functions::bessel;
 
@@ -59,18 +61,31 @@ where
     let s_min = (m1 + m2).max(m3 + m4);
 
     let s_integrand = |ss: f64| {
-        let s = (1.0 - ss) / ss + s_min;
-        let dsdss = ss.powi(-2);
+        // Remap the semi-infinite s interval onto [0, 1)
+        let s = ss / (1.0 - ss) + s_min;
+        let dsdss = (ss - 1.0).powi(-2);
         let sqrt_s = s.sqrt();
 
-        let (t_min, t_max) = t_range(s, m1, m2, m3, m4);
-        let t_integrand = |t: f64| amplitude(s, t);
+        // Combination of factors constant w.r.t. t
+        let s_factors = bessel::k1(sqrt_s * beta) / sqrt_s * dsdss;
 
-        integrate(t_integrand, t_min, t_max, 0.0).integral * bessel::k1(sqrt_s * beta) / sqrt_s
-            * dsdss
+        // Remap the (potentially very large) t interval onto [0, 1]
+        // This appears to be substantially slower in benchmarks
+        // let (t_min, t_max) = t_range(s, m1, m2, m3, m4);
+        // let delta = (t_max - t_min).recip() + 1.0;
+        // let t_integrand = |tt: f64| {
+        //     let t = tt / (delta - tt) + t_min;
+        //     let dtdtt = delta / (delta - tt).powi(2);
+        //     amplitude(s, t) * dtdtt * s_factors
+        // };
+        // integrate(t_integrand, 0.0, 1.0, 0.0).integral
+
+        let (t_min, t_max) = t_range(s, m1, m2, m3, m4);
+        let t_integrand = |t: f64| amplitude(s, t) * s_factors;
+        integrate(t_integrand, t_min, t_max, 0.0).integral
     };
 
-    integrate(s_integrand, 0.0, 1.0, 0.0).integral
+    integrate(s_integrand, 0.0, 1.0, 0.0).integral / (512.0 * PI_5 * beta)
 }
 
 #[cfg(test)]
@@ -118,25 +133,40 @@ mod tests {
     fn integrate_st() {
         // |M|² = 1
         approx_eq(
-            super::integrate_st(|_, _| 1.0, 1.0, 0.0, 0.0, 0.0, 0.0),
-            4.0,
-            8.0,
+            super::integrate_st(|_, _| 1.0, 0.01, 1.0, 10.0, 2.0, 20.0),
+            2538.6650417543515,
+            2.0,
             0.0,
         );
 
-        // |M|² = sqrt(s)
+        // |M|² = 1 / (s^2 + 1)
         approx_eq(
-            super::integrate_st(|s, _| s.sqrt(), 1.0, 0.0, 0.0, 0.0, 0.0),
-            9.424_777_960_769_38,
-            8.0,
+            super::integrate_st(|s, _| 1.0 / (s.powi(2) + 1.0), 0.01, 1.0, 10.0, 2.0, 20.0),
+            0.0011966876930957792,
+            2.0,
             0.0,
         );
 
-        // |M|² = sqrt(s) t
+        // |M|² = 1 / (t^2 + 1)
         approx_eq(
-            super::integrate_st(|s, t| s.sqrt() * t, 1.0, 0.0, 0.0, 0.0, 0.0),
-            -70.685_834_705_770_35,
-            8.0,
+            super::integrate_st(|_, t| 1.0 / (t.powi(2) + 1.0), 0.01, 1.0, 10.0, 2.0, 20.0),
+            0.6784160555589841,
+            2.0,
+            0.0,
+        );
+
+        // |M|² = (s t) / [(s+1) (t+1)]
+        approx_eq(
+            super::integrate_st(
+                |s, t| (s * t) / (s + 1.0) / (t + 1.0),
+                0.01,
+                1.0,
+                10.0,
+                2.0,
+                20.0,
+            ),
+            2540.321286336532,
+            2.0,
             0.0,
         );
     }
@@ -146,35 +176,54 @@ mod tests {
 mod benches {
     use test::Bencher;
 
+    /// |M|² = 1
     #[bench]
-    fn integrate_st_0(b: &mut Bencher) {
+    fn integrate_st_const(b: &mut Bencher) {
+        b.iter(|| test::black_box(super::integrate_st(|_, _| 1.0, 0.01, 1.0, 10.0, 2.0, 20.0)));
+    }
+
+    /// |M|² = 1 / (s^2 + 1)
+    #[bench]
+    fn integrate_st_s_inv(b: &mut Bencher) {
         b.iter(|| {
-            let r = super::integrate_st(|_, _| 1.0, 1.0, 0.0, 0.0, 0.0, 0.0);
-            test::black_box(r)
+            test::black_box(super::integrate_st(
+                |s, _| 1.0 / (s.powi(2) + 1.0),
+                0.01,
+                1.0,
+                10.0,
+                2.0,
+                20.0,
+            ))
         });
     }
 
+    /// |M|² = 1 / (t^2 + 1)
     #[bench]
-    fn integrate_st_1(b: &mut Bencher) {
+    fn integrate_st_t_inv(b: &mut Bencher) {
         b.iter(|| {
-            let r = super::integrate_st(|s, _| s.sqrt(), 1.0, 0.0, 0.0, 0.0, 0.0);
-            test::black_box(r)
+            test::black_box(super::integrate_st(
+                |_, t| 1.0 / (t.powi(2) + 1.0),
+                0.01,
+                1.0,
+                10.0,
+                2.0,
+                20.0,
+            ))
         });
     }
 
+    /// |M|² = (s t) / [(s+1) (t+1)]
     #[bench]
-    fn integrate_st_2(b: &mut Bencher) {
+    fn integrate_st_st(b: &mut Bencher) {
         b.iter(|| {
-            let r = super::integrate_st(|s, t| s.sqrt() * t, 1.0, 0.0, 0.0, 0.0, 0.0);
-            test::black_box(r)
-        });
-    }
-
-    #[bench]
-    fn integrate_st_3(b: &mut Bencher) {
-        b.iter(|| {
-            let r = super::integrate_st(|s, t| s.sqrt() * t, 1.0, 1.0, 2.0, 3.0, 4.0);
-            test::black_box(r)
-        });
+            test::black_box(super::integrate_st(
+                |s, t| (s * t) / (s + 1.0) / (t + 1.0),
+                0.01,
+                1.0,
+                10.0,
+                2.0,
+                20.0,
+            ))
+        })
     }
 }
