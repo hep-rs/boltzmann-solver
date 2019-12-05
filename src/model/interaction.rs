@@ -433,7 +433,7 @@ impl<M: Model> Interaction<M> {
             } => {
                 let &[p0, p1] = particles;
                 let &[a0, a1] = antiparticles;
-                let gamma = gamma[0];
+                let gamma = gamma[0] * c.step_size;
 
                 let (rate_forward, rate_backward) = if p0 != p1 {
                     (
@@ -472,7 +472,7 @@ impl<M: Model> Interaction<M> {
                     #[allow(clippy::float_cmp)]
                     let decaying = ptcl[p0].mass == max_m;
                     if decaying {
-                        let gamma_tilde = gamma[i];
+                        let gamma_tilde = gamma[i] * c.step_size;
 
                         let rate_forward = gamma_tilde * c.n[p0];
                         let rate_backward = gamma_tilde
@@ -506,7 +506,7 @@ impl<M: Model> Interaction<M> {
                 for i in 0..3 {
                     let [p0, p1, p2, p3] = particles[i];
                     let [a0, a1, a2, a3] = antiparticles[i];
-                    let gamma = gamma[i];
+                    let gamma = gamma[i] * c.step_size;
 
                     // A NaN can occur from `0.0 / 0.0`, in which case the
                     // correct value ought to be 0.
