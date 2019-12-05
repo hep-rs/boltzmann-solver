@@ -1,5 +1,7 @@
 //! Cubic Hermite interpolation
 
+use std::f64;
+
 /// Cubic Hermite spline interpolator using a constant data array
 pub struct ConstCubicHermiteSpline {
     /// Data array arranged in triples of `(xi, yi, mi)` where `xi`, `yi` are x
@@ -39,33 +41,56 @@ impl ConstCubicHermiteSpline {
     }
 }
 
+/// Single point within a cubic Hermite spline going through the coordinate `(x, y)`.
+///
+/// The gradient at the point is `m` and is normalized to the size of the
+/// interval between `x` and the next value (and thus is not meaningful without
+/// being part of a spline).
+///
+/// The `accurate` flag indicates whether the interval between the current point
+/// and the next point is deemed accurate.
+struct SplinePoint {
+    x: f64,
+    y: f64,
+    m: f64,
+    accurate: bool,
+}
+
+impl SplinePoint {
+    /// Create a new spline point going through coordinate `(x, y)`.
+    ///
+    /// The gradient will be NaN initially, and `accurate` is set to `false`.
+    fn new(x: f64, y: f64) -> Self {
+        SplinePoint {
+            x,
+            y,
+            m: f64::NAN,
+            accurate: false,
+        }
+    }
+}
+
 /// Cubic Hermite spline interpolator
 pub struct CubicHermiteSpline {
-    // `(x, y)` pairs through which the spline goes through
-    data: Vec<(f64, f64)>,
-    // Gradient at each point.
-    gradients: Vec<f64>,
-    // Segments where the spline is deemed to be accurate.  The value of
-    // `accurate[i]` determines the accuracy for the interval `x[i]` to
-    // `x[i+1]`.
-    accurate: Vec<bool>,
+    // `(x, y, m, accurate)` tuples through which the spline goes through, with
+    // gradient `m`.  The accurate flag determines whether the interval between
+    // it and the next value is accurate or not.
+    data: Vec<SplinePoint>,
     // Number of points required before it begins to consider whether an
     // interval is accurate.
     min_points: usize,
 }
 
 impl CubicHermiteSpline {
-    /// Create a new empty Cubic Hermite Spline
+    /// Create a new empty cubic Hermite Spline.
     pub fn empty() -> Self {
         CubicHermiteSpline {
             data: Vec::new(),
-            gradients: Vec::new(),
-            accurate: Vec::new(),
-            min_points: 16,
+            min_points: 24,
         }
     }
 
-    /// Return the number of data points in the underlying data
+    /// Return the number of data points in the underlying data.
     pub fn len(&self) -> usize {
         self.data.len()
     }
@@ -77,30 +102,27 @@ impl CubicHermiteSpline {
 
     /// Adds a data point to the spline.
     ///
-    /// If the `x` value is already present, the input is ignored.
+    /// If the `x` value is already present, the input is ignored and the spline
+    /// remains unchanged.
     ///
     /// If the data point is within the range that is being interpolated, the
     /// given value is compared to the interpolated value and if they are in
     /// good agreement, both sides adjacent to the new point are marked as
     /// accurate (provided the spline has reached the minimum number of points).
+    ///
+    /// Any addition to the spline which extends the interval will result in the
+    /// new interval being marked as inaccurate.
     pub fn add(&mut self, x: f64, y: f64) {
-        match self
-            .data
-            .binary_search_by(|&(xi, _)| xi.partial_cmp(&x).unwrap())
-        {
+        match self.data.binary_search_by(|p| p.x.partial_cmp(&x).unwrap()) {
             Ok(_) => (),
             Err(0) => {
-                self.data.insert(0, (x, y));
-                self.gradients.insert(0, 0.0);
-                self.accurate.insert(0, false);
+                self.data.insert(0, SplinePoint::new(x, y));
 
                 self.compute_gradient(0);
                 self.compute_gradient(1);
             }
             Err(i) if i == self.data.len() => {
-                self.data.insert(i, (x, y));
-                self.gradients.insert(i, 0.0);
-                self.accurate.insert(i, false);
+                self.data.insert(i, SplinePoint::new(x, y));
 
                 self.compute_gradient(i - 1);
                 self.compute_gradient(i);
@@ -108,9 +130,7 @@ impl CubicHermiteSpline {
             Err(i) => {
                 let ny = self.sample(x);
 
-                self.data.insert(i, (x, y));
-                self.gradients.insert(i, 0.0);
-                self.accurate.insert(i, false);
+                self.data.insert(i, SplinePoint::new(x, y));
 
                 self.compute_gradient(i - 1);
                 self.compute_gradient(i);
@@ -120,27 +140,34 @@ impl CubicHermiteSpline {
                 if self.data.len() > self.min_points
                     && (delta / (ny.abs() + y.abs()) < 0.05 || delta < 1e-3)
                 {
-                    self.accurate[i - 1] = true;
-                    self.accurate[i] = true;
+                    self.data[i - 1].accurate = true;
+                    self.data[i].accurate = true;
                 }
             }
         }
     }
 
+    /// Compute the gradient of point `i`.
+    ///
+    /// If `i` is bigger than the number of points within the spline, this
+    /// function does nothing.  Similarly, this function will not do anything
+    /// until there are at least 2 points within the spline.
     fn compute_gradient(&mut self, i: usize) {
         if self.data.len() < 2 || i > self.data.len() {
             return;
         }
 
         if i == 0 {
-            self.gradients[0] = self.data[1].1 - self.data[0].1;
+            self.data[0].m = self.data[1].y - self.data[0].y;
         } else if i == self.data.len() - 1 {
-            self.gradients[i] = self.data[i].1 - self.data[i - 1].1;
+            self.data[i].m = self.data[i].y - self.data[i - 1].y;
         } else {
-            let (x0, y0) = self.data[i - 1];
-            let (x1, y1) = self.data[i];
-            let (x2, y2) = self.data[i + 1];
-            self.gradients[i] = 0.5 * ((y2 - y1) / (x2 - x1) + (y1 - y0) / (x1 - x0)) * (x2 - x1)
+            let p0 = &self.data[i - 1];
+            let p1 = &self.data[i];
+            let p2 = &self.data[i + 1];
+            self.data[i].m = 0.5
+                * ((p2.y - p1.y) / (p2.x - p1.x) + (p1.y - p0.y) / (p1.x - p0.x))
+                * (p2.x - p1.x);
         }
     }
 
@@ -151,14 +178,11 @@ impl CubicHermiteSpline {
     /// control point, then `true` is returned even if the interval on either
     /// side might not be accurate.
     pub fn accurate(&self, x: f64) -> bool {
-        match self
-            .data
-            .binary_search_by(|&(xi, _)| xi.partial_cmp(&x).unwrap())
-        {
+        match self.data.binary_search_by(|p| p.x.partial_cmp(&x).unwrap()) {
             Ok(_) => true,
             Err(0) => false,
             Err(i) if i == self.data.len() => false,
-            Err(i) => self.accurate[i],
+            Err(i) => self.data[i].accurate,
         }
     }
 
@@ -167,26 +191,21 @@ impl CubicHermiteSpline {
     /// For values of `x` outside of the domain of the underlying data, the
     /// boundary value is returned.
     pub fn sample(&self, x: f64) -> f64 {
-        match self
-            .data
-            .binary_search_by(|&(xi, _)| xi.partial_cmp(&x).unwrap())
-        {
-            Ok(i) => self.data[i].1,
-            Err(0) => self.data[0].1,
-            Err(i) if i == self.data.len() => self.data[i - 1].1,
+        match self.data.binary_search_by(|p| p.x.partial_cmp(&x).unwrap()) {
+            Ok(i) => self.data[i].y,
+            Err(0) => self.data[0].y,
+            Err(i) if i == self.data.len() => self.data[i - 1].y,
             Err(i) => {
-                let (x0, y0) = self.data[i - 1];
-                let (x1, y1) = self.data[i];
-                let m0 = self.gradients[i - 1];
-                let m1 = self.gradients[i];
+                let p0 = &self.data[i - 1];
+                let p1 = &self.data[i];
 
-                let t = (x - x0) / (x1 - x0);
+                let t = (x - p0.x) / (p1.x - p0.x);
                 let t2 = t.powi(2);
                 let t3 = t.powi(3);
-                y0 * (2.0 * t3 - 3.0 * t2 + 1.0)
-                    + m0 * (t3 - 2.0 * t2 + t)
-                    + y1 * (-2.0 * t3 + 3.0 * t2)
-                    + m1 * (t3 - t2)
+                p0.y * (2.0 * t3 - 3.0 * t2 + 1.0)
+                    + p0.m * (t3 - 2.0 * t2 + t)
+                    + p1.y * (-2.0 * t3 + 3.0 * t2)
+                    + p1.m * (t3 - t2)
             }
         }
     }
@@ -271,25 +290,30 @@ mod test {
     }
 
     #[test]
-    fn spline() {
+    fn spline() -> Result<(), Box<dyn std::error::Error>> {
         let mut spline = super::CubicHermiteSpline::empty();
 
         let mut path = std::env::temp_dir();
         path.push("sampled.csv");
-        let mut sampled = BufWriter::new(fs::File::create(path).unwrap());
+        let mut sampled = BufWriter::new(fs::File::create(path)?);
         for x in super::rec_linspace(0.0, 1.0, RECURSIONS) {
             if !spline.accurate(x) {
-                writeln!(sampled, "{:e},{:e}", x, f(x)).unwrap();
-                spline.add(x, f(x))
+                spline.add(x, f(x));
             }
+        }
+
+        for p in &spline.data {
+            writeln!(sampled, "{:e},{:e},{:e}", p.x, p.y, p.m)?;
         }
 
         let mut path = std::env::temp_dir();
         path.push("spline.csv");
-        let mut output = BufWriter::new(fs::File::create(path).unwrap());
+        let mut output = BufWriter::new(fs::File::create(path)?);
         for &x in Array1::linspace(0.0, 1.0, 2usize.pow(RECURSIONS)).iter() {
-            writeln!(output, "{:e},{:e}", x, spline.sample(x)).unwrap();
+            writeln!(output, "{:e},{:e}", x, spline.sample(x))?;
         }
+
+        Ok(())
     }
 }
 

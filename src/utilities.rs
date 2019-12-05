@@ -1,6 +1,6 @@
 //! Module of various useful miscellaneous functions.
 
-pub(crate) mod spline;
+pub mod spline;
 #[cfg(test)]
 pub(crate) mod test;
 
