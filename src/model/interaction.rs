@@ -260,7 +260,7 @@ impl<M: Model> Interaction<M> {
         let mut gammas = Vec::with_capacity(3);
 
         match self {
-            Interaction::TwoParticle { m2, .. } => {
+            Interaction::TwoParticle { .. } => {
                 // let gamma = m2(&c.model).abs() / c.beta.powi(2) * c.normalization;
                 // gammas.push(gamma);
                 unimplemented!()
@@ -384,7 +384,9 @@ impl<M: Model> Interaction<M> {
                     let [p0, p1, p2] = particles[i];
                     let [s0, s1, s2] = signed_particles[i];
 
-                    if ptcl[p0].mass != max_m || ptcl[p0].mass < ptcl[p1].mass + ptcl[p2].mass {
+                    #[allow(clippy::float_cmp)]
+                    let heaviest = ptcl[p0].mass == max_m;
+                    if !heaviest || ptcl[p0].mass < ptcl[p1].mass + ptcl[p2].mass {
                         continue;
                     }
 
@@ -392,7 +394,7 @@ impl<M: Model> Interaction<M> {
                         / (2.0 * ptcl[p0].mass);
 
                     // 1 / 8 π ≅ 0.039788735772973836
-                    width = 0.039788735772973836 * p / ptcl[p0].mass2 * m2(c.model).abs();
+                    width = 0.039_788_735_772_973_836 * p / ptcl[p0].mass2 * m2(c.model).abs();
                     daughters.push(s0);
                     daughters.push(s1);
                     daughters.push(s2);
