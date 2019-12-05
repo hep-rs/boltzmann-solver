@@ -261,9 +261,9 @@ impl<M: Model> Interaction<M> {
 
         match self {
             Interaction::TwoParticle { m2, .. } => {
-                let gamma =
-                    1e10 * m2(&c.model).abs() / c.beta.powi(2) * c.normalization * c.step_size;
-                gammas.push(gamma);
+                // let gamma = m2(&c.model).abs() / c.beta.powi(2) * c.normalization;
+                // gammas.push(gamma);
+                unimplemented!()
             }
             Interaction::ThreeParticle { particles, m2, .. } => {
                 let ptcl = c.model.particles();
@@ -275,6 +275,9 @@ impl<M: Model> Interaction<M> {
                 // Iterate over the three possible configurations (though only 1
                 // will be non-zero)
                 for &[p0, _, _] in particles {
+                    // TODO: What happens when the decaying particle's mass is
+                    // not greater than the sum of the masses of the daughter
+                    // particles?
                     #[allow(clippy::float_cmp)]
                     let decaying = ptcl[p0].mass == max_m;
                     if decaying {
@@ -284,8 +287,7 @@ impl<M: Model> Interaction<M> {
                             * bessel::k1_on_k2(ptcl[p0].mass * c.beta)
                             / c.beta.powi(3)
                             / ptcl[p0].mass
-                            * c.normalization
-                            * c.step_size;
+                            * c.normalization;
 
                         gammas.push(gamma_tilde);
                     } else {
@@ -309,7 +311,7 @@ impl<M: Model> Interaction<M> {
                     {
                         let spline = gamma[i].read().unwrap();
                         if spline.accurate(ln_beta) {
-                            gammas.push(spline.sample(ln_beta));
+                            gammas.push(spline.sample(ln_beta).exp());
                             continue;
                         }
                     }
@@ -333,12 +335,17 @@ impl<M: Model> Interaction<M> {
                         ptcl[p1].mass2,
                         ptcl[p2].mass2,
                         ptcl[p3].mass2,
-                    ) * c.normalization
-                        * c.step_size;
+                    ) * c.normalization;
+                    // if value < 0.0 {
+                    //     log::error!("value: {:e}", value);
+                    // } else {
+                    //     log::warn!("value: {:e}", value);
+                    // }
+                    let value = value.abs();
                     gammas.push(value);
 
                     let mut spline = gamma[i].write().unwrap();
-                    spline.add(ln_beta, value);
+                    spline.add(ln_beta, value.ln());
                 }
             }
         }
