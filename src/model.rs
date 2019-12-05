@@ -9,6 +9,13 @@ pub use interaction::Interaction;
 pub use particle::Particle;
 pub use standard_model::StandardModel;
 
+use crate::{
+    solver::Context,
+    statistic::{Statistic, Statistics},
+};
+use ndarray::prelude::*;
+use std::{collections::HashMap, convert::TryFrom};
+
 /// Contains all the information relevant to a particular model, including
 /// masses, widths and couplings.  All these attributes can be dependent on the
 /// inverse temperature \\(\beta\\).
