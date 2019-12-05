@@ -381,25 +381,27 @@ impl<M: Model + Sync> Default for SolverBuilder<M> {
 
 impl<M: Model + Sync> Solver<M> {
     /// Precompute certain things so that the integration can happen faster.
-    fn precompute(&mut self) {
+    fn precompute(&mut self, n: u32) {
+        log::info!("Pre-computing γ...");
         let zero = Array1::zeros(0);
-        for &beta in rec_geomspace(self.beta_range.0, self.beta_range.1, 10)
-            .iter()
-            .chain(&vec![
-                0.96 * self.beta_range.0,
-                0.98 * self.beta_range.0,
-                1.02 * self.beta_range.1,
-                1.04 * self.beta_range.1,
-            ])
+        for (i, &beta) in vec![
+            0.98 * self.beta_range.0,
+            0.99 * self.beta_range.0,
+            1.01 * self.beta_range.1,
+            1.02 * self.beta_range.1,
+        ]
+        .iter()
+        .chain(&rec_geomspace(self.beta_range.0, self.beta_range.1, n))
+        .enumerate()
         {
-            log::warn!("Precomputing at β = {:.3e}", beta);
-            self.model.beta(beta);
+            log::trace!("Precomputing at {} / {}\r", i, 2usize.pow(n) + 4);
+            self.model.set_beta(beta);
             let c = self.context(0, 1.0, beta, &zero, &zero);
 
             self.model
                 .interactions()
                 .par_iter()
-                .filter(|interaction| interaction.is_four_body())
+                .filter(|interaction| interaction.is_four_particle())
                 .for_each(|interaction| {
                     interaction.gamma(&c);
                 });
@@ -414,8 +416,8 @@ impl<M: Model + Sync> Solver<M> {
     /// time-step.
     #[allow(clippy::cognitive_complexity)]
     pub fn solve(&mut self) -> (Array1<f64>, Array1<f64>) {
-        // Precompute certain values
-        self.precompute();
+        // Precompute `gamma` for interactions that support it.
+        self.precompute(10);
 
         use super::tableau::rk87::*;
 
