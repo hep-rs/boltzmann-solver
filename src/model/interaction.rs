@@ -1,7 +1,7 @@
 use crate::{
     model::Model,
     solver::Context,
-    utilities::{integrate_st, spline::CubicHermiteSpline},
+    utilities::{integrate_st, kallen_lambda, spline::CubicHermiteSpline},
 };
 use ndarray::prelude::*;
 use special_functions::bessel;
@@ -11,22 +11,25 @@ use std::{convert::TryFrom, sync::RwLock};
 /// Interaction between particles.
 ///
 /// This can be either a three-body or four-body interaction.  See the
-/// documentation of [`Interaction::three_body`] and [`Interaction::four_body`]
+/// documentation of [`Interaction::three_particle`] and [`Interaction::four_particle`]
 /// for more details as to their implementations.
 #[allow(clippy::large_enum_variant)]
 pub enum Interaction<M: Model> {
     TwoParticle {
+        signed_particles: [isize; 2],
         particles: [usize; 2],
         antiparticles: [f64; 2],
         m2: Box<dyn Fn(&M) -> f64>,
     },
     ThreeParticle {
+        signed_particles: [[isize; 3]; 3],
         particles: [[usize; 3]; 3],
         antiparticles: [[f64; 3]; 3],
         m2: Box<dyn Fn(&M) -> f64>,
         asymmetry: Option<Box<dyn Fn(&M) -> f64>>,
     },
     FourParticle {
+        signed_particles: [[isize; 4]; 3],
         particles: [[usize; 4]; 3],
         antiparticles: [[f64; 4]; 3],
         m2: Box<dyn Fn(&M, f64, f64, f64) -> f64>,
@@ -36,7 +39,7 @@ pub enum Interaction<M: Model> {
 
 impl<M: Model> Interaction<M> {
     /// Return `true` if the interaction is a two-particle interaction.
-    pub fn is_two_body(&self) -> bool {
+    pub fn is_two_particle(&self) -> bool {
         match &self {
             Interaction::TwoParticle { .. } => true,
             _ => false,
@@ -44,7 +47,7 @@ impl<M: Model> Interaction<M> {
     }
 
     /// Return `true` if the interaction is a three-particle interaction.
-    pub fn is_three_body(&self) -> bool {
+    pub fn is_three_particle(&self) -> bool {
         match &self {
             Interaction::ThreeParticle { .. } => true,
             _ => false,
@@ -52,7 +55,7 @@ impl<M: Model> Interaction<M> {
     }
 
     /// Return `true` if the interaction is a four-particle interaction.
-    pub fn is_four_body(&self) -> bool {
+    pub fn is_four_particle(&self) -> bool {
         match &self {
             Interaction::FourParticle { .. } => true,
             _ => false,
@@ -68,7 +71,7 @@ impl<M: Model> Interaction<M> {
     ///
     /// Panics if `p1 == p2`.  For a mass interaction, make sure that `p1 == -
     /// p2`.
-    pub fn two_body<F>(m2: F, p1: isize, p2: isize) -> Self
+    pub fn two_particle<F>(m2: F, p1: isize, p2: isize) -> Self
     where
         F: Fn(&M) -> f64 + 'static,
     {
@@ -77,6 +80,7 @@ impl<M: Model> Interaction<M> {
         let u2 = usize::try_from(p2.abs()).unwrap();
         Interaction::TwoParticle {
             particles: [u1, u2],
+            signed_particles: [p1, p2],
             antiparticles: [p1.signum() as f64, p2.signum() as f64],
             m2: Box::new(m2),
         }
@@ -97,7 +101,7 @@ impl<M: Model> Interaction<M> {
     ///
     /// Only the interaction between the heavier particle and the lighter two is
     /// computed.
-    pub fn three_body<F>(m2: F, p1: isize, p2: isize, p3: isize) -> Self
+    pub fn three_particle<F>(m2: F, p1: isize, p2: isize, p3: isize) -> Self
     where
         F: Fn(&M) -> f64 + 'static,
     {
@@ -106,6 +110,7 @@ impl<M: Model> Interaction<M> {
         let u3 = usize::try_from(p3.abs()).unwrap();
         Interaction::ThreeParticle {
             particles: [[u1, u2, u3], [u2, u1, u3], [u3, u1, u2]],
+            signed_particles: [[p1, p2, p3], [-p2, -p1, p3], [-p3, -p1, p2]],
             antiparticles: [
                 [p1.signum() as f64, p2.signum() as f64, p3.signum() as f64],
                 [-p2.signum() as f64, -p1.signum() as f64, p3.signum() as f64],
@@ -145,7 +150,7 @@ impl<M: Model> Interaction<M> {
     /// Crossing symmetry is then used in order to compute the other processes.
     ///
     /// The three-body decays are not currently computed.
-    pub fn four_body<F>(m2: F, p1: isize, p2: isize, p3: isize, p4: isize) -> Self
+    pub fn four_particle<F>(m2: F, p1: isize, p2: isize, p3: isize, p4: isize) -> Self
     where
         F: Fn(&M, f64, f64, f64) -> f64 + 'static,
     {
@@ -156,7 +161,8 @@ impl<M: Model> Interaction<M> {
             usize::try_from(p4.abs()).unwrap(),
         ];
         Interaction::FourParticle {
-            particles: [[u1, u2, u3, u4], [u1, u3, u2, u3], [u1, u4, u2, u3]],
+            particles: [[u1, u2, u3, u4], [u1, u3, u2, u4], [u1, u4, u2, u3]],
+            signed_particles: [[p1, p2, p3, p4], [p1, -p3, -p2, p4], [p1, -p4, -p2, p3]],
             antiparticles: [
                 [
                     p1.signum() as f64,
