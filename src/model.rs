@@ -141,4 +141,35 @@ pub trait Model: Sized {
             model: &self,
         }
     }
+
+    /// Calculate the widths of all particles.
+    ///
+    /// This computes the possible decays of all particles given the
+    /// interactions specified within the model in order to compute the
+    /// particle's final width.
+    ///
+    /// The information is stored in each particle's `p.width` and the partial
+    /// widths are stored in `p.decays`.
+    fn update_widths(&mut self) {
+        let mut widths: Vec<_> = std::iter::repeat_with(|| (0.0, HashMap::new()))
+            .take(self.particles().len())
+            .collect();
+
+        let c = self.as_context();
+        for interaction in self.interactions() {
+            let (mut ptcls, width) = interaction.width(&c);
+            if !ptcls.is_empty() && width > 0.0 {
+                let p0 = usize::try_from(ptcls[0].abs()).unwrap();
+                ptcls.remove(0);
+                widths[p0].0 += width;
+                widths[p0].1.insert(ptcls, width);
+            }
+        }
+
+        for (i, (width, hm)) in widths.into_iter().enumerate() {
+            let p = &mut self.particles_mut()[i];
+            p.set_width(width);
+            p.decays = hm;
+        }
+    }
 }
