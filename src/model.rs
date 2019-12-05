@@ -112,4 +112,33 @@ pub trait Model: Sized {
 
     /// Return a list of interactions in the model.
     fn interactions(&self) -> &Vec<Interaction<Self>>;
+
+    /// Return a instance of [`Context`] for the model.
+    ///
+    /// As this is not within the context of solving the Boltzmann equations,
+    /// the following attributes have a special value:
+    ///
+    /// - `step = 0`,
+    /// - `step_size = 1.0`,
+    /// - `normalization = (hubble_rate * beta * n).recip()`, and
+    /// - `eq`, `n`, `na` are empty arrays.
+    ///
+    /// All other attribute contexts will be as expected.
+    fn as_context<'a>(&'a self) -> Context<'a, Self> {
+        let beta = self.get_beta();
+        let n = Statistic::BoseEinstein.massless_number_density(0.0, beta);
+        let hubble_rate = self.hubble_rate(beta);
+
+        Context {
+            step: 0,
+            step_size: 1.0,
+            beta,
+            hubble_rate,
+            normalization: (hubble_rate * beta * n).recip(),
+            eq: Array1::zeros(0),
+            n: Array1::zeros(0),
+            na: Array1::zeros(0),
+            model: &self,
+        }
+    }
 }
