@@ -167,81 +167,76 @@ impl Statistics for Statistic {
 
         match *self {
             Statistic::FermiDirac => {
-                if mass * beta < 1e-4 {
-                    log::debug!("Mass is below threshold, using massless_number_density instead.");
-                    return self.massless_number_density(mu, beta);
-                }
+                if mu == 0.0 {
+                    particle_statistics::fermi_dirac_massive(mass, beta)
+                } else {
+                    let integral = integrate(
+                        |t| {
+                            let u = mass + t / (1.0 - t);
+                            let dudt = (t - 1.0).powi(-2);
 
-                let integral = integrate(
-                    |t| {
-                        let u = mass + t / (1.0 - t);
-                        let dudt = (t - 1.0).powi(-2);
-
-                        self.phase_space(u, mass, mu, beta)
-                            * u
-                            * f64::sqrt(u.powi(2) - mass.powi(2))
-                            * dudt
-                    },
-                    0.0,
-                    1.0,
-                    1e-12,
-                );
-                log::debug!(
-                    "Fermi–Dirac integral: {:e} ± {:e} ({} function evaluations)",
-                    integral.integral,
-                    integral.error_estimate,
-                    integral.num_function_evaluations
-                );
-                if cfg!(debug_assertions) && integral.error_estimate > 0.01 * integral.integral {
-                    log::warn!(
-                        "Fermi–Dirac integral has a relative error of {:0.2}%",
-                        integral.error_estimate / integral.integral.abs()
+                            self.phase_space(u, mass, mu, beta)
+                                * u
+                                * f64::sqrt(u.powi(2) - mass.powi(2))
+                                * dudt
+                        },
+                        0.0,
+                        1.0,
+                        1e-12,
                     );
+                    log::debug!(
+                        "Fermi–Dirac integral: {:e} ± {:e} ({} function evaluations)",
+                        integral.integral,
+                        integral.error_estimate,
+                        integral.num_function_evaluations
+                    );
+                    if cfg!(debug_assertions) && integral.error_estimate > 0.01 * integral.integral
+                    {
+                        log::warn!(
+                            "Fermi–Dirac integral has a relative error of {:0.2}%",
+                            integral.error_estimate / integral.integral.abs()
+                        );
+                    }
+                    // 1/(2 π²) ≅ 0.050_660_591_821_168_89
+                    0.050_660_591_821_168_89 * integral.integral
                 }
-                // 1/(2 π²) ≅ 0.050_660_591_821_168_89
-                0.050_660_591_821_168_89 * integral.integral
             }
             Statistic::BoseEinstein => {
-                if mass * beta < 1e-4 {
-                    log::debug!("Mass is below threshold, using massless_number_density instead.");
-                    return self.massless_number_density(mu, beta);
-                }
+                if mu == 0.0 {
+                    particle_statistics::bose_einstein_massive(mass, beta)
+                } else {
+                    let integral = integrate(
+                        |t| {
+                            let u = mass + t / (1.0 - t);
+                            let dudt = (t - 1.0).powi(-2);
 
-                let integral = integrate(
-                    |t| {
-                        let u = mass + t / (1.0 - t);
-                        let dudt = (t - 1.0).powi(-2);
-
-                        self.phase_space(u, mass, mu, beta)
-                            * u
-                            * f64::sqrt(u.powi(2) - mass.powi(2))
-                            * dudt
-                    },
-                    0.0,
-                    1.0,
-                    1e-12,
-                );
-                log::debug!(
-                    "Bose–Einstein integral: {:e} ± {:e} ({} function evaluations)",
-                    integral.integral,
-                    integral.error_estimate,
-                    integral.num_function_evaluations
-                );
-                if cfg!(debug_assertions) && integral.error_estimate > 0.01 * integral.integral {
-                    log::warn!(
-                        "Bose–Einstein integral has a relative error of {:0.2}%",
-                        integral.error_estimate / integral.integral.abs()
+                            self.phase_space(u, mass, mu, beta)
+                                * u
+                                * f64::sqrt(u.powi(2) - mass.powi(2))
+                                * dudt
+                        },
+                        0.0,
+                        1.0,
+                        1e-12,
                     );
+                    log::debug!(
+                        "Bose–Einstein integral: {:e} ± {:e} ({} function evaluations)",
+                        integral.integral,
+                        integral.error_estimate,
+                        integral.num_function_evaluations
+                    );
+                    if cfg!(debug_assertions) && integral.error_estimate > 0.01 * integral.integral
+                    {
+                        log::warn!(
+                            "Bose–Einstein integral has a relative error of {:0.2}%",
+                            integral.error_estimate / integral.integral.abs()
+                        );
+                    }
+                    // 1/(2 π²) ≅ 0.050_660_591_821_168_89
+                    0.050_660_591_821_168_89 * integral.integral
                 }
-                // 1/(2 π²) ≅ 0.050_660_591_821_168_89
-                0.050_660_591_821_168_89 * integral.integral
             }
             Statistic::MaxwellBoltzmann => {
-                if mass * beta < 1e-4 {
-                    log::debug!("Mass is below threshold, using massless_number_density instead.");
-                    return self.massless_number_density(mu, beta);
-                }
-
                 // 1/(2 π²) ≅ 0.050_660_591_821_168_89
                 0.050_660_591_821_168_89
                     * mass.powi(2)
@@ -299,13 +294,13 @@ impl Statistics for Statistic {
         debug_assert!(beta >= 0.0, "β must be positive.");
 
         match *self {
-            Statistic::FermiDirac => particle_statistics::fermi_dirac(mu, beta),
+            Statistic::FermiDirac => particle_statistics::fermi_dirac_massless(mu, beta),
             Statistic::BoseEinstein => {
                 debug_assert!(
                     mu <= 0.0,
                     "Bose–Einstein condensates (μ > 0) are not supported."
                 );
-                particle_statistics::bose_einstein(mu, beta)
+                particle_statistics::bose_einstein_massless(mu, beta)
             }
             Statistic::MaxwellBoltzmann => PI_N2 * f64::exp(mu * beta) * beta.powi(-3),
             Statistic::MaxwellJuttner => 0.0,
@@ -412,6 +407,7 @@ mod tests {
             }
             if !n_be.is_nan() {
                 let n = be.massless_number_density(mu, beta);
+                println!("μ = {:e}, β = {:e}, n = {:e}", mu, beta, n);
                 approx_eq(n_be, n, 10.0, 1e-100);
             }
             if !n_mb.is_nan() {
