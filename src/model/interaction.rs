@@ -220,6 +220,41 @@ impl<M: Model> Interaction<M> {
         self
     }
 
+    /// Return the particles involved in this interaction.
+    ///
+    /// The resulting vector is a `Vec<Vec<isize>>` where the outer list are for
+    /// the different possible interactions (calculated using crossing
+    /// symmetry), and the inner list as the signed particle numbers involved in
+    /// the specific interaction.
+    pub fn particles(&self) -> Vec<Vec<isize>> {
+        match self {
+            Interaction::TwoParticle {
+                signed_particles, ..
+            } => vec![signed_particles.to_vec()],
+            Interaction::ThreeParticle {
+                signed_particles, ..
+            } => signed_particles.iter().map(|ps| ps.to_vec()).collect(),
+            Interaction::FourParticle {
+                signed_particles, ..
+            } => signed_particles.iter().map(|ps| ps.to_vec()).collect(),
+        }
+    }
+
+    /// Analogue of [`Interaction::particles`], but instead of returning the
+    /// signed particle numbers, return purely the particle index which does not
+    /// distinguish between particles and anti-particles.
+    pub fn particles_idx(&self) -> Vec<Vec<usize>> {
+        match self {
+            Interaction::TwoParticle { particles, .. } => vec![particles.to_vec()],
+            Interaction::ThreeParticle { particles, .. } => {
+                particles.iter().map(|ps| ps.to_vec()).collect()
+            }
+            Interaction::FourParticle { particles, .. } => {
+                particles.iter().map(|ps| ps.to_vec()).collect()
+            }
+        }
+    }
+
     /// Calculate the value(s) of `gamma`.
     pub(crate) fn gamma(&self, c: &Context<M>) -> Vec<f64> {
         let mut gammas = Vec::with_capacity(3);
