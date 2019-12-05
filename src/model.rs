@@ -13,12 +13,18 @@ pub use standard_model::StandardModel;
 /// masses, widths and couplings.  All these attributes can be dependent on the
 /// inverse temperature \\(\beta\\).
 pub trait Model: Sized {
-    /// Instantiate a new instance of the model parameters with the values
-    /// calculated at 0-temperature (\\(\beta = \infty\\)).
-    fn new() -> Self;
+    /// Instantiate a new instance of the model at 0 temperature (\\(\beta =
+    /// \infty\\)).
+    fn zero() -> Self;
 
     /// Update the model to be valid at the given inverse temperature `beta`.
-    fn beta(&mut self, beta: f64);
+    ///
+    /// Beta is always strictly positive, and should never be infinite.  The
+    /// zero temperature case should be obtained from [`Model::zero`].
+    fn set_beta(&mut self, beta: f64);
+
+    /// Return the current value of beta for the model
+    fn get_beta(&self) -> f64;
 
     /// Return the effective degrees of freedom contributing to the entropy
     /// density of the Universe at the specified inverse temperature.
