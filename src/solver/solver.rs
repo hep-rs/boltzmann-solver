@@ -18,6 +18,9 @@ pub enum Error {
     /// The number of particles held in equilibrium exceeds the number of
     /// particles in the model.
     TooManyInEquilibrium,
+    /// The number of particles with no asymmetry exceeds the number of
+    /// particles in the model.
+    TooManyNoAsymmetry,
     /// The underlying model has not been specified
     UndefinedModel,
 }
@@ -31,6 +34,9 @@ impl fmt::Display for Error {
             }
             Error::TooManyInEquilibrium => {
                 write!(f, "too many particles held in equilibrium for the model")
+            }
+            Error::TooManyNoAsymmetry => {
+                write!(f, "too many particles without asymmetry for the model")
             }
             Error::UndefinedModel => write!(f, "underlying model is not defined"),
         }
@@ -303,18 +309,36 @@ impl<M: Model> SolverBuilder<M> {
                     .map(|p| p.normalized_number_density(0.0, beta_range.0)),
             )
         });
-        if initial_densities.len() != particles.len()
-            || initial_densities.iter().any(|v| !v.is_finite())
+        if initial_densities.len() != particles.len() {
+            log::error!(
+                "Initial densities is not the same length as the number of particles in the model."
+            );
+            return Err(Error::InvalidInitialDensities);
+        } else if initial_densities
+            .iter()
+            .any(|v| !v.is_finite() || v.is_nan())
         {
+            log::error!(
+                "Some of initial densities are not finite or NaN:\n{:.3e}",
+                initial_densities
+            );
             return Err(Error::InvalidInitialDensities);
         }
 
         let initial_asymmetries = self
             .initial_asymmetries
             .unwrap_or_else(|| Array1::zeros(particles.len()));
-        if initial_asymmetries.len() != particles.len()
-            || initial_asymmetries.iter().any(|v| !v.is_finite())
+        if initial_asymmetries.len() != particles.len() {
+            log::error!("Initial asymmetries is not the same length as the number of particles in the model.");
+            return Err(Error::InvalidInitialAsymmetries);
+        } else if initial_asymmetries
+            .iter()
+            .any(|v| !v.is_finite() || v.is_nan())
         {
+            log::error!(
+                "Some of initial asymmetries are not finite or NaN:\n{:.3e}",
+                initial_asymmetries
+            );
             return Err(Error::InvalidInitialAsymmetries);
         }
 
@@ -324,6 +348,14 @@ impl<M: Model> SolverBuilder<M> {
                         self.in_equilibrium.len(),
                         particles.len());
             return Err(Error::TooManyInEquilibrium);
+        }
+        if self.no_asymmetry.len() > particles.len() {
+            log::error!(
+                "There are more particles with 0 asymmetry ({}) than particles in the model ({}).",
+                self.no_asymmetry.len(),
+                particles.len()
+            );
+            return Err(Error::TooManyNoAsymmetry);
         }
 
         Ok(Solver {
