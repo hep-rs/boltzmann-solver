@@ -256,7 +256,7 @@ impl<M: Model> Interaction<M> {
     }
 
     /// Calculate the value(s) of `gamma`.
-    pub(crate) fn gamma(&self, c: &Context<M>) -> Vec<f64> {
+    pub fn gamma(&self, c: &Context<M>) -> Vec<f64> {
         let mut gammas = Vec::with_capacity(3);
 
         match self {
