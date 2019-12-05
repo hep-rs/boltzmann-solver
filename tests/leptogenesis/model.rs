@@ -21,14 +21,13 @@ pub struct LeptogenesisModel {
     pub sm: StandardModel,
     pub yv: Array2<Complex<f64>>,
     pub mn: Array1<f64>,
-    pub particles: Vec<Particle>,
     pub interactions: Vec<Interaction<Self>>,
     pub epsilon: Array2<f64>,
 }
 
 impl Model for LeptogenesisModel {
-    fn new() -> Self {
-        let sm = StandardModel::new();
+    fn zero() -> Self {
+        let mut sm = StandardModel::zero();
 
         let yv = array![
             [
@@ -50,10 +49,9 @@ impl Model for LeptogenesisModel {
 
         let mn = array![1e10, 1e15, 5e15];
 
-        let mut particles = sm.particles.clone();
-        particles.push(Particle::new(1, mn[0], 0.0).name("N1"));
-        particles.push(Particle::new(1, mn[1], 0.0).name("N2"));
-        particles.push(Particle::new(1, mn[2], 0.0).name("N3"));
+        sm.particles.push(Particle::new(1, mn[0], 0.0).name("N1"));
+        sm.particles.push(Particle::new(1, mn[1], 0.0).name("N2"));
+        sm.particles.push(Particle::new(1, mn[2], 0.0).name("N3"));
 
         // epsilon[[i, j]] is the asymmetry in Ni -> H Lj.
         let yvd_yv: Array2<Complex<f64>> = Array2::from_shape_fn((3, 3), |(i, j)| {
@@ -77,12 +75,16 @@ impl Model for LeptogenesisModel {
         });
 
         let mut interactions = Vec::new();
+        // interactions.append(&mut interaction::hh());
         // interactions.append(&mut interaction::nn());
-        interactions.append(&mut interaction::hln());
+        // interactions.append(&mut interaction::hle());
+        // interactions.append(&mut interaction::hln());
+        // interactions.append(&mut interaction::hqu());
+        // interactions.append(&mut interaction::hqd());
         interactions.append(&mut interaction::hhll1());
-        // interactions.append(&mut interaction::hhll2());
-        // interactions.append(&mut interaction::nlqd());
-        // interactions.append(&mut interaction::nlqu());
+        interactions.append(&mut interaction::hhll2());
+        interactions.append(&mut interaction::nlqd());
+        interactions.append(&mut interaction::nlqu());
 
         log::info!("Interactions in model: {}", interactions.len());
 
@@ -90,21 +92,53 @@ impl Model for LeptogenesisModel {
             sm,
             yv,
             mn,
-            particles,
             interactions,
             epsilon,
         }
     }
 
-    fn beta(&mut self, beta: f64) {
-        self.sm.beta(beta);
+    fn set_beta(&mut self, beta: f64) {
+        self.sm.set_beta(beta);
 
-        self.particles = self.sm.particles.clone();
-        let yv = self.yv.diag().mapv(|v| v.norm_sqr() / 16.0);
+        // Precompute the squared couplings to be used in the thermal masses
+        let g1 = self.sm.g1.powi(2) / 8.0;
+        let g2 = self.sm.g2.powi(2) / 8.0;
+        let yu = self.sm.yu.diag().mapv(|y| y.powi(2) / 16.0);
+        let yd = self.sm.yd.diag().mapv(|y| y.powi(2) / 16.0);
+        let ye = self.sm.ye.diag().mapv(|y| y.powi(2) / 16.0);
+        let yv = self.yv.diag().mapv(|y| y.norm_sqr() / 16.0);
+        let lambda = 0.0 * self.sm.lambda / 4.0;
+
+        self.particle_mut("H", 0).set_mass(
+            std::f64::consts::SQRT_2
+                * f64::sqrt(
+                    g1 / 4.0
+                        + (3.0 / 4.0) * g2
+                        + 2.0 * yu.sum()
+                        + 2.0 * yd.sum()
+                        + 2.0 * ye.sum()
+                        + 2.0 * yv.sum()
+                        + lambda,
+                )
+                / beta,
+        );
+
         for i in 0..3 {
-            self.particles
-                .push(Particle::new(1, self.mn[i] + f64::sqrt(yv[i]) / beta, 0.0))
+            let mi = self.mn[i] + f64::sqrt(yv[i]) / beta;
+
+            self.particle_mut("N", i).set_mass(mi);
+            self.particle_mut("L", i)
+                .set_mass(f64::sqrt(g1 / 4.0 + (3.0 / 4.0) * g2 + ye[i] + yv[i]) / beta);
         }
+
+        self.update_widths();
+
+        // let mh = self.particle("H", 0).mass;
+        // self.particle_mut("H", 0).set_width(1e-2 * mh);
+    }
+
+    fn get_beta(&self) -> f64 {
+        self.sm.get_beta()
     }
 
     fn entropy_dof(&self, beta: f64) -> f64 {
@@ -112,16 +146,16 @@ impl Model for LeptogenesisModel {
     }
 
     fn particles(&self) -> &Vec<Particle> {
-        &self.particles
+        &self.sm.particles
     }
 
     fn particles_mut(&mut self) -> &mut Vec<Particle> {
-        &mut self.particles
+        &mut self.sm.particles
     }
 
     fn particle_idx(name: &str, i: usize) -> Result<usize, (&str, usize)> {
         StandardModel::particle_idx(name, i).or_else(|(name, i)| match (name, i) {
-            ("N", i) if i < 3 => Ok(17 + i),
+            ("N", i) if i < 3 => Ok(20 + i),
             (name, i) => Err((name, i)),
         })
     }
