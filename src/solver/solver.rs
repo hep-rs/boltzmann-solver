@@ -296,7 +296,7 @@ impl<M: Model> SolverBuilder<M> {
     /// Build the Boltzmann solver.
     pub fn build(self) -> Result<Solver<M>, Error> {
         let mut model = self.model.ok_or(Error::UndefinedModel)?;
-        model.beta(self.beta_range.0);
+        model.set_beta(self.beta_range.0);
         let particles = model.particles();
         let beta_range = self.beta_range;
 
@@ -489,7 +489,7 @@ impl<M: Model + Sync> Solver<M> {
                 let ai = RK_A[i];
                 let ni = (0..i).fold(n.clone(), |total, j| total + ai[j] * &k[j]);
                 let nai = (0..i).fold(na.clone(), |total, j| total + ai[j] * &ka[j]);
-                self.model.beta(beta_i);
+                self.model.set_beta(beta_i);
                 let ci = self.context(step, h, beta_i, &ni, &nai);
 
                 // Compute k[i] and ka[i] from each interaction
@@ -533,7 +533,7 @@ impl<M: Model + Sync> Solver<M> {
                     });
             }
 
-            self.model.beta(beta);
+            self.model.set_beta(beta);
             let c = self.context(step, h, beta, &n, &na);
 
             // Adjust dn for those particles in equilibrium
@@ -612,7 +612,6 @@ impl<M: Model> Solver<M> {
         n: &Array1<f64>,
         na: &Array1<f64>,
     ) -> Context<M> {
-        // self.model.beta(beta);
         let hubble_rate = self.model.hubble_rate(beta);
         let normalization = if self.normalized {
             let n = Statistic::BoseEinstein.massless_number_density(0.0, beta);
