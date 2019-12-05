@@ -353,6 +353,64 @@ impl<M: Model> Interaction<M> {
         gammas
     }
 
+    /// Calculate the decay width associated with a particular interaction.
+    ///
+    /// This returns two values:
+    ///
+    /// - a vector of particles involved, with the first particle being the one
+    ///   decaying and the remaining being the daughter particles; and
+    /// - the width of this process in GeV.
+    pub fn width(&self, c: &Context<M>) -> (Vec<isize>, f64) {
+        let mut daughters = Vec::new();
+        let mut width = 0.0;
+
+        match self {
+            Interaction::TwoParticle { .. } => (),
+            Interaction::ThreeParticle {
+                particles,
+                signed_particles,
+                m2,
+                ..
+            } => {
+                let ptcl = c.model.particles();
+                let max_m = ptcl[particles[0][0]]
+                    .mass
+                    .max(ptcl[particles[0][1]].mass)
+                    .max(ptcl[particles[0][2]].mass);
+
+                // Iterate over the three possible configurations (though only 1
+                // will be non-zero)
+                for i in 0..3 {
+                    let [p0, p1, p2] = particles[i];
+                    let [s0, s1, s2] = signed_particles[i];
+
+                    if ptcl[p0].mass != max_m || ptcl[p0].mass < ptcl[p1].mass + ptcl[p2].mass {
+                        continue;
+                    }
+
+                    let p = kallen_lambda(ptcl[p0].mass2, ptcl[p1].mass2, ptcl[p2].mass2).sqrt()
+                        / (2.0 * ptcl[p0].mass);
+
+                    // 1 / 8 π ≅ 0.039788735772973836
+                    width = 0.039788735772973836 * p / ptcl[p0].mass2 * m2(c.model).abs();
+                    daughters.push(s0);
+                    daughters.push(s1);
+                    daughters.push(s2);
+                }
+            }
+            Interaction::FourParticle {
+                // particles,
+                // signed_particles,
+                // m2,
+                ..
+            } => {
+                unimplemented!()
+            }
+        }
+
+        (daughters, width)
+    }
+
     /// Calculate the interaction rates.
     ///
     /// This returns a vector of
