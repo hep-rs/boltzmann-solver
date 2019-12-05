@@ -95,6 +95,11 @@ impl CubicHermiteSpline {
         self.data.len()
     }
 
+    /// Check whether the spline is empty
+    pub fn is_empty(&self) -> bool {
+        self.data.is_empty()
+    }
+
     /// Adjust the minimum number of points before accuracy is considered.
     pub fn min_points(&mut self, min_points: usize) {
         self.min_points = min_points;

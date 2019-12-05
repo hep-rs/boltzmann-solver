@@ -131,7 +131,7 @@ pub trait Model: Sized {
     /// - `eq`, `n`, `na` are empty arrays.
     ///
     /// All other attribute contexts will be as expected.
-    fn as_context<'a>(&'a self) -> Context<'a, Self> {
+    fn as_context(&self) -> Context<'_, Self> {
         let beta = self.get_beta();
         let n = Statistic::BoseEinstein.massless_number_density(0.0, beta);
         let hubble_rate = self.hubble_rate(beta);
