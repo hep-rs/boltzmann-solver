@@ -999,7 +999,7 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">model</span>::<span class="ident">Model</span>,
     <span class="ident">solver</span>::<span class="ident">Context</span>,
-    <span class="ident">utilities</span>::{<span class="ident">integrate_st</span>, <span class="ident">kallen_lambda</span>, <span class="ident">spline</span>::<span class="ident">CubicHermiteSpline</span>},
+    <span class="ident">utilities</span>::{<span class="ident">integrate_st</span>, <span class="ident">kallen_lambda_sqrt</span>, <span class="ident">spline</span>::<span class="ident">CubicHermiteSpline</span>},
 };
 <span class="kw">use</span> <span class="ident">ndarray</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">special_functions</span>::<span class="ident">bessel</span>;
@@ -1490,7 +1490,7 @@
                         <span class="kw">continue</span>;
                     }
 
-                    <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">kallen_lambda</span>(<span class="ident">ptcl</span>[<span class="ident">p0</span>].<span class="ident">mass2</span>, <span class="ident">ptcl</span>[<span class="ident">p1</span>].<span class="ident">mass2</span>, <span class="ident">ptcl</span>[<span class="ident">p2</span>].<span class="ident">mass2</span>).<span class="ident">sqrt</span>()
+                    <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">kallen_lambda_sqrt</span>(<span class="ident">ptcl</span>[<span class="ident">p0</span>].<span class="ident">mass2</span>, <span class="ident">ptcl</span>[<span class="ident">p1</span>].<span class="ident">mass2</span>, <span class="ident">ptcl</span>[<span class="ident">p2</span>].<span class="ident">mass2</span>)
                         <span class="op">/</span> (<span class="number">2.0</span> <span class="op">*</span> <span class="ident">ptcl</span>[<span class="ident">p0</span>].<span class="ident">mass</span>);
 
                     <span class="comment">// 1 / 8 π ≅ 0.039788735772973836</span>

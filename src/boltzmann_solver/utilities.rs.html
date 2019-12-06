@@ -232,6 +232,53 @@
 <span id="232">232</span>
 <span id="233">233</span>
 <span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Module of various useful miscellaneous functions.</span>
 
@@ -249,14 +296,62 @@
 <span class="doccomment">/// \\begin{equation}</span>
 <span class="doccomment">///   \lambda(a, b, c) = a^2 + b^2 + c^2 - 2ab - 2ac - 2bc</span>
 <span class="doccomment">/// \\end{equation}</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Example</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use boltzmann_solver::utilities::kallen_lambda;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// assert_eq!(kallen_lambda(5.0, 2.0, 0.5), 2.25);</span>
+<span class="doccomment">/// assert_eq!(kallen_lambda(1.0, 1.0, 1.0), -3.0);</span>
+<span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kallen_lambda</span>(<span class="ident">a</span>: <span class="ident">f64</span>, <span class="ident">b</span>: <span class="ident">f64</span>, <span class="ident">c</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
     <span class="ident">a</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">b</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">c</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="number">2.0</span> <span class="op">*</span> (<span class="ident">a</span> <span class="op">*</span> <span class="ident">b</span> <span class="op">+</span> <span class="ident">a</span> <span class="op">*</span> <span class="ident">c</span> <span class="op">+</span> <span class="ident">b</span> <span class="op">*</span> <span class="ident">c</span>)
 }
 
+<span class="doccomment">/// Square root of the Kallen lambda function:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// \\begin{equation}</span>
+<span class="doccomment">///   \lambda^{\frac{1}{2}}(a, b, c) = \sqrt{a^2 + b^2 + c^2 - 2ab - 2ac - 2bc}</span>
+<span class="doccomment">/// \\end{equation}</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This implementation is more precise than taking the square root of</span>
+<span class="doccomment">/// [`kallen_lambda`] in cases where the arguments are span several orders of</span>
+<span class="doccomment">/// magnitude.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Example</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use boltzmann_solver::utilities::{kallen_lambda, kallen_lambda_sqrt};</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// assert!((kallen_lambda_sqrt(5.0, 2.0, 0.5) - 1.5).abs() &lt; 1e-14);</span>
+<span class="doccomment">/// assert!((kallen_lambda(5.0, 2.0, 0.5).sqrt() - kallen_lambda_sqrt(5.0, 2.0, 0.5)).abs() &lt; 1e-14);</span>
+<span class="doccomment">/// assert!((kallen_lambda_sqrt(1.0, 1.0, 1.0) - 3f64.sqrt()).abs() &lt; 1e-14);</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Warning</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This function only returns the *absolute value* of the result.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kallen_lambda_sqrt</span>(<span class="ident">a</span>: <span class="ident">f64</span>, <span class="ident">b</span>: <span class="ident">f64</span>, <span class="ident">c</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">a</span> <span class="op">&gt;</span> <span class="ident">b</span> { <span class="ident">a</span> } <span class="kw">else</span> { <span class="ident">b</span> };
+    <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">max</span> <span class="op">&gt;</span> <span class="ident">c</span> { <span class="ident">max</span> } <span class="kw">else</span> { <span class="ident">c</span> };
+
+    <span class="ident">max</span> <span class="op">*</span> <span class="ident">kallen_lambda</span>(<span class="number">1.0</span>, <span class="ident">b</span> <span class="op">/</span> <span class="ident">max</span>, <span class="ident">c</span> <span class="op">/</span> <span class="ident">max</span>).<span class="ident">abs</span>().<span class="ident">sqrt</span>()
+}
+
 <span class="doccomment">/// Return the minimum and maximum value of the Mandelstam variable \\(t\\)</span>
-<span class="doccomment">/// based on the four particle masses \\(m_1\\), \\(m_2\\), \\(m_3\\) and</span>
-<span class="doccomment">/// \\(m_4\\), where particles 1 and 2 are initial state and particles 3 and 4</span>
-<span class="doccomment">/// are the final state particles.</span>
+<span class="doccomment">/// based on the four particle **squared** masses \\(m_1^2\\), \\(m_2^2\\),</span>
+<span class="doccomment">/// \\(m_3^2\\) and \\(m_4^2\\), where particles 1 and 2 are initial state and</span>
+<span class="doccomment">/// particles 3 and 4 are the final state particles.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Explicitly, the values are:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// \\begin{equation}\\begin{aligned}</span>
+<span class="doccomment">///   t_{\text{min}} &amp;= \frac{(m_1^2 - m_2^2 - m_3^3 + m_4^4)^2}{4 s}</span>
+<span class="doccomment">///       - \frac{\lambda^{\frac{1}{2}}(s, m_1^2, m_2^2) \lambda^{\frac{1}{2}}(s, m_3^2, m_4^2)}{s} \\\\</span>
+<span class="doccomment">///   t_{\text{max}} &amp;= \frac{(m_1^2 - m_2^2 - m_3^3 + m_4^4)^2}{4 s}</span>
+<span class="doccomment">///       + \frac{\lambda^{\frac{1}{2}}(s, m_1^2, m_2^2) \lambda^{\frac{1}{2}}(s, m_3^2, m_4^2)}{s}</span>
+<span class="doccomment">/// \\end{aligned}\\end{equation}</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">t_range</span>(<span class="ident">s</span>: <span class="ident">f64</span>, <span class="ident">m1</span>: <span class="ident">f64</span>, <span class="ident">m2</span>: <span class="ident">f64</span>, <span class="ident">m3</span>: <span class="ident">f64</span>, <span class="ident">m4</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>) {
     <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">s</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">m1</span> <span class="op">+</span> <span class="ident">m2</span>, <span class="string">&quot;s must be greater than m1^2 + m2^2.&quot;</span>);
     <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">s</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">m3</span> <span class="op">+</span> <span class="ident">m4</span>, <span class="string">&quot;s must be greater than m3^2 + m4^2.&quot;</span>);
@@ -266,12 +361,7 @@
     }
 
     <span class="kw">let</span> <span class="ident">baseline</span> <span class="op">=</span> (<span class="ident">m1</span> <span class="op">-</span> <span class="ident">m2</span> <span class="op">-</span> <span class="ident">m3</span> <span class="op">+</span> <span class="ident">m4</span>).<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">/</span> (<span class="number">4.0</span> <span class="op">*</span> <span class="ident">s</span>);
-    <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="ident">kallen_lambda</span>(<span class="ident">s</span>, <span class="ident">m1</span>, <span class="ident">m2</span>).<span class="ident">abs</span>().<span class="ident">sqrt</span>() <span class="op">*</span> <span class="ident">kallen_lambda</span>(<span class="ident">s</span>, <span class="ident">m3</span>, <span class="ident">m4</span>).<span class="ident">abs</span>().<span class="ident">sqrt</span>() <span class="op">/</span> <span class="ident">s</span>;
-    <span class="comment">// let t_const = 0.5 * ((m1 + m2 + m3 + m4) - s - (m1 - m2) * (m3 - m4) / s);</span>
-    <span class="comment">// let t_cos = f64::sqrt(f64::abs(</span>
-    <span class="comment">//     (s.powi(2) - 2.0 * s * (m1 + m2) + (m1 - m2).powi(2))</span>
-    <span class="comment">//         * (s.powi(2) - 2.0 * s * (m3 + m4) + (m3 - m4).powi(2)),</span>
-    <span class="comment">// )) / (2.0 * s);</span>
+    <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="ident">kallen_lambda_sqrt</span>(<span class="ident">s</span>, <span class="ident">m1</span>, <span class="ident">m2</span>) <span class="op">*</span> <span class="ident">kallen_lambda_sqrt</span>(<span class="ident">s</span>, <span class="ident">m3</span>, <span class="ident">m4</span>) <span class="op">/</span> <span class="ident">s</span>;
 
     (<span class="ident">baseline</span> <span class="op">-</span> <span class="ident">delta</span>, <span class="ident">baseline</span>)
 }
@@ -323,7 +413,11 @@
     <span class="ident">integrate</span>(<span class="ident">s_integrand</span>, <span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>).<span class="ident">integral</span> <span class="op">/</span> (<span class="number">512.0</span> <span class="op">*</span> <span class="ident">PI_5</span> <span class="op">*</span> <span class="ident">beta</span>)
 }
 
-<span class="doccomment">/// Propagator with squared momentum `q2` involving particle `p`, defined as</span>
+<span class="doccomment">/// Propagator with squared momentum `q2` involving particle `p`, defined as:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// \\begin{equation}</span>
+<span class="doccomment">///   \mathcal{P}_{p}(q^2) \defeq \frac{1}{q^2 - m_p^2 + i m_p \Gamma_p}</span>
+<span class="doccomment">/// \\end{equation}</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">propagator</span>(<span class="ident">q2</span>: <span class="ident">f64</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Particle</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
     <span class="number">1.0</span> <span class="op">/</span> (<span class="ident">q2</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">mass2</span> <span class="op">+</span> <span class="ident">Complex</span>::<span class="ident">i</span>() <span class="op">*</span> <span class="ident">p</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">p</span>.<span class="ident">width</span>)
 }
