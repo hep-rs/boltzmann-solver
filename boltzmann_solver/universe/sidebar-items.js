@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["SingleSpecies","Contribution from a single particle in the Universe."],["StandardModel","Implementation of [`Universe`] for the Standard Model."]],"trait":[["Universe","Collection of properties which determine the evolution of a Universe."]]});

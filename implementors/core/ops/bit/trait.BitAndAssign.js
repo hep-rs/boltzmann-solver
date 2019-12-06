@@ -6,5 +6,4 @@ implementors["ndarray"] = [{text:"impl&lt;'a, A, S, S2, D, E&gt; <a class=\"trai
             } else {
                 window.pending_implementors = implementors;
             }
-        
-})()
+        })()

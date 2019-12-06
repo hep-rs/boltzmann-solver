@@ -1,14 +1,244 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `solver` mod in crate `boltzmann_solver`."><meta name="keywords" content="rust, rustlang, rust-lang, solver"><title>boltzmann_solver::solver - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!-- Google Tag Manager (noscript) --><noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N9HX7G4" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript><!-- End Google Tag Manager (noscript) --><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a><p class='location'>Module solver</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li></ul></div><p class='location'><a href='../index.html'>boltzmann_solver</a></p><script>window.sidebarCurrent = {name: 'solver', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../src/boltzmann_solver/solver.rs.html#1-41' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../index.html'>boltzmann_solver</a>::<wbr><a class="mod" href=''>solver</a></span></h1><div class='docblock'><p>Solvers for the Boltzmann equation, or sets of Boltzmann equations</p>
-</div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
-<table><tr class='module-item'><td><a class="mod" href="number_density/index.html" title='boltzmann_solver::solver::number_density mod'>number_density</a></td><td class='docblock-short'><p>Solver for the number density evolution given by integrating the Boltzmann
+<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `solver` mod in crate `boltzmann_solver`."><meta name="keywords" content="rust, rustlang, rust-lang, solver"><title>boltzmann_solver::solver - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!-- Google Tag Manager (noscript) --><noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N9HX7G4" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript><!-- End Google Tag Manager (noscript) --><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a><p class='location'>Module solver</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li></ul></div><p class='location'><a href='../index.html'>boltzmann_solver</a></p><script>window.sidebarCurrent = {name: 'solver', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../src/boltzmann_solver/solver.rs.html#1-323' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../index.html'>boltzmann_solver</a>::<wbr><a class="mod" href=''>solver</a></span></h1><div class='docblock'><p>Solver for the number density evolution given by integrating the Boltzmann
 equation.</p>
-</td></tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
-<table><tr class='module-item'><td><a class="struct" href="struct.EmptyModel.html" title='boltzmann_solver::solver::EmptyModel struct'>EmptyModel</a></td><td class='docblock-short'><p>An empty model containing no couplings, masses, etc.  This is can be used
-for very simple implementations of the Boltzmann solver.</p>
-</td></tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
-<table><tr class='module-item'><td><a class="enum" href="enum.InitialCondition.html" title='boltzmann_solver::solver::InitialCondition enum'>InitialCondition</a></td><td class='docblock-short'><p>Initial conditions for a particle.</p>
-</td></tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
-<table><tr class='module-item'><td><a class="trait" href="trait.Model.html" title='boltzmann_solver::solver::Model trait'>Model</a></td><td class='docblock-short'><p>Contains all the information relevant to a particular model, including
-masses, widths and couplings.  All these attributes can be dependent on the
-inverse temperature \(\beta\).</p>
+<p>Solving the Boltzmann equation in generality without making any assumption
+about the phase space distribution \(f\) (other than specifying some
+initial condition) is a difficult problem.  Furthermore, within the context
+of baryogenesis and leptogenesis, we are only interested in the number
+density (or more specifically, the difference in the number densities or a
+particle and its corresponding antiparticle).</p>
+<h1 id="assumptions" class="section-header"><a href="#assumptions">Assumptions</a></h1>
+<p>A couple of assumptions can be made to simplify the Boltzmann equation so
+that the number densities can be computed directly.</p>
+<ul>
+<li>
+<p><em>Assume kinetic equilibrium.</em> If the rate at which a particle species is
+scattering is sufficiently fast, phase space distribution of this species
+will rapidly converge converge onto either the Bose–Einstein or
+Fermi–Dirac distributions:</p>
+<p>\begin{equation}
+f_{\textsc{BE}} = \frac{1}{\exp[(E - \mu) \beta] - 1}, \qquad
+f_{\textsc{FD}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.
+\end{equation}</p>
+<p>For a particular that remains in kinetic equilibrium, the evolution of its
+phase space is entirely described by the evolution of \(\mu\) in time.</p>
+</li>
+<li>
+<p><em>Assume \(\beta \gg E - \mu\).</em> In the limit that the temperature is
+much less than \(E - \mu\) (or equivalently, that the inverse
+temperature \(\beta\) is greater than \(E - \mu\)), both the
+Fermi–Dirac and Bose–Einstein approach the Maxwell–Boltzmann distribution,</p>
+<p>\begin{equation}
+f_{\textsc{MB}} = \exp[-(E - \mu) \beta].
+\end{equation}</p>
+<p>This simplifies the expression for the number density to</p>
+<p>\begin{equation}
+n = \frac{g m^2 K_2(m \beta)}{2 \pi^2 \beta} e^{\mu \beta} = n^{(0)} e^{\mu \beta},
+\end{equation}</p>
+<p>where \(n^{(0)}\) is the equilibrium number density when \(\mu = 0\).
+This also allows for the equilibrium phase space distribution to be
+expressed in terms of the \(\mu = 0\) distribution:</p>
+<p>\begin{equation}
+f_{\textsc{MB}} = e^{\mu \beta} f_{\textsc{MB}}^{(0)} = \frac{n}{n^{(0)}} f_{\textsc{MB}}^{(0)}.
+\end{equation}</p>
+<p>Furthermore, the assumption that \(\beta \gg E - \mu\) implies that
+\(f_{\textsc{BE}}, f_{\textsc{FD}} \ll 1\).  Consequently, the Pauli
+suppression and Bose enhancement factors in the collision term can all be
+neglected resulting in:</p>
+<p>\begin{equation}
+\begin{aligned}
+g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
+&amp;= - \int_{\vt a}^{\vt b}
+\abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f_i \right)
+- \abs{\mathcal M(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} f_i \right) \\
+&amp;= - \int_{\vt a}^{\vt b}
+\abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right)
+- \abs{\mathcal M(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right).
+\end{aligned}
+\end{equation}</p>
+<p>This is then commonly expressed as,</p>
+<p>\begin{equation}
+g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
+= - \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt a \to \vt b)
++ \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right) \gamma(\vt b \to \vt a),
+\end{equation}</p>
+<p>where we have introduced the interaction density</p>
+<p>\begin{equation}
+\gamma(\vt a \to \vt b)
+= \int_{\vt a}^{\vt b}
+\abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f^{(0)}_i \right).
+\end{equation}</p>
+</li>
+</ul>
+<h1 id="interactions" class="section-header"><a href="#interactions">Interactions</a></h1>
+<p>The majority of interactions can be accounted for by looking at simply \(1
+\leftrightarrow 2\) decays/inverse decays and \(2 \leftrightarrow 2\)
+scatterings.  In the former case, the phase space integration can be done
+entirely analytically and is presented below; whilst in the latter case, the
+phase space integration can be simplified to just two integrals.</p>
+<h2 id="decays-and-inverse-decays" class="section-header"><a href="#decays-and-inverse-decays">Decays and Inverse Decays</a></h2>
+<p>Considering the interaction \(a \leftrightarrow b + c\), the reaction is</p>
+<p>\begin{equation}
+\begin{aligned}
+g_a \int \vt C[f_a] \frac{\dd \vt p_a}{(2\pi)^3}
+&amp;= - \frac{n_a}{n^{(0)}_a} \gamma(a \to bc) + \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} \gamma(bc \to a)
+\end{aligned}
+\end{equation}</p>
+<p>In every case, the squared matrix element will be completely independent of
+all initial and final state momenta (even \(\varepsilon \cdot p\) terms
+vanish after averaging over both initial and final spins).</p>
+<h3 id="decay-term" class="section-header"><a href="#decay-term">Decay Term</a></h3>
+<p>For the decay, the integration over the final state momenta is trivial as
+the only final-state-momentum dependence appears within the Dirac delta
+function.  Consequently, we need only integrate over the initial state
+momentum:</p>
+<p>\begin{equation}
+\begin{aligned}
+\gamma(a \to bc)
+&amp;= - \abs{\mathcal M(a \to bc)}^2 \int_{a}^{b,c} f^{(0)}_a \\
+&amp;= - \frac{\abs{\mathcal M(a \to bc)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}
+\end{aligned}
+\end{equation}</p>
+<p>Combined with the number density scaling:</p>
+<p>\begin{equation}
+\frac{n_a}{n^{(0)}_a} \gamma(a \to bc)
+= n_a \frac{\abs{\mathcal M(a \to bc)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
+\end{equation}</p>
+<p>where the analytic expression for \(n^{(0)}_a\) was used to introduce the
+second Bessel function.</p>
+<p>The ratio of Bessel functions is generally referred to as the <em>time-dilation
+factor</em> for the decaying particle.  When \(m \beta \gg 1\), the ratio of
+Bessel functions approaches 1, and when \(m \beta \ll 1\), the ratio
+approaches \(0\).</p>
+<p>If the final state particles are essentially massless in comparison to the
+decaying particle, then the decay rate in the rest frame of the particle of
+\(\Gamma_\text{rest} = \abs{\mathcal M}^2 / 16 \pi m_a\) and the above
+expression can be simplified to</p>
+<p>\begin{equation}
+\frac{n_a}{n^{(0)}_a} \gamma(a \to bc)
+= n_a \Gamma_\text{rest} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}.
+\end{equation}</p>
+<h3 id="inverse-decay" class="section-header"><a href="#inverse-decay">Inverse Decay</a></h3>
+<p>The inverse decay rate is given by</p>
+<p>\begin{equation}
+\gamma(bc \to a)
+= \abs{\mathcal M(bc \to a)}^2 \int_{a}^{b,c} f^{(0)}_b f^{(0)}_c
+\end{equation}</p>
+<p>The Dirac delta enforces that \(E_a = E_b + E_c\) which implies that
+\(f^{(0)}_a = f^{(0)}_b f^{(0)}_c\) thereby making the integral identical
+to the decay scenario:</p>
+<p>\begin{equation}
+\gamma(bc \to a)
+= \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}
+= n^{(0)}_a \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
+\end{equation}</p>
+<p>The full expression including the number density scaling becomes:</p>
+<p>\begin{equation}
+\frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} \gamma(bc \to a)
+= \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} n^{(0)}_a \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
+\end{equation}</p>
+<h3 id="combined-decay-and-inverse-decay" class="section-header"><a href="#combined-decay-and-inverse-decay">Combined Decay and Inverse Decay</a></h3>
+<p>If only the tree-level contributions are considered for the decay and
+inverse decays, then both squared amplitudes will be in fact identical and
+thus \(\gamma(ab \to c) \equiv \gamma(c \to ab)\).  As a result, the decay
+and inverse decay only differ by a scaling factor to take into account the
+initial state particles.</p>
+<p>In particular, we can define an alternative reaction rate,</p>
+<p>\begin{equation}
+\tilde \gamma(a \to bc) = \frac{\abs{\mathcal{M}(a \to bc)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)},
+\end{equation}</p>
+<p>which allows for the overall \(1 \leftrightarrow 2\) reaction rate to be expressed as:</p>
+<p>\begin{equation}
+\frac{n_a}{n_a^{(0)}} \gamma(a \to bc) - \frac{n_b n_c}{n_b^{(0)} n_c^{(0)}} \gamma(bc \to a)
+= \left[ n_a - \frac{n_b n_c}{n_b^{(0)} n_c^{(0)}} n_a^{(0)} \right] \tilde \gamma(a \to bc)
+\end{equation}</p>
+<p>provided the forward and backward rates are equal.</p>
+<h2 id="two-body-scattering" class="section-header"><a href="#two-body-scattering">Two Body Scattering</a></h2>
+<p>The two-to-two scattering \(ab \to cd\) reaction density is given by</p>
+<p>\begin{equation}
+\gamma(ab \to cd) = \int_{a,b}^{c,d} \abs{\mathcal M(ab \to cd)}^2 f_a^{(0)} f_b^{(0)}
+\end{equation}</p>
+<p>The two initial-state phase space integrals can be reduced to a simple
+integral over the centre-of-mass \(s\):</p>
+<p>\begin{equation}
+\gamma(ab \to cd) = \frac{1}{8 \pi^3 \beta} \int \hat \sigma_{ab}^{cd}(s) \sqrt{s} K_1(\sqrt{s} \beta) \dd s
+\end{equation}</p>
+<p>where \(\hat \sigma(s)\) is the reduced cross-section:</p>
+<p>\begin{equation}
+\hat \sigma_{ab}^{cd}(s) = \frac{g_a g_b g_c g_d}{64 \pi^2 s} \int \abs{\mathcal M(ab \to cd)}^2 \dd t
+\end{equation}</p>
+<p>in which \(t\) is the usual Mandelstam variable.</p>
+<p>As a result, the full \(2 \to 2\) cross-section can be expressed as</p>
+<p>\begin{equation}
+\gamma(ab \to cd) = \frac{g_a g_b g_c g_d}{512 \pi^5 \beta} \int \abs{\mathcal M(ab \to cd)}^2 \frac{K_1(\sqrt s \beta)}{\sqrt s} \dd s \dd t
+\end{equation}</p>
+<h3 id="real-intermediate-state" class="section-header"><a href="#real-intermediate-state">Real Intermediate State</a></h3>
+<p>When considering both \(1 \leftrightarrow 2\) and \(2 \leftrightarrow
+2\) scattering processes, there is a double counting issue that arises from
+having a real intermediate state (RIS) in \(2 \leftrightarrow 2\)
+interactions.</p>
+<p>As a concrete example, one may have the processes \(ab \leftrightarrow X\)
+and \(X \leftrightarrow cd\) and thus also \(ab \leftrightarrow cd\).
+In computing the squared amplitude for the \(2 \leftrightarrow 2\)
+process, one needs to subtract the RIS:</p>
+<p>\begin{equation}
+\abs{\mathcal M(ab \leftrightarrow cd)}^2 = \abs{\mathcal M_\text{full}(ab \leftrightarrow cd)}^2 - \abs{\mathcal M_\textsc{RIS}(ab \leftrightarrow cd)}^2
+\end{equation}</p>
+<p>In the case of a single scalar RIS, the RIS-subtracted amplitude is given by</p>
+<p>\begin{align}
+\abs{\mathcal M_\textsc{RIS}(ab \to cd)}
+&amp;= \frac{\pi}{m_X \Gamma_X} \delta(s - m_X^2) \theta(\sqrt{s}) \\
+&amp;\quad \Big[
+\abs{\mathcal M(ab \to X)}^2 \abs{\mathcal M(X \to cd)}^2
++ \abs{\mathcal M(ab \to \overline X)}^2 \abs{\mathcal M(\overline X \to cd)}^2
+\Big].
+\end{align}</p>
+<p>Care must be taken for fermions as the spinorial structure prevents a simple
+factorization in separate squared amplitude.  Furthermore if there are
+multiple intermediate states, the mixing between these states must also be
+taken into account.</p>
+<h1 id="temperature-evolution" class="section-header"><a href="#temperature-evolution">Temperature Evolution</a></h1>
+<p>Although it is most intuitive to describe the interaction rates in terms of
+time, most quantities depend on the temperature of the Universe at a
+particular time.  We therefore make the change of variables from \(t\) to
+\(\beta\) which introduces a factor of \(H(\beta) \beta\):</p>
+<p>\begin{equation}
+\pfrac{n}{t} + 3 H n \equiv H \beta \pfrac{n}{\beta} + 3 H n.
+\end{equation}</p>
+<p>As a result, the actual change in the number density, it becomes</p>
+<p>\begin{equation}
+\pfrac{n}{\beta} = \frac{1}{H \beta} \left[\vt C[n] - 3 H n\right]
+\end{equation}</p>
+<p>and one must only input \(\vt C[n]\) in the interaction.</p>
+<h1 id="normalized-number-density" class="section-header"><a href="#normalized-number-density">Normalized Number Density</a></h1>
+<p>The number densities themselves can be often quite large (especially in the
+early Universe), and often are compared to other number densities; as a
+result, they are often normalized to either the photon number density
+\(n_\gamma\) or the entropy density \(s\).  This library uses a
+equilibrium number density of a single massless bosonic degree of freedom
+(and thus differs from using the photon number density by a factor of 2).</p>
+<p>When dealing with number densities, the Liouville operator is:</p>
+<p>\begin{equation}
+\pfrac{n}{t} + 3 H n = \vt C[n]
+\end{equation}</p>
+<p>where \(\vt C[n]\) is the change in the number density.  If we now
+define</p>
+<p>\begin{equation}
+Y \defeq \frac{n}{n_{\text{eq}}},
+\end{equation}</p>
+<p>then the change in this normalized number density is:</p>
+<p>\begin{equation}
+\pfrac{Y}{t} = \frac{1}{n_{\text{eq}}} \vt C[n]
+\end{equation}</p>
+<p>with \(n_{\text{eq}}\) having the simple analytic form \(3 \zeta(3) / 4
+\pi^2 \beta^3\).  Furthermore, make the change of variable from time
+\(t\) to inverse temperature \(\beta\), we get:</p>
+<p>\begin{equation}
+\pfrac{Y}{\beta} = \frac{1}{H \beta n_{\text{eq}}} \vt C[n].
+\end{equation}</p>
+<p>As with the non-normalized number density calculations, only \(\vt
+C[n]\) must be inputted in the interaction.</p>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table><tr class='module-item'><td><a class="struct" href="struct.Context.html" title='boltzmann_solver::solver::Context struct'>Context</a></td><td class='docblock-short'><p>Current context at a particular step in the numerical integration.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Solver.html" title='boltzmann_solver::solver::Solver struct'>Solver</a></td><td class='docblock-short'><p>Boltzmann solver</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.SolverBuilder.html" title='boltzmann_solver::solver::SolverBuilder struct'>SolverBuilder</a></td><td class='docblock-short'><p>Boltzmann solver builder</p>
 </td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "boltzmann_solver";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script defer src="../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>

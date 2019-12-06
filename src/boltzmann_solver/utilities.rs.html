@@ -223,21 +223,33 @@
 <span id="223">223</span>
 <span id="224">224</span>
 <span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Module of various useful miscellaneous functions.</span>
 
-<span class="kw">use</span> <span class="ident">quadrature</span>::<span class="ident">integrate</span>;
-<span class="kw">use</span> <span class="ident">special_functions</span>::<span class="ident">bessel</span>;
-
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">spline</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">test</span>;
+
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constants</span>::<span class="ident">PI_5</span>, <span class="ident">model</span>::<span class="ident">Particle</span>};
+<span class="kw">use</span> <span class="ident">num_complex</span>::<span class="ident">Complex</span>;
+<span class="kw">use</span> <span class="ident">quadrature</span>::<span class="ident">integrate</span>;
+<span class="kw">use</span> <span class="ident">special_functions</span>::<span class="ident">bessel</span>;
 
 <span class="doccomment">/// Kallen lambda function:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// \\begin{equation}</span>
 <span class="doccomment">///   \lambda(a, b, c) = a^2 + b^2 + c^2 - 2ab - 2ac - 2bc</span>
 <span class="doccomment">/// \\end{equation}</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kallen_lambda</span>(<span class="ident">a</span>: <span class="ident">f64</span>, <span class="ident">b</span>: <span class="ident">f64</span>, <span class="ident">c</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kallen_lambda</span>(<span class="ident">a</span>: <span class="ident">f64</span>, <span class="ident">b</span>: <span class="ident">f64</span>, <span class="ident">c</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
     <span class="ident">a</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">b</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">c</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="number">2.0</span> <span class="op">*</span> (<span class="ident">a</span> <span class="op">*</span> <span class="ident">b</span> <span class="op">+</span> <span class="ident">a</span> <span class="op">*</span> <span class="ident">c</span> <span class="op">+</span> <span class="ident">b</span> <span class="op">*</span> <span class="ident">c</span>)
 }
 
@@ -245,41 +257,23 @@
 <span class="doccomment">/// based on the four particle masses \\(m_1\\), \\(m_2\\), \\(m_3\\) and</span>
 <span class="doccomment">/// \\(m_4\\), where particles 1 and 2 are initial state and particles 3 and 4</span>
 <span class="doccomment">/// are the final state particles.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The values are given by:</span>
-<span class="doccomment">/// \\begin{equation}</span>
-<span class="doccomment">///   t_{\text{min},\text{max}} = a \pm b</span>
-<span class="doccomment">/// \\end{equation}</span>
-<span class="doccomment">/// where</span>
-<span class="doccomment">/// \\begin{equation}</span>
-<span class="doccomment">///   \\begin{aligned}</span>
-<span class="doccomment">///     a &amp;= \frac{1}{2} \left( m_1^2 + m_2^2 + m_3^2 + m_4^2 - s - \frac{\left( m_1^2 - m_2^2 \right) \left( m_3^2 - m_4^2 \right)}{s} \right) \\\\</span>
-<span class="doccomment">///     b &amp;= \frac{\mathop{\text{sign}}\left(m_1^2 - m_2^2\right)}{2s}</span>
-<span class="doccomment">///           \sqrt{m_2^2 + \left(s - m_1^2\right)^2 - 2 m_2^2 \left(s + m_1^2\right)}</span>
-<span class="doccomment">///           \sqrt{m_4^2 + \left(s - m_3^2\right)^2 - 2 m_4^2 \left(s + m_3^2\right)}</span>
-<span class="doccomment">///   \\end{aligned}</span>
-<span class="doccomment">/// \\end{equation}</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">t_min_max</span>(<span class="ident">s</span>: <span class="ident">f64</span>, <span class="ident">m1</span>: <span class="ident">f64</span>, <span class="ident">m2</span>: <span class="ident">f64</span>, <span class="ident">m3</span>: <span class="ident">f64</span>, <span class="ident">m4</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>) {
-    <span class="kw">let</span> <span class="ident">m1</span> <span class="op">=</span> <span class="ident">m1</span>.<span class="ident">powi</span>(<span class="number">2</span>);
-    <span class="kw">let</span> <span class="ident">m2</span> <span class="op">=</span> <span class="ident">m2</span>.<span class="ident">powi</span>(<span class="number">2</span>);
-    <span class="kw">let</span> <span class="ident">m3</span> <span class="op">=</span> <span class="ident">m3</span>.<span class="ident">powi</span>(<span class="number">2</span>);
-    <span class="kw">let</span> <span class="ident">m4</span> <span class="op">=</span> <span class="ident">m4</span>.<span class="ident">powi</span>(<span class="number">2</span>);
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">t_range</span>(<span class="ident">s</span>: <span class="ident">f64</span>, <span class="ident">m1</span>: <span class="ident">f64</span>, <span class="ident">m2</span>: <span class="ident">f64</span>, <span class="ident">m3</span>: <span class="ident">f64</span>, <span class="ident">m4</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>) {
+    <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">s</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">m1</span> <span class="op">+</span> <span class="ident">m2</span>, <span class="string">&quot;s must be greater than m1^2 + m2^2.&quot;</span>);
+    <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">s</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">m3</span> <span class="op">+</span> <span class="ident">m4</span>, <span class="string">&quot;s must be greater than m3^2 + m4^2.&quot;</span>);
 
-    <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">s</span> <span class="op">&gt;=</span> <span class="ident">m1</span> <span class="op">+</span> <span class="ident">m2</span>, <span class="string">&quot;s must be greater than m1^2 + m2^2.&quot;</span>);
-    <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">s</span> <span class="op">&gt;=</span> <span class="ident">m3</span> <span class="op">+</span> <span class="ident">m4</span>, <span class="string">&quot;s must be greater than m3^2 + m4^2.&quot;</span>);
-
-    <span class="kw">if</span> <span class="ident">s</span> <span class="op">==</span> <span class="number">0.0</span> {
-        <span class="kw">return</span> (<span class="op">-</span><span class="number">0.0</span>, <span class="number">0.0</span>);
+    <span class="kw">if</span> <span class="ident">s</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+        <span class="kw">return</span> (<span class="number">0.0</span>, <span class="number">0.0</span>);
     }
 
-    <span class="kw">let</span> <span class="ident">t_const</span> <span class="op">=</span> (<span class="ident">m1</span> <span class="op">+</span> <span class="ident">m2</span> <span class="op">+</span> <span class="ident">m3</span> <span class="op">+</span> <span class="ident">m4</span> <span class="op">-</span> <span class="ident">s</span> <span class="op">-</span> (<span class="ident">m1</span> <span class="op">-</span> <span class="ident">m2</span>) <span class="op">*</span> (<span class="ident">m3</span> <span class="op">-</span> <span class="ident">m4</span>) <span class="op">/</span> <span class="ident">s</span>) <span class="op">/</span> <span class="number">2.0</span>;
-    <span class="kw">let</span> <span class="ident">t_cos</span> <span class="op">=</span> ((<span class="ident">m2</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> (<span class="ident">s</span> <span class="op">-</span> <span class="ident">m1</span>).<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">m2</span> <span class="op">*</span> (<span class="ident">s</span> <span class="op">+</span> <span class="ident">m1</span>))
-        <span class="op">*</span> (<span class="ident">m4</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> (<span class="ident">s</span> <span class="op">-</span> <span class="ident">m3</span>).<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">m4</span> <span class="op">*</span> (<span class="ident">s</span> <span class="op">+</span> <span class="ident">m3</span>)))
-        .<span class="ident">abs</span>()
-        .<span class="ident">sqrt</span>()
-        <span class="op">/</span> (<span class="number">2.0</span> <span class="op">*</span> <span class="ident">s</span>);
+    <span class="kw">let</span> <span class="ident">baseline</span> <span class="op">=</span> (<span class="ident">m1</span> <span class="op">-</span> <span class="ident">m2</span> <span class="op">-</span> <span class="ident">m3</span> <span class="op">+</span> <span class="ident">m4</span>).<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">/</span> (<span class="number">4.0</span> <span class="op">*</span> <span class="ident">s</span>);
+    <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="ident">kallen_lambda</span>(<span class="ident">s</span>, <span class="ident">m1</span>, <span class="ident">m2</span>).<span class="ident">abs</span>().<span class="ident">sqrt</span>() <span class="op">*</span> <span class="ident">kallen_lambda</span>(<span class="ident">s</span>, <span class="ident">m3</span>, <span class="ident">m4</span>).<span class="ident">abs</span>().<span class="ident">sqrt</span>() <span class="op">/</span> <span class="ident">s</span>;
+    <span class="comment">// let t_const = 0.5 * ((m1 + m2 + m3 + m4) - s - (m1 - m2) * (m3 - m4) / s);</span>
+    <span class="comment">// let t_cos = f64::sqrt(f64::abs(</span>
+    <span class="comment">//     (s.powi(2) - 2.0 * s * (m1 + m2) + (m1 - m2).powi(2))</span>
+    <span class="comment">//         * (s.powi(2) - 2.0 * s * (m3 + m4) + (m3 - m4).powi(2)),</span>
+    <span class="comment">// )) / (2.0 * s);</span>
 
-    (<span class="ident">t_const</span> <span class="op">-</span> <span class="ident">t_cos</span>, <span class="ident">t_const</span> <span class="op">+</span> <span class="ident">t_cos</span>)
+    (<span class="ident">baseline</span> <span class="op">-</span> <span class="ident">delta</span>, <span class="ident">baseline</span>)
 }
 
 <span class="doccomment">/// Integrate the amplitude with respect to the Mandelstam variable \\(s\\) and</span>
@@ -292,120 +286,73 @@
 <span class="doccomment">/// \\end{equation}</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// where \\(s_\text{min} = \mathop{\text{max}}(m_1^2 + m_2^2, m_3^2 + m_4^2)\\)</span>
-<span class="doccomment">/// and \\(t_{\text{min},\text{max}}\\) are determined from [`t_min_max`].</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">integrate_st</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">amplitude</span>: <span class="ident">F</span>, <span class="ident">beta</span>: <span class="ident">f64</span>, <span class="ident">m1</span>: <span class="ident">f64</span>, <span class="ident">m2</span>: <span class="ident">f64</span>, <span class="ident">m3</span>: <span class="ident">f64</span>, <span class="ident">m4</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span>
+<span class="doccomment">/// and \\(t_{\text{min},\text{max}}\\) are determined from [`t_range`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The squared masses should be given.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">integrate_st</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">amplitude</span>: <span class="ident">F</span>, <span class="ident">beta</span>: <span class="ident">f64</span>, <span class="ident">m1</span>: <span class="ident">f64</span>, <span class="ident">m2</span>: <span class="ident">f64</span>, <span class="ident">m3</span>: <span class="ident">f64</span>, <span class="ident">m4</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span>,
+    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span>,
 {
-    <span class="kw">let</span> <span class="ident">s_min</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">m1</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">m2</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">&gt;</span> <span class="ident">m3</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">m4</span>.<span class="ident">powi</span>(<span class="number">4</span>) {
-        <span class="ident">m1</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">m2</span>.<span class="ident">powi</span>(<span class="number">2</span>)
-    } <span class="kw">else</span> {
-        <span class="ident">m3</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">m4</span>.<span class="ident">powi</span>(<span class="number">4</span>)
-    };
+    <span class="kw">let</span> <span class="ident">s_min</span> <span class="op">=</span> (<span class="ident">m1</span> <span class="op">+</span> <span class="ident">m2</span>).<span class="ident">max</span>(<span class="ident">m3</span> <span class="op">+</span> <span class="ident">m4</span>);
 
     <span class="kw">let</span> <span class="ident">s_integrand</span> <span class="op">=</span> <span class="op">|</span><span class="ident">ss</span>: <span class="ident">f64</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> (<span class="number">1.0</span> <span class="op">-</span> <span class="ident">ss</span>) <span class="op">/</span> <span class="ident">ss</span> <span class="op">+</span> <span class="ident">s_min</span>;
-        <span class="kw">let</span> <span class="ident">dsdss</span> <span class="op">=</span> <span class="ident">ss</span>.<span class="ident">powi</span>(<span class="op">-</span><span class="number">2</span>);
+        <span class="comment">// Remap the semi-infinite s interval onto [0, 1)</span>
+        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">ss</span> <span class="op">/</span> (<span class="number">1.0</span> <span class="op">-</span> <span class="ident">ss</span>) <span class="op">+</span> <span class="ident">s_min</span>;
+        <span class="kw">let</span> <span class="ident">dsdss</span> <span class="op">=</span> (<span class="ident">ss</span> <span class="op">-</span> <span class="number">1.0</span>).<span class="ident">powi</span>(<span class="op">-</span><span class="number">2</span>);
         <span class="kw">let</span> <span class="ident">sqrt_s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">sqrt</span>();
 
-        <span class="kw">let</span> (<span class="ident">t_min</span>, <span class="ident">t_max</span>) <span class="op">=</span> <span class="ident">t_min_max</span>(<span class="ident">s</span>, <span class="ident">m1</span>, <span class="ident">m2</span>, <span class="ident">m3</span>, <span class="ident">m4</span>);
-        <span class="kw">let</span> <span class="ident">t_integrand</span> <span class="op">=</span> <span class="op">|</span><span class="ident">t</span>: <span class="ident">f64</span><span class="op">|</span> <span class="ident">amplitude</span>(<span class="ident">s</span>, <span class="ident">t</span>);
+        <span class="comment">// Combination of factors constant w.r.t. t</span>
+        <span class="kw">let</span> <span class="ident">s_factors</span> <span class="op">=</span> <span class="ident">bessel</span>::<span class="ident">k1</span>(<span class="ident">sqrt_s</span> <span class="op">*</span> <span class="ident">beta</span>) <span class="op">/</span> <span class="ident">sqrt_s</span> <span class="op">*</span> <span class="ident">dsdss</span>;
 
-        <span class="ident">integrate</span>(<span class="ident">t_integrand</span>, <span class="ident">t_min</span>, <span class="ident">t_max</span>, <span class="number">0.0</span>).<span class="ident">integral</span> <span class="op">*</span> <span class="ident">bessel</span>::<span class="ident">k1</span>(<span class="ident">sqrt_s</span> <span class="op">*</span> <span class="ident">beta</span>) <span class="op">/</span> <span class="ident">sqrt_s</span>
-            <span class="op">*</span> <span class="ident">dsdss</span>
+        <span class="comment">// Remap the (potentially very large) t interval onto [0, 1]</span>
+        <span class="comment">// This appears to be substantially slower in benchmarks</span>
+        <span class="comment">// let (t_min, t_max) = t_range(s, m1, m2, m3, m4);</span>
+        <span class="comment">// let delta = (t_max - t_min).recip() + 1.0;</span>
+        <span class="comment">// let t_integrand = |tt: f64| {</span>
+        <span class="comment">//     let t = tt / (delta - tt) + t_min;</span>
+        <span class="comment">//     let dtdtt = delta / (delta - tt).powi(2);</span>
+        <span class="comment">//     amplitude(s, t) * dtdtt * s_factors</span>
+        <span class="comment">// };</span>
+        <span class="comment">// integrate(t_integrand, 0.0, 1.0, 0.0).integral</span>
+
+        <span class="kw">let</span> (<span class="ident">t_min</span>, <span class="ident">t_max</span>) <span class="op">=</span> <span class="ident">t_range</span>(<span class="ident">s</span>, <span class="ident">m1</span>, <span class="ident">m2</span>, <span class="ident">m3</span>, <span class="ident">m4</span>);
+        <span class="kw">let</span> <span class="ident">t_integrand</span> <span class="op">=</span> <span class="op">|</span><span class="ident">t</span>: <span class="ident">f64</span><span class="op">|</span> <span class="ident">amplitude</span>(<span class="ident">s</span>, <span class="ident">t</span>) <span class="op">*</span> <span class="ident">s_factors</span>;
+        <span class="ident">integrate</span>(<span class="ident">t_integrand</span>, <span class="ident">t_min</span>, <span class="ident">t_max</span>, <span class="number">0.0</span>).<span class="ident">integral</span>
     };
 
-    <span class="ident">integrate</span>(<span class="ident">s_integrand</span>, <span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>).<span class="ident">integral</span>
+    <span class="ident">integrate</span>(<span class="ident">s_integrand</span>, <span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>).<span class="ident">integral</span> <span class="op">/</span> (<span class="number">512.0</span> <span class="op">*</span> <span class="ident">PI_5</span> <span class="op">*</span> <span class="ident">beta</span>)
+}
+
+<span class="doccomment">/// Propagator with squared momentum `q2` involving particle `p`, defined as</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">propagator</span>(<span class="ident">q2</span>: <span class="ident">f64</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Particle</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+    <span class="number">1.0</span> <span class="op">/</span> (<span class="ident">q2</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">mass2</span> <span class="op">+</span> <span class="ident">Complex</span>::<span class="ident">i</span>() <span class="op">*</span> <span class="ident">p</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">p</span>.<span class="ident">width</span>)
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">t_min_max</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utilities</span>::<span class="ident">test</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">ndarray</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">t_min_max_zero</span>() {
-        <span class="kw">let</span> (<span class="ident">m1</span>, <span class="ident">m2</span>, <span class="ident">m3</span>, <span class="ident">m4</span>): (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">=</span> (<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);
+    <span class="kw">fn</span> <span class="ident">t_range</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
+            [<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>],
+            [<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">10.0</span>, <span class="op">-</span><span class="number">10.0</span>, <span class="number">0.0</span>],
+            [<span class="number">2.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">2.0</span>, <span class="number">0.5</span>, <span class="number">0.5</span>],
+            [<span class="number">2.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">10.0</span>, <span class="op">-</span><span class="number">7.9</span>, <span class="number">0.1</span>],
+            [<span class="number">0.0</span>, <span class="number">2.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">2.0</span>, <span class="number">0.5</span>, <span class="number">0.5</span>],
+            [<span class="number">0.0</span>, <span class="number">2.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">10.0</span>, <span class="op">-</span><span class="number">7.9</span>, <span class="number">0.1</span>],
+            [<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">2.0</span>, <span class="number">0.0</span>, <span class="number">2.0</span>, <span class="number">0.5</span>, <span class="number">0.5</span>],
+            [<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">2.0</span>, <span class="number">0.0</span>, <span class="number">10.0</span>, <span class="op">-</span><span class="number">7.9</span>, <span class="number">0.1</span>],
+            [<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">2.0</span>, <span class="number">2.0</span>, <span class="number">0.5</span>, <span class="number">0.5</span>],
+            [<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">2.0</span>, <span class="number">10.0</span>, <span class="op">-</span><span class="number">7.9</span>, <span class="number">0.1</span>],
+            [<span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">8.0</span>, <span class="op">-</span><span class="number">3.533_323_506</span>, <span class="number">0.0</span>],
+            [<span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">20.0</span>, <span class="op">-</span><span class="number">9.219_680_038</span>, <span class="number">0.0</span>],
+        ];
 
-        <span class="kw">let</span> <span class="ident">s_min</span> <span class="op">=</span> <span class="ident">m1</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">m2</span>.<span class="ident">powi</span>(<span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">ss</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">linspace</span>(<span class="ident">s_min</span>, <span class="ident">s_min</span> <span class="op">+</span> <span class="number">1e3</span>, <span class="number">100</span>);
-
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">s</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">ss</span> {
-            <span class="kw">let</span> (<span class="ident">t_min</span>, <span class="ident">t_max</span>) <span class="op">=</span> <span class="ident">t_min_max</span>(<span class="ident">s</span>, <span class="ident">m1</span>, <span class="ident">m2</span>, <span class="ident">m3</span>, <span class="ident">m4</span>);
-
-            <span class="ident">approx_eq</span>(<span class="ident">t_min</span>, <span class="op">-</span><span class="ident">s</span>, <span class="number">8.0</span>, <span class="number">1e-8</span>);
-            <span class="ident">approx_eq</span>(<span class="ident">t_max</span>, <span class="number">0.0</span>, <span class="number">8.0</span>, <span class="number">1e-8</span>);
-        }
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">t_min_max_one</span>() {
-        <span class="comment">// m1 != 0</span>
-        <span class="kw">let</span> (<span class="ident">m1</span>, <span class="ident">m2</span>, <span class="ident">m3</span>, <span class="ident">m4</span>): (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">=</span> (<span class="number">100.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);
-
-        <span class="kw">let</span> <span class="ident">s_min</span> <span class="op">=</span> <span class="ident">m1</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">m2</span>.<span class="ident">powi</span>(<span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">ss</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">linspace</span>(<span class="ident">s_min</span>, <span class="ident">s_min</span> <span class="op">+</span> <span class="number">1e3</span>, <span class="number">100</span>);
-
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">s</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">ss</span> {
-            <span class="kw">let</span> (<span class="ident">t_min</span>, <span class="ident">t_max</span>) <span class="op">=</span> <span class="ident">t_min_max</span>(<span class="ident">s</span>, <span class="ident">m1</span>, <span class="ident">m2</span>, <span class="ident">m3</span>, <span class="ident">m4</span>);
-
-            <span class="ident">approx_eq</span>(<span class="ident">t_min</span>, <span class="ident">m1</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="ident">s</span>, <span class="number">8.0</span>, <span class="number">1e-8</span>);
-            <span class="ident">approx_eq</span>(<span class="ident">t_max</span>, <span class="number">0.0</span>, <span class="number">8.0</span>, <span class="number">1e-8</span>);
-        }
-
-        <span class="comment">// m2 != 0</span>
-        <span class="kw">let</span> (<span class="ident">m1</span>, <span class="ident">m2</span>, <span class="ident">m3</span>, <span class="ident">m4</span>): (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">=</span> (<span class="number">0.0</span>, <span class="number">100.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);
-
-        <span class="kw">let</span> <span class="ident">s_min</span> <span class="op">=</span> <span class="ident">m1</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">m2</span>.<span class="ident">powi</span>(<span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">ss</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">linspace</span>(<span class="ident">s_min</span>, <span class="ident">s_min</span> <span class="op">+</span> <span class="number">1e3</span>, <span class="number">100</span>);
-
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">s</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">ss</span> {
-            <span class="kw">let</span> (<span class="ident">t_min</span>, <span class="ident">t_max</span>) <span class="op">=</span> <span class="ident">t_min_max</span>(<span class="ident">s</span>, <span class="ident">m1</span>, <span class="ident">m2</span>, <span class="ident">m3</span>, <span class="ident">m4</span>);
-
-            <span class="ident">approx_eq</span>(<span class="ident">t_min</span>, <span class="ident">m2</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="ident">s</span>, <span class="number">8.0</span>, <span class="number">1e-8</span>);
-            <span class="ident">approx_eq</span>(<span class="ident">t_max</span>, <span class="number">0.0</span>, <span class="number">8.0</span>, <span class="number">1e-8</span>);
-        }
-
-        <span class="comment">// m3 != 0</span>
-        <span class="kw">let</span> (<span class="ident">m1</span>, <span class="ident">m2</span>, <span class="ident">m3</span>, <span class="ident">m4</span>): (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">=</span> (<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">100.0</span>, <span class="number">0.0</span>);
-
-        <span class="kw">let</span> <span class="ident">s_min</span> <span class="op">=</span> <span class="ident">m3</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">m4</span>.<span class="ident">powi</span>(<span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">ss</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">linspace</span>(<span class="ident">s_min</span>, <span class="ident">s_min</span> <span class="op">+</span> <span class="number">1e3</span>, <span class="number">100</span>);
-
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">s</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">ss</span> {
-            <span class="kw">let</span> (<span class="ident">t_min</span>, <span class="ident">t_max</span>) <span class="op">=</span> <span class="ident">t_min_max</span>(<span class="ident">s</span>, <span class="ident">m1</span>, <span class="ident">m2</span>, <span class="ident">m3</span>, <span class="ident">m4</span>);
-
-            <span class="ident">approx_eq</span>(<span class="ident">t_min</span>, <span class="ident">m3</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="ident">s</span>, <span class="number">8.0</span>, <span class="number">1e-8</span>);
-            <span class="ident">approx_eq</span>(<span class="ident">t_max</span>, <span class="number">0.0</span>, <span class="number">8.0</span>, <span class="number">1e-8</span>);
-        }
-
-        <span class="comment">// m4 != 0</span>
-        <span class="kw">let</span> (<span class="ident">m1</span>, <span class="ident">m2</span>, <span class="ident">m3</span>, <span class="ident">m4</span>): (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">=</span> (<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">100.0</span>);
-
-        <span class="kw">let</span> <span class="ident">s_min</span> <span class="op">=</span> <span class="ident">m3</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">m4</span>.<span class="ident">powi</span>(<span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">ss</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">linspace</span>(<span class="ident">s_min</span>, <span class="ident">s_min</span> <span class="op">+</span> <span class="number">1e3</span>, <span class="number">100</span>);
-
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">s</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">ss</span> {
-            <span class="kw">let</span> (<span class="ident">t_min</span>, <span class="ident">t_max</span>) <span class="op">=</span> <span class="ident">t_min_max</span>(<span class="ident">s</span>, <span class="ident">m1</span>, <span class="ident">m2</span>, <span class="ident">m3</span>, <span class="ident">m4</span>);
-
-            <span class="ident">approx_eq</span>(<span class="ident">t_min</span>, <span class="ident">m4</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">-</span> <span class="ident">s</span>, <span class="number">8.0</span>, <span class="number">1e-8</span>);
-            <span class="ident">approx_eq</span>(<span class="ident">t_max</span>, <span class="number">0.0</span>, <span class="number">8.0</span>, <span class="number">1e-8</span>);
-        }
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">t_min_max_multiple</span>() {
-        <span class="kw">let</span> (<span class="ident">m1</span>, <span class="ident">m2</span>, <span class="ident">m3</span>, <span class="ident">m4</span>): (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">=</span> (<span class="number">10.0</span>, <span class="number">20.0</span>, <span class="number">30.0</span>, <span class="number">40.0</span>);
-
-        <span class="kw">let</span> <span class="ident">s_min</span> <span class="op">=</span> <span class="ident">m3</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">m4</span>.<span class="ident">powi</span>(<span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">ss</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">linspace</span>(<span class="ident">s_min</span>, <span class="ident">s_min</span> <span class="op">+</span> <span class="number">1e3</span>, <span class="number">100</span>);
-
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">s</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">ss</span> {
-            <span class="kw">let</span> (<span class="ident">t_min</span>, <span class="ident">t_max</span>) <span class="op">=</span> <span class="ident">t_min_max</span>(<span class="ident">s</span>, <span class="ident">m1</span>, <span class="ident">m2</span>, <span class="ident">m3</span>, <span class="ident">m4</span>);
-
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">t_min</span>.<span class="ident">is_finite</span>() <span class="op">&amp;&amp;</span> <span class="ident">t_max</span>.<span class="ident">is_finite</span>());
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">t_min</span> <span class="op">&lt;=</span> <span class="ident">t_max</span>);
+        <span class="kw">for</span> <span class="kw-2">&amp;</span>[<span class="ident">m1</span>, <span class="ident">m2</span>, <span class="ident">m3</span>, <span class="ident">m4</span>, <span class="ident">s</span>, <span class="ident">ea</span>, <span class="ident">eb</span>] <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span> {
+            <span class="kw">let</span> (<span class="ident">ta</span>, <span class="ident">tb</span>) <span class="op">=</span> <span class="kw">super</span>::<span class="ident">t_range</span>(<span class="ident">s</span>, <span class="ident">m1</span>, <span class="ident">m2</span>, <span class="ident">m3</span>, <span class="ident">m4</span>);
+            <span class="ident">approx_eq</span>(<span class="ident">ta</span>, <span class="ident">ea</span>, <span class="number">8.0</span>, <span class="number">0.0</span>);
+            <span class="ident">approx_eq</span>(<span class="ident">tb</span>, <span class="ident">eb</span>, <span class="number">8.0</span>, <span class="number">0.0</span>);
         }
     }
 
@@ -426,27 +373,98 @@
     <span class="kw">fn</span> <span class="ident">integrate_st</span>() {
         <span class="comment">// |M|² = 1</span>
         <span class="ident">approx_eq</span>(
-            <span class="kw">super</span>::<span class="ident">integrate_st</span>(<span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>),
-            <span class="number">4.0</span>,
-            <span class="number">8.0</span>,
+            <span class="kw">super</span>::<span class="ident">integrate_st</span>(<span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> <span class="number">1.0</span>, <span class="number">0.01</span>, <span class="number">1.0</span>, <span class="number">10.0</span>, <span class="number">2.0</span>, <span class="number">20.0</span>),
+            <span class="number">2_538.665_041_754_351_5</span>,
+            <span class="number">2.0</span>,
             <span class="number">0.0</span>,
         );
 
-        <span class="comment">// |M|² = sqrt(s)</span>
+        <span class="comment">// |M|² = 1 / (s^2 + 1)</span>
         <span class="ident">approx_eq</span>(
-            <span class="kw">super</span>::<span class="ident">integrate_st</span>(<span class="op">|</span><span class="ident">s</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">sqrt</span>(), <span class="number">1.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>),
-            <span class="number">9.424_777_960_769_38</span>,
-            <span class="number">8.0</span>,
+            <span class="kw">super</span>::<span class="ident">integrate_st</span>(<span class="op">|</span><span class="ident">s</span>, <span class="kw">_</span><span class="op">|</span> <span class="number">1.0</span> <span class="op">/</span> (<span class="ident">s</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="number">1.0</span>), <span class="number">0.01</span>, <span class="number">1.0</span>, <span class="number">10.0</span>, <span class="number">2.0</span>, <span class="number">20.0</span>),
+            <span class="number">0.001_196_687_693_095_779_2</span>,
+            <span class="number">2.0</span>,
             <span class="number">0.0</span>,
         );
 
-        <span class="comment">// |M|² = sqrt(s) t</span>
+        <span class="comment">// |M|² = 1 / (t^2 + 1)</span>
         <span class="ident">approx_eq</span>(
-            <span class="kw">super</span>::<span class="ident">integrate_st</span>(<span class="op">|</span><span class="ident">s</span>, <span class="ident">t</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">sqrt</span>() <span class="op">*</span> <span class="ident">t</span>, <span class="number">1.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>),
-            <span class="op">-</span><span class="number">70.685_834_705_770_35</span>,
-            <span class="number">8.0</span>,
+            <span class="kw">super</span>::<span class="ident">integrate_st</span>(<span class="op">|</span><span class="kw">_</span>, <span class="ident">t</span><span class="op">|</span> <span class="number">1.0</span> <span class="op">/</span> (<span class="ident">t</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="number">1.0</span>), <span class="number">0.01</span>, <span class="number">1.0</span>, <span class="number">10.0</span>, <span class="number">2.0</span>, <span class="number">20.0</span>),
+            <span class="number">0.678_416_055_558_984_1</span>,
+            <span class="number">2.0</span>,
             <span class="number">0.0</span>,
         );
+
+        <span class="comment">// |M|² = (s t) / [(s+1) (t+1)]</span>
+        <span class="ident">approx_eq</span>(
+            <span class="kw">super</span>::<span class="ident">integrate_st</span>(
+                <span class="op">|</span><span class="ident">s</span>, <span class="ident">t</span><span class="op">|</span> (<span class="ident">s</span> <span class="op">*</span> <span class="ident">t</span>) <span class="op">/</span> (<span class="ident">s</span> <span class="op">+</span> <span class="number">1.0</span>) <span class="op">/</span> (<span class="ident">t</span> <span class="op">+</span> <span class="number">1.0</span>),
+                <span class="number">0.01</span>,
+                <span class="number">1.0</span>,
+                <span class="number">10.0</span>,
+                <span class="number">2.0</span>,
+                <span class="number">20.0</span>,
+            ),
+            <span class="number">2_540.321_286_336_532</span>,
+            <span class="number">1.9</span>,
+            <span class="number">0.0</span>,
+        );
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>))]</span>
+<span class="kw">mod</span> <span class="ident">benches</span> {
+    <span class="kw">use</span> <span class="ident">test</span>::<span class="ident">Bencher</span>;
+
+    <span class="doccomment">/// |M|² = 1</span>
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">integrate_st_const</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
+        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test</span>::<span class="ident">black_box</span>(<span class="kw">super</span>::<span class="ident">integrate_st</span>(<span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> <span class="number">1.0</span>, <span class="number">0.01</span>, <span class="number">1.0</span>, <span class="number">10.0</span>, <span class="number">2.0</span>, <span class="number">20.0</span>)));
+    }
+
+    <span class="doccomment">/// |M|² = 1 / (s^2 + 1)</span>
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">integrate_st_s_inv</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
+        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="ident">test</span>::<span class="ident">black_box</span>(<span class="kw">super</span>::<span class="ident">integrate_st</span>(
+                <span class="op">|</span><span class="ident">s</span>, <span class="kw">_</span><span class="op">|</span> <span class="number">1.0</span> <span class="op">/</span> (<span class="ident">s</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="number">1.0</span>),
+                <span class="number">0.01</span>,
+                <span class="number">1.0</span>,
+                <span class="number">10.0</span>,
+                <span class="number">2.0</span>,
+                <span class="number">20.0</span>,
+            ))
+        });
+    }
+
+    <span class="doccomment">/// |M|² = 1 / (t^2 + 1)</span>
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">integrate_st_t_inv</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
+        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="ident">test</span>::<span class="ident">black_box</span>(<span class="kw">super</span>::<span class="ident">integrate_st</span>(
+                <span class="op">|</span><span class="kw">_</span>, <span class="ident">t</span><span class="op">|</span> <span class="number">1.0</span> <span class="op">/</span> (<span class="ident">t</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="number">1.0</span>),
+                <span class="number">0.01</span>,
+                <span class="number">1.0</span>,
+                <span class="number">10.0</span>,
+                <span class="number">2.0</span>,
+                <span class="number">20.0</span>,
+            ))
+        });
+    }
+
+    <span class="doccomment">/// |M|² = (s t) / [(s+1) (t+1)]</span>
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">integrate_st_st</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
+        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="ident">test</span>::<span class="ident">black_box</span>(<span class="kw">super</span>::<span class="ident">integrate_st</span>(
+                <span class="op">|</span><span class="ident">s</span>, <span class="ident">t</span><span class="op">|</span> (<span class="ident">s</span> <span class="op">*</span> <span class="ident">t</span>) <span class="op">/</span> (<span class="ident">s</span> <span class="op">+</span> <span class="number">1.0</span>) <span class="op">/</span> (<span class="ident">t</span> <span class="op">+</span> <span class="number">1.0</span>),
+                <span class="number">0.01</span>,
+                <span class="number">1.0</span>,
+                <span class="number">10.0</span>,
+                <span class="number">2.0</span>,
+                <span class="number">20.0</span>,
+            ))
+        })
     }
 }
 </pre></div>

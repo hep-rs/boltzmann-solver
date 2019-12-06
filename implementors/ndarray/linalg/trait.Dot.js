@@ -6,5 +6,4 @@ implementors["ndarray"] = [];
             } else {
                 window.pending_implementors = implementors;
             }
-        
-})()
+        })()

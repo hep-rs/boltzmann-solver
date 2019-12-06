@@ -6,5 +6,4 @@ implementors["rawpointer"] = [];
             } else {
                 window.pending_implementors = implementors;
             }
-        
-})()
+        })()

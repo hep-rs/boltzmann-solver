@@ -8,5 +8,4 @@ implementors["num_complex"] = [{text:"impl&lt;T&gt; <a class=\"trait\" href=\"ht
             } else {
                 window.pending_implementors = implementors;
             }
-        
-})()
+        })()
