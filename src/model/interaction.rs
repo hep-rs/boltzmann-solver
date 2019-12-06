@@ -6,21 +6,33 @@ use crate::{
 use ndarray::prelude::*;
 use special_functions::bessel;
 use std::{convert::TryFrom, sync::RwLock};
-// use std::ops;
 
 /// Interaction between particles.
 ///
-/// This can be either a three-body or four-body interaction.  See the
-/// documentation of [`Interaction::three_particle`] and [`Interaction::four_particle`]
-/// for more details as to their implementations.
+/// See the documentation of [`Interaction::three_particle`] and
+/// [`Interaction::four_particle`] for more details as to their implementations.
 #[allow(clippy::large_enum_variant)]
 pub enum Interaction<M: Model> {
+    /// Two particle interaction.
+    ///
+    /// These are mass-mixing interactions such as \\(m N N^{c}\\) for the
+    /// right-handed neutrino, or \\(\mu_{12}^{2} \Phi_1 \Phi_2\\) in the case
+    /// of a two Higgs doublets.  In the limit that the strength of the mixing
+    /// is very small, then it might be sensible to consider the asymmetry in
+    /// the densities of the two particles involved.
+    ///
+    /// **This is not implemented yet*.*
     TwoParticle {
         signed_particles: [isize; 2],
         particles: [usize; 2],
         antiparticles: [f64; 2],
         m2: Box<dyn Fn(&M) -> f64>,
     },
+    /// Three particle interaction.
+    ///
+    /// Every permutation of the three particle interaction is computed through
+    /// crossing symmetry, though only the interaction between the heaviest
+    /// particle and the lighter two is computed.
     ThreeParticle {
         signed_particles: [[isize; 3]; 3],
         particles: [[usize; 3]; 3],
@@ -28,6 +40,10 @@ pub enum Interaction<M: Model> {
         m2: Box<dyn Fn(&M) -> f64>,
         asymmetry: Option<Box<dyn Fn(&M) -> f64>>,
     },
+    /// Four particle interaction.
+    ///
+    /// Every permutation of the three particle interaction is compute through
+    /// crossing symmetry.
     FourParticle {
         signed_particles: [[isize; 4]; 3],
         particles: [[usize; 4]; 3],
@@ -35,10 +51,17 @@ pub enum Interaction<M: Model> {
         m2: Box<dyn Fn(&M, f64, f64, f64) -> f64>,
         gamma: [RwLock<CubicHermiteSpline>; 3],
     },
+    /// Custom interaction.
+    Custom {
+        signed_particles: [Vec<isize>; 2],
+        particles: [Vec<usize>; 2],
+        antiparticles: [Vec<f64>; 2],
+        gamma: Box<dyn Fn(&M) -> f64>,
+    },
 }
 
 impl<M: Model> Interaction<M> {
-    /// Return `true` if the interaction is a two-particle interaction.
+    /// Check if this is a two-particle interaction.
     pub fn is_two_particle(&self) -> bool {
         match &self {
             Interaction::TwoParticle { .. } => true,
@@ -46,7 +69,7 @@ impl<M: Model> Interaction<M> {
         }
     }
 
-    /// Return `true` if the interaction is a three-particle interaction.
+    /// Check if this is a three-particle interaction.
     pub fn is_three_particle(&self) -> bool {
         match &self {
             Interaction::ThreeParticle { .. } => true,
@@ -54,10 +77,18 @@ impl<M: Model> Interaction<M> {
         }
     }
 
-    /// Return `true` if the interaction is a four-particle interaction.
+    /// Check if this is a four-particle interaction.
     pub fn is_four_particle(&self) -> bool {
         match &self {
             Interaction::FourParticle { .. } => true,
+            _ => false,
+        }
+    }
+
+    /// Check if this is a custom interaction.
+    pub fn is_custom(&self) -> bool {
+        match &self {
+            Interaction::Custom { .. } => true,
             _ => false,
         }
     }
@@ -192,6 +223,36 @@ impl<M: Model> Interaction<M> {
         }
     }
 
+    /// Create a new custom interaction which takes `ingoing` particles going to
+    /// `outgoing` particles.
+    ///
+    /// Unlike the other implementations, this requires an explicit expression
+    /// for `gamma` and does not use any crossing symmetry to compute other
+    /// interactions.
+    pub fn custom<F>(gamma: F, ingoing: Vec<isize>, outgoing: Vec<isize>) -> Self
+    where
+        F: Fn(&M) -> f64 + 'static,
+    {
+        Interaction::Custom {
+            particles: [
+                ingoing
+                    .iter()
+                    .map(|p| usize::try_from(p.abs()).unwrap())
+                    .collect(),
+                outgoing
+                    .iter()
+                    .map(|p| usize::try_from(p.abs()).unwrap())
+                    .collect(),
+            ],
+            antiparticles: [
+                ingoing.iter().map(|p| p.signum() as f64).collect(),
+                outgoing.iter().map(|p| p.signum() as f64).collect(),
+            ],
+            signed_particles: [ingoing, outgoing],
+            gamma: Box::new(gamma),
+        }
+    }
+
     /// Set the asymmetry between this interaction and its CP-conjugate.
     ///
     /// For three-body interactions, this is defined as:
@@ -237,6 +298,13 @@ impl<M: Model> Interaction<M> {
             Interaction::FourParticle {
                 signed_particles, ..
             } => signed_particles.iter().map(|ps| ps.to_vec()).collect(),
+            Interaction::Custom {
+                signed_particles, ..
+            } => vec![signed_particles[0]
+                .iter()
+                .chain(&signed_particles[1])
+                .cloned()
+                .collect()],
         }
     }
 
@@ -251,6 +319,9 @@ impl<M: Model> Interaction<M> {
             }
             Interaction::FourParticle { particles, .. } => {
                 particles.iter().map(|ps| ps.to_vec()).collect()
+            }
+            Interaction::Custom { particles, .. } => {
+                vec![particles[0].iter().chain(&particles[1]).cloned().collect()]
             }
         }
     }
@@ -348,6 +419,7 @@ impl<M: Model> Interaction<M> {
                     spline.add(ln_beta, value.ln());
                 }
             }
+            Interaction::Custom { gamma, .. } => gammas.push(gamma(&c.model)),
         }
 
         gammas
@@ -359,7 +431,7 @@ impl<M: Model> Interaction<M> {
     ///
     /// - a vector of particles involved, with the first particle being the one
     ///   decaying and the remaining being the daughter particles; and
-    /// - the width of this process in GeV.
+    /// - the partial width of this process in GeV.
     pub fn width(&self, c: &Context<M>) -> (Vec<isize>, f64) {
         let mut daughters = Vec::new();
         let mut width = 0.0;
@@ -400,14 +472,10 @@ impl<M: Model> Interaction<M> {
                     daughters.push(s2);
                 }
             }
-            Interaction::FourParticle {
-                // particles,
-                // signed_particles,
-                // m2,
-                ..
-            } => {
-                unimplemented!()
+            Interaction::FourParticle { .. } => {
+                // TODO: implement
             }
+            Interaction::Custom { .. } => (),
         }
 
         (daughters, width)
@@ -530,6 +598,39 @@ impl<M: Model> Interaction<M> {
                         (aforward * gamma, abackward * gamma),
                     ]);
                 }
+            }
+            Interaction::Custom {
+                particles,
+                antiparticles,
+                ..
+            } => {
+                let [pi, po] = particles;
+                let [ai, ao] = antiparticles;
+                let gamma = gamma[0];
+
+                // A NaN can occur from `0.0 / 0.0`, in which case the
+                // correct value ought to be 0.
+                let forward = nan_to_zero(pi.iter().map(|&p| c.n[p] / c.eq[p]).product());
+                let backward = nan_to_zero(po.iter().map(|&p| c.n[p] / c.eq[p]).product());
+                let aforward = forward
+                    - nan_to_zero(
+                        pi.iter()
+                            .zip(ai)
+                            .map(|(&p, &a)| (c.n[p] - a * c.na[p]) / c.eq[p])
+                            .product(),
+                    );
+                let abackward = forward
+                    - nan_to_zero(
+                        po.iter()
+                            .zip(ao)
+                            .map(|(&p, &a)| (c.n[p] - a * c.na[p]) / c.eq[p])
+                            .product(),
+                    );
+
+                rates.push([
+                    (forward * gamma, backward * gamma),
+                    (aforward * gamma, abackward * gamma),
+                ]);
             }
         }
 
@@ -677,6 +778,43 @@ impl<M: Model> Interaction<M> {
                     }
                 }
             }
+            Interaction::Custom {
+                particles,
+                antiparticles,
+                ..
+            } => {
+                let [pi, po] = particles;
+                let [ai, ao] = antiparticles;
+                let [rate, arate] = &mut rates[0];
+
+                let mut net_rate = rate.0 - rate.1;
+                for &p in pi {
+                    if overshoots(c, p, -net_rate) {
+                        rate.0 = (c.n[p] - c.eq[p]) / ALPHA_N + rate.1;
+                        net_rate = rate.0 - rate.1;
+                    }
+                }
+                for &p in po {
+                    if overshoots(c, p, net_rate) {
+                        rate.1 = (c.n[p] - c.eq[p]) / ALPHA_N + rate.0;
+                        net_rate = rate.0 - rate.1;
+                    }
+                }
+
+                let mut net_arate = arate.0 - arate.1;
+                for (&p, a) in pi.iter().zip(ai) {
+                    if asymmetry_overshoots(c, p, -a * net_arate) {
+                        arate.0 = c.na[p] / ALPHA_NA + arate.1;
+                        net_arate = arate.0 - arate.1;
+                    }
+                }
+                for (&p, a) in po.iter().zip(ao) {
+                    if asymmetry_overshoots(c, p, a * net_arate) {
+                        arate.1 = c.na[p] / ALPHA_NA + arate.0;
+                        net_arate = arate.0 - arate.1;
+                    }
+                }
+            }
         }
 
         rates
@@ -772,6 +910,28 @@ impl<M: Model> Interaction<M> {
                     dna[p1] -= a1 * net_arate;
                     dna[p2] += a2 * net_arate;
                     dna[p3] += a3 * net_arate;
+                }
+            }
+            Interaction::Custom {
+                particles,
+                antiparticles,
+                ..
+            } => {
+                let [pi, po] = particles;
+                let [ai, ao] = antiparticles;
+                let [rate, arate] = rates[0];
+                let net_rate = rate.0 - rate.1;
+                let net_arate = arate.0 - arate.1;
+                log::trace!("γ({:?} ↔ {:?}) = {:<10.3e}", pi, po, net_rate);
+                log::trace!("γ'({:?} ↔ {:?}) = {:<10.3e}", pi, po, net_arate);
+
+                for (&p, a) in pi.iter().zip(ai) {
+                    dn[p] -= net_rate;
+                    dna[p] -= a * net_arate;
+                }
+                for (&p, a) in po.iter().zip(ao) {
+                    dn[p] += net_rate;
+                    dna[p] += a * net_arate;
                 }
             }
         }
