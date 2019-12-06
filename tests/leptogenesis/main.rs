@@ -16,7 +16,7 @@ use std::{fs::File, io, sync::RwLock};
 /// be given to record the progress of Boltzmann equations.
 pub fn solve<W>(
     mut builder: SolverBuilder<LeptogenesisModel>,
-    names: &Vec<&str>,
+    names: &[&str],
     csv: Option<csv::Writer<W>>,
 ) -> Result<(Array1<f64>, Array1<f64>), Box<dyn std::error::Error>>
 where
@@ -30,7 +30,7 @@ where
         csv.write_field("step")?;
         csv.write_field("beta")?;
         for name in names {
-            csv.write_field(format!("{}", name))?;
+            csv.write_field((*name).to_string())?;
             csv.write_field(format!("Δ{}", name))?;
             csv.write_field(format!("({})", name))?;
         }
@@ -40,7 +40,7 @@ where
         // and offers mutability to the CSV.
         let csv = RwLock::new(csv);
 
-        builder.logger(move |c| {
+        builder = builder.logger(move |c| {
             // Write out the current step and inverse temperature
             let mut csv = csv.write().unwrap();
             csv.write_field(format!("{}", c.step)).unwrap();
@@ -62,16 +62,16 @@ where
     } else {
         // If we're not tracking the number density, simply make sure that all
         // the number densities are always finite, or quite.
-        builder.logger(|c| {
+        builder = builder.logger(|c| {
             if c.n.iter().chain(c.na.iter()).any(|n| !n.is_finite()) {
                 log::error!("Non-finite number density at step {}.", c.step);
                 panic!("Non-finite number density at step {}.", c.step)
             }
-        })
+        });
     }
 
     // Build and run the solver
-    let mut solver = builder.build().expect("Error while building the solver.");
+    let mut solver = builder.build()?;
     Ok(solver.solve())
 }
 
@@ -87,7 +87,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
 
     // Get the solution
     let model = LeptogenesisModel::zero();
-    let names = model.particles().iter().map(|p| p.name).collect();
+    let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
 
     let mut no_asymmetry: Vec<usize> = (0..3)
         .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
@@ -144,7 +144,7 @@ pub fn scan() -> Result<(), Box<dyn std::error::Error>> {
             .collect();
         no_asymmetry.push(LeptogenesisModel::particle_idx("H", 0).unwrap());
 
-        let names = model.particles().iter().map(|p| p.name).collect();
+        let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
         let builder = SolverBuilder::new()
             .no_asymmetry(no_asymmetry)
             .model(model)
@@ -166,7 +166,7 @@ pub fn scan() -> Result<(), Box<dyn std::error::Error>> {
                         ("L", -1.0),
                         ("e", -1.0)
                     ]
-                    .into_iter(),
+                    .iter(),
                     0..3
                 )
                 .map(|((p, f), i)| f * na[LeptogenesisModel::particle_idx(p, i).unwrap()])
@@ -182,7 +182,6 @@ pub fn scan() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
-#[ignore]
 fn widths() -> Result<(), Box<dyn std::error::Error>> {
     // Setup logging
     // common::setup_logging(2);
@@ -280,7 +279,6 @@ fn gammas() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
-#[ignore]
 fn particle_indices() {
     let model = LeptogenesisModel::zero();
 

@@ -196,6 +196,7 @@ impl Particle {
             * self.degrees_of_freedom()
     }
 
+    /// Return the entropy degrees of freedom associated with this particle.
     pub fn entropy_dof(&self, beta: f64) -> f64 {
         if self.is_bosonic() {
             data::BOSON_GSTAR.sample((self.mass * beta).ln()).exp() * self.degrees_of_freedom()

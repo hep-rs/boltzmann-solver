@@ -84,19 +84,17 @@ impl<M: Model> SolverBuilder<M> {
     /// it uses normalization by default.
     ///
     /// Most of the method for the builder are intended to be chained one after
-    /// the other.  The two notable exceptions which use the builder by
-    /// reference are [`SolverBuilder::add_interaction`] and
-    /// [`SolverBuilder::logger`].
+    /// the other.
     ///
     /// ```
     /// use boltzmann_solver::prelude::*;
     /// use boltzmann_solver::model::StandardModel;
     ///
     /// let mut solver_builder: SolverBuilder<StandardModel> = SolverBuilder::new()
+    ///     // .logger(..)
+    ///     // .initial_densities(..)
     ///     .beta_range(1e-10, 1e-6);
     ///
-    /// // builder.add_interaction(..);
-    /// // builder.logger(..);
     /// let solver = solver_builder.build();
     /// ```
     pub fn new() -> Self {
@@ -237,11 +235,12 @@ impl<M: Model> SolverBuilder<M> {
     ///
     /// This is useful if one wants to track the evolution of the solutions and
     /// log these in a CSV file.
-    pub fn logger<F: 'static>(&mut self, f: F)
+    pub fn logger<F: 'static>(mut self, f: F) -> Self
     where
         F: Fn(&Context<M>),
     {
         self.logger = Box::new(f);
+        self
     }
 
     /// Specify how large or small the step size is allowed to become.

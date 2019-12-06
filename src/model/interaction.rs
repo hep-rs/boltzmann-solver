@@ -22,6 +22,7 @@ pub enum Interaction<M: Model> {
     /// the densities of the two particles involved.
     ///
     /// **This is not implemented yet*.*
+    #[allow(missing_docs)]
     TwoParticle {
         signed_particles: [isize; 2],
         particles: [usize; 2],
@@ -33,6 +34,7 @@ pub enum Interaction<M: Model> {
     /// Every permutation of the three particle interaction is computed through
     /// crossing symmetry, though only the interaction between the heaviest
     /// particle and the lighter two is computed.
+    #[allow(missing_docs)]
     ThreeParticle {
         signed_particles: [[isize; 3]; 3],
         particles: [[usize; 3]; 3],
@@ -44,14 +46,19 @@ pub enum Interaction<M: Model> {
     ///
     /// Every permutation of the three particle interaction is compute through
     /// crossing symmetry.
+    #[allow(missing_docs)]
     FourParticle {
         signed_particles: [[isize; 4]; 3],
         particles: [[usize; 4]; 3],
         antiparticles: [[f64; 4]; 3],
+        /// The squared amplitude, as a function of the model and the Mandelstam
+        /// variables `s`, `t` and `u` corresponding to the particle ordering as
+        /// specified in the call of [`Interaction::four_particle`].
         m2: Box<dyn Fn(&M, f64, f64, f64) -> f64>,
         gamma: [RwLock<CubicHermiteSpline>; 3],
     },
     /// Custom interaction.
+    #[allow(missing_docs)]
     Custom {
         signed_particles: [Vec<isize>; 2],
         particles: [Vec<usize>; 2],
@@ -641,6 +648,7 @@ impl<M: Model> Interaction<M> {
 
     /// Adjust the backward and forward rates such that they do not
     /// overshoot the equilibrium number densities.
+    #[allow(clippy::cognitive_complexity)]
     fn adjust_rate_overshoot(
         &self,
         c: &Context<M>,
