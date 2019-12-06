@@ -3,20 +3,35 @@ use ndarray::{array, prelude::*};
 
 /// The Standard Model of particle physics.
 pub struct StandardModel {
+    /// Inverse temperature in \\(GeV^{-1}\\)
     pub beta: f64,
     // Particle and Interations
+    /// Particles
     pub particles: Vec<Particle>,
+    /// Interactions
     pub interactions: Vec<Interaction<Self>>,
     // Gauge couplings
+    /// Hypercharge gauge coupling
     pub g1: f64,
+    /// Weak gauge coupling
     pub g2: f64,
+    /// Strong gauge coupling
     pub g3: f64,
     // Yukawa couplings
+    /// Up-quark Yukawa
     pub yu: Array2<f64>,
+    /// Down-quark Yukawa
     pub yd: Array2<f64>,
+    /// Electron Yukawa
     pub ye: Array2<f64>,
     // Scalar potential
+    /// 0-temperature mass of the Higgs
+    pub mh: f64,
+    /// Vacuum expectation value of the Higgs
+    pub vev: f64,
+    /// Quadratic coupling of the Higgs
     pub mu2: f64,
+    /// Quartic term in scalar potential
     pub lambda: f64,
 }
 
@@ -46,6 +61,11 @@ impl Model for StandardModel {
         ];
         let interactions = Vec::new();
 
+        let mh: f64 = 125.10;
+        let vev: f64 = 246.0;
+        let mu2 = -mh.powi(2);
+        let lambda = (mh / vev).powi(2);
+
         StandardModel {
             beta: std::f64::INFINITY,
             g1: 3.585e-01,
@@ -66,8 +86,10 @@ impl Model for StandardModel {
                 [0.0, 5.956e-04, 0.0],
                 [0.0, 0.0, 1.001e-02],
             ],
-            mu2: -1.139e+04,
-            lambda: 3.475e-01, // TODO: Verify value
+            mh,
+            vev,
+            mu2,
+            lambda,
             particles,
             interactions,
         }
@@ -98,11 +120,12 @@ impl Model for StandardModel {
         let yu = self.yu.diag().mapv(|y| y.powi(2) / 16.0);
         let yd = self.yd.diag().mapv(|y| y.powi(2) / 16.0);
         let ye = self.ye.diag().mapv(|y| y.powi(2) / 16.0);
-        let lambda = 0.0 * self.lambda / 4.0; // TODO: Verify this as it seems wrong
+        let mh = self.mh;
+        let lambda = self.lambda / 4.0;
 
         // Update the thermal masses
         self.particle_mut("H", 0).set_mass(
-            std::f64::consts::SQRT_2
+            mh + std::f64::consts::SQRT_2
                 * f64::sqrt(
                     g1 / 4.0
                         + (3.0 / 4.0) * g2
