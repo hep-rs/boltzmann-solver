@@ -38,6 +38,10 @@ jobs:
           name: clippy-${{ matrix.toolchain }}
           args: >-
             --features "${{ matrix.features }}"
+            --bins
+            --examples
+            --tests
+            --benches
 
   test:
     runs-on: ubuntu-latest
