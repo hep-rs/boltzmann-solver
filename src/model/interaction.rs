@@ -22,11 +22,14 @@ pub enum Interaction<M: Model> {
     /// the densities of the two particles involved.
     ///
     /// **This is not implemented yet*.*
-    #[allow(missing_docs)]
     TwoParticle {
+        /// Particles involved.
         signed_particles: [isize; 2],
+        /// Indices of the particles involved.
         particles: [usize; 2],
+        /// Antiparticle indicators.
         antiparticles: [f64; 2],
+        /// Squared amplitude as a function of the model.
         m2: Box<dyn Fn(&M) -> f64>,
     },
     /// Three particle interaction.
@@ -34,72 +37,60 @@ pub enum Interaction<M: Model> {
     /// Every permutation of the three particle interaction is computed through
     /// crossing symmetry, though only the interaction between the heaviest
     /// particle and the lighter two is computed.
-    #[allow(missing_docs)]
     ThreeParticle {
+        /// The three permutations of the particles involved.
         signed_particles: [[isize; 3]; 3],
+        /// The three permutations of the indices of the particles involved.
         particles: [[usize; 3]; 3],
+        /// The three permutations particle/antiparticle indicators.
         antiparticles: [[f64; 3]; 3],
+        /// Squared amplitude as a function of the model.
         m2: Box<dyn Fn(&M) -> f64>,
+        /// Asymmetry between the amplitude and its \\(\mathcal{CP}\\)
+        /// conjugate.
         asymmetry: Option<Box<dyn Fn(&M) -> f64>>,
     },
     /// Four particle interaction.
     ///
     /// Every permutation of the three particle interaction is compute through
     /// crossing symmetry.
-    #[allow(missing_docs)]
     FourParticle {
+        /// The three permutations of the particles involved.
         signed_particles: [[isize; 4]; 3],
+        /// The three permutations of the indices of the particles involved.
         particles: [[usize; 4]; 3],
+        /// The three permutations particle/antiparticle indicators.
         antiparticles: [[f64; 4]; 3],
-        /// The squared amplitude, as a function of the model and the Mandelstam
+        /// The squared amplitude as a function of the model and the Mandelstam
         /// variables `s`, `t` and `u` corresponding to the particle ordering as
-        /// specified in the call of [`Interaction::four_particle`].
+        /// specified in the call of [`Interaction::four_particle`] (which is
+        /// also the first of the three permutations above).
         m2: Box<dyn Fn(&M, f64, f64, f64) -> f64>,
+        /// Spline of the interaction rate density which is built as the
+        /// interaction is used.
         gamma: [RwLock<CubicHermiteSpline>; 3],
     },
-    /// Custom interaction.
-    #[allow(missing_docs)]
+    /// Custom interaction where an arbitrary number of ingoing particle
+    /// interact with an arbitrary number of outgoing particles.
+    ///
+    /// Unlike all other interactions, this only computes one permutation of the
+    /// interaction and does *not* use crossing symmetry.  Furthermore, the
+    /// interaction rate \\(\gamma\\) must be specified explicitly unlike the
+    /// other interactions in which \\(\gamma\\) is calculated from the squared
+    /// amplitude.
     Custom {
+        /// Vector of ingoing and outgoing particles.
         signed_particles: [Vec<isize>; 2],
+        /// Vector of ingoing and outgoing particle indices.
         particles: [Vec<usize>; 2],
+        /// Vector of ingoing and outgoing particle/antiparticle indicators.
         antiparticles: [Vec<f64>; 2],
+        /// Interaction rate density.
         gamma: Box<dyn Fn(&M) -> f64>,
     },
 }
 
 impl<M: Model> Interaction<M> {
-    /// Check if this is a two-particle interaction.
-    pub fn is_two_particle(&self) -> bool {
-        match &self {
-            Interaction::TwoParticle { .. } => true,
-            _ => false,
-        }
-    }
-
-    /// Check if this is a three-particle interaction.
-    pub fn is_three_particle(&self) -> bool {
-        match &self {
-            Interaction::ThreeParticle { .. } => true,
-            _ => false,
-        }
-    }
-
-    /// Check if this is a four-particle interaction.
-    pub fn is_four_particle(&self) -> bool {
-        match &self {
-            Interaction::FourParticle { .. } => true,
-            _ => false,
-        }
-    }
-
-    /// Check if this is a custom interaction.
-    pub fn is_custom(&self) -> bool {
-        match &self {
-            Interaction::Custom { .. } => true,
-            _ => false,
-        }
-    }
-
     /// Create a new two-particle interaction.
     ///
     /// This will calculate the interaction between the particles \\(p_1\\) and
@@ -257,6 +248,38 @@ impl<M: Model> Interaction<M> {
             ],
             signed_particles: [ingoing, outgoing],
             gamma: Box::new(gamma),
+        }
+    }
+
+    /// Check if this is a two-particle interaction.
+    pub fn is_two_particle(&self) -> bool {
+        match &self {
+            Interaction::TwoParticle { .. } => true,
+            _ => false,
+        }
+    }
+
+    /// Check if this is a three-particle interaction.
+    pub fn is_three_particle(&self) -> bool {
+        match &self {
+            Interaction::ThreeParticle { .. } => true,
+            _ => false,
+        }
+    }
+
+    /// Check if this is a four-particle interaction.
+    pub fn is_four_particle(&self) -> bool {
+        match &self {
+            Interaction::FourParticle { .. } => true,
+            _ => false,
+        }
+    }
+
+    /// Check if this is a custom interaction.
+    pub fn is_custom(&self) -> bool {
+        match &self {
+            Interaction::Custom { .. } => true,
+            _ => false,
         }
     }
 
