@@ -14,14 +14,62 @@ use special_functions::bessel;
 /// \\begin{equation}
 ///   \lambda(a, b, c) = a^2 + b^2 + c^2 - 2ab - 2ac - 2bc
 /// \\end{equation}
+///
+/// # Example
+///
+/// ```
+/// use boltzmann_solver::utilities::kallen_lambda;
+///
+/// assert_eq!(kallen_lambda(5.0, 2.0, 0.5), 2.25);
+/// assert_eq!(kallen_lambda(1.0, 1.0, 1.0), -3.0);
+/// ```
 pub fn kallen_lambda(a: f64, b: f64, c: f64) -> f64 {
     a.powi(2) + b.powi(2) + c.powi(2) - 2.0 * (a * b + a * c + b * c)
 }
 
+/// Square root of the Kallen lambda function:
+///
+/// \\begin{equation}
+///   \lambda^{\frac{1}{2}}(a, b, c) = \sqrt{a^2 + b^2 + c^2 - 2ab - 2ac - 2bc}
+/// \\end{equation}
+///
+/// This implementation is more precise than taking the square root of
+/// [`kallen_lambda`] in cases where the arguments are span several orders of
+/// magnitude.
+///
+/// # Example
+///
+/// ```
+/// use boltzmann_solver::utilities::{kallen_lambda, kallen_lambda_sqrt};
+///
+/// assert!((kallen_lambda_sqrt(5.0, 2.0, 0.5) - 1.5).abs() < 1e-14);
+/// assert!((kallen_lambda(5.0, 2.0, 0.5).sqrt() - kallen_lambda_sqrt(5.0, 2.0, 0.5)).abs() < 1e-14);
+/// assert!((kallen_lambda_sqrt(1.0, 1.0, 1.0) - 3f64.sqrt()).abs() < 1e-14);
+/// ```
+///
+/// # Warning
+///
+/// This function only returns the *absolute value* of the result.
+pub fn kallen_lambda_sqrt(a: f64, b: f64, c: f64) -> f64 {
+    let max = if a > b { a } else { b };
+    let max = if max > c { max } else { c };
+
+    max * kallen_lambda(1.0, b / max, c / max).abs().sqrt()
+}
+
 /// Return the minimum and maximum value of the Mandelstam variable \\(t\\)
-/// based on the four particle masses \\(m_1\\), \\(m_2\\), \\(m_3\\) and
-/// \\(m_4\\), where particles 1 and 2 are initial state and particles 3 and 4
-/// are the final state particles.
+/// based on the four particle **squared** masses \\(m_1^2\\), \\(m_2^2\\),
+/// \\(m_3^2\\) and \\(m_4^2\\), where particles 1 and 2 are initial state and
+/// particles 3 and 4 are the final state particles.
+///
+/// Explicitly, the values are:
+///
+/// \\begin{equation}\\begin{aligned}
+///   t_{\text{min}} &= \frac{(m_1^2 - m_2^2 - m_3^3 + m_4^4)^2}{4 s}
+///       - \frac{\lambda^{\frac{1}{2}}(s, m_1^2, m_2^2) \lambda^{\frac{1}{2}}(s, m_3^2, m_4^2)}{s} \\\\
+///   t_{\text{max}} &= \frac{(m_1^2 - m_2^2 - m_3^3 + m_4^4)^2}{4 s}
+///       + \frac{\lambda^{\frac{1}{2}}(s, m_1^2, m_2^2) \lambda^{\frac{1}{2}}(s, m_3^2, m_4^2)}{s}
+/// \\end{aligned}\\end{equation}
 pub fn t_range(s: f64, m1: f64, m2: f64, m3: f64, m4: f64) -> (f64, f64) {
     debug_assert!(s >= m1 + m2, "s must be greater than m1^2 + m2^2.");
     debug_assert!(s >= m3 + m4, "s must be greater than m3^2 + m4^2.");
@@ -31,12 +79,7 @@ pub fn t_range(s: f64, m1: f64, m2: f64, m3: f64, m4: f64) -> (f64, f64) {
     }
 
     let baseline = (m1 - m2 - m3 + m4).powi(2) / (4.0 * s);
-    let delta = kallen_lambda(s, m1, m2).abs().sqrt() * kallen_lambda(s, m3, m4).abs().sqrt() / s;
-    // let t_const = 0.5 * ((m1 + m2 + m3 + m4) - s - (m1 - m2) * (m3 - m4) / s);
-    // let t_cos = f64::sqrt(f64::abs(
-    //     (s.powi(2) - 2.0 * s * (m1 + m2) + (m1 - m2).powi(2))
-    //         * (s.powi(2) - 2.0 * s * (m3 + m4) + (m3 - m4).powi(2)),
-    // )) / (2.0 * s);
+    let delta = kallen_lambda_sqrt(s, m1, m2) * kallen_lambda_sqrt(s, m3, m4) / s;
 
     (baseline - delta, baseline)
 }
@@ -88,7 +131,11 @@ where
     integrate(s_integrand, 0.0, 1.0, 0.0).integral / (512.0 * PI_5 * beta)
 }
 
-/// Propagator with squared momentum `q2` involving particle `p`, defined as
+/// Propagator with squared momentum `q2` involving particle `p`, defined as:
+///
+/// \\begin{equation}
+///   \mathcal{P}_{p}(q^2) \defeq \frac{1}{q^2 - m_p^2 + i m_p \Gamma_p}
+/// \\end{equation}
 pub fn propagator(q2: f64, p: &Particle) -> Complex<f64> {
     1.0 / (q2 - p.mass2 + Complex::i() * p.mass * p.width)
 }
