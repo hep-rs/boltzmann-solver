@@ -77,6 +77,7 @@ where
 
 /// Test a single run, and log the evolution in a CSV file.
 #[test]
+#[ignore]
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     common::setup_logging(2);
 
@@ -114,6 +115,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
 
 /// Scan some parameter space and store the B-L from the scan in a CSV file.
 #[test]
+#[ignore]
 pub fn scan() -> Result<(), Box<dyn std::error::Error>> {
     // common::setup_logging(2);
 
@@ -180,6 +182,7 @@ pub fn scan() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
+#[ignore]
 fn widths() -> Result<(), Box<dyn std::error::Error>> {
     // Setup logging
     // common::setup_logging(2);
@@ -229,6 +232,7 @@ fn widths() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
+#[ignore]
 fn gammas() -> Result<(), Box<dyn std::error::Error>> {
     // Setup logging
     common::setup_logging(2);
@@ -276,6 +280,7 @@ fn gammas() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
+#[ignore]
 fn particle_indices() {
     let model = LeptogenesisModel::zero();
 
