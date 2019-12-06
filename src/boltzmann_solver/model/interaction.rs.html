@@ -972,6 +972,29 @@
 <span id="972">972</span>
 <span id="973">973</span>
 <span id="974">974</span>
+<span id="975">975</span>
+<span id="976">976</span>
+<span id="977">977</span>
+<span id="978">978</span>
+<span id="979">979</span>
+<span id="980">980</span>
+<span id="981">981</span>
+<span id="982">982</span>
+<span id="983">983</span>
+<span id="984">984</span>
+<span id="985">985</span>
+<span id="986">986</span>
+<span id="987">987</span>
+<span id="988">988</span>
+<span id="989">989</span>
+<span id="990">990</span>
+<span id="991">991</span>
+<span id="992">992</span>
+<span id="993">993</span>
+<span id="994">994</span>
+<span id="995">995</span>
+<span id="996">996</span>
+<span id="997">997</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">model</span>::<span class="ident">Model</span>,
@@ -997,11 +1020,14 @@
     <span class="doccomment">/// the densities of the two particles involved.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **This is not implemented yet*.*</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
     <span class="ident">TwoParticle</span> {
+        <span class="doccomment">/// Particles involved.</span>
         <span class="ident">signed_particles</span>: [<span class="ident">isize</span>; <span class="number">2</span>],
+        <span class="doccomment">/// Indices of the particles involved.</span>
         <span class="ident">particles</span>: [<span class="ident">usize</span>; <span class="number">2</span>],
+        <span class="doccomment">/// Antiparticle indicators.</span>
         <span class="ident">antiparticles</span>: [<span class="ident">f64</span>; <span class="number">2</span>],
+        <span class="doccomment">/// Squared amplitude as a function of the model.</span>
         <span class="ident">m2</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span><span class="op">&gt;</span>,
     },
     <span class="doccomment">/// Three particle interaction.</span>
@@ -1009,72 +1035,60 @@
     <span class="doccomment">/// Every permutation of the three particle interaction is computed through</span>
     <span class="doccomment">/// crossing symmetry, though only the interaction between the heaviest</span>
     <span class="doccomment">/// particle and the lighter two is computed.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
     <span class="ident">ThreeParticle</span> {
+        <span class="doccomment">/// The three permutations of the particles involved.</span>
         <span class="ident">signed_particles</span>: [[<span class="ident">isize</span>; <span class="number">3</span>]; <span class="number">3</span>],
+        <span class="doccomment">/// The three permutations of the indices of the particles involved.</span>
         <span class="ident">particles</span>: [[<span class="ident">usize</span>; <span class="number">3</span>]; <span class="number">3</span>],
+        <span class="doccomment">/// The three permutations particle/antiparticle indicators.</span>
         <span class="ident">antiparticles</span>: [[<span class="ident">f64</span>; <span class="number">3</span>]; <span class="number">3</span>],
+        <span class="doccomment">/// Squared amplitude as a function of the model.</span>
         <span class="ident">m2</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span><span class="op">&gt;</span>,
+        <span class="doccomment">/// Asymmetry between the amplitude and its \\(\mathcal{CP}\\)</span>
+        <span class="doccomment">/// conjugate.</span>
         <span class="ident">asymmetry</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     },
     <span class="doccomment">/// Four particle interaction.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Every permutation of the three particle interaction is compute through</span>
     <span class="doccomment">/// crossing symmetry.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
     <span class="ident">FourParticle</span> {
+        <span class="doccomment">/// The three permutations of the particles involved.</span>
         <span class="ident">signed_particles</span>: [[<span class="ident">isize</span>; <span class="number">4</span>]; <span class="number">3</span>],
+        <span class="doccomment">/// The three permutations of the indices of the particles involved.</span>
         <span class="ident">particles</span>: [[<span class="ident">usize</span>; <span class="number">4</span>]; <span class="number">3</span>],
+        <span class="doccomment">/// The three permutations particle/antiparticle indicators.</span>
         <span class="ident">antiparticles</span>: [[<span class="ident">f64</span>; <span class="number">4</span>]; <span class="number">3</span>],
-        <span class="doccomment">/// The squared amplitude, as a function of the model and the Mandelstam</span>
+        <span class="doccomment">/// The squared amplitude as a function of the model and the Mandelstam</span>
         <span class="doccomment">/// variables `s`, `t` and `u` corresponding to the particle ordering as</span>
-        <span class="doccomment">/// specified in the call of [`Interaction::four_particle`].</span>
+        <span class="doccomment">/// specified in the call of [`Interaction::four_particle`] (which is</span>
+        <span class="doccomment">/// also the first of the three permutations above).</span>
         <span class="ident">m2</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span><span class="op">&gt;</span>,
+        <span class="doccomment">/// Spline of the interaction rate density which is built as the</span>
+        <span class="doccomment">/// interaction is used.</span>
         <span class="ident">gamma</span>: [<span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">CubicHermiteSpline</span><span class="op">&gt;</span>; <span class="number">3</span>],
     },
-    <span class="doccomment">/// Custom interaction.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
+    <span class="doccomment">/// Custom interaction where an arbitrary number of ingoing particle</span>
+    <span class="doccomment">/// interact with an arbitrary number of outgoing particles.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Unlike all other interactions, this only computes one permutation of the</span>
+    <span class="doccomment">/// interaction and does *not* use crossing symmetry.  Furthermore, the</span>
+    <span class="doccomment">/// interaction rate \\(\gamma\\) must be specified explicitly unlike the</span>
+    <span class="doccomment">/// other interactions in which \\(\gamma\\) is calculated from the squared</span>
+    <span class="doccomment">/// amplitude.</span>
     <span class="ident">Custom</span> {
+        <span class="doccomment">/// Vector of ingoing and outgoing particles.</span>
         <span class="ident">signed_particles</span>: [<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span>; <span class="number">2</span>],
+        <span class="doccomment">/// Vector of ingoing and outgoing particle indices.</span>
         <span class="ident">particles</span>: [<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>; <span class="number">2</span>],
+        <span class="doccomment">/// Vector of ingoing and outgoing particle/antiparticle indicators.</span>
         <span class="ident">antiparticles</span>: [<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>; <span class="number">2</span>],
+        <span class="doccomment">/// Interaction rate density.</span>
         <span class="ident">gamma</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span><span class="op">&gt;</span>,
     },
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span><span class="op">&gt;</span> <span class="ident">Interaction</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Check if this is a two-particle interaction.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_two_particle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
-            <span class="ident">Interaction</span>::<span class="ident">TwoParticle</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-        }
-    }
-
-    <span class="doccomment">/// Check if this is a three-particle interaction.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_three_particle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
-            <span class="ident">Interaction</span>::<span class="ident">ThreeParticle</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-        }
-    }
-
-    <span class="doccomment">/// Check if this is a four-particle interaction.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_four_particle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
-            <span class="ident">Interaction</span>::<span class="ident">FourParticle</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-        }
-    }
-
-    <span class="doccomment">/// Check if this is a custom interaction.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_custom</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
-            <span class="ident">Interaction</span>::<span class="ident">Custom</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-        }
-    }
-
     <span class="doccomment">/// Create a new two-particle interaction.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will calculate the interaction between the particles \\(p_1\\) and</span>
@@ -1232,6 +1246,38 @@
             ],
             <span class="ident">signed_particles</span>: [<span class="ident">ingoing</span>, <span class="ident">outgoing</span>],
             <span class="ident">gamma</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">gamma</span>),
+        }
+    }
+
+    <span class="doccomment">/// Check if this is a two-particle interaction.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_two_particle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
+            <span class="ident">Interaction</span>::<span class="ident">TwoParticle</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+        }
+    }
+
+    <span class="doccomment">/// Check if this is a three-particle interaction.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_three_particle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
+            <span class="ident">Interaction</span>::<span class="ident">ThreeParticle</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+        }
+    }
+
+    <span class="doccomment">/// Check if this is a four-particle interaction.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_four_particle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
+            <span class="ident">Interaction</span>::<span class="ident">FourParticle</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+        }
+    }
+
+    <span class="doccomment">/// Check if this is a custom interaction.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_custom</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
+            <span class="ident">Interaction</span>::<span class="ident">Custom</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
         }
     }
 
