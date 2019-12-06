@@ -44,6 +44,8 @@ make_doc() {
     if [[ "$TRAVIS_RUST_VERSION" == "stable"
        && "$TRAVIS_EVENT_TYPE" == "push"
        && "$TRAVIS_BRANCH" == "master" ]]; then
+        rustup install nightly
+        rustup default nightly
 
         cargo doc --features "$FEATURES"
 
