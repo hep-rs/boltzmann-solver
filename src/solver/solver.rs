@@ -89,16 +89,15 @@ impl<M: Model> SolverBuilder<M> {
     /// [`SolverBuilder::logger`].
     ///
     /// ```
-    /// use boltzmann_solver::solver::{EmptyModel, number_density::SolverBuilder};
+    /// use boltzmann_solver::prelude::*;
+    /// use boltzmann_solver::model::StandardModel;
     ///
-    /// let mut solver_builder: SolverBuilder<EmptyModel> = SolverBuilder::new()
-    ///     .initial_conditions(vec![1.2, 1.3])
-    ///     .beta_range(1e-10, 1e-6)
-    ///     .equilibrium(vec![0]);
+    /// let mut solver_builder: SolverBuilder<StandardModel> = SolverBuilder::new()
+    ///     .beta_range(1e-10, 1e-6);
     ///
     /// // builder.add_interaction(..);
     /// // builder.logger(..);
-    /// // let solver = solver_builder.build();
+    /// let solver = solver_builder.build();
     /// ```
     pub fn new() -> Self {
         Self {

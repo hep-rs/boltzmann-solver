@@ -484,13 +484,15 @@ impl<M: Model> Interaction<M> {
     /// Calculate the interaction rates.
     ///
     /// This returns a vector of
-    /// ```
+    ///
+    /// ```ignore
     /// [(rate_forward, rate_backward), (arate_forward, arate_backward)]
-    /// ```(rate_forward, rate_backward,
-    /// arate_forward, arate_backward)`, where `arate` is the rate of the
-    /// asymmetries.  For three-particle interactions, the result is a vector of
-    /// length 3 with only 1 being non-zero, while four-body interactions will
-    /// produce an array of length 3.
+    /// ```
+    ///
+    /// where `arate` is the rate of the asymmetries.  For three-particle
+    /// interactions, the result is a vector of length 3 with only 1 being
+    /// non-zero, while four-body interactions will produce an array of length
+    /// 3.
     fn calculate_rate(&self, c: &Context<M>) -> Vec<[(f64, f64); 2]> {
         let mut rates = Vec::with_capacity(3);
         let gamma = self.gamma(c);
