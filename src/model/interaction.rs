@@ -1,7 +1,7 @@
 use crate::{
     model::Model,
     solver::Context,
-    utilities::{integrate_st, kallen_lambda, spline::CubicHermiteSpline},
+    utilities::{integrate_st, kallen_lambda_sqrt, spline::CubicHermiteSpline},
 };
 use ndarray::prelude::*;
 use special_functions::bessel;
@@ -492,7 +492,7 @@ impl<M: Model> Interaction<M> {
                         continue;
                     }
 
-                    let p = kallen_lambda(ptcl[p0].mass2, ptcl[p1].mass2, ptcl[p2].mass2).sqrt()
+                    let p = kallen_lambda_sqrt(ptcl[p0].mass2, ptcl[p1].mass2, ptcl[p2].mass2)
                         / (2.0 * ptcl[p0].mass);
 
                     // 1 / 8 π ≅ 0.039788735772973836
