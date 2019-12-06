@@ -4,8 +4,8 @@
 mod common;
 mod model;
 
-pub use crate::model::LeptogenesisModel;
-use boltzmann_solver::{prelude::*, utilities::spline::rec_geomspace};
+use crate::model::{interaction, LeptogenesisModel};
+use boltzmann_solver::prelude::*;
 use itertools::iproduct;
 use ndarray::prelude::*;
 use std::{fs::File, io, sync::RwLock};
@@ -75,11 +75,95 @@ where
     Ok(solver.solve())
 }
 
+/// Test the effects of the right-handed neutrino decay on its own.
+#[test]
+pub fn decay_only_n1l1() -> Result<(), Box<dyn std::error::Error>> {
+    // common::setup_logging(2);
+
+    // Create the CSV file
+    let output_dir = common::output_dir("leptogenesis/decay_only_n1l1");
+    let csv = csv::Writer::from_path(output_dir.join("n.csv"))?;
+
+    // Get the solution
+    let mut model = LeptogenesisModel::zero();
+    let hl1n1 = interaction::hln().remove(0);
+    model.interactions.push(hl1n1);
+
+    // Collect the names now as SolverBuilder takes ownership of the model
+    // later.
+    let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
+
+    // Prevent any asymmetry from being generated in the N_i and H.
+    let mut no_asymmetry: Vec<usize> = (0..3)
+        .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
+        .collect();
+    no_asymmetry.push(LeptogenesisModel::particle_idx("H", 0).unwrap());
+
+    let builder = SolverBuilder::new()
+        .no_asymmetry(no_asymmetry)
+        .model(model)
+        .beta_range(1e-17, 1e-3);
+
+    let (n, na) = solve(builder, &names, Some(csv))?;
+
+    // Check that the solution is fine
+    log::info!("Final number density: {:.3e}", n);
+    log::info!("Final number density asymmetry: {:.3e}", na);
+
+    let nai = na[LeptogenesisModel::particle_idx("L", 0).unwrap()].abs();
+    assert!(1e-10 < nai && nai < 1e-5);
+    assert!(n[LeptogenesisModel::particle_idx("N", 0).unwrap()] < 1e-8);
+
+    Ok(())
+}
+
+/// Test the effects of the right-handed neutrino decay on its own.
+#[test]
+pub fn decay_only() -> Result<(), Box<dyn std::error::Error>> {
+    // common::setup_logging(2);
+
+    // Create the CSV file
+    let output_dir = common::output_dir("leptogenesis/decay_only");
+    let csv = csv::Writer::from_path(output_dir.join("n.csv"))?;
+
+    // Get the solution
+    let mut model = LeptogenesisModel::zero();
+    model.interactions.append(&mut interaction::hln());
+
+    // Collect the names now as SolverBuilder takes ownership of the model
+    // later.
+    let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
+
+    // Prevent any asymmetry from being generated in the N_i and H.
+    let mut no_asymmetry: Vec<usize> = (0..3)
+        .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
+        .collect();
+    no_asymmetry.push(LeptogenesisModel::particle_idx("H", 0).unwrap());
+
+    let builder = SolverBuilder::new()
+        .no_asymmetry(no_asymmetry)
+        .model(model)
+        .beta_range(1e-17, 1e-3);
+
+    let (n, na) = solve(builder, &names, Some(csv))?;
+
+    // Check that the solution is fine
+    log::info!("Final number density: {:.3e}", n);
+    log::info!("Final number density asymmetry: {:.3e}", na);
+    for i in 0..3 {
+        let nai = na[LeptogenesisModel::particle_idx("L", i).unwrap()].abs();
+        assert!(1e-10 < nai && nai < 1e-5);
+        assert!(n[LeptogenesisModel::particle_idx("N", i).unwrap()] < 1e-8);
+    }
+
+    Ok(())
+}
+
 /// Test a single run, and log the evolution in a CSV file.
 #[test]
 #[ignore]
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
-    common::setup_logging(2);
+    // common::setup_logging(2);
 
     // Create the CSV file
     let output_dir = common::output_dir("leptogenesis");
@@ -182,17 +266,18 @@ pub fn scan() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
-fn widths() -> Result<(), Box<dyn std::error::Error>> {
+fn masses_widths() -> Result<(), Box<dyn std::error::Error>> {
     // Setup logging
     // common::setup_logging(2);
 
     let mut model = LeptogenesisModel::zero();
+    model.interactions.append(&mut interaction::hle());
+    model.interactions.append(&mut interaction::hln());
+    model.interactions.append(&mut interaction::hqu());
+    model.interactions.append(&mut interaction::hqd());
 
     // Create the CSV files
     let output_dir = common::output_dir("leptogenesis");
-
-    let mut gauge = csv::Writer::from_path(output_dir.join("gauge.csv"))?;
-    gauge.serialize(["beta", "g1", "g2", "g3"])?;
 
     let mut widths = csv::Writer::from_path(output_dir.join("width.csv"))?;
     widths.write_field("beta")?;
@@ -208,11 +293,9 @@ fn widths() -> Result<(), Box<dyn std::error::Error>> {
     }
     masses.write_record(None::<&[u8]>)?;
 
-    for beta in rec_geomspace(1e-20, 1e-3, 10).into_iter() {
+    for &beta in Array1::geomspace(1e-17, 1e-2, 1024).unwrap().into_iter() {
         model.set_beta(beta);
         model.update_widths();
-
-        gauge.serialize([beta, model.sm.g1, model.sm.g2, model.sm.g3])?;
 
         widths.write_field(format!("{:e}", beta))?;
         for p in model.particles() {
@@ -249,8 +332,7 @@ fn gammas() -> Result<(), Box<dyn std::error::Error>> {
     }
     gammas.write_record(None::<&[u8]>)?;
 
-    // for beta in rec_geomspace(1e-20, 1e-3, 10).into_iter() {
-    for &beta in Array1::geomspace(1e-20, 1e-3, 40).unwrap().into_iter() {
+    for &beta in Array1::geomspace(1e-17, 1e-2, 40).unwrap().into_iter() {
         log::warn!("β = {:e}", beta);
         model.set_beta(beta);
         let c = model.as_context();

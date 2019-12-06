@@ -5,7 +5,7 @@
 // compute and ultimately not used, it would be preferable to comment these out.
 #![allow(dead_code)]
 
-mod interaction;
+pub mod interaction;
 
 use boltzmann_solver::{constants::PI, prelude::*};
 use ndarray::{array, prelude::*};
@@ -74,19 +74,21 @@ impl Model for LeptogenesisModel {
                 / (8.0 * PI * yvd_yv[[i, i]].re)
         });
 
-        let mut interactions = Vec::new();
+        let interactions = Vec::new();
+
+        // Add them on a per-test basis in order to avoid every test using all
+        // of them, possibly risking slowing down many tests.
+
         // interactions.append(&mut interaction::hh());
         // interactions.append(&mut interaction::nn());
         // interactions.append(&mut interaction::hle());
         // interactions.append(&mut interaction::hln());
         // interactions.append(&mut interaction::hqu());
         // interactions.append(&mut interaction::hqd());
-        interactions.append(&mut interaction::hhll1());
-        interactions.append(&mut interaction::hhll2());
-        interactions.append(&mut interaction::nlqd());
-        interactions.append(&mut interaction::nlqu());
-
-        log::info!("Interactions in model: {}", interactions.len());
+        // interactions.append(&mut interaction::hhll1());
+        // interactions.append(&mut interaction::hhll2());
+        // interactions.append(&mut interaction::nlqd());
+        // interactions.append(&mut interaction::nlqu());
 
         LeptogenesisModel {
             sm,

@@ -9,7 +9,7 @@ use std::convert::TryFrom;
 pub fn nn() -> Vec<Interaction<LeptogenesisModel>> {
     let mut interactions = Vec::with_capacity(3);
 
-    for i1 in 0..1 {
+    for i1 in 0..3 {
         let p1 = LeptogenesisModel::particle_idx("N", i1).unwrap();
 
         let m2 = move |m: &LeptogenesisModel| m.mn[i1].powi(2);
@@ -119,7 +119,7 @@ pub fn hln() -> Vec<Interaction<LeptogenesisModel>> {
     let mut interactions = Vec::with_capacity(3 * 3);
 
     let p1 = LeptogenesisModel::particle_idx("H", 0).unwrap();
-    for (i2, i3) in iproduct!(0..1, 0..1) {
+    for (i2, i3) in iproduct!(0..3, 0..3) {
         let p2 = LeptogenesisModel::particle_idx("L", i2).unwrap();
         let p3 = LeptogenesisModel::particle_idx("N", i3).unwrap();
 
@@ -147,8 +147,8 @@ pub fn hln() -> Vec<Interaction<LeptogenesisModel>> {
 pub fn hhll1() -> Vec<Interaction<LeptogenesisModel>> {
     let mut interactions = Vec::with_capacity(6);
 
-    for i3 in 0..1 {
-        for i4 in i3..1 {
+    for i3 in 0..3 {
+        for i4 in i3..3 {
             let m2 = move |m: &LeptogenesisModel, s: f64, t: f64, u: f64| {
                 // let p1 = m.particle("H", 0);
                 // let p2 = m.particle("H", 0);
@@ -196,8 +196,8 @@ pub fn hhll1() -> Vec<Interaction<LeptogenesisModel>> {
 pub fn hhll2() -> Vec<Interaction<LeptogenesisModel>> {
     let mut interactions = Vec::with_capacity(6);
 
-    for i3 in 0..1 {
-        for i4 in i3..1 {
+    for i3 in 0..3 {
+        for i4 in i3..3 {
             let m2 = move |m: &LeptogenesisModel, s: f64, t: f64, u: f64| {
                 let p1 = m.particle("H", 0);
                 // let p2 = m.particle("H", 0);
@@ -253,7 +253,7 @@ pub fn hhll2() -> Vec<Interaction<LeptogenesisModel>> {
 pub fn nlqd() -> Vec<Interaction<LeptogenesisModel>> {
     let mut interactions = Vec::with_capacity(3 * 3 * 3);
 
-    for (i1, i2, i3) in iproduct!(0..1, 0..1, 2..3) {
+    for (i1, i2, i3) in iproduct!(0..3, 0..3, 0..3) {
         let i4 = i3;
         let m2 = move |m: &LeptogenesisModel, s: f64, _: f64, _: f64| {
             let p1 = m.particle("N", i1);
@@ -285,7 +285,7 @@ pub fn nlqd() -> Vec<Interaction<LeptogenesisModel>> {
 pub fn nlqu() -> Vec<Interaction<LeptogenesisModel>> {
     let mut interactions = Vec::with_capacity(3 * 3 * 3);
 
-    for (i1, i2, i3) in iproduct!(0..1, 0..1, 2..3) {
+    for (i1, i2, i3) in iproduct!(0..3, 0..3, 0..3) {
         let i4 = i3;
         let m2 = move |m: &LeptogenesisModel, s: f64, _: f64, _: f64| {
             let p1 = m.particle("N", i1);
