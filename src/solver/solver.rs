@@ -393,49 +393,6 @@ impl<M: Model + Sync> Solver<M> {
         }
     }
 
-    fn write_interactions(&mut self) {
-        use std::fs::File;
-        use std::io::{prelude::*, BufWriter};
-        use std::sync::RwLock;
-
-        let zero = Array1::zeros(0);
-
-        let mut files = Vec::new();
-        for (i, interaction) in self.model.interactions().iter().enumerate() {
-            let mut path = std::env::temp_dir();
-            path.push(format!("{}.csv", i));
-            let mut file = BufWriter::new(File::create(path).unwrap());
-            write!(file, "beta").unwrap();
-            for p in interaction.particles() {
-                write!(file, ",\"{:?}\"", p).unwrap();
-            }
-            write!(file, "\n").unwrap();
-            files.push(RwLock::new(file));
-        }
-
-        log::warn!("Writing out {} interactions.", files.len());
-
-        for &beta in Array1::geomspace(self.beta_range.0, self.beta_range.1, 2048)
-            .unwrap()
-            .iter()
-        {
-            self.model.set_beta(beta);
-            let c = self.context(0, 1.0, beta, &zero, &zero);
-            self.model
-                .interactions()
-                .par_iter()
-                .enumerate()
-                .for_each(|(i, interaction)| {
-                    let mut file = files[i].write().unwrap();
-                    write!(file, "{:e}", c.beta).unwrap();
-                    for gamma in interaction.gamma(&c) {
-                        write!(file, ",{:e}", gamma).unwrap();
-                    }
-                    write!(file, "\n").unwrap();
-                })
-        }
-    }
-
     /// Evolve the initial conditions by solving the PDEs.
     ///
     /// Note that this is not a true PDE solver, but instead converts the PDE
@@ -446,7 +403,6 @@ impl<M: Model + Sync> Solver<M> {
     pub fn solve(&mut self) -> (Array1<f64>, Array1<f64>) {
         // Precompute `gamma` for interactions that support it.
         self.precompute(10);
-        self.write_interactions();
 
         use super::tableau::rk87::*;
 
