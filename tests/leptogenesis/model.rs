@@ -29,6 +29,7 @@ impl Model for LeptogenesisModel {
     fn zero() -> Self {
         let mut sm = StandardModel::zero();
 
+        // These values correspond to m̃ = 0.06 eV
         let yv = array![
             [
                 Complex::new(1.0, 0.0),
@@ -45,7 +46,8 @@ impl Model for LeptogenesisModel {
                 Complex::new(0.3, -0.3),
                 Complex::new(3.0, 0.0)
             ],
-        ] * 1e-4;
+        ] * 1e-4
+            * 30.0;
 
         let mn = array![1e10, 1e15, 5e15];
 
