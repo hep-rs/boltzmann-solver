@@ -108,7 +108,7 @@ impl Model for LeptogenesisModel {
         let yu = self.sm.yu.diag().mapv(|y| y.powi(2) / 16.0);
         let yd = self.sm.yd.diag().mapv(|y| y.powi(2) / 16.0);
         let ye = self.sm.ye.diag().mapv(|y| y.powi(2) / 16.0);
-        let yv = self.yv.diag().mapv(|y| y.norm_sqr() / 16.0);
+        let yv = Array1::from_shape_fn(3, |i| (0..3).map(|k| self.yv[[k, i]].norm_sqr()).sum());
         let lambda = 0.0 * self.sm.lambda / 4.0;
 
         self.particle_mut("H", 0).set_mass(
