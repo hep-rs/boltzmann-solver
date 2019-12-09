@@ -137,6 +137,10 @@ impl Model for StandardModel {
                 )
                 / beta,
         );
+        self.particle_mut("A", 0)
+            .set_mass(f64::sqrt((22.0 / 3.0) * g1) / beta);
+        self.particle_mut("W", 0)
+            .set_mass(f64::sqrt((22.0 / 3.0) * g2) / beta);
 
         for i in 0..3 {
             self.particle_mut("L", i)
