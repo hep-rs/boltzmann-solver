@@ -10,7 +10,10 @@ use ndarray::prelude::*;
 use std::{io, sync::RwLock};
 
 #[cfg(not(debug_assertions))]
-use boltzmann_solver::utilities::spline::rec_geomspace;
+use boltzmann_solver::{
+    statistic::{Statistic, Statistics},
+    utilities::spline::rec_geomspace,
+};
 #[cfg(not(debug_assertions))]
 use itertools::iproduct;
 #[cfg(not(debug_assertions))]
@@ -184,6 +187,54 @@ pub fn decay_only_3gen() -> Result<(), Box<dyn std::error::Error>> {
         assert!(1e-10 < nai && nai < 1e-5);
         assert!(n[LeptogenesisModel::particle_idx("N", i).unwrap()] < 1e-8);
     }
+
+    Ok(())
+}
+
+/// Test the effects of a washout term on its own in the 1-generation case.
+#[test]
+#[cfg(not(debug_assertions))]
+pub fn washout_only_1gen() -> Result<(), Box<dyn std::error::Error>> {
+    // common::setup_logging(2);
+
+    // Create the CSV file
+    let output_dir = common::output_dir("leptogenesis/washout_only/1gen");
+    let csv = csv::Writer::from_path(output_dir.join("n.csv"))?;
+
+    // Get the solution
+    let mut model = LeptogenesisModel::zero();
+    model.interactions.push(interaction::hhll1().remove(0));
+
+    // Collect the names now as SolverBuilder takes ownership of the model
+    // later.
+    let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
+
+    // Prevent any asymmetry from being generated in the N_i and H.
+    let mut no_asymmetry: Vec<usize> = (0..3)
+        .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
+        .collect();
+    no_asymmetry.push(LeptogenesisModel::particle_idx("H", 0).unwrap());
+
+    // Add a primordial asymmetry in L1
+    let mut initial_asymmetries = Array1::zeros(model.particles().len());
+    initial_asymmetries[LeptogenesisModel::particle_idx("L", 0).unwrap()] = 1.0;
+
+    let builder = SolverBuilder::new()
+        .no_asymmetry(no_asymmetry)
+        .initial_asymmetries(initial_asymmetries)
+        .model(model)
+        .beta_range(1e-17, 1e-3)
+        .step_precision(1e-6, 1e-1);
+
+    let (n, na) = solve(builder, &names, Some(csv))?;
+
+    // Check that the solution is fine
+    println!("Final number density: {:.3e}", n);
+    println!("Final number density asymmetry: {:.3e}", na);
+
+    let nai = na[LeptogenesisModel::particle_idx("L", 0).unwrap()].abs();
+    assert!(1e-10 < nai && nai < 1e-5);
+    assert!(n[LeptogenesisModel::particle_idx("N", 0).unwrap()] < 1e-8);
 
     Ok(())
 }
