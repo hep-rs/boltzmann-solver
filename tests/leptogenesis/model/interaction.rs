@@ -237,10 +237,10 @@ pub fn hhll2() -> Vec<Interaction<LeptogenesisModel>> {
 
             interactions.push(Interaction::four_particle(
                 m2,
-                isize::try_from(LeptogenesisModel::particle_idx("H", 0).unwrap()).unwrap(),
+                -isize::try_from(LeptogenesisModel::particle_idx("H", 0).unwrap()).unwrap(),
                 isize::try_from(LeptogenesisModel::particle_idx("H", 0).unwrap()).unwrap(),
                 -isize::try_from(LeptogenesisModel::particle_idx("L", i3).unwrap()).unwrap(),
-                -isize::try_from(LeptogenesisModel::particle_idx("L", i4).unwrap()).unwrap(),
+                isize::try_from(LeptogenesisModel::particle_idx("L", i4).unwrap()).unwrap(),
             ))
         }
     }
