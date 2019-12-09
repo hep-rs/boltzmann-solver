@@ -278,6 +278,49 @@ pub fn decay_washout_1gen() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+#[test]
+#[cfg(not(debug_assertions))]
+pub fn decay_washout_3gen() -> Result<(), Box<dyn std::error::Error>> {
+    // common::setup_logging(2);
+
+    // Create the CSV file
+    let output_dir = common::output_dir("leptogenesis/decay_washout/3gen");
+    let csv = csv::Writer::from_path(output_dir.join("n.csv"))?;
+
+    // Get the solution
+    let mut model = LeptogenesisModel::zero();
+    model.interactions.append(&mut interaction::hln());
+    model.interactions.append(&mut interaction::hhll1());
+    model.interactions.append(&mut interaction::hhll2());
+
+    // Collect the names now as SolverBuilder takes ownership of the model
+    // later.
+    let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
+
+    let mut no_asymmetry: Vec<usize> = (0..3)
+        .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
+        .collect();
+    no_asymmetry.push(LeptogenesisModel::particle_idx("H", 0).unwrap());
+
+    let builder = SolverBuilder::new().no_asymmetry(no_asymmetry).model(model);
+
+    let (n, na) = solve(builder, &names, Some(csv))?;
+
+    // Check that the solution is fine
+    println!("Final number density: {:.3e}", n);
+    println!("Final number density asymmetry: {:.3e}", na);
+
+    let nai = na[LeptogenesisModel::particle_idx("L", 0).unwrap()].abs();
+    assert!(1e-10 < nai && nai < 1e-5);
+    for i in 0..3 {
+        let nai = na[LeptogenesisModel::particle_idx("L", i).unwrap()].abs();
+        assert!(1e-10 < nai && nai < 1e-5);
+        assert!(n[LeptogenesisModel::particle_idx("N", i).unwrap()] < 1e-8);
+    }
+
+    Ok(())
+}
+
 /// Scan some parameter space and store the B-L from the scan in a CSV file.
 #[test]
 #[ignore]
