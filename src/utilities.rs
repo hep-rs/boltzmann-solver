@@ -68,7 +68,6 @@ pub fn kallen_lambda_sqrt(a: f64, b: f64, c: f64) -> f64 {
 ///   t_{\text{min}} &= \frac{(m_1^2 - m_2^2 - m_3^3 + m_4^4)^2}{4 s}
 ///       - \frac{\lambda^{\frac{1}{2}}(s, m_1^2, m_2^2) \lambda^{\frac{1}{2}}(s, m_3^2, m_4^2)}{s} \\\\
 ///   t_{\text{max}} &= \frac{(m_1^2 - m_2^2 - m_3^3 + m_4^4)^2}{4 s}
-///       + \frac{\lambda^{\frac{1}{2}}(s, m_1^2, m_2^2) \lambda^{\frac{1}{2}}(s, m_3^2, m_4^2)}{s}
 /// \\end{aligned}\\end{equation}
 pub fn t_range(s: f64, m1: f64, m2: f64, m3: f64, m4: f64) -> (f64, f64) {
     debug_assert!(s >= m1 + m2, "s must be greater than m1^2 + m2^2.");
@@ -137,6 +136,16 @@ where
 /// \\begin{equation}
 ///   \mathcal{P}_{p}(q^2) \defeq \frac{1}{q^2 - m_p^2 + i m_p \Gamma_p}
 /// \\end{equation}
+///
+/// # To-do
+///
+/// Adjust the propagator to take into account particles in the thermal bath:
+///
+/// \\begin{equation}\begin{aligned}
+///   S(q^2, m) &= \left[\frac{i}{q^2 - m^2 + i0} - 2 \pi n \delta(q^2 - m^2)] (\slashed p + m) \\\\
+///   D(q^2, m) &= \left[\frac{i}{q^2 - m^2 + i0} + 2 \pi n \delta(q^2 - m^2)]
+/// \\end{aligned}\\end{equation}
+// TODO: Implemented Dirac delta
 pub fn propagator(q2: f64, p: &Particle) -> Complex<f64> {
     1.0 / (q2 - p.mass2 + Complex::i() * p.mass * p.width)
 }
