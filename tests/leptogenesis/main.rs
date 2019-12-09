@@ -10,6 +10,26 @@ use itertools::iproduct;
 use ndarray::prelude::*;
 use std::{fs::File, io, sync::RwLock};
 
+#[test]
+fn particle_indices() {
+    let model = LeptogenesisModel::zero();
+
+    for (i, p) in model.particles().iter().enumerate() {
+        let name = p.name;
+        if name.len() == 1 {
+            assert_eq!(Ok(i), LeptogenesisModel::particle_idx(name, 0));
+        } else if name.len() == 2 {
+            let mut chars = name.chars();
+            let head = chars.next().unwrap();
+            let idx = chars.next().unwrap() as usize - 49;
+            assert_eq!(
+                Ok(i),
+                LeptogenesisModel::particle_idx(&head.to_string(), idx)
+            );
+        }
+    }
+}
+
 /// Solve the Boltzmann equations and return the final values.
 ///
 /// The model function is specified by `model`, and optionally a CSV writer can
@@ -77,11 +97,11 @@ where
 
 /// Test the effects of the right-handed neutrino decay on its own.
 #[test]
-pub fn decay_only_n1l1() -> Result<(), Box<dyn std::error::Error>> {
+pub fn decay_only_1gen() -> Result<(), Box<dyn std::error::Error>> {
     // common::setup_logging(2);
 
     // Create the CSV file
-    let output_dir = common::output_dir("leptogenesis/decay_only_n1l1");
+    let output_dir = common::output_dir("leptogenesis/decay_only/1gen");
     let csv = csv::Writer::from_path(output_dir.join("n.csv"))?;
 
     // Get the solution
@@ -102,7 +122,8 @@ pub fn decay_only_n1l1() -> Result<(), Box<dyn std::error::Error>> {
     let builder = SolverBuilder::new()
         .no_asymmetry(no_asymmetry)
         .model(model)
-        .beta_range(1e-17, 1e-3);
+        .beta_range(1e-17, 1e-3)
+        .step_precision(1e-6, 1e-1);
 
     let (n, na) = solve(builder, &names, Some(csv))?;
 
@@ -119,11 +140,11 @@ pub fn decay_only_n1l1() -> Result<(), Box<dyn std::error::Error>> {
 
 /// Test the effects of the right-handed neutrino decay on its own.
 #[test]
-pub fn decay_only() -> Result<(), Box<dyn std::error::Error>> {
+pub fn decay_only_3gen() -> Result<(), Box<dyn std::error::Error>> {
     // common::setup_logging(2);
 
     // Create the CSV file
-    let output_dir = common::output_dir("leptogenesis/decay_only");
+    let output_dir = common::output_dir("leptogenesis/decay_only/3gen");
     let csv = csv::Writer::from_path(output_dir.join("n.csv"))?;
 
     // Get the solution
@@ -143,7 +164,8 @@ pub fn decay_only() -> Result<(), Box<dyn std::error::Error>> {
     let builder = SolverBuilder::new()
         .no_asymmetry(no_asymmetry)
         .model(model)
-        .beta_range(1e-17, 1e-3);
+        .beta_range(1e-17, 1e-3)
+        .step_precision(1e-6, 1e-1);
 
     let (n, na) = solve(builder, &names, Some(csv))?;
 
@@ -358,24 +380,4 @@ fn gammas() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     Ok(())
-}
-
-#[test]
-fn particle_indices() {
-    let model = LeptogenesisModel::zero();
-
-    for (i, p) in model.particles().iter().enumerate() {
-        let name = p.name;
-        if name.len() == 1 {
-            assert_eq!(Ok(i), LeptogenesisModel::particle_idx(name, 0));
-        } else if name.len() == 2 {
-            let mut chars = name.chars();
-            let head = chars.next().unwrap();
-            let idx = chars.next().unwrap() as usize - 49;
-            assert_eq!(
-                Ok(i),
-                LeptogenesisModel::particle_idx(&head.to_string(), idx)
-            );
-        }
-    }
 }
