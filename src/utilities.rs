@@ -112,20 +112,21 @@ where
         // Combination of factors constant w.r.t. t
         let s_factors = bessel::k1(sqrt_s * beta) / sqrt_s * dsdss;
 
-        // Remap the (potentially very large) t interval onto [0, 1]
-        // This appears to be substantially slower in benchmarks
-        // let (t_min, t_max) = t_range(s, m1, m2, m3, m4);
-        // let delta = (t_max - t_min).recip() + 1.0;
-        // let t_integrand = |tt: f64| {
-        //     let t = tt / (delta - tt) + t_min;
-        //     let dtdtt = delta / (delta - tt).powi(2);
-        //     amplitude(s, t) * dtdtt * s_factors
-        // };
-        // integrate(t_integrand, 0.0, 1.0, 0.0).integral
-
+        // Remap the (potentially very large) t interval onto [0, 1].  This
+        // appears to be substantially slower in benchmarks; however, it appears
+        // to be significantly more stable.
         let (t_min, t_max) = t_range(s, m1, m2, m3, m4);
-        let t_integrand = |t: f64| amplitude(s, t) * s_factors;
-        integrate(t_integrand, t_min, t_max, 0.0).integral
+        let delta = (t_max - t_min).recip() + 1.0;
+        let t_integrand = |tt: f64| {
+            let t = tt / (delta - tt) + t_min;
+            let dtdtt = delta / (delta - tt).powi(2);
+            amplitude(s, t) * dtdtt * s_factors
+        };
+        integrate(t_integrand, 0.0, 1.0, 0.0).integral
+
+        // let (t_min, t_max) = t_range(s, m1, m2, m3, m4);
+        // let t_integrand = |t: f64| amplitude(s, t) * s_factors;
+        // integrate(t_integrand, t_min, t_max, 0.0).integral
     };
 
     integrate(s_integrand, 0.0, 1.0, 0.0).integral / (512.0 * PI_5 * beta)
