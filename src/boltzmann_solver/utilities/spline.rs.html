@@ -432,19 +432,19 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The `accurate` flag indicates whether the interval between the current point</span>
 <span class="doccomment">/// and the next point is deemed accurate.</span>
-<span class="kw">struct</span> <span class="ident">SplinePoint</span> {
+<span class="kw">struct</span> <span class="ident">CubicHermiteSplinePoint</span> {
     <span class="ident">x</span>: <span class="ident">f64</span>,
     <span class="ident">y</span>: <span class="ident">f64</span>,
     <span class="ident">m</span>: <span class="ident">f64</span>,
     <span class="ident">accurate</span>: <span class="ident">bool</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">SplinePoint</span> {
+<span class="kw">impl</span> <span class="ident">CubicHermiteSplinePoint</span> {
     <span class="doccomment">/// Create a new spline point going through coordinate `(x, y)`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The gradient will be NaN initially, and `accurate` is set to `false`.</span>
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">x</span>: <span class="ident">f64</span>, <span class="ident">y</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">SplinePoint</span> {
+        <span class="ident">CubicHermiteSplinePoint</span> {
             <span class="ident">x</span>,
             <span class="ident">y</span>,
             <span class="ident">m</span>: <span class="ident">f64</span>::<span class="ident">NAN</span>,
@@ -458,7 +458,7 @@
     <span class="comment">// `(x, y, m, accurate)` tuples through which the spline goes through, with</span>
     <span class="comment">// gradient `m`.  The accurate flag determines whether the interval between</span>
     <span class="comment">// it and the next value is accurate or not.</span>
-    <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SplinePoint</span><span class="op">&gt;</span>,
+    <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CubicHermiteSplinePoint</span><span class="op">&gt;</span>,
     <span class="comment">// Number of points required before it begins to consider whether an</span>
     <span class="comment">// interval is accurate.</span>
     <span class="ident">min_points</span>: <span class="ident">usize</span>,
@@ -504,13 +504,13 @@
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">binary_search_by</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">x</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>).<span class="ident">unwrap</span>()) {
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
             <span class="prelude-val">Err</span>(<span class="number">0</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="ident">SplinePoint</span>::<span class="ident">new</span>(<span class="ident">x</span>, <span class="ident">y</span>));
+                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="ident">CubicHermiteSplinePoint</span>::<span class="ident">new</span>(<span class="ident">x</span>, <span class="ident">y</span>));
 
                 <span class="self">self</span>.<span class="ident">compute_gradient</span>(<span class="number">0</span>);
                 <span class="self">self</span>.<span class="ident">compute_gradient</span>(<span class="number">1</span>);
             }
             <span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">insert</span>(<span class="ident">i</span>, <span class="ident">SplinePoint</span>::<span class="ident">new</span>(<span class="ident">x</span>, <span class="ident">y</span>));
+                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">insert</span>(<span class="ident">i</span>, <span class="ident">CubicHermiteSplinePoint</span>::<span class="ident">new</span>(<span class="ident">x</span>, <span class="ident">y</span>));
 
                 <span class="self">self</span>.<span class="ident">compute_gradient</span>(<span class="ident">i</span> <span class="op">-</span> <span class="number">1</span>);
                 <span class="self">self</span>.<span class="ident">compute_gradient</span>(<span class="ident">i</span>);
@@ -518,7 +518,7 @@
             <span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">ny</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sample</span>(<span class="ident">x</span>);
 
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">insert</span>(<span class="ident">i</span>, <span class="ident">SplinePoint</span>::<span class="ident">new</span>(<span class="ident">x</span>, <span class="ident">y</span>));
+                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">insert</span>(<span class="ident">i</span>, <span class="ident">CubicHermiteSplinePoint</span>::<span class="ident">new</span>(<span class="ident">x</span>, <span class="ident">y</span>));
 
                 <span class="self">self</span>.<span class="ident">compute_gradient</span>(<span class="ident">i</span> <span class="op">-</span> <span class="number">1</span>);
                 <span class="self">self</span>.<span class="ident">compute_gradient</span>(<span class="ident">i</span>);

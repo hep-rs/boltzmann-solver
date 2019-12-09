@@ -210,6 +210,11 @@
 <span id="210">210</span>
 <span id="211">211</span>
 <span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::{<span class="ident">data</span>, <span class="ident">Interaction</span>, <span class="ident">Model</span>, <span class="ident">Particle</span>};
 <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">array</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
@@ -276,7 +281,7 @@
 
         <span class="kw">let</span> <span class="ident">mh</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">125.10</span>;
         <span class="kw">let</span> <span class="ident">vev</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">246.0</span>;
-        <span class="kw">let</span> <span class="ident">mu2</span> <span class="op">=</span> <span class="op">-</span><span class="ident">mh</span>.<span class="ident">powi</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="ident">mu2</span> <span class="op">=</span> <span class="op">-</span><span class="number">2.0</span> <span class="op">*</span> <span class="ident">mh</span>.<span class="ident">powi</span>(<span class="number">2</span>);
         <span class="kw">let</span> <span class="ident">lambda</span> <span class="op">=</span> (<span class="ident">mh</span> <span class="op">/</span> <span class="ident">vev</span>).<span class="ident">powi</span>(<span class="number">2</span>);
 
         <span class="ident">StandardModel</span> {
@@ -333,22 +338,27 @@
         <span class="kw">let</span> <span class="ident">yu</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">yu</span>.<span class="ident">diag</span>().<span class="ident">mapv</span>(<span class="op">|</span><span class="ident">y</span><span class="op">|</span> <span class="ident">y</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">/</span> <span class="number">16.0</span>);
         <span class="kw">let</span> <span class="ident">yd</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">yd</span>.<span class="ident">diag</span>().<span class="ident">mapv</span>(<span class="op">|</span><span class="ident">y</span><span class="op">|</span> <span class="ident">y</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">/</span> <span class="number">16.0</span>);
         <span class="kw">let</span> <span class="ident">ye</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ye</span>.<span class="ident">diag</span>().<span class="ident">mapv</span>(<span class="op">|</span><span class="ident">y</span><span class="op">|</span> <span class="ident">y</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">/</span> <span class="number">16.0</span>);
-        <span class="kw">let</span> <span class="ident">mh</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mh</span>;
+        <span class="comment">// let mh = self.mh;</span>
+        <span class="kw">let</span> <span class="ident">mu2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mu2</span>;
         <span class="kw">let</span> <span class="ident">lambda</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lambda</span> <span class="op">/</span> <span class="number">4.0</span>;
 
         <span class="comment">// Update the thermal masses</span>
         <span class="self">self</span>.<span class="ident">particle_mut</span>(<span class="string">&quot;H&quot;</span>, <span class="number">0</span>).<span class="ident">set_mass</span>(
-            <span class="ident">mh</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">consts</span>::<span class="ident">SQRT_2</span>
+            <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">consts</span>::<span class="ident">SQRT_2</span>
                 <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">sqrt</span>(
-                    <span class="ident">g1</span> <span class="op">/</span> <span class="number">4.0</span>
+                    <span class="op">-</span><span class="ident">mu2</span> <span class="op">+</span> <span class="ident">lambda</span>
+                        <span class="op">+</span> <span class="ident">g1</span> <span class="op">/</span> <span class="number">4.0</span>
                         <span class="op">+</span> (<span class="number">3.0</span> <span class="op">/</span> <span class="number">4.0</span>) <span class="op">*</span> <span class="ident">g2</span>
                         <span class="op">+</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">yu</span>.<span class="ident">sum</span>()
                         <span class="op">+</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">yd</span>.<span class="ident">sum</span>()
-                        <span class="op">+</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">ye</span>.<span class="ident">sum</span>()
-                        <span class="op">+</span> <span class="ident">lambda</span>,
+                        <span class="op">+</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">ye</span>.<span class="ident">sum</span>(),
                 )
                 <span class="op">/</span> <span class="ident">beta</span>,
         );
+        <span class="self">self</span>.<span class="ident">particle_mut</span>(<span class="string">&quot;A&quot;</span>, <span class="number">0</span>)
+            .<span class="ident">set_mass</span>(<span class="ident">f64</span>::<span class="ident">sqrt</span>((<span class="number">22.0</span> <span class="op">/</span> <span class="number">3.0</span>) <span class="op">*</span> <span class="ident">g1</span>) <span class="op">/</span> <span class="ident">beta</span>);
+        <span class="self">self</span>.<span class="ident">particle_mut</span>(<span class="string">&quot;W&quot;</span>, <span class="number">0</span>)
+            .<span class="ident">set_mass</span>(<span class="ident">f64</span>::<span class="ident">sqrt</span>((<span class="number">22.0</span> <span class="op">/</span> <span class="number">3.0</span>) <span class="op">*</span> <span class="ident">g2</span>) <span class="op">/</span> <span class="ident">beta</span>);
 
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">3</span> {
             <span class="self">self</span>.<span class="ident">particle_mut</span>(<span class="string">&quot;L&quot;</span>, <span class="ident">i</span>)

@@ -279,6 +279,7 @@
 <span id="279">279</span>
 <span id="280">280</span>
 <span id="281">281</span>
+<span id="282">282</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Module of various useful miscellaneous functions.</span>
 
@@ -394,20 +395,21 @@
         <span class="comment">// Combination of factors constant w.r.t. t</span>
         <span class="kw">let</span> <span class="ident">s_factors</span> <span class="op">=</span> <span class="ident">bessel</span>::<span class="ident">k1</span>(<span class="ident">sqrt_s</span> <span class="op">*</span> <span class="ident">beta</span>) <span class="op">/</span> <span class="ident">sqrt_s</span> <span class="op">*</span> <span class="ident">dsdss</span>;
 
-        <span class="comment">// Remap the (potentially very large) t interval onto [0, 1]</span>
-        <span class="comment">// This appears to be substantially slower in benchmarks</span>
-        <span class="comment">// let (t_min, t_max) = t_range(s, m1, m2, m3, m4);</span>
-        <span class="comment">// let delta = (t_max - t_min).recip() + 1.0;</span>
-        <span class="comment">// let t_integrand = |tt: f64| {</span>
-        <span class="comment">//     let t = tt / (delta - tt) + t_min;</span>
-        <span class="comment">//     let dtdtt = delta / (delta - tt).powi(2);</span>
-        <span class="comment">//     amplitude(s, t) * dtdtt * s_factors</span>
-        <span class="comment">// };</span>
-        <span class="comment">// integrate(t_integrand, 0.0, 1.0, 0.0).integral</span>
-
+        <span class="comment">// Remap the (potentially very large) t interval onto [0, 1].  This</span>
+        <span class="comment">// appears to be substantially slower in benchmarks; however, it appears</span>
+        <span class="comment">// to be significantly more stable.</span>
         <span class="kw">let</span> (<span class="ident">t_min</span>, <span class="ident">t_max</span>) <span class="op">=</span> <span class="ident">t_range</span>(<span class="ident">s</span>, <span class="ident">m1</span>, <span class="ident">m2</span>, <span class="ident">m3</span>, <span class="ident">m4</span>);
-        <span class="kw">let</span> <span class="ident">t_integrand</span> <span class="op">=</span> <span class="op">|</span><span class="ident">t</span>: <span class="ident">f64</span><span class="op">|</span> <span class="ident">amplitude</span>(<span class="ident">s</span>, <span class="ident">t</span>) <span class="op">*</span> <span class="ident">s_factors</span>;
-        <span class="ident">integrate</span>(<span class="ident">t_integrand</span>, <span class="ident">t_min</span>, <span class="ident">t_max</span>, <span class="number">0.0</span>).<span class="ident">integral</span>
+        <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> (<span class="ident">t_max</span> <span class="op">-</span> <span class="ident">t_min</span>).<span class="ident">recip</span>() <span class="op">+</span> <span class="number">1.0</span>;
+        <span class="kw">let</span> <span class="ident">t_integrand</span> <span class="op">=</span> <span class="op">|</span><span class="ident">tt</span>: <span class="ident">f64</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">tt</span> <span class="op">/</span> (<span class="ident">delta</span> <span class="op">-</span> <span class="ident">tt</span>) <span class="op">+</span> <span class="ident">t_min</span>;
+            <span class="kw">let</span> <span class="ident">dtdtt</span> <span class="op">=</span> <span class="ident">delta</span> <span class="op">/</span> (<span class="ident">delta</span> <span class="op">-</span> <span class="ident">tt</span>).<span class="ident">powi</span>(<span class="number">2</span>);
+            <span class="ident">amplitude</span>(<span class="ident">s</span>, <span class="ident">t</span>) <span class="op">*</span> <span class="ident">dtdtt</span> <span class="op">*</span> <span class="ident">s_factors</span>
+        };
+        <span class="ident">integrate</span>(<span class="ident">t_integrand</span>, <span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>).<span class="ident">integral</span>
+
+        <span class="comment">// let (t_min, t_max) = t_range(s, m1, m2, m3, m4);</span>
+        <span class="comment">// let t_integrand = |t: f64| amplitude(s, t) * s_factors;</span>
+        <span class="comment">// integrate(t_integrand, t_min, t_max, 0.0).integral</span>
     };
 
     <span class="ident">integrate</span>(<span class="ident">s_integrand</span>, <span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>).<span class="ident">integral</span> <span class="op">/</span> (<span class="number">512.0</span> <span class="op">*</span> <span class="ident">PI_5</span> <span class="op">*</span> <span class="ident">beta</span>)
