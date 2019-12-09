@@ -280,6 +280,15 @@
 <span id="280">280</span>
 <span id="281">281</span>
 <span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Module of various useful miscellaneous functions.</span>
 
@@ -351,7 +360,6 @@
 <span class="doccomment">///   t_{\text{min}} &amp;= \frac{(m_1^2 - m_2^2 - m_3^3 + m_4^4)^2}{4 s}</span>
 <span class="doccomment">///       - \frac{\lambda^{\frac{1}{2}}(s, m_1^2, m_2^2) \lambda^{\frac{1}{2}}(s, m_3^2, m_4^2)}{s} \\\\</span>
 <span class="doccomment">///   t_{\text{max}} &amp;= \frac{(m_1^2 - m_2^2 - m_3^3 + m_4^4)^2}{4 s}</span>
-<span class="doccomment">///       + \frac{\lambda^{\frac{1}{2}}(s, m_1^2, m_2^2) \lambda^{\frac{1}{2}}(s, m_3^2, m_4^2)}{s}</span>
 <span class="doccomment">/// \\end{aligned}\\end{equation}</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">t_range</span>(<span class="ident">s</span>: <span class="ident">f64</span>, <span class="ident">m1</span>: <span class="ident">f64</span>, <span class="ident">m2</span>: <span class="ident">f64</span>, <span class="ident">m3</span>: <span class="ident">f64</span>, <span class="ident">m4</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>) {
     <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">s</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">m1</span> <span class="op">+</span> <span class="ident">m2</span>, <span class="string">&quot;s must be greater than m1^2 + m2^2.&quot;</span>);
@@ -420,6 +428,16 @@
 <span class="doccomment">/// \\begin{equation}</span>
 <span class="doccomment">///   \mathcal{P}_{p}(q^2) \defeq \frac{1}{q^2 - m_p^2 + i m_p \Gamma_p}</span>
 <span class="doccomment">/// \\end{equation}</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # To-do</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Adjust the propagator to take into account particles in the thermal bath:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// \\begin{equation}\begin{aligned}</span>
+<span class="doccomment">///   S(q^2, m) &amp;= \left[\frac{i}{q^2 - m^2 + i0} - 2 \pi n \delta(q^2 - m^2)] (\slashed p + m) \\\\</span>
+<span class="doccomment">///   D(q^2, m) &amp;= \left[\frac{i}{q^2 - m^2 + i0} + 2 \pi n \delta(q^2 - m^2)]</span>
+<span class="doccomment">/// \\end{aligned}\\end{equation}</span>
+<span class="comment">// TODO: Implemented Dirac delta</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">propagator</span>(<span class="ident">q2</span>: <span class="ident">f64</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Particle</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
     <span class="number">1.0</span> <span class="op">/</span> (<span class="ident">q2</span> <span class="op">-</span> <span class="ident">p</span>.<span class="ident">mass2</span> <span class="op">+</span> <span class="ident">Complex</span>::<span class="ident">i</span>() <span class="op">*</span> <span class="ident">p</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">p</span>.<span class="ident">width</span>)
 }
