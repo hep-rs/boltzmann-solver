@@ -63,7 +63,7 @@ impl Model for StandardModel {
 
         let mh: f64 = 125.10;
         let vev: f64 = 246.0;
-        let mu2 = -mh.powi(2);
+        let mu2 = -2.0 * mh.powi(2);
         let lambda = (mh / vev).powi(2);
 
         StandardModel {
@@ -120,19 +120,20 @@ impl Model for StandardModel {
         let yu = self.yu.diag().mapv(|y| y.powi(2) / 16.0);
         let yd = self.yd.diag().mapv(|y| y.powi(2) / 16.0);
         let ye = self.ye.diag().mapv(|y| y.powi(2) / 16.0);
-        let mh = self.mh;
+        // let mh = self.mh;
+        let mu2 = self.mu2;
         let lambda = self.lambda / 4.0;
 
         // Update the thermal masses
         self.particle_mut("H", 0).set_mass(
-            mh + std::f64::consts::SQRT_2
+            std::f64::consts::SQRT_2
                 * f64::sqrt(
-                    g1 / 4.0
+                    -mu2 + lambda
+                        + g1 / 4.0
                         + (3.0 / 4.0) * g2
                         + 2.0 * yu.sum()
                         + 2.0 * yd.sum()
-                        + 2.0 * ye.sum()
-                        + lambda,
+                        + 2.0 * ye.sum(),
                 )
                 / beta,
         );
