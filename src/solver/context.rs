@@ -13,13 +13,13 @@ pub struct Context<'a, M: Model> {
     pub beta: f64,
     /// Hubble rate, in GeV
     pub hubble_rate: f64,
-    /// Normalization factor, which may be either
+    /// Normalization factor, which is
     /// \\begin{equation}
-    ///   \frac{1}{H \beta} \quad \text{or} \quad \frac{1}{H \beta n_1}
+    ///   \frac{1}{H \beta n_1}
     /// \\end{equation}
-    /// depending on whether it is the plain number density or normalized number
-    /// density (respectively), and where \\(n_1\\) is the number density of a
-    /// single massless bosonic degree of freedom.
+    /// where \\(n_1\\) is the number density of a single massless bosonic
+    /// degree of freedom, \\(H\\) is the Hubble rate and \\(\beta\\) is the
+    /// inverse temperature.
     pub normalization: f64,
     /// Equilibrium number densities for the particles
     pub eq: Array1<f64>,

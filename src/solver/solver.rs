@@ -51,7 +51,6 @@ impl error::Error for Error {
 
 /// Boltzmann solver builder
 pub struct SolverBuilder<M: Model> {
-    normalized: bool,
     model: Option<M>,
     initial_densities: Option<Array1<f64>>,
     initial_asymmetries: Option<Array1<f64>>,
@@ -65,7 +64,6 @@ pub struct SolverBuilder<M: Model> {
 
 /// Boltzmann solver
 pub struct Solver<M: Model> {
-    normalized: bool,
     model: M,
     initial_densities: Array1<f64>,
     initial_asymmetries: Array1<f64>,
@@ -99,7 +97,6 @@ impl<M: Model> SolverBuilder<M> {
     /// ```
     pub fn new() -> Self {
         Self {
-            normalized: true,
             model: None,
             initial_densities: None,
             initial_asymmetries: None,
@@ -110,15 +107,6 @@ impl<M: Model> SolverBuilder<M> {
             step_precision: StepPrecision::default(),
             error_tolerance: 1e-4,
         }
-    }
-
-    /// Specify whether the solver is dealing with normalized quantities or not.
-    ///
-    /// If normalized, the number densities are normalized to the number density
-    /// of a single massless bosonic degree of freedom.
-    pub fn normalized(mut self, val: bool) -> Self {
-        self.normalized = val;
-        self
     }
 
     /// Set a model function.
@@ -357,7 +345,6 @@ impl<M: Model> SolverBuilder<M> {
         }
 
         Ok(Solver {
-            normalized: self.normalized,
             model,
             initial_densities,
             initial_asymmetries,
@@ -655,19 +642,16 @@ impl<M: Model> Solver<M> {
         na: &Array1<f64>,
     ) -> Context<M> {
         let hubble_rate = self.model.hubble_rate(beta);
-        let normalization = if self.normalized {
-            let n = Statistic::BoseEinstein.massless_number_density(0.0, beta);
-            (hubble_rate * beta * n).recip()
-        } else {
-            (hubble_rate * beta).recip()
-        };
+        let normalization =
+            (hubble_rate * beta * Statistic::BoseEinstein.massless_number_density(0.0, beta))
+                .recip();
         Context {
             step,
             step_size,
             beta,
             hubble_rate,
             normalization,
-            eq: equilibrium_number_densities(self.model.particles(), beta, self.normalized),
+            eq: equilibrium_number_densities(self.model.particles(), beta),
             n: n.clone(),
             na: na.clone(),
             model: &self.model,
@@ -683,17 +667,13 @@ impl<M: Model> Solver<M> {
 /// Fermi–Dirac distribution as determined by their spin.
 ///
 /// The `normalized` flag
-fn equilibrium_number_densities<'a, I>(particles: I, beta: f64, normalized: bool) -> Array1<f64>
+fn equilibrium_number_densities<'a, I>(particles: I, beta: f64) -> Array1<f64>
 where
     I: IntoIterator<Item = &'a Particle>,
 {
-    if normalized {
-        Array1::from_iter(
-            particles
-                .into_iter()
-                .map(|p| p.normalized_number_density(0.0, beta)),
-        )
-    } else {
-        unimplemented!()
-    }
+    Array1::from_iter(
+        particles
+            .into_iter()
+            .map(|p| p.normalized_number_density(0.0, beta)),
+    )
 }
