@@ -49,19 +49,19 @@ impl ConstCubicHermiteSpline {
 ///
 /// The `accurate` flag indicates whether the interval between the current point
 /// and the next point is deemed accurate.
-struct SplinePoint {
+struct CubicHermiteSplinePoint {
     x: f64,
     y: f64,
     m: f64,
     accurate: bool,
 }
 
-impl SplinePoint {
+impl CubicHermiteSplinePoint {
     /// Create a new spline point going through coordinate `(x, y)`.
     ///
     /// The gradient will be NaN initially, and `accurate` is set to `false`.
     fn new(x: f64, y: f64) -> Self {
-        SplinePoint {
+        CubicHermiteSplinePoint {
             x,
             y,
             m: f64::NAN,
@@ -75,7 +75,7 @@ pub struct CubicHermiteSpline {
     // `(x, y, m, accurate)` tuples through which the spline goes through, with
     // gradient `m`.  The accurate flag determines whether the interval between
     // it and the next value is accurate or not.
-    data: Vec<SplinePoint>,
+    data: Vec<CubicHermiteSplinePoint>,
     // Number of points required before it begins to consider whether an
     // interval is accurate.
     min_points: usize,
@@ -121,13 +121,13 @@ impl CubicHermiteSpline {
         match self.data.binary_search_by(|p| p.x.partial_cmp(&x).unwrap()) {
             Ok(_) => (),
             Err(0) => {
-                self.data.insert(0, SplinePoint::new(x, y));
+                self.data.insert(0, CubicHermiteSplinePoint::new(x, y));
 
                 self.compute_gradient(0);
                 self.compute_gradient(1);
             }
             Err(i) if i == self.data.len() => {
-                self.data.insert(i, SplinePoint::new(x, y));
+                self.data.insert(i, CubicHermiteSplinePoint::new(x, y));
 
                 self.compute_gradient(i - 1);
                 self.compute_gradient(i);
@@ -135,7 +135,7 @@ impl CubicHermiteSpline {
             Err(i) => {
                 let ny = self.sample(x);
 
-                self.data.insert(i, SplinePoint::new(x, y));
+                self.data.insert(i, CubicHermiteSplinePoint::new(x, y));
 
                 self.compute_gradient(i - 1);
                 self.compute_gradient(i);
