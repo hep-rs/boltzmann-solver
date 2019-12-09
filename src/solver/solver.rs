@@ -392,7 +392,7 @@ impl<M: Model + Sync> Solver<M> {
         .chain(&rec_geomspace(self.beta_range.0, self.beta_range.1, n))
         .enumerate()
         {
-            log::trace!("Precomputing at {} / {}\r", i, 2usize.pow(n) + 4);
+            log::trace!("Precomputing at {} / {}", i, 2usize.pow(n) + 4);
             self.model.set_beta(beta);
             let c = self.context(0, 1.0, beta, &zero, &zero);
 
@@ -414,10 +414,16 @@ impl<M: Model + Sync> Solver<M> {
         let zero = Array1::zeros(0);
 
         let mut files = Vec::new();
-        for (i, _) in self.model.interactions().iter().enumerate() {
+        for (i, interaction) in self.model.interactions().iter().enumerate() {
             let mut path = std::env::temp_dir();
             path.push(format!("{}.csv", i));
-            files.push(RwLock::new(BufWriter::new(File::create(path).unwrap())));
+            let mut file = BufWriter::new(File::create(path).unwrap());
+            write!(file, "beta").unwrap();
+            for p in interaction.particles() {
+                write!(file, ",\"{:?}\"", p).unwrap();
+            }
+            write!(file, "\n").unwrap();
+            files.push(RwLock::new(file));
         }
 
         log::warn!("Writing out {} interactions.", files.len());
@@ -434,7 +440,11 @@ impl<M: Model + Sync> Solver<M> {
                 .enumerate()
                 .for_each(|(i, interaction)| {
                     let mut file = files[i].write().unwrap();
-                    writeln!(file, "{:e},{:e}", c.beta, interaction.gamma(&c)[0]).unwrap();
+                    write!(file, "{:e}", c.beta).unwrap();
+                    for gamma in interaction.gamma(&c) {
+                        write!(file, ",{:e}", gamma).unwrap();
+                    }
+                    write!(file, "\n").unwrap();
                 })
         }
     }
