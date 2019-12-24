@@ -21,26 +21,6 @@ use rayon::prelude::*;
 #[cfg(not(debug_assertions))]
 use std::fs::File;
 
-#[test]
-fn particle_indices() {
-    let model = LeptogenesisModel::zero();
-
-    for (i, p) in model.particles().iter().enumerate() {
-        let name = p.name;
-        if name.len() == 1 {
-            assert_eq!(Ok(i), LeptogenesisModel::particle_idx(name, 0));
-        } else if name.len() == 2 {
-            let mut chars = name.chars();
-            let head = chars.next().unwrap();
-            let idx = chars.next().unwrap() as usize - 49;
-            assert_eq!(
-                Ok(i),
-                LeptogenesisModel::particle_idx(&head.to_string(), idx)
-            );
-        }
-    }
-}
-
 /// Solve the Boltzmann equations and return the final values.
 ///
 /// The model function is specified by `model`, and optionally a CSV writer can
@@ -104,6 +84,26 @@ where
     // Build and run the solver
     let mut solver = builder.build()?;
     Ok(solver.solve())
+}
+
+#[test]
+fn particle_indices() {
+    let model = LeptogenesisModel::zero();
+
+    for (i, p) in model.particles().iter().enumerate() {
+        let name = p.name;
+        if name.len() == 1 {
+            assert_eq!(Ok(i), LeptogenesisModel::particle_idx(name, 0));
+        } else if name.len() == 2 {
+            let mut chars = name.chars();
+            let head = chars.next().unwrap();
+            let idx = chars.next().unwrap() as usize - 49;
+            assert_eq!(
+                Ok(i),
+                LeptogenesisModel::particle_idx(&head.to_string(), idx)
+            );
+        }
+    }
 }
 
 /// Test the effects of the right-handed neutrino decay on its own in the
