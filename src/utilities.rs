@@ -157,8 +157,8 @@ where
 ///   S(q^2, m) &= \left[\frac{i}{q^2 - m^2 + i0} - 2 \pi n \delta(q^2 - m^2)] (\slashed p + m) \\\\
 ///   D(q^2, m) &= \left[\frac{i}{q^2 - m^2 + i0} + 2 \pi n \delta(q^2 - m^2)]
 /// \\end{aligned}\\end{equation}
-// TODO: Implemented Dirac delta
 pub fn propagator(q2: f64, p: &Particle) -> Complex<f64> {
+    // TODO: Implement Dirac delta?
     1.0 / (q2 - p.mass2 + Complex::i() * p.mass * p.width)
 }
 
