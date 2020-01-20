@@ -1,13 +1,14 @@
 //! Module of various useful miscellaneous functions.
 
-pub(crate) mod clenshaw_curtis;
-pub(crate) mod double_exponential;
+// pub(crate) mod clenshaw_curtis;
+// pub(crate) mod double_exponential;
 pub mod spline;
 #[cfg(test)]
 pub(crate) mod test;
 
 use crate::{constants::PI_5, model::Particle};
 use num_complex::Complex;
+use quadrature::{clenshaw_curtis, double_exponential};
 use special_functions::bessel;
 
 const INTEGRATION_PRECISION: f64 = 1e-10;
@@ -113,12 +114,12 @@ where
         if (t_min - t_max).abs() < std::f64::EPSILON {
             0.0
         } else {
-        let sqrt_s = s.sqrt();
+            let sqrt_s = s.sqrt();
 
-        // Combination of factors constant w.r.t. t
-        let s_factors = bessel::k1(sqrt_s * beta) / sqrt_s * dsdss;
+            // Combination of factors constant w.r.t. t
+            let s_factors = bessel::k1(sqrt_s * beta) / sqrt_s * dsdss;
 
-        // Remap the (potentially very large) t interval onto [0, 1].  This
+            // Remap the (potentially very large) t interval onto [0, 1].  This
             // appears to be substantially slower in benchmarks; however, it
             // appears to be significantly more stable for some reason (which is
             // odd as the underlying integration algorithm remaps the integral
@@ -129,16 +130,16 @@ where
             //     let dtdtt = delta / (delta - tt).powi(2);
             //     amplitude(s, t) * dtdtt * s_factors
             // };
-            // clenshaw_curtis::integrate(&t_integrand, 0.0, 1.0, INTEGRATION_PRECISION)
+            // clenshaw_curtis::integrate(&t_integrand, 0.0, 1.0, INTEGRATION_PRECISION).integral
 
             // Use the original range
-        let (t_min, t_max) = t_range(s, m1, m2, m3, m4);
+            let (t_min, t_max) = t_range(s, m1, m2, m3, m4);
             let t_integrand = |t: f64| amplitude(s, t) * s_factors;
-            clenshaw_curtis::integrate(&t_integrand, t_min, t_max, INTEGRATION_PRECISION)
+            clenshaw_curtis::integrate(&t_integrand, t_min, t_max, INTEGRATION_PRECISION).integral
         }
-        };
+    };
 
-    double_exponential::integrate(&s_integrand, 0.0, 1.0, INTEGRATION_PRECISION)
+    double_exponential::integrate(&s_integrand, 0.0, 1.0, INTEGRATION_PRECISION).integral
         / (512.0 * PI_5 * beta)
 }
 
