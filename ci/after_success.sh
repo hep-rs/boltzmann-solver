@@ -76,7 +76,7 @@ EOF
 }
 
 main() {
-    coverage
+    # coverage
     make_doc
 }
 
