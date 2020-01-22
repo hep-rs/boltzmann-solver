@@ -445,12 +445,29 @@ fn gammas() -> Result<(), Box<dyn std::error::Error>> {
     // common::setup_logging(2);
 
     let beta = (1e-17, 1e-2);
-    let mut model = LeptogenesisModel::zero();
-    model.interactions.push(interaction::hln().remove(0));
-    model.interactions.push(interaction::hhll1().remove(0));
-    model.interactions.push(interaction::hhll2().remove(0));
+    let mut model_precomp = LeptogenesisModel::zero();
+    model_precomp
+        .interactions
+        .push(interaction::hln().remove(0));
+    model_precomp
+        .interactions
+        .push(interaction::hhll1().remove(0));
+    model_precomp
+        .interactions
+        .push(interaction::hhll2().remove(0));
 
-    // Precompute gamma
+    let mut model_no_precomp = LeptogenesisModel::zero();
+    model_no_precomp
+        .interactions
+        .push(interaction::hln().remove(0));
+    model_no_precomp
+        .interactions
+        .push(interaction::hhll1().remove(0));
+    model_no_precomp
+        .interactions
+        .push(interaction::hhll2().remove(0));
+
+    // Precompute gamma for model1 only
     for (i, &beta) in vec![0.98 * beta.0, 0.99 * beta.0, 1.01 * beta.1, 1.02 * beta.1]
         .iter()
         .chain(&rec_geomspace(1e-17, 1e-2, 10))
@@ -458,10 +475,10 @@ fn gammas() -> Result<(), Box<dyn std::error::Error>> {
     {
         log::trace!("Precomputing at {} / {}", i, 2usize.pow(10) + 4);
 
-        model.set_beta(beta);
-        let c = model.as_context();
+        model_precomp.set_beta(beta);
+        let c = model_precomp.as_context();
 
-        model
+        model_precomp
             .interactions()
             .par_iter()
             .filter(|interaction| interaction.is_four_particle())
@@ -471,18 +488,20 @@ fn gammas() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Create the CSV files
-    let output_dir = common::output_dir("leptogenesis/gamma");
-    let mut normalization = csv::Writer::from_path({
+    let output_dir_precomp = common::output_dir("leptogenesis/gamma/precomp");
+    let output_dir_no_precomp = common::output_dir("leptogenesis/gamma/noprecomp");
+    let mut normalization_csv = csv::Writer::from_path({
+        let output_dir = common::output_dir("leptogenesis/gamma");
         let mut path = output_dir.clone();
         path.push("normalization.csv");
         path
     })?;
-    normalization.serialize(("beta", "H", "n1", "normalization"))?;
+    normalization_csv.serialize(("beta", "H", "n1", "normalization"))?;
 
-    let mut csvs = Vec::new();
-    for (i, interaction) in model.interactions().iter().enumerate() {
+    let mut csvs_precomp = Vec::new();
+    for (i, interaction) in model_precomp.interactions().iter().enumerate() {
         let mut csv = csv::Writer::from_path({
-            let mut path = output_dir.clone();
+            let mut path = output_dir_precomp.clone();
             path.push(format!("{}.csv", i));
             path
         })?;
@@ -492,24 +511,52 @@ fn gammas() -> Result<(), Box<dyn std::error::Error>> {
             csv.write_field(format!("{:?}", p))?;
         }
         csv.write_record(None::<&[u8]>)?;
-        csvs.push(RwLock::new(csv));
+        csvs_precomp.push(RwLock::new(csv));
+    }
+
+    let mut csvs_no_precomp = Vec::new();
+    for (i, interaction) in model_no_precomp.interactions().iter().enumerate() {
+        let mut csv = csv::Writer::from_path({
+            let mut path = output_dir_no_precomp.clone();
+            path.push(format!("{}.csv", i));
+            path
+        })?;
+        csv.write_field("beta")?;
+        log::warn!("{:?}", interaction.particles());
+        for p in interaction.particles() {
+            csv.write_field(format!("{:?}", p))?;
+        }
+        csv.write_record(None::<&[u8]>)?;
+        csvs_no_precomp.push(RwLock::new(csv));
     }
 
     // Write out all the outputs
-    for &beta in Array1::geomspace(beta.0, beta.1, 10_000).unwrap().iter() {
-        model.set_beta(beta);
-        let c = model.as_context();
-        normalization.serialize((
+    for &beta in Array1::geomspace(beta.0, beta.1, 100).unwrap().iter() {
+        model_precomp.set_beta(beta);
+        model_no_precomp.set_beta(beta);
+
+        let c = model_precomp.as_context();
+        normalization_csv.serialize((
             c.beta,
             c.hubble_rate,
             Statistic::BoseEinstein.massless_number_density(0.0, beta),
             c.normalization,
         ))?;
 
-        model
+        model_precomp
             .interactions()
             .par_iter()
-            .zip(&mut csvs)
+            .zip(&mut csvs_precomp)
+            .for_each(|(interaction, csv)| {
+                let mut v = vec![beta];
+                v.append(&mut interaction.gamma(&c));
+                csv.write().unwrap().serialize(v).unwrap();
+            });
+
+        model_no_precomp
+            .interactions()
+            .par_iter()
+            .zip(&mut csvs_no_precomp)
             .for_each(|(interaction, csv)| {
                 let mut v = vec![beta];
                 v.append(&mut interaction.gamma(&c));
