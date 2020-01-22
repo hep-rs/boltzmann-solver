@@ -125,10 +125,9 @@ pub fn decay_only_1gen() -> Result<(), Box<dyn std::error::Error>> {
     let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
 
     // Prevent any asymmetry from being generated in the N_i and H.
-    let mut no_asymmetry: Vec<usize> = (0..3)
+    let no_asymmetry: Vec<usize> = (0..3)
         .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
         .collect();
-    no_asymmetry.push(LeptogenesisModel::particle_idx("H", 0).unwrap());
 
     let builder = SolverBuilder::new()
         .no_asymmetry(no_asymmetry)
@@ -168,10 +167,9 @@ pub fn decay_only_3gen() -> Result<(), Box<dyn std::error::Error>> {
     let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
 
     // Prevent any asymmetry from being generated in the N_i and H.
-    let mut no_asymmetry: Vec<usize> = (0..3)
+    let no_asymmetry: Vec<usize> = (0..3)
         .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
         .collect();
-    no_asymmetry.push(LeptogenesisModel::particle_idx("H", 0).unwrap());
 
     let builder = SolverBuilder::new()
         .no_asymmetry(no_asymmetry)
@@ -212,10 +210,9 @@ pub fn washout_only_1gen() -> Result<(), Box<dyn std::error::Error>> {
     let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
 
     // Prevent any asymmetry from being generated in the N_i and H.
-    let mut no_asymmetry: Vec<usize> = (0..3)
+    let no_asymmetry: Vec<usize> = (0..3)
         .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
         .collect();
-    no_asymmetry.push(LeptogenesisModel::particle_idx("H", 0).unwrap());
 
     // Add a primordial asymmetry in L1
     let mut initial_asymmetries = Array1::zeros(model.particles().len());
@@ -258,12 +255,14 @@ pub fn decay_washout_1gen() -> Result<(), Box<dyn std::error::Error>> {
     // later.
     let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
 
-    let mut no_asymmetry: Vec<usize> = (0..3)
+    let no_asymmetry: Vec<usize> = (0..3)
         .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
         .collect();
-    no_asymmetry.push(LeptogenesisModel::particle_idx("H", 0).unwrap());
 
-    let builder = SolverBuilder::new().no_asymmetry(no_asymmetry).model(model);
+    let builder = SolverBuilder::new()
+        .no_asymmetry(no_asymmetry)
+        .model(model)
+        .beta_range(1e-17, 1e-3);
 
     let (n, na) = solve(builder, &names, Some(csv))?;
 
@@ -297,12 +296,14 @@ pub fn decay_washout_3gen() -> Result<(), Box<dyn std::error::Error>> {
     // later.
     let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
 
-    let mut no_asymmetry: Vec<usize> = (0..3)
+    let no_asymmetry: Vec<usize> = (0..3)
         .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
         .collect();
-    no_asymmetry.push(LeptogenesisModel::particle_idx("H", 0).unwrap());
 
-    let builder = SolverBuilder::new().no_asymmetry(no_asymmetry).model(model);
+    let builder = SolverBuilder::new()
+        .no_asymmetry(no_asymmetry)
+        .model(model)
+        .beta_range(1e-17, 1e-3);
 
     let (n, na) = solve(builder, &names, Some(csv))?;
 
@@ -348,10 +349,9 @@ pub fn scan() -> Result<(), Box<dyn std::error::Error>> {
         model.yv.mapv_inplace(|yi| yi / 1e-4 * y);
         model.mn[0] = m;
 
-        let mut no_asymmetry: Vec<usize> = (0..3)
+        let no_asymmetry: Vec<usize> = (0..3)
             .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
             .collect();
-        no_asymmetry.push(LeptogenesisModel::particle_idx("H", 0).unwrap());
 
         let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
         let builder = SolverBuilder::new()
