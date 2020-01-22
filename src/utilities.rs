@@ -135,6 +135,10 @@ where
         let s = ss / (delta - ss) + s_med;
         let dsdss = delta / (delta - ss).powi(2);
 
+        // Remap the semi-infinite s interval onto [0, 1)
+        // let s = ss / (1.0 - ss) + s_min;
+        // let dsdss = (ss - 1.0).powi(-2);
+
         // Combination of factors constant w.r.t. t
         let sqrt_s = s.sqrt();
         let s_factors = bessel::k1(sqrt_s * beta) / sqrt_s * dsdss;
@@ -248,20 +252,18 @@ mod tests {
             1.5,
             0.0,
         );
-
-        let m2 = |s: f64, t: f64| (s * t) / (s + 1.0).powi(2) / (t + 1.0).powi(2);
-        approx_eq(
-            super::integrate_st(m2, BETA, M1, M2, M3, M4),
-            -104.802_543_808_272,
-            1.3,
-            0.0,
-        );
     }
 }
 
 #[cfg(all(test, feature = "nightly"))]
 mod benches {
     use test::Bencher;
+
+    const BETA: f64 = 1e-2;
+    const M1: f64 = 1.0;
+    const M2: f64 = 10.0;
+    const M3: f64 = 2.0;
+    const M4: f64 = 20.0;
 
     #[bench]
     fn integrate_st_const(b: &mut Bencher) {
@@ -284,18 +286,6 @@ mod benches {
     #[bench]
     fn integrate_st_st(b: &mut Bencher) {
         let m2 = |s: f64, t: f64| (s * t) / (s + 1.0) / (t + 1.0);
-        b.iter(|| test::black_box(super::integrate_st(m2, BETA, M1, M2, M3, M4)))
-    }
-
-    #[bench]
-    fn integrate_st_st2(b: &mut Bencher) {
-        let m2 = |s: f64, t: f64| (s * t) / (s + 1.0).powi(2) / (t + 1.0).powi(2);
-        b.iter(|| test::black_box(super::integrate_st(m2, BETA, M1, M2, M3, M4)))
-    }
-
-    #[bench]
-    fn integrate_st_st2(b: &mut Bencher) {
-        let m2 = |s: f64, t: f64| 1.0 / (s + 1.0).powi(2) / (t + 1.0).powi(2);
         b.iter(|| test::black_box(super::integrate_st(m2, BETA, M1, M2, M3, M4)))
     }
 }
