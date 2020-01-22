@@ -104,42 +104,48 @@ pub fn integrate_st<F>(amplitude: F, beta: f64, m1: f64, m2: f64, m3: f64, m4: f
 where
     F: Fn(f64, f64) -> f64,
 {
+    // The weighing by the bessel function means  that most of the integral's
+    // non-zero values are near the lower bound of the s domain.  We use
+    // Clenshaw-Curtis integration for the lower range, and then
+    // double-exponential integration for the rest of the range.
+    //
+    // For values above of s above 8328.95/β², the factor of K₁(√s β)/√s
+    // evaluates to 0 within machine precision.  So we use this as the upper
+    // bound instead of infinity.
+
     let s_min = (m1 + m2).max(m3 + m4);
+    let s_med = 10.0 * s_min;
+    let s_max = 8328.95 / beta.powi(2);
 
-    let s_integrand = |ss: f64| {
-        // Remap the semi-infinite s interval onto [0, 1)
-        let s = ss / (1.0 - ss) + s_min;
-        let dsdss = (ss - 1.0).powi(-2);
+    let s_integrand_0 = |s: f64| {
+        // Combination of factors constant w.r.t. t
+        let sqrt_s = s.sqrt();
+        let s_factors = bessel::k1(sqrt_s * beta) / sqrt_s;
+
         let (t_min, t_max) = t_range(s, m1, m2, m3, m4);
-        if (t_min - t_max).abs() < std::f64::EPSILON {
-            0.0
-        } else {
-            let sqrt_s = s.sqrt();
-
-            // Combination of factors constant w.r.t. t
-            let s_factors = bessel::k1(sqrt_s * beta) / sqrt_s * dsdss;
-
-            // Remap the (potentially very large) t interval onto [0, 1].  This
-            // appears to be substantially slower in benchmarks; however, it
-            // appears to be significantly more stable for some reason (which is
-            // odd as the underlying integration algorithm remaps the integral
-            // anyway).
-            // let delta = (t_max - t_min).recip() + 1.0;
-            // let t_integrand = |tt: f64| {
-            //     let t = tt / (delta - tt) + t_min;
-            //     let dtdtt = delta / (delta - tt).powi(2);
-            //     amplitude(s, t) * dtdtt * s_factors
-            // };
-            // clenshaw_curtis::integrate(&t_integrand, 0.0, 1.0, INTEGRATION_PRECISION).integral
-
-            // Use the original range
-            let (t_min, t_max) = t_range(s, m1, m2, m3, m4);
-            let t_integrand = |t: f64| amplitude(s, t) * s_factors;
-            clenshaw_curtis::integrate(&t_integrand, t_min, t_max, INTEGRATION_PRECISION).integral
-        }
+        let t_integrand = |t: f64| amplitude(s, t) * s_factors;
+        clenshaw_curtis::integrate(&t_integrand, t_min, t_max, INTEGRATION_PRECISION).integral
     };
 
-    double_exponential::integrate(&s_integrand, 0.0, 1.0, INTEGRATION_PRECISION).integral
+    let s_integrand_1 = |ss: f64| {
+        // Remap the interval [s_med, s_max] onto [0, 1].  The following
+        // rescaling will cause the numerical integration to sample more heavily
+        // from the lower part of the domain (unlike a simple linear rescaling).
+        let delta = (s_max - s_med).recip() + 1.0;
+        let s = ss / (delta - ss) + s_med;
+        let dsdss = delta / (delta - ss).powi(2);
+
+        // Combination of factors constant w.r.t. t
+        let sqrt_s = s.sqrt();
+        let s_factors = bessel::k1(sqrt_s * beta) / sqrt_s * dsdss;
+
+        let (t_min, t_max) = t_range(s, m1, m2, m3, m4);
+        let t_integrand = |t: f64| amplitude(s, t) * s_factors;
+        clenshaw_curtis::integrate(&t_integrand, t_min, t_max, INTEGRATION_PRECISION).integral
+    };
+
+    (clenshaw_curtis::integrate(&s_integrand_0, s_min, s_med, INTEGRATION_PRECISION).integral
+        + double_exponential::integrate(&s_integrand_1, 0.0, 1.0, INTEGRATION_PRECISION).integral)
         / (512.0 * PI_5 * beta)
 }
 
