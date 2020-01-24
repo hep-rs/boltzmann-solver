@@ -74,8 +74,8 @@ pub fn kallen_lambda_sqrt(a: f64, b: f64, c: f64) -> f64 {
 ///   t_{\text{max}} &= \frac{(m_1^2 - m_2^2 - m_3^3 + m_4^4)^2}{4 s}
 /// \\end{aligned}\\end{equation}
 pub fn t_range(s: f64, m1: f64, m2: f64, m3: f64, m4: f64) -> (f64, f64) {
-    debug_assert!(s >= m1 + m2, "s must be greater than m1^2 + m2^2.");
-    debug_assert!(s >= m3 + m4, "s must be greater than m3^2 + m4^2.");
+    debug_assert!(s >= m1 + m2, "s cannot be smaller than (m1² + m2²).");
+    debug_assert!(s >= m3 + m4, "s cannot be smaller than (m3² + m4²).");
 
     if s == 0.0 {
         return (0.0, 0.0);
