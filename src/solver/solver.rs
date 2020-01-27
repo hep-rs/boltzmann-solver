@@ -379,8 +379,14 @@ impl<M: Model + Sync> Solver<M> {
         .chain(&rec_geomspace(self.beta_range.0, self.beta_range.1, n))
         .enumerate()
         {
-            log::trace!("Precomputing at {} / {}", i, 2usize.pow(n) + 4);
+            if i % 64 == 0 {
+                log::debug!("Precomputing step {} / {}", i, 2usize.pow(n) + 4);
+            } else {
+                log::trace!("Precomputing step {} / {}", i, 2usize.pow(n) + 4);
+            }
             self.model.set_beta(beta);
+            // We could use `self.model.as_context()`; however, this allocated
+            // new zero arrays every time.
             let c = self.context(0, 1.0, beta, &zero, &zero);
 
             self.model
