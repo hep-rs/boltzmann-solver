@@ -465,7 +465,7 @@ impl<M: Model + Sync> Solver<M> {
                 log::info!("Step {}, β = {:.4e}", step, beta);
             // log::info!("n = {:.3e}", n);
             } else if step % 10 == 0 {
-                log::debug!("Step {}, , β = {:.4e}", step, beta);
+                log::debug!("Step {}, β = {:.4e}", step, beta);
             // log::debug!("n = {:.3e}", n);
             } else {
                 log::trace!("Step {}, β = {:.4e}, h = {:.4e}", step, beta, h);
