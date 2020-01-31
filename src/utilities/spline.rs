@@ -1,5 +1,7 @@
 //! Cubic Hermite interpolation
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::f64;
 
 /// Cubic Hermite spline interpolator using a constant data array
@@ -49,6 +51,8 @@ impl ConstCubicHermiteSpline {
 ///
 /// The `accurate` flag indicates whether the interval between the current point
 /// and the next point is deemed accurate.
+#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 struct CubicHermiteSplinePoint {
     x: f64,
     y: f64,
@@ -71,6 +75,8 @@ impl CubicHermiteSplinePoint {
 }
 
 /// Cubic Hermite spline interpolator
+#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct CubicHermiteSpline {
     // `(x, y, m, accurate)` tuples through which the spline goes through, with
     // gradient `m`.  The accurate flag determines whether the interval between

@@ -1,6 +1,5 @@
 use crate::model::Model;
 use ndarray::prelude::*;
-// use std::sync::RwLock;
 
 /// Current context at a particular step in the numerical integration.
 #[derive(Debug)]
@@ -29,4 +28,14 @@ pub struct Context<'a, M: Model> {
     pub na: Array1<f64>,
     /// Model data
     pub model: &'a M,
+}
+
+impl<'a, M: Model> std::fmt::Display for Context<'a, M> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Context {{ step: {}, beta: {}, ... }}",
+            self.step, self.beta
+        )
+    }
 }

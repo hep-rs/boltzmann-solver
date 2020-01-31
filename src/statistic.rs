@@ -13,6 +13,8 @@
 
 use crate::constants::PI_N2;
 use quadrature::integrate;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use special_functions::{bessel, particle_statistics};
 use std::f64;
 
@@ -28,6 +30,8 @@ pub const FERMION_EQ_DENSITY: f64 = 0.75;
 /// The statistics which describe the distribution of particles over energy
 /// states.  Both Fermi–Dirac and Bose–Einstein quantum statistics are
 /// implemented, as well as the classical Maxwell–Boltzmann statistic.
+#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub enum Statistic {
     /// Fermi–Dirac statistic describing half-integer-spin particles:
     ///
@@ -53,6 +57,17 @@ pub enum Statistic {
     ///   f_{\textsc{MJ}} = \frac{E \beta \sqrt{E^2 - m^2}}{m K_2(m \beta)} \exp[- E \beta].
     /// \\end{equation}
     MaxwellJuttner,
+}
+
+impl std::fmt::Display for Statistic {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::FermiDirac => write!(f, "Statistic::FermiDirac"),
+            Self::BoseEinstein => write!(f, "Statistic::BoseEinstein"),
+            Self::MaxwellBoltzmann => write!(f, "Statistic::MaxwellBoltzmann"),
+            Self::MaxwellJuttner => write!(f, "Statistic::MaxwellJuttner"),
+        }
+    }
 }
 
 /// Equilibrium statistics.
