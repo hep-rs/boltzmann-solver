@@ -1,15 +1,22 @@
-use crate::model::{data, Interaction, Model, Particle};
+use crate::model::{data, interaction::Interaction, Model, Particle};
 use ndarray::{array, prelude::*};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 /// The Standard Model of particle physics.
+// #[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct StandardModel {
     /// Inverse temperature in \\(GeV^{-1}\\)
     pub beta: f64,
+
     // Particle and Interations
     /// Particles
     pub particles: Vec<Particle>,
     /// Interactions
-    pub interactions: Vec<Interaction<Self>>,
+    #[serde(skip)]
+    pub interactions: Vec<Box<dyn Interaction<Self> + Sync>>,
+
     // Gauge couplings
     /// Hypercharge gauge coupling
     pub g1: f64,
@@ -17,6 +24,7 @@ pub struct StandardModel {
     pub g2: f64,
     /// Strong gauge coupling
     pub g3: f64,
+
     // Yukawa couplings
     /// Up-quark Yukawa
     pub yu: Array2<f64>,
@@ -24,6 +32,7 @@ pub struct StandardModel {
     pub yd: Array2<f64>,
     /// Electron Yukawa
     pub ye: Array2<f64>,
+
     // Scalar potential
     /// 0-temperature mass of the Higgs
     pub mh: f64,
@@ -173,8 +182,8 @@ impl Model for StandardModel {
         &mut self.particles
     }
 
-    fn particle_idx(name: &str, i: usize) -> Result<usize, (&str, usize)> {
-        match (name, i) {
+    fn particle_idx<S: AsRef<str>>(name: S, i: usize) -> Result<usize, (S, usize)> {
+        match (name.as_ref(), i) {
             ("A", _) => Ok(1),
             ("W", _) => Ok(2),
             ("G", _) => Ok(3),
@@ -184,11 +193,11 @@ impl Model for StandardModel {
             ("Q", i) if i < 3 => Ok(11 + i),
             ("u", i) if i < 3 => Ok(14 + i),
             ("d", i) if i < 3 => Ok(17 + i),
-            (name, i) => Err((name, i)),
+            (_, i) => Err((name, i)),
         }
     }
 
-    fn interactions(&self) -> &Vec<Interaction<Self>> {
+    fn interactions(&self) -> &Vec<Box<dyn Interaction<Self> + Sync>> {
         &self.interactions
     }
 }
@@ -203,7 +212,7 @@ mod tests {
         let model = StandardModel::zero();
 
         for (i, p) in model.particles().iter().enumerate() {
-            let name = p.name;
+            let name = &p.name;
             if name.len() == 1 {
                 assert_eq!(Ok(i), StandardModel::particle_idx(name, 0));
             } else if name.len() == 2 {

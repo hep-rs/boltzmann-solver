@@ -1,20 +1,20 @@
 //! Model information
 
 pub(crate) mod data;
-mod interaction;
+pub mod interaction;
 mod particle;
 mod standard_model;
 
-pub use interaction::Interaction;
 pub use particle::Particle;
 pub use standard_model::StandardModel;
 
 use crate::{
+    model::interaction::Interaction,
     solver::Context,
     statistic::{Statistic, Statistics},
 };
 use ndarray::prelude::*;
-use std::{collections::HashMap, convert::TryFrom};
+use std::collections::HashMap;
 
 /// Contains all the information relevant to a particular model, including
 /// masses, widths and couplings.  All these attributes can be dependent on the
@@ -22,6 +22,9 @@ use std::{collections::HashMap, convert::TryFrom};
 pub trait Model: Sized {
     /// Instantiate a new instance of the model at 0 temperature (\\(\beta =
     /// \infty\\)).
+    ///
+    /// This is implemented separately so that the computational peculiarities
+    /// of dealing with \\(\beta = \infty\\) can be avoided.
     fn zero() -> Self;
 
     /// Update the model to be valid at the given inverse temperature `beta`.
@@ -85,15 +88,16 @@ pub trait Model: Sized {
     ///
     /// If the particle is not within the model, the name and index should be
     /// returned as an error so that they can be subsequently handled.
-    fn particle_idx(name: &str, i: usize) -> Result<usize, (&str, usize)>;
+    // fn particle_idx(name: &str, i: usize) -> Result<usize, (&str, usize)>;
+    fn particle_idx<S: AsRef<str>>(name: S, i: usize) -> Result<usize, (S, usize)>;
 
     /// Return a reference to the matching particle by name.
     ///
     /// # Panics
     ///
     /// Panics if then name or particle is not known within the model.
-    fn particle(&self, name: &str, i: usize) -> &Particle {
-        match Self::particle_idx(name, i) {
+    fn particle<S: AsRef<str>>(&self, name: S, i: usize) -> &Particle {
+        match Self::particle_idx(name.as_ref(), i) {
             Ok(idx) => &self.particles()[idx],
             Err((name, i)) => {
                 log::error!("unknown particle {}{}", name, i);
@@ -118,7 +122,7 @@ pub trait Model: Sized {
     }
 
     /// Return a list of interactions in the model.
-    fn interactions(&self) -> &Vec<Interaction<Self>>;
+    fn interactions(&self) -> &Vec<Box<dyn Interaction<Self> + Sync>>;
 
     /// Return a instance of [`Context`] for the model.
     ///
@@ -164,12 +168,12 @@ pub trait Model: Sized {
 
         let c = self.as_context();
         for interaction in self.interactions() {
-            let (mut ptcls, width) = interaction.width(&c);
-            if !ptcls.is_empty() && width > 0.0 {
-                let p0 = usize::try_from(ptcls[0].abs()).unwrap();
-                ptcls.remove(0);
-                widths[p0].0 += width;
-                widths[p0].1.insert(ptcls, width);
+            if let Some(partial_width) = interaction.width(&c) {
+                let parent_idx = partial_width.parent_idx();
+                widths[parent_idx].0 += partial_width.width;
+                widths[parent_idx]
+                    .1
+                    .insert(partial_width.daughters, partial_width.width);
             }
         }
 
