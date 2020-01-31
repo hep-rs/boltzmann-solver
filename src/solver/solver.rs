@@ -223,9 +223,9 @@ impl<M: Model> SolverBuilder<M> {
     ///
     /// This is useful if one wants to track the evolution of the solutions and
     /// log these in a CSV file.
-    pub fn logger<F: 'static>(mut self, f: F) -> Self
+    pub fn logger<F>(mut self, f: F) -> Self
     where
-        F: Fn(&Context<M>),
+        F: Fn(&Context<M>) + 'static,
     {
         self.logger = Box::new(f);
         self
@@ -279,22 +279,12 @@ impl<M: Model> SolverBuilder<M> {
         self
     }
 
-    /// Build the Boltzmann solver.
-    pub fn build(self) -> Result<Solver<M>, Error> {
-        let mut model = self.model.ok_or(Error::UndefinedModel)?;
-        model.set_beta(self.beta_range.0);
-        let particles = model.particles();
-        let beta_range = self.beta_range;
-
-        // Get the initial conditions and check for their validity.  If they
-        // weren't specified, assume everything to be in equilibrium.
-        let initial_densities = self.initial_densities.unwrap_or_else(|| {
-            Array1::from_iter(
-                particles
-                    .iter()
-                    .map(|p| p.normalized_number_density(0.0, beta_range.0)),
-            )
-        });
+    /// Check the validity of the initial densities, making sure we have the
+    /// right number of initial conditions and they are all finite.
+    fn check_initial_densities(
+        initial_densities: &Array1<f64>,
+        particles: &[Particle],
+    ) -> Result<(), Error> {
         if initial_densities.len() != particles.len() {
             log::error!(
                 "Initial densities is not the same length as the number of particles in the model."
@@ -311,9 +301,15 @@ impl<M: Model> SolverBuilder<M> {
             return Err(Error::InvalidInitialDensities);
         }
 
-        let initial_asymmetries = self
-            .initial_asymmetries
-            .unwrap_or_else(|| Array1::zeros(particles.len()));
+        Ok(())
+    }
+
+    /// Check the validity of the initial asymmetries, making sure we have the
+    /// right number of initial conditions and they are all finite.
+    fn check_initial_asymmetries(
+        initial_asymmetries: &Array1<f64>,
+        particles: &[Particle],
+    ) -> Result<(), Error> {
         if initial_asymmetries.len() != particles.len() {
             log::error!("Initial asymmetries is not the same length as the number of particles in the model.");
             return Err(Error::InvalidInitialAsymmetries);
@@ -328,7 +324,67 @@ impl<M: Model> SolverBuilder<M> {
             return Err(Error::InvalidInitialAsymmetries);
         }
 
-        // Make sure that there aren't too many particles held in equilibrium
+        Ok(())
+    }
+
+    /// Precompute the interaction rates for 4-particle interactions.
+    fn precompute(model: &mut M, beta_range: (f64, f64)) {
+        // Number of recursive subdivisions in beta range (so there are 2^N
+        // subdivisions).
+        const N: u32 = 10;
+
+        log::info!("Pre-computing γ...");
+        for (i, &beta) in vec![
+            0.98 * beta_range.0,
+            0.99 * beta_range.0,
+            1.01 * beta_range.1,
+            1.02 * beta_range.1,
+        ]
+        .iter()
+        .chain(&rec_geomspace(beta_range.0, beta_range.1, N))
+        .enumerate()
+        {
+            if i % 64 == 0 {
+                log::debug!("Precomputing step {} / {}", i, 2usize.pow(N) + 4);
+            } else {
+                log::trace!("Precomputing step {} / {}", i, 2usize.pow(N) + 4);
+            }
+            model.set_beta(beta);
+            let c = model.as_context();
+
+            model.interactions().par_iter().for_each(|interaction| {
+                interaction.gamma(&c);
+            });
+        }
+    }
+
+    /// Build the Boltzmann solver.
+    pub fn build(self) -> Result<Solver<M>, Error> {
+        let mut model = self.model.ok_or(Error::UndefinedModel)?;
+        model.set_beta(self.beta_range.0);
+        let particles = model.particles();
+        let beta_range = self.beta_range;
+
+        // If no initial densities were given, all particles are assumed to be
+        // in equilibrium.
+        let initial_densities = self.initial_densities.unwrap_or_else(|| {
+            Array1::from_iter(
+                particles
+                    .iter()
+                    .map(|p| p.normalized_number_density(0.0, beta_range.0)),
+            )
+        });
+        Self::check_initial_densities(&initial_densities, &particles)?;
+
+        // If no initial asymmetries were given, all particles are assumed to be
+        // in equilibrium with no asymmetry.
+        let initial_asymmetries = self
+            .initial_asymmetries
+            .unwrap_or_else(|| Array1::zeros(particles.len()));
+        Self::check_initial_asymmetries(&initial_asymmetries, &particles)?;
+
+        // Make sure that there aren't too many particles held in equilibrium or
+        // forbidden from developping any asymmetry.
         if self.in_equilibrium.len() > particles.len() {
             log::error!("There are more particles held in equilibrium ({}) than particles in the model ({}).",
                         self.in_equilibrium.len(),
@@ -343,6 +399,10 @@ impl<M: Model> SolverBuilder<M> {
             );
             return Err(Error::TooManyNoAsymmetry);
         }
+
+        // Run the precomputations so that the solver can run multiple times
+        // later.
+        Self::precompute(&mut model, beta_range);
 
         Ok(Solver {
             model,
@@ -365,40 +425,6 @@ impl<M: Model + Sync> Default for SolverBuilder<M> {
 }
 
 impl<M: Model + Sync> Solver<M> {
-    /// Precompute certain things so that the integration can happen faster.
-    fn precompute(&mut self, n: u32) {
-        log::info!("Pre-computing γ...");
-        let zero = Array1::zeros(0);
-        for (i, &beta) in vec![
-            0.98 * self.beta_range.0,
-            0.99 * self.beta_range.0,
-            1.01 * self.beta_range.1,
-            1.02 * self.beta_range.1,
-        ]
-        .iter()
-        .chain(&rec_geomspace(self.beta_range.0, self.beta_range.1, n))
-        .enumerate()
-        {
-            if i % 64 == 0 {
-                log::debug!("Precomputing step {} / {}", i, 2usize.pow(n) + 4);
-            } else {
-                log::trace!("Precomputing step {} / {}", i, 2usize.pow(n) + 4);
-            }
-            self.model.set_beta(beta);
-            // We could use `self.model.as_context()`; however, this allocated
-            // new zero arrays every time.
-            let c = self.context(0, 1.0, beta, &zero, &zero);
-
-            self.model
-                .interactions()
-                .par_iter()
-                .filter(|interaction| interaction.is_four_particle())
-                .for_each(|interaction| {
-                    interaction.gamma(&c);
-                });
-        }
-    }
-
     /// Evolve the initial conditions by solving the PDEs.
     ///
     /// Note that this is not a true PDE solver, but instead converts the PDE
@@ -407,9 +433,6 @@ impl<M: Model + Sync> Solver<M> {
     /// time-step.
     #[allow(clippy::cognitive_complexity)]
     pub fn solve(&mut self) -> (Array1<f64>, Array1<f64>) {
-        // Precompute `gamma` for interactions that support it.
-        self.precompute(10);
-
         use super::tableau::rk87::*;
 
         // Initialize all the variables that will be used in the integration
