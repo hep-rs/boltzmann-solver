@@ -24,6 +24,8 @@ use special_functions::approximations::interpolation;
 /// Note that this always assumes the particle to be free and does not work if
 /// the particle forms bound states below a particular energy scale (such as
 /// with coloured particles in the Standard Model).
+#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct SingleSpecies {
     statistic: Statistic,
     mass: f64,
@@ -57,5 +59,15 @@ impl Universe for SingleSpecies {
             Statistic::MaxwellBoltzmann => unimplemented!(),
             Statistic::MaxwellJuttner => unimplemented!(),
         }
+    }
+}
+
+impl std::fmt::Display for SingleSpecies {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "SingleSpecies {{ {}, mass: {}, dof: {} }}",
+            self.statistic, self.mass, self.dof
+        )
     }
 }
