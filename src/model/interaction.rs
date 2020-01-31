@@ -20,8 +20,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct InteractionParticles {
-    ingoing: Vec<isize>,
-    outgoing: Vec<isize>,
+    pub ingoing: Vec<isize>,
+    pub outgoing: Vec<isize>,
 }
 
 impl InteractionParticles {
@@ -53,8 +53,8 @@ impl InteractionParticles {
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct InteractionParticleIndices {
-    ingoing: Vec<usize>,
-    outgoing: Vec<usize>,
+    pub ingoing: Vec<usize>,
+    pub outgoing: Vec<usize>,
 }
 
 /// The signed particle to its signum (as a floating point).
@@ -64,8 +64,8 @@ pub struct InteractionParticleIndices {
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct InteractionParticleSigns {
-    ingoing: Vec<f64>,
-    outgoing: Vec<f64>,
+    pub ingoing: Vec<f64>,
+    pub outgoing: Vec<f64>,
 }
 
 /// Generic interaction between particles.
