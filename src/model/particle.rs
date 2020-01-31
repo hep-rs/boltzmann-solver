@@ -4,6 +4,8 @@ use crate::{
     model::data,
     statistic::{Statistic, Statistics},
 };
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, f64};
 
 /// Particle type
@@ -22,6 +24,7 @@ use std::{collections::HashMap, f64};
 ///
 /// In the long run, it is intended that this type be replaced by another one.
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct Particle {
     // The spin is stored as twice the spin, so a spin-½ particle has `spin ==
     // 1` and a spin-1 particle has `spin == 2`
@@ -41,7 +44,7 @@ pub struct Particle {
     // Internal degrees of freedom of the particle
     dof: f64,
     /// Name
-    pub name: &'static str,
+    pub name: String,
 }
 
 impl Particle {
@@ -60,7 +63,7 @@ impl Particle {
             decays: HashMap::new(),
             complex: false,
             dof: 1.0,
-            name: "",
+            name: "".to_string(),
         }
     }
 
@@ -106,8 +109,8 @@ impl Particle {
     }
 
     /// Specify the particle's name
-    pub fn name(mut self, name: &'static str) -> Self {
-        self.name = name;
+    pub fn name<S: Into<String>>(mut self, name: S) -> Self {
+        self.name = name.into();
         self
     }
 
