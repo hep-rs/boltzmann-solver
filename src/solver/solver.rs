@@ -60,6 +60,7 @@ pub struct SolverBuilder<M: Model> {
     logger: Box<dyn Fn(&Context<M>)>,
     step_precision: StepPrecision,
     error_tolerance: f64,
+    skip_precomputation: bool,
 }
 
 /// Boltzmann solver
@@ -75,7 +76,7 @@ pub struct Solver<M: Model> {
     error_tolerance: f64,
 }
 
-impl<M: Model> SolverBuilder<M> {
+impl<M: Model + Sync> SolverBuilder<M> {
     /// Creates a new builder for the Boltzmann solver.
     ///
     /// The default range of temperatures span 1 GeV through to 10^{20} GeV, and
@@ -106,6 +107,7 @@ impl<M: Model> SolverBuilder<M> {
             logger: Box::new(|_| {}),
             step_precision: StepPrecision::default(),
             error_tolerance: 1e-4,
+            skip_precomputation: false,
         }
     }
 
@@ -279,6 +281,15 @@ impl<M: Model> SolverBuilder<M> {
         self
     }
 
+    /// Upon calling [`SolverBuilder::build`], skip the precomputation of
+    /// interactions.
+    ///
+    /// By default, interactions are precomputed.
+    pub fn skip_precomputation(mut self, v: bool) -> Self {
+        self.skip_precomputation = v;
+        self
+    }
+
     /// Check the validity of the initial densities, making sure we have the
     /// right number of initial conditions and they are all finite.
     fn check_initial_densities(
@@ -402,7 +413,9 @@ impl<M: Model> SolverBuilder<M> {
 
         // Run the precomputations so that the solver can run multiple times
         // later.
-        Self::precompute(&mut model, beta_range);
+        if !self.skip_precomputation {
+            Self::precompute(&mut model, beta_range);
+        }
 
         Ok(Solver {
             model,
