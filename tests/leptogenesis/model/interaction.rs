@@ -1,47 +1,13 @@
 //! Define the various interactions involved in leptogenesis.
 
 use crate::LeptogenesisModel;
-use boltzmann_solver::{prelude::*, utilities::propagator};
+use boltzmann_solver::{model::interaction, prelude::*, utilities::propagator};
 use itertools::iproduct;
 use std::convert::TryFrom;
 
-/// Interaction N(i1) ↔ N(i2)
-pub fn nn() -> Vec<Interaction<LeptogenesisModel>> {
-    let mut interactions = Vec::with_capacity(3);
-
-    for i1 in 0..3 {
-        let p1 = LeptogenesisModel::particle_idx("N", i1).unwrap();
-
-        let m2 = move |m: &LeptogenesisModel| m.mn[i1].powi(2);
-
-        interactions.push(Interaction::two_particle(
-            m2,
-            isize::try_from(p1).unwrap(),
-            -isize::try_from(p1).unwrap(),
-        ));
-    }
-
-    interactions
-}
-
-pub fn hh() -> Vec<Interaction<LeptogenesisModel>> {
-    let mut interactions = Vec::with_capacity(1);
-
-    let p1 = LeptogenesisModel::particle_idx("H", 0).unwrap();
-    let m2 = |_: &LeptogenesisModel| 1e30;
-
-    interactions.push(Interaction::two_particle(
-        m2,
-        isize::try_from(p1).unwrap(),
-        -isize::try_from(p1).unwrap(),
-    ));
-
-    interactions
-}
-
 /// Interaction H ↔ L(i2), -e(i3)
-pub fn hle() -> Vec<Interaction<LeptogenesisModel>> {
-    let mut interactions = Vec::with_capacity(3 * 3);
+pub fn hle() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
+    let mut interactions = Vec::new();
 
     let p1 = LeptogenesisModel::particle_idx("H", 0).unwrap();
     for (i2, i3) in iproduct!(0..3, 0..3) {
@@ -53,7 +19,7 @@ pub fn hle() -> Vec<Interaction<LeptogenesisModel>> {
             2.0 * m.sm.ye[[i3, i2]].powi(2) * (ptcl[p1].mass2 - ptcl[p2].mass2 - ptcl[p3].mass2)
         };
 
-        interactions.push(Interaction::three_particle(
+        interactions.append(&mut interaction::ThreeParticle::new_all(
             m2,
             isize::try_from(p1).unwrap(),
             isize::try_from(p2).unwrap(),
@@ -65,8 +31,8 @@ pub fn hle() -> Vec<Interaction<LeptogenesisModel>> {
 }
 
 /// Interaction H ↔ Q(i2), -u(i3)
-pub fn hqu() -> Vec<Interaction<LeptogenesisModel>> {
-    let mut interactions = Vec::with_capacity(3 * 3);
+pub fn hqu() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
+    let mut interactions = Vec::new();
 
     let p1 = LeptogenesisModel::particle_idx("H", 0).unwrap();
     for (i2, i3) in iproduct!(0..3, 0..3) {
@@ -78,7 +44,7 @@ pub fn hqu() -> Vec<Interaction<LeptogenesisModel>> {
             2.0 * m.sm.yu[[i3, i2]].powi(2) * (ptcl[p1].mass2 - ptcl[p2].mass2 - ptcl[p3].mass2)
         };
 
-        interactions.push(Interaction::three_particle(
+        interactions.append(&mut interaction::ThreeParticle::new_all(
             m2,
             isize::try_from(p1).unwrap(),
             isize::try_from(p2).unwrap(),
@@ -90,8 +56,8 @@ pub fn hqu() -> Vec<Interaction<LeptogenesisModel>> {
 }
 
 /// Interaction H ↔ Q(i2), -d(i3)
-pub fn hqd() -> Vec<Interaction<LeptogenesisModel>> {
-    let mut interactions = Vec::with_capacity(3 * 3);
+pub fn hqd() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
+    let mut interactions = Vec::new();
 
     let p1 = LeptogenesisModel::particle_idx("H", 0).unwrap();
     for (i2, i3) in iproduct!(0..3, 0..3) {
@@ -103,7 +69,7 @@ pub fn hqd() -> Vec<Interaction<LeptogenesisModel>> {
             2.0 * m.sm.yd[[i3, i2]].powi(2) * (ptcl[p1].mass2 - ptcl[p2].mass2 - ptcl[p3].mass2)
         };
 
-        interactions.push(Interaction::three_particle(
+        interactions.append(&mut interaction::ThreeParticle::new_all(
             m2,
             isize::try_from(p1).unwrap(),
             isize::try_from(p2).unwrap(),
@@ -115,8 +81,8 @@ pub fn hqd() -> Vec<Interaction<LeptogenesisModel>> {
 }
 
 /// Interaction H ↔ -L(i2), N(i3)
-pub fn hln() -> Vec<Interaction<LeptogenesisModel>> {
-    let mut interactions = Vec::with_capacity(3 * 3);
+pub fn hln() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
+    let mut interactions = Vec::new();
 
     let p1 = LeptogenesisModel::particle_idx("H", 0).unwrap();
     for (i2, i3) in iproduct!(0..3, 0..3) {
@@ -128,14 +94,17 @@ pub fn hln() -> Vec<Interaction<LeptogenesisModel>> {
             2.0 * m.yv[[i3, i2]].norm_sqr() * (ptcl[p1].mass2 - ptcl[p2].mass2 - ptcl[p3].mass2)
         };
 
-        interactions.push(
-            Interaction::three_particle(
+        interactions.extend(
+            interaction::ThreeParticle::new_all(
                 m2,
                 isize::try_from(p1).unwrap(),
                 -isize::try_from(p2).unwrap(),
                 isize::try_from(p3).unwrap(),
             )
-            .asymmetry(move |m: &LeptogenesisModel| m.epsilon[[i3, i2]]),
+            .drain(..)
+            .map(|interaction| {
+                interaction.asymmetry(move |m: &LeptogenesisModel| m.epsilon[[i3, i2]])
+            }),
         );
     }
 
@@ -144,7 +113,7 @@ pub fn hln() -> Vec<Interaction<LeptogenesisModel>> {
 
 /// Interaction:
 /// H, H ↔ -L(i3), -L(i4)
-pub fn hhll1() -> Vec<Interaction<LeptogenesisModel>> {
+pub fn hhll1() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     let mut interactions = Vec::with_capacity(6);
 
     for i3 in 0..3 {
@@ -178,7 +147,7 @@ pub fn hhll1() -> Vec<Interaction<LeptogenesisModel>> {
                     .sum()
             };
 
-            interactions.push(Interaction::four_particle(
+            interactions.append(&mut interaction::FourParticle::new_all(
                 m2,
                 isize::try_from(LeptogenesisModel::particle_idx("H", 0).unwrap()).unwrap(),
                 isize::try_from(LeptogenesisModel::particle_idx("H", 0).unwrap()).unwrap(),
@@ -193,7 +162,7 @@ pub fn hhll1() -> Vec<Interaction<LeptogenesisModel>> {
 
 /// Interaction:
 /// -H, H ↔ -L(i3), L(i4)
-pub fn hhll2() -> Vec<Interaction<LeptogenesisModel>> {
+pub fn hhll2() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     let mut interactions = Vec::with_capacity(6);
 
     for i3 in 0..3 {
@@ -235,7 +204,7 @@ pub fn hhll2() -> Vec<Interaction<LeptogenesisModel>> {
                     .sum()
             };
 
-            interactions.push(Interaction::four_particle(
+            interactions.append(&mut interaction::FourParticle::new_all(
                 m2,
                 -isize::try_from(LeptogenesisModel::particle_idx("H", 0).unwrap()).unwrap(),
                 isize::try_from(LeptogenesisModel::particle_idx("H", 0).unwrap()).unwrap(),
@@ -250,7 +219,7 @@ pub fn hhll2() -> Vec<Interaction<LeptogenesisModel>> {
 
 /// Interaction:
 /// N(i1), L(i2) ↔ -Q(i3), d(i4)
-pub fn nlqd() -> Vec<Interaction<LeptogenesisModel>> {
+pub fn nlqd() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     let mut interactions = Vec::with_capacity(3 * 3 * 3);
 
     for (i1, i2, i3) in iproduct!(0..3, 0..3, 0..3) {
@@ -268,7 +237,7 @@ pub fn nlqd() -> Vec<Interaction<LeptogenesisModel>> {
                 / ((p5.mass2 - s).powi(2) + p5.mass2 * p5.width2)
         };
 
-        interactions.push(Interaction::four_particle(
+        interactions.append(&mut interaction::FourParticle::new_all(
             m2,
             isize::try_from(LeptogenesisModel::particle_idx("N", i1).unwrap()).unwrap(),
             isize::try_from(LeptogenesisModel::particle_idx("L", i2).unwrap()).unwrap(),
@@ -282,7 +251,7 @@ pub fn nlqd() -> Vec<Interaction<LeptogenesisModel>> {
 
 /// Interaction:
 /// N(i1), L(i2) ↔ -Q(i3), u(i4)
-pub fn nlqu() -> Vec<Interaction<LeptogenesisModel>> {
+pub fn nlqu() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     let mut interactions = Vec::with_capacity(3 * 3 * 3);
 
     for (i1, i2, i3) in iproduct!(0..3, 0..3, 0..3) {
@@ -300,7 +269,7 @@ pub fn nlqu() -> Vec<Interaction<LeptogenesisModel>> {
                 / ((p5.mass2 - s).powi(2) + p5.mass2 * p5.width2)
         };
 
-        interactions.push(Interaction::four_particle(
+        interactions.append(&mut interaction::FourParticle::new_all(
             m2,
             isize::try_from(LeptogenesisModel::particle_idx("N", i1).unwrap()).unwrap(),
             isize::try_from(LeptogenesisModel::particle_idx("L", i2).unwrap()).unwrap(),

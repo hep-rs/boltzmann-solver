@@ -21,7 +21,7 @@ pub struct LeptogenesisModel {
     pub sm: StandardModel,
     pub yv: Array2<Complex<f64>>,
     pub mn: Array1<f64>,
-    pub interactions: Vec<Interaction<Self>>,
+    pub interactions: Vec<Box<dyn Interaction<Self> + Sync>>,
     pub epsilon: Array2<f64>,
 }
 
@@ -157,14 +157,14 @@ impl Model for LeptogenesisModel {
         &mut self.sm.particles
     }
 
-    fn particle_idx(name: &str, i: usize) -> Result<usize, (&str, usize)> {
-        StandardModel::particle_idx(name, i).or_else(|(name, i)| match (name, i) {
+    fn particle_idx<S: AsRef<str>>(name: S, i: usize) -> Result<usize, (S, usize)> {
+        StandardModel::particle_idx(name, i).or_else(|(name, i)| match (name.as_ref(), i) {
             ("N", i) if i < 3 => Ok(20 + i),
-            (name, i) => Err((name, i)),
+            (_, i) => Err((name, i)),
         })
     }
 
-    fn interactions(&self) -> &Vec<Interaction<Self>> {
+    fn interactions(&self) -> &Vec<Box<dyn Interaction<Self> + Sync>> {
         &self.interactions
     }
 }

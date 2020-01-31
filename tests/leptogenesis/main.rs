@@ -25,13 +25,14 @@ use std::fs::File;
 ///
 /// The model function is specified by `model`, and optionally a CSV writer can
 /// be given to record the progress of Boltzmann equations.
-pub fn solve<W>(
+pub fn solve<W, S>(
     mut builder: SolverBuilder<LeptogenesisModel>,
-    names: &[&str],
+    names: &[S],
     csv: Option<csv::Writer<W>>,
 ) -> Result<(Array1<f64>, Array1<f64>), Box<dyn std::error::Error>>
 where
     W: io::Write + 'static,
+    S: AsRef<str> + std::fmt::Display,
 {
     if let Some(mut csv) = csv {
         // If we have a CSV file to write to, track the number densities as they
@@ -41,7 +42,7 @@ where
         csv.write_field("step")?;
         csv.write_field("beta")?;
         for name in names {
-            csv.write_field((*name).to_string())?;
+            csv.write_field(format!("{}", name))?;
             csv.write_field(format!("Δ{}", name))?;
             csv.write_field(format!("({})", name))?;
         }
@@ -91,7 +92,7 @@ fn particle_indices() {
     let model = LeptogenesisModel::zero();
 
     for (i, p) in model.particles().iter().enumerate() {
-        let name = p.name;
+        let name = &p.name;
         if name.len() == 1 {
             assert_eq!(Ok(i), LeptogenesisModel::particle_idx(name, 0));
         } else if name.len() == 2 {
@@ -118,11 +119,16 @@ pub fn decay_only_1gen() -> Result<(), Box<dyn std::error::Error>> {
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
-    model.interactions.push(interaction::hln().remove(0));
+    model
+        .interactions
+        .extend(interaction::hln().drain(..3).map(|i| {
+            Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>
+                as Box<dyn Interaction<LeptogenesisModel> + Sync>
+        }));
 
     // Collect the names now as SolverBuilder takes ownership of the model
     // later.
-    let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
+    let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
 
     // Prevent any asymmetry from being generated in the N_i and H.
     let no_asymmetry: Vec<usize> = (0..3)
@@ -160,11 +166,15 @@ pub fn decay_only_3gen() -> Result<(), Box<dyn std::error::Error>> {
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
-    model.interactions.append(&mut interaction::hln());
+    model.interactions.extend(
+        interaction::hln()
+            .drain(..)
+            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+    );
 
     // Collect the names now as SolverBuilder takes ownership of the model
     // later.
-    let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
+    let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
 
     // Prevent any asymmetry from being generated in the N_i and H.
     let no_asymmetry: Vec<usize> = (0..3)
@@ -203,11 +213,15 @@ pub fn washout_only_1gen() -> Result<(), Box<dyn std::error::Error>> {
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
-    model.interactions.push(interaction::hhll1().remove(0));
+    model.interactions.extend(
+        interaction::hhll1()
+            .drain(..3)
+            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+    );
 
     // Collect the names now as SolverBuilder takes ownership of the model
     // later.
-    let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
+    let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
 
     // Prevent any asymmetry from being generated in the N_i and H.
     let no_asymmetry: Vec<usize> = (0..3)
@@ -248,12 +262,20 @@ pub fn decay_washout_1gen() -> Result<(), Box<dyn std::error::Error>> {
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
-    model.interactions.push(interaction::hln().remove(0));
-    model.interactions.push(interaction::hhll1().remove(0));
+    model.interactions.extend(
+        interaction::hln()
+            .drain(..3)
+            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+    );
+    model.interactions.extend(
+        interaction::hhll1()
+            .drain(..3)
+            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+    );
 
     // Collect the names now as SolverBuilder takes ownership of the model
     // later.
-    let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
+    let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
 
     let no_asymmetry: Vec<usize> = (0..3)
         .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
@@ -288,13 +310,25 @@ pub fn decay_washout_3gen() -> Result<(), Box<dyn std::error::Error>> {
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
-    model.interactions.append(&mut interaction::hln());
-    model.interactions.append(&mut interaction::hhll1());
-    model.interactions.append(&mut interaction::hhll2());
+    model.interactions.extend(
+        interaction::hln()
+            .drain(..)
+            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+    );
+    model.interactions.extend(
+        interaction::hhll1()
+            .drain(..)
+            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+    );
+    model.interactions.extend(
+        interaction::hhll2()
+            .drain(..)
+            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+    );
 
     // Collect the names now as SolverBuilder takes ownership of the model
     // later.
-    let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
+    let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
 
     let no_asymmetry: Vec<usize> = (0..3)
         .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
@@ -353,7 +387,7 @@ pub fn scan() -> Result<(), Box<dyn std::error::Error>> {
             .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
             .collect();
 
-        let names: Vec<_> = model.particles().iter().map(|p| p.name).collect();
+        let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
         let builder = SolverBuilder::new()
             .no_asymmetry(no_asymmetry)
             .model(model)
@@ -396,10 +430,26 @@ fn masses_widths() -> Result<(), Box<dyn std::error::Error>> {
     // common::setup_logging(2);
 
     let mut model = LeptogenesisModel::zero();
-    model.interactions.append(&mut interaction::hle());
-    model.interactions.append(&mut interaction::hln());
-    model.interactions.append(&mut interaction::hqu());
-    model.interactions.append(&mut interaction::hqd());
+    model.interactions.extend(
+        interaction::hle()
+            .drain(..)
+            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+    );
+    model.interactions.extend(
+        interaction::hln()
+            .drain(..)
+            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+    );
+    model.interactions.extend(
+        interaction::hqu()
+            .drain(..)
+            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+    );
+    model.interactions.extend(
+        interaction::hqd()
+            .drain(..)
+            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+    );
 
     // Create the CSV files
     let output_dir = common::output_dir("leptogenesis");
@@ -407,14 +457,14 @@ fn masses_widths() -> Result<(), Box<dyn std::error::Error>> {
     let mut widths = csv::Writer::from_path(output_dir.join("width.csv"))?;
     widths.write_field("beta")?;
     for p in model.particles() {
-        widths.write_field(p.name)?;
+        widths.write_field(&p.name)?;
     }
     widths.write_record(None::<&[u8]>)?;
 
     let mut masses = csv::Writer::from_path(output_dir.join("mass.csv"))?;
     masses.write_field("beta")?;
     for p in model.particles() {
-        masses.write_field(p.name)?;
+        masses.write_field(&p.name)?;
     }
     masses.write_record(None::<&[u8]>)?;
 
@@ -446,34 +496,51 @@ fn gammas() -> Result<(), Box<dyn std::error::Error>> {
 
     let beta = (1e-17, 1e-2);
     let mut model_precomp = LeptogenesisModel::zero();
-    model_precomp
-        .interactions
-        .push(interaction::hln().remove(0));
-    model_precomp
-        .interactions
-        .push(interaction::hhll1().remove(0));
-    model_precomp
-        .interactions
-        .push(interaction::hhll2().remove(0));
+    model_precomp.interactions.extend(
+        interaction::hln()
+            .drain(..3)
+            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+    );
+    model_precomp.interactions.extend(
+        interaction::hhll1()
+            .drain(..3)
+            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+    );
+    model_precomp.interactions.extend(
+        interaction::hhll2()
+            .drain(..3)
+            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+    );
 
     let mut model_no_precomp = LeptogenesisModel::zero();
-    model_no_precomp
-        .interactions
-        .push(interaction::hln().remove(0));
-    model_no_precomp
-        .interactions
-        .push(interaction::hhll1().remove(0));
-    model_no_precomp
-        .interactions
-        .push(interaction::hhll2().remove(0));
+    model_no_precomp.interactions.extend(
+        interaction::hln()
+            .drain(..3)
+            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+    );
+    model_no_precomp.interactions.extend(
+        interaction::hhll1()
+            .drain(..3)
+            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+    );
+    model_no_precomp.interactions.extend(
+        interaction::hhll2()
+            .drain(..3)
+            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+    );
 
     // Precompute gamma for model1 only
+    const N: u32 = 10;
     for (i, &beta) in vec![0.98 * beta.0, 0.99 * beta.0, 1.01 * beta.1, 1.02 * beta.1]
         .iter()
-        .chain(&rec_geomspace(1e-17, 1e-2, 10))
+        .chain(&rec_geomspace(1e-17, 1e-2, N))
         .enumerate()
     {
-        log::trace!("Precomputing at {} / {}", i, 2usize.pow(10) + 4);
+        if i % 64 == 0 {
+            log::debug!("Precomputing step {} / {}", i, 2usize.pow(N) + 4);
+        } else {
+            log::trace!("Precomputing step {} / {}", i, 2usize.pow(N) + 4);
+        }
 
         model_precomp.set_beta(beta);
         let c = model_precomp.as_context();
@@ -481,7 +548,6 @@ fn gammas() -> Result<(), Box<dyn std::error::Error>> {
         model_precomp
             .interactions()
             .par_iter()
-            .filter(|interaction| interaction.is_four_particle())
             .for_each(|interaction| {
                 interaction.gamma(&c);
             });
@@ -499,34 +565,32 @@ fn gammas() -> Result<(), Box<dyn std::error::Error>> {
     normalization_csv.serialize(("beta", "H", "n1", "normalization"))?;
 
     let mut csvs_precomp = Vec::new();
-    for (i, interaction) in model_precomp.interactions().iter().enumerate() {
+    for interaction in model_precomp.interactions() {
+        let particles = interaction.particles();
         let mut csv = csv::Writer::from_path({
             let mut path = output_dir_precomp.clone();
-            path.push(format!("{}.csv", i));
+            path.push(format!(
+                "{:?}:{:?}.csv",
+                particles.ingoing, particles.outgoing
+            ));
             path
         })?;
-        csv.write_field("beta")?;
-        log::warn!("{:?}", interaction.particles());
-        for p in interaction.particles() {
-            csv.write_field(format!("{:?}", p))?;
-        }
-        csv.write_record(None::<&[u8]>)?;
+        csv.serialize(("beta", "gamma"))?;
         csvs_precomp.push(RwLock::new(csv));
     }
 
     let mut csvs_no_precomp = Vec::new();
-    for (i, interaction) in model_no_precomp.interactions().iter().enumerate() {
+    for interaction in model_no_precomp.interactions() {
+        let particles = interaction.particles();
         let mut csv = csv::Writer::from_path({
             let mut path = output_dir_no_precomp.clone();
-            path.push(format!("{}.csv", i));
+            path.push(format!(
+                "{:?}:{:?}.csv",
+                particles.ingoing, particles.outgoing
+            ));
             path
         })?;
-        csv.write_field("beta")?;
-        log::warn!("{:?}", interaction.particles());
-        for p in interaction.particles() {
-            csv.write_field(format!("{:?}", p))?;
-        }
-        csv.write_record(None::<&[u8]>)?;
+        csv.serialize(("beta", "gamma"))?;
         csvs_no_precomp.push(RwLock::new(csv));
     }
 
@@ -548,9 +612,10 @@ fn gammas() -> Result<(), Box<dyn std::error::Error>> {
             .par_iter()
             .zip(&mut csvs_precomp)
             .for_each(|(interaction, csv)| {
-                let mut v = vec![beta];
-                v.append(&mut interaction.gamma(&c));
-                csv.write().unwrap().serialize(v).unwrap();
+                csv.write()
+                    .unwrap()
+                    .serialize((beta, interaction.gamma(&c)))
+                    .unwrap();
             });
 
         model_no_precomp
@@ -558,9 +623,10 @@ fn gammas() -> Result<(), Box<dyn std::error::Error>> {
             .par_iter()
             .zip(&mut csvs_no_precomp)
             .for_each(|(interaction, csv)| {
-                let mut v = vec![beta];
-                v.append(&mut interaction.gamma(&c));
-                csv.write().unwrap().serialize(v).unwrap();
+                csv.write()
+                    .unwrap()
+                    .serialize((beta, interaction.gamma(&c)))
+                    .unwrap();
             })
     }
 
