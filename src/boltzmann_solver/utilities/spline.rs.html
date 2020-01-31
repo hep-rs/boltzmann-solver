@@ -380,9 +380,17 @@
 <span id="380">380</span>
 <span id="381">381</span>
 <span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Cubic Hermite interpolation</span>
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f64</span>;
 
 <span class="doccomment">/// Cubic Hermite spline interpolator using a constant data array</span>
@@ -432,6 +440,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The `accurate` flag indicates whether the interval between the current point</span>
 <span class="doccomment">/// and the next point is deemed accurate.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
 <span class="kw">struct</span> <span class="ident">CubicHermiteSplinePoint</span> {
     <span class="ident">x</span>: <span class="ident">f64</span>,
     <span class="ident">y</span>: <span class="ident">f64</span>,
@@ -454,6 +464,8 @@
 }
 
 <span class="doccomment">/// Cubic Hermite spline interpolator</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CubicHermiteSpline</span> {
     <span class="comment">// `(x, y, m, accurate)` tuples through which the spline goes through, with</span>
     <span class="comment">// gradient `m`.  The accurate flag determines whether the interval between</span>

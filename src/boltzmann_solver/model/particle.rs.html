@@ -338,6 +338,9 @@
 <span id="338">338</span>
 <span id="339">339</span>
 <span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Basic implementation of a particle type</span>
 
@@ -345,6 +348,8 @@
     <span class="ident">model</span>::<span class="ident">data</span>,
     <span class="ident">statistic</span>::{<span class="ident">Statistic</span>, <span class="ident">Statistics</span>},
 };
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections</span>::<span class="ident">HashMap</span>, <span class="ident">f64</span>};
 
 <span class="doccomment">/// Particle type</span>
@@ -363,6 +368,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// In the long run, it is intended that this type be replaced by another one.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Particle</span> {
     <span class="comment">// The spin is stored as twice the spin, so a spin-½ particle has `spin ==</span>
     <span class="comment">// 1` and a spin-1 particle has `spin == 2`</span>
@@ -382,7 +388,7 @@
     <span class="comment">// Internal degrees of freedom of the particle</span>
     <span class="ident">dof</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// Name</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
+    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Particle</span> {
@@ -401,7 +407,7 @@
             <span class="ident">decays</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
             <span class="ident">complex</span>: <span class="bool-val">false</span>,
             <span class="ident">dof</span>: <span class="number">1.0</span>,
-            <span class="ident">name</span>: <span class="string">&quot;&quot;</span>,
+            <span class="ident">name</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
         }
     }
 
@@ -447,8 +453,8 @@
     }
 
     <span class="doccomment">/// Specify the particle&#39;s name</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
         <span class="self">self</span>
     }
 

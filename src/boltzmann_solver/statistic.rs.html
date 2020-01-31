@@ -582,6 +582,21 @@
 <span id="582">582</span>
 <span id="583">583</span>
 <span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! If the rate of collisions between particles is sufficiently high (as is</span>
 <span class="doccomment">//! usually the case), the phase space distribution of the particles will</span>
@@ -598,6 +613,8 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">constants</span>::<span class="ident">PI_N2</span>;
 <span class="kw">use</span> <span class="ident">quadrature</span>::<span class="ident">integrate</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">special_functions</span>::{<span class="ident">bessel</span>, <span class="ident">particle_statistics</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f64</span>;
 
@@ -613,6 +630,8 @@
 <span class="doccomment">/// The statistics which describe the distribution of particles over energy</span>
 <span class="doccomment">/// states.  Both Fermi–Dirac and Bose–Einstein quantum statistics are</span>
 <span class="doccomment">/// implemented, as well as the classical Maxwell–Boltzmann statistic.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Statistic</span> {
     <span class="doccomment">/// Fermi–Dirac statistic describing half-integer-spin particles:</span>
     <span class="doccomment">///</span>
@@ -638,6 +657,17 @@
     <span class="doccomment">///   f_{\textsc{MJ}} = \frac{E \beta \sqrt{E^2 - m^2}}{m K_2(m \beta)} \exp[- E \beta].</span>
     <span class="doccomment">/// \\end{equation}</span>
     <span class="ident">MaxwellJuttner</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Statistic</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="self">Self</span>::<span class="ident">FermiDirac</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Statistic::FermiDirac&quot;</span>),
+            <span class="self">Self</span>::<span class="ident">BoseEinstein</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Statistic::BoseEinstein&quot;</span>),
+            <span class="self">Self</span>::<span class="ident">MaxwellBoltzmann</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Statistic::MaxwellBoltzmann&quot;</span>),
+            <span class="self">Self</span>::<span class="ident">MaxwellJuttner</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Statistic::MaxwellJuttner&quot;</span>),
+        }
+    }
 }
 
 <span class="doccomment">/// Equilibrium statistics.</span>

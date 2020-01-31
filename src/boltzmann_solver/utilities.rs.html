@@ -289,6 +289,12 @@
 <span id="289">289</span>
 <span id="290">290</span>
 <span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Module of various useful miscellaneous functions.</span>
 
@@ -366,8 +372,14 @@
 <span class="doccomment">///   t_{\text{max}} &amp;= \frac{(m_1^2 - m_2^2 - m_3^3 + m_4^4)^2}{4 s}</span>
 <span class="doccomment">/// \\end{aligned}\\end{equation}</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">t_range</span>(<span class="ident">s</span>: <span class="ident">f64</span>, <span class="ident">m1</span>: <span class="ident">f64</span>, <span class="ident">m2</span>: <span class="ident">f64</span>, <span class="ident">m3</span>: <span class="ident">f64</span>, <span class="ident">m4</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>) {
-    <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">s</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">m1</span> <span class="op">+</span> <span class="ident">m2</span>, <span class="string">&quot;s must be greater than m1^2 + m2^2.&quot;</span>);
-    <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">s</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">m3</span> <span class="op">+</span> <span class="ident">m4</span>, <span class="string">&quot;s must be greater than m3^2 + m4^2.&quot;</span>);
+    <span class="macro">debug_assert</span><span class="macro">!</span>(
+        <span class="ident">s</span> <span class="op">*</span> (<span class="number">1.0</span> <span class="op">+</span> <span class="number">5.0</span> <span class="op">*</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">EPSILON</span>) <span class="op">&gt;</span><span class="op">=</span> <span class="ident">m1</span> <span class="op">+</span> <span class="ident">m2</span>,
+        <span class="string">&quot;s cannot be smaller than (m1² + m2²).&quot;</span>
+    );
+    <span class="macro">debug_assert</span><span class="macro">!</span>(
+        <span class="ident">s</span> <span class="op">*</span> (<span class="number">1.0</span> <span class="op">+</span> <span class="number">5.0</span> <span class="op">*</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">EPSILON</span>) <span class="op">&gt;</span><span class="op">=</span> <span class="ident">m3</span> <span class="op">+</span> <span class="ident">m4</span>,
+        <span class="string">&quot;s cannot be smaller than (m3² + m4²).&quot;</span>
+    );
 
     <span class="kw">if</span> <span class="ident">s</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
         <span class="kw">return</span> (<span class="number">0.0</span>, <span class="number">0.0</span>);
@@ -407,7 +419,7 @@
 
     <span class="kw">let</span> <span class="ident">s_min</span> <span class="op">=</span> (<span class="ident">m1</span> <span class="op">+</span> <span class="ident">m2</span>).<span class="ident">max</span>(<span class="ident">m3</span> <span class="op">+</span> <span class="ident">m4</span>);
     <span class="kw">let</span> <span class="ident">s_med</span> <span class="op">=</span> <span class="number">10.0</span> <span class="op">*</span> <span class="ident">s_min</span>;
-    <span class="kw">let</span> <span class="ident">s_max</span> <span class="op">=</span> <span class="number">8328.95</span> <span class="op">/</span> <span class="ident">beta</span>.<span class="ident">powi</span>(<span class="number">2</span>);
+    <span class="kw">let</span> <span class="ident">s_max</span> <span class="op">=</span> (<span class="number">8328.95</span> <span class="op">/</span> <span class="ident">beta</span>.<span class="ident">powi</span>(<span class="number">2</span>)).<span class="ident">max</span>(<span class="number">10.0</span> <span class="op">*</span> <span class="ident">s_med</span>);
 
     <span class="kw">let</span> <span class="ident">s_integrand_0</span> <span class="op">=</span> <span class="op">|</span><span class="ident">s</span>: <span class="ident">f64</span><span class="op">|</span> {
         <span class="comment">// Combination of factors constant w.r.t. t</span>
