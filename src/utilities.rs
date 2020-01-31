@@ -74,8 +74,14 @@ pub fn kallen_lambda_sqrt(a: f64, b: f64, c: f64) -> f64 {
 ///   t_{\text{max}} &= \frac{(m_1^2 - m_2^2 - m_3^3 + m_4^4)^2}{4 s}
 /// \\end{aligned}\\end{equation}
 pub fn t_range(s: f64, m1: f64, m2: f64, m3: f64, m4: f64) -> (f64, f64) {
-    debug_assert!(s >= m1 + m2, "s cannot be smaller than (m1² + m2²).");
-    debug_assert!(s >= m3 + m4, "s cannot be smaller than (m3² + m4²).");
+    debug_assert!(
+        s * (1.0 + 5.0 * std::f64::EPSILON) >= m1 + m2,
+        "s cannot be smaller than (m1² + m2²)."
+    );
+    debug_assert!(
+        s * (1.0 + 5.0 * std::f64::EPSILON) >= m3 + m4,
+        "s cannot be smaller than (m3² + m4²)."
+    );
 
     if s == 0.0 {
         return (0.0, 0.0);
@@ -115,7 +121,7 @@ where
 
     let s_min = (m1 + m2).max(m3 + m4);
     let s_med = 10.0 * s_min;
-    let s_max = 8328.95 / beta.powi(2);
+    let s_max = (8328.95 / beta.powi(2)).max(10.0 * s_med);
 
     let s_integrand_0 = |s: f64| {
         // Combination of factors constant w.r.t. t
