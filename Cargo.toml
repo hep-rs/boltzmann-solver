@@ -22,8 +22,9 @@ itertools = "0.8.0"
 num = "0.2.0"
 
 [features]
-default = []
+default = ["serialization"]
 nightly = []
+serialization = ["serde", "ndarray/serde"]
 
 [profile.test]
 opt-level = 1
