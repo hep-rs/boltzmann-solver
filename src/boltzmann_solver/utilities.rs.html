@@ -295,6 +295,7 @@
 <span id="295">295</span>
 <span id="296">296</span>
 <span id="297">297</span>
+<span id="298">298</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Module of various useful miscellaneous functions.</span>
 
@@ -308,6 +309,7 @@
 <span class="kw">use</span> <span class="ident">num_complex</span>::<span class="ident">Complex</span>;
 <span class="kw">use</span> <span class="ident">quadrature</span>::{<span class="ident">clenshaw_curtis</span>, <span class="ident">double_exponential</span>};
 <span class="kw">use</span> <span class="ident">special_functions</span>::<span class="ident">bessel</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f64</span>;
 
 <span class="kw">const</span> <span class="ident">INTEGRATION_PRECISION</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">1e-10</span>;
 
@@ -373,11 +375,11 @@
 <span class="doccomment">/// \\end{aligned}\\end{equation}</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">t_range</span>(<span class="ident">s</span>: <span class="ident">f64</span>, <span class="ident">m1</span>: <span class="ident">f64</span>, <span class="ident">m2</span>: <span class="ident">f64</span>, <span class="ident">m3</span>: <span class="ident">f64</span>, <span class="ident">m4</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>) {
     <span class="macro">debug_assert</span><span class="macro">!</span>(
-        <span class="ident">s</span> <span class="op">*</span> (<span class="number">1.0</span> <span class="op">+</span> <span class="number">5.0</span> <span class="op">*</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">EPSILON</span>) <span class="op">&gt;</span><span class="op">=</span> <span class="ident">m1</span> <span class="op">+</span> <span class="ident">m2</span>,
+        <span class="ident">s</span> <span class="op">*</span> (<span class="number">1.0</span> <span class="op">+</span> <span class="number">5.0</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">EPSILON</span>) <span class="op">&gt;</span><span class="op">=</span> <span class="ident">m1</span> <span class="op">+</span> <span class="ident">m2</span>,
         <span class="string">&quot;s cannot be smaller than (m1² + m2²).&quot;</span>
     );
     <span class="macro">debug_assert</span><span class="macro">!</span>(
-        <span class="ident">s</span> <span class="op">*</span> (<span class="number">1.0</span> <span class="op">+</span> <span class="number">5.0</span> <span class="op">*</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">EPSILON</span>) <span class="op">&gt;</span><span class="op">=</span> <span class="ident">m3</span> <span class="op">+</span> <span class="ident">m4</span>,
+        <span class="ident">s</span> <span class="op">*</span> (<span class="number">1.0</span> <span class="op">+</span> <span class="number">5.0</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">EPSILON</span>) <span class="op">&gt;</span><span class="op">=</span> <span class="ident">m3</span> <span class="op">+</span> <span class="ident">m4</span>,
         <span class="string">&quot;s cannot be smaller than (m3² + m4²).&quot;</span>
     );
 
