@@ -10,6 +10,7 @@ use crate::{
     utilities::kallen_lambda_sqrt,
 };
 use special_functions::bessel;
+use std::fmt;
 
 /// Three particle interaction, all determined from the underlying squared amplitude.
 pub struct ThreeParticle<M> {
@@ -20,9 +21,14 @@ pub struct ThreeParticle<M> {
     squared_amplitude: Box<dyn Fn(&M) -> f64 + Sync>,
     /// Asymmetry between the amplitude and its \\(\mathcal{CP}\\) conjugate.
     asymmetry: Option<Box<dyn Fn(&M) -> f64 + Sync>>,
+    gamma_enabled: bool,
+    width_enabled: bool,
 }
 
-impl<M: Model> ThreeParticle<M> {
+impl<M> ThreeParticle<M>
+where
+    M: Model,
+{
     /// Create a new three-particle interaction.
     ///
     /// The order in which the interaction takes place is determined by the
@@ -39,7 +45,7 @@ impl<M: Model> ThreeParticle<M> {
         F: Fn(&M) -> f64 + Sync + 'static,
     {
         let particles = InteractionParticles {
-            ingoing: vec![p1],
+            incoming: vec![p1],
             outgoing: vec![p2, p3],
         };
         let particles_idx = particles.as_idx();
@@ -51,6 +57,8 @@ impl<M: Model> ThreeParticle<M> {
             particles_sign,
             squared_amplitude: Box::new(squared_amplitude),
             asymmetry: None,
+            width_enabled: true,
+            gamma_enabled: true,
         }
     }
 
@@ -65,24 +73,43 @@ impl<M: Model> ThreeParticle<M> {
     where
         F: Fn(&M) -> f64 + Sync + Copy + 'static,
     {
-        vec![
-            Self::new(squared_amplitude, p1, p2, p3),
-            Self::new(squared_amplitude, -p2, -p1, p3),
-            Self::new(squared_amplitude, -p3, -p1, p2),
-        ]
+        let mut v = vec![Self::new(squared_amplitude, p1, p2, p3)];
+
+        // Avoid doubling up interactions if they have the same particles
+        if p1 != -p2 {
+            v.push(Self::new(squared_amplitude, -p2, -p1, p3));
+        }
+        if p2 != p3 {
+            v.push(Self::new(squared_amplitude, -p3, -p1, p2));
+        }
+
+        v
     }
 
-    pub fn asymmetry<F>(mut self, asymmetry: F) -> Self
+    /// Specify the asymmetry between this process and its CP-conjugate.
+    pub fn set_asymmetry<F>(mut self, asymmetry: F) -> Self
     where
         F: Fn(&M) -> f64 + Sync + 'static,
     {
         self.asymmetry = Some(Box::new(asymmetry));
         self
     }
+
+    /// Adjust whether this interaction will calculate decay widths.
+    pub fn enable_width(mut self, v: bool) -> Self {
+        self.width_enabled = v;
+        self
+    }
+
+    /// Adjust whether this interaction will calculate decay widths.
+    pub fn enable_gamma(mut self, v: bool) -> Self {
+        self.gamma_enabled = v;
+        self
+    }
 }
 
-impl<M> std::fmt::Debug for ThreeParticle<M> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl<M> fmt::Debug for ThreeParticle<M> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if self.asymmetry.is_some() {
             write!(
                 f,
@@ -111,7 +138,10 @@ impl<M> std::fmt::Debug for ThreeParticle<M> {
     }
 }
 
-impl<M: Model> Interaction<M> for ThreeParticle<M> {
+impl<M> Interaction<M> for ThreeParticle<M>
+where
+    M: Model,
+{
     fn particles(&self) -> &InteractionParticles {
         &self.particles
     }
@@ -124,11 +154,19 @@ impl<M: Model> Interaction<M> for ThreeParticle<M> {
         &self.particles_sign
     }
 
+    fn width_enabled(&self) -> bool {
+        self.width_enabled
+    }
+
     fn width(&self, c: &Context<M>) -> Option<PartialWidth> {
+        if !self.width_enabled {
+            return None;
+        }
+
         let ptcl = c.model.particles();
 
         // Get the *squared* masses
-        let m0 = ptcl[self.particles_idx.ingoing[0]].mass2;
+        let m0 = ptcl[self.particles_idx.incoming[0]].mass2;
         let m1 = ptcl[self.particles_idx.outgoing[0]].mass2;
         let m2 = ptcl[self.particles_idx.outgoing[1]].mass2;
 
@@ -141,12 +179,16 @@ impl<M: Model> Interaction<M> for ThreeParticle<M> {
 
             Some(PartialWidth {
                 width,
-                parent: self.particles.ingoing[0],
+                parent: self.particles.incoming[0],
                 daughters: self.particles.outgoing.clone(),
             })
         } else {
             None
         }
+    }
+
+    fn gamma_enabled(&self) -> bool {
+        self.gamma_enabled
     }
 
     /// Note that for three particle interactions, this does *not* return the
@@ -155,11 +197,15 @@ impl<M: Model> Interaction<M> for ThreeParticle<M> {
     ///
     /// The reason for this is that it prevents the computation of \\(\gamma / n
     /// \\) which becomes numerically unstable when \\(n\\) becomes very small.
-    fn gamma(&self, c: &Context<M>) -> f64 {
+    fn gamma(&self, c: &Context<M>) -> Option<f64> {
+        if !self.gamma_enabled {
+            return None;
+        }
+
         let ptcl = c.model.particles();
 
         // Get the masses
-        let m0 = ptcl[self.particles_idx.ingoing[0]].mass;
+        let m0 = ptcl[self.particles_idx.incoming[0]].mass;
         let m1 = ptcl[self.particles_idx.outgoing[0]].mass;
         let m2 = ptcl[self.particles_idx.outgoing[1]].mass;
 
@@ -167,7 +213,7 @@ impl<M: Model> Interaction<M> for ThreeParticle<M> {
         //
         // TODO: What happens when the decaying particle's mass is not
         // greater than the sum of the masses of the daughter particles?
-        if m0 < m1 || m0 < m2 {
+        let gamma = if m0 < m1 || m0 < m2 {
             0.0
         } else {
             // 0.002_423_011_225_182_300_4 = ζ(3) / 16 π³
@@ -177,23 +223,27 @@ impl<M: Model> Interaction<M> for ThreeParticle<M> {
                 / c.beta.powi(3)
                 / m0
                 * c.normalization
-        }
+        };
+
+        Some(gamma)
     }
 
-    /// Override the default implementation of calculate_rate to make use of the
+    fn asymmetry(&self, c: &Context<M>) -> Option<f64> {
+        self.asymmetry.as_ref().map(|a| a(c.model))
+    }
+
+    /// Override the default implementation of [`rate`] to make use of the
     /// adjusted reaction rate density.
-    fn calculate_rate(&self, gamma_tilde: f64, c: &Context<M>) -> RateDensity {
-        if gamma_tilde == 0.0 {
-            return RateDensity {
-                forward: 0.0,
-                backward: 0.0,
-                asymmetric_forward: 0.0,
-                asymmetric_backward: 0.0,
-            };
+    fn rate(&self, gamma_tilde: Option<f64>, c: &Context<M>) -> Option<RateDensity> {
+        // If there's no interaction rate or it is 0 to begin with, there's no
+        // need to adjust it to the particles' number densities.
+        if gamma_tilde.map_or(true, |gamma| gamma == 0.0) {
+            return None;
         }
+        let gamma_tilde = gamma_tilde.unwrap();
 
         // Get the masses
-        let p0 = self.particles_idx.ingoing[0];
+        let p0 = self.particles_idx.incoming[0];
         let p1 = self.particles_idx.outgoing[0];
         let p2 = self.particles_idx.outgoing[1];
 
@@ -203,7 +253,7 @@ impl<M: Model> Interaction<M> for ThreeParticle<M> {
 
         let particles_sign = self.particles_sign();
 
-        let asymmetric_forward = gamma_tilde * particles_sign.ingoing[0] * c.na[p0];
+        let asymmetric_forward = gamma_tilde * particles_sign.incoming[0] * c.na[p0];
         let asymmetric_backward = gamma_tilde
             * c.eq[p0]
             * nan_to_zero(
@@ -216,12 +266,12 @@ impl<M: Model> Interaction<M> for ThreeParticle<M> {
                     / (c.eq[p1] * c.eq[p2]),
             );
 
-        RateDensity {
+        Some(RateDensity {
             forward,
             backward,
             asymmetric_forward,
             asymmetric_backward,
-        }
+        })
     }
 }
 

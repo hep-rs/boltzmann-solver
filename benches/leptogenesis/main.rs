@@ -16,7 +16,9 @@ use test::{black_box, Bencher};
 pub fn decay_only_1gen(b: &mut Bencher) {
     b.iter(|| {
         let mut model = LeptogenesisModel::zero();
-        model.interactions.push(interaction::hln().remove(0));
+        model
+            .interactions
+            .push(Box::new(interaction::hln().remove(0)));
         let no_asymmetry: Vec<usize> = (0..3)
             .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
             .collect();
@@ -36,7 +38,11 @@ pub fn decay_only_1gen(b: &mut Bencher) {
 pub fn decay_only_3gen(b: &mut Bencher) {
     b.iter(|| {
         let mut model = LeptogenesisModel::zero();
-        model.interactions.append(&mut interaction::hln());
+        model.interactions.extend(
+            interaction::hln()
+                .drain(..)
+                .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+        );
         let no_asymmetry: Vec<usize> = (0..3)
             .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
             .collect();

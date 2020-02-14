@@ -1,8 +1,8 @@
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::convert::TryFrom;
+use std::{convert::TryFrom, fmt};
 
-/// Partial width from a particle.
+/// Partial width associated with a single specific interaction.
 #[derive(Debug)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct PartialWidth {
@@ -30,8 +30,8 @@ impl PartialWidth {
     }
 }
 
-impl std::fmt::Display for PartialWidth {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for PartialWidth {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "PartialWidth {{ width: {:e}, parent: {}, daughters: {:?} }}",

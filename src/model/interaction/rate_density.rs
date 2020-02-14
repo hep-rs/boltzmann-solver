@@ -1,5 +1,6 @@
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+use std::{fmt, ops};
 
 /// Partial width from a particle.
 #[derive(Debug)]
@@ -27,8 +28,8 @@ impl RateDensity {
     }
 }
 
-impl std::fmt::Display for RateDensity {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for RateDensity {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "RateDensity {{ forward: {:e}, backward: {:e}, ... }}",
@@ -37,7 +38,7 @@ impl std::fmt::Display for RateDensity {
     }
 }
 
-impl std::ops::Mul<f64> for RateDensity {
+impl ops::Mul<f64> for RateDensity {
     type Output = Self;
 
     fn mul(self, rhs: f64) -> Self {
@@ -50,7 +51,7 @@ impl std::ops::Mul<f64> for RateDensity {
     }
 }
 
-impl std::ops::MulAssign<f64> for RateDensity {
+impl ops::MulAssign<f64> for RateDensity {
     fn mul_assign(&mut self, rhs: f64) {
         self.forward *= rhs;
         self.backward *= rhs;

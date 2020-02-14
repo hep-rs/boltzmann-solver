@@ -39,7 +39,7 @@ pub mod rk98;
 mod tests {
     use crate::utilities::test::*;
     use ndarray::{array, prelude::*};
-    use std::f64::consts::PI;
+    use std::{f64::consts::PI, mem, ptr};
 
     const TWO_PI: f64 = 2.0 * PI;
 
@@ -67,9 +67,9 @@ mod tests {
                 let mut dy_err;
                 let mut k: [Array1<f64>; RK_S];
                 unsafe {
-                    k = std::mem::MaybeUninit::uninit().assume_init();
+                    k = mem::MaybeUninit::uninit().assume_init();
                     for ki in &mut k[..] {
-                        std::ptr::write(ki, Array1::zeros(y.dim()));
+                        ptr::write(ki, Array1::zeros(y.dim()));
                     }
                 };
 

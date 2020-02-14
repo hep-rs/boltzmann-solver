@@ -21,7 +21,10 @@ pub struct LeptogenesisModel {
     pub sm: StandardModel,
     pub yv: Array2<Complex<f64>>,
     pub mn: Array1<f64>,
+    #[cfg(feature = "parallel")]
     pub interactions: Vec<Box<dyn Interaction<Self> + Sync>>,
+    #[cfg(not(feature = "parallel"))]
+    pub interactions: Vec<Box<dyn Interaction<Self>>>,
     pub epsilon: Array2<f64>,
 }
 
@@ -114,7 +117,7 @@ impl Model for LeptogenesisModel {
         let lambda = 0.0 * self.sm.lambda / 4.0;
 
         self.particle_mut("H", 0).set_mass(
-            std::f64::consts::SQRT_2
+            f64::consts::SQRT_2
                 * f64::sqrt(
                     g1 / 4.0
                         + (3.0 / 4.0) * g2
@@ -163,8 +166,24 @@ impl Model for LeptogenesisModel {
             (_, i) => Err((name, i)),
         })
     }
+}
 
-    fn interactions(&self) -> &Vec<Box<dyn Interaction<Self> + Sync>> {
+#[cfg(not(feature = "parallel"))]
+impl ModelInteractions for LeptogenesisModel {
+    // type Iter = &Vec<Self::Item>;
+    type Item = Box<dyn Interaction<Self>>;
+
+    fn interactions(&self) -> &[Self::Item] {
+        &self.interactions
+    }
+}
+
+#[cfg(feature = "parallel")]
+impl ModelInteractions for LeptogenesisModel {
+    // type Iter = &'data Vec<Self::Item>;
+    type Item = Box<dyn Interaction<Self> + Sync>;
+
+    fn interactions(&self) -> &[Self::Item] {
         &self.interactions
     }
 }

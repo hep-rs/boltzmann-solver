@@ -26,7 +26,7 @@ pub const ZETA_3: f64 = 1.202_056_903_159_594_2;
 pub const EULER_GAMMA: f64 = 0.577_215_664_901_532_9;
 
 /// \\(\pi\\)
-pub const PI: f64 = ::std::f64::consts::PI;
+pub const PI: f64 = std::f64::consts::PI;
 /// \\(\pi\\) [named to follow the convention `PI_n`]
 pub const PI_1: f64 = PI;
 /// \\(\pi^2\\)

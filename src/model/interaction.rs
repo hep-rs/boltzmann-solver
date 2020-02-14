@@ -1,3 +1,5 @@
+//! Common trait and implementations for interactions.
+
 mod four_particle;
 mod partial_width;
 mod rate_density;
@@ -20,7 +22,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct InteractionParticles {
-    pub ingoing: Vec<isize>,
+    /// Initial state particles
+    pub incoming: Vec<isize>,
+    /// Final state particles
     pub outgoing: Vec<isize>,
 }
 
@@ -29,7 +33,7 @@ impl InteractionParticles {
     /// index the model's particle.
     pub fn as_idx(&self) -> InteractionParticleIndices {
         InteractionParticleIndices {
-            ingoing: self.ingoing.iter().map(|p| p.abs() as usize).collect(),
+            incoming: self.incoming.iter().map(|p| p.abs() as usize).collect(),
             outgoing: self.outgoing.iter().map(|p| p.abs() as usize).collect(),
         }
     }
@@ -40,7 +44,7 @@ impl InteractionParticles {
     /// sign the change really ought to be.
     pub fn as_sign(&self) -> InteractionParticleSigns {
         InteractionParticleSigns {
-            ingoing: self.ingoing.iter().map(|p| p.signum() as f64).collect(),
+            incoming: self.incoming.iter().map(|p| p.signum() as f64).collect(),
             outgoing: self.outgoing.iter().map(|p| p.signum() as f64).collect(),
         }
     }
@@ -53,7 +57,9 @@ impl InteractionParticles {
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct InteractionParticleIndices {
-    pub ingoing: Vec<usize>,
+    /// Initial state particles
+    pub incoming: Vec<usize>,
+    /// Final state particles
     pub outgoing: Vec<usize>,
 }
 
@@ -64,12 +70,17 @@ pub struct InteractionParticleIndices {
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct InteractionParticleSigns {
-    pub ingoing: Vec<f64>,
+    /// Initial state particles
+    pub incoming: Vec<f64>,
+    /// Final state particles
     pub outgoing: Vec<f64>,
 }
 
 /// Generic interaction between particles.
-pub trait Interaction<M: Model> {
+pub trait Interaction<M>
+where
+    M: Model,
+{
     /// Return the particles involved in this interaction
     fn particles(&self) -> &InteractionParticles;
 
@@ -81,35 +92,53 @@ pub trait Interaction<M: Model> {
     /// antiparticle.
     fn particles_sign(&self) -> &InteractionParticleSigns;
 
+    /// Whether this interaction is to be used to determine decays.
+    ///
+    /// If width calcuilations are disable, then [`width`] is expected to return
+    /// `None` all the time.  If it is enabled, then [`width`] is expected to
+    /// return `None` only when the decay is not kinematically allowed.
+    fn width_enabled(&self) -> bool;
+
     /// Calculate the decay width associated with a particular interaction.
     ///
     /// There may not be a result if the decay is not kinematically allowed, or
     /// not relevant.
     ///
     /// The default implementation simply returns `None` and must be implemented
-    /// manually.
+    /// manually.  Care must be taken to obey [`width_enabled`] in order to
+    /// avoid unnecessary computation (though the incorrect implementation will
+    /// not be detrimental other than in performance).
     fn width(&self, _: &Context<M>) -> Option<PartialWidth> {
         None
     }
 
-    /// Calculate the reaction rate density.
+    /// Whether this interaction is to be used within the Boltzmann equations.
     ///
-    /// This is returned as a vector for each possible configuration.
-    fn gamma(&self, c: &Context<M>) -> f64;
+    /// If this returns true, then [`gamma`] is expected to return `None`.
+    fn gamma_enabled(&self) -> bool;
+
+    /// Calculate the reaction rate density of this interaction.
+    ///
+    /// Care must be taken to obey [`gamma_enabled`] in order to avoid
+    /// computation.
+    fn gamma(&self, c: &Context<M>) -> Option<f64>;
+
+    /// Asymmetry
+    ///
+    /// TODO: Document better
+    fn asymmetry(&self, _c: &Context<M>) -> Option<f64> {
+        None
+    }
 
     /// Calculate the interaction rates density from the interaction rate
     /// density by taking into account the number densities prefactors.
-    fn calculate_rate(&self, gamma: f64, c: &Context<M>) -> RateDensity {
-        // If the interaction rate is 0 to begin with, there's no need to adjust
-        // it to the particles' number densities.
-        if gamma == 0.0 {
-            return RateDensity {
-                forward: 0.0,
-                backward: 0.0,
-                asymmetric_forward: 0.0,
-                asymmetric_backward: 0.0,
-            };
+    fn rate(&self, gamma: Option<f64>, c: &Context<M>) -> Option<RateDensity> {
+        // If there's no interaction rate or it is 0 to begin with, there's no
+        // need to adjust it to the particles' number densities.
+        if gamma.map_or(true, |gamma| gamma == 0.0) {
+            return None;
         }
+        let gamma = gamma.unwrap();
 
         let particles_idx = self.particles_idx();
         let particles_sign = self.particles_sign();
@@ -118,7 +147,7 @@ pub trait Interaction<M: Model> {
         // value ought to be 0.
         let forward = nan_to_zero(
             particles_idx
-                .ingoing
+                .incoming
                 .iter()
                 .map(|&p| c.n[p] / c.eq[p])
                 .product(),
@@ -133,9 +162,9 @@ pub trait Interaction<M: Model> {
         let asymmetric_forward = forward
             - nan_to_zero(
                 particles_idx
-                    .ingoing
+                    .incoming
                     .iter()
-                    .zip(&particles_sign.ingoing)
+                    .zip(&particles_sign.incoming)
                     .map(|(&p, &a)| (c.n[p] - a * c.na[p]) / c.eq[p])
                     .product(),
             );
@@ -156,12 +185,18 @@ pub trait Interaction<M: Model> {
             asymmetric_backward,
         };
         rate *= gamma;
-        rate
+        Some(rate)
     }
 
     /// Adjust the backward and forward rates such that they do not
     /// overshoot the equilibrium number densities.
-    fn adjust_rate_overshoot(&self, mut rate: RateDensity, c: &Context<M>) -> RateDensity {
+    fn adjust_rate_overshoot(
+        &self,
+        rate: Option<RateDensity>,
+        c: &Context<M>,
+    ) -> Option<RateDensity> {
+        let mut rate = rate?;
+
         // If an overshoot of the interaction rate is detected, the rate is
         // adjusted such that `dn` satisfies:
         //
@@ -183,7 +218,7 @@ pub trait Interaction<M: Model> {
         let mut net_asymmetric_rate = rate.net_asymmetric_rate();
 
         if net_rate != 0.0 || net_asymmetric_rate != 0.0 {
-            for (&p, a) in particles_idx.ingoing.iter().zip(&particles_sign.ingoing) {
+            for (&p, a) in particles_idx.incoming.iter().zip(&particles_sign.incoming) {
                 if overshoots(c, p, -net_rate) {
                     rate.forward = (c.n[p] - c.eq[p]) / ALPHA_N + rate.backward;
                     net_rate = rate.net_rate();
@@ -204,10 +239,11 @@ pub trait Interaction<M: Model> {
                 }
             }
         }
-        rate
+
+        Some(rate)
     }
 
-    /// Add this interaction to the `dn` array.
+    /// Add this interaction to the `dn` and `dna` array.
     ///
     /// The changes in `dn` should contain only the effect from the integrated
     /// collision operator and not take into account the normalization to
@@ -215,34 +251,37 @@ pub trait Interaction<M: Model> {
     /// the Universe.  These factors are handled separately and automatically.
     ///
     /// This function automatically adjusts the rate calculated by
-    /// [`Interaction::calculate_rate`] so that overshooting is avoided.
-    fn change(
-        &self,
-        mut dn: Array1<f64>,
-        mut dna: Array1<f64>,
-        c: &Context<M>,
-    ) -> (Array1<f64>, Array1<f64>) {
-        let rate = self.adjust_rate_overshoot(self.calculate_rate(self.gamma(c), c), c);
-        let particles = self.particles();
+    /// [`Interaction::rate`] so that overshooting is avoided.
+    fn change(&self, dn: &mut Array1<f64>, dna: &mut Array1<f64>, c: &Context<M>) {
+        let rate = self.adjust_rate_overshoot(self.rate(self.gamma(c), c), c);
+
+        if rate.is_none() {
+            return;
+        }
+        let rate = rate.unwrap();
+
         let particles_idx = self.particles_idx();
         let particles_sign = self.particles_sign();
 
         let net_rate = rate.net_rate();
         let net_asymmetric_rate = rate.net_asymmetric_rate();
-        log::trace!(
-            "γ({:?} ↔ {:?}) = {:<10.3e}",
-            particles.ingoing,
-            particles.outgoing,
-            net_rate
-        );
-        log::trace!(
-            "γ'({:?} ↔ {:?}) = {:<10.3e}",
-            particles.ingoing,
-            particles.outgoing,
-            net_asymmetric_rate
-        );
 
-        for (&p, a) in particles_idx.ingoing.iter().zip(&particles_sign.ingoing) {
+        // DEBUG
+        // let particles = self.particles();
+        // log::trace!(
+        //     "γ({:?} ↔ {:?}) = {:<10.3e}",
+        //     particles.incoming,
+        //     particles.outgoing,
+        //     net_rate
+        // );
+        // log::trace!(
+        //     "γ'({:?} ↔ {:?}) = {:<10.3e}",
+        //     particles.incoming,
+        //     particles.outgoing,
+        //     net_asymmetric_rate
+        // );
+
+        for (&p, a) in particles_idx.incoming.iter().zip(&particles_sign.incoming) {
             dn[p] -= net_rate;
             dna[p] -= a * net_asymmetric_rate;
         }
@@ -251,19 +290,24 @@ pub trait Interaction<M: Model> {
             dna[p] += a * net_asymmetric_rate;
         }
 
-        (dn, dna)
+        if let Some(asymmetry) = self.asymmetry(c) {
+            let source = net_rate * asymmetry;
+            for (&p, a) in particles_idx.outgoing.iter().zip(&particles_sign.outgoing) {
+                dna[p] += a * source;
+            }
+        }
     }
 }
 
 /// Check whether particle `i` from the model with the given rate change will
 /// overshoot equilibrium.
-pub fn overshoots<M: Model>(c: &Context<M>, i: usize, rate: f64) -> bool {
+pub fn overshoots<M>(c: &Context<M>, i: usize, rate: f64) -> bool {
     (c.n[i] > c.eq[i] && c.n[i] + rate < c.eq[i]) || (c.n[i] < c.eq[i] && c.n[i] + rate > c.eq[i])
 }
 
 /// Check whether particle asymmetry `i` from the model with the given rate
 /// change will overshoot 0.
-pub fn asymmetry_overshoots<M: Model>(c: &Context<M>, i: usize, rate: f64) -> bool {
+pub fn asymmetry_overshoots<M>(c: &Context<M>, i: usize, rate: f64) -> bool {
     (c.na[i] > 0.0 && c.na[i] + rate < 0.0) || (c.na[i] < 0.0 && c.na[i] + rate > 0.0)
 }
 
@@ -273,5 +317,105 @@ fn nan_to_zero(v: f64) -> f64 {
         0.0
     } else {
         v
+    }
+}
+
+impl<I: ?Sized, M> Interaction<M> for &I
+where
+    I: Interaction<M>,
+    M: Model,
+{
+    fn particles(&self) -> &InteractionParticles {
+        (*self).particles()
+    }
+
+    fn particles_idx(&self) -> &InteractionParticleIndices {
+        (*self).particles_idx()
+    }
+
+    fn particles_sign(&self) -> &InteractionParticleSigns {
+        (*self).particles_sign()
+    }
+
+    fn width_enabled(&self) -> bool {
+        (*self).width_enabled()
+    }
+
+    fn width(&self, c: &Context<M>) -> Option<PartialWidth> {
+        (*self).width(c)
+    }
+
+    fn gamma_enabled(&self) -> bool {
+        (*self).gamma_enabled()
+    }
+
+    fn gamma(&self, c: &Context<M>) -> Option<f64> {
+        (*self).gamma(c)
+    }
+
+    fn rate(&self, gamma: Option<f64>, c: &Context<M>) -> Option<RateDensity> {
+        (*self).rate(gamma, c)
+    }
+
+    fn adjust_rate_overshoot(
+        &self,
+        rate: Option<RateDensity>,
+        c: &Context<M>,
+    ) -> Option<RateDensity> {
+        (*self).adjust_rate_overshoot(rate, c)
+    }
+
+    fn change(&self, dn: &mut Array1<f64>, dna: &mut Array1<f64>, c: &Context<M>) {
+        (*self).change(dn, dna, c)
+    }
+}
+
+impl<I: ?Sized, M> Interaction<M> for Box<I>
+where
+    I: Interaction<M>,
+    M: Model,
+{
+    fn particles(&self) -> &InteractionParticles {
+        self.as_ref().particles()
+    }
+
+    fn particles_idx(&self) -> &InteractionParticleIndices {
+        self.as_ref().particles_idx()
+    }
+
+    fn particles_sign(&self) -> &InteractionParticleSigns {
+        self.as_ref().particles_sign()
+    }
+
+    fn width_enabled(&self) -> bool {
+        self.as_ref().width_enabled()
+    }
+
+    fn width(&self, c: &Context<M>) -> Option<PartialWidth> {
+        self.as_ref().width(c)
+    }
+
+    fn gamma_enabled(&self) -> bool {
+        self.as_ref().gamma_enabled()
+    }
+
+    fn gamma(&self, c: &Context<M>) -> Option<f64> {
+        self.as_ref().gamma(c)
+    }
+
+    fn rate(&self, gamma: Option<f64>, c: &Context<M>) -> Option<RateDensity> {
+        self.as_ref().rate(gamma, c)
+    }
+
+    fn adjust_rate_overshoot(
+        &self,
+        rate: Option<RateDensity>,
+        c: &Context<M>,
+    ) -> Option<RateDensity> {
+        self.as_ref().adjust_rate_overshoot(rate, c)
+    }
+
+    fn change(&self, dn: &mut Array1<f64>, dna: &mut Array1<f64>, c: &Context<M>) {
+        self.as_ref().change(dn, dna, c)
     }
 }

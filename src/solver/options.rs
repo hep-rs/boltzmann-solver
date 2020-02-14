@@ -1,5 +1,6 @@
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 /// Determines the range of step sizes allowed: `min * beta < h < max * beta`.
 #[derive(Debug)]
@@ -18,8 +19,8 @@ impl Default for StepPrecision {
     }
 }
 
-impl std::fmt::Display for StepPrecision {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for StepPrecision {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "StepPrecision {{ min: {}, max: {} }}",
