@@ -1,9 +1,9 @@
-use crate::model::Model;
 use ndarray::prelude::*;
+use std::fmt;
 
 /// Current context at a particular step in the numerical integration.
 #[derive(Debug)]
-pub struct Context<'a, M: Model> {
+pub struct Context<'a, M> {
     /// Evaluation step
     pub step: u64,
     /// Step size
@@ -30,8 +30,8 @@ pub struct Context<'a, M: Model> {
     pub model: &'a M,
 }
 
-impl<'a, M: Model> std::fmt::Display for Context<'a, M> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl<'a, M> fmt::Display for Context<'a, M> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "Context {{ step: {}, beta: {}, ... }}",

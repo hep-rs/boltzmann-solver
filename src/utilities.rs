@@ -10,6 +10,7 @@ use crate::{constants::PI_5, model::Particle};
 use num_complex::Complex;
 use quadrature::{clenshaw_curtis, double_exponential};
 use special_functions::bessel;
+use std::f64;
 
 const INTEGRATION_PRECISION: f64 = 1e-10;
 
@@ -75,11 +76,11 @@ pub fn kallen_lambda_sqrt(a: f64, b: f64, c: f64) -> f64 {
 /// \\end{aligned}\\end{equation}
 pub fn t_range(s: f64, m1: f64, m2: f64, m3: f64, m4: f64) -> (f64, f64) {
     debug_assert!(
-        s * (1.0 + 5.0 * std::f64::EPSILON) >= m1 + m2,
+        s * (1.0 + 5.0 * f64::EPSILON) >= m1 + m2,
         "s cannot be smaller than (m1² + m2²)."
     );
     debug_assert!(
-        s * (1.0 + 5.0 * std::f64::EPSILON) >= m3 + m4,
+        s * (1.0 + 5.0 * f64::EPSILON) >= m3 + m4,
         "s cannot be smaller than (m3² + m4²)."
     );
 

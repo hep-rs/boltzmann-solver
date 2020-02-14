@@ -1,3 +1,19 @@
+// Boltzmann-solver
+// Copyright (C) 2020  JP-Ellis <josh@jpells.me>
+
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
+
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+// details.
+
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <https://www.gnu.org/licenses/>.
+
 //! `boltzmann-solver` is a library allowing for Boltzmann equation in the
 //! context of particle physics / early cosmology.  It provides functionalities
 //! to solve Boltzmann equation in the case where a single species is out of
@@ -6,9 +22,10 @@
 //!
 //! **This library is still undergoing development.**
 //!
-//! [![Crates.io](https://img.shields.io/crates/v/hep-boltzmann-solver.svg)](https://crates.io/crates/hep-boltzmann-solver)
-//! [![Travis](https://img.shields.io/travis/hep-rs/boltzmann-solver/master.svg)](https://travis-ci.org/hep-rs/boltzmann-solver)
-//! [![Codecov](https://img.shields.io/codecov/c/github/hep-rs/boltzmann-solver/master.svg)](https://codecov.io/gh/hep-rs/boltzmann-solver)
+//! [![crates.io](https://img.shields.io/crates/v/hep-boltmzann-solver.svg)](https://crates.io/crates/hep-boltzmann-solver)
+//! [![crates.io](https://img.shields.io/crates/d/hep-boltmzann-solver.svg)](https://crates.io/crates/hep-boltmzann-solver)
+//! [![Codecov branch](https://img.shields.io/codecov/c/github/hep-rs/boltzmann-solver/master)](https://codecov.io/gh/hep-rs/boltzmann-solver)
+//! [![Build Status](https://img.shields.io/github/workflow/status/hep-rs/boltzmann-solver/Rust/master.svg)](https://github.com/hep-rs/boltzmann-solver/actions)
 //!
 //! Licensed under [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).
 //!
@@ -133,5 +150,4 @@ pub mod model;
 pub mod prelude;
 pub mod solver;
 pub mod statistic;
-// pub mod universe;
 pub mod utilities;

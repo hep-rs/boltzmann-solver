@@ -292,7 +292,7 @@ pub fn rec_linspace(start: f64, end: f64, recursions: u32) -> Vec<f64> {
 #[cfg(test)]
 mod test {
     use ndarray::prelude::*;
-    use std::{f64, fs, io::prelude::*, io::BufWriter};
+    use std::{env, error, f64, fs, io::prelude::*, io::BufWriter};
 
     pub(crate) const RECURSIONS: u32 = 12;
 
@@ -301,10 +301,10 @@ mod test {
     }
 
     #[test]
-    fn spline() -> Result<(), Box<dyn std::error::Error>> {
+    fn spline() -> Result<(), Box<dyn error::Error>> {
         let mut spline = super::CubicHermiteSpline::empty();
 
-        let mut path = std::env::temp_dir();
+        let mut path = env::temp_dir();
         path.push("sampled.csv");
         let mut sampled = BufWriter::new(fs::File::create(path)?);
         for x in super::rec_linspace(0.0, 1.0, RECURSIONS) {
@@ -317,7 +317,7 @@ mod test {
             writeln!(sampled, "{:e},{:e},{:e}", p.x, p.y, p.m)?;
         }
 
-        let mut path = std::env::temp_dir();
+        let mut path = env::temp_dir();
         path.push("spline.csv");
         let mut output = BufWriter::new(fs::File::create(path)?);
         for &x in Array1::linspace(0.0, 1.0, 2usize.pow(RECURSIONS)).iter() {

@@ -14,12 +14,19 @@ use crate::{
     statistic::{Statistic, Statistics},
 };
 use ndarray::prelude::*;
-use std::collections::HashMap;
+#[cfg(feature = "parallel")]
+use rayon::prelude::*;
+#[cfg(feature = "parallel")]
+use std::sync::RwLock;
+use std::{collections::HashMap, iter};
 
 /// Contains all the information relevant to a particular model, including
 /// masses, widths and couplings.  All these attributes can be dependent on the
 /// inverse temperature \\(\beta\\).
-pub trait Model: Sized {
+pub trait Model
+where
+    Self: Sized,
+{
     /// Instantiate a new instance of the model at 0 temperature (\\(\beta =
     /// \infty\\)).
     ///
@@ -29,8 +36,9 @@ pub trait Model: Sized {
 
     /// Update the model to be valid at the given inverse temperature `beta`.
     ///
-    /// Beta is always strictly positive, and should never be infinite.  The
-    /// zero temperature case should be obtained from [`Model::zero`].
+    /// The inverse temperature is always strictly positive, and should never be
+    /// infinite.  The zero temperature case should be obtained from
+    /// [`Model::zero`].
     fn set_beta(&mut self, beta: f64);
 
     /// Return the current value of beta for the model
@@ -56,7 +64,7 @@ pub trait Model: Sized {
     ///
     /// The dominated epoch in the Standard Model of cosmology ends at the
     /// matter–radiation equality, which occurs at an inverse temperature of
-    /// \\(\beta \approx 10^{9}\\) GeV^{-1}.
+    /// \\(\beta \approx 10^{8}\\) GeV^{-1}.
     fn hubble_rate(&self, beta: f64) -> f64 {
         debug_assert_warn!(
             beta > 1e8,
@@ -88,7 +96,6 @@ pub trait Model: Sized {
     ///
     /// If the particle is not within the model, the name and index should be
     /// returned as an error so that they can be subsequently handled.
-    // fn particle_idx(name: &str, i: usize) -> Result<usize, (&str, usize)>;
     fn particle_idx<S: AsRef<str>>(name: S, i: usize) -> Result<usize, (S, usize)>;
 
     /// Return a reference to the matching particle by name.
@@ -121,9 +128,6 @@ pub trait Model: Sized {
         }
     }
 
-    /// Return a list of interactions in the model.
-    fn interactions(&self) -> &Vec<Box<dyn Interaction<Self> + Sync>>;
-
     /// Return a instance of [`Context`] for the model.
     ///
     /// As this is not within the context of solving the Boltzmann equations,
@@ -152,6 +156,24 @@ pub trait Model: Sized {
             model: &self,
         }
     }
+}
+
+/// Supertrait for [`Model`] for the handling of interactions.
+#[cfg(not(feature = "parallel"))]
+pub trait ModelInteractions
+where
+    Self: Model,
+{
+    /// The underlying interaction type.
+    ///
+    /// If only three-particle interactions are used, then
+    /// [`ThreeParticle`](crate::model::interaction::ThreeParticle) would be
+    /// appropriate here; however, if a combination of interactions might be
+    /// used then it is necessary to us `Box<dyn Interaction<Self>>`.
+    type Item: Interaction<Self>;
+
+    /// Return an iterator over all interactions in the model.
+    fn interactions(&self) -> &[Self::Item];
 
     /// Calculate the widths of all particles.
     ///
@@ -159,10 +181,10 @@ pub trait Model: Sized {
     /// interactions specified within the model in order to compute the
     /// particle's final width.
     ///
-    /// The information is stored in each particle's `p.width` and the partial
-    /// widths are stored in `p.decays`.
+    /// The information is stored in each particle's [`Particle::width`] and the
+    /// partial widths are stored in [`Particle::decays`].
     fn update_widths(&mut self) {
-        let mut widths: Vec<_> = std::iter::repeat_with(|| (0.0, HashMap::new()))
+        let mut widths: Vec<_> = iter::repeat_with(|| (0.0, HashMap::new()))
             .take(self.particles().len())
             .collect();
 
@@ -179,6 +201,67 @@ pub trait Model: Sized {
 
         for (i, (width, hm)) in widths.into_iter().enumerate() {
             let p = &mut self.particles_mut()[i];
+            p.set_width(width);
+            p.decays = hm;
+        }
+    }
+}
+
+/// Supertrait for [`Model`] for the handling of interactions.
+#[cfg(feature = "parallel")]
+pub trait ModelInteractions
+where
+    Self: Model + Sync,
+{
+    /// The underlying interaction type.
+    ///
+    /// If only three-particle interactions are used, then
+    /// [`ThreeParticle`](crate::model::interaction::ThreeParticle) would be
+    /// appropriate here; however, if a combination of interactions might be
+    /// used then it is necessary to us `Box<dyn Interaction<Self>>`.
+    type Item: Interaction<Self> + Sync;
+
+    /// Return an iterator over all interactions in the model.
+    fn interactions(&self) -> &[Self::Item];
+
+    /// Calculate the widths of all particles.
+    ///
+    /// This computes the possible decays of all particles given the
+    /// interactions specified within the model in order to compute the
+    /// particle's final width.
+    ///
+    /// The information is stored in each particle's [`Particle::width`] and the
+    /// partial widths are stored in [`Particle::decays`].
+    fn update_widths(&mut self) {
+        let widths: RwLock<Vec<_>> = RwLock::new(
+            iter::repeat_with(|| (0.0, HashMap::new()))
+                .take(self.particles().len())
+                .collect(),
+        );
+
+        let c = self.as_context();
+
+        self.interactions().par_iter().for_each(|interaction| {
+            if let Some(partial_width) = interaction.width(&c) {
+                let parent_idx = partial_width.parent_idx();
+                let mut widths = widths
+                    .write()
+                    .expect("cannot get write access of widths behind RwLock");
+                widths[parent_idx].0 += partial_width.width;
+                widths[parent_idx]
+                    .1
+                    .insert(partial_width.daughters, partial_width.width);
+            }
+        });
+
+        let ptcl = self.particles_mut();
+        for (i, (width, hm)) in widths
+            .into_inner()
+            .expect("cannot unwrap RwLock protecting widths")
+            .into_iter()
+            .enumerate()
+        {
+            let p = &mut ptcl[i];
             p.set_width(width);
             p.decays = hm;
         }

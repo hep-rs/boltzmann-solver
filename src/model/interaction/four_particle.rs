@@ -8,7 +8,7 @@ use crate::{
     solver::Context,
     utilities::{integrate_st, spline::CubicHermiteSpline},
 };
-use std::sync::RwLock;
+use std::{fmt, sync::RwLock};
 
 /// Three particle interaction, all determined from the underlying squared amplitude.
 pub struct FourParticle<M> {
@@ -18,6 +18,8 @@ pub struct FourParticle<M> {
     /// Squared amplitude as a function of the model.
     squared_amplitude: Box<dyn Fn(&M, f64, f64, f64) -> f64 + Sync>,
     gamma_spline: RwLock<CubicHermiteSpline>,
+    gamma_enabled: bool,
+    width_enabled: bool,
 }
 
 impl<M> FourParticle<M> {
@@ -43,7 +45,7 @@ impl<M> FourParticle<M> {
         F: Fn(&M, f64, f64, f64) -> f64 + Sync + 'static,
     {
         let particles = InteractionParticles {
-            ingoing: vec![p1, p2],
+            incoming: vec![p1, p2],
             outgoing: vec![p3, p4],
         };
         let particles_idx = particles.as_idx();
@@ -55,6 +57,8 @@ impl<M> FourParticle<M> {
             particles_sign,
             squared_amplitude: Box::new(squared_amplitude),
             gamma_spline: RwLock::new(CubicHermiteSpline::empty()),
+            width_enabled: false,
+            gamma_enabled: true,
         }
     }
 
@@ -80,28 +84,46 @@ impl<M> FourParticle<M> {
     where
         F: Fn(&M, f64, f64, f64) -> f64 + Sync + Copy + 'static,
     {
-        vec![
-            Self::new(squared_amplitude, p1, p2, p3, p4),
-            Self::new(
+        let mut v = vec![Self::new(squared_amplitude, p1, p2, p3, p4)];
+
+        // Avoid doubling up interactions if they have the same particles
+        if p2 != -p3 {
+            v.push(Self::new(
                 move |c, s, t, u| squared_amplitude(c, t, s, u),
                 p1,
                 -p3,
                 -p2,
                 p4,
-            ),
-            Self::new(
+            ));
+        }
+        if p3 != p4 {
+            v.push(Self::new(
                 move |c, s, t, u| squared_amplitude(c, u, t, s),
                 p1,
                 -p4,
-                -p2,
                 p3,
-            ),
-        ]
+                -p2,
+            ))
+        }
+
+        v
+    }
+
+    /// Adjust whether this interaction will calculate decay widths.
+    pub fn enable_width(mut self, v: bool) -> Self {
+        self.width_enabled = v;
+        self
+    }
+
+    /// Adjust whether this interaction will calculate decay widths.
+    pub fn enable_gamma(mut self, v: bool) -> Self {
+        self.gamma_enabled = v;
+        self
     }
 }
 
-impl<M> std::fmt::Debug for FourParticle<M> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl<M> fmt::Debug for FourParticle<M> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "FourParticle {{ \
@@ -115,7 +137,10 @@ impl<M> std::fmt::Debug for FourParticle<M> {
     }
 }
 
-impl<M: Model> Interaction<M> for FourParticle<M> {
+impl<M> Interaction<M> for FourParticle<M>
+where
+    M: Model,
+{
     fn particles(&self) -> &InteractionParticles {
         &self.particles
     }
@@ -128,22 +153,34 @@ impl<M: Model> Interaction<M> for FourParticle<M> {
         &self.particles_sign
     }
 
+    fn width_enabled(&self) -> bool {
+        self.width_enabled
+    }
+
     // TODO: Implement three-body decays
     // fn width(&self, c: &Context<M>) -> Option<PartialWidth> {}
 
-    fn gamma(&self, c: &Context<M>) -> f64 {
+    fn gamma_enabled(&self) -> bool {
+        self.gamma_enabled
+    }
+
+    fn gamma(&self, c: &Context<M>) -> Option<f64> {
+        if !self.gamma_enabled {
+            return None;
+        }
+
         let ln_beta = c.beta.ln();
 
         if let Ok(gamma_spline) = self.gamma_spline.read() {
             if gamma_spline.accurate(ln_beta) {
-                return gamma_spline.sample(ln_beta).exp();
+                return Some(gamma_spline.sample(ln_beta).exp());
             }
         }
         let ptcl = c.model.particles();
 
         // Get the *squared* masses
-        let m0 = ptcl[self.particles_idx.ingoing[0]].mass2;
-        let m1 = ptcl[self.particles_idx.ingoing[1]].mass2;
+        let m0 = ptcl[self.particles_idx.incoming[0]].mass2;
+        let m1 = ptcl[self.particles_idx.incoming[1]].mass2;
         let m2 = ptcl[self.particles_idx.outgoing[0]].mass2;
         let m3 = ptcl[self.particles_idx.outgoing[1]].mass2;
 
@@ -163,6 +200,6 @@ impl<M: Model> Interaction<M> for FourParticle<M> {
             gamma_spline.add(ln_beta, gamma.ln());
         }
 
-        gamma
+        Some(gamma)
     }
 }

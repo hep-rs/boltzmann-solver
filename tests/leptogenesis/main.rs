@@ -6,9 +6,6 @@ mod model;
 
 use crate::model::{interaction, LeptogenesisModel};
 use boltzmann_solver::prelude::*;
-use ndarray::prelude::*;
-use std::{io, sync::RwLock};
-
 #[cfg(not(debug_assertions))]
 use boltzmann_solver::{
     statistic::{Statistic, Statistics},
@@ -16,10 +13,46 @@ use boltzmann_solver::{
 };
 #[cfg(not(debug_assertions))]
 use itertools::iproduct;
+use ndarray::prelude::*;
 #[cfg(not(debug_assertions))]
 use rayon::prelude::*;
 #[cfg(not(debug_assertions))]
 use std::fs::File;
+use std::{error, fmt, io, sync::RwLock};
+
+/// Box an interaction
+#[cfg(feature = "parallel")]
+fn into_interaction_box<I, M>(interaction: I) -> Box<dyn Interaction<M> + Sync>
+where
+    I: Interaction<M> + Sync + 'static,
+    M: Model,
+{
+    Box::new(interaction)
+}
+
+/// Box an interaction
+#[cfg(not(feature = "parallel"))]
+fn into_interaction_box<I, M>(interaction: I) -> Box<dyn Interaction<M>>
+where
+    I: Interaction<M> + 'static,
+    M: Model,
+{
+    Box::new(interaction)
+}
+
+/// Filter iteraction based whether they involve first-generation particles only
+/// or not.
+fn one_generation<I, M>(interaction: &I) -> bool
+where
+    I: Interaction<M>,
+    M: Model,
+{
+    let ptcl = interaction.particles_idx();
+    ptcl.incoming.iter().chain(&ptcl.outgoing).all(|i| match i {
+        1 | 2 | 3 | 4 | 5 | 8 | 11 | 14 | 17 | 20 => true,
+        _ => false,
+    })
+}
 
 /// Solve the Boltzmann equations and return the final values.
 ///
@@ -29,10 +62,10 @@ pub fn solve<W, S>(
     mut builder: SolverBuilder<LeptogenesisModel>,
     names: &[S],
     csv: Option<csv::Writer<W>>,
-) -> Result<(Array1<f64>, Array1<f64>), Box<dyn std::error::Error>>
+) -> Result<(Array1<f64>, Array1<f64>), Box<dyn error::Error>>
 where
     W: io::Write + 'static,
-    S: AsRef<str> + std::fmt::Display,
+    S: AsRef<str> + fmt::Display,
 {
     if let Some(mut csv) = csv {
         // If we have a CSV file to write to, track the number densities as they
@@ -110,8 +143,8 @@ fn particle_indices() {
 /// Test the effects of the right-handed neutrino decay on its own in the
 /// 1-generation case.
 #[test]
-pub fn decay_only_1gen() -> Result<(), Box<dyn std::error::Error>> {
-    // common::setup_logging(2);
+pub fn decay_only_1gen() -> Result<(), Box<dyn error::Error>> {
+    common::setup_logging(1);
 
     // Create the CSV file
     let output_dir = common::output_dir("leptogenesis/decay_only/1gen");
@@ -119,12 +152,12 @@ pub fn decay_only_1gen() -> Result<(), Box<dyn std::error::Error>> {
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
-    model
-        .interactions
-        .extend(interaction::hln().drain(..3).map(|i| {
-            Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>
-                as Box<dyn Interaction<LeptogenesisModel> + Sync>
-        }));
+    model.interactions.extend(
+        interaction::hln()
+            .drain(..)
+            .filter(one_generation)
+            .map(into_interaction_box),
+    );
 
     // Collect the names now as SolverBuilder takes ownership of the model
     // later.
@@ -157,7 +190,7 @@ pub fn decay_only_1gen() -> Result<(), Box<dyn std::error::Error>> {
 /// Test the effects of the right-handed neutrino decay on its own in the
 /// 3-generation case.
 #[test]
-pub fn decay_only_3gen() -> Result<(), Box<dyn std::error::Error>> {
+pub fn decay_only_3gen() -> Result<(), Box<dyn error::Error>> {
     // common::setup_logging(2);
 
     // Create the CSV file
@@ -166,11 +199,9 @@ pub fn decay_only_3gen() -> Result<(), Box<dyn std::error::Error>> {
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
-    model.interactions.extend(
-        interaction::hln()
-            .drain(..)
-            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
-    );
+    model
+        .interactions
+        .extend(interaction::hln().drain(..).map(into_interaction_box));
 
     // Collect the names now as SolverBuilder takes ownership of the model
     // later.
@@ -204,7 +235,7 @@ pub fn decay_only_3gen() -> Result<(), Box<dyn std::error::Error>> {
 /// Test the effects of a washout term on its own in the 1-generation case.
 #[test]
 #[cfg(not(debug_assertions))]
-pub fn washout_only_1gen() -> Result<(), Box<dyn std::error::Error>> {
+pub fn washout_only_1gen() -> Result<(), Box<dyn error::Error>> {
     // common::setup_logging(2);
 
     // Create the CSV file
@@ -215,8 +246,9 @@ pub fn washout_only_1gen() -> Result<(), Box<dyn std::error::Error>> {
     let mut model = LeptogenesisModel::zero();
     model.interactions.extend(
         interaction::hhll1()
-            .drain(..3)
-            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+            .drain(..)
+            .filter(one_generation)
+            .map(into_interaction_box),
     );
 
     // Collect the names now as SolverBuilder takes ownership of the model
@@ -253,10 +285,10 @@ pub fn washout_only_1gen() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 #[cfg(not(debug_assertions))]
-pub fn decay_washout_1gen() -> Result<(), Box<dyn std::error::Error>> {
+pub fn decay_washout_1gen() -> Result<(), Box<dyn error::Error>> {
     // common::setup_logging(2);
 
-    // Create the CSV file
+    // Create the CSV files
     let output_dir = common::output_dir("leptogenesis/decay_washout/1gen");
     let csv = csv::Writer::from_path(output_dir.join("n.csv"))?;
 
@@ -264,13 +296,15 @@ pub fn decay_washout_1gen() -> Result<(), Box<dyn std::error::Error>> {
     let mut model = LeptogenesisModel::zero();
     model.interactions.extend(
         interaction::hln()
-            .drain(..3)
-            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+            .drain(..)
+            .filter(one_generation)
+            .map(into_interaction_box),
     );
     model.interactions.extend(
         interaction::hhll1()
-            .drain(..3)
-            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+            .drain(..)
+            .filter(one_generation)
+            .map(into_interaction_box),
     );
 
     // Collect the names now as SolverBuilder takes ownership of the model
@@ -301,7 +335,7 @@ pub fn decay_washout_1gen() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 #[cfg(not(debug_assertions))]
-pub fn decay_washout_3gen() -> Result<(), Box<dyn std::error::Error>> {
+pub fn decay_washout_3gen() -> Result<(), Box<dyn error::Error>> {
     // common::setup_logging(2);
 
     // Create the CSV file
@@ -310,21 +344,15 @@ pub fn decay_washout_3gen() -> Result<(), Box<dyn std::error::Error>> {
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
-    model.interactions.extend(
-        interaction::hln()
-            .drain(..)
-            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
-    );
-    model.interactions.extend(
-        interaction::hhll1()
-            .drain(..)
-            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
-    );
-    model.interactions.extend(
-        interaction::hhll2()
-            .drain(..)
-            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
-    );
+    model
+        .interactions
+        .extend(interaction::hln().drain(..).map(into_interaction_box));
+    model
+        .interactions
+        .extend(interaction::hhll1().drain(..).map(into_interaction_box));
+    model
+        .interactions
+        .extend(interaction::hhll2().drain(..).map(into_interaction_box));
 
     // Collect the names now as SolverBuilder takes ownership of the model
     // later.
@@ -360,7 +388,7 @@ pub fn decay_washout_3gen() -> Result<(), Box<dyn std::error::Error>> {
 #[test]
 #[ignore]
 #[cfg(not(debug_assertions))]
-pub fn scan() -> Result<(), Box<dyn std::error::Error>> {
+pub fn scan() -> Result<(), Box<dyn error::Error>> {
     // common::setup_logging(2);
 
     // Create the CSV file
@@ -425,31 +453,23 @@ pub fn scan() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
-fn masses_widths() -> Result<(), Box<dyn std::error::Error>> {
+fn masses_widths() -> Result<(), Box<dyn error::Error>> {
     // Setup logging
     // common::setup_logging(2);
 
     let mut model = LeptogenesisModel::zero();
-    model.interactions.extend(
-        interaction::hle()
-            .drain(..)
-            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
-    );
-    model.interactions.extend(
-        interaction::hln()
-            .drain(..)
-            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
-    );
-    model.interactions.extend(
-        interaction::hqu()
-            .drain(..)
-            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
-    );
-    model.interactions.extend(
-        interaction::hqd()
-            .drain(..)
-            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
-    );
+    model
+        .interactions
+        .extend(interaction::hle().drain(..).map(into_interaction_box));
+    model
+        .interactions
+        .extend(interaction::hln().drain(..).map(into_interaction_box));
+    model
+        .interactions
+        .extend(interaction::hqu().drain(..).map(into_interaction_box));
+    model
+        .interactions
+        .extend(interaction::hqd().drain(..).map(into_interaction_box));
 
     // Create the CSV files
     let output_dir = common::output_dir("leptogenesis");
@@ -490,7 +510,7 @@ fn masses_widths() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 #[cfg(not(debug_assertions))]
-fn gammas() -> Result<(), Box<dyn std::error::Error>> {
+fn gammas() -> Result<(), Box<dyn error::Error>> {
     // Setup logging
     // common::setup_logging(2);
 
@@ -498,36 +518,42 @@ fn gammas() -> Result<(), Box<dyn std::error::Error>> {
     let mut model_precomp = LeptogenesisModel::zero();
     model_precomp.interactions.extend(
         interaction::hln()
-            .drain(..3)
-            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+            .drain(..)
+            .filter(one_generation)
+            .map(into_interaction_box),
     );
     model_precomp.interactions.extend(
         interaction::hhll1()
-            .drain(..3)
-            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+            .drain(..)
+            .filter(one_generation)
+            .map(into_interaction_box),
     );
-    model_precomp.interactions.extend(
-        interaction::hhll2()
-            .drain(..3)
-            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
-    );
+    // model_precomp.interactions.extend(
+    //     interaction::hhll2()
+    //         .drain(..)
+    //         .filter(one_generation)
+    //         .map(into_interaction_box),
+    // );
 
     let mut model_no_precomp = LeptogenesisModel::zero();
     model_no_precomp.interactions.extend(
         interaction::hln()
-            .drain(..3)
-            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+            .drain(..)
+            .filter(one_generation)
+            .map(into_interaction_box),
     );
     model_no_precomp.interactions.extend(
         interaction::hhll1()
-            .drain(..3)
-            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
+            .drain(..)
+            .filter(one_generation)
+            .map(into_interaction_box),
     );
-    model_no_precomp.interactions.extend(
-        interaction::hhll2()
-            .drain(..3)
-            .map(|i| Box::new(i) as Box<dyn Interaction<LeptogenesisModel> + Sync>),
-    );
+    // model_no_precomp.interactions.extend(
+    //     interaction::hhll2()
+    //         .drain(..)
+    //         .filter(one_generation)
+    //         .map(into_interaction_box),
+    // );
 
     // Precompute gamma for model1 only
     const N: u32 = 10;
@@ -571,7 +597,7 @@ fn gammas() -> Result<(), Box<dyn std::error::Error>> {
             let mut path = output_dir_precomp.clone();
             path.push(format!(
                 "{:?}:{:?}.csv",
-                particles.ingoing, particles.outgoing
+                particles.incoming, particles.outgoing
             ));
             path
         })?;
@@ -586,7 +612,7 @@ fn gammas() -> Result<(), Box<dyn std::error::Error>> {
             let mut path = output_dir_no_precomp.clone();
             path.push(format!(
                 "{:?}:{:?}.csv",
-                particles.ingoing, particles.outgoing
+                particles.incoming, particles.outgoing
             ));
             path
         })?;

@@ -16,7 +16,7 @@ use quadrature::integrate;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use special_functions::{bessel, particle_statistics};
-use std::f64;
+use std::{f64, fmt};
 
 /// Equilibrium number density for massless bosons, normalized to the
 /// equilibrium number density of a massless boson.  This is specified per
@@ -59,8 +59,8 @@ pub enum Statistic {
     MaxwellJuttner,
 }
 
-impl std::fmt::Display for Statistic {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for Statistic {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::FermiDirac => write!(f, "Statistic::FermiDirac"),
             Self::BoseEinstein => write!(f, "Statistic::BoseEinstein"),

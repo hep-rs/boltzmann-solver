@@ -1,7 +1,8 @@
-use crate::model::{data, interaction::Interaction, Model, Particle};
+use crate::model::{data, Model, Particle};
 use ndarray::{array, prelude::*};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+use std::f64;
 
 /// The Standard Model of particle physics.
 // #[derive(Debug)]
@@ -10,12 +11,8 @@ pub struct StandardModel {
     /// Inverse temperature in \\(GeV^{-1}\\)
     pub beta: f64,
 
-    // Particle and Interations
     /// Particles
     pub particles: Vec<Particle>,
-    /// Interactions
-    #[serde(skip)]
-    pub interactions: Vec<Box<dyn Interaction<Self> + Sync>>,
 
     // Gauge couplings
     /// Hypercharge gauge coupling
@@ -68,7 +65,6 @@ impl Model for StandardModel {
             Particle::new(1, 0.0, 0.0).name("d2").dof(3.0),
             Particle::new(1, 0.0, 0.0).name("d3").dof(3.0),
         ];
-        let interactions = Vec::new();
 
         let mh: f64 = 125.10;
         let vev: f64 = 246.0;
@@ -76,7 +72,7 @@ impl Model for StandardModel {
         let lambda = (mh / vev).powi(2);
 
         StandardModel {
-            beta: std::f64::INFINITY,
+            beta: f64::INFINITY,
             g1: 3.585e-01,
             g2: 6.476e-01,
             g3: 1.164e+00,
@@ -100,7 +96,6 @@ impl Model for StandardModel {
             mu2,
             lambda,
             particles,
-            interactions,
         }
     }
 
@@ -195,10 +190,6 @@ impl Model for StandardModel {
             ("d", i) if i < 3 => Ok(17 + i),
             (_, i) => Err((name, i)),
         }
-    }
-
-    fn interactions(&self) -> &Vec<Box<dyn Interaction<Self> + Sync>> {
-        &self.interactions
     }
 }
 

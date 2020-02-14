@@ -1,12 +1,13 @@
 use crate::{
-    model::{Model, Particle},
+    model::{interaction::Interaction, Model, ModelInteractions, Particle},
     solver::{options::StepPrecision, Context},
     statistic::{Statistic, Statistics},
     utilities::spline::rec_geomspace,
 };
 use ndarray::{prelude::*, Zip};
+#[cfg(feature = "parallel")]
 use rayon::prelude::*;
-use std::{error, fmt, iter::FromIterator};
+use std::{error, fmt, iter::FromIterator, mem, ptr};
 
 /// Error type returned by the solver builder in case there is an error.
 #[derive(Debug)]
@@ -50,7 +51,7 @@ impl error::Error for Error {
 }
 
 /// Boltzmann solver builder
-pub struct SolverBuilder<M: Model> {
+pub struct SolverBuilder<M> {
     model: Option<M>,
     initial_densities: Option<Array1<f64>>,
     initial_asymmetries: Option<Array1<f64>>,
@@ -64,7 +65,7 @@ pub struct SolverBuilder<M: Model> {
 }
 
 /// Boltzmann solver
-pub struct Solver<M: Model> {
+pub struct Solver<M> {
     model: M,
     initial_densities: Array1<f64>,
     initial_asymmetries: Array1<f64>,
@@ -76,7 +77,7 @@ pub struct Solver<M: Model> {
     error_tolerance: f64,
 }
 
-impl<M: Model + Sync> SolverBuilder<M> {
+impl<M> SolverBuilder<M> {
     /// Creates a new builder for the Boltzmann solver.
     ///
     /// The default range of temperatures span 1 GeV through to 10^{20} GeV, and
@@ -337,8 +338,46 @@ impl<M: Model + Sync> SolverBuilder<M> {
 
         Ok(())
     }
+}
 
-    /// Precompute the interaction rates for 4-particle interactions.
+impl<M> SolverBuilder<M>
+where
+    M: ModelInteractions,
+{
+    /// Precompute the interaction rates.
+    #[cfg(not(feature = "parallel"))]
+    fn precompute(model: &mut M, beta_range: (f64, f64)) {
+        // Number of recursive subdivisions in beta range (so there are 2^N
+        // subdivisions).
+        const N: u32 = 10;
+
+        log::info!("Pre-computing γ...");
+        for (i, &beta) in vec![
+            0.98 * beta_range.0,
+            0.99 * beta_range.0,
+            1.01 * beta_range.1,
+            1.02 * beta_range.1,
+        ]
+        .iter()
+        .chain(&rec_geomspace(beta_range.0, beta_range.1, N))
+        .enumerate()
+        {
+            if i % 64 == 0 {
+                log::debug!("Precomputing step {} / {}", i, 2usize.pow(N) + 4);
+            } else {
+                log::trace!("Precomputing step {} / {}", i, 2usize.pow(N) + 4);
+            }
+            model.set_beta(beta);
+            let c = model.as_context();
+
+            for interaction in model.interactions() {
+                interaction.gamma(&c);
+            }
+        }
+    }
+
+    /// Precompute the interaction rates.
+    #[cfg(feature = "parallel")]
     fn precompute(model: &mut M, beta_range: (f64, f64)) {
         // Number of recursive subdivisions in beta range (so there are 2^N
         // subdivisions).
@@ -368,7 +407,6 @@ impl<M: Model + Sync> SolverBuilder<M> {
             });
         }
     }
-
     /// Build the Boltzmann solver.
     pub fn build(self) -> Result<Solver<M>, Error> {
         let mut model = self.model.ok_or(Error::UndefinedModel)?;
@@ -431,13 +469,51 @@ impl<M: Model + Sync> SolverBuilder<M> {
     }
 }
 
-impl<M: Model + Sync> Default for SolverBuilder<M> {
+impl<M> Default for SolverBuilder<M> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<M: Model + Sync> Solver<M> {
+impl<M> Solver<M>
+where
+    M: ModelInteractions,
+{
+    #[cfg(not(feature = "parallel"))]
+    fn compute_ki(&self, ki: &mut Array1<f64>, kai: &mut Array1<f64>, ci: &Context<M>) {
+        ki.fill(0.0);
+        kai.fill(0.0);
+        for interaction in self.model.interactions() {
+            interaction.change(ki, kai, &ci);
+        }
+    }
+
+    #[cfg(feature = "parallel")]
+    fn compute_ki(&self, ki: &mut Array1<f64>, kai: &mut Array1<f64>, ci: &Context<M>) {
+        let n = ki.dim();
+        ki.fill(0.0);
+        kai.fill(0.0);
+
+        let (new_ki, new_kai) = self
+            .model
+            .interactions()
+            .par_iter()
+            .fold(
+                || (Array1::zeros(n), Array1::zeros(n)),
+                |(mut dn, mut dna), interaction| {
+                    interaction.change(&mut dn, &mut dna, &ci);
+                    (dn, dna)
+                },
+            )
+            .reduce(
+                || (Array1::zeros(n), Array1::zeros(n)),
+                |(dn, dna), (dni, dnai)| (dn + dni, dna + dnai),
+            );
+
+        *ki = new_ki;
+        *kai = new_kai;
+    }
+
     /// Evolve the initial conditions by solving the PDEs.
     ///
     /// Note that this is not a true PDE solver, but instead converts the PDE
@@ -459,13 +535,13 @@ impl<M: Model + Sync> Solver<M> {
         let mut k: [Array1<f64>; RK_S];
         let mut ka: [Array1<f64>; RK_S];
         unsafe {
-            k = std::mem::MaybeUninit::uninit().assume_init();
+            k = mem::MaybeUninit::uninit().assume_init();
             for ki in &mut k[..] {
-                std::ptr::write(ki, Array1::zeros(n.dim()));
+                ptr::write(ki, Array1::zeros(n.dim()));
             }
-            ka = std::mem::MaybeUninit::uninit().assume_init();
+            ka = mem::MaybeUninit::uninit().assume_init();
             for ki in &mut ka[..] {
-                std::ptr::write(ki, Array1::zeros(n.dim()));
+                ptr::write(ki, Array1::zeros(n.dim()));
             }
         };
 
@@ -520,20 +596,7 @@ impl<M: Model + Sync> Solver<M> {
                 let ci = self.context(step, h, beta_i, &ni, &nai);
 
                 // Compute k[i] and ka[i] from each interaction
-                let (ki, kai) = self
-                    .model
-                    .interactions()
-                    .par_iter()
-                    .fold(
-                        || (Array1::zeros(n.dim()), Array1::zeros(na.dim())),
-                        |(dn, dna), interaction| interaction.change(dn, dna, &ci),
-                    )
-                    .reduce(
-                        || (Array1::zeros(n.dim()), Array1::zeros(na.dim())),
-                        |(dn, dna), (dni, dnai)| (dn + dni, dna + dnai),
-                    );
-                k[i] = ki;
-                ka[i] = kai;
+                self.compute_ki(&mut k[i], &mut ka[i], &ci);
 
                 // Set changes to zero for those particles in equilibrium
                 for &eq in &self.in_equilibrium {
@@ -628,7 +691,10 @@ impl<M: Model + Sync> Solver<M> {
     }
 }
 
-impl<M: Model> Solver<M> {
+impl<M> Solver<M>
+where
+    M: Model,
+{
     /// Generate the context at a given beta to pass to the logger/interaction
     /// functions.
     fn context(

@@ -103,7 +103,7 @@ pub fn hln() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
             )
             .drain(..)
             .map(|interaction| {
-                interaction.asymmetry(move |m: &LeptogenesisModel| m.epsilon[[i3, i2]])
+                interaction.set_asymmetry(move |m: &LeptogenesisModel| m.epsilon[[i3, i2]])
             }),
         );
     }
