@@ -546,7 +546,8 @@ where
         };
 
         let mut step = 0;
-        let mut evals = 0;
+        let mut steps_discarded = 0u64;
+        let mut evals = 0u64;
         let mut beta = self.beta_range.0;
         let mut h = beta * f64::sqrt(self.step_precision.min * self.step_precision.max);
         let mut advance;
@@ -672,6 +673,7 @@ where
 
                 (*self.logger)(&c);
             } else {
+                steps_discarded += 1;
                 log::trace!("Discarding integration step.");
             }
 
@@ -685,6 +687,7 @@ where
         }
 
         log::info!("Number of integration steps: {}", step);
+        log::info!("Number of integration steps discarded: {}", steps_discarded);
         log::info!("Number of evaluations: {}", evals);
 
         (n, na)
