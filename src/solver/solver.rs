@@ -95,7 +95,7 @@ impl<M> SolverBuilder<M> {
     ///     // .initial_densities(..)
     ///     .beta_range(1e-10, 1e-6);
     ///
-    /// let solver = solver_builder.build();
+    /// // let solver = solver_builder.build();
     /// ```
     pub fn new() -> Self {
         Self {
