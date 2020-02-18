@@ -741,6 +741,9 @@
 <span id="741">741</span>
 <span id="742">742</span>
 <span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">model</span>::{<span class="ident">interaction</span>::<span class="ident">Interaction</span>, <span class="ident">Model</span>, <span class="ident">ModelInteractions</span>, <span class="ident">Particle</span>},
@@ -1290,7 +1293,8 @@
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">evals</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">steps_discarded</span> <span class="op">=</span> <span class="number">0u64</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">evals</span> <span class="op">=</span> <span class="number">0u64</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">beta</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">sqrt</span>(<span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">max</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">advance</span>;
@@ -1416,6 +1420,7 @@
 
                 (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">logger</span>)(<span class="kw-2">&amp;</span><span class="ident">c</span>);
             } <span class="kw">else</span> {
+                <span class="ident">steps_discarded</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Discarding integration step.&quot;</span>);
             }
 
@@ -1429,6 +1434,7 @@
         }
 
         <span class="ident">log</span>::<span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Number of integration steps: {}&quot;</span>, <span class="ident">step</span>);
+        <span class="ident">log</span>::<span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Number of integration steps discarded: {}&quot;</span>, <span class="ident">steps_discarded</span>);
         <span class="ident">log</span>::<span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Number of evaluations: {}&quot;</span>, <span class="ident">evals</span>);
 
         (<span class="ident">n</span>, <span class="ident">na</span>)

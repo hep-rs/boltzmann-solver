@@ -419,6 +419,23 @@
 <span id="419">419</span>
 <span id="420">420</span>
 <span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Common trait and implementations for interactions.</span>
 
@@ -541,8 +558,13 @@
 
     <span class="doccomment">/// Calculate the reaction rate density of this interaction.</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// This must return the result *before* it is normalized by the Hubble rate</span>
+    <span class="doccomment">/// or other factors related to the number densities of particles involved.</span>
+    <span class="doccomment">/// It also must *not* be normalized to the integration step size.</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// Care must be taken to obey [`gamma_enabled`] in order to avoid</span>
-    <span class="doccomment">/// computation.</span>
+    <span class="doccomment">/// computation.  Specifically, this should always return `None` when</span>
+    <span class="doccomment">/// `self.gamma_enabled() == true`.</span>
     <span class="kw">fn</span> <span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Asymmetry</span>
@@ -552,8 +574,11 @@
         <span class="prelude-val">None</span>
     }
 
-    <span class="doccomment">/// Calculate the interaction rates density from the interaction rate</span>
-    <span class="doccomment">/// density by taking into account the number densities prefactors.</span>
+    <span class="doccomment">/// Calculate the actual interaction rates density taking into account</span>
+    <span class="doccomment">/// factors related to the number densities of particles involved.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The result must not be normalized by the Hubble rate, nor include the</span>
+    <span class="doccomment">/// factors relating to the integration step size.</span>
     <span class="kw">fn</span> <span class="ident">rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">gamma</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
         <span class="comment">// If there&#39;s no interaction rate or it is 0 to begin with, there&#39;s no</span>
         <span class="comment">// need to adjust it to the particles&#39; number densities.</span>
@@ -612,12 +637,21 @@
 
     <span class="doccomment">/// Adjust the backward and forward rates such that they do not</span>
     <span class="doccomment">/// overshoot the equilibrium number densities.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The rate density going into this function is expected to be the output</span>
+    <span class="doccomment">/// of [`rate`] and must not be previously normalized to the Hubble rate nor</span>
+    <span class="doccomment">/// include factors relating to the integration step size.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The output of this function however *will* be normalized by the HUbble</span>
+    <span class="doccomment">/// rate and *will* factors relating to the numerical integration.</span>
     <span class="kw">fn</span> <span class="ident">adjust_rate_overshoot</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">rate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span>,
         <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rate</span> <span class="op">=</span> <span class="ident">rate</span><span class="question-mark">?</span>;
+
+        <span class="ident">rate</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">c</span>.<span class="ident">step_size</span> <span class="op">*</span> <span class="ident">c</span>.<span class="ident">normalization</span>;
 
         <span class="comment">// If an overshoot of the interaction rate is detected, the rate is</span>
         <span class="comment">// adjusted such that `dn` satisfies:</span>
