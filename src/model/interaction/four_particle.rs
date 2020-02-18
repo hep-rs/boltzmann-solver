@@ -194,7 +194,10 @@ where
             m1,
             m2,
             m3,
-        ) * c.normalization;
+        );
+
+        // TODO Should this be done?
+        let gamma = gamma.abs();
 
         if let Ok(mut gamma_spline) = self.gamma_spline.write() {
             gamma_spline.add(ln_beta, gamma.ln());

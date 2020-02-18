@@ -213,19 +213,18 @@ where
         //
         // TODO: What happens when the decaying particle's mass is not
         // greater than the sum of the masses of the daughter particles?
-        let gamma = if m0 < m1 || m0 < m2 {
-            0.0
+        if m0 < m1 || m0 < m2 {
+            None
         } else {
             // 0.002_423_011_225_182_300_4 = ζ(3) / 16 π³
-            0.002_423_011_225_182_300_4
-                * (self.squared_amplitude)(&c.model).abs()
-                * bessel::k1_on_k2(m0 * c.beta)
-                / c.beta.powi(3)
-                / m0
-                * c.normalization
-        };
-
-        Some(gamma)
+            Some(
+                0.002_423_011_225_182_300_4
+                    * (self.squared_amplitude)(&c.model).abs()
+                    * bessel::k1_on_k2(m0 * c.beta)
+                    / c.beta.powi(3)
+                    / m0,
+            )
+        }
     }
 
     fn asymmetry(&self, c: &Context<M>) -> Option<f64> {

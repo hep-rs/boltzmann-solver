@@ -119,8 +119,13 @@ where
 
     /// Calculate the reaction rate density of this interaction.
     ///
+    /// This must return the result *before* it is normalized by the Hubble rate
+    /// or other factors related to the number densities of particles involved.
+    /// It also must *not* be normalized to the integration step size.
+    ///
     /// Care must be taken to obey [`gamma_enabled`] in order to avoid
-    /// computation.
+    /// computation.  Specifically, this should always return `None` when
+    /// `self.gamma_enabled() == true`.
     fn gamma(&self, c: &Context<M>) -> Option<f64>;
 
     /// Asymmetry
@@ -130,8 +135,11 @@ where
         None
     }
 
-    /// Calculate the interaction rates density from the interaction rate
-    /// density by taking into account the number densities prefactors.
+    /// Calculate the actual interaction rates density taking into account
+    /// factors related to the number densities of particles involved.
+    ///
+    /// The result must not be normalized by the Hubble rate, nor include the
+    /// factors relating to the integration step size.
     fn rate(&self, gamma: Option<f64>, c: &Context<M>) -> Option<RateDensity> {
         // If there's no interaction rate or it is 0 to begin with, there's no
         // need to adjust it to the particles' number densities.
@@ -190,12 +198,21 @@ where
 
     /// Adjust the backward and forward rates such that they do not
     /// overshoot the equilibrium number densities.
+    ///
+    /// The rate density going into this function is expected to be the output
+    /// of [`rate`] and must not be previously normalized to the Hubble rate nor
+    /// include factors relating to the integration step size.
+    ///
+    /// The output of this function however *will* be normalized by the HUbble
+    /// rate and *will* factors relating to the numerical integration.
     fn adjust_rate_overshoot(
         &self,
         rate: Option<RateDensity>,
         c: &Context<M>,
     ) -> Option<RateDensity> {
         let mut rate = rate?;
+
+        rate *= c.step_size * c.normalization;
 
         // If an overshoot of the interaction rate is detected, the rate is
         // adjusted such that `dn` satisfies:
