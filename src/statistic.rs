@@ -327,7 +327,6 @@ impl Statistics for Statistic {
 mod tests {
     use super::*;
     use crate::utilities::test::*;
-    use csv;
     use std::f64;
 
     type Row6 = (f64, f64, f64, f64, f64, f64);
@@ -440,7 +439,6 @@ mod tests {
 #[cfg(all(test, feature = "nightly"))]
 mod benches {
     use super::*;
-    use csv;
     use std::result::Result;
     use test::{black_box, Bencher};
 
