@@ -34,7 +34,7 @@ impl<'a, M> fmt::Display for Context<'a, M> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "Context {{ step: {}, beta: {}, ... }}",
+            "Context {{ step: {}, beta: {:e}, ... }}",
             self.step, self.beta
         )
     }
