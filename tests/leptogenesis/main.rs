@@ -144,7 +144,7 @@ fn particle_indices() {
 /// 1-generation case.
 #[test]
 pub fn decay_only_1gen() -> Result<(), Box<dyn error::Error>> {
-    common::setup_logging(1);
+    // common::setup_logging(2);
 
     // Create the CSV file
     let output_dir = common::output_dir("leptogenesis/decay_only/1gen");
