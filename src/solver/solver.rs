@@ -652,7 +652,11 @@ where
             if err < self.error_tolerance {
                 advance = true;
             } else {
-                log::trace!("Error is not within tolerance.");
+                log::trace!(
+                    "Error is not within tolerance ({:e} > {:e}).",
+                    err,
+                    self.error_tolerance
+                );
             }
 
             // Compute the change in step size based on the current error and
