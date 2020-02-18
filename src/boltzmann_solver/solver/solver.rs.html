@@ -744,6 +744,10 @@
 <span id="744">744</span>
 <span id="745">745</span>
 <span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">model</span>::{<span class="ident">interaction</span>::<span class="ident">Interaction</span>, <span class="ident">Model</span>, <span class="ident">ModelInteractions</span>, <span class="ident">Particle</span>},
@@ -1399,7 +1403,11 @@
             <span class="kw">if</span> <span class="ident">err</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">error_tolerance</span> {
                 <span class="ident">advance</span> <span class="op">=</span> <span class="bool-val">true</span>;
             } <span class="kw">else</span> {
-                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Error is not within tolerance.&quot;</span>);
+                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(
+                    <span class="string">&quot;Error is not within tolerance ({:e} &gt; {:e}).&quot;</span>,
+                    <span class="ident">err</span>,
+                    <span class="self">self</span>.<span class="ident">error_tolerance</span>
+                );
             }
 
             <span class="comment">// Compute the change in step size based on the current error and</span>
