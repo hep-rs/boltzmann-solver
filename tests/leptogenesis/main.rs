@@ -14,7 +14,7 @@ use boltzmann_solver::{
 #[cfg(not(debug_assertions))]
 use itertools::iproduct;
 use ndarray::prelude::*;
-#[cfg(not(debug_assertions))]
+#[cfg(all(not(debug_assertions), feature = "parallel"))]
 use rayon::prelude::*;
 #[cfg(not(debug_assertions))]
 use std::fs::File;
@@ -514,48 +514,33 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
     // Setup logging
     // common::setup_logging(2);
 
+    // We'll be using models[0] as the precomputed (default) model, and
+    // models[1] as the comparison.
+    let mut models = [LeptogenesisModel::zero(), LeptogenesisModel::zero()];
     let beta = (1e-17, 1e-2);
-    let mut model_precomp = LeptogenesisModel::zero();
-    model_precomp.interactions.extend(
-        interaction::hln()
-            .drain(..)
-            .filter(one_generation)
-            .map(into_interaction_box),
-    );
-    model_precomp.interactions.extend(
-        interaction::hhll1()
-            .drain(..)
-            .filter(one_generation)
-            .map(into_interaction_box),
-    );
-    // model_precomp.interactions.extend(
-    //     interaction::hhll2()
-    //         .drain(..)
-    //         .filter(one_generation)
-    //         .map(into_interaction_box),
-    // );
 
-    let mut model_no_precomp = LeptogenesisModel::zero();
-    model_no_precomp.interactions.extend(
-        interaction::hln()
-            .drain(..)
-            .filter(one_generation)
-            .map(into_interaction_box),
-    );
-    model_no_precomp.interactions.extend(
-        interaction::hhll1()
-            .drain(..)
-            .filter(one_generation)
-            .map(into_interaction_box),
-    );
-    // model_no_precomp.interactions.extend(
-    //     interaction::hhll2()
-    //         .drain(..)
-    //         .filter(one_generation)
-    //         .map(into_interaction_box),
-    // );
+    for model in &mut models {
+        model.interactions.extend(
+            interaction::hln()
+                .drain(..)
+                .filter(one_generation)
+                .map(into_interaction_box),
+        );
+        model.interactions.extend(
+            interaction::hhll1()
+                .drain(..)
+                .filter(one_generation)
+                .map(into_interaction_box),
+        );
+        // model.interactions.extend(
+        //     interaction::hhll2()
+        //         .drain(..)
+        //         .filter(one_generation)
+        //         .map(into_interaction_box),
+        // );
+    }
 
-    // Precompute gamma for model1 only
+    // Precompute gamma for models[0]
     const N: u32 = 10;
     for (i, &beta) in vec![0.98 * beta.0, 0.99 * beta.0, 1.01 * beta.1, 1.02 * beta.1]
         .iter()
@@ -568,92 +553,86 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
             log::trace!("Precomputing step {} / {}", i, 2usize.pow(N) + 4);
         }
 
-        model_precomp.set_beta(beta);
-        let c = model_precomp.as_context();
+        let model = &mut models[0];
 
-        model_precomp
-            .interactions()
-            .par_iter()
-            .for_each(|interaction| {
-                interaction.gamma(&c);
-            });
+        model.set_beta(beta);
+        let c = model.as_context();
+
+        #[cfg(feature = "parallel")]
+        model.interactions().par_iter().for_each(|interaction| {
+            interaction.gamma(&c);
+        });
+        #[cfg(not(feature = "parallel"))]
+        for interaction in model.interactions() {
+            interaction.gamma(&c);
+        }
     }
 
     // Create the CSV files
-    let output_dir_precomp = common::output_dir("leptogenesis/gamma/precomp");
-    let output_dir_no_precomp = common::output_dir("leptogenesis/gamma/noprecomp");
+    let base_output_dir = common::output_dir("leptogenesis/gamma");
+    let output_dirs = [
+        common::output_dir("leptogenesis/gamma/precomp"),
+        common::output_dir("leptogenesis/gamma/noprecomp"),
+    ];
+
     let mut normalization_csv = csv::Writer::from_path({
-        let output_dir = common::output_dir("leptogenesis/gamma");
-        let mut path = output_dir.clone();
+        let mut path = base_output_dir.clone();
         path.push("normalization.csv");
         path
     })?;
     normalization_csv.serialize(("beta", "H", "n1", "normalization"))?;
 
-    let mut csvs_precomp = Vec::new();
-    for interaction in model_precomp.interactions() {
-        let particles = interaction.particles();
-        let mut csv = csv::Writer::from_path({
-            let mut path = output_dir_precomp.clone();
-            path.push(format!(
-                "{:?}:{:?}.csv",
-                particles.incoming, particles.outgoing
-            ));
-            path
-        })?;
-        csv.serialize(("beta", "gamma"))?;
-        csvs_precomp.push(RwLock::new(csv));
-    }
+    let mut csvs = [Vec::new(), Vec::new()];
+    for i in 0..models.len() {
+        for interaction in models[i].interactions() {
+            let ptcl = interaction.particles();
+            let mut csv = csv::Writer::from_path({
+                let mut path = output_dirs[i].clone();
+                path.push(format!("{:?}:{:?}.csv", ptcl.incoming, ptcl.outgoing));
+                path
+            })
+            .unwrap();
+            csv.serialize(("beta", "gamma"))?;
 
-    let mut csvs_no_precomp = Vec::new();
-    for interaction in model_no_precomp.interactions() {
-        let particles = interaction.particles();
-        let mut csv = csv::Writer::from_path({
-            let mut path = output_dir_no_precomp.clone();
-            path.push(format!(
-                "{:?}:{:?}.csv",
-                particles.incoming, particles.outgoing
-            ));
-            path
-        })?;
-        csv.serialize(("beta", "gamma"))?;
-        csvs_no_precomp.push(RwLock::new(csv));
+            #[cfg(feature = "parallel")]
+            csvs[i].push(RwLock::new(csv));
+            #[cfg(not(feature = "parallel"))]
+            csvs[i].push(csv);
+        }
     }
 
     // Write out all the outputs
     for &beta in Array1::geomspace(beta.0, beta.1, 100).unwrap().iter() {
-        model_precomp.set_beta(beta);
-        model_no_precomp.set_beta(beta);
+        for i in 0..models.len() {
+            models[i].set_beta(beta);
+            let c = models[i].as_context();
 
-        let c = model_precomp.as_context();
-        normalization_csv.serialize((
-            c.beta,
-            c.hubble_rate,
-            Statistic::BoseEinstein.massless_number_density(0.0, beta),
-            c.normalization,
-        ))?;
+            if i == 0 {
+                normalization_csv.serialize((
+                    c.beta,
+                    c.hubble_rate,
+                    Statistic::BoseEinstein.massless_number_density(0.0, beta),
+                    c.normalization,
+                ))?;
+            }
 
-        model_precomp
-            .interactions()
-            .par_iter()
-            .zip(&mut csvs_precomp)
-            .for_each(|(interaction, csv)| {
-                csv.write()
-                    .unwrap()
-                    .serialize((beta, interaction.gamma(&c)))
-                    .unwrap();
-            });
+            #[cfg(feature = "parallel")]
+            models[i]
+                .interactions()
+                .par_iter()
+                .zip(&mut csvs[i])
+                .for_each(|(interaction, csv)| {
+                    csv.write()
+                        .unwrap()
+                        .serialize((beta, interaction.gamma(&c)))
+                        .unwrap();
+                });
 
-        model_no_precomp
-            .interactions()
-            .par_iter()
-            .zip(&mut csvs_no_precomp)
-            .for_each(|(interaction, csv)| {
-                csv.write()
-                    .unwrap()
-                    .serialize((beta, interaction.gamma(&c)))
-                    .unwrap();
-            })
+            #[cfg(not(feature = "parallel"))]
+            for (interaction, csv) in models[i].interactions().iter().zip(&mut csvs[i]) {
+                csv.serialize((beta, interaction.gamma(&c)))?;
+            }
+        }
     }
 
     Ok(())
