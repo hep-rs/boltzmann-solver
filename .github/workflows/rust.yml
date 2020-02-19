@@ -1,6 +1,17 @@
 name: Rust
 
-on: [push, pull_request]
+on:
+  release:
+  push:
+    paths:
+      - "**/*.rs"
+      - "Cargo.toml"
+    tags:
+      - "v*"
+  pull_request:
+    paths:
+      - "**/*.rs"
+      - "Cargo.toml"
 
 jobs:
   check:
@@ -29,14 +40,14 @@ jobs:
             default-features: false
             features: "nightly"
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
         with:
           toolchain: ${{ matrix.toolchain }}
           override: true
           components: rustfmt, clippy
-      - name: format
+      - name: Format
         # switch to `action-rs/rustfmt-check` once that is available
         uses: actions-rs/cargo@v1
         with:
@@ -44,7 +55,7 @@ jobs:
           args: >-
             --
             --check
-      - name: clippy
+      - name: Clippy
         uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -60,6 +71,7 @@ jobs:
             -W missing_docs
 
   test:
+    needs: check
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -85,13 +97,13 @@ jobs:
             default-features: false
             features: "nightly"
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
         with:
           toolchain: ${{ matrix.toolchain }}
           override: true
-      - name: test
+      - name: Test
         uses: actions-rs/cargo@v1
         with:
           command: test
@@ -100,6 +112,7 @@ jobs:
             --features "${{ matrix.features }}"
 
   test-release:
+    needs: check
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -110,13 +123,13 @@ jobs:
           - default-features: false
             features: ""
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
-      - name: test-release
+      - name: Test (release)
         uses: actions-rs/cargo@v1
         with:
           command: test
@@ -126,19 +139,3 @@ jobs:
             --features "${{ matrix.features }}"
             --
             --test-threads 1
-
-  coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Install rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - name: tarpaulin
-        uses: actions-rs/tarpaulin@v0.1
-      - name: upload
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
