@@ -1,4 +1,59 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/tableau/rk98.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rk98.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="generator" content=
+"HTML Tidy for HTML5 for Linux version 5.6.0">
+<meta charset="utf-8">
+<meta name="viewport" content=
+"width=device-width, initial-scale=1.0">
+<meta name="generator" content="rustdoc">
+<meta name="description" content=
+"Source to the Rust file `src/solver/tableau/rk98.rs`.">
+<meta name="keywords" content="rust, rustlang, rust-lang">
+<title>rk98.rs.html -- source</title>
+<link rel="stylesheet" type="text/css" href=
+"../../../../normalize.css">
+<link rel="stylesheet" type="text/css" href=
+"../../../../rustdoc.css" id="mainThemeStyle">
+<link rel="stylesheet" type="text/css" href="../../../../dark.css">
+<link rel="stylesheet" type="text/css" href="../../../../light.css"
+id="themeStyle">
+<script src="../../../../storage.js"></script><noscript>
+<link rel="stylesheet" href="../../../../noscript.css"></noscript>
+<link rel="shortcut icon" href="../../../../favicon.ico">
+<style type="text/css">
+#crate-search{background-image:url("../../../../down-arrow.svg");}
+</style>
+</head>
+<body class="rustdoc source">
+<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
+<nav class="sidebar">
+<div class="sidebar-menu">☰</div>
+<a href='../../../../boltzmann_solver/index.html'>
+<div class='logo-container'><img src='../../../../rust-logo.png'
+alt='logo'></div>
+</a></nav>
+<div class="theme-picker"><button id="theme-picker" aria-label=
+"Pick another theme!"><img src="../../../../brush.svg" width="18"
+alt="Pick another theme!"></button>
+<div id="theme-choices"></div>
+</div>
+<script src="../../../../theme.js"></script>
+<nav class="sub">
+<form class="search-form">
+<div class="search-container">
+<div><select id="crate-search">
+<option value="All crates">All crates</option>
+</select><input class="search-input" name="search" disabled
+autocomplete="off" spellcheck="false" placeholder=
+"Click or press ‘S’ to search, ‘?’ for more options…" type=
+"search"></div>
+<a id="settings-menu" href="../../../../settings.html"><img src=
+"../../../../wheel.svg" width="18" alt="Change settings"></a></div>
+</form>
+</nav>
+<section id="main" class="content">
+<pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -304,22 +359,54 @@
 <span id="304">304</span>
 <span id="305">305</span>
 <span id="306">306</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! Runge-Kutta method of order 9 in 16 stages.</span>
+</pre>
+<div class="example-wrap">
+<pre class="rust">
+<span class=
+"doccomment">//! Runge-Kutta method of order 9 in 16 stages.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Coefficients are exported from Mathematica and can be obtained from</span>
+<span class=
+"doccomment">//! Coefficients are exported from Mathematica and can be obtained from</span>
 <span class="doccomment">//! references therein.</span>
 
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">all</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+<span class="attribute">#![<span class=
+"ident">allow</span>(<span class=
+"ident">clippy</span>::<span class="ident">all</span>)]</span>
+<span class="attribute">#![<span class=
+"ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_ORDER</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">9</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_S</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">16</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_A</span>: [[<span class="ident">f64</span>; <span class="ident">RK_S</span> <span class="op">-</span> <span class="number">1</span>]; <span class="ident">RK_S</span>] <span class="op">=</span> [
-    [<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>],
-    [<span class="number">0.04</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>],
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">RK_ORDER</span>: <span class=
+"ident">i32</span> <span class="op">=</span> <span class=
+"number">9</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">RK_S</span>: <span class=
+"ident">usize</span> <span class="op">=</span> <span class=
+"number">16</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">RK_A</span>: [[<span class=
+"ident">f64</span>; <span class="ident">RK_S</span> <span class=
+"op">-</span> <span class="number">1</span>]; <span class=
+"ident">RK_S</span>] <span class="op">=</span> [
+    [<span class="number">0.</span>, <span class=
+"number">0.</span>, <span class="number">0.</span>, <span class=
+"number">0.</span>, <span class="number">0.</span>, <span class=
+"number">0.</span>, <span class="number">0.</span>, <span class=
+"number">0.</span>, <span class="number">0.</span>, <span class=
+"number">0.</span>, <span class="number">0.</span>, <span class=
+"number">0.</span>, <span class="number">0.</span>, <span class=
+"number">0.</span>, <span class="number">0.</span>],
+    [<span class="number">0.04</span>, <span class=
+"number">0.</span>, <span class="number">0.</span>, <span class=
+"number">0.</span>, <span class="number">0.</span>, <span class=
+"number">0.</span>, <span class="number">0.</span>, <span class=
+"number">0.</span>, <span class="number">0.</span>, <span class=
+"number">0.</span>, <span class="number">0.</span>, <span class=
+"number">0.</span>, <span class="number">0.</span>, <span class=
+"number">0.</span>, <span class="number">0.</span>],
     [
-        <span class="op">-</span><span class="number">0.019885273191822924</span>,
+        <span class="op">-</span><span class=
+"number">0.019885273191822924</span>,
         <span class="number">0.11637263332969654</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
@@ -355,7 +442,8 @@
     [
         <span class="number">2.2721142642901775</span>,
         <span class="number">0.</span>,
-        <span class="op">-</span><span class="number">8.526886447976398</span>,
+        <span class="op">-</span><span class=
+"number">8.526886447976398</span>,
         <span class="number">6.8307721836862205</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
@@ -390,7 +478,8 @@
         <span class="number">0.1424783668683285</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
-        <span class="op">-</span><span class="number">0.3541799434668684</span>,
+        <span class="op">-</span><span class=
+"number">0.3541799434668684</span>,
         <span class="number">0.07595315450295101</span>,
         <span class="number">0.6765157656337121</span>,
         <span class="number">0.</span>,
@@ -428,7 +517,8 @@
         <span class="number">0.</span>,
         <span class="number">0.3268842451575246</span>,
         <span class="number">0.11561575484247545</span>,
-        <span class="op">-</span><span class="number">0.03375</span>,
+        <span class="op">-</span><span class=
+"number">0.03375</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
@@ -445,8 +535,10 @@
         <span class="number">0.</span>,
         <span class="number">0.039485599804954</span>,
         <span class="number">0.10588511619346581</span>,
-        <span class="op">-</span><span class="number">0.021520063204743093</span>,
-        <span class="op">-</span><span class="number">0.10453742601833482</span>,
+        <span class="op">-</span><span class=
+"number">0.021520063204743093</span>,
+        <span class="op">-</span><span class=
+"number">0.10453742601833482</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
@@ -455,13 +547,15 @@
         <span class="number">0.</span>,
     ],
     [
-        <span class="op">-</span><span class="number">0.026091134357549232</span>,
+        <span class="op">-</span><span class=
+"number">0.026091134357549232</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
         <span class="number">0.03333333333333333</span>,
-        <span class="op">-</span><span class="number">0.1652504006638105</span>,
+        <span class="op">-</span><span class=
+"number">0.1652504006638105</span>,
         <span class="number">0.03434664118368617</span>,
         <span class="number">0.1595758283215209</span>,
         <span class="number">0.21408573218281932</span>,
@@ -472,15 +566,18 @@
         <span class="number">0.</span>,
     ],
     [
-        <span class="op">-</span><span class="number">0.03628423396255661</span>,
+        <span class="op">-</span><span class=
+"number">0.03628423396255661</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
-        <span class="op">-</span><span class="number">1.0961675974272087</span>,
+        <span class="op">-</span><span class=
+"number">1.0961675974272087</span>,
         <span class="number">0.1826035504321331</span>,
         <span class="number">0.07082254444170685</span>,
-        <span class="op">-</span><span class="number">0.02313647018482423</span>,
+        <span class="op">-</span><span class=
+"number">0.02313647018482423</span>,
         <span class="number">0.2711204726320933</span>,
         <span class="number">1.3081337494229806</span>,
         <span class="number">0.</span>,
@@ -489,14 +586,18 @@
         <span class="number">0.</span>,
     ],
     [
-        <span class="op">-</span><span class="number">0.5074635056416975</span>,
+        <span class="op">-</span><span class=
+"number">0.5074635056416975</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
-        <span class="op">-</span><span class="number">6.631342198657237</span>,
-        <span class="op">-</span><span class="number">0.2527480100908805</span>,
-        <span class="op">-</span><span class="number">0.49526123800360944</span>,
+        <span class="op">-</span><span class=
+"number">6.631342198657237</span>,
+        <span class="op">-</span><span class=
+"number">0.2527480100908805</span>,
+        <span class="op">-</span><span class=
+"number">0.49526123800360944</span>,
         <span class="number">0.2932525545253893</span>,
         <span class="number">1.4401086937682814</span>,
         <span class="number">6.237934498647055</span>,
@@ -512,30 +613,39 @@
         <span class="number">0.</span>,
         <span class="number">0.</span>,
         <span class="number">9.088803891640463</span>,
-        <span class="op">-</span><span class="number">0.40737881562934536</span>,
+        <span class="op">-</span><span class=
+"number">0.40737881562934536</span>,
         <span class="number">1.7907333894903747</span>,
         <span class="number">0.714927166761755</span>,
-        <span class="op">-</span><span class="number">1.4385808578417227</span>,
-        <span class="op">-</span><span class="number">8.26332931206474</span>,
-        <span class="op">-</span><span class="number">1.537570570808865</span>,
+        <span class="op">-</span><span class=
+"number">1.4385808578417227</span>,
+        <span class="op">-</span><span class=
+"number">8.26332931206474</span>,
+        <span class="op">-</span><span class=
+"number">1.537570570808865</span>,
         <span class="number">0.3453832827564871</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
     ],
     [
-        <span class="op">-</span><span class="number">1.211697910343874</span>,
+        <span class="op">-</span><span class=
+"number">1.211697910343874</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
-        <span class="op">-</span><span class="number">19.05581871559595</span>,
+        <span class="op">-</span><span class=
+"number">19.05581871559595</span>,
         <span class="number">1.263060675389874</span>,
-        <span class="op">-</span><span class="number">6.913916969178459</span>,
-        <span class="op">-</span><span class="number">0.6764622665094988</span>,
+        <span class="op">-</span><span class=
+"number">6.913916969178459</span>,
+        <span class="op">-</span><span class=
+"number">0.6764622665094988</span>,
         <span class="number">3.367860445026608</span>,
         <span class="number">18.006751643125906</span>,
         <span class="number">6.83882892679428</span>,
-        <span class="op">-</span><span class="number">1.0315164519219506</span>,
+        <span class="op">-</span><span class=
+"number">1.0315164519219506</span>,
         <span class="number">0.41291062321306227</span>,
         <span class="number">0.</span>,
     ],
@@ -548,16 +658,23 @@
         <span class="number">23.807122198095808</span>,
         <span class="number">0.8862779249216589</span>,
         <span class="number">13.139130397598764</span>,
-        <span class="op">-</span><span class="number">2.604415709287714</span>,
-        <span class="op">-</span><span class="number">5.193859949783872</span>,
-        <span class="op">-</span><span class="number">20.41234071154151</span>,
-        <span class="op">-</span><span class="number">12.300856252505723</span>,
+        <span class="op">-</span><span class=
+"number">2.604415709287714</span>,
+        <span class="op">-</span><span class=
+"number">5.193859949783872</span>,
+        <span class="op">-</span><span class=
+"number">20.41234071154151</span>,
+        <span class="op">-</span><span class=
+"number">12.300856252505723</span>,
         <span class="number">1.5215530950085394</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
     ],
 ];
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_B</span>: [<span class="ident">f64</span>; <span class="ident">RK_S</span>] <span class="op">=</span> [
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">RK_B</span>: [<span class=
+"ident">f64</span>; <span class="ident">RK_S</span>] <span class=
+"op">=</span> [
     <span class="number">0.014588852784055398</span>,
     <span class="number">0.</span>,
     <span class="number">0.</span>,
@@ -575,7 +692,10 @@
     <span class="number">0.029477447612619417</span>,
     <span class="number">0.</span>,
 ];
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_C</span>: [<span class="ident">f64</span>; <span class="ident">RK_S</span>] <span class="op">=</span> [
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">RK_C</span>: [<span class=
+"ident">f64</span>; <span class="ident">RK_S</span>] <span class=
+"op">=</span> [
     <span class="number">0.</span>,
     <span class="number">0.04</span>,
     <span class="number">0.09648736013787362</span>,
@@ -593,23 +713,43 @@
     <span class="number">1.</span>,
     <span class="number">1.</span>,
 ];
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_E</span>: [<span class="ident">f64</span>; <span class="ident">RK_S</span>] <span class="op">=</span> [
-    <span class="op">-</span><span class="number">0.005757813768188949</span>,
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">RK_E</span>: [<span class=
+"ident">f64</span>; <span class="ident">RK_S</span>] <span class=
+"op">=</span> [
+    <span class="op">-</span><span class=
+"number">0.005757813768188949</span>,
     <span class="number">0.</span>,
     <span class="number">0.</span>,
     <span class="number">0.</span>,
     <span class="number">0.</span>,
     <span class="number">0.</span>,
     <span class="number">0.</span>,
-    <span class="op">-</span><span class="number">1.0675934530948108</span>,
+    <span class="op">-</span><span class=
+"number">1.0675934530948108</span>,
     <span class="number">0.14099636134393978</span>,
     <span class="number">0.014411715396914923</span>,
-    <span class="op">-</span><span class="number">0.03079696125188303</span>,
+    <span class="op">-</span><span class=
+"number">0.03079696125188303</span>,
     <span class="number">1.1613152578179067</span>,
-    <span class="op">-</span><span class="number">0.3222111348611858</span>,
+    <span class="op">-</span><span class=
+"number">0.3222111348611858</span>,
     <span class="number">0.12948458791975614</span>,
     <span class="number">0.029477447612619417</span>,
-    <span class="op">-</span><span class="number">0.0493260071150684</span>,
+    <span class="op">-</span><span class=
+"number">0.0493260071150684</span>,
 ];
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "boltzmann_solver";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>
+</section>
+<section id="search" class="content hidden"></section>
+<section class="footer"></section>
+<script>
+window.rootPath = "../../../../";window.currentCrate = "boltzmann_solver";
+</script>
+<script src="../../../../aliases.js"></script>
+<script src="../../../../main.js"></script>
+<script src="../../../../source-script.js"></script>
+<script src="../../../../source-files.js"></script>
+<script defer src="../../../../search-index.js"></script>
+</body>
+</html>

@@ -1,4 +1,58 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.8.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../crossbeam_epoch/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="generator" content=
+"HTML Tidy for HTML5 for Linux version 5.6.0">
+<meta charset="utf-8">
+<meta name="viewport" content=
+"width=device-width, initial-scale=1.0">
+<meta name="generator" content="rustdoc">
+<meta name="description" content=
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.8.0/src/lib.rs`.">
+<meta name="keywords" content="rust, rustlang, rust-lang">
+<title>lib.rs.html -- source</title>
+<link rel="stylesheet" type="text/css" href="../../normalize.css">
+<link rel="stylesheet" type="text/css" href="../../rustdoc.css" id=
+"mainThemeStyle">
+<link rel="stylesheet" type="text/css" href="../../dark.css">
+<link rel="stylesheet" type="text/css" href="../../light.css" id=
+"themeStyle">
+<script src="../../storage.js"></script><noscript>
+<link rel="stylesheet" href="../../noscript.css"></noscript>
+<link rel="shortcut icon" href="../../favicon.ico">
+<style type="text/css">
+#crate-search{background-image:url("../../down-arrow.svg");}
+</style>
+</head>
+<body class="rustdoc source">
+<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
+<nav class="sidebar">
+<div class="sidebar-menu">☰</div>
+<a href='../../crossbeam_epoch/index.html'>
+<div class='logo-container'><img src='../../rust-logo.png' alt=
+'logo'></div>
+</a></nav>
+<div class="theme-picker"><button id="theme-picker" aria-label=
+"Pick another theme!"><img src="../../brush.svg" width="18" alt=
+"Pick another theme!"></button>
+<div id="theme-choices"></div>
+</div>
+<script src="../../theme.js"></script>
+<nav class="sub">
+<form class="search-form">
+<div class="search-container">
+<div><select id="crate-search">
+<option value="All crates">All crates</option>
+</select><input class="search-input" name="search" disabled
+autocomplete="off" spellcheck="false" placeholder=
+"Click or press ‘S’ to search, ‘?’ for more options…" type=
+"search"></div>
+<a id="settings-menu" href="../../settings.html"><img src=
+"../../wheel.svg" width="18" alt="Change settings"></a></div>
+</form>
+</nav>
+<section id="main" class="content">
+<pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -104,112 +158,226 @@
 <span id="104">104</span>
 <span id="105">105</span>
 <span id="106">106</span>
-</pre><div class="example-wrap"><pre class="rust ">
+</pre>
+<div class="example-wrap">
+<pre class="rust">
 <span class="doccomment">//! Epoch-based memory reclamation.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! An interesting problem concurrent collections deal with comes from the remove operation.</span>
-<span class="doccomment">//! Suppose that a thread removes an element from a lock-free map, while another thread is reading</span>
-<span class="doccomment">//! that same element at the same time. The first thread must wait until the second thread stops</span>
-<span class="doccomment">//! reading the element. Only then it is safe to destruct it.</span>
+<span class=
+"doccomment">//! An interesting problem concurrent collections deal with comes from the remove operation.</span>
+<span class=
+"doccomment">//! Suppose that a thread removes an element from a lock-free map, while another thread is reading</span>
+<span class=
+"doccomment">//! that same element at the same time. The first thread must wait until the second thread stops</span>
+<span class=
+"doccomment">//! reading the element. Only then it is safe to destruct it.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Programming languages that come with garbage collectors solve this problem trivially. The</span>
-<span class="doccomment">//! garbage collector will destruct the removed element when no thread can hold a reference to it</span>
+<span class=
+"doccomment">//! Programming languages that come with garbage collectors solve this problem trivially. The</span>
+<span class=
+"doccomment">//! garbage collector will destruct the removed element when no thread can hold a reference to it</span>
 <span class="doccomment">//! anymore.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! This crate implements a basic memory reclamation mechanism, which is based on epochs. When an</span>
-<span class="doccomment">//! element gets removed from a concurrent collection, it is inserted into a pile of garbage and</span>
-<span class="doccomment">//! marked with the current epoch. Every time a thread accesses a collection, it checks the current</span>
-<span class="doccomment">//! epoch, attempts to increment it, and destructs some garbage that became so old that no thread</span>
+<span class=
+"doccomment">//! This crate implements a basic memory reclamation mechanism, which is based on epochs. When an</span>
+<span class=
+"doccomment">//! element gets removed from a concurrent collection, it is inserted into a pile of garbage and</span>
+<span class=
+"doccomment">//! marked with the current epoch. Every time a thread accesses a collection, it checks the current</span>
+<span class=
+"doccomment">//! epoch, attempts to increment it, and destructs some garbage that became so old that no thread</span>
 <span class="doccomment">//! can be referencing it anymore.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! That is the general mechanism behind epoch-based memory reclamation, but the details are a bit</span>
-<span class="doccomment">//! more complicated. Anyhow, memory reclamation is designed to be fully automatic and something</span>
-<span class="doccomment">//! users of concurrent collections don&#39;t have to worry much about.</span>
+<span class=
+"doccomment">//! That is the general mechanism behind epoch-based memory reclamation, but the details are a bit</span>
+<span class=
+"doccomment">//! more complicated. Anyhow, memory reclamation is designed to be fully automatic and something</span>
+<span class=
+"doccomment">//! users of concurrent collections don't have to worry much about.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Pointers</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Concurrent collections are built using atomic pointers. This module provides [`Atomic`], which</span>
-<span class="doccomment">//! is just a shared atomic pointer to a heap-allocated object. Loading an [`Atomic`] yields a</span>
-<span class="doccomment">//! [`Shared`], which is an epoch-protected pointer through which the loaded object can be safely</span>
+<span class=
+"doccomment">//! Concurrent collections are built using atomic pointers. This module provides [`Atomic`], which</span>
+<span class=
+"doccomment">//! is just a shared atomic pointer to a heap-allocated object. Loading an [`Atomic`] yields a</span>
+<span class=
+"doccomment">//! [`Shared`], which is an epoch-protected pointer through which the loaded object can be safely</span>
 <span class="doccomment">//! read.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Pinning</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Before an [`Atomic`] can be loaded, a participant must be [`pin`]ned. By pinning a participant</span>
-<span class="doccomment">//! we declare that any object that gets removed from now on must not be destructed just</span>
-<span class="doccomment">//! yet. Garbage collection of newly removed objects is suspended until the participant gets</span>
+<span class=
+"doccomment">//! Before an [`Atomic`] can be loaded, a participant must be [`pin`]ned. By pinning a participant</span>
+<span class=
+"doccomment">//! we declare that any object that gets removed from now on must not be destructed just</span>
+<span class=
+"doccomment">//! yet. Garbage collection of newly removed objects is suspended until the participant gets</span>
 <span class="doccomment">//! unpinned.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Garbage</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Objects that get removed from concurrent collections must be stashed away until all currently</span>
-<span class="doccomment">//! pinned participants get unpinned. Such objects can be stored into a thread-local or global</span>
-<span class="doccomment">//! storage, where they are kept until the right time for their destruction comes.</span>
+<span class=
+"doccomment">//! Objects that get removed from concurrent collections must be stashed away until all currently</span>
+<span class=
+"doccomment">//! pinned participants get unpinned. Such objects can be stored into a thread-local or global</span>
+<span class=
+"doccomment">//! storage, where they are kept until the right time for their destruction comes.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! There is a global shared instance of garbage queue. You can [`defer`] the execution of an</span>
-<span class="doccomment">//! arbitrary function until the global epoch is advanced enough. Most notably, concurrent data</span>
-<span class="doccomment">//! structures may defer the deallocation of an object.</span>
+<span class=
+"doccomment">//! There is a global shared instance of garbage queue. You can [`defer`] the execution of an</span>
+<span class=
+"doccomment">//! arbitrary function until the global epoch is advanced enough. Most notably, concurrent data</span>
+<span class=
+"doccomment">//! structures may defer the deallocation of an object.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # APIs</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! For majority of use cases, just use the default garbage collector by invoking [`pin`]. If you</span>
-<span class="doccomment">//! want to create your own garbage collector, use the [`Collector`] API.</span>
+<span class=
+"doccomment">//! For majority of use cases, just use the default garbage collector by invoking [`pin`]. If you</span>
+<span class=
+"doccomment">//! want to create your own garbage collector, use the [`Collector`] API.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [`Atomic`]: struct.Atomic.html</span>
-<span class="doccomment">//! [`Collector`]: struct.Collector.html</span>
+<span class=
+"doccomment">//! [`Collector`]: struct.Collector.html</span>
 <span class="doccomment">//! [`Shared`]: struct.Shared.html</span>
 <span class="doccomment">//! [`pin`]: fn.pin.html</span>
 <span class="doccomment">//! [`defer`]: fn.defer.html</span>
 
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_debug_implementations</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>, <span class="ident">feature</span>(<span class="ident">cfg_target_has_atomic</span>))]</span>
+<span class="attribute">#![<span class=
+"ident">warn</span>(<span class=
+"ident">missing_docs</span>)]</span>
+<span class="attribute">#![<span class=
+"ident">warn</span>(<span class=
+"ident">missing_debug_implementations</span>)]</span>
+<span class="attribute">#![<span class=
+"ident">cfg_attr</span>(<span class="ident">not</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>), <span class="ident">no_std</span>)]</span>
+<span class="attribute">#![<span class=
+"ident">cfg_attr</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"nightly"</span>, <span class=
+"ident">feature</span>(<span class=
+"ident">cfg_target_has_atomic</span>))]</span>
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">cfg_if</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">core</span>;
+<span class="attribute">#[<span class=
+"ident">macro_use</span>]</span>
+<span class="kw">extern</span> <span class=
+"kw">crate</span> <span class="ident">cfg_if</span>;
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">feature</span> <span class=
+"op">=</span> <span class="string">"std"</span>)]</span>
+<span class="kw">extern</span> <span class=
+"kw">crate</span> <span class="ident">core</span>;
 
 <span class="macro">cfg_if</span><span class="macro">!</span> {
-    <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span> {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span> {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">std</span> <span class="kw">as</span> <span class="ident">alloc</span>;
+    <span class="kw">if</span> <span class=
+"attribute">#[<span class="ident">cfg</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"alloc"</span>)]</span> {
+        <span class="kw">extern</span> <span class=
+"kw">crate</span> <span class="ident">alloc</span>;
+    } <span class="kw">else</span> <span class=
+"kw">if</span> <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">feature</span> <span class=
+"op">=</span> <span class="string">"std"</span>)]</span> {
+        <span class="kw">extern</span> <span class=
+"kw">crate</span> <span class="ident">std</span> <span class=
+"kw">as</span> <span class="ident">alloc</span>;
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>, <span class="ident">cfg</span>(<span class="ident">target_has_atomic</span> <span class="op">=</span> <span class="string">&quot;ptr&quot;</span>))]</span>
+<span class="attribute">#[<span class=
+"ident">cfg_attr</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"nightly"</span>, <span class=
+"ident">cfg</span>(<span class=
+"ident">target_has_atomic</span> <span class=
+"op">=</span> <span class="string">"ptr"</span>))]</span>
 <span class="macro">cfg_if</span><span class="macro">!</span> {
-    <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span> {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">crossbeam_utils</span>;
-        <span class="attribute">#[<span class="ident">macro_use</span>]</span>
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">memoffset</span>;
-        <span class="attribute">#[<span class="ident">macro_use</span>]</span>
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">scopeguard</span>;
+    <span class="kw">if</span> <span class=
+"attribute">#[<span class="ident">cfg</span>(<span class=
+"ident">any</span>(<span class="ident">feature</span> <span class=
+"op">=</span> <span class="string">"alloc"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>))]</span> {
+        <span class="kw">extern</span> <span class=
+"kw">crate</span> <span class="ident">crossbeam_utils</span>;
+        <span class="attribute">#[<span class=
+"ident">macro_use</span>]</span>
+        <span class="kw">extern</span> <span class=
+"kw">crate</span> <span class="ident">memoffset</span>;
+        <span class="attribute">#[<span class=
+"ident">macro_use</span>]</span>
+        <span class="kw">extern</span> <span class=
+"kw">crate</span> <span class="ident">scopeguard</span>;
 
-        <span class="kw">mod</span> <span class="ident">atomic</span>;
-        <span class="kw">mod</span> <span class="ident">collector</span>;
-        <span class="kw">mod</span> <span class="ident">deferred</span>;
-        <span class="kw">mod</span> <span class="ident">epoch</span>;
-        <span class="kw">mod</span> <span class="ident">guard</span>;
-        <span class="kw">mod</span> <span class="ident">internal</span>;
-        <span class="kw">mod</span> <span class="ident">sync</span>;
+        <span class="kw">mod</span> <span class=
+"ident">atomic</span>;
+        <span class="kw">mod</span> <span class=
+"ident">collector</span>;
+        <span class="kw">mod</span> <span class=
+"ident">deferred</span>;
+        <span class="kw">mod</span> <span class=
+"ident">epoch</span>;
+        <span class="kw">mod</span> <span class=
+"ident">guard</span>;
+        <span class="kw">mod</span> <span class=
+"ident">internal</span>;
+        <span class="kw">mod</span> <span class=
+"ident">sync</span>;
 
-        <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">atomic</span>::{<span class="ident">Atomic</span>, <span class="ident">CompareAndSetError</span>, <span class="ident">CompareAndSetOrdering</span>, <span class="ident">Owned</span>, <span class="ident">Pointer</span>, <span class="ident">Shared</span>};
-        <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">collector</span>::{<span class="ident">Collector</span>, <span class="ident">LocalHandle</span>};
-        <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">guard</span>::{<span class="ident">unprotected</span>, <span class="ident">Guard</span>};
+        <span class="kw">pub</span> <span class=
+"kw">use</span> <span class="self">self</span>::<span class=
+"ident">atomic</span>::{<span class=
+"ident">Atomic</span>, <span class=
+"ident">CompareAndSetError</span>, <span class=
+"ident">CompareAndSetOrdering</span>, <span class=
+"ident">Owned</span>, <span class=
+"ident">Pointer</span>, <span class="ident">Shared</span>};
+        <span class="kw">pub</span> <span class=
+"kw">use</span> <span class="self">self</span>::<span class=
+"ident">collector</span>::{<span class=
+"ident">Collector</span>, <span class="ident">LocalHandle</span>};
+        <span class="kw">pub</span> <span class=
+"kw">use</span> <span class="self">self</span>::<span class=
+"ident">guard</span>::{<span class=
+"ident">unprotected</span>, <span class="ident">Guard</span>};
     }
 }
 
 <span class="macro">cfg_if</span><span class="macro">!</span> {
-    <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span> {
-        <span class="attribute">#[<span class="ident">macro_use</span>]</span>
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">lazy_static</span>;
+    <span class="kw">if</span> <span class=
+"attribute">#[<span class="ident">cfg</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>)]</span> {
+        <span class="attribute">#[<span class=
+"ident">macro_use</span>]</span>
+        <span class="kw">extern</span> <span class=
+"kw">crate</span> <span class="ident">lazy_static</span>;
 
-        <span class="kw">mod</span> <span class="ident">default</span>;
-        <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">default</span>::{<span class="ident">default_collector</span>, <span class="ident">is_pinned</span>, <span class="ident">pin</span>};
+        <span class="kw">mod</span> <span class=
+"ident">default</span>;
+        <span class="kw">pub</span> <span class=
+"kw">use</span> <span class="self">self</span>::<span class=
+"ident">default</span>::{<span class=
+"ident">default_collector</span>, <span class=
+"ident">is_pinned</span>, <span class="ident">pin</span>};
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "crossbeam_epoch";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>
+</section>
+<section id="search" class="content hidden"></section>
+<section class="footer"></section>
+<script>
+window.rootPath = "../../";window.currentCrate = "crossbeam_epoch";
+</script>
+<script src="../../aliases.js"></script>
+<script src="../../main.js"></script>
+<script src="../../source-script.js"></script>
+<script src="../../source-files.js"></script>
+<script defer src="../../search-index.js"></script>
+</body>
+</html>

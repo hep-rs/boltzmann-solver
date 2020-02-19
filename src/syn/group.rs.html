@@ -1,4 +1,58 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.14/src/group.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>group.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../syn/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="generator" content=
+"HTML Tidy for HTML5 for Linux version 5.6.0">
+<meta charset="utf-8">
+<meta name="viewport" content=
+"width=device-width, initial-scale=1.0">
+<meta name="generator" content="rustdoc">
+<meta name="description" content=
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.14/src/group.rs`.">
+<meta name="keywords" content="rust, rustlang, rust-lang">
+<title>group.rs.html -- source</title>
+<link rel="stylesheet" type="text/css" href="../../normalize.css">
+<link rel="stylesheet" type="text/css" href="../../rustdoc.css" id=
+"mainThemeStyle">
+<link rel="stylesheet" type="text/css" href="../../dark.css">
+<link rel="stylesheet" type="text/css" href="../../light.css" id=
+"themeStyle">
+<script src="../../storage.js"></script><noscript>
+<link rel="stylesheet" href="../../noscript.css"></noscript>
+<link rel="shortcut icon" href="../../favicon.ico">
+<style type="text/css">
+#crate-search{background-image:url("../../down-arrow.svg");}
+</style>
+</head>
+<body class="rustdoc source">
+<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
+<nav class="sidebar">
+<div class="sidebar-menu">☰</div>
+<a href='../../syn/index.html'>
+<div class='logo-container'><img src='../../rust-logo.png' alt=
+'logo'></div>
+</a></nav>
+<div class="theme-picker"><button id="theme-picker" aria-label=
+"Pick another theme!"><img src="../../brush.svg" width="18" alt=
+"Pick another theme!"></button>
+<div id="theme-choices"></div>
+</div>
+<script src="../../theme.js"></script>
+<nav class="sub">
+<form class="search-form">
+<div class="search-container">
+<div><select id="crate-search">
+<option value="All crates">All crates</option>
+</select><input class="search-input" name="search" disabled
+autocomplete="off" spellcheck="false" placeholder=
+"Click or press ‘S’ to search, ‘?’ for more options…" type=
+"search"></div>
+<a id="settings-menu" href="../../settings.html"><img src=
+"../../wheel.svg" width="18" alt="Change settings"></a></div>
+</form>
+</nav>
+<section id="main" class="content">
+<pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -278,131 +332,330 @@
 <span id="278">278</span>
 <span id="279">279</span>
 <span id="280">280</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Delimiter</span>, <span class="ident">Span</span>};
+</pre>
+<div class="example-wrap">
+<pre class="rust">
+<span class="kw">use</span> <span class=
+"ident">proc_macro2</span>::{<span class=
+"ident">Delimiter</span>, <span class="ident">Span</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">error</span>::<span class="prelude-ty">Result</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">parse</span>::<span class="ident">ParseBuffer</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">token</span>;
+<span class="kw">use</span> <span class=
+"kw">crate</span>::<span class="ident">error</span>::<span class=
+"prelude-ty">Result</span>;
+<span class="kw">use</span> <span class=
+"kw">crate</span>::<span class="ident">parse</span>::<span class=
+"ident">ParseBuffer</span>;
+<span class="kw">use</span> <span class=
+"kw">crate</span>::<span class="ident">token</span>;
 
 <span class="comment">// Not public API.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Parens</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">token</span>::<span class="ident">Paren</span>,
-    <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">ParseBuffer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="attribute">#[<span class=
+"ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class=
+"kw">struct</span> <span class="ident">Parens</span><span class=
+"op">&lt;</span><span class="lifetime">'a</span><span class=
+"op">&gt;</span> {
+    <span class="kw">pub</span> <span class=
+"ident">token</span>: <span class=
+"ident">token</span>::<span class="ident">Paren</span>,
+    <span class="kw">pub</span> <span class=
+"ident">content</span>: <span class=
+"ident">ParseBuffer</span><span class="op">&lt;</span><span class=
+"lifetime">'a</span><span class="op">&gt;</span>,
 }
 
 <span class="comment">// Not public API.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Braces</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">token</span>::<span class="ident">Brace</span>,
-    <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">ParseBuffer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="attribute">#[<span class=
+"ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class=
+"kw">struct</span> <span class="ident">Braces</span><span class=
+"op">&lt;</span><span class="lifetime">'a</span><span class=
+"op">&gt;</span> {
+    <span class="kw">pub</span> <span class=
+"ident">token</span>: <span class=
+"ident">token</span>::<span class="ident">Brace</span>,
+    <span class="kw">pub</span> <span class=
+"ident">content</span>: <span class=
+"ident">ParseBuffer</span><span class="op">&lt;</span><span class=
+"lifetime">'a</span><span class="op">&gt;</span>,
 }
 
 <span class="comment">// Not public API.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Brackets</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">token</span>::<span class="ident">Bracket</span>,
-    <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">ParseBuffer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="attribute">#[<span class=
+"ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class=
+"kw">struct</span> <span class="ident">Brackets</span><span class=
+"op">&lt;</span><span class="lifetime">'a</span><span class=
+"op">&gt;</span> {
+    <span class="kw">pub</span> <span class=
+"ident">token</span>: <span class=
+"ident">token</span>::<span class="ident">Bracket</span>,
+    <span class="kw">pub</span> <span class=
+"ident">content</span>: <span class=
+"ident">ParseBuffer</span><span class="op">&lt;</span><span class=
+"lifetime">'a</span><span class="op">&gt;</span>,
 }
 
 <span class="comment">// Not public API.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;full&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;derive&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Group</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">token</span>::<span class="ident">Group</span>,
-    <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">ParseBuffer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"full"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"derive"</span>))]</span>
+<span class="attribute">#[<span class=
+"ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class=
+"kw">struct</span> <span class="ident">Group</span><span class=
+"op">&lt;</span><span class="lifetime">'a</span><span class=
+"op">&gt;</span> {
+    <span class="kw">pub</span> <span class=
+"ident">token</span>: <span class=
+"ident">token</span>::<span class="ident">Group</span>,
+    <span class="kw">pub</span> <span class=
+"ident">content</span>: <span class=
+"ident">ParseBuffer</span><span class="op">&lt;</span><span class=
+"lifetime">'a</span><span class="op">&gt;</span>,
 }
 
 <span class="comment">// Not public API.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_parens</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">ParseBuffer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Parens</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">parse_delimited</span>(<span class="ident">input</span>, <span class="ident">Delimiter</span>::<span class="ident">Parenthesis</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">span</span>, <span class="ident">content</span>)<span class="op">|</span> <span class="ident">Parens</span> {
-        <span class="ident">token</span>: <span class="ident">token</span>::<span class="ident">Paren</span>(<span class="ident">span</span>),
+<span class="attribute">#[<span class=
+"ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class=
+"ident">parse_parens</span><span class="op">&lt;</span><span class=
+"lifetime">'a</span><span class="op">&gt;</span>(<span class=
+"ident">input</span>: <span class="kw-2">&</span><span class=
+"ident">ParseBuffer</span><span class="op">&lt;</span><span class=
+"lifetime">'a</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"prelude-ty">Result</span><span class="op">&lt;</span><span class=
+"ident">Parens</span><span class="op">&lt;</span><span class=
+"lifetime">'a</span><span class="op">&gt;</span><span class=
+"op">&gt;</span> {
+    <span class="ident">parse_delimited</span>(<span class=
+"ident">input</span>, <span class=
+"ident">Delimiter</span>::<span class=
+"ident">Parenthesis</span>).<span class=
+"ident">map</span>(<span class="op">|</span>(<span class=
+"ident">span</span>, <span class=
+"ident">content</span>)<span class="op">|</span> <span class=
+"ident">Parens</span> {
+        <span class="ident">token</span>: <span class=
+"ident">token</span>::<span class="ident">Paren</span>(<span class=
+"ident">span</span>),
         <span class="ident">content</span>,
     })
 }
 
 <span class="comment">// Not public API.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_braces</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">ParseBuffer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Braces</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">parse_delimited</span>(<span class="ident">input</span>, <span class="ident">Delimiter</span>::<span class="ident">Brace</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">span</span>, <span class="ident">content</span>)<span class="op">|</span> <span class="ident">Braces</span> {
-        <span class="ident">token</span>: <span class="ident">token</span>::<span class="ident">Brace</span>(<span class="ident">span</span>),
+<span class="attribute">#[<span class=
+"ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class=
+"ident">parse_braces</span><span class="op">&lt;</span><span class=
+"lifetime">'a</span><span class="op">&gt;</span>(<span class=
+"ident">input</span>: <span class="kw-2">&</span><span class=
+"ident">ParseBuffer</span><span class="op">&lt;</span><span class=
+"lifetime">'a</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"prelude-ty">Result</span><span class="op">&lt;</span><span class=
+"ident">Braces</span><span class="op">&lt;</span><span class=
+"lifetime">'a</span><span class="op">&gt;</span><span class=
+"op">&gt;</span> {
+    <span class="ident">parse_delimited</span>(<span class=
+"ident">input</span>, <span class=
+"ident">Delimiter</span>::<span class=
+"ident">Brace</span>).<span class="ident">map</span>(<span class=
+"op">|</span>(<span class="ident">span</span>, <span class=
+"ident">content</span>)<span class="op">|</span> <span class=
+"ident">Braces</span> {
+        <span class="ident">token</span>: <span class=
+"ident">token</span>::<span class="ident">Brace</span>(<span class=
+"ident">span</span>),
         <span class="ident">content</span>,
     })
 }
 
 <span class="comment">// Not public API.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_brackets</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">ParseBuffer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Brackets</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">parse_delimited</span>(<span class="ident">input</span>, <span class="ident">Delimiter</span>::<span class="ident">Bracket</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">span</span>, <span class="ident">content</span>)<span class="op">|</span> <span class="ident">Brackets</span> {
-        <span class="ident">token</span>: <span class="ident">token</span>::<span class="ident">Bracket</span>(<span class="ident">span</span>),
+<span class="attribute">#[<span class=
+"ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class=
+"ident">parse_brackets</span><span class=
+"op">&lt;</span><span class="lifetime">'a</span><span class=
+"op">&gt;</span>(<span class="ident">input</span>: <span class=
+"kw-2">&</span><span class="ident">ParseBuffer</span><span class=
+"op">&lt;</span><span class="lifetime">'a</span><span class=
+"op">&gt;</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Result</span><span class=
+"op">&lt;</span><span class="ident">Brackets</span><span class=
+"op">&lt;</span><span class="lifetime">'a</span><span class=
+"op">&gt;</span><span class="op">&gt;</span> {
+    <span class="ident">parse_delimited</span>(<span class=
+"ident">input</span>, <span class=
+"ident">Delimiter</span>::<span class=
+"ident">Bracket</span>).<span class="ident">map</span>(<span class=
+"op">|</span>(<span class="ident">span</span>, <span class=
+"ident">content</span>)<span class="op">|</span> <span class=
+"ident">Brackets</span> {
+        <span class="ident">token</span>: <span class=
+"ident">token</span>::<span class=
+"ident">Bracket</span>(<span class="ident">span</span>),
         <span class="ident">content</span>,
     })
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;full&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;derive&quot;</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_group</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">ParseBuffer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Group</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">parse_delimited</span>(<span class="ident">input</span>, <span class="ident">Delimiter</span>::<span class="prelude-val">None</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">span</span>, <span class="ident">content</span>)<span class="op">|</span> <span class="ident">Group</span> {
-        <span class="ident">token</span>: <span class="ident">token</span>::<span class="ident">Group</span>(<span class="ident">span</span>),
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"full"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"derive"</span>))]</span>
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">fn</span> <span class=
+"ident">parse_group</span><span class="op">&lt;</span><span class=
+"lifetime">'a</span><span class="op">&gt;</span>(<span class=
+"ident">input</span>: <span class="kw-2">&</span><span class=
+"ident">ParseBuffer</span><span class="op">&lt;</span><span class=
+"lifetime">'a</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"prelude-ty">Result</span><span class="op">&lt;</span><span class=
+"ident">Group</span><span class="op">&lt;</span><span class=
+"lifetime">'a</span><span class="op">&gt;</span><span class=
+"op">&gt;</span> {
+    <span class="ident">parse_delimited</span>(<span class=
+"ident">input</span>, <span class=
+"ident">Delimiter</span>::<span class=
+"prelude-val">None</span>).<span class=
+"ident">map</span>(<span class="op">|</span>(<span class=
+"ident">span</span>, <span class=
+"ident">content</span>)<span class="op">|</span> <span class=
+"ident">Group</span> {
+        <span class="ident">token</span>: <span class=
+"ident">token</span>::<span class="ident">Group</span>(<span class=
+"ident">span</span>),
         <span class="ident">content</span>,
     })
 }
 
-<span class="kw">fn</span> <span class="ident">parse_delimited</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">ParseBuffer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">delimiter</span>: <span class="ident">Delimiter</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Span</span>, <span class="ident">ParseBuffer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="ident">input</span>.<span class="ident">step</span>(<span class="op">|</span><span class="ident">cursor</span><span class="op">|</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">content</span>, <span class="ident">span</span>, <span class="ident">rest</span>)) <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">group</span>(<span class="ident">delimiter</span>) {
-            <span class="kw">let</span> <span class="ident">scope</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">buffer</span>::<span class="ident">close_span_of_group</span>(<span class="kw-2">*</span><span class="ident">cursor</span>);
-            <span class="kw">let</span> <span class="ident">nested</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">parse</span>::<span class="ident">advance_step_cursor</span>(<span class="ident">cursor</span>, <span class="ident">content</span>);
-            <span class="kw">let</span> <span class="ident">unexpected</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">parse</span>::<span class="ident">get_unexpected</span>(<span class="ident">input</span>);
-            <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">parse</span>::<span class="ident">new_parse_buffer</span>(<span class="ident">scope</span>, <span class="ident">nested</span>, <span class="ident">unexpected</span>);
-            <span class="prelude-val">Ok</span>(((<span class="ident">span</span>, <span class="ident">content</span>), <span class="ident">rest</span>))
+<span class="kw">fn</span> <span class=
+"ident">parse_delimited</span><span class=
+"op">&lt;</span><span class="lifetime">'a</span><span class=
+"op">&gt;</span>(
+    <span class="ident">input</span>: <span class=
+"kw-2">&</span><span class="ident">ParseBuffer</span><span class=
+"op">&lt;</span><span class="lifetime">'a</span><span class=
+"op">&gt;</span>,
+    <span class="ident">delimiter</span>: <span class=
+"ident">Delimiter</span>,
+) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Result</span><span class=
+"op">&lt;</span>(<span class="ident">Span</span>, <span class=
+"ident">ParseBuffer</span><span class="op">&lt;</span><span class=
+"lifetime">'a</span><span class="op">&gt;</span>)<span class=
+"op">&gt;</span> {
+    <span class="ident">input</span>.<span class=
+"ident">step</span>(<span class="op">|</span><span class=
+"ident">cursor</span><span class="op">|</span> {
+        <span class="kw">if</span> <span class=
+"kw">let</span> <span class="prelude-val">Some</span>((<span class=
+"ident">content</span>, <span class=
+"ident">span</span>, <span class="ident">rest</span>)) <span class=
+"op">=</span> <span class="ident">cursor</span>.<span class=
+"ident">group</span>(<span class="ident">delimiter</span>) {
+            <span class="kw">let</span> <span class=
+"ident">scope</span> <span class="op">=</span> <span class=
+"kw">crate</span>::<span class="ident">buffer</span>::<span class=
+"ident">close_span_of_group</span>(<span class=
+"kw-2">*</span><span class="ident">cursor</span>);
+            <span class="kw">let</span> <span class=
+"ident">nested</span> <span class="op">=</span> <span class=
+"kw">crate</span>::<span class="ident">parse</span>::<span class=
+"ident">advance_step_cursor</span>(<span class=
+"ident">cursor</span>, <span class="ident">content</span>);
+            <span class="kw">let</span> <span class=
+"ident">unexpected</span> <span class="op">=</span> <span class=
+"kw">crate</span>::<span class="ident">parse</span>::<span class=
+"ident">get_unexpected</span>(<span class="ident">input</span>);
+            <span class="kw">let</span> <span class=
+"ident">content</span> <span class="op">=</span> <span class=
+"kw">crate</span>::<span class="ident">parse</span>::<span class=
+"ident">new_parse_buffer</span>(<span class=
+"ident">scope</span>, <span class=
+"ident">nested</span>, <span class="ident">unexpected</span>);
+            <span class="prelude-val">Ok</span>(((<span class=
+"ident">span</span>, <span class=
+"ident">content</span>), <span class="ident">rest</span>))
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">delimiter</span> {
-                <span class="ident">Delimiter</span>::<span class="ident">Parenthesis</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;expected parentheses&quot;</span>,
-                <span class="ident">Delimiter</span>::<span class="ident">Brace</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;expected curly braces&quot;</span>,
-                <span class="ident">Delimiter</span>::<span class="ident">Bracket</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;expected square brackets&quot;</span>,
-                <span class="ident">Delimiter</span>::<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;expected invisible group&quot;</span>,
+            <span class="kw">let</span> <span class=
+"ident">message</span> <span class="op">=</span> <span class=
+"kw">match</span> <span class="ident">delimiter</span> {
+                <span class="ident">Delimiter</span>::<span class=
+"ident">Parenthesis</span> <span class="op">=</span><span class=
+"op">&gt;</span> <span class=
+"string">"expected parentheses"</span>,
+                <span class="ident">Delimiter</span>::<span class=
+"ident">Brace</span> <span class="op">=</span><span class=
+"op">&gt;</span> <span class=
+"string">"expected curly braces"</span>,
+                <span class="ident">Delimiter</span>::<span class=
+"ident">Bracket</span> <span class="op">=</span><span class=
+"op">&gt;</span> <span class=
+"string">"expected square brackets"</span>,
+                <span class="ident">Delimiter</span>::<span class=
+"prelude-val">None</span> <span class="op">=</span><span class=
+"op">&gt;</span> <span class=
+"string">"expected invisible group"</span>,
             };
-            <span class="prelude-val">Err</span>(<span class="ident">cursor</span>.<span class="ident">error</span>(<span class="ident">message</span>))
+            <span class="prelude-val">Err</span>(<span class=
+"ident">cursor</span>.<span class="ident">error</span>(<span class=
+"ident">message</span>))
         }
     })
 }
 
-<span class="doccomment">/// Parse a set of parentheses and expose their content to subsequent parsers.</span>
+<span class=
+"doccomment">/// Parse a set of parentheses and expose their content to subsequent parsers.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// # use quote::quote;</span>
 <span class="doccomment">/// #</span>
-<span class="doccomment">/// use syn::{parenthesized, token, Ident, Result, Token, Type};</span>
-<span class="doccomment">/// use syn::parse::{Parse, ParseStream};</span>
-<span class="doccomment">/// use syn::punctuated::Punctuated;</span>
+<span class=
+"doccomment">/// use syn::{parenthesized, token, Ident, Result, Token, Type};</span>
+<span class=
+"doccomment">/// use syn::parse::{Parse, ParseStream};</span>
+<span class=
+"doccomment">/// use syn::punctuated::Punctuated;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// // Parse a simplified tuple struct syntax like:</span>
+<span class=
+"doccomment">/// // Parse a simplified tuple struct syntax like:</span>
 <span class="doccomment">/// //</span>
 <span class="doccomment">/// //     struct S(A, B);</span>
 <span class="doccomment">/// struct TupleStruct {</span>
-<span class="doccomment">///     struct_token: Token![struct],</span>
+<span class=
+"doccomment">///     struct_token: Token![struct],</span>
 <span class="doccomment">///     ident: Ident,</span>
 <span class="doccomment">///     paren_token: token::Paren,</span>
-<span class="doccomment">///     fields: Punctuated&lt;Type, Token![,]&gt;,</span>
+<span class=
+"doccomment">///     fields: Punctuated&lt;Type, Token![,]&gt;,</span>
 <span class="doccomment">///     semi_token: Token![;],</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// impl Parse for TupleStruct {</span>
-<span class="doccomment">///     fn parse(input: ParseStream) -&gt; Result&lt;Self&gt; {</span>
+<span class=
+"doccomment">///     fn parse(input: ParseStream) -&gt; Result&lt;Self&gt; {</span>
 <span class="doccomment">///         let content;</span>
 <span class="doccomment">///         Ok(TupleStruct {</span>
-<span class="doccomment">///             struct_token: input.parse()?,</span>
-<span class="doccomment">///             ident: input.parse()?,</span>
-<span class="doccomment">///             paren_token: parenthesized!(content in input),</span>
-<span class="doccomment">///             fields: content.parse_terminated(Type::parse)?,</span>
-<span class="doccomment">///             semi_token: input.parse()?,</span>
+<span class=
+"doccomment">///             struct_token: input.parse()?,</span>
+<span class=
+"doccomment">///             ident: input.parse()?,</span>
+<span class=
+"doccomment">///             paren_token: parenthesized!(content in input),</span>
+<span class=
+"doccomment">///             fields: content.parse_terminated(Type::parse)?,</span>
+<span class=
+"doccomment">///             semi_token: input.parse()?,</span>
 <span class="doccomment">///         })</span>
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
@@ -411,46 +664,84 @@
 <span class="doccomment">/// #     let input = quote! {</span>
 <span class="doccomment">/// #         struct S(A, B);</span>
 <span class="doccomment">/// #     };</span>
-<span class="doccomment">/// #     syn::parse2::&lt;TupleStruct&gt;(input).unwrap();</span>
+<span class=
+"doccomment">/// #     syn::parse2::&lt;TupleStruct&gt;(input).unwrap();</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">parenthesized</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">content</span>:<span class="ident">ident</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cursor</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">group</span>::<span class="ident">parse_parens</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">cursor</span>) {
-            <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">export</span>::<span class="prelude-val">Ok</span>(<span class="ident">parens</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">content</span> <span class="op">=</span> <span class="ident">parens</span>.<span class="ident">content</span>;
-                <span class="ident">parens</span>.<span class="ident">token</span>
+<span class="attribute">#[<span class=
+"ident">macro_export</span>]</span>
+<span class="macro">macro_rules</span><span class=
+"macro">!</span> <span class="ident">parenthesized</span> {
+    (<span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">content</span>:<span class=
+"ident">ident</span> <span class="kw">in</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">cursor</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+        <span class="kw">match</span> <span class=
+"macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">group</span>::<span class=
+"ident">parse_parens</span>(<span class="kw-2">&</span><span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">cursor</span>) {
+            <span class="macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">export</span>::<span class=
+"prelude-val">Ok</span>(<span class=
+"ident">parens</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+                <span class=
+"macro-nonterminal">$</span><span class="macro-nonterminal">content</span> <span class="op">=</span> <span class="ident">parens</span>.<span class="ident">content</span>;
+                <span class="ident">parens</span>.<span class=
+"ident">token</span>
             }
-            <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">export</span>::<span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">return</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">export</span>::<span class="prelude-val">Err</span>(<span class="ident">error</span>);
+            <span class="macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">export</span>::<span class=
+"prelude-val">Err</span>(<span class=
+"ident">error</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+                <span class="kw">return</span> <span class=
+"macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">export</span>::<span class=
+"prelude-val">Err</span>(<span class="ident">error</span>);
             }
         }
     };
 }
 
-<span class="doccomment">/// Parse a set of curly braces and expose their content to subsequent parsers.</span>
+<span class=
+"doccomment">/// Parse a set of curly braces and expose their content to subsequent parsers.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// # use quote::quote;</span>
 <span class="doccomment">/// #</span>
-<span class="doccomment">/// use syn::{braced, token, Ident, Result, Token, Type};</span>
-<span class="doccomment">/// use syn::parse::{Parse, ParseStream};</span>
-<span class="doccomment">/// use syn::punctuated::Punctuated;</span>
+<span class=
+"doccomment">/// use syn::{braced, token, Ident, Result, Token, Type};</span>
+<span class=
+"doccomment">/// use syn::parse::{Parse, ParseStream};</span>
+<span class=
+"doccomment">/// use syn::punctuated::Punctuated;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// // Parse a simplified struct syntax like:</span>
+<span class=
+"doccomment">/// // Parse a simplified struct syntax like:</span>
 <span class="doccomment">/// //</span>
 <span class="doccomment">/// //     struct S {</span>
 <span class="doccomment">/// //         a: A,</span>
 <span class="doccomment">/// //         b: B,</span>
 <span class="doccomment">/// //     }</span>
 <span class="doccomment">/// struct Struct {</span>
-<span class="doccomment">///     struct_token: Token![struct],</span>
+<span class=
+"doccomment">///     struct_token: Token![struct],</span>
 <span class="doccomment">///     ident: Ident,</span>
 <span class="doccomment">///     brace_token: token::Brace,</span>
-<span class="doccomment">///     fields: Punctuated&lt;Field, Token![,]&gt;,</span>
+<span class=
+"doccomment">///     fields: Punctuated&lt;Field, Token![,]&gt;,</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// struct Field {</span>
@@ -460,22 +751,30 @@
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// impl Parse for Struct {</span>
-<span class="doccomment">///     fn parse(input: ParseStream) -&gt; Result&lt;Self&gt; {</span>
+<span class=
+"doccomment">///     fn parse(input: ParseStream) -&gt; Result&lt;Self&gt; {</span>
 <span class="doccomment">///         let content;</span>
 <span class="doccomment">///         Ok(Struct {</span>
-<span class="doccomment">///             struct_token: input.parse()?,</span>
-<span class="doccomment">///             ident: input.parse()?,</span>
-<span class="doccomment">///             brace_token: braced!(content in input),</span>
-<span class="doccomment">///             fields: content.parse_terminated(Field::parse)?,</span>
+<span class=
+"doccomment">///             struct_token: input.parse()?,</span>
+<span class=
+"doccomment">///             ident: input.parse()?,</span>
+<span class=
+"doccomment">///             brace_token: braced!(content in input),</span>
+<span class=
+"doccomment">///             fields: content.parse_terminated(Field::parse)?,</span>
 <span class="doccomment">///         })</span>
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// impl Parse for Field {</span>
-<span class="doccomment">///     fn parse(input: ParseStream) -&gt; Result&lt;Self&gt; {</span>
+<span class=
+"doccomment">///     fn parse(input: ParseStream) -&gt; Result&lt;Self&gt; {</span>
 <span class="doccomment">///         Ok(Field {</span>
-<span class="doccomment">///             name: input.parse()?,</span>
-<span class="doccomment">///             colon_token: input.parse()?,</span>
+<span class=
+"doccomment">///             name: input.parse()?,</span>
+<span class=
+"doccomment">///             colon_token: input.parse()?,</span>
 <span class="doccomment">///             ty: input.parse()?,</span>
 <span class="doccomment">///         })</span>
 <span class="doccomment">///     }</span>
@@ -488,25 +787,57 @@
 <span class="doccomment">/// #             b: B,</span>
 <span class="doccomment">/// #         }</span>
 <span class="doccomment">/// #     };</span>
-<span class="doccomment">/// #     syn::parse2::&lt;Struct&gt;(input).unwrap();</span>
+<span class=
+"doccomment">/// #     syn::parse2::&lt;Struct&gt;(input).unwrap();</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">braced</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">content</span>:<span class="ident">ident</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cursor</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">group</span>::<span class="ident">parse_braces</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">cursor</span>) {
-            <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">export</span>::<span class="prelude-val">Ok</span>(<span class="ident">braces</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">content</span> <span class="op">=</span> <span class="ident">braces</span>.<span class="ident">content</span>;
-                <span class="ident">braces</span>.<span class="ident">token</span>
+<span class="attribute">#[<span class=
+"ident">macro_export</span>]</span>
+<span class="macro">macro_rules</span><span class=
+"macro">!</span> <span class="ident">braced</span> {
+    (<span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">content</span>:<span class=
+"ident">ident</span> <span class="kw">in</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">cursor</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+        <span class="kw">match</span> <span class=
+"macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">group</span>::<span class=
+"ident">parse_braces</span>(<span class="kw-2">&</span><span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">cursor</span>) {
+            <span class="macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">export</span>::<span class=
+"prelude-val">Ok</span>(<span class=
+"ident">braces</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+                <span class=
+"macro-nonterminal">$</span><span class="macro-nonterminal">content</span> <span class="op">=</span> <span class="ident">braces</span>.<span class="ident">content</span>;
+                <span class="ident">braces</span>.<span class=
+"ident">token</span>
             }
-            <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">export</span>::<span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">return</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">export</span>::<span class="prelude-val">Err</span>(<span class="ident">error</span>);
+            <span class="macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">export</span>::<span class=
+"prelude-val">Err</span>(<span class=
+"ident">error</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+                <span class="kw">return</span> <span class=
+"macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">export</span>::<span class=
+"prelude-val">Err</span>(<span class="ident">error</span>);
             }
         }
     };
 }
 
-<span class="doccomment">/// Parse a set of square brackets and expose their content to subsequent</span>
+<span class=
+"doccomment">/// Parse a set of square brackets and expose their content to subsequent</span>
 <span class="doccomment">/// parsers.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
@@ -515,25 +846,33 @@
 <span class="doccomment">/// # use quote::quote;</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// use proc_macro2::TokenStream;</span>
-<span class="doccomment">/// use syn::{bracketed, token, Result, Token};</span>
-<span class="doccomment">/// use syn::parse::{Parse, ParseStream};</span>
+<span class=
+"doccomment">/// use syn::{bracketed, token, Result, Token};</span>
+<span class=
+"doccomment">/// use syn::parse::{Parse, ParseStream};</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// // Parse an outer attribute like:</span>
+<span class=
+"doccomment">/// // Parse an outer attribute like:</span>
 <span class="doccomment">/// //</span>
 <span class="doccomment">/// //     #[repr(C, packed)]</span>
 <span class="doccomment">/// struct OuterAttribute {</span>
 <span class="doccomment">///     pound_token: Token![#],</span>
-<span class="doccomment">///     bracket_token: token::Bracket,</span>
+<span class=
+"doccomment">///     bracket_token: token::Bracket,</span>
 <span class="doccomment">///     content: TokenStream,</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// impl Parse for OuterAttribute {</span>
-<span class="doccomment">///     fn parse(input: ParseStream) -&gt; Result&lt;Self&gt; {</span>
+<span class=
+"doccomment">///     fn parse(input: ParseStream) -&gt; Result&lt;Self&gt; {</span>
 <span class="doccomment">///         let content;</span>
 <span class="doccomment">///         Ok(OuterAttribute {</span>
-<span class="doccomment">///             pound_token: input.parse()?,</span>
-<span class="doccomment">///             bracket_token: bracketed!(content in input),</span>
-<span class="doccomment">///             content: content.parse()?,</span>
+<span class=
+"doccomment">///             pound_token: input.parse()?,</span>
+<span class=
+"doccomment">///             bracket_token: bracketed!(content in input),</span>
+<span class=
+"doccomment">///             content: content.parse()?,</span>
 <span class="doccomment">///         })</span>
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
@@ -542,22 +881,65 @@
 <span class="doccomment">/// #     let input = quote! {</span>
 <span class="doccomment">/// #         #[repr(C, packed)]</span>
 <span class="doccomment">/// #     };</span>
-<span class="doccomment">/// #     syn::parse2::&lt;OuterAttribute&gt;(input).unwrap();</span>
+<span class=
+"doccomment">/// #     syn::parse2::&lt;OuterAttribute&gt;(input).unwrap();</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">bracketed</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">content</span>:<span class="ident">ident</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cursor</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">group</span>::<span class="ident">parse_brackets</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">cursor</span>) {
-            <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">export</span>::<span class="prelude-val">Ok</span>(<span class="ident">brackets</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">content</span> <span class="op">=</span> <span class="ident">brackets</span>.<span class="ident">content</span>;
-                <span class="ident">brackets</span>.<span class="ident">token</span>
+<span class="attribute">#[<span class=
+"ident">macro_export</span>]</span>
+<span class="macro">macro_rules</span><span class=
+"macro">!</span> <span class="ident">bracketed</span> {
+    (<span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">content</span>:<span class=
+"ident">ident</span> <span class="kw">in</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">cursor</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+        <span class="kw">match</span> <span class=
+"macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">group</span>::<span class=
+"ident">parse_brackets</span>(<span class=
+"kw-2">&</span><span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">cursor</span>) {
+            <span class="macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">export</span>::<span class=
+"prelude-val">Ok</span>(<span class=
+"ident">brackets</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+                <span class=
+"macro-nonterminal">$</span><span class="macro-nonterminal">content</span> <span class="op">=</span> <span class="ident">brackets</span>.<span class="ident">content</span>;
+                <span class="ident">brackets</span>.<span class=
+"ident">token</span>
             }
-            <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">export</span>::<span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">return</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">export</span>::<span class="prelude-val">Err</span>(<span class="ident">error</span>);
+            <span class="macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">export</span>::<span class=
+"prelude-val">Err</span>(<span class=
+"ident">error</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+                <span class="kw">return</span> <span class=
+"macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">export</span>::<span class=
+"prelude-val">Err</span>(<span class="ident">error</span>);
             }
         }
     };
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "syn";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>
+</section>
+<section id="search" class="content hidden"></section>
+<section class="footer"></section>
+<script>
+window.rootPath = "../../";window.currentCrate = "syn";
+</script>
+<script src="../../aliases.js"></script>
+<script src="../../main.js"></script>
+<script src="../../source-script.js"></script>
+<script src="../../source-files.js"></script>
+<script defer src="../../search-index.js"></script>
+</body>
+</html>

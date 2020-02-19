@@ -1,4 +1,58 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/matrixmultiply-0.2.3/src/loopmacros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>loopmacros.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../matrixmultiply/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="generator" content=
+"HTML Tidy for HTML5 for Linux version 5.6.0">
+<meta charset="utf-8">
+<meta name="viewport" content=
+"width=device-width, initial-scale=1.0">
+<meta name="generator" content="rustdoc">
+<meta name="description" content=
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/matrixmultiply-0.2.3/src/loopmacros.rs`.">
+<meta name="keywords" content="rust, rustlang, rust-lang">
+<title>loopmacros.rs.html -- source</title>
+<link rel="stylesheet" type="text/css" href="../../normalize.css">
+<link rel="stylesheet" type="text/css" href="../../rustdoc.css" id=
+"mainThemeStyle">
+<link rel="stylesheet" type="text/css" href="../../dark.css">
+<link rel="stylesheet" type="text/css" href="../../light.css" id=
+"themeStyle">
+<script src="../../storage.js"></script><noscript>
+<link rel="stylesheet" href="../../noscript.css"></noscript>
+<link rel="shortcut icon" href="../../favicon.ico">
+<style type="text/css">
+#crate-search{background-image:url("../../down-arrow.svg");}
+</style>
+</head>
+<body class="rustdoc source">
+<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
+<nav class="sidebar">
+<div class="sidebar-menu">☰</div>
+<a href='../../matrixmultiply/index.html'>
+<div class='logo-container'><img src='../../rust-logo.png' alt=
+'logo'></div>
+</a></nav>
+<div class="theme-picker"><button id="theme-picker" aria-label=
+"Pick another theme!"><img src="../../brush.svg" width="18" alt=
+"Pick another theme!"></button>
+<div id="theme-choices"></div>
+</div>
+<script src="../../theme.js"></script>
+<nav class="sub">
+<form class="search-form">
+<div class="search-container">
+<div><select id="crate-search">
+<option value="All crates">All crates</option>
+</select><input class="search-input" name="search" disabled
+autocomplete="off" spellcheck="false" placeholder=
+"Click or press ‘S’ to search, ‘?’ for more options…" type=
+"search"></div>
+<a id="settings-menu" href="../../settings.html"><img src=
+"../../wheel.svg" width="18" alt="Change settings"></a></div>
+</form>
+</nav>
+<section id="main" class="content">
+<pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -108,116 +162,474 @@
 <span id="108">108</span>
 <span id="109">109</span>
 <span id="110">110</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="comment">// Copyright 2016 - 2018 Ulrik Sverdrup &quot;bluss&quot;</span>
+</pre>
+<div class="example-wrap">
+<pre class="rust">
+<span class=
+"comment">// Copyright 2016 - 2018 Ulrik Sverdrup "bluss"</span>
 <span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
-<span class="comment">// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. This file may not be copied, modified, or distributed</span>
+<span class=
+"comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class=
+"comment">// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class=
+"comment">// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
+<span class=
+"comment">// option. This file may not be copied, modified, or distributed</span>
 <span class="comment">// except according to those terms.</span>
 
 <span class="comment">// Unroll only in non-debug builds</span>
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">debug_assertions</span>))]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">repeat</span> {
-    (<span class="number">1</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; };
-    (<span class="number">2</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; };
-    (<span class="number">3</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; };
-    (<span class="number">4</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; };
-    (<span class="number">5</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; };
-    (<span class="number">6</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; };
-    (<span class="number">7</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; };
-    (<span class="number">8</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>; };
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">not</span>(<span class=
+"ident">debug_assertions</span>))]</span>
+<span class="macro">macro_rules</span><span class=
+"macro">!</span> <span class="ident">repeat</span> {
+    (<span class="number">1</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> { <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; };
+    (<span class="number">2</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> { <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; };
+    (<span class="number">3</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> { <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; };
+    (<span class="number">4</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> { <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; };
+    (<span class="number">5</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> { <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; };
+    (<span class="number">6</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> { <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; };
+    (<span class="number">7</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> { <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; };
+    (<span class="number">8</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> { <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>; };
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">loop4</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">4</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> }
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">debug_assertions</span>)]</span>
+<span class="macro">macro_rules</span><span class=
+"macro">!</span> <span class="ident">loop4</span> {
+    (<span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span>:<span class=
+"ident">ident</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+        <span class="kw">for</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span> <span class=
+"kw">in</span> <span class="number">0</span>..<span class=
+"number">4</span> { <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span> }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">debug_assertions</span>))]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">loop4</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="op">=</span> <span class="number">0</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="op">=</span> <span class="number">1</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="op">=</span> <span class="number">2</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="op">=</span> <span class="number">3</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">not</span>(<span class=
+"ident">debug_assertions</span>))]</span>
+<span class="macro">macro_rules</span><span class=
+"macro">!</span> <span class="ident">loop4</span> {
+    (<span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span>:<span class=
+"ident">ident</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {{
+        <span class="kw">let</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span> <span class="op">=</span> <span class=
+"number">0</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;
+        <span class="kw">let</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span> <span class="op">=</span> <span class=
+"number">1</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;
+        <span class="kw">let</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span> <span class="op">=</span> <span class=
+"number">2</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;
+        <span class="kw">let</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span> <span class="op">=</span> <span class=
+"number">3</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;
     }}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">loop8</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">8</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> }
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">debug_assertions</span>)]</span>
+<span class="macro">macro_rules</span><span class=
+"macro">!</span> <span class="ident">loop8</span> {
+    (<span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span>:<span class=
+"ident">ident</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+        <span class="kw">for</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span> <span class=
+"kw">in</span> <span class="number">0</span>..<span class=
+"number">8</span> { <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span> }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">debug_assertions</span>))]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">loop8</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="op">=</span> <span class="number">0</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="op">=</span> <span class="number">1</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="op">=</span> <span class="number">2</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="op">=</span> <span class="number">3</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="op">=</span> <span class="number">4</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="op">=</span> <span class="number">5</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="op">=</span> <span class="number">6</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="op">=</span> <span class="number">7</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">not</span>(<span class=
+"ident">debug_assertions</span>))]</span>
+<span class="macro">macro_rules</span><span class=
+"macro">!</span> <span class="ident">loop8</span> {
+    (<span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span>:<span class=
+"ident">ident</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {{
+        <span class="kw">let</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span> <span class="op">=</span> <span class=
+"number">0</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;
+        <span class="kw">let</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span> <span class="op">=</span> <span class=
+"number">1</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;
+        <span class="kw">let</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span> <span class="op">=</span> <span class=
+"number">2</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;
+        <span class="kw">let</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span> <span class="op">=</span> <span class=
+"number">3</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;
+        <span class="kw">let</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span> <span class="op">=</span> <span class=
+"number">4</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;
+        <span class="kw">let</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span> <span class="op">=</span> <span class=
+"number">5</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;
+        <span class="kw">let</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span> <span class="op">=</span> <span class=
+"number">6</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;
+        <span class="kw">let</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">i</span> <span class="op">=</span> <span class=
+"number">7</span>; <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;
     }}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">unroll_by</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">by</span>:<span class="ident">tt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ntimes</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ntimes</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> }
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">debug_assertions</span>)]</span>
+<span class="macro">macro_rules</span><span class=
+"macro">!</span> <span class="ident">unroll_by</span> {
+    (<span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">by</span>:<span class=
+"ident">tt</span> <span class="op">=</span><span class=
+"op">&gt;</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">ntimes</span>:<span class=
+"ident">expr</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+        <span class="kw">for</span> <span class=
+"kw">_</span> <span class="kw">in</span> <span class=
+"number">0</span>..<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">ntimes</span> { <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span> }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">debug_assertions</span>))]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">unroll_by</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">by</span>:<span class="ident">tt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ntimes</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
-        <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ntimes</span>;
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">k</span> <span class="op">/</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">by</span> {
-            <span class="macro">repeat</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">by</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>);
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">not</span>(<span class=
+"ident">debug_assertions</span>))]</span>
+<span class="macro">macro_rules</span><span class=
+"macro">!</span> <span class="ident">unroll_by</span> {
+    (<span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">by</span>:<span class=
+"ident">tt</span> <span class="op">=</span><span class=
+"op">&gt;</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">ntimes</span>:<span class=
+"ident">expr</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {{
+        <span class="kw">let</span> <span class=
+"ident">k</span> <span class="op">=</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">ntimes</span>;
+        <span class="kw">for</span> <span class=
+"kw">_</span> <span class="kw">in</span> <span class=
+"number">0</span>..<span class="ident">k</span> <span class=
+"op">/</span> <span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">by</span> {
+            <span class="macro">repeat</span><span class=
+"macro">!</span>(<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">by</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>);
         }
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">k</span> <span class="op">%</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">by</span> {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>
+        <span class="kw">for</span> <span class=
+"kw">_</span> <span class="kw">in</span> <span class=
+"number">0</span>..<span class="ident">k</span> <span class=
+"op">%</span> <span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">by</span> {
+            <span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>
         }
     }}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">unroll_by_with_last</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">by</span>:<span class="ident">tt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ntimes</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_last</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
-        <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ntimes</span> <span class="op">-</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_last</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">k</span> {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">debug_assertions</span>)]</span>
+<span class="macro">macro_rules</span><span class=
+"macro">!</span> <span class="ident">unroll_by_with_last</span> {
+    (<span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">by</span>:<span class=
+"ident">tt</span> <span class="op">=</span><span class=
+"op">&gt;</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">ntimes</span>:<span class=
+"ident">expr</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">is_last</span>:<span class=
+"ident">ident</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {{
+        <span class="kw">let</span> <span class=
+"ident">k</span> <span class="op">=</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">ntimes</span> <span class=
+"op">-</span> <span class="number">1</span>;
+        <span class="kw">let</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">is_last</span> <span class=
+"op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">for</span> <span class=
+"kw">_</span> <span class="kw">in</span> <span class=
+"number">0</span>..<span class="ident">k</span> {
+            <span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;
         }
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_last</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_assignments</span>)]</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;
+        <span class="kw">let</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">is_last</span> <span class=
+"op">=</span> <span class="bool-val">true</span>;
+        <span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">unused_assignments</span>)]</span>
+        <span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;
     }}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">debug_assertions</span>))]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">unroll_by_with_last</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">by</span>:<span class="ident">tt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ntimes</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_last</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
-        <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ntimes</span> <span class="op">-</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_last</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">k</span> <span class="op">/</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">by</span> {
-            <span class="macro">repeat</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">by</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>);
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">not</span>(<span class=
+"ident">debug_assertions</span>))]</span>
+<span class="macro">macro_rules</span><span class=
+"macro">!</span> <span class="ident">unroll_by_with_last</span> {
+    (<span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">by</span>:<span class=
+"ident">tt</span> <span class="op">=</span><span class=
+"op">&gt;</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">ntimes</span>:<span class=
+"ident">expr</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">is_last</span>:<span class=
+"ident">ident</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>:<span class=
+"ident">expr</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {{
+        <span class="kw">let</span> <span class=
+"ident">k</span> <span class="op">=</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">ntimes</span> <span class=
+"op">-</span> <span class="number">1</span>;
+        <span class="kw">let</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">is_last</span> <span class=
+"op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">for</span> <span class=
+"kw">_</span> <span class="kw">in</span> <span class=
+"number">0</span>..<span class="ident">k</span> <span class=
+"op">/</span> <span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">by</span> {
+            <span class="macro">repeat</span><span class=
+"macro">!</span>(<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">by</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>);
         }
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">k</span> <span class="op">%</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">by</span> {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;
+        <span class="kw">for</span> <span class=
+"kw">_</span> <span class="kw">in</span> <span class=
+"number">0</span>..<span class="ident">k</span> <span class=
+"op">%</span> <span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">by</span> {
+            <span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;
         }
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_last</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_assignments</span>)]</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>;
+        <span class="kw">let</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">is_last</span> <span class=
+"op">=</span> <span class="bool-val">true</span>;
+        <span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">unused_assignments</span>)]</span>
+        <span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">e</span>;
     }}
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "matrixmultiply";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>
+</section>
+<section id="search" class="content hidden"></section>
+<section class="footer"></section>
+<script>
+window.rootPath = "../../";window.currentCrate = "matrixmultiply";
+</script>
+<script src="../../aliases.js"></script>
+<script src="../../main.js"></script>
+<script src="../../source-script.js"></script>
+<script src="../../source-files.js"></script>
+<script defer src="../../search-index.js"></script>
+</body>
+</html>

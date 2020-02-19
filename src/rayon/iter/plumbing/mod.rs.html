@@ -1,4 +1,59 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/rayon-1.3.0/src/iter/plumbing/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../rayon/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="generator" content=
+"HTML Tidy for HTML5 for Linux version 5.6.0">
+<meta charset="utf-8">
+<meta name="viewport" content=
+"width=device-width, initial-scale=1.0">
+<meta name="generator" content="rustdoc">
+<meta name="description" content=
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rayon-1.3.0/src/iter/plumbing/mod.rs`.">
+<meta name="keywords" content="rust, rustlang, rust-lang">
+<title>mod.rs.html -- source</title>
+<link rel="stylesheet" type="text/css" href=
+"../../../../normalize.css">
+<link rel="stylesheet" type="text/css" href=
+"../../../../rustdoc.css" id="mainThemeStyle">
+<link rel="stylesheet" type="text/css" href="../../../../dark.css">
+<link rel="stylesheet" type="text/css" href="../../../../light.css"
+id="themeStyle">
+<script src="../../../../storage.js"></script><noscript>
+<link rel="stylesheet" href="../../../../noscript.css"></noscript>
+<link rel="shortcut icon" href="../../../../favicon.ico">
+<style type="text/css">
+#crate-search{background-image:url("../../../../down-arrow.svg");}
+</style>
+</head>
+<body class="rustdoc source">
+<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
+<nav class="sidebar">
+<div class="sidebar-menu">☰</div>
+<a href='../../../../rayon/index.html'>
+<div class='logo-container'><img src='../../../../rust-logo.png'
+alt='logo'></div>
+</a></nav>
+<div class="theme-picker"><button id="theme-picker" aria-label=
+"Pick another theme!"><img src="../../../../brush.svg" width="18"
+alt="Pick another theme!"></button>
+<div id="theme-choices"></div>
+</div>
+<script src="../../../../theme.js"></script>
+<nav class="sub">
+<form class="search-form">
+<div class="search-container">
+<div><select id="crate-search">
+<option value="All crates">All crates</option>
+</select><input class="search-input" name="search" disabled
+autocomplete="off" spellcheck="false" placeholder=
+"Click or press ‘S’ to search, ‘?’ for more options…" type=
+"search"></div>
+<a id="settings-menu" href="../../../../settings.html"><img src=
+"../../../../wheel.svg" width="18" alt="Change settings"></a></div>
+</form>
+</nav>
+<section id="main" class="content">
+<pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -482,490 +537,1086 @@
 <span id="482">482</span>
 <span id="483">483</span>
 <span id="484">484</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! Traits and functions used to implement parallel iteration.  These are</span>
-<span class="doccomment">//! low-level details -- users of parallel iterators should not need to</span>
-<span class="doccomment">//! interact with them directly.  See [the `plumbing` README][r] for a high-level overview.</span>
+</pre>
+<div class="example-wrap">
+<pre class="rust">
+<span class=
+"doccomment">//! Traits and functions used to implement parallel iteration.  These are</span>
+<span class=
+"doccomment">//! low-level details -- users of parallel iterators should not need to</span>
+<span class=
+"doccomment">//! interact with them directly.  See [the `plumbing` README][r] for a high-level overview.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [r]: https://github.com/rayon-rs/rayon/blob/master/src/iter/plumbing/README.md</span>
+<span class=
+"doccomment">//! [r]: https://github.com/rayon-rs/rayon/blob/master/src/iter/plumbing/README.md</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">join_context</span>;
+<span class="kw">use</span> <span class=
+"kw">crate</span>::<span class="ident">join_context</span>;
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">IndexedParallelIterator</span>;
+<span class="kw">use</span> <span class=
+"kw">super</span>::<span class=
+"ident">IndexedParallelIterator</span>;
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">usize</span>;
+<span class="kw">use</span> <span class=
+"ident">std</span>::<span class="ident">cmp</span>;
+<span class="kw">use</span> <span class=
+"ident">std</span>::<span class="ident">usize</span>;
 
-<span class="doccomment">/// The `ProducerCallback` trait is a kind of generic closure,</span>
-<span class="doccomment">/// [analogous to `FnOnce`][FnOnce]. See [the corresponding section in</span>
-<span class="doccomment">/// the plumbing README][r] for more details.</span>
+<span class=
+"doccomment">/// The `ProducerCallback` trait is a kind of generic closure,</span>
+<span class=
+"doccomment">/// [analogous to `FnOnce`][FnOnce]. See [the corresponding section in</span>
+<span class=
+"doccomment">/// the plumbing README][r] for more details.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [r]: https://github.com/rayon-rs/rayon/blob/master/src/iter/plumbing/README.md#producer-callback</span>
-<span class="doccomment">/// [FnOnce]: https://doc.rust-lang.org/std/ops/trait.FnOnce.html</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ProducerCallback</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The type of value returned by this callback. Analogous to</span>
-    <span class="doccomment">/// [`Output` from the `FnOnce` trait][Output].</span>
+<span class=
+"doccomment">/// [r]: https://github.com/rayon-rs/rayon/blob/master/src/iter/plumbing/README.md#producer-callback</span>
+<span class=
+"doccomment">/// [FnOnce]: https://doc.rust-lang.org/std/ops/trait.FnOnce.html</span>
+<span class="kw">pub</span> <span class=
+"kw">trait</span> <span class=
+"ident">ProducerCallback</span><span class=
+"op">&lt;</span><span class="ident">T</span><span class=
+"op">&gt;</span> {
+    <span class=
+"doccomment">/// The type of value returned by this callback. Analogous to</span>
+    <span class=
+"doccomment">/// [`Output` from the `FnOnce` trait][Output].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Output]: https://doc.rust-lang.org/std/ops/trait.FnOnce.html#associatedtype.Output</span>
+    <span class=
+"doccomment">/// [Output]: https://doc.rust-lang.org/std/ops/trait.FnOnce.html#associatedtype.Output</span>
     <span class="kw">type</span> <span class="ident">Output</span>;
 
-    <span class="doccomment">/// Invokes the callback with the given producer as argument. The</span>
-    <span class="doccomment">/// key point of this trait is that this method is generic over</span>
-    <span class="doccomment">/// `P`, and hence implementors must be defined for any producer.</span>
-    <span class="kw">fn</span> <span class="ident">callback</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">producer</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Output</span>
+    <span class=
+"doccomment">/// Invokes the callback with the given producer as argument. The</span>
+    <span class=
+"doccomment">/// key point of this trait is that this method is generic over</span>
+    <span class=
+"doccomment">/// `P`, and hence implementors must be defined for any producer.</span>
+    <span class="kw">fn</span> <span class=
+"ident">callback</span><span class="op">&lt;</span><span class=
+"ident">P</span><span class="op">&gt;</span>(<span class=
+"self">self</span>, <span class=
+"ident">producer</span>: <span class="ident">P</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"self">Self</span>::<span class="ident">Output</span>
     <span class="kw">where</span>
-        <span class="ident">P</span>: <span class="ident">Producer</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>;
+        <span class="ident">P</span>: <span class=
+"ident">Producer</span><span class="op">&lt;</span><span class=
+"ident">Item</span> <span class="op">=</span> <span class=
+"ident">T</span><span class="op">&gt;</span>;
 }
 
-<span class="doccomment">/// A `Producer` is effectively a &quot;splittable `IntoIterator`&quot;. That</span>
-<span class="doccomment">/// is, a producer is a value which can be converted into an iterator</span>
-<span class="doccomment">/// at any time: at that point, it simply produces items on demand,</span>
-<span class="doccomment">/// like any iterator. But what makes a `Producer` special is that,</span>
-<span class="doccomment">/// *before* we convert to an iterator, we can also **split** it at a</span>
-<span class="doccomment">/// particular point using the `split_at` method. This will yield up</span>
-<span class="doccomment">/// two producers, one producing the items before that point, and one</span>
-<span class="doccomment">/// producing the items after that point (these two producers can then</span>
-<span class="doccomment">/// independently be split further, or be converted into iterators).</span>
-<span class="doccomment">/// In Rayon, this splitting is used to divide between threads.</span>
-<span class="doccomment">/// See [the `plumbing` README][r] for further details.</span>
+<span class=
+"doccomment">/// A `Producer` is effectively a "splittable `IntoIterator`". That</span>
+<span class=
+"doccomment">/// is, a producer is a value which can be converted into an iterator</span>
+<span class=
+"doccomment">/// at any time: at that point, it simply produces items on demand,</span>
+<span class=
+"doccomment">/// like any iterator. But what makes a `Producer` special is that,</span>
+<span class=
+"doccomment">/// *before* we convert to an iterator, we can also **split** it at a</span>
+<span class=
+"doccomment">/// particular point using the `split_at` method. This will yield up</span>
+<span class=
+"doccomment">/// two producers, one producing the items before that point, and one</span>
+<span class=
+"doccomment">/// producing the items after that point (these two producers can then</span>
+<span class=
+"doccomment">/// independently be split further, or be converted into iterators).</span>
+<span class=
+"doccomment">/// In Rayon, this splitting is used to divide between threads.</span>
+<span class=
+"doccomment">/// See [the `plumbing` README][r] for further details.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Note that each producer will always produce a fixed number of</span>
-<span class="doccomment">/// items N. However, this number N is not queryable through the API;</span>
-<span class="doccomment">/// the consumer is expected to track it.</span>
+<span class=
+"doccomment">/// Note that each producer will always produce a fixed number of</span>
+<span class=
+"doccomment">/// items N. However, this number N is not queryable through the API;</span>
+<span class=
+"doccomment">/// the consumer is expected to track it.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// NB. You might expect `Producer` to extend the `IntoIterator`</span>
-<span class="doccomment">/// trait.  However, [rust-lang/rust#20671][20671] prevents us from</span>
-<span class="doccomment">/// declaring the DoubleEndedIterator and ExactSizeIterator</span>
-<span class="doccomment">/// constraints on a required IntoIterator trait, so we inline</span>
-<span class="doccomment">/// IntoIterator here until that issue is fixed.</span>
+<span class=
+"doccomment">/// NB. You might expect `Producer` to extend the `IntoIterator`</span>
+<span class=
+"doccomment">/// trait.  However, [rust-lang/rust#20671][20671] prevents us from</span>
+<span class=
+"doccomment">/// declaring the DoubleEndedIterator and ExactSizeIterator</span>
+<span class=
+"doccomment">/// constraints on a required IntoIterator trait, so we inline</span>
+<span class=
+"doccomment">/// IntoIterator here until that issue is fixed.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [r]: https://github.com/rayon-rs/rayon/blob/master/src/iter/plumbing/README.md</span>
-<span class="doccomment">/// [20671]: https://github.com/rust-lang/rust/issues/20671</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Producer</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sized</span> {
-    <span class="doccomment">/// The type of item that will be produced by this producer once</span>
-    <span class="doccomment">/// it is converted into an iterator.</span>
+<span class=
+"doccomment">/// [r]: https://github.com/rayon-rs/rayon/blob/master/src/iter/plumbing/README.md</span>
+<span class=
+"doccomment">/// [20671]: https://github.com/rust-lang/rust/issues/20671</span>
+<span class="kw">pub</span> <span class=
+"kw">trait</span> <span class="ident">Producer</span>: <span class=
+"ident">Send</span> <span class="op">+</span> <span class=
+"ident">Sized</span> {
+    <span class=
+"doccomment">/// The type of item that will be produced by this producer once</span>
+    <span class=
+"doccomment">/// it is converted into an iterator.</span>
     <span class="kw">type</span> <span class="ident">Item</span>;
 
-    <span class="doccomment">/// The type of iterator we will become.</span>
-    <span class="kw">type</span> <span class="ident">IntoIter</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">Item</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">DoubleEndedIterator</span> <span class="op">+</span> <span class="ident">ExactSizeIterator</span>;
+    <span class=
+"doccomment">/// The type of iterator we will become.</span>
+    <span class="kw">type</span> <span class=
+"ident">IntoIter</span>: <span class=
+"ident">Iterator</span><span class="op">&lt;</span><span class=
+"ident">Item</span> <span class="op">=</span> <span class=
+"self">Self</span>::<span class="ident">Item</span><span class=
+"op">&gt;</span> <span class="op">+</span> <span class=
+"ident">DoubleEndedIterator</span> <span class=
+"op">+</span> <span class="ident">ExactSizeIterator</span>;
 
-    <span class="doccomment">/// Convert `self` into an iterator; at this point, no more parallel splits</span>
+    <span class=
+"doccomment">/// Convert `self` into an iterator; at this point, no more parallel splits</span>
     <span class="doccomment">/// are possible.</span>
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">IntoIter</span>;
+    <span class="kw">fn</span> <span class=
+"ident">into_iter</span>(<span class=
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span>::<span class=
+"ident">IntoIter</span>;
 
-    <span class="doccomment">/// The minimum number of items that we will process</span>
-    <span class="doccomment">/// sequentially. Defaults to 1, which means that we will split</span>
-    <span class="doccomment">/// all the way down to a single item. This can be raised higher</span>
-    <span class="doccomment">/// using the [`with_min_len`] method, which will force us to</span>
-    <span class="doccomment">/// create sequential tasks at a larger granularity. Note that</span>
-    <span class="doccomment">/// Rayon automatically normally attempts to adjust the size of</span>
-    <span class="doccomment">/// parallel splits to reduce overhead, so this should not be</span>
+    <span class=
+"doccomment">/// The minimum number of items that we will process</span>
+    <span class=
+"doccomment">/// sequentially. Defaults to 1, which means that we will split</span>
+    <span class=
+"doccomment">/// all the way down to a single item. This can be raised higher</span>
+    <span class=
+"doccomment">/// using the [`with_min_len`] method, which will force us to</span>
+    <span class=
+"doccomment">/// create sequential tasks at a larger granularity. Note that</span>
+    <span class=
+"doccomment">/// Rayon automatically normally attempts to adjust the size of</span>
+    <span class=
+"doccomment">/// parallel splits to reduce overhead, so this should not be</span>
     <span class="doccomment">/// needed.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`with_min_len`]: ../trait.IndexedParallelIterator.html#method.with_min_len</span>
-    <span class="kw">fn</span> <span class="ident">min_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class=
+"doccomment">/// [`with_min_len`]: ../trait.IndexedParallelIterator.html#method.with_min_len</span>
+    <span class="kw">fn</span> <span class=
+"ident">min_len</span>(<span class="kw-2">&</span><span class=
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">usize</span> {
         <span class="number">1</span>
     }
 
-    <span class="doccomment">/// The maximum number of items that we will process</span>
-    <span class="doccomment">/// sequentially. Defaults to MAX, which means that we can choose</span>
-    <span class="doccomment">/// not to split at all. This can be lowered using the</span>
-    <span class="doccomment">/// [`with_max_len`] method, which will force us to create more</span>
-    <span class="doccomment">/// parallel tasks. Note that Rayon automatically normally</span>
-    <span class="doccomment">/// attempts to adjust the size of parallel splits to reduce</span>
-    <span class="doccomment">/// overhead, so this should not be needed.</span>
+    <span class=
+"doccomment">/// The maximum number of items that we will process</span>
+    <span class=
+"doccomment">/// sequentially. Defaults to MAX, which means that we can choose</span>
+    <span class=
+"doccomment">/// not to split at all. This can be lowered using the</span>
+    <span class=
+"doccomment">/// [`with_max_len`] method, which will force us to create more</span>
+    <span class=
+"doccomment">/// parallel tasks. Note that Rayon automatically normally</span>
+    <span class=
+"doccomment">/// attempts to adjust the size of parallel splits to reduce</span>
+    <span class=
+"doccomment">/// overhead, so this should not be needed.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`with_max_len`]: ../trait.IndexedParallelIterator.html#method.with_max_len</span>
-    <span class="kw">fn</span> <span class="ident">max_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
-        <span class="ident">usize</span>::<span class="ident">MAX</span>
+    <span class=
+"doccomment">/// [`with_max_len`]: ../trait.IndexedParallelIterator.html#method.with_max_len</span>
+    <span class="kw">fn</span> <span class=
+"ident">max_len</span>(<span class="kw-2">&</span><span class=
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">usize</span> {
+        <span class="ident">usize</span>::<span class=
+"ident">MAX</span>
     }
 
-    <span class="doccomment">/// Split into two producers; one produces items `0..index`, the</span>
-    <span class="doccomment">/// other `index..N`. Index must be less than or equal to `N`.</span>
-    <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="self">Self</span>);
+    <span class=
+"doccomment">/// Split into two producers; one produces items `0..index`, the</span>
+    <span class=
+"doccomment">/// other `index..N`. Index must be less than or equal to `N`.</span>
+    <span class="kw">fn</span> <span class=
+"ident">split_at</span>(<span class=
+"self">self</span>, <span class="ident">index</span>: <span class=
+"ident">usize</span>) <span class="op">-</span><span class=
+"op">&gt;</span> (<span class="self">Self</span>, <span class=
+"self">Self</span>);
 
-    <span class="doccomment">/// Iterate the producer, feeding each element to `folder`, and</span>
-    <span class="doccomment">/// stop when the folder is full (or all elements have been consumed).</span>
+    <span class=
+"doccomment">/// Iterate the producer, feeding each element to `folder`, and</span>
+    <span class=
+"doccomment">/// stop when the folder is full (or all elements have been consumed).</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The provided implementation is sufficient for most iterables.</span>
-    <span class="kw">fn</span> <span class="ident">fold_with</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">folder</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">F</span>
+    <span class=
+"doccomment">/// The provided implementation is sufficient for most iterables.</span>
+    <span class="kw">fn</span> <span class=
+"ident">fold_with</span><span class="op">&lt;</span><span class=
+"ident">F</span><span class="op">&gt;</span>(<span class=
+"self">self</span>, <span class="ident">folder</span>: <span class=
+"ident">F</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">F</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Folder</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class=
+"ident">Folder</span><span class="op">&lt;</span><span class=
+"self">Self</span>::<span class="ident">Item</span><span class=
+"op">&gt;</span>,
     {
-        <span class="ident">folder</span>.<span class="ident">consume_iter</span>(<span class="self">self</span>.<span class="ident">into_iter</span>())
+        <span class="ident">folder</span>.<span class=
+"ident">consume_iter</span>(<span class=
+"self">self</span>.<span class="ident">into_iter</span>())
     }
 }
 
-<span class="doccomment">/// A consumer is effectively a [generalized &quot;fold&quot; operation][fold],</span>
-<span class="doccomment">/// and in fact each consumer will eventually be converted into a</span>
-<span class="doccomment">/// [`Folder`]. What makes a consumer special is that, like a</span>
-<span class="doccomment">/// [`Producer`], it can be **split** into multiple consumers using</span>
-<span class="doccomment">/// the `split_at` method. When a consumer is split, it produces two</span>
-<span class="doccomment">/// consumers, as well as a **reducer**. The two consumers can be fed</span>
-<span class="doccomment">/// items independently, and when they are done the reducer is used to</span>
-<span class="doccomment">/// combine their two results into one. See [the `plumbing`</span>
+<span class=
+"doccomment">/// A consumer is effectively a [generalized "fold" operation][fold],</span>
+<span class=
+"doccomment">/// and in fact each consumer will eventually be converted into a</span>
+<span class=
+"doccomment">/// [`Folder`]. What makes a consumer special is that, like a</span>
+<span class=
+"doccomment">/// [`Producer`], it can be **split** into multiple consumers using</span>
+<span class=
+"doccomment">/// the `split_at` method. When a consumer is split, it produces two</span>
+<span class=
+"doccomment">/// consumers, as well as a **reducer**. The two consumers can be fed</span>
+<span class=
+"doccomment">/// items independently, and when they are done the reducer is used to</span>
+<span class=
+"doccomment">/// combine their two results into one. See [the `plumbing`</span>
 <span class="doccomment">/// README][r] for further details.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [r]: https://github.com/rayon-rs/rayon/blob/master/src/iter/plumbing/README.md</span>
-<span class="doccomment">/// [fold]: https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.fold</span>
+<span class=
+"doccomment">/// [r]: https://github.com/rayon-rs/rayon/blob/master/src/iter/plumbing/README.md</span>
+<span class=
+"doccomment">/// [fold]: https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.fold</span>
 <span class="doccomment">/// [`Folder`]: trait.Folder.html</span>
-<span class="doccomment">/// [`Producer`]: trait.Producer.html</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Consumer</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sized</span> {
-    <span class="doccomment">/// The type of folder that this consumer can be converted into.</span>
-    <span class="kw">type</span> <span class="ident">Folder</span>: <span class="ident">Folder</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="self">Self</span>::<span class="prelude-ty">Result</span><span class="op">&gt;</span>;
+<span class=
+"doccomment">/// [`Producer`]: trait.Producer.html</span>
+<span class="kw">pub</span> <span class=
+"kw">trait</span> <span class="ident">Consumer</span><span class=
+"op">&lt;</span><span class="ident">Item</span><span class=
+"op">&gt;</span>: <span class="ident">Send</span> <span class=
+"op">+</span> <span class="ident">Sized</span> {
+    <span class=
+"doccomment">/// The type of folder that this consumer can be converted into.</span>
+    <span class="kw">type</span> <span class=
+"ident">Folder</span>: <span class=
+"ident">Folder</span><span class="op">&lt;</span><span class=
+"ident">Item</span>, <span class=
+"prelude-ty">Result</span> <span class="op">=</span> <span class=
+"self">Self</span>::<span class=
+"prelude-ty">Result</span><span class="op">&gt;</span>;
 
-    <span class="doccomment">/// The type of reducer that is produced if this consumer is split.</span>
-    <span class="kw">type</span> <span class="ident">Reducer</span>: <span class="ident">Reducer</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="prelude-ty">Result</span><span class="op">&gt;</span>;
+    <span class=
+"doccomment">/// The type of reducer that is produced if this consumer is split.</span>
+    <span class="kw">type</span> <span class=
+"ident">Reducer</span>: <span class=
+"ident">Reducer</span><span class="op">&lt;</span><span class=
+"self">Self</span>::<span class=
+"prelude-ty">Result</span><span class="op">&gt;</span>;
 
-    <span class="doccomment">/// The type of result that this consumer will ultimately produce.</span>
-    <span class="kw">type</span> <span class="prelude-ty">Result</span>: <span class="ident">Send</span>;
+    <span class=
+"doccomment">/// The type of result that this consumer will ultimately produce.</span>
+    <span class="kw">type</span> <span class=
+"prelude-ty">Result</span>: <span class="ident">Send</span>;
 
-    <span class="doccomment">/// Divide the consumer into two consumers, one processing items</span>
-    <span class="doccomment">/// `0..index` and one processing items from `index..`. Also</span>
-    <span class="doccomment">/// produces a reducer that can be used to reduce the results at</span>
+    <span class=
+"doccomment">/// Divide the consumer into two consumers, one processing items</span>
+    <span class=
+"doccomment">/// `0..index` and one processing items from `index..`. Also</span>
+    <span class=
+"doccomment">/// produces a reducer that can be used to reduce the results at</span>
     <span class="doccomment">/// the end.</span>
-    <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="self">Self</span>, <span class="self">Self</span>::<span class="ident">Reducer</span>);
+    <span class="kw">fn</span> <span class=
+"ident">split_at</span>(<span class=
+"self">self</span>, <span class="ident">index</span>: <span class=
+"ident">usize</span>) <span class="op">-</span><span class=
+"op">&gt;</span> (<span class="self">Self</span>, <span class=
+"self">Self</span>, <span class="self">Self</span>::<span class=
+"ident">Reducer</span>);
 
-    <span class="doccomment">/// Convert the consumer into a folder that can consume items</span>
-    <span class="doccomment">/// sequentially, eventually producing a final result.</span>
-    <span class="kw">fn</span> <span class="ident">into_folder</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Folder</span>;
+    <span class=
+"doccomment">/// Convert the consumer into a folder that can consume items</span>
+    <span class=
+"doccomment">/// sequentially, eventually producing a final result.</span>
+    <span class="kw">fn</span> <span class=
+"ident">into_folder</span>(<span class=
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span>::<span class=
+"ident">Folder</span>;
 
-    <span class="doccomment">/// Hint whether this `Consumer` would like to stop processing</span>
-    <span class="doccomment">/// further items, e.g. if a search has been completed.</span>
-    <span class="kw">fn</span> <span class="ident">full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class=
+"doccomment">/// Hint whether this `Consumer` would like to stop processing</span>
+    <span class=
+"doccomment">/// further items, e.g. if a search has been completed.</span>
+    <span class="kw">fn</span> <span class=
+"ident">full</span>(<span class="kw-2">&</span><span class=
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">bool</span>;
 }
 
-<span class="doccomment">/// The `Folder` trait encapsulates [the standard fold</span>
-<span class="doccomment">/// operation][fold].  It can be fed many items using the `consume`</span>
-<span class="doccomment">/// method. At the end, once all items have been consumed, it can then</span>
-<span class="doccomment">/// be converted (using `complete`) into a final value.</span>
+<span class=
+"doccomment">/// The `Folder` trait encapsulates [the standard fold</span>
+<span class=
+"doccomment">/// operation][fold].  It can be fed many items using the `consume`</span>
+<span class=
+"doccomment">/// method. At the end, once all items have been consumed, it can then</span>
+<span class=
+"doccomment">/// be converted (using `complete`) into a final value.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [fold]: https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.fold</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Folder</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>: <span class="ident">Sized</span> {
-    <span class="doccomment">/// The type of result that will ultimately be produced by the folder.</span>
-    <span class="kw">type</span> <span class="prelude-ty">Result</span>;
+<span class=
+"doccomment">/// [fold]: https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.fold</span>
+<span class="kw">pub</span> <span class=
+"kw">trait</span> <span class="ident">Folder</span><span class=
+"op">&lt;</span><span class="ident">Item</span><span class=
+"op">&gt;</span>: <span class="ident">Sized</span> {
+    <span class=
+"doccomment">/// The type of result that will ultimately be produced by the folder.</span>
+    <span class="kw">type</span> <span class=
+"prelude-ty">Result</span>;
 
-    <span class="doccomment">/// Consume next item and return new sequential state.</span>
-    <span class="kw">fn</span> <span class="ident">consume</span>(<span class="self">self</span>, <span class="ident">item</span>: <span class="ident">Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class=
+"doccomment">/// Consume next item and return new sequential state.</span>
+    <span class="kw">fn</span> <span class=
+"ident">consume</span>(<span class="self">self</span>, <span class=
+"ident">item</span>: <span class="ident">Item</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"self">Self</span>;
 
-    <span class="doccomment">/// Consume items from the iterator until full, and return new sequential state.</span>
+    <span class=
+"doccomment">/// Consume items from the iterator until full, and return new sequential state.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This method is **optional**. The default simply iterates over</span>
-    <span class="doccomment">/// `iter`, invoking `consume` and checking after each iteration</span>
-    <span class="doccomment">/// whether `full` returns false.</span>
+    <span class=
+"doccomment">/// This method is **optional**. The default simply iterates over</span>
+    <span class=
+"doccomment">/// `iter`, invoking `consume` and checking after each iteration</span>
+    <span class=
+"doccomment">/// whether `full` returns false.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The main reason to override it is if you can provide a more</span>
-    <span class="doccomment">/// specialized, efficient implementation.</span>
-    <span class="kw">fn</span> <span class="ident">consume_iter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class=
+"doccomment">/// The main reason to override it is if you can provide a more</span>
+    <span class=
+"doccomment">/// specialized, efficient implementation.</span>
+    <span class="kw">fn</span> <span class=
+"ident">consume_iter</span><span class="op">&lt;</span><span class=
+"ident">I</span><span class="op">&gt;</span>(<span class=
+"kw-2">mut</span> <span class="self">self</span>, <span class=
+"ident">iter</span>: <span class="ident">I</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Item</span><span class="op">&gt;</span>,
+        <span class="ident">I</span>: <span class=
+"ident">IntoIterator</span><span class="op">&lt;</span><span class=
+"ident">Item</span> <span class="op">=</span> <span class=
+"ident">Item</span><span class="op">&gt;</span>,
     {
-        <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">iter</span> {
-            <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">consume</span>(<span class="ident">item</span>);
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">full</span>() {
+        <span class="kw">for</span> <span class=
+"ident">item</span> <span class="kw">in</span> <span class=
+"ident">iter</span> {
+            <span class="self">self</span> <span class=
+"op">=</span> <span class="self">self</span>.<span class=
+"ident">consume</span>(<span class="ident">item</span>);
+            <span class="kw">if</span> <span class=
+"self">self</span>.<span class="ident">full</span>() {
                 <span class="kw">break</span>;
             }
         }
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Finish consuming items, produce final result.</span>
-    <span class="kw">fn</span> <span class="ident">complete</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="prelude-ty">Result</span>;
+    <span class=
+"doccomment">/// Finish consuming items, produce final result.</span>
+    <span class="kw">fn</span> <span class=
+"ident">complete</span>(<span class=
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span>::<span class=
+"prelude-ty">Result</span>;
 
-    <span class="doccomment">/// Hint whether this `Folder` would like to stop processing</span>
-    <span class="doccomment">/// further items, e.g. if a search has been completed.</span>
-    <span class="kw">fn</span> <span class="ident">full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class=
+"doccomment">/// Hint whether this `Folder` would like to stop processing</span>
+    <span class=
+"doccomment">/// further items, e.g. if a search has been completed.</span>
+    <span class="kw">fn</span> <span class=
+"ident">full</span>(<span class="kw-2">&</span><span class=
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">bool</span>;
 }
 
-<span class="doccomment">/// The reducer is the final step of a `Consumer` -- after a consumer</span>
-<span class="doccomment">/// has been split into two parts, and each of those parts has been</span>
-<span class="doccomment">/// fully processed, we are left with two results. The reducer is then</span>
-<span class="doccomment">/// used to combine those two results into one. See [the `plumbing`</span>
+<span class=
+"doccomment">/// The reducer is the final step of a `Consumer` -- after a consumer</span>
+<span class=
+"doccomment">/// has been split into two parts, and each of those parts has been</span>
+<span class=
+"doccomment">/// fully processed, we are left with two results. The reducer is then</span>
+<span class=
+"doccomment">/// used to combine those two results into one. See [the `plumbing`</span>
 <span class="doccomment">/// README][r] for further details.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [r]: https://github.com/rayon-rs/rayon/blob/master/src/iter/plumbing/README.md</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Reducer</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Reduce two final results into one; this is executed after a</span>
+<span class=
+"doccomment">/// [r]: https://github.com/rayon-rs/rayon/blob/master/src/iter/plumbing/README.md</span>
+<span class="kw">pub</span> <span class=
+"kw">trait</span> <span class="ident">Reducer</span><span class=
+"op">&lt;</span><span class="prelude-ty">Result</span><span class=
+"op">&gt;</span> {
+    <span class=
+"doccomment">/// Reduce two final results into one; this is executed after a</span>
     <span class="doccomment">/// split.</span>
-    <span class="kw">fn</span> <span class="ident">reduce</span>(<span class="self">self</span>, <span class="ident">left</span>: <span class="prelude-ty">Result</span>, <span class="ident">right</span>: <span class="prelude-ty">Result</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span>;
+    <span class="kw">fn</span> <span class=
+"ident">reduce</span>(<span class="self">self</span>, <span class=
+"ident">left</span>: <span class=
+"prelude-ty">Result</span>, <span class=
+"ident">right</span>: <span class=
+"prelude-ty">Result</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Result</span>;
 }
 
-<span class="doccomment">/// A stateless consumer can be freely copied. These consumers can be</span>
-<span class="doccomment">/// used like regular consumers, but they also support a</span>
-<span class="doccomment">/// `split_off_left` method that does not take an index to split, but</span>
-<span class="doccomment">/// simply splits at some arbitrary point (`for_each`, for example,</span>
-<span class="doccomment">/// produces an unindexed consumer).</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">UnindexedConsumer</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>: <span class="ident">Consumer</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Splits off a &quot;left&quot; consumer and returns it. The `self`</span>
-    <span class="doccomment">/// consumer should then be used to consume the &quot;right&quot; portion of</span>
-    <span class="doccomment">/// the data. (The ordering matters for methods like find_first --</span>
-    <span class="doccomment">/// values produced by the returned value are given precedence</span>
-    <span class="doccomment">/// over values produced by `self`.) Once the left and right</span>
-    <span class="doccomment">/// halves have been fully consumed, you should reduce the results</span>
-    <span class="doccomment">/// with the result of `to_reducer`.</span>
-    <span class="kw">fn</span> <span class="ident">split_off_left</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+<span class=
+"doccomment">/// A stateless consumer can be freely copied. These consumers can be</span>
+<span class=
+"doccomment">/// used like regular consumers, but they also support a</span>
+<span class=
+"doccomment">/// `split_off_left` method that does not take an index to split, but</span>
+<span class=
+"doccomment">/// simply splits at some arbitrary point (`for_each`, for example,</span>
+<span class=
+"doccomment">/// produces an unindexed consumer).</span>
+<span class="kw">pub</span> <span class=
+"kw">trait</span> <span class=
+"ident">UnindexedConsumer</span><span class=
+"op">&lt;</span><span class="ident">I</span><span class=
+"op">&gt;</span>: <span class="ident">Consumer</span><span class=
+"op">&lt;</span><span class="ident">I</span><span class=
+"op">&gt;</span> {
+    <span class=
+"doccomment">/// Splits off a "left" consumer and returns it. The `self`</span>
+    <span class=
+"doccomment">/// consumer should then be used to consume the "right" portion of</span>
+    <span class=
+"doccomment">/// the data. (The ordering matters for methods like find_first --</span>
+    <span class=
+"doccomment">/// values produced by the returned value are given precedence</span>
+    <span class=
+"doccomment">/// over values produced by `self`.) Once the left and right</span>
+    <span class=
+"doccomment">/// halves have been fully consumed, you should reduce the results</span>
+    <span class=
+"doccomment">/// with the result of `to_reducer`.</span>
+    <span class="kw">fn</span> <span class=
+"ident">split_off_left</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"self">Self</span>;
 
-    <span class="doccomment">/// Creates a reducer that can be used to combine the results from</span>
+    <span class=
+"doccomment">/// Creates a reducer that can be used to combine the results from</span>
     <span class="doccomment">/// a split consumer.</span>
-    <span class="kw">fn</span> <span class="ident">to_reducer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Reducer</span>;
+    <span class="kw">fn</span> <span class=
+"ident">to_reducer</span>(<span class="kw-2">&</span><span class=
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span>::<span class=
+"ident">Reducer</span>;
 }
 
-<span class="doccomment">/// A variant on `Producer` which does not know its exact length or</span>
-<span class="doccomment">/// cannot represent it in a `usize`. These producers act like</span>
-<span class="doccomment">/// ordinary producers except that they cannot be told to split at a</span>
-<span class="doccomment">/// particular point. Instead, you just ask them to split &#39;somewhere&#39;.</span>
+<span class=
+"doccomment">/// A variant on `Producer` which does not know its exact length or</span>
+<span class=
+"doccomment">/// cannot represent it in a `usize`. These producers act like</span>
+<span class=
+"doccomment">/// ordinary producers except that they cannot be told to split at a</span>
+<span class=
+"doccomment">/// particular point. Instead, you just ask them to split 'somewhere'.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// (In principle, `Producer` could extend this trait; however, it</span>
-<span class="doccomment">/// does not because to do so would require producers to carry their</span>
+<span class=
+"doccomment">/// (In principle, `Producer` could extend this trait; however, it</span>
+<span class=
+"doccomment">/// does not because to do so would require producers to carry their</span>
 <span class="doccomment">/// own length with them.)</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">UnindexedProducer</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sized</span> {
-    <span class="doccomment">/// The type of item returned by this producer.</span>
+<span class="kw">pub</span> <span class=
+"kw">trait</span> <span class=
+"ident">UnindexedProducer</span>: <span class=
+"ident">Send</span> <span class="op">+</span> <span class=
+"ident">Sized</span> {
+    <span class=
+"doccomment">/// The type of item returned by this producer.</span>
     <span class="kw">type</span> <span class="ident">Item</span>;
 
-    <span class="doccomment">/// Split midway into a new producer if possible, otherwise return `None`.</span>
-    <span class="kw">fn</span> <span class="ident">split</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>);
+    <span class=
+"doccomment">/// Split midway into a new producer if possible, otherwise return `None`.</span>
+    <span class="kw">fn</span> <span class=
+"ident">split</span>(<span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> (<span class=
+"self">Self</span>, <span class=
+"prelude-ty">Option</span><span class="op">&lt;</span><span class=
+"self">Self</span><span class="op">&gt;</span>);
 
-    <span class="doccomment">/// Iterate the producer, feeding each element to `folder`, and</span>
-    <span class="doccomment">/// stop when the folder is full (or all elements have been consumed).</span>
-    <span class="kw">fn</span> <span class="ident">fold_with</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">folder</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">F</span>
+    <span class=
+"doccomment">/// Iterate the producer, feeding each element to `folder`, and</span>
+    <span class=
+"doccomment">/// stop when the folder is full (or all elements have been consumed).</span>
+    <span class="kw">fn</span> <span class=
+"ident">fold_with</span><span class="op">&lt;</span><span class=
+"ident">F</span><span class="op">&gt;</span>(<span class=
+"self">self</span>, <span class="ident">folder</span>: <span class=
+"ident">F</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">F</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Folder</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span><span class="op">&gt;</span>;
+        <span class="ident">F</span>: <span class=
+"ident">Folder</span><span class="op">&lt;</span><span class=
+"self">Self</span>::<span class="ident">Item</span><span class=
+"op">&gt;</span>;
 }
 
-<span class="doccomment">/// A splitter controls the policy for splitting into smaller work items.</span>
+<span class=
+"doccomment">/// A splitter controls the policy for splitting into smaller work items.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Thief-splitting is an adaptive policy that starts by splitting into</span>
-<span class="doccomment">/// enough jobs for every worker thread, and then resets itself whenever a</span>
-<span class="doccomment">/// job is actually stolen into a different thread.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Splitter</span> {
-    <span class="doccomment">/// The `splits` tell us approximately how many remaining times we&#39;d</span>
-    <span class="doccomment">/// like to split this job.  We always just divide it by two though, so</span>
-    <span class="doccomment">/// the effective number of pieces will be `next_power_of_two()`.</span>
-    <span class="ident">splits</span>: <span class="ident">usize</span>,
+<span class=
+"doccomment">/// Thief-splitting is an adaptive policy that starts by splitting into</span>
+<span class=
+"doccomment">/// enough jobs for every worker thread, and then resets itself whenever a</span>
+<span class=
+"doccomment">/// job is actually stolen into a different thread.</span>
+<span class="attribute">#[<span class=
+"ident">derive</span>(<span class=
+"ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="kw">struct</span> <span class=
+"ident">Splitter</span> {
+    <span class=
+"doccomment">/// The `splits` tell us approximately how many remaining times we'd</span>
+    <span class=
+"doccomment">/// like to split this job.  We always just divide it by two though, so</span>
+    <span class=
+"doccomment">/// the effective number of pieces will be `next_power_of_two()`.</span>
+    <span class="ident">splits</span>: <span class=
+"ident">usize</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Splitter</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Splitter</span> {
+    <span class="attribute">#[<span class=
+"ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class=
+"ident">new</span>() <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">Splitter</span> {
         <span class="ident">Splitter</span> {
-            <span class="ident">splits</span>: <span class="kw">crate</span>::<span class="ident">current_num_threads</span>(),
+            <span class="ident">splits</span>: <span class=
+"kw">crate</span>::<span class=
+"ident">current_num_threads</span>(),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">try_split</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stolen</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">Splitter</span> { <span class="ident">splits</span> } <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
+    <span class="attribute">#[<span class=
+"ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class=
+"ident">try_split</span>(<span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="self">self</span>, <span class=
+"ident">stolen</span>: <span class=
+"ident">bool</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">let</span> <span class=
+"ident">Splitter</span> { <span class=
+"ident">splits</span> } <span class="op">=</span> <span class=
+"kw-2">*</span><span class="self">self</span>;
 
-        <span class="kw">if</span> <span class="ident">stolen</span> {
-            <span class="comment">// This job was stolen!  Reset the number of desired splits to the</span>
-            <span class="comment">// thread count, if that&#39;s more than we had remaining anyway.</span>
-            <span class="self">self</span>.<span class="ident">splits</span> <span class="op">=</span> <span class="ident">cmp</span>::<span class="ident">max</span>(<span class="kw">crate</span>::<span class="ident">current_num_threads</span>(), <span class="self">self</span>.<span class="ident">splits</span> <span class="op">/</span> <span class="number">2</span>);
+        <span class="kw">if</span> <span class=
+"ident">stolen</span> {
+            <span class=
+"comment">// This job was stolen!  Reset the number of desired splits to the</span>
+            <span class=
+"comment">// thread count, if that's more than we had remaining anyway.</span>
+            <span class="self">self</span>.<span class=
+"ident">splits</span> <span class="op">=</span> <span class=
+"ident">cmp</span>::<span class="ident">max</span>(<span class=
+"kw">crate</span>::<span class=
+"ident">current_num_threads</span>(), <span class=
+"self">self</span>.<span class="ident">splits</span> <span class=
+"op">/</span> <span class="number">2</span>);
             <span class="bool-val">true</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">splits</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="comment">// We have splits remaining, make it so.</span>
-            <span class="self">self</span>.<span class="ident">splits</span> <span class="op">/</span><span class="op">=</span> <span class="number">2</span>;
+        } <span class="kw">else</span> <span class=
+"kw">if</span> <span class="ident">splits</span> <span class=
+"op">&gt;</span> <span class="number">0</span> {
+            <span class=
+"comment">// We have splits remaining, make it so.</span>
+            <span class="self">self</span>.<span class=
+"ident">splits</span> <span class="op">/</span><span class=
+"op">=</span> <span class="number">2</span>;
             <span class="bool-val">true</span>
         } <span class="kw">else</span> {
-            <span class="comment">// Not stolen, and no more splits -- we&#39;re done!</span>
+            <span class=
+"comment">// Not stolen, and no more splits -- we're done!</span>
             <span class="bool-val">false</span>
         }
     }
 }
 
-<span class="doccomment">/// The length splitter is built on thief-splitting, but additionally takes</span>
-<span class="doccomment">/// into account the remaining length of the iterator.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">struct</span> <span class="ident">LengthSplitter</span> {
-    <span class="ident">inner</span>: <span class="ident">Splitter</span>,
+<span class=
+"doccomment">/// The length splitter is built on thief-splitting, but additionally takes</span>
+<span class=
+"doccomment">/// into account the remaining length of the iterator.</span>
+<span class="attribute">#[<span class=
+"ident">derive</span>(<span class=
+"ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="kw">struct</span> <span class=
+"ident">LengthSplitter</span> {
+    <span class="ident">inner</span>: <span class=
+"ident">Splitter</span>,
 
-    <span class="doccomment">/// The smallest we&#39;re willing to divide into.  Usually this is just 1,</span>
-    <span class="doccomment">/// but you can choose a larger working size with `with_min_len()`.</span>
-    <span class="ident">min</span>: <span class="ident">usize</span>,
+    <span class=
+"doccomment">/// The smallest we're willing to divide into.  Usually this is just 1,</span>
+    <span class=
+"doccomment">/// but you can choose a larger working size with `with_min_len()`.</span>
+    <span class="ident">min</span>: <span class=
+"ident">usize</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">LengthSplitter</span> {
-    <span class="doccomment">/// Create a new splitter based on lengths.</span>
+<span class="kw">impl</span> <span class=
+"ident">LengthSplitter</span> {
+    <span class=
+"doccomment">/// Create a new splitter based on lengths.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The `min` is a hard lower bound.  We&#39;ll never split below that, but</span>
-    <span class="doccomment">/// of course an iterator might start out smaller already.</span>
+    <span class=
+"doccomment">/// The `min` is a hard lower bound.  We'll never split below that, but</span>
+    <span class=
+"doccomment">/// of course an iterator might start out smaller already.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The `max` is an upper bound on the working size, used to determine</span>
-    <span class="doccomment">/// the minimum number of times we need to split to get under that limit.</span>
-    <span class="doccomment">/// The adaptive algorithm may very well split even further, but never</span>
+    <span class=
+"doccomment">/// The `max` is an upper bound on the working size, used to determine</span>
+    <span class=
+"doccomment">/// the minimum number of times we need to split to get under that limit.</span>
+    <span class=
+"doccomment">/// The adaptive algorithm may very well split even further, but never</span>
     <span class="doccomment">/// smaller than the `min`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">min</span>: <span class="ident">usize</span>, <span class="ident">max</span>: <span class="ident">usize</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LengthSplitter</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">splitter</span> <span class="op">=</span> <span class="ident">LengthSplitter</span> {
-            <span class="ident">inner</span>: <span class="ident">Splitter</span>::<span class="ident">new</span>(),
-            <span class="ident">min</span>: <span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">min</span>, <span class="number">1</span>),
+    <span class="attribute">#[<span class=
+"ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class=
+"ident">new</span>(<span class="ident">min</span>: <span class=
+"ident">usize</span>, <span class="ident">max</span>: <span class=
+"ident">usize</span>, <span class="ident">len</span>: <span class=
+"ident">usize</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">LengthSplitter</span> {
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">splitter</span> <span class=
+"op">=</span> <span class="ident">LengthSplitter</span> {
+            <span class="ident">inner</span>: <span class=
+"ident">Splitter</span>::<span class="ident">new</span>(),
+            <span class="ident">min</span>: <span class=
+"ident">cmp</span>::<span class="ident">max</span>(<span class=
+"ident">min</span>, <span class="number">1</span>),
         };
 
-        <span class="comment">// Divide the given length by the max working length to get the minimum</span>
-        <span class="comment">// number of splits we need to get under that max.  This rounds down,</span>
-        <span class="comment">// but the splitter actually gives `next_power_of_two()` pieces anyway.</span>
-        <span class="comment">// e.g. len 12345 / max 100 = 123 min_splits -&gt; 128 pieces.</span>
-        <span class="kw">let</span> <span class="ident">min_splits</span> <span class="op">=</span> <span class="ident">len</span> <span class="op">/</span> <span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">max</span>, <span class="number">1</span>);
+        <span class=
+"comment">// Divide the given length by the max working length to get the minimum</span>
+        <span class=
+"comment">// number of splits we need to get under that max.  This rounds down,</span>
+        <span class=
+"comment">// but the splitter actually gives `next_power_of_two()` pieces anyway.</span>
+        <span class=
+"comment">// e.g. len 12345 / max 100 = 123 min_splits -&gt; 128 pieces.</span>
+        <span class="kw">let</span> <span class=
+"ident">min_splits</span> <span class="op">=</span> <span class=
+"ident">len</span> <span class="op">/</span> <span class=
+"ident">cmp</span>::<span class="ident">max</span>(<span class=
+"ident">max</span>, <span class="number">1</span>);
 
-        <span class="comment">// Only update the value if it&#39;s not splitting enough already.</span>
-        <span class="kw">if</span> <span class="ident">min_splits</span> <span class="op">&gt;</span> <span class="ident">splitter</span>.<span class="ident">inner</span>.<span class="ident">splits</span> {
-            <span class="ident">splitter</span>.<span class="ident">inner</span>.<span class="ident">splits</span> <span class="op">=</span> <span class="ident">min_splits</span>;
+        <span class=
+"comment">// Only update the value if it's not splitting enough already.</span>
+        <span class="kw">if</span> <span class=
+"ident">min_splits</span> <span class="op">&gt;</span> <span class=
+"ident">splitter</span>.<span class=
+"ident">inner</span>.<span class="ident">splits</span> {
+            <span class="ident">splitter</span>.<span class=
+"ident">inner</span>.<span class="ident">splits</span> <span class=
+"op">=</span> <span class="ident">min_splits</span>;
         }
 
         <span class="ident">splitter</span>
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">try_split</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">stolen</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="comment">// If splitting wouldn&#39;t make us too small, try the inner splitter.</span>
-        <span class="ident">len</span> <span class="op">/</span> <span class="number">2</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">min</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">try_split</span>(<span class="ident">stolen</span>)
+    <span class="attribute">#[<span class=
+"ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class=
+"ident">try_split</span>(<span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="self">self</span>, <span class=
+"ident">len</span>: <span class="ident">usize</span>, <span class=
+"ident">stolen</span>: <span class=
+"ident">bool</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">bool</span> {
+        <span class=
+"comment">// If splitting wouldn't make us too small, try the inner splitter.</span>
+        <span class="ident">len</span> <span class=
+"op">/</span> <span class="number">2</span> <span class=
+"op">&gt;</span><span class="op">=</span> <span class=
+"self">self</span>.<span class="ident">min</span> <span class=
+"kw-2">&</span><span class="op">&</span> <span class=
+"self">self</span>.<span class="ident">inner</span>.<span class=
+"ident">try_split</span>(<span class="ident">stolen</span>)
     }
 }
 
-<span class="doccomment">/// This helper function is used to &quot;connect&quot; a parallel iterator to a</span>
-<span class="doccomment">/// consumer. It will convert the `par_iter` into a producer P and</span>
-<span class="doccomment">/// then pull items from P and feed them to `consumer`, splitting and</span>
-<span class="doccomment">/// creating parallel threads as needed.</span>
+<span class=
+"doccomment">/// This helper function is used to "connect" a parallel iterator to a</span>
+<span class=
+"doccomment">/// consumer. It will convert the `par_iter` into a producer P and</span>
+<span class=
+"doccomment">/// then pull items from P and feed them to `consumer`, splitting and</span>
+<span class=
+"doccomment">/// creating parallel threads as needed.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This is useful when you are implementing your own parallel</span>
-<span class="doccomment">/// iterators: it is often used as the definition of the</span>
-<span class="doccomment">/// [`drive_unindexed`] or [`drive`] methods.</span>
+<span class=
+"doccomment">/// This is useful when you are implementing your own parallel</span>
+<span class=
+"doccomment">/// iterators: it is often used as the definition of the</span>
+<span class=
+"doccomment">/// [`drive_unindexed`] or [`drive`] methods.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`drive_unindexed`]: ../trait.ParallelIterator.html#tymethod.drive_unindexed</span>
-<span class="doccomment">/// [`drive`]: ../trait.IndexedParallelIterator.html#tymethod.drive</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bridge</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">par_iter</span>: <span class="ident">I</span>, <span class="ident">consumer</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">C</span>::<span class="prelude-ty">Result</span>
+<span class=
+"doccomment">/// [`drive_unindexed`]: ../trait.ParallelIterator.html#tymethod.drive_unindexed</span>
+<span class=
+"doccomment">/// [`drive`]: ../trait.IndexedParallelIterator.html#tymethod.drive</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class=
+"ident">bridge</span><span class="op">&lt;</span><span class=
+"ident">I</span>, <span class="ident">C</span><span class=
+"op">&gt;</span>(<span class="ident">par_iter</span>: <span class=
+"ident">I</span>, <span class="ident">consumer</span>: <span class=
+"ident">C</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">C</span>::<span class=
+"prelude-ty">Result</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IndexedParallelIterator</span>,
-    <span class="ident">C</span>: <span class="ident">Consumer</span><span class="op">&lt;</span><span class="ident">I</span>::<span class="ident">Item</span><span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class=
+"ident">IndexedParallelIterator</span>,
+    <span class="ident">C</span>: <span class=
+"ident">Consumer</span><span class="op">&lt;</span><span class=
+"ident">I</span>::<span class="ident">Item</span><span class=
+"op">&gt;</span>,
 {
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">par_iter</span>.<span class="ident">len</span>();
-    <span class="kw">return</span> <span class="ident">par_iter</span>.<span class="ident">with_producer</span>(<span class="ident">Callback</span> { <span class="ident">len</span>, <span class="ident">consumer</span> });
+    <span class="kw">let</span> <span class=
+"ident">len</span> <span class="op">=</span> <span class=
+"ident">par_iter</span>.<span class="ident">len</span>();
+    <span class="kw">return</span> <span class=
+"ident">par_iter</span>.<span class=
+"ident">with_producer</span>(<span class=
+"ident">Callback</span> { <span class=
+"ident">len</span>, <span class="ident">consumer</span> });
 
-    <span class="kw">struct</span> <span class="ident">Callback</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-        <span class="ident">len</span>: <span class="ident">usize</span>,
-        <span class="ident">consumer</span>: <span class="ident">C</span>,
+    <span class="kw">struct</span> <span class=
+"ident">Callback</span><span class="op">&lt;</span><span class=
+"ident">C</span><span class="op">&gt;</span> {
+        <span class="ident">len</span>: <span class=
+"ident">usize</span>,
+        <span class="ident">consumer</span>: <span class=
+"ident">C</span>,
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">ProducerCallback</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Callback</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>
+    <span class="kw">impl</span><span class=
+"op">&lt;</span><span class="ident">C</span>, <span class=
+"ident">I</span><span class="op">&gt;</span> <span class=
+"ident">ProducerCallback</span><span class=
+"op">&lt;</span><span class="ident">I</span><span class=
+"op">&gt;</span> <span class="kw">for</span> <span class=
+"ident">Callback</span><span class="op">&lt;</span><span class=
+"ident">C</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">Consumer</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>,
+        <span class="ident">C</span>: <span class=
+"ident">Consumer</span><span class="op">&lt;</span><span class=
+"ident">I</span><span class="op">&gt;</span>,
     {
-        <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">C</span>::<span class="prelude-ty">Result</span>;
-        <span class="kw">fn</span> <span class="ident">callback</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">producer</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">C</span>::<span class="prelude-ty">Result</span>
+        <span class="kw">type</span> <span class=
+"ident">Output</span> <span class="op">=</span> <span class=
+"ident">C</span>::<span class="prelude-ty">Result</span>;
+        <span class="kw">fn</span> <span class=
+"ident">callback</span><span class="op">&lt;</span><span class=
+"ident">P</span><span class="op">&gt;</span>(<span class=
+"self">self</span>, <span class=
+"ident">producer</span>: <span class="ident">P</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">C</span>::<span class="prelude-ty">Result</span>
         <span class="kw">where</span>
-            <span class="ident">P</span>: <span class="ident">Producer</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span>,
+            <span class="ident">P</span>: <span class=
+"ident">Producer</span><span class="op">&lt;</span><span class=
+"ident">Item</span> <span class="op">=</span> <span class=
+"ident">I</span><span class="op">&gt;</span>,
         {
-            <span class="ident">bridge_producer_consumer</span>(<span class="self">self</span>.<span class="ident">len</span>, <span class="ident">producer</span>, <span class="self">self</span>.<span class="ident">consumer</span>)
+            <span class=
+"ident">bridge_producer_consumer</span>(<span class=
+"self">self</span>.<span class="ident">len</span>, <span class=
+"ident">producer</span>, <span class=
+"self">self</span>.<span class="ident">consumer</span>)
         }
     }
 }
 
-<span class="doccomment">/// This helper function is used to &quot;connect&quot; a producer and a</span>
-<span class="doccomment">/// consumer. You may prefer to call [`bridge`], which wraps this</span>
-<span class="doccomment">/// function. This function will draw items from `producer` and feed</span>
-<span class="doccomment">/// them to `consumer`, splitting and creating parallel tasks when</span>
+<span class=
+"doccomment">/// This helper function is used to "connect" a producer and a</span>
+<span class=
+"doccomment">/// consumer. You may prefer to call [`bridge`], which wraps this</span>
+<span class=
+"doccomment">/// function. This function will draw items from `producer` and feed</span>
+<span class=
+"doccomment">/// them to `consumer`, splitting and creating parallel tasks when</span>
 <span class="doccomment">/// needed.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This is useful when you are implementing your own parallel</span>
-<span class="doccomment">/// iterators: it is often used as the definition of the</span>
-<span class="doccomment">/// [`drive_unindexed`] or [`drive`] methods.</span>
+<span class=
+"doccomment">/// This is useful when you are implementing your own parallel</span>
+<span class=
+"doccomment">/// iterators: it is often used as the definition of the</span>
+<span class=
+"doccomment">/// [`drive_unindexed`] or [`drive`] methods.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`bridge`]: fn.bridge.html</span>
-<span class="doccomment">/// [`drive_unindexed`]: ../trait.ParallelIterator.html#tymethod.drive_unindexed</span>
-<span class="doccomment">/// [`drive`]: ../trait.IndexedParallelIterator.html#tymethod.drive</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bridge_producer_consumer</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">producer</span>: <span class="ident">P</span>, <span class="ident">consumer</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">C</span>::<span class="prelude-ty">Result</span>
+<span class=
+"doccomment">/// [`drive_unindexed`]: ../trait.ParallelIterator.html#tymethod.drive_unindexed</span>
+<span class=
+"doccomment">/// [`drive`]: ../trait.IndexedParallelIterator.html#tymethod.drive</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class=
+"ident">bridge_producer_consumer</span><span class=
+"op">&lt;</span><span class="ident">P</span>, <span class=
+"ident">C</span><span class="op">&gt;</span>(<span class=
+"ident">len</span>: <span class="ident">usize</span>, <span class=
+"ident">producer</span>: <span class="ident">P</span>, <span class=
+"ident">consumer</span>: <span class="ident">C</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">C</span>::<span class="prelude-ty">Result</span>
 <span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Producer</span>,
-    <span class="ident">C</span>: <span class="ident">Consumer</span><span class="op">&lt;</span><span class="ident">P</span>::<span class="ident">Item</span><span class="op">&gt;</span>,
+    <span class="ident">P</span>: <span class=
+"ident">Producer</span>,
+    <span class="ident">C</span>: <span class=
+"ident">Consumer</span><span class="op">&lt;</span><span class=
+"ident">P</span>::<span class="ident">Item</span><span class=
+"op">&gt;</span>,
 {
-    <span class="kw">let</span> <span class="ident">splitter</span> <span class="op">=</span> <span class="ident">LengthSplitter</span>::<span class="ident">new</span>(<span class="ident">producer</span>.<span class="ident">min_len</span>(), <span class="ident">producer</span>.<span class="ident">max_len</span>(), <span class="ident">len</span>);
-    <span class="kw">return</span> <span class="ident">helper</span>(<span class="ident">len</span>, <span class="bool-val">false</span>, <span class="ident">splitter</span>, <span class="ident">producer</span>, <span class="ident">consumer</span>);
+    <span class="kw">let</span> <span class=
+"ident">splitter</span> <span class="op">=</span> <span class=
+"ident">LengthSplitter</span>::<span class=
+"ident">new</span>(<span class="ident">producer</span>.<span class=
+"ident">min_len</span>(), <span class=
+"ident">producer</span>.<span class=
+"ident">max_len</span>(), <span class="ident">len</span>);
+    <span class="kw">return</span> <span class=
+"ident">helper</span>(<span class="ident">len</span>, <span class=
+"bool-val">false</span>, <span class=
+"ident">splitter</span>, <span class=
+"ident">producer</span>, <span class="ident">consumer</span>);
 
-    <span class="kw">fn</span> <span class="ident">helper</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">C</span><span class="op">&gt;</span>(
-        <span class="ident">len</span>: <span class="ident">usize</span>,
-        <span class="ident">migrated</span>: <span class="ident">bool</span>,
-        <span class="kw-2">mut</span> <span class="ident">splitter</span>: <span class="ident">LengthSplitter</span>,
-        <span class="ident">producer</span>: <span class="ident">P</span>,
-        <span class="ident">consumer</span>: <span class="ident">C</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">C</span>::<span class="prelude-ty">Result</span>
+    <span class="kw">fn</span> <span class=
+"ident">helper</span><span class="op">&lt;</span><span class=
+"ident">P</span>, <span class="ident">C</span><span class=
+"op">&gt;</span>(
+        <span class="ident">len</span>: <span class=
+"ident">usize</span>,
+        <span class="ident">migrated</span>: <span class=
+"ident">bool</span>,
+        <span class="kw-2">mut</span> <span class=
+"ident">splitter</span>: <span class="ident">LengthSplitter</span>,
+        <span class="ident">producer</span>: <span class=
+"ident">P</span>,
+        <span class="ident">consumer</span>: <span class=
+"ident">C</span>,
+    ) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">C</span>::<span class=
+"prelude-ty">Result</span>
     <span class="kw">where</span>
-        <span class="ident">P</span>: <span class="ident">Producer</span>,
-        <span class="ident">C</span>: <span class="ident">Consumer</span><span class="op">&lt;</span><span class="ident">P</span>::<span class="ident">Item</span><span class="op">&gt;</span>,
+        <span class="ident">P</span>: <span class=
+"ident">Producer</span>,
+        <span class="ident">C</span>: <span class=
+"ident">Consumer</span><span class="op">&lt;</span><span class=
+"ident">P</span>::<span class="ident">Item</span><span class=
+"op">&gt;</span>,
     {
-        <span class="kw">if</span> <span class="ident">consumer</span>.<span class="ident">full</span>() {
-            <span class="ident">consumer</span>.<span class="ident">into_folder</span>().<span class="ident">complete</span>()
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">splitter</span>.<span class="ident">try_split</span>(<span class="ident">len</span>, <span class="ident">migrated</span>) {
-            <span class="kw">let</span> <span class="ident">mid</span> <span class="op">=</span> <span class="ident">len</span> <span class="op">/</span> <span class="number">2</span>;
-            <span class="kw">let</span> (<span class="ident">left_producer</span>, <span class="ident">right_producer</span>) <span class="op">=</span> <span class="ident">producer</span>.<span class="ident">split_at</span>(<span class="ident">mid</span>);
-            <span class="kw">let</span> (<span class="ident">left_consumer</span>, <span class="ident">right_consumer</span>, <span class="ident">reducer</span>) <span class="op">=</span> <span class="ident">consumer</span>.<span class="ident">split_at</span>(<span class="ident">mid</span>);
-            <span class="kw">let</span> (<span class="ident">left_result</span>, <span class="ident">right_result</span>) <span class="op">=</span> <span class="ident">join_context</span>(
-                <span class="op">|</span><span class="ident">context</span><span class="op">|</span> {
+        <span class="kw">if</span> <span class=
+"ident">consumer</span>.<span class="ident">full</span>() {
+            <span class="ident">consumer</span>.<span class=
+"ident">into_folder</span>().<span class="ident">complete</span>()
+        } <span class="kw">else</span> <span class=
+"kw">if</span> <span class="ident">splitter</span>.<span class=
+"ident">try_split</span>(<span class=
+"ident">len</span>, <span class="ident">migrated</span>) {
+            <span class="kw">let</span> <span class=
+"ident">mid</span> <span class="op">=</span> <span class=
+"ident">len</span> <span class="op">/</span> <span class=
+"number">2</span>;
+            <span class="kw">let</span> (<span class=
+"ident">left_producer</span>, <span class=
+"ident">right_producer</span>) <span class=
+"op">=</span> <span class="ident">producer</span>.<span class=
+"ident">split_at</span>(<span class="ident">mid</span>);
+            <span class="kw">let</span> (<span class=
+"ident">left_consumer</span>, <span class=
+"ident">right_consumer</span>, <span class=
+"ident">reducer</span>) <span class="op">=</span> <span class=
+"ident">consumer</span>.<span class=
+"ident">split_at</span>(<span class="ident">mid</span>);
+            <span class="kw">let</span> (<span class=
+"ident">left_result</span>, <span class=
+"ident">right_result</span>) <span class="op">=</span> <span class=
+"ident">join_context</span>(
+                <span class="op">|</span><span class=
+"ident">context</span><span class="op">|</span> {
                     <span class="ident">helper</span>(
                         <span class="ident">mid</span>,
-                        <span class="ident">context</span>.<span class="ident">migrated</span>(),
+                        <span class=
+"ident">context</span>.<span class="ident">migrated</span>(),
                         <span class="ident">splitter</span>,
                         <span class="ident">left_producer</span>,
                         <span class="ident">left_consumer</span>,
                     )
                 },
-                <span class="op">|</span><span class="ident">context</span><span class="op">|</span> {
+                <span class="op">|</span><span class=
+"ident">context</span><span class="op">|</span> {
                     <span class="ident">helper</span>(
-                        <span class="ident">len</span> <span class="op">-</span> <span class="ident">mid</span>,
-                        <span class="ident">context</span>.<span class="ident">migrated</span>(),
+                        <span class="ident">len</span> <span class=
+"op">-</span> <span class="ident">mid</span>,
+                        <span class=
+"ident">context</span>.<span class="ident">migrated</span>(),
                         <span class="ident">splitter</span>,
                         <span class="ident">right_producer</span>,
                         <span class="ident">right_consumer</span>,
                     )
                 },
             );
-            <span class="ident">reducer</span>.<span class="ident">reduce</span>(<span class="ident">left_result</span>, <span class="ident">right_result</span>)
+            <span class="ident">reducer</span>.<span class=
+"ident">reduce</span>(<span class=
+"ident">left_result</span>, <span class=
+"ident">right_result</span>)
         } <span class="kw">else</span> {
-            <span class="ident">producer</span>.<span class="ident">fold_with</span>(<span class="ident">consumer</span>.<span class="ident">into_folder</span>()).<span class="ident">complete</span>()
+            <span class="ident">producer</span>.<span class=
+"ident">fold_with</span>(<span class=
+"ident">consumer</span>.<span class=
+"ident">into_folder</span>()).<span class="ident">complete</span>()
         }
     }
 }
 
-<span class="doccomment">/// A variant of [`bridge_producer_consumer`] where the producer is an unindexed producer.</span>
+<span class=
+"doccomment">/// A variant of [`bridge_producer_consumer`] where the producer is an unindexed producer.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`bridge_producer_consumer`]: fn.bridge_producer_consumer.html</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bridge_unindexed</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">producer</span>: <span class="ident">P</span>, <span class="ident">consumer</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">C</span>::<span class="prelude-ty">Result</span>
+<span class=
+"doccomment">/// [`bridge_producer_consumer`]: fn.bridge_producer_consumer.html</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class=
+"ident">bridge_unindexed</span><span class=
+"op">&lt;</span><span class="ident">P</span>, <span class=
+"ident">C</span><span class="op">&gt;</span>(<span class=
+"ident">producer</span>: <span class="ident">P</span>, <span class=
+"ident">consumer</span>: <span class="ident">C</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">C</span>::<span class="prelude-ty">Result</span>
 <span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">UnindexedProducer</span>,
-    <span class="ident">C</span>: <span class="ident">UnindexedConsumer</span><span class="op">&lt;</span><span class="ident">P</span>::<span class="ident">Item</span><span class="op">&gt;</span>,
+    <span class="ident">P</span>: <span class=
+"ident">UnindexedProducer</span>,
+    <span class="ident">C</span>: <span class=
+"ident">UnindexedConsumer</span><span class=
+"op">&lt;</span><span class="ident">P</span>::<span class=
+"ident">Item</span><span class="op">&gt;</span>,
 {
-    <span class="kw">let</span> <span class="ident">splitter</span> <span class="op">=</span> <span class="ident">Splitter</span>::<span class="ident">new</span>();
-    <span class="ident">bridge_unindexed_producer_consumer</span>(<span class="bool-val">false</span>, <span class="ident">splitter</span>, <span class="ident">producer</span>, <span class="ident">consumer</span>)
+    <span class="kw">let</span> <span class=
+"ident">splitter</span> <span class="op">=</span> <span class=
+"ident">Splitter</span>::<span class="ident">new</span>();
+    <span class=
+"ident">bridge_unindexed_producer_consumer</span>(<span class=
+"bool-val">false</span>, <span class=
+"ident">splitter</span>, <span class=
+"ident">producer</span>, <span class="ident">consumer</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">bridge_unindexed_producer_consumer</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">C</span><span class="op">&gt;</span>(
-    <span class="ident">migrated</span>: <span class="ident">bool</span>,
-    <span class="kw-2">mut</span> <span class="ident">splitter</span>: <span class="ident">Splitter</span>,
-    <span class="ident">producer</span>: <span class="ident">P</span>,
-    <span class="ident">consumer</span>: <span class="ident">C</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">C</span>::<span class="prelude-ty">Result</span>
+<span class="kw">fn</span> <span class=
+"ident">bridge_unindexed_producer_consumer</span><span class=
+"op">&lt;</span><span class="ident">P</span>, <span class=
+"ident">C</span><span class="op">&gt;</span>(
+    <span class="ident">migrated</span>: <span class=
+"ident">bool</span>,
+    <span class="kw-2">mut</span> <span class=
+"ident">splitter</span>: <span class="ident">Splitter</span>,
+    <span class="ident">producer</span>: <span class=
+"ident">P</span>,
+    <span class="ident">consumer</span>: <span class=
+"ident">C</span>,
+) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">C</span>::<span class=
+"prelude-ty">Result</span>
 <span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">UnindexedProducer</span>,
-    <span class="ident">C</span>: <span class="ident">UnindexedConsumer</span><span class="op">&lt;</span><span class="ident">P</span>::<span class="ident">Item</span><span class="op">&gt;</span>,
+    <span class="ident">P</span>: <span class=
+"ident">UnindexedProducer</span>,
+    <span class="ident">C</span>: <span class=
+"ident">UnindexedConsumer</span><span class=
+"op">&lt;</span><span class="ident">P</span>::<span class=
+"ident">Item</span><span class="op">&gt;</span>,
 {
-    <span class="kw">if</span> <span class="ident">consumer</span>.<span class="ident">full</span>() {
-        <span class="ident">consumer</span>.<span class="ident">into_folder</span>().<span class="ident">complete</span>()
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">splitter</span>.<span class="ident">try_split</span>(<span class="ident">migrated</span>) {
-        <span class="kw">match</span> <span class="ident">producer</span>.<span class="ident">split</span>() {
-            (<span class="ident">left_producer</span>, <span class="prelude-val">Some</span>(<span class="ident">right_producer</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> (<span class="ident">reducer</span>, <span class="ident">left_consumer</span>, <span class="ident">right_consumer</span>) <span class="op">=</span>
-                    (<span class="ident">consumer</span>.<span class="ident">to_reducer</span>(), <span class="ident">consumer</span>.<span class="ident">split_off_left</span>(), <span class="ident">consumer</span>);
-                <span class="kw">let</span> <span class="ident">bridge</span> <span class="op">=</span> <span class="ident">bridge_unindexed_producer_consumer</span>;
-                <span class="kw">let</span> (<span class="ident">left_result</span>, <span class="ident">right_result</span>) <span class="op">=</span> <span class="ident">join_context</span>(
-                    <span class="op">|</span><span class="ident">context</span><span class="op">|</span> <span class="ident">bridge</span>(<span class="ident">context</span>.<span class="ident">migrated</span>(), <span class="ident">splitter</span>, <span class="ident">left_producer</span>, <span class="ident">left_consumer</span>),
-                    <span class="op">|</span><span class="ident">context</span><span class="op">|</span> <span class="ident">bridge</span>(<span class="ident">context</span>.<span class="ident">migrated</span>(), <span class="ident">splitter</span>, <span class="ident">right_producer</span>, <span class="ident">right_consumer</span>),
+    <span class="kw">if</span> <span class=
+"ident">consumer</span>.<span class="ident">full</span>() {
+        <span class="ident">consumer</span>.<span class=
+"ident">into_folder</span>().<span class="ident">complete</span>()
+    } <span class="kw">else</span> <span class=
+"kw">if</span> <span class="ident">splitter</span>.<span class=
+"ident">try_split</span>(<span class="ident">migrated</span>) {
+        <span class="kw">match</span> <span class=
+"ident">producer</span>.<span class="ident">split</span>() {
+            (<span class="ident">left_producer</span>, <span class=
+"prelude-val">Some</span>(<span class=
+"ident">right_producer</span>)) <span class=
+"op">=</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> (<span class=
+"ident">reducer</span>, <span class=
+"ident">left_consumer</span>, <span class=
+"ident">right_consumer</span>) <span class="op">=</span>
+                    (<span class=
+"ident">consumer</span>.<span class=
+"ident">to_reducer</span>(), <span class=
+"ident">consumer</span>.<span class=
+"ident">split_off_left</span>(), <span class=
+"ident">consumer</span>);
+                <span class="kw">let</span> <span class=
+"ident">bridge</span> <span class="op">=</span> <span class=
+"ident">bridge_unindexed_producer_consumer</span>;
+                <span class="kw">let</span> (<span class=
+"ident">left_result</span>, <span class=
+"ident">right_result</span>) <span class="op">=</span> <span class=
+"ident">join_context</span>(
+                    <span class="op">|</span><span class=
+"ident">context</span><span class="op">|</span> <span class=
+"ident">bridge</span>(<span class=
+"ident">context</span>.<span class=
+"ident">migrated</span>(), <span class=
+"ident">splitter</span>, <span class=
+"ident">left_producer</span>, <span class=
+"ident">left_consumer</span>),
+                    <span class="op">|</span><span class=
+"ident">context</span><span class="op">|</span> <span class=
+"ident">bridge</span>(<span class=
+"ident">context</span>.<span class=
+"ident">migrated</span>(), <span class=
+"ident">splitter</span>, <span class=
+"ident">right_producer</span>, <span class=
+"ident">right_consumer</span>),
                 );
-                <span class="ident">reducer</span>.<span class="ident">reduce</span>(<span class="ident">left_result</span>, <span class="ident">right_result</span>)
+                <span class="ident">reducer</span>.<span class=
+"ident">reduce</span>(<span class=
+"ident">left_result</span>, <span class=
+"ident">right_result</span>)
             }
-            (<span class="ident">producer</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">producer</span>.<span class="ident">fold_with</span>(<span class="ident">consumer</span>.<span class="ident">into_folder</span>()).<span class="ident">complete</span>(),
+            (<span class="ident">producer</span>, <span class=
+"prelude-val">None</span>) <span class="op">=</span><span class=
+"op">&gt;</span> <span class="ident">producer</span>.<span class=
+"ident">fold_with</span>(<span class=
+"ident">consumer</span>.<span class=
+"ident">into_folder</span>()).<span class=
+"ident">complete</span>(),
         }
     } <span class="kw">else</span> {
-        <span class="ident">producer</span>.<span class="ident">fold_with</span>(<span class="ident">consumer</span>.<span class="ident">into_folder</span>()).<span class="ident">complete</span>()
+        <span class="ident">producer</span>.<span class=
+"ident">fold_with</span>(<span class=
+"ident">consumer</span>.<span class=
+"ident">into_folder</span>()).<span class="ident">complete</span>()
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "rayon";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>
+</section>
+<section id="search" class="content hidden"></section>
+<section class="footer"></section>
+<script>
+window.rootPath = "../../../../";window.currentCrate = "rayon";
+</script>
+<script src="../../../../aliases.js"></script>
+<script src="../../../../main.js"></script>
+<script src="../../../../source-script.js"></script>
+<script src="../../../../source-files.js"></script>
+<script defer src="../../../../search-index.js"></script>
+</body>
+</html>

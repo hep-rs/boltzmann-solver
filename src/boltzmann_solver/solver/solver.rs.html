@@ -1,4 +1,59 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/solver.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>solver.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="generator" content=
+"HTML Tidy for HTML5 for Linux version 5.6.0">
+<meta charset="utf-8">
+<meta name="viewport" content=
+"width=device-width, initial-scale=1.0">
+<meta name="generator" content="rustdoc">
+<meta name="description" content=
+"Source to the Rust file `src/solver/solver.rs`.">
+<meta name="keywords" content="rust, rustlang, rust-lang">
+<title>solver.rs.html -- source</title>
+<link rel="stylesheet" type="text/css" href=
+"../../../normalize.css">
+<link rel="stylesheet" type="text/css" href="../../../rustdoc.css"
+id="mainThemeStyle">
+<link rel="stylesheet" type="text/css" href="../../../dark.css">
+<link rel="stylesheet" type="text/css" href="../../../light.css"
+id="themeStyle">
+<script src="../../../storage.js"></script><noscript>
+<link rel="stylesheet" href="../../../noscript.css"></noscript>
+<link rel="shortcut icon" href="../../../favicon.ico">
+<style type="text/css">
+#crate-search{background-image:url("../../../down-arrow.svg");}
+</style>
+</head>
+<body class="rustdoc source">
+<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
+<nav class="sidebar">
+<div class="sidebar-menu">☰</div>
+<a href='../../../boltzmann_solver/index.html'>
+<div class='logo-container'><img src='../../../rust-logo.png' alt=
+'logo'></div>
+</a></nav>
+<div class="theme-picker"><button id="theme-picker" aria-label=
+"Pick another theme!"><img src="../../../brush.svg" width="18" alt=
+"Pick another theme!"></button>
+<div id="theme-choices"></div>
+</div>
+<script src="../../../theme.js"></script>
+<nav class="sub">
+<form class="search-form">
+<div class="search-container">
+<div><select id="crate-search">
+<option value="All crates">All crates</option>
+</select><input class="search-input" name="search" disabled
+autocomplete="off" spellcheck="false" placeholder=
+"Click or press ‘S’ to search, ‘?’ for more options…" type=
+"search"></div>
+<a id="settings-menu" href="../../../settings.html"><img src=
+"../../../wheel.svg" width="18" alt="Change settings"></a></div>
+</form>
+</nav>
+<section id="main" class="content">
+<pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -748,724 +803,1741 @@
 <span id="748">748</span>
 <span id="749">749</span>
 <span id="750">750</span>
-</pre><div class="example-wrap"><pre class="rust ">
+</pre>
+<div class="example-wrap">
+<pre class="rust">
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">model</span>::{<span class="ident">interaction</span>::<span class="ident">Interaction</span>, <span class="ident">Model</span>, <span class="ident">ModelInteractions</span>, <span class="ident">Particle</span>},
-    <span class="ident">solver</span>::{<span class="ident">options</span>::<span class="ident">StepPrecision</span>, <span class="ident">Context</span>},
-    <span class="ident">statistic</span>::{<span class="ident">Statistic</span>, <span class="ident">Statistics</span>},
-    <span class="ident">utilities</span>::<span class="ident">spline</span>::<span class="ident">rec_geomspace</span>,
+    <span class="ident">model</span>::{<span class=
+"ident">interaction</span>::<span class=
+"ident">Interaction</span>, <span class=
+"ident">Model</span>, <span class=
+"ident">ModelInteractions</span>, <span class=
+"ident">Particle</span>},
+    <span class="ident">solver</span>::{<span class=
+"ident">options</span>::<span class=
+"ident">StepPrecision</span>, <span class="ident">Context</span>},
+    <span class="ident">statistic</span>::{<span class=
+"ident">Statistic</span>, <span class="ident">Statistics</span>},
+    <span class="ident">utilities</span>::<span class=
+"ident">spline</span>::<span class="ident">rec_geomspace</span>,
 };
-<span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">Zip</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">rayon</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">error</span>, <span class="ident">fmt</span>, <span class="ident">iter</span>::<span class="ident">FromIterator</span>, <span class="ident">mem</span>, <span class="ident">ptr</span>};
+<span class="kw">use</span> <span class=
+"ident">ndarray</span>::{<span class=
+"ident">prelude</span>::<span class="kw-2">*</span>, <span class=
+"ident">Zip</span>};
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">feature</span> <span class=
+"op">=</span> <span class="string">"parallel"</span>)]</span>
+<span class="kw">use</span> <span class=
+"ident">rayon</span>::<span class=
+"ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class=
+"ident">std</span>::{<span class="ident">error</span>, <span class=
+"ident">fmt</span>, <span class="ident">iter</span>::<span class=
+"ident">FromIterator</span>, <span class=
+"ident">mem</span>, <span class="ident">ptr</span>};
 
-<span class="doccomment">/// Error type returned by the solver builder in case there is an error.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// The initial number densities are invalid.</span>
+<span class=
+"doccomment">/// Error type returned by the solver builder in case there is an error.</span>
+<span class="attribute">#[<span class=
+"ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class=
+"kw">enum</span> <span class="ident">Error</span> {
+    <span class=
+"doccomment">/// The initial number densities are invalid.</span>
     <span class="ident">InvalidInitialDensities</span>,
-    <span class="doccomment">/// The initial asymmetries are invalid.</span>
+    <span class=
+"doccomment">/// The initial asymmetries are invalid.</span>
     <span class="ident">InvalidInitialAsymmetries</span>,
-    <span class="doccomment">/// The number of particles held in equilibrium exceeds the number of</span>
+    <span class=
+"doccomment">/// The number of particles held in equilibrium exceeds the number of</span>
     <span class="doccomment">/// particles in the model.</span>
     <span class="ident">TooManyInEquilibrium</span>,
-    <span class="doccomment">/// The number of particles with no asymmetry exceeds the number of</span>
+    <span class=
+"doccomment">/// The number of particles with no asymmetry exceeds the number of</span>
     <span class="doccomment">/// particles in the model.</span>
     <span class="ident">TooManyNoAsymmetry</span>,
-    <span class="doccomment">/// The underlying model has not been specified</span>
+    <span class=
+"doccomment">/// The underlying model has not been specified</span>
     <span class="ident">UndefinedModel</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error</span>::<span class="ident">InvalidInitialDensities</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;initial number densities are invalid&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">InvalidInitialAsymmetries</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;initial number density asymmetries are invalid&quot;</span>)
+<span class="kw">impl</span> <span class=
+"ident">fmt</span>::<span class="ident">Display</span> <span class=
+"kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class=
+"ident">fmt</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">f</span>: <span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">fmt</span>::<span class=
+"ident">Formatter</span><span class="op">&lt;</span><span class=
+"lifetime">'_</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="kw">match</span> <span class=
+"self">self</span> {
+            <span class="ident">Error</span>::<span class=
+"ident">InvalidInitialDensities</span> <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"macro">write</span><span class="macro">!</span>(<span class=
+"ident">f</span>, <span class=
+"string">"initial number densities are invalid"</span>),
+            <span class="ident">Error</span>::<span class=
+"ident">InvalidInitialAsymmetries</span> <span class=
+"op">=</span><span class="op">&gt;</span> {
+                <span class="macro">write</span><span class=
+"macro">!</span>(<span class="ident">f</span>, <span class=
+"string">"initial number density asymmetries are invalid"</span>)
             }
-            <span class="ident">Error</span>::<span class="ident">TooManyInEquilibrium</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;too many particles held in equilibrium for the model&quot;</span>)
+            <span class="ident">Error</span>::<span class=
+"ident">TooManyInEquilibrium</span> <span class=
+"op">=</span><span class="op">&gt;</span> {
+                <span class="macro">write</span><span class=
+"macro">!</span>(<span class="ident">f</span>, <span class=
+"string">"too many particles held in equilibrium for the model"</span>)
             }
-            <span class="ident">Error</span>::<span class="ident">TooManyNoAsymmetry</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;too many particles without asymmetry for the model&quot;</span>)
+            <span class="ident">Error</span>::<span class=
+"ident">TooManyNoAsymmetry</span> <span class=
+"op">=</span><span class="op">&gt;</span> {
+                <span class="macro">write</span><span class=
+"macro">!</span>(<span class="ident">f</span>, <span class=
+"string">"too many particles without asymmetry for the model"</span>)
             }
-            <span class="ident">Error</span>::<span class="ident">UndefinedModel</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;underlying model is not defined&quot;</span>),
+            <span class="ident">Error</span>::<span class=
+"ident">UndefinedModel</span> <span class="op">=</span><span class=
+"op">&gt;</span> <span class="macro">write</span><span class=
+"macro">!</span>(<span class="ident">f</span>, <span class=
+"string">"underlying model is not defined"</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class=
+"ident">error</span>::<span class="ident">Error</span> <span class=
+"kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class=
+"ident">source</span>(<span class="kw-2">&</span><span class=
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Option</span><span class=
+"op">&lt;</span><span class="kw-2">&</span>(<span class=
+"kw">dyn</span> <span class="ident">error</span>::<span class=
+"ident">Error</span> <span class="op">+</span> <span class=
+"lifetime">'static</span>)<span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 }
 
 <span class="doccomment">/// Boltzmann solver builder</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SolverBuilder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="ident">model</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
-    <span class="ident">initial_densities</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">initial_asymmetries</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">beta_range</span>: (<span class="ident">f64</span>, <span class="ident">f64</span>),
-    <span class="ident">in_equilibrium</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">no_asymmetry</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">logger</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-    <span class="ident">step_precision</span>: <span class="ident">StepPrecision</span>,
-    <span class="ident">error_tolerance</span>: <span class="ident">f64</span>,
-    <span class="ident">skip_precomputation</span>: <span class="ident">bool</span>,
+<span class="kw">pub</span> <span class=
+"kw">struct</span> <span class=
+"ident">SolverBuilder</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span> {
+    <span class="ident">model</span>: <span class=
+"prelude-ty">Option</span><span class="op">&lt;</span><span class=
+"ident">M</span><span class="op">&gt;</span>,
+    <span class="ident">initial_densities</span>: <span class=
+"prelude-ty">Option</span><span class="op">&lt;</span><span class=
+"ident">Array1</span><span class="op">&lt;</span><span class=
+"ident">f64</span><span class="op">&gt;</span><span class=
+"op">&gt;</span>,
+    <span class="ident">initial_asymmetries</span>: <span class=
+"prelude-ty">Option</span><span class="op">&lt;</span><span class=
+"ident">Array1</span><span class="op">&lt;</span><span class=
+"ident">f64</span><span class="op">&gt;</span><span class=
+"op">&gt;</span>,
+    <span class="ident">beta_range</span>: (<span class=
+"ident">f64</span>, <span class="ident">f64</span>),
+    <span class="ident">in_equilibrium</span>: <span class=
+"ident">Vec</span><span class="op">&lt;</span><span class=
+"ident">usize</span><span class="op">&gt;</span>,
+    <span class="ident">no_asymmetry</span>: <span class=
+"ident">Vec</span><span class="op">&lt;</span><span class=
+"ident">usize</span><span class="op">&gt;</span>,
+    <span class="ident">logger</span>: <span class=
+"ident">Box</span><span class="op">&lt;</span><span class=
+"kw">dyn</span> <span class="ident">Fn</span>(<span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">step_precision</span>: <span class=
+"ident">StepPrecision</span>,
+    <span class="ident">error_tolerance</span>: <span class=
+"ident">f64</span>,
+    <span class="ident">skip_precomputation</span>: <span class=
+"ident">bool</span>,
 }
 
 <span class="doccomment">/// Boltzmann solver</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class=
+"kw">struct</span> <span class="ident">Solver</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span> {
     <span class="ident">model</span>: <span class="ident">M</span>,
-    <span class="ident">initial_densities</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="ident">initial_asymmetries</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="ident">beta_range</span>: (<span class="ident">f64</span>, <span class="ident">f64</span>),
-    <span class="ident">in_equilibrium</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">no_asymmetry</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">logger</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-    <span class="ident">step_precision</span>: <span class="ident">StepPrecision</span>,
-    <span class="ident">error_tolerance</span>: <span class="ident">f64</span>,
+    <span class="ident">initial_densities</span>: <span class=
+"ident">Array1</span><span class="op">&lt;</span><span class=
+"ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">initial_asymmetries</span>: <span class=
+"ident">Array1</span><span class="op">&lt;</span><span class=
+"ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">beta_range</span>: (<span class=
+"ident">f64</span>, <span class="ident">f64</span>),
+    <span class="ident">in_equilibrium</span>: <span class=
+"ident">Vec</span><span class="op">&lt;</span><span class=
+"ident">usize</span><span class="op">&gt;</span>,
+    <span class="ident">no_asymmetry</span>: <span class=
+"ident">Vec</span><span class="op">&lt;</span><span class=
+"ident">usize</span><span class="op">&gt;</span>,
+    <span class="ident">logger</span>: <span class=
+"ident">Box</span><span class="op">&lt;</span><span class=
+"kw">dyn</span> <span class="ident">Fn</span>(<span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">step_precision</span>: <span class=
+"ident">StepPrecision</span>,
+    <span class="ident">error_tolerance</span>: <span class=
+"ident">f64</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="ident">SolverBuilder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new builder for the Boltzmann solver.</span>
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span> <span class=
+"ident">SolverBuilder</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span> {
+    <span class=
+"doccomment">/// Creates a new builder for the Boltzmann solver.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The default range of temperatures span 1 GeV through to 10^{20} GeV, and</span>
-    <span class="doccomment">/// it uses normalization by default.</span>
+    <span class=
+"doccomment">/// The default range of temperatures span 1 GeV through to 10^{20} GeV, and</span>
+    <span class=
+"doccomment">/// it uses normalization by default.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Most of the method for the builder are intended to be chained one after</span>
+    <span class=
+"doccomment">/// Most of the method for the builder are intended to be chained one after</span>
     <span class="doccomment">/// the other.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use boltzmann_solver::prelude::*;</span>
-    <span class="doccomment">/// use boltzmann_solver::model::StandardModel;</span>
+    <span class=
+"doccomment">/// use boltzmann_solver::prelude::*;</span>
+    <span class=
+"doccomment">/// use boltzmann_solver::model::StandardModel;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut solver_builder: SolverBuilder&lt;StandardModel&gt; = SolverBuilder::new()</span>
+    <span class=
+"doccomment">/// let mut solver_builder: SolverBuilder&lt;StandardModel&gt; = SolverBuilder::new()</span>
     <span class="doccomment">///     // .logger(..)</span>
-    <span class="doccomment">///     // .initial_densities(..)</span>
-    <span class="doccomment">///     .beta_range(1e-10, 1e-6);</span>
+    <span class=
+"doccomment">///     // .initial_densities(..)</span>
+    <span class=
+"doccomment">///     .beta_range(1e-10, 1e-6);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// // let solver = solver_builder.build();</span>
+    <span class=
+"doccomment">/// // let solver = solver_builder.build();</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">new</span>() <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"self">Self</span> {
         <span class="self">Self</span> {
-            <span class="ident">model</span>: <span class="prelude-val">None</span>,
-            <span class="ident">initial_densities</span>: <span class="prelude-val">None</span>,
-            <span class="ident">initial_asymmetries</span>: <span class="prelude-val">None</span>,
-            <span class="ident">beta_range</span>: (<span class="number">1e-20</span>, <span class="number">1e0</span>),
-            <span class="ident">in_equilibrium</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
-            <span class="ident">no_asymmetry</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
-            <span class="ident">logger</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {}),
-            <span class="ident">step_precision</span>: <span class="ident">StepPrecision</span>::<span class="ident">default</span>(),
-            <span class="ident">error_tolerance</span>: <span class="number">1e-4</span>,
-            <span class="ident">skip_precomputation</span>: <span class="bool-val">false</span>,
+            <span class="ident">model</span>: <span class=
+"prelude-val">None</span>,
+            <span class=
+"ident">initial_densities</span>: <span class=
+"prelude-val">None</span>,
+            <span class=
+"ident">initial_asymmetries</span>: <span class=
+"prelude-val">None</span>,
+            <span class="ident">beta_range</span>: (<span class=
+"number">1e-20</span>, <span class="number">1e0</span>),
+            <span class="ident">in_equilibrium</span>: <span class=
+"ident">Vec</span>::<span class="ident">new</span>(),
+            <span class="ident">no_asymmetry</span>: <span class=
+"ident">Vec</span>::<span class="ident">new</span>(),
+            <span class="ident">logger</span>: <span class=
+"ident">Box</span>::<span class="ident">new</span>(<span class=
+"op">|</span><span class="kw">_</span><span class=
+"op">|</span> {}),
+            <span class="ident">step_precision</span>: <span class=
+"ident">StepPrecision</span>::<span class="ident">default</span>(),
+            <span class=
+"ident">error_tolerance</span>: <span class="number">1e-4</span>,
+            <span class=
+"ident">skip_precomputation</span>: <span class=
+"bool-val">false</span>,
         }
     }
 
     <span class="doccomment">/// Set a model function.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Add a function that can modify the model before it is used by the</span>
-    <span class="doccomment">/// context.  This is particularly useful if there is a baseline model with</span>
-    <span class="doccomment">/// fixed parameters and only certain parameters are changed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">model</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">model</span>);
+    <span class=
+"doccomment">/// Add a function that can modify the model before it is used by the</span>
+    <span class=
+"doccomment">/// context.  This is particularly useful if there is a baseline model with</span>
+    <span class=
+"doccomment">/// fixed parameters and only certain parameters are changed.</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">model</span>(<span class=
+"kw-2">mut</span> <span class="self">self</span>, <span class=
+"ident">model</span>: <span class="ident">M</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"self">Self</span> {
+        <span class="self">self</span>.<span class=
+"ident">model</span> <span class="op">=</span> <span class=
+"prelude-val">Some</span>(<span class="ident">model</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Specify initial number densities explicitly.</span>
+    <span class=
+"doccomment">/// Specify initial number densities explicitly.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If unspecified, all number densities are assumed to be in equilibrium to</span>
+    <span class=
+"doccomment">/// If unspecified, all number densities are assumed to be in equilibrium to</span>
     <span class="doccomment">/// begin with.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The list of number densities must be in the same order as the particles</span>
+    <span class=
+"doccomment">/// The list of number densities must be in the same order as the particles</span>
     <span class="doccomment">/// in the model.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initial_densities</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">initial_densities</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">n</span>);
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class=
+"ident">initial_densities</span>(<span class=
+"kw-2">mut</span> <span class="self">self</span>, <span class=
+"ident">n</span>: <span class="ident">Array1</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class=
+"ident">initial_densities</span> <span class=
+"op">=</span> <span class="prelude-val">Some</span>(<span class=
+"ident">n</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Specify initial number density asymmetries explicitly.</span>
+    <span class=
+"doccomment">/// Specify initial number density asymmetries explicitly.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If unspecified, all asymmetries are assumed to be 0 to begin with.</span>
+    <span class=
+"doccomment">/// If unspecified, all asymmetries are assumed to be 0 to begin with.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The list of number densities must be in the same order as the particles</span>
+    <span class=
+"doccomment">/// The list of number densities must be in the same order as the particles</span>
     <span class="doccomment">/// in the model.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initial_asymmetries</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">na</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">initial_asymmetries</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">na</span>);
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class=
+"ident">initial_asymmetries</span>(<span class=
+"kw-2">mut</span> <span class="self">self</span>, <span class=
+"ident">na</span>: <span class="ident">Array1</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class=
+"ident">initial_asymmetries</span> <span class=
+"op">=</span> <span class="prelude-val">Some</span>(<span class=
+"ident">na</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Set the range of inverse temperature values over which the solution is</span>
+    <span class=
+"doccomment">/// Set the range of inverse temperature values over which the solution is</span>
     <span class="doccomment">/// calculated.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Inverse temperature must be provided in units of GeV^{-1}.</span>
+    <span class=
+"doccomment">/// Inverse temperature must be provided in units of GeV^{-1}.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This function has a convenience alternative called</span>
-    <span class="doccomment">/// [`SolverBuilder::temperature_range`] allowing for the limits to be specified as</span>
-    <span class="doccomment">/// temperature in the units of GeV.</span>
+    <span class=
+"doccomment">/// This function has a convenience alternative called</span>
+    <span class=
+"doccomment">/// [`SolverBuilder::temperature_range`] allowing for the limits to be specified as</span>
+    <span class=
+"doccomment">/// temperature in the units of GeV.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the starting value is larger than the final value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">beta_range</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">start</span>: <span class="ident">f64</span>, <span class="ident">end</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="macro">assert</span><span class="macro">!</span>(
-            <span class="ident">start</span> <span class="op">&lt;</span> <span class="ident">end</span>,
-            <span class="string">&quot;The initial β must be smaller than the final β value.&quot;</span>
+    <span class=
+"doccomment">/// Panics if the starting value is larger than the final value.</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">beta_range</span>(<span class=
+"kw-2">mut</span> <span class="self">self</span>, <span class=
+"ident">start</span>: <span class="ident">f64</span>, <span class=
+"ident">end</span>: <span class="ident">f64</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"self">Self</span> {
+        <span class="macro">assert</span><span class=
+"macro">!</span>(
+            <span class="ident">start</span> <span class=
+"op">&lt;</span> <span class="ident">end</span>,
+            <span class=
+"string">"The initial β must be smaller than the final β value."</span>
         );
-        <span class="self">self</span>.<span class="ident">beta_range</span> <span class="op">=</span> (<span class="ident">start</span>, <span class="ident">end</span>);
+        <span class="self">self</span>.<span class=
+"ident">beta_range</span> <span class="op">=</span> (<span class=
+"ident">start</span>, <span class="ident">end</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Set the range of temperature values over which the phase space is</span>
+    <span class=
+"doccomment">/// Set the range of temperature values over which the phase space is</span>
     <span class="doccomment">/// evolved.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Temperature must be provided in units of GeV.</span>
+    <span class=
+"doccomment">/// Temperature must be provided in units of GeV.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is a convenience alternative to [`Solver::beta_range`].</span>
+    <span class=
+"doccomment">/// This function is a convenience alternative to [`Solver::beta_range`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the starting value is smaller than the final value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">temperature_range</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">start</span>: <span class="ident">f64</span>, <span class="ident">end</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="macro">assert</span><span class="macro">!</span>(
-            <span class="ident">start</span> <span class="op">&gt;</span> <span class="ident">end</span>,
-            <span class="string">&quot;The initial temperature must be larger than the final temperature.&quot;</span>
+    <span class=
+"doccomment">/// Panics if the starting value is smaller than the final value.</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class=
+"ident">temperature_range</span>(<span class=
+"kw-2">mut</span> <span class="self">self</span>, <span class=
+"ident">start</span>: <span class="ident">f64</span>, <span class=
+"ident">end</span>: <span class="ident">f64</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"self">Self</span> {
+        <span class="macro">assert</span><span class=
+"macro">!</span>(
+            <span class="ident">start</span> <span class=
+"op">&gt;</span> <span class="ident">end</span>,
+            <span class=
+"string">"The initial temperature must be larger than the final temperature."</span>
         );
-        <span class="self">self</span>.<span class="ident">beta_range</span> <span class="op">=</span> (<span class="ident">start</span>.<span class="ident">recip</span>(), <span class="ident">end</span>.<span class="ident">recip</span>());
+        <span class="self">self</span>.<span class=
+"ident">beta_range</span> <span class="op">=</span> (<span class=
+"ident">start</span>.<span class=
+"ident">recip</span>(), <span class="ident">end</span>.<span class=
+"ident">recip</span>());
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Specify the particles which must remain in equilibrium.</span>
+    <span class=
+"doccomment">/// Specify the particles which must remain in equilibrium.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Particles which are held in equilibrium will never have their number</span>
-    <span class="doccomment">/// density deviate from equilibrium, and the corresponding asymmetry never</span>
+    <span class=
+"doccomment">/// Particles which are held in equilibrium will never have their number</span>
+    <span class=
+"doccomment">/// density deviate from equilibrium, and the corresponding asymmetry never</span>
     <span class="doccomment">/// deviates from 0.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// These particles are specified by their index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">in_equilibrium</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">eq</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class=
+"doccomment">/// These particles are specified by their index.</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class=
+"ident">in_equilibrium</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">eq</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">usize</span><span class="op">&gt;</span>,
+        <span class="ident">I</span>: <span class=
+"ident">IntoIterator</span><span class="op">&lt;</span><span class=
+"ident">Item</span> <span class="op">=</span> <span class=
+"ident">usize</span><span class="op">&gt;</span>,
     {
-        <span class="self">self</span>.<span class="ident">in_equilibrium</span> <span class="op">=</span> <span class="ident">eq</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
+        <span class="self">self</span>.<span class=
+"ident">in_equilibrium</span> <span class=
+"op">=</span> <span class="ident">eq</span>.<span class=
+"ident">into_iter</span>().<span class="ident">collect</span>();
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Specify the particles which never develop an asymmetry.</span>
+    <span class=
+"doccomment">/// Specify the particles which never develop an asymmetry.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// These particles will never develop an asymmetry between their particle</span>
-    <span class="doccomment">/// and antiparticle densities.  This does not prevent the number densities</span>
-    <span class="doccomment">/// of the particle and antiparticles from deviating from their equilibrium.</span>
+    <span class=
+"doccomment">/// These particles will never develop an asymmetry between their particle</span>
+    <span class=
+"doccomment">/// and antiparticle densities.  This does not prevent the number densities</span>
+    <span class=
+"doccomment">/// of the particle and antiparticles from deviating from their equilibrium.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// These particles are specified by their index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">no_asymmetry</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">na</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class=
+"doccomment">/// These particles are specified by their index.</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">no_asymmetry</span><span class=
+"op">&lt;</span><span class="ident">I</span><span class=
+"op">&gt;</span>(<span class="kw-2">mut</span> <span class=
+"self">self</span>, <span class="ident">na</span>: <span class=
+"ident">I</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">usize</span><span class="op">&gt;</span>,
+        <span class="ident">I</span>: <span class=
+"ident">IntoIterator</span><span class="op">&lt;</span><span class=
+"ident">Item</span> <span class="op">=</span> <span class=
+"ident">usize</span><span class="op">&gt;</span>,
     {
-        <span class="self">self</span>.<span class="ident">no_asymmetry</span> <span class="op">=</span> <span class="ident">na</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
+        <span class="self">self</span>.<span class=
+"ident">no_asymmetry</span> <span class="op">=</span> <span class=
+"ident">na</span>.<span class=
+"ident">into_iter</span>().<span class="ident">collect</span>();
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the logger.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The logger provides some insight into the numerical integration &#39;black</span>
-    <span class="doccomment">/// box&#39;.  Specifically, it is run at the start of each integration step and</span>
-    <span class="doccomment">/// has access to the current value as a `&amp;Array1`, the change from this</span>
-    <span class="doccomment">/// step as a `&amp;Solution`, and the current `Context` at the start of the</span>
-    <span class="doccomment">/// integration step.  As a result, for the first step, the solution will be</span>
-    <span class="doccomment">/// equal to the initial conditions.</span>
+    <span class=
+"doccomment">/// The logger provides some insight into the numerical integration 'black</span>
+    <span class=
+"doccomment">/// box'.  Specifically, it is run at the start of each integration step and</span>
+    <span class=
+"doccomment">/// has access to the current value as a `&amp;Array1`, the change from this</span>
+    <span class=
+"doccomment">/// step as a `&amp;Solution`, and the current `Context` at the start of the</span>
+    <span class=
+"doccomment">/// integration step.  As a result, for the first step, the solution will be</span>
+    <span class=
+"doccomment">/// equal to the initial conditions.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is useful if one wants to track the evolution of the solutions and</span>
+    <span class=
+"doccomment">/// This is useful if one wants to track the evolution of the solutions and</span>
     <span class="doccomment">/// log these in a CSV file.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">logger</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">logger</span><span class=
+"op">&lt;</span><span class="ident">F</span><span class=
+"op">&gt;</span>(<span class="kw-2">mut</span> <span class=
+"self">self</span>, <span class="ident">f</span>: <span class=
+"ident">F</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="ident">F</span>: <span class=
+"ident">Fn</span>(<span class="kw-2">&</span><span class=
+"ident">Context</span><span class="op">&lt;</span><span class=
+"ident">M</span><span class="op">&gt;</span>) <span class=
+"op">+</span> <span class="lifetime">'static</span>,
     {
-        <span class="self">self</span>.<span class="ident">logger</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">f</span>);
+        <span class="self">self</span>.<span class=
+"ident">logger</span> <span class="op">=</span> <span class=
+"ident">Box</span>::<span class="ident">new</span>(<span class=
+"ident">f</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Specify how large or small the step size is allowed to become.</span>
+    <span class=
+"doccomment">/// Specify how large or small the step size is allowed to become.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The evolution of number densities are discretized in steps of \\(h\\)</span>
-    <span class="doccomment">/// such that \\(\beta_{i+1} = \beta_{i} + h\\).  The algorithm will</span>
-    <span class="doccomment">/// determine automatically the optimal step size \\(h\\) such that the</span>
-    <span class="doccomment">/// error is deemed acceptable; however, one may wish to override this to</span>
-    <span class="doccomment">/// prevent step sizes which are either too large or too small.</span>
+    <span class=
+"doccomment">/// The evolution of number densities are discretized in steps of \\(h\\)</span>
+    <span class=
+"doccomment">/// such that \\(\beta_{i+1} = \beta_{i} + h\\).  The algorithm will</span>
+    <span class=
+"doccomment">/// determine automatically the optimal step size \\(h\\) such that the</span>
+    <span class=
+"doccomment">/// error is deemed acceptable; however, one may wish to override this to</span>
+    <span class=
+"doccomment">/// prevent step sizes which are either too large or too small.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The step precision sets the range of allowed values of \\(h\\) in</span>
-    <span class="doccomment">/// proportion to the current value of \\(\beta\\):</span>
+    <span class=
+"doccomment">/// The step precision sets the range of allowed values of \\(h\\) in</span>
+    <span class=
+"doccomment">/// proportion to the current value of \\(\beta\\):</span>
     <span class="doccomment">/// \\begin{equation}</span>
-    <span class="doccomment">///   p_\text{min} \beta &lt; h &lt; p_\text{max} \beta</span>
+    <span class=
+"doccomment">///   p_\text{min} \beta &lt; h &lt; p_\text{max} \beta</span>
     <span class="doccomment">/// \\end{equation}</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The default values are `min = 1e-10` and `max = 1.0`.</span>
+    <span class=
+"doccomment">/// The default values are `min = 1e-10` and `max = 1.0`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The relative step precision has a higher priority on the step size than</span>
-    <span class="doccomment">/// the error.  That is, the step size will never be less than</span>
-    <span class="doccomment">/// \\(p_\text{min} \beta\\) even if this results in a larger local error</span>
+    <span class=
+"doccomment">/// The relative step precision has a higher priority on the step size than</span>
+    <span class=
+"doccomment">/// the error.  That is, the step size will never be less than</span>
+    <span class=
+"doccomment">/// \\(p_\text{min} \beta\\) even if this results in a larger local error</span>
     <span class="doccomment">/// than desired.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Panic</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This will panic if `min &gt;= max`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">step_precision</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">min</span>: <span class="ident">f64</span>, <span class="ident">max</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="macro">assert</span><span class="macro">!</span>(
-            <span class="ident">min</span> <span class="op">&lt;</span> <span class="ident">max</span>,
-            <span class="string">&quot;Minimum step precision must be smaller than the maximum step precision.&quot;</span>
+    <span class=
+"doccomment">/// This will panic if `min &gt;= max`.</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class=
+"ident">step_precision</span>(<span class=
+"kw-2">mut</span> <span class="self">self</span>, <span class=
+"ident">min</span>: <span class="ident">f64</span>, <span class=
+"ident">max</span>: <span class="ident">f64</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"self">Self</span> {
+        <span class="macro">assert</span><span class=
+"macro">!</span>(
+            <span class="ident">min</span> <span class=
+"op">&lt;</span> <span class="ident">max</span>,
+            <span class=
+"string">"Minimum step precision must be smaller than the maximum step precision."</span>
         );
-        <span class="self">self</span>.<span class="ident">step_precision</span> <span class="op">=</span> <span class="ident">StepPrecision</span> { <span class="ident">min</span>, <span class="ident">max</span> };
+        <span class="self">self</span>.<span class=
+"ident">step_precision</span> <span class=
+"op">=</span> <span class="ident">StepPrecision</span> { <span class="ident">min</span>, <span class="ident">max</span> };
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Specify the local error tolerance.</span>
+    <span class=
+"doccomment">/// Specify the local error tolerance.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The algorithm will adjust the evolution step size such that the local</span>
-    <span class="doccomment">/// error remains less than the specified the error tolerance.</span>
+    <span class=
+"doccomment">/// The algorithm will adjust the evolution step size such that the local</span>
+    <span class=
+"doccomment">/// error remains less than the specified the error tolerance.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the error is only ever estimated and thus may occasionally be</span>
-    <span class="doccomment">/// inaccurate.  Furthermore, the [`Solver::step_precision`] takes</span>
-    <span class="doccomment">/// precedence and thus if a large minimum step precision is requested, the</span>
-    <span class="doccomment">/// local error may be larger than the error tolerance.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_tolerance</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">tol</span> <span class="op">&gt;</span> <span class="number">0.0</span>, <span class="string">&quot;The tolerance must be greater than 0.&quot;</span>);
-        <span class="self">self</span>.<span class="ident">error_tolerance</span> <span class="op">=</span> <span class="ident">tol</span>;
+    <span class=
+"doccomment">/// Note that the error is only ever estimated and thus may occasionally be</span>
+    <span class=
+"doccomment">/// inaccurate.  Furthermore, the [`Solver::step_precision`] takes</span>
+    <span class=
+"doccomment">/// precedence and thus if a large minimum step precision is requested, the</span>
+    <span class=
+"doccomment">/// local error may be larger than the error tolerance.</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class=
+"ident">error_tolerance</span>(<span class=
+"kw-2">mut</span> <span class="self">self</span>, <span class=
+"ident">tol</span>: <span class="ident">f64</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"self">Self</span> {
+        <span class="macro">assert</span><span class=
+"macro">!</span>(<span class="ident">tol</span> <span class=
+"op">&gt;</span> <span class="number">0.0</span>, <span class=
+"string">"The tolerance must be greater than 0."</span>);
+        <span class="self">self</span>.<span class=
+"ident">error_tolerance</span> <span class=
+"op">=</span> <span class="ident">tol</span>;
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Upon calling [`SolverBuilder::build`], skip the precomputation of</span>
+    <span class=
+"doccomment">/// Upon calling [`SolverBuilder::build`], skip the precomputation of</span>
     <span class="doccomment">/// interactions.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// By default, interactions are precomputed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skip_precomputation</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">skip_precomputation</span> <span class="op">=</span> <span class="ident">v</span>;
+    <span class=
+"doccomment">/// By default, interactions are precomputed.</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class=
+"ident">skip_precomputation</span>(<span class=
+"kw-2">mut</span> <span class="self">self</span>, <span class=
+"ident">v</span>: <span class="ident">bool</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"self">Self</span> {
+        <span class="self">self</span>.<span class=
+"ident">skip_precomputation</span> <span class=
+"op">=</span> <span class="ident">v</span>;
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Check the validity of the initial densities, making sure we have the</span>
-    <span class="doccomment">/// right number of initial conditions and they are all finite.</span>
-    <span class="kw">fn</span> <span class="ident">check_initial_densities</span>(
-        <span class="ident">initial_densities</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-        <span class="ident">particles</span>: <span class="kw-2">&amp;</span>[<span class="ident">Particle</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">initial_densities</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">particles</span>.<span class="ident">len</span>() {
-            <span class="ident">log</span>::<span class="macro">error</span><span class="macro">!</span>(
-                <span class="string">&quot;Initial densities is not the same length as the number of particles in the model.&quot;</span>
+    <span class=
+"doccomment">/// Check the validity of the initial densities, making sure we have the</span>
+    <span class=
+"doccomment">/// right number of initial conditions and they are all finite.</span>
+    <span class="kw">fn</span> <span class=
+"ident">check_initial_densities</span>(
+        <span class="ident">initial_densities</span>: <span class=
+"kw-2">&</span><span class="ident">Array1</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>,
+        <span class="ident">particles</span>: <span class=
+"kw-2">&</span>[<span class="ident">Particle</span>],
+    ) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Result</span><span class=
+"op">&lt;</span>(), <span class="ident">Error</span><span class=
+"op">&gt;</span> {
+        <span class="kw">if</span> <span class=
+"ident">initial_densities</span>.<span class=
+"ident">len</span>() <span class="op">!</span><span class=
+"op">=</span> <span class="ident">particles</span>.<span class=
+"ident">len</span>() {
+            <span class="ident">log</span>::<span class=
+"macro">error</span><span class="macro">!</span>(
+                <span class=
+"string">"Initial densities is not the same length as the number of particles in the model."</span>
             );
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">InvalidInitialDensities</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">initial_densities</span>
+            <span class="kw">return</span> <span class=
+"prelude-val">Err</span>(<span class=
+"ident">Error</span>::<span class=
+"ident">InvalidInitialDensities</span>);
+        } <span class="kw">else</span> <span class=
+"kw">if</span> <span class="ident">initial_densities</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="op">!</span><span class="ident">v</span>.<span class="ident">is_finite</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">is_nan</span>())
+            .<span class="ident">any</span>(<span class=
+"op">|</span><span class="ident">v</span><span class=
+"op">|</span> <span class="op">!</span><span class=
+"ident">v</span>.<span class=
+"ident">is_finite</span>() <span class="op">|</span><span class=
+"op">|</span> <span class="ident">v</span>.<span class=
+"ident">is_nan</span>())
         {
-            <span class="ident">log</span>::<span class="macro">error</span><span class="macro">!</span>(
-                <span class="string">&quot;Some of initial densities are not finite or NaN:\n{:.3e}&quot;</span>,
+            <span class="ident">log</span>::<span class=
+"macro">error</span><span class="macro">!</span>(
+                <span class=
+"string">"Some of initial densities are not finite or NaN:\n{:.3e}"</span>,
                 <span class="ident">initial_densities</span>
             );
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">InvalidInitialDensities</span>);
+            <span class="kw">return</span> <span class=
+"prelude-val">Err</span>(<span class=
+"ident">Error</span>::<span class=
+"ident">InvalidInitialDensities</span>);
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Check the validity of the initial asymmetries, making sure we have the</span>
-    <span class="doccomment">/// right number of initial conditions and they are all finite.</span>
-    <span class="kw">fn</span> <span class="ident">check_initial_asymmetries</span>(
-        <span class="ident">initial_asymmetries</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-        <span class="ident">particles</span>: <span class="kw-2">&amp;</span>[<span class="ident">Particle</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">initial_asymmetries</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">particles</span>.<span class="ident">len</span>() {
-            <span class="ident">log</span>::<span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;Initial asymmetries is not the same length as the number of particles in the model.&quot;</span>);
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">InvalidInitialAsymmetries</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">initial_asymmetries</span>
+    <span class=
+"doccomment">/// Check the validity of the initial asymmetries, making sure we have the</span>
+    <span class=
+"doccomment">/// right number of initial conditions and they are all finite.</span>
+    <span class="kw">fn</span> <span class=
+"ident">check_initial_asymmetries</span>(
+        <span class=
+"ident">initial_asymmetries</span>: <span class="kw-2">&</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+        <span class="ident">particles</span>: <span class=
+"kw-2">&</span>[<span class="ident">Particle</span>],
+    ) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Result</span><span class=
+"op">&lt;</span>(), <span class="ident">Error</span><span class=
+"op">&gt;</span> {
+        <span class="kw">if</span> <span class=
+"ident">initial_asymmetries</span>.<span class=
+"ident">len</span>() <span class="op">!</span><span class=
+"op">=</span> <span class="ident">particles</span>.<span class=
+"ident">len</span>() {
+            <span class="ident">log</span>::<span class=
+"macro">error</span><span class="macro">!</span>(<span class=
+"string">"Initial asymmetries is not the same length as the number of particles in the model."</span>);
+            <span class="kw">return</span> <span class=
+"prelude-val">Err</span>(<span class=
+"ident">Error</span>::<span class=
+"ident">InvalidInitialAsymmetries</span>);
+        } <span class="kw">else</span> <span class=
+"kw">if</span> <span class="ident">initial_asymmetries</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="op">!</span><span class="ident">v</span>.<span class="ident">is_finite</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">is_nan</span>())
+            .<span class="ident">any</span>(<span class=
+"op">|</span><span class="ident">v</span><span class=
+"op">|</span> <span class="op">!</span><span class=
+"ident">v</span>.<span class=
+"ident">is_finite</span>() <span class="op">|</span><span class=
+"op">|</span> <span class="ident">v</span>.<span class=
+"ident">is_nan</span>())
         {
-            <span class="ident">log</span>::<span class="macro">error</span><span class="macro">!</span>(
-                <span class="string">&quot;Some of initial asymmetries are not finite or NaN:\n{:.3e}&quot;</span>,
+            <span class="ident">log</span>::<span class=
+"macro">error</span><span class="macro">!</span>(
+                <span class=
+"string">"Some of initial asymmetries are not finite or NaN:\n{:.3e}"</span>,
                 <span class="ident">initial_asymmetries</span>
             );
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">InvalidInitialAsymmetries</span>);
+            <span class="kw">return</span> <span class=
+"prelude-val">Err</span>(<span class=
+"ident">Error</span>::<span class=
+"ident">InvalidInitialAsymmetries</span>);
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="ident">SolverBuilder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span> <span class=
+"ident">SolverBuilder</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">ModelInteractions</span>,
+    <span class="ident">M</span>: <span class=
+"ident">ModelInteractions</span>,
 {
-    <span class="doccomment">/// Precompute the interaction rates.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">precompute</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">M</span>, <span class="ident">beta_range</span>: (<span class="ident">f64</span>, <span class="ident">f64</span>)) {
-        <span class="comment">// Number of recursive subdivisions in beta range (so there are 2^N</span>
+    <span class=
+"doccomment">/// Precompute the interaction rates.</span>
+    <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">not</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"parallel"</span>))]</span>
+    <span class="kw">fn</span> <span class=
+"ident">precompute</span>(<span class=
+"ident">model</span>: <span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="ident">M</span>, <span class=
+"ident">beta_range</span>: (<span class=
+"ident">f64</span>, <span class="ident">f64</span>)) {
+        <span class=
+"comment">// Number of recursive subdivisions in beta range (so there are 2^N</span>
         <span class="comment">// subdivisions).</span>
-        <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">10</span>;
+        <span class="kw">const</span> <span class=
+"ident">N</span>: <span class="ident">u32</span> <span class=
+"op">=</span> <span class="number">10</span>;
 
-        <span class="ident">log</span>::<span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Pre-computing γ...&quot;</span>);
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="ident">beta</span>) <span class="kw">in</span> <span class="macro">vec</span><span class="macro">!</span>[
-            <span class="number">0.98</span> <span class="op">*</span> <span class="ident">beta_range</span>.<span class="number">0</span>,
-            <span class="number">0.99</span> <span class="op">*</span> <span class="ident">beta_range</span>.<span class="number">0</span>,
-            <span class="number">1.01</span> <span class="op">*</span> <span class="ident">beta_range</span>.<span class="number">1</span>,
-            <span class="number">1.02</span> <span class="op">*</span> <span class="ident">beta_range</span>.<span class="number">1</span>,
+        <span class="ident">log</span>::<span class=
+"macro">info</span><span class="macro">!</span>(<span class=
+"string">"Pre-computing γ..."</span>);
+        <span class="kw">for</span> (<span class=
+"ident">i</span>, <span class="kw-2">&</span><span class=
+"ident">beta</span>) <span class="kw">in</span> <span class=
+"macro">vec</span><span class="macro">!</span>[
+            <span class="number">0.98</span> <span class=
+"op">*</span> <span class="ident">beta_range</span>.<span class=
+"number">0</span>,
+            <span class="number">0.99</span> <span class=
+"op">*</span> <span class="ident">beta_range</span>.<span class=
+"number">0</span>,
+            <span class="number">1.01</span> <span class=
+"op">*</span> <span class="ident">beta_range</span>.<span class=
+"number">1</span>,
+            <span class="number">1.02</span> <span class=
+"op">*</span> <span class="ident">beta_range</span>.<span class=
+"number">1</span>,
         ]
         .<span class="ident">iter</span>()
-        .<span class="ident">chain</span>(<span class="kw-2">&amp;</span><span class="ident">rec_geomspace</span>(<span class="ident">beta_range</span>.<span class="number">0</span>, <span class="ident">beta_range</span>.<span class="number">1</span>, <span class="ident">N</span>))
+        .<span class="ident">chain</span>(<span class=
+"kw-2">&</span><span class=
+"ident">rec_geomspace</span>(<span class="ident">beta_range</span>.<span class="number">0</span>, <span class="ident">beta_range</span>.<span class="number">1</span>, <span class="ident">N</span>))
         .<span class="ident">enumerate</span>()
         {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">%</span> <span class="number">64</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">log</span>::<span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Precomputing step {} / {}&quot;</span>, <span class="ident">i</span>, <span class="number">2usize</span>.<span class="ident">pow</span>(<span class="ident">N</span>) <span class="op">+</span> <span class="number">4</span>);
+            <span class="kw">if</span> <span class=
+"ident">i</span> <span class="op">%</span> <span class=
+"number">64</span> <span class="op">=</span><span class=
+"op">=</span> <span class="number">0</span> {
+                <span class="ident">log</span>::<span class=
+"macro">debug</span><span class="macro">!</span>(<span class=
+"string">"Precomputing step {} / {}"</span>, <span class=
+"ident">i</span>, <span class="number">2usize</span>.<span class=
+"ident">pow</span>(<span class="ident">N</span>) <span class=
+"op">+</span> <span class="number">4</span>);
             } <span class="kw">else</span> {
-                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Precomputing step {} / {}&quot;</span>, <span class="ident">i</span>, <span class="number">2usize</span>.<span class="ident">pow</span>(<span class="ident">N</span>) <span class="op">+</span> <span class="number">4</span>);
+                <span class="ident">log</span>::<span class=
+"macro">trace</span><span class="macro">!</span>(<span class=
+"string">"Precomputing step {} / {}"</span>, <span class=
+"ident">i</span>, <span class="number">2usize</span>.<span class=
+"ident">pow</span>(<span class="ident">N</span>) <span class=
+"op">+</span> <span class="number">4</span>);
             }
-            <span class="ident">model</span>.<span class="ident">set_beta</span>(<span class="ident">beta</span>);
-            <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">as_context</span>();
+            <span class="ident">model</span>.<span class=
+"ident">set_beta</span>(<span class="ident">beta</span>);
+            <span class="kw">let</span> <span class=
+"ident">c</span> <span class="op">=</span> <span class=
+"ident">model</span>.<span class="ident">as_context</span>();
 
-            <span class="kw">for</span> <span class="ident">interaction</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">interactions</span>() {
-                <span class="ident">interaction</span>.<span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>);
+            <span class="kw">for</span> <span class=
+"ident">interaction</span> <span class="kw">in</span> <span class=
+"ident">model</span>.<span class="ident">interactions</span>() {
+                <span class="ident">interaction</span>.<span class=
+"ident">gamma</span>(<span class="kw-2">&</span><span class=
+"ident">c</span>);
             }
         }
     }
 
-    <span class="doccomment">/// Precompute the interaction rates.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">precompute</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">M</span>, <span class="ident">beta_range</span>: (<span class="ident">f64</span>, <span class="ident">f64</span>)) {
-        <span class="comment">// Number of recursive subdivisions in beta range (so there are 2^N</span>
+    <span class=
+"doccomment">/// Precompute the interaction rates.</span>
+    <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">feature</span> <span class=
+"op">=</span> <span class="string">"parallel"</span>)]</span>
+    <span class="kw">fn</span> <span class=
+"ident">precompute</span>(<span class=
+"ident">model</span>: <span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="ident">M</span>, <span class=
+"ident">beta_range</span>: (<span class=
+"ident">f64</span>, <span class="ident">f64</span>)) {
+        <span class=
+"comment">// Number of recursive subdivisions in beta range (so there are 2^N</span>
         <span class="comment">// subdivisions).</span>
-        <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">10</span>;
+        <span class="kw">const</span> <span class=
+"ident">N</span>: <span class="ident">u32</span> <span class=
+"op">=</span> <span class="number">10</span>;
 
-        <span class="ident">log</span>::<span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Pre-computing γ...&quot;</span>);
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="ident">beta</span>) <span class="kw">in</span> <span class="macro">vec</span><span class="macro">!</span>[
-            <span class="number">0.98</span> <span class="op">*</span> <span class="ident">beta_range</span>.<span class="number">0</span>,
-            <span class="number">0.99</span> <span class="op">*</span> <span class="ident">beta_range</span>.<span class="number">0</span>,
-            <span class="number">1.01</span> <span class="op">*</span> <span class="ident">beta_range</span>.<span class="number">1</span>,
-            <span class="number">1.02</span> <span class="op">*</span> <span class="ident">beta_range</span>.<span class="number">1</span>,
+        <span class="ident">log</span>::<span class=
+"macro">info</span><span class="macro">!</span>(<span class=
+"string">"Pre-computing γ..."</span>);
+        <span class="kw">for</span> (<span class=
+"ident">i</span>, <span class="kw-2">&</span><span class=
+"ident">beta</span>) <span class="kw">in</span> <span class=
+"macro">vec</span><span class="macro">!</span>[
+            <span class="number">0.98</span> <span class=
+"op">*</span> <span class="ident">beta_range</span>.<span class=
+"number">0</span>,
+            <span class="number">0.99</span> <span class=
+"op">*</span> <span class="ident">beta_range</span>.<span class=
+"number">0</span>,
+            <span class="number">1.01</span> <span class=
+"op">*</span> <span class="ident">beta_range</span>.<span class=
+"number">1</span>,
+            <span class="number">1.02</span> <span class=
+"op">*</span> <span class="ident">beta_range</span>.<span class=
+"number">1</span>,
         ]
         .<span class="ident">iter</span>()
-        .<span class="ident">chain</span>(<span class="kw-2">&amp;</span><span class="ident">rec_geomspace</span>(<span class="ident">beta_range</span>.<span class="number">0</span>, <span class="ident">beta_range</span>.<span class="number">1</span>, <span class="ident">N</span>))
+        .<span class="ident">chain</span>(<span class=
+"kw-2">&</span><span class=
+"ident">rec_geomspace</span>(<span class="ident">beta_range</span>.<span class="number">0</span>, <span class="ident">beta_range</span>.<span class="number">1</span>, <span class="ident">N</span>))
         .<span class="ident">enumerate</span>()
         {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">%</span> <span class="number">64</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">log</span>::<span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Precomputing step {} / {}&quot;</span>, <span class="ident">i</span>, <span class="number">2usize</span>.<span class="ident">pow</span>(<span class="ident">N</span>) <span class="op">+</span> <span class="number">4</span>);
+            <span class="kw">if</span> <span class=
+"ident">i</span> <span class="op">%</span> <span class=
+"number">64</span> <span class="op">=</span><span class=
+"op">=</span> <span class="number">0</span> {
+                <span class="ident">log</span>::<span class=
+"macro">debug</span><span class="macro">!</span>(<span class=
+"string">"Precomputing step {} / {}"</span>, <span class=
+"ident">i</span>, <span class="number">2usize</span>.<span class=
+"ident">pow</span>(<span class="ident">N</span>) <span class=
+"op">+</span> <span class="number">4</span>);
             } <span class="kw">else</span> {
-                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Precomputing step {} / {}&quot;</span>, <span class="ident">i</span>, <span class="number">2usize</span>.<span class="ident">pow</span>(<span class="ident">N</span>) <span class="op">+</span> <span class="number">4</span>);
+                <span class="ident">log</span>::<span class=
+"macro">trace</span><span class="macro">!</span>(<span class=
+"string">"Precomputing step {} / {}"</span>, <span class=
+"ident">i</span>, <span class="number">2usize</span>.<span class=
+"ident">pow</span>(<span class="ident">N</span>) <span class=
+"op">+</span> <span class="number">4</span>);
             }
-            <span class="ident">model</span>.<span class="ident">set_beta</span>(<span class="ident">beta</span>);
-            <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">as_context</span>();
+            <span class="ident">model</span>.<span class=
+"ident">set_beta</span>(<span class="ident">beta</span>);
+            <span class="kw">let</span> <span class=
+"ident">c</span> <span class="op">=</span> <span class=
+"ident">model</span>.<span class="ident">as_context</span>();
 
-            <span class="ident">model</span>.<span class="ident">interactions</span>().<span class="ident">par_iter</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">interaction</span><span class="op">|</span> {
-                <span class="ident">interaction</span>.<span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>);
+            <span class="ident">model</span>.<span class=
+"ident">interactions</span>().<span class=
+"ident">par_iter</span>().<span class=
+"ident">for_each</span>(<span class="op">|</span><span class=
+"ident">interaction</span><span class="op">|</span> {
+                <span class="ident">interaction</span>.<span class=
+"ident">gamma</span>(<span class="kw-2">&</span><span class=
+"ident">c</span>);
             });
         }
     }
     <span class="doccomment">/// Build the Boltzmann solver.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="ident">UndefinedModel</span>)<span class="question-mark">?</span>;
-        <span class="ident">model</span>.<span class="ident">set_beta</span>(<span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">particles</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">particles</span>();
-        <span class="kw">let</span> <span class="ident">beta_range</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">beta_range</span>;
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">build</span>(<span class=
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Result</span><span class=
+"op">&lt;</span><span class="ident">Solver</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>, <span class="ident">Error</span><span class=
+"op">&gt;</span> {
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">model</span> <span class=
+"op">=</span> <span class="self">self</span>.<span class=
+"ident">model</span>.<span class="ident">ok_or</span>(<span class=
+"ident">Error</span>::<span class=
+"ident">UndefinedModel</span>)<span class="question-mark">?</span>;
+        <span class="ident">model</span>.<span class=
+"ident">set_beta</span>(<span class="self">self</span>.<span class=
+"ident">beta_range</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class=
+"ident">particles</span> <span class="op">=</span> <span class=
+"ident">model</span>.<span class="ident">particles</span>();
+        <span class="kw">let</span> <span class=
+"ident">beta_range</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class="ident">beta_range</span>;
 
-        <span class="comment">// If no initial densities were given, all particles are assumed to be</span>
+        <span class=
+"comment">// If no initial densities were given, all particles are assumed to be</span>
         <span class="comment">// in equilibrium.</span>
-        <span class="kw">let</span> <span class="ident">initial_densities</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">initial_densities</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">Array1</span>::<span class="ident">from_iter</span>(
+        <span class="kw">let</span> <span class=
+"ident">initial_densities</span> <span class=
+"op">=</span> <span class="self">self</span>.<span class=
+"ident">initial_densities</span>.<span class=
+"ident">unwrap_or_else</span>(<span class="op">|</span><span class=
+"op">|</span> {
+            <span class="ident">Array1</span>::<span class=
+"ident">from_iter</span>(
                 <span class="ident">particles</span>
                     .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">normalized_number_density</span>(<span class="number">0.0</span>, <span class="ident">beta_range</span>.<span class="number">0</span>)),
+                    .<span class="ident">map</span>(<span class=
+"op">|</span><span class="ident">p</span><span class=
+"op">|</span> <span class="ident">p</span>.<span class=
+"ident">normalized_number_density</span>(<span class=
+"number">0.0</span>, <span class=
+"ident">beta_range</span>.<span class="number">0</span>)),
             )
         });
-        <span class="self">Self</span>::<span class="ident">check_initial_densities</span>(<span class="kw-2">&amp;</span><span class="ident">initial_densities</span>, <span class="kw-2">&amp;</span><span class="ident">particles</span>)<span class="question-mark">?</span>;
+        <span class="self">Self</span>::<span class=
+"ident">check_initial_densities</span>(<span class=
+"kw-2">&</span><span class=
+"ident">initial_densities</span>, <span class=
+"kw-2">&</span><span class="ident">particles</span>)<span class=
+"question-mark">?</span>;
 
-        <span class="comment">// If no initial asymmetries were given, all particles are assumed to be</span>
-        <span class="comment">// in equilibrium with no asymmetry.</span>
-        <span class="kw">let</span> <span class="ident">initial_asymmetries</span> <span class="op">=</span> <span class="self">self</span>
+        <span class=
+"comment">// If no initial asymmetries were given, all particles are assumed to be</span>
+        <span class=
+"comment">// in equilibrium with no asymmetry.</span>
+        <span class="kw">let</span> <span class=
+"ident">initial_asymmetries</span> <span class=
+"op">=</span> <span class="self">self</span>
             .<span class="ident">initial_asymmetries</span>
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">particles</span>.<span class="ident">len</span>()));
-        <span class="self">Self</span>::<span class="ident">check_initial_asymmetries</span>(<span class="kw-2">&amp;</span><span class="ident">initial_asymmetries</span>, <span class="kw-2">&amp;</span><span class="ident">particles</span>)<span class="question-mark">?</span>;
+            .<span class="ident">unwrap_or_else</span>(<span class=
+"op">|</span><span class="op">|</span> <span class=
+"ident">Array1</span>::<span class=
+"ident">zeros</span>(<span class="ident">particles</span>.<span class="ident">len</span>()));
+        <span class="self">Self</span>::<span class=
+"ident">check_initial_asymmetries</span>(<span class=
+"kw-2">&</span><span class=
+"ident">initial_asymmetries</span>, <span class=
+"kw-2">&</span><span class="ident">particles</span>)<span class=
+"question-mark">?</span>;
 
-        <span class="comment">// Make sure that there aren&#39;t too many particles held in equilibrium or</span>
-        <span class="comment">// forbidden from developping any asymmetry.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">in_equilibrium</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">particles</span>.<span class="ident">len</span>() {
-            <span class="ident">log</span>::<span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;There are more particles held in equilibrium ({}) than particles in the model ({}).&quot;</span>,
-                        <span class="self">self</span>.<span class="ident">in_equilibrium</span>.<span class="ident">len</span>(),
-                        <span class="ident">particles</span>.<span class="ident">len</span>());
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">TooManyInEquilibrium</span>);
+        <span class=
+"comment">// Make sure that there aren't too many particles held in equilibrium or</span>
+        <span class=
+"comment">// forbidden from developping any asymmetry.</span>
+        <span class="kw">if</span> <span class=
+"self">self</span>.<span class=
+"ident">in_equilibrium</span>.<span class=
+"ident">len</span>() <span class="op">&gt;</span> <span class=
+"ident">particles</span>.<span class="ident">len</span>() {
+            <span class="ident">log</span>::<span class=
+"macro">error</span><span class="macro">!</span>(<span class=
+"string">"There are more particles held in equilibrium ({}) than particles in the model ({})."</span>,
+                        <span class="self">self</span>.<span class=
+"ident">in_equilibrium</span>.<span class="ident">len</span>(),
+                        <span class=
+"ident">particles</span>.<span class="ident">len</span>());
+            <span class="kw">return</span> <span class=
+"prelude-val">Err</span>(<span class=
+"ident">Error</span>::<span class=
+"ident">TooManyInEquilibrium</span>);
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">no_asymmetry</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">particles</span>.<span class="ident">len</span>() {
-            <span class="ident">log</span>::<span class="macro">error</span><span class="macro">!</span>(
-                <span class="string">&quot;There are more particles with 0 asymmetry ({}) than particles in the model ({}).&quot;</span>,
-                <span class="self">self</span>.<span class="ident">no_asymmetry</span>.<span class="ident">len</span>(),
-                <span class="ident">particles</span>.<span class="ident">len</span>()
+        <span class="kw">if</span> <span class=
+"self">self</span>.<span class=
+"ident">no_asymmetry</span>.<span class=
+"ident">len</span>() <span class="op">&gt;</span> <span class=
+"ident">particles</span>.<span class="ident">len</span>() {
+            <span class="ident">log</span>::<span class=
+"macro">error</span><span class="macro">!</span>(
+                <span class=
+"string">"There are more particles with 0 asymmetry ({}) than particles in the model ({})."</span>,
+                <span class="self">self</span>.<span class=
+"ident">no_asymmetry</span>.<span class="ident">len</span>(),
+                <span class="ident">particles</span>.<span class=
+"ident">len</span>()
             );
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">TooManyNoAsymmetry</span>);
+            <span class="kw">return</span> <span class=
+"prelude-val">Err</span>(<span class=
+"ident">Error</span>::<span class=
+"ident">TooManyNoAsymmetry</span>);
         }
 
-        <span class="comment">// Run the precomputations so that the solver can run multiple times</span>
+        <span class=
+"comment">// Run the precomputations so that the solver can run multiple times</span>
         <span class="comment">// later.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">skip_precomputation</span> {
-            <span class="self">Self</span>::<span class="ident">precompute</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">model</span>, <span class="ident">beta_range</span>);
+        <span class="kw">if</span> <span class=
+"op">!</span><span class="self">self</span>.<span class=
+"ident">skip_precomputation</span> {
+            <span class="self">Self</span>::<span class=
+"ident">precompute</span>(<span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="ident">model</span>, <span class=
+"ident">beta_range</span>);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Solver</span> {
+        <span class="prelude-val">Ok</span>(<span class=
+"ident">Solver</span> {
             <span class="ident">model</span>,
             <span class="ident">initial_densities</span>,
             <span class="ident">initial_asymmetries</span>,
             <span class="ident">beta_range</span>,
-            <span class="ident">in_equilibrium</span>: <span class="self">self</span>.<span class="ident">in_equilibrium</span>,
-            <span class="ident">no_asymmetry</span>: <span class="self">self</span>.<span class="ident">no_asymmetry</span>,
-            <span class="ident">logger</span>: <span class="self">self</span>.<span class="ident">logger</span>,
-            <span class="ident">step_precision</span>: <span class="self">self</span>.<span class="ident">step_precision</span>,
-            <span class="ident">error_tolerance</span>: <span class="self">self</span>.<span class="ident">error_tolerance</span>,
+            <span class="ident">in_equilibrium</span>: <span class=
+"self">self</span>.<span class="ident">in_equilibrium</span>,
+            <span class="ident">no_asymmetry</span>: <span class=
+"self">self</span>.<span class="ident">no_asymmetry</span>,
+            <span class="ident">logger</span>: <span class=
+"self">self</span>.<span class="ident">logger</span>,
+            <span class="ident">step_precision</span>: <span class=
+"self">self</span>.<span class="ident">step_precision</span>,
+            <span class=
+"ident">error_tolerance</span>: <span class="self">self</span>.<span class="ident">error_tolerance</span>,
         })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SolverBuilder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>()
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span> <span class="ident">Default</span> <span class=
+"kw">for</span> <span class=
+"ident">SolverBuilder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class=
+"ident">default</span>() <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span>::<span class=
+"ident">new</span>()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span> <span class="ident">Solver</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">ModelInteractions</span>,
+    <span class="ident">M</span>: <span class=
+"ident">ModelInteractions</span>,
 {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">compute_ki</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ki</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">kai</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ci</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) {
-        <span class="ident">ki</span>.<span class="ident">fill</span>(<span class="number">0.0</span>);
-        <span class="ident">kai</span>.<span class="ident">fill</span>(<span class="number">0.0</span>);
-        <span class="kw">for</span> <span class="ident">interaction</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">interactions</span>() {
-            <span class="ident">interaction</span>.<span class="ident">change</span>(<span class="ident">ki</span>, <span class="ident">kai</span>, <span class="kw-2">&amp;</span><span class="ident">ci</span>);
+    <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">not</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"parallel"</span>))]</span>
+    <span class="kw">fn</span> <span class=
+"ident">compute_ki</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">ki</span>: <span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">Array1</span><span class="op">&lt;</span><span class=
+"ident">f64</span><span class="op">&gt;</span>, <span class=
+"ident">kai</span>: <span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="ident">Array1</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>, <span class="ident">ci</span>: <span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>) {
+        <span class="ident">ki</span>.<span class=
+"ident">fill</span>(<span class="number">0.0</span>);
+        <span class="ident">kai</span>.<span class=
+"ident">fill</span>(<span class="number">0.0</span>);
+        <span class="kw">for</span> <span class=
+"ident">interaction</span> <span class="kw">in</span> <span class=
+"self">self</span>.<span class="ident">model</span>.<span class=
+"ident">interactions</span>() {
+            <span class="ident">interaction</span>.<span class=
+"ident">change</span>(<span class="ident">ki</span>, <span class=
+"ident">kai</span>, <span class="kw-2">&</span><span class=
+"ident">ci</span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">compute_ki</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ki</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">kai</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ci</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">ki</span>.<span class="ident">dim</span>();
-        <span class="ident">ki</span>.<span class="ident">fill</span>(<span class="number">0.0</span>);
-        <span class="ident">kai</span>.<span class="ident">fill</span>(<span class="number">0.0</span>);
+    <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">feature</span> <span class=
+"op">=</span> <span class="string">"parallel"</span>)]</span>
+    <span class="kw">fn</span> <span class=
+"ident">compute_ki</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">ki</span>: <span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">Array1</span><span class="op">&lt;</span><span class=
+"ident">f64</span><span class="op">&gt;</span>, <span class=
+"ident">kai</span>: <span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="ident">Array1</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>, <span class="ident">ci</span>: <span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>) {
+        <span class="kw">let</span> <span class=
+"ident">n</span> <span class="op">=</span> <span class=
+"ident">ki</span>.<span class="ident">dim</span>();
+        <span class="ident">ki</span>.<span class=
+"ident">fill</span>(<span class="number">0.0</span>);
+        <span class="ident">kai</span>.<span class=
+"ident">fill</span>(<span class="number">0.0</span>);
 
-        <span class="kw">let</span> (<span class="ident">new_ki</span>, <span class="ident">new_kai</span>) <span class="op">=</span> <span class="self">self</span>
+        <span class="kw">let</span> (<span class=
+"ident">new_ki</span>, <span class=
+"ident">new_kai</span>) <span class="op">=</span> <span class=
+"self">self</span>
             .<span class="ident">model</span>
             .<span class="ident">interactions</span>()
             .<span class="ident">par_iter</span>()
             .<span class="ident">fold</span>(
-                <span class="op">|</span><span class="op">|</span> (<span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">n</span>), <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">n</span>)),
-                <span class="op">|</span>(<span class="kw-2">mut</span> <span class="ident">dn</span>, <span class="kw-2">mut</span> <span class="ident">dna</span>), <span class="ident">interaction</span><span class="op">|</span> {
-                    <span class="ident">interaction</span>.<span class="ident">change</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dn</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dna</span>, <span class="kw-2">&amp;</span><span class="ident">ci</span>);
-                    (<span class="ident">dn</span>, <span class="ident">dna</span>)
+                <span class="op">|</span><span class=
+"op">|</span> (<span class="ident">Array1</span>::<span class=
+"ident">zeros</span>(<span class="ident">n</span>), <span class=
+"ident">Array1</span>::<span class=
+"ident">zeros</span>(<span class="ident">n</span>)),
+                <span class="op">|</span>(<span class=
+"kw-2">mut</span> <span class="ident">dn</span>, <span class=
+"kw-2">mut</span> <span class="ident">dna</span>), <span class=
+"ident">interaction</span><span class="op">|</span> {
+                    <span class=
+"ident">interaction</span>.<span class=
+"ident">change</span>(<span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="ident">dn</span>, <span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">dna</span>, <span class="kw-2">&</span><span class=
+"ident">ci</span>);
+                    (<span class="ident">dn</span>, <span class=
+"ident">dna</span>)
                 },
             )
             .<span class="ident">reduce</span>(
-                <span class="op">|</span><span class="op">|</span> (<span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">n</span>), <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">n</span>)),
-                <span class="op">|</span>(<span class="ident">dn</span>, <span class="ident">dna</span>), (<span class="ident">dni</span>, <span class="ident">dnai</span>)<span class="op">|</span> (<span class="ident">dn</span> <span class="op">+</span> <span class="ident">dni</span>, <span class="ident">dna</span> <span class="op">+</span> <span class="ident">dnai</span>),
+                <span class="op">|</span><span class=
+"op">|</span> (<span class="ident">Array1</span>::<span class=
+"ident">zeros</span>(<span class="ident">n</span>), <span class=
+"ident">Array1</span>::<span class=
+"ident">zeros</span>(<span class="ident">n</span>)),
+                <span class="op">|</span>(<span class=
+"ident">dn</span>, <span class="ident">dna</span>), (<span class=
+"ident">dni</span>, <span class="ident">dnai</span>)<span class=
+"op">|</span> (<span class="ident">dn</span> <span class=
+"op">+</span> <span class="ident">dni</span>, <span class=
+"ident">dna</span> <span class="op">+</span> <span class=
+"ident">dnai</span>),
             );
 
-        <span class="kw-2">*</span><span class="ident">ki</span> <span class="op">=</span> <span class="ident">new_ki</span>;
-        <span class="kw-2">*</span><span class="ident">kai</span> <span class="op">=</span> <span class="ident">new_kai</span>;
+        <span class="kw-2">*</span><span class=
+"ident">ki</span> <span class="op">=</span> <span class=
+"ident">new_ki</span>;
+        <span class="kw-2">*</span><span class=
+"ident">kai</span> <span class="op">=</span> <span class=
+"ident">new_kai</span>;
     }
 
-    <span class="doccomment">/// Evolve the initial conditions by solving the PDEs.</span>
+    <span class=
+"doccomment">/// Evolve the initial conditions by solving the PDEs.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this is not a true PDE solver, but instead converts the PDE</span>
-    <span class="doccomment">/// into an ODE in time (or inverse temperature in this case), with the</span>
-    <span class="doccomment">/// derivative in energy being calculated solely from the previous</span>
+    <span class=
+"doccomment">/// Note that this is not a true PDE solver, but instead converts the PDE</span>
+    <span class=
+"doccomment">/// into an ODE in time (or inverse temperature in this case), with the</span>
+    <span class=
+"doccomment">/// derivative in energy being calculated solely from the previous</span>
     <span class="doccomment">/// time-step.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">cognitive_complexity</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">solve</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) {
-        <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">tableau</span>::<span class="ident">rk87</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">clippy</span>::<span class="ident">cognitive_complexity</span>)]</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">solve</span>(<span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> (<span class="ident">Array1</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>, <span class="ident">Array1</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>) {
+        <span class="kw">use</span> <span class=
+"kw">super</span>::<span class="ident">tableau</span>::<span class=
+"ident">rk87</span>::<span class="kw-2">*</span>;
 
-        <span class="comment">// Initialize all the variables that will be used in the integration</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">initial_densities</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dn</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dn_err</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">na</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">initial_asymmetries</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dna</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">na</span>.<span class="ident">dim</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dna_err</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">na</span>.<span class="ident">dim</span>());
+        <span class=
+"comment">// Initialize all the variables that will be used in the integration</span>
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">n</span> <span class=
+"op">=</span> <span class="self">self</span>.<span class=
+"ident">initial_densities</span>.<span class=
+"ident">clone</span>();
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">dn</span> <span class=
+"op">=</span> <span class="ident">Array1</span>::<span class=
+"ident">zeros</span>(<span class="ident">n</span>.<span class=
+"ident">dim</span>());
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">dn_err</span> <span class=
+"op">=</span> <span class="ident">Array1</span>::<span class=
+"ident">zeros</span>(<span class="ident">n</span>.<span class=
+"ident">dim</span>());
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">na</span> <span class=
+"op">=</span> <span class="self">self</span>.<span class=
+"ident">initial_asymmetries</span>.<span class=
+"ident">clone</span>();
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">dna</span> <span class=
+"op">=</span> <span class="ident">Array1</span>::<span class=
+"ident">zeros</span>(<span class="ident">na</span>.<span class=
+"ident">dim</span>());
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">dna_err</span> <span class=
+"op">=</span> <span class="ident">Array1</span>::<span class=
+"ident">zeros</span>(<span class="ident">na</span>.<span class=
+"ident">dim</span>());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k</span>: [<span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>; <span class="ident">RK_S</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ka</span>: [<span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>; <span class="ident">RK_S</span>];
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">k</span>: [<span class=
+"ident">Array1</span><span class="op">&lt;</span><span class=
+"ident">f64</span><span class="op">&gt;</span>; <span class=
+"ident">RK_S</span>];
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">ka</span>: [<span class=
+"ident">Array1</span><span class="op">&lt;</span><span class=
+"ident">f64</span><span class="op">&gt;</span>; <span class=
+"ident">RK_S</span>];
         <span class="kw">unsafe</span> {
-            <span class="ident">k</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>().<span class="ident">assume_init</span>();
-            <span class="kw">for</span> <span class="ident">ki</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">k</span>[..] {
-                <span class="ident">ptr</span>::<span class="ident">write</span>(<span class="ident">ki</span>, <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()));
+            <span class="ident">k</span> <span class=
+"op">=</span> <span class="ident">mem</span>::<span class=
+"ident">MaybeUninit</span>::<span class=
+"ident">uninit</span>().<span class="ident">assume_init</span>();
+            <span class="kw">for</span> <span class=
+"ident">ki</span> <span class="kw">in</span> <span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">k</span>[..] {
+                <span class="ident">ptr</span>::<span class=
+"ident">write</span>(<span class="ident">ki</span>, <span class=
+"ident">Array1</span>::<span class=
+"ident">zeros</span>(<span class="ident">n</span>.<span class=
+"ident">dim</span>()));
             }
-            <span class="ident">ka</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>().<span class="ident">assume_init</span>();
-            <span class="kw">for</span> <span class="ident">ki</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ka</span>[..] {
-                <span class="ident">ptr</span>::<span class="ident">write</span>(<span class="ident">ki</span>, <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>()));
+            <span class="ident">ka</span> <span class=
+"op">=</span> <span class="ident">mem</span>::<span class=
+"ident">MaybeUninit</span>::<span class=
+"ident">uninit</span>().<span class="ident">assume_init</span>();
+            <span class="kw">for</span> <span class=
+"ident">ki</span> <span class="kw">in</span> <span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">ka</span>[..] {
+                <span class="ident">ptr</span>::<span class=
+"ident">write</span>(<span class="ident">ki</span>, <span class=
+"ident">Array1</span>::<span class=
+"ident">zeros</span>(<span class="ident">n</span>.<span class=
+"ident">dim</span>()));
             }
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">steps_discarded</span> <span class="op">=</span> <span class="number">0u64</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">evals</span> <span class="op">=</span> <span class="number">0u64</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">beta</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">sqrt</span>(<span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">max</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">advance</span>;
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">step</span> <span class=
+"op">=</span> <span class="number">0</span>;
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class=
+"ident">steps_discarded</span> <span class=
+"op">=</span> <span class="number">0u64</span>;
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">evals</span> <span class=
+"op">=</span> <span class="number">0u64</span>;
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">beta</span> <span class=
+"op">=</span> <span class="self">self</span>.<span class=
+"ident">beta_range</span>.<span class="number">0</span>;
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">h</span> <span class=
+"op">=</span> <span class="ident">beta</span> <span class=
+"op">*</span> <span class="ident">f64</span>::<span class=
+"ident">sqrt</span>(<span class="self">self</span>.<span class=
+"ident">step_precision</span>.<span class=
+"ident">min</span> <span class="op">*</span> <span class=
+"self">self</span>.<span class=
+"ident">step_precision</span>.<span class="ident">max</span>);
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">advance</span>;
 
-        <span class="kw">while</span> <span class="ident">beta</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">1</span> {
-            <span class="ident">step</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">advance</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="ident">dn</span>.<span class="ident">fill</span>(<span class="number">0.0</span>);
-            <span class="ident">dna</span>.<span class="ident">fill</span>(<span class="number">0.0</span>);
-            <span class="ident">dn_err</span>.<span class="ident">fill</span>(<span class="number">0.0</span>);
-            <span class="ident">dna_err</span>.<span class="ident">fill</span>(<span class="number">0.0</span>);
+        <span class="kw">while</span> <span class=
+"ident">beta</span> <span class="op">&lt;</span> <span class=
+"self">self</span>.<span class=
+"ident">beta_range</span>.<span class="number">1</span> {
+            <span class="ident">step</span> <span class=
+"op">+</span><span class="op">=</span> <span class=
+"number">1</span>;
+            <span class="ident">advance</span> <span class=
+"op">=</span> <span class="bool-val">false</span>;
+            <span class="ident">dn</span>.<span class=
+"ident">fill</span>(<span class="number">0.0</span>);
+            <span class="ident">dna</span>.<span class=
+"ident">fill</span>(<span class="number">0.0</span>);
+            <span class="ident">dn_err</span>.<span class=
+"ident">fill</span>(<span class="number">0.0</span>);
+            <span class="ident">dna_err</span>.<span class=
+"ident">fill</span>(<span class="number">0.0</span>);
 
-            <span class="comment">// Ensure that h is within the desired range of step sizes.</span>
-            <span class="kw">let</span> <span class="ident">h_on_beta</span> <span class="op">=</span> <span class="ident">h</span> <span class="op">/</span> <span class="ident">beta</span>;
-            <span class="kw">if</span> <span class="ident">h_on_beta</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">max</span> {
-                <span class="ident">h</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">max</span>;
-                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Step size too large, decreased h to {:.3e}&quot;</span>, <span class="ident">h</span>);
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">h_on_beta</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span> {
-                <span class="ident">h</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span>;
-                <span class="ident">log</span>::<span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Step size too small, increased h to {:.3e}&quot;</span>, <span class="ident">h</span>);
-                <span class="comment">// Irrespective of the local error, if we&#39;re at the minimum step</span>
-                <span class="comment">// size we will be integrating this step.</span>
-                <span class="ident">advance</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            <span class=
+"comment">// Ensure that h is within the desired range of step sizes.</span>
+            <span class="kw">let</span> <span class=
+"ident">h_on_beta</span> <span class="op">=</span> <span class=
+"ident">h</span> <span class="op">/</span> <span class=
+"ident">beta</span>;
+            <span class="kw">if</span> <span class=
+"ident">h_on_beta</span> <span class="op">&gt;</span> <span class=
+"self">self</span>.<span class=
+"ident">step_precision</span>.<span class="ident">max</span> {
+                <span class="ident">h</span> <span class=
+"op">=</span> <span class="ident">beta</span> <span class=
+"op">*</span> <span class="self">self</span>.<span class=
+"ident">step_precision</span>.<span class="ident">max</span>;
+                <span class="ident">log</span>::<span class=
+"macro">trace</span><span class="macro">!</span>(<span class=
+"string">"Step size too large, decreased h to {:.3e}"</span>, <span class="ident">h</span>);
+            } <span class="kw">else</span> <span class=
+"kw">if</span> <span class="ident">h_on_beta</span> <span class=
+"op">&lt;</span> <span class="self">self</span>.<span class=
+"ident">step_precision</span>.<span class="ident">min</span> {
+                <span class="ident">h</span> <span class=
+"op">=</span> <span class="ident">beta</span> <span class=
+"op">*</span> <span class="self">self</span>.<span class=
+"ident">step_precision</span>.<span class="ident">min</span>;
+                <span class="ident">log</span>::<span class=
+"macro">debug</span><span class="macro">!</span>(<span class=
+"string">"Step size too small, increased h to {:.3e}"</span>, <span class="ident">h</span>);
+                <span class=
+"comment">// Irrespective of the local error, if we're at the minimum step</span>
+                <span class=
+"comment">// size we will be integrating this step.</span>
+                <span class="ident">advance</span> <span class=
+"op">=</span> <span class="bool-val">true</span>;
             }
 
-            <span class="comment">// Log the progress of the integration</span>
-            <span class="kw">if</span> <span class="ident">step</span> <span class="op">%</span> <span class="number">100</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">log</span>::<span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Step {}, β = {:.4e}&quot;</span>, <span class="ident">step</span>, <span class="ident">beta</span>);
-            <span class="comment">// log::info!(&quot;n = {:.3e}&quot;, n);</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">step</span> <span class="op">%</span> <span class="number">10</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">log</span>::<span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Step {}, β = {:.4e}&quot;</span>, <span class="ident">step</span>, <span class="ident">beta</span>);
-            <span class="comment">// log::debug!(&quot;n = {:.3e}&quot;, n);</span>
+            <span class=
+"comment">// Log the progress of the integration</span>
+            <span class="kw">if</span> <span class=
+"ident">step</span> <span class="op">%</span> <span class=
+"number">100</span> <span class="op">=</span><span class=
+"op">=</span> <span class="number">0</span> {
+                <span class="ident">log</span>::<span class=
+"macro">info</span><span class="macro">!</span>(<span class=
+"string">"Step {}, β = {:.4e}"</span>, <span class=
+"ident">step</span>, <span class="ident">beta</span>);
+            <span class=
+"comment">// log::info!("n = {:.3e}", n);</span>
+            } <span class="kw">else</span> <span class=
+"kw">if</span> <span class="ident">step</span> <span class=
+"op">%</span> <span class="number">10</span> <span class=
+"op">=</span><span class="op">=</span> <span class=
+"number">0</span> {
+                <span class="ident">log</span>::<span class=
+"macro">debug</span><span class="macro">!</span>(<span class=
+"string">"Step {}, β = {:.4e}"</span>, <span class=
+"ident">step</span>, <span class="ident">beta</span>);
+            <span class=
+"comment">// log::debug!("n = {:.3e}", n);</span>
             } <span class="kw">else</span> {
-                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Step {}, β = {:.4e}, h = {:.4e}&quot;</span>, <span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">h</span>);
-                <span class="comment">// log::trace!(&quot;n = {:.3e}&quot;, n);</span>
+                <span class="ident">log</span>::<span class=
+"macro">trace</span><span class="macro">!</span>(<span class=
+"string">"Step {}, β = {:.4e}, h = {:.4e}"</span>, <span class=
+"ident">step</span>, <span class="ident">beta</span>, <span class=
+"ident">h</span>);
+                <span class=
+"comment">// log::trace!("n = {:.3e}", n);</span>
             }
 
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">RK_S</span> {
-                <span class="ident">evals</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="kw">for</span> <span class=
+"ident">i</span> <span class="kw">in</span> <span class=
+"number">0</span>..<span class="ident">RK_S</span> {
+                <span class="ident">evals</span> <span class=
+"op">+</span><span class="op">=</span> <span class=
+"number">1</span>;
 
-                <span class="comment">// Compute the sub-step values</span>
-                <span class="kw">let</span> <span class="ident">beta_i</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">+</span> <span class="ident">RK_C</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">h</span>;
-                <span class="kw">let</span> <span class="ident">ai</span> <span class="op">=</span> <span class="ident">RK_A</span>[<span class="ident">i</span>];
-                <span class="kw">let</span> <span class="ident">ni</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">i</span>).<span class="ident">fold</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="op">|</span><span class="ident">total</span>, <span class="ident">j</span><span class="op">|</span> <span class="ident">total</span> <span class="op">+</span> <span class="ident">ai</span>[<span class="ident">j</span>] <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">j</span>]);
-                <span class="kw">let</span> <span class="ident">nai</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">i</span>).<span class="ident">fold</span>(<span class="ident">na</span>.<span class="ident">clone</span>(), <span class="op">|</span><span class="ident">total</span>, <span class="ident">j</span><span class="op">|</span> <span class="ident">total</span> <span class="op">+</span> <span class="ident">ai</span>[<span class="ident">j</span>] <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">ka</span>[<span class="ident">j</span>]);
-                <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">set_beta</span>(<span class="ident">beta_i</span>);
-                <span class="kw">let</span> <span class="ident">ci</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">h</span>, <span class="ident">beta_i</span>, <span class="kw-2">&amp;</span><span class="ident">ni</span>, <span class="kw-2">&amp;</span><span class="ident">nai</span>);
+                <span class=
+"comment">// Compute the sub-step values</span>
+                <span class="kw">let</span> <span class=
+"ident">beta_i</span> <span class="op">=</span> <span class=
+"ident">beta</span> <span class="op">+</span> <span class=
+"ident">RK_C</span>[<span class="ident">i</span>] <span class=
+"op">*</span> <span class="ident">h</span>;
+                <span class="kw">let</span> <span class=
+"ident">ai</span> <span class="op">=</span> <span class=
+"ident">RK_A</span>[<span class="ident">i</span>];
+                <span class="kw">let</span> <span class=
+"ident">ni</span> <span class="op">=</span> (<span class=
+"number">0</span>..<span class="ident">i</span>).<span class=
+"ident">fold</span>(<span class="ident">n</span>.<span class=
+"ident">clone</span>(), <span class="op">|</span><span class=
+"ident">total</span>, <span class="ident">j</span><span class=
+"op">|</span> <span class="ident">total</span> <span class=
+"op">+</span> <span class="ident">ai</span>[<span class=
+"ident">j</span>] <span class="op">*</span> <span class=
+"kw-2">&</span><span class="ident">k</span>[<span class=
+"ident">j</span>]);
+                <span class="kw">let</span> <span class=
+"ident">nai</span> <span class="op">=</span> (<span class=
+"number">0</span>..<span class="ident">i</span>).<span class=
+"ident">fold</span>(<span class="ident">na</span>.<span class=
+"ident">clone</span>(), <span class="op">|</span><span class=
+"ident">total</span>, <span class="ident">j</span><span class=
+"op">|</span> <span class="ident">total</span> <span class=
+"op">+</span> <span class="ident">ai</span>[<span class=
+"ident">j</span>] <span class="op">*</span> <span class=
+"kw-2">&</span><span class="ident">ka</span>[<span class=
+"ident">j</span>]);
+                <span class="self">self</span>.<span class=
+"ident">model</span>.<span class=
+"ident">set_beta</span>(<span class="ident">beta_i</span>);
+                <span class="kw">let</span> <span class=
+"ident">ci</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class="ident">context</span>(<span class=
+"ident">step</span>, <span class="ident">h</span>, <span class=
+"ident">beta_i</span>, <span class="kw-2">&</span><span class=
+"ident">ni</span>, <span class="kw-2">&</span><span class=
+"ident">nai</span>);
 
-                <span class="comment">// Compute k[i] and ka[i] from each interaction</span>
-                <span class="self">self</span>.<span class="ident">compute_ki</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">k</span>[<span class="ident">i</span>], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ka</span>[<span class="ident">i</span>], <span class="kw-2">&amp;</span><span class="ident">ci</span>);
+                <span class=
+"comment">// Compute k[i] and ka[i] from each interaction</span>
+                <span class="self">self</span>.<span class=
+"ident">compute_ki</span>(<span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="ident">k</span>[<span class=
+"ident">i</span>], <span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="ident">ka</span>[<span class=
+"ident">i</span>], <span class="kw-2">&</span><span class=
+"ident">ci</span>);
 
-                <span class="comment">// Set changes to zero for those particles in equilibrium</span>
-                <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">eq</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">in_equilibrium</span> {
-                    <span class="ident">k</span>[<span class="ident">i</span>][<span class="ident">eq</span>] <span class="op">=</span> <span class="number">0.0</span>;
-                    <span class="ident">ka</span>[<span class="ident">i</span>][<span class="ident">eq</span>] <span class="op">=</span> <span class="number">0.0</span>;
+                <span class=
+"comment">// Set changes to zero for those particles in equilibrium</span>
+                <span class="kw">for</span> <span class=
+"kw-2">&</span><span class="ident">eq</span> <span class=
+"kw">in</span> <span class="kw-2">&</span><span class=
+"self">self</span>.<span class="ident">in_equilibrium</span> {
+                    <span class="ident">k</span>[<span class=
+"ident">i</span>][<span class="ident">eq</span>] <span class=
+"op">=</span> <span class="number">0.0</span>;
+                    <span class="ident">ka</span>[<span class=
+"ident">i</span>][<span class="ident">eq</span>] <span class=
+"op">=</span> <span class="number">0.0</span>;
                 }
-                <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">eq</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">no_asymmetry</span> {
-                    <span class="ident">ka</span>[<span class="ident">i</span>][<span class="ident">eq</span>] <span class="op">=</span> <span class="number">0.0</span>;
+                <span class="kw">for</span> <span class=
+"kw-2">&</span><span class="ident">eq</span> <span class=
+"kw">in</span> <span class="kw-2">&</span><span class=
+"self">self</span>.<span class="ident">no_asymmetry</span> {
+                    <span class="ident">ka</span>[<span class=
+"ident">i</span>][<span class="ident">eq</span>] <span class=
+"op">=</span> <span class="number">0.0</span>;
                 }
 
-                <span class="kw">let</span> <span class="ident">bi</span> <span class="op">=</span> <span class="ident">RK_B</span>[<span class="ident">i</span>];
-                <span class="kw">let</span> <span class="ident">ei</span> <span class="op">=</span> <span class="ident">RK_E</span>[<span class="ident">i</span>];
-                <span class="ident">Zip</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dn</span>)
-                    .<span class="ident">and</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dn_err</span>)
-                    .<span class="ident">and</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>[<span class="ident">i</span>])
-                    .<span class="ident">and</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dna</span>)
-                    .<span class="ident">and</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dna_err</span>)
-                    .<span class="ident">and</span>(<span class="kw-2">&amp;</span><span class="ident">ka</span>[<span class="ident">i</span>])
-                    .<span class="ident">apply</span>(<span class="op">|</span><span class="ident">dn</span>, <span class="ident">dn_err</span>, <span class="kw-2">&amp;</span><span class="ident">ki</span>, <span class="ident">dna</span>, <span class="ident">dna_err</span>, <span class="kw-2">&amp;</span><span class="ident">kai</span><span class="op">|</span> {
-                        <span class="kw-2">*</span><span class="ident">dn</span> <span class="op">+</span><span class="op">=</span> <span class="ident">bi</span> <span class="op">*</span> <span class="ident">ki</span>;
-                        <span class="kw-2">*</span><span class="ident">dn_err</span> <span class="op">+</span><span class="op">=</span> <span class="ident">ei</span> <span class="op">*</span> <span class="ident">ki</span>;
-                        <span class="kw-2">*</span><span class="ident">dna</span> <span class="op">+</span><span class="op">=</span> <span class="ident">bi</span> <span class="op">*</span> <span class="ident">kai</span>;
-                        <span class="kw-2">*</span><span class="ident">dna_err</span> <span class="op">+</span><span class="op">=</span> <span class="ident">ei</span> <span class="op">*</span> <span class="ident">kai</span>;
+                <span class="kw">let</span> <span class=
+"ident">bi</span> <span class="op">=</span> <span class=
+"ident">RK_B</span>[<span class="ident">i</span>];
+                <span class="kw">let</span> <span class=
+"ident">ei</span> <span class="op">=</span> <span class=
+"ident">RK_E</span>[<span class="ident">i</span>];
+                <span class="ident">Zip</span>::<span class=
+"ident">from</span>(<span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="ident">dn</span>)
+                    .<span class="ident">and</span>(<span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">dn_err</span>)
+                    .<span class="ident">and</span>(<span class=
+"kw-2">&</span><span class="ident">k</span>[<span class=
+"ident">i</span>])
+                    .<span class="ident">and</span>(<span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">dna</span>)
+                    .<span class="ident">and</span>(<span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">dna_err</span>)
+                    .<span class="ident">and</span>(<span class=
+"kw-2">&</span><span class="ident">ka</span>[<span class=
+"ident">i</span>])
+                    .<span class="ident">apply</span>(<span class=
+"op">|</span><span class="ident">dn</span>, <span class=
+"ident">dn_err</span>, <span class="kw-2">&</span><span class=
+"ident">ki</span>, <span class="ident">dna</span>, <span class=
+"ident">dna_err</span>, <span class="kw-2">&</span><span class=
+"ident">kai</span><span class="op">|</span> {
+                        <span class="kw-2">*</span><span class=
+"ident">dn</span> <span class="op">+</span><span class=
+"op">=</span> <span class="ident">bi</span> <span class=
+"op">*</span> <span class="ident">ki</span>;
+                        <span class="kw-2">*</span><span class=
+"ident">dn_err</span> <span class="op">+</span><span class=
+"op">=</span> <span class="ident">ei</span> <span class=
+"op">*</span> <span class="ident">ki</span>;
+                        <span class="kw-2">*</span><span class=
+"ident">dna</span> <span class="op">+</span><span class=
+"op">=</span> <span class="ident">bi</span> <span class=
+"op">*</span> <span class="ident">kai</span>;
+                        <span class="kw-2">*</span><span class=
+"ident">dna_err</span> <span class="op">+</span><span class=
+"op">=</span> <span class="ident">ei</span> <span class=
+"op">*</span> <span class="ident">kai</span>;
                     });
             }
 
-            <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">set_beta</span>(<span class="ident">beta</span>);
-            <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="ident">step</span>, <span class="ident">h</span>, <span class="ident">beta</span>, <span class="kw-2">&amp;</span><span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">na</span>);
+            <span class="self">self</span>.<span class=
+"ident">model</span>.<span class=
+"ident">set_beta</span>(<span class="ident">beta</span>);
+            <span class="kw">let</span> <span class=
+"ident">c</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class="ident">context</span>(<span class=
+"ident">step</span>, <span class="ident">h</span>, <span class=
+"ident">beta</span>, <span class="kw-2">&</span><span class=
+"ident">n</span>, <span class="kw-2">&</span><span class=
+"ident">na</span>);
 
-            <span class="comment">// Adjust dn for those particles in equilibrium</span>
-            <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">eq</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">in_equilibrium</span> {
-                <span class="ident">dn</span>[<span class="ident">eq</span>] <span class="op">=</span> <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">eq</span>] <span class="op">-</span> <span class="ident">n</span>[<span class="ident">eq</span>];
-                <span class="ident">dna</span>[<span class="ident">eq</span>] <span class="op">=</span> <span class="op">-</span><span class="ident">na</span>[<span class="ident">eq</span>];
+            <span class=
+"comment">// Adjust dn for those particles in equilibrium</span>
+            <span class="kw">for</span> <span class=
+"kw-2">&</span><span class="ident">eq</span> <span class=
+"kw">in</span> <span class="kw-2">&</span><span class=
+"self">self</span>.<span class="ident">in_equilibrium</span> {
+                <span class="ident">dn</span>[<span class=
+"ident">eq</span>] <span class="op">=</span> <span class=
+"ident">c</span>.<span class="ident">eq</span>[<span class=
+"ident">eq</span>] <span class="op">-</span> <span class=
+"ident">n</span>[<span class="ident">eq</span>];
+                <span class="ident">dna</span>[<span class=
+"ident">eq</span>] <span class="op">=</span> <span class=
+"op">-</span><span class="ident">na</span>[<span class=
+"ident">eq</span>];
             }
-            <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">eq</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">no_asymmetry</span> {
-                <span class="ident">dna</span>[<span class="ident">eq</span>] <span class="op">=</span> <span class="op">-</span><span class="ident">na</span>[<span class="ident">eq</span>];
+            <span class="kw">for</span> <span class=
+"kw-2">&</span><span class="ident">eq</span> <span class=
+"kw">in</span> <span class="kw-2">&</span><span class=
+"self">self</span>.<span class="ident">no_asymmetry</span> {
+                <span class="ident">dna</span>[<span class=
+"ident">eq</span>] <span class="op">=</span> <span class=
+"op">-</span><span class="ident">na</span>[<span class=
+"ident">eq</span>];
             }
 
-            <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;     dn = {:&gt;10.3e}&quot;</span>, <span class="ident">dn</span>);
-            <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;    dna = {:&gt;10.3e}&quot;</span>, <span class="ident">dna</span>);
-            <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot; dn_err = {:&gt;10.3e}&quot;</span>, <span class="ident">dn_err</span>);
-            <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;dna_err = {:&gt;10.3e}&quot;</span>, <span class="ident">dna_err</span>);
+            <span class="ident">log</span>::<span class=
+"macro">trace</span><span class="macro">!</span>(<span class=
+"string">"     dn = {:&gt;10.3e}"</span>, <span class=
+"ident">dn</span>);
+            <span class="ident">log</span>::<span class=
+"macro">trace</span><span class="macro">!</span>(<span class=
+"string">"    dna = {:&gt;10.3e}"</span>, <span class=
+"ident">dna</span>);
+            <span class="ident">log</span>::<span class=
+"macro">trace</span><span class="macro">!</span>(<span class=
+"string">" dn_err = {:&gt;10.3e}"</span>, <span class=
+"ident">dn_err</span>);
+            <span class="ident">log</span>::<span class=
+"macro">trace</span><span class="macro">!</span>(<span class=
+"string">"dna_err = {:&gt;10.3e}"</span>, <span class=
+"ident">dna_err</span>);
 
-            <span class="comment">// Get the local error using L∞-norm</span>
-            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">dn_err</span>
+            <span class=
+"comment">// Get the local error using L∞-norm</span>
+            <span class="kw">let</span> <span class=
+"ident">err</span> <span class="op">=</span> <span class=
+"ident">dn_err</span>
                 .<span class="ident">iter</span>()
-                .<span class="ident">chain</span>(<span class="ident">dna_err</span>.<span class="ident">iter</span>())
-                .<span class="ident">fold</span>(<span class="number">0f64</span>, <span class="op">|</span><span class="ident">e</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">max</span>(<span class="ident">v</span>.<span class="ident">abs</span>()));
+                .<span class="ident">chain</span>(<span class=
+"ident">dna_err</span>.<span class="ident">iter</span>())
+                .<span class="ident">fold</span>(<span class=
+"number">0f64</span>, <span class="op">|</span><span class=
+"ident">e</span>, <span class="ident">v</span><span class=
+"op">|</span> <span class="ident">e</span>.<span class=
+"ident">max</span>(<span class="ident">v</span>.<span class=
+"ident">abs</span>()));
 
-            <span class="comment">// If the error is within the tolerance, we&#39;ll be advancing the</span>
+            <span class=
+"comment">// If the error is within the tolerance, we'll be advancing the</span>
             <span class="comment">// iteration step</span>
-            <span class="kw">if</span> <span class="ident">err</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">error_tolerance</span> {
-                <span class="ident">advance</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            <span class="kw">if</span> <span class=
+"ident">err</span> <span class="op">&lt;</span> <span class=
+"self">self</span>.<span class="ident">error_tolerance</span> {
+                <span class="ident">advance</span> <span class=
+"op">=</span> <span class="bool-val">true</span>;
             } <span class="kw">else</span> {
-                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(
-                    <span class="string">&quot;Error is not within tolerance ({:e} &gt; {:e}).&quot;</span>,
+                <span class="ident">log</span>::<span class=
+"macro">trace</span><span class="macro">!</span>(
+                    <span class=
+"string">"Error is not within tolerance ({:e} &gt; {:e})."</span>,
                     <span class="ident">err</span>,
-                    <span class="self">self</span>.<span class="ident">error_tolerance</span>
+                    <span class="self">self</span>.<span class=
+"ident">error_tolerance</span>
                 );
             }
 
-            <span class="comment">// Compute the change in step size based on the current error and</span>
-            <span class="comment">// correspondingly adjust the step size</span>
-            <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">err</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+            <span class=
+"comment">// Compute the change in step size based on the current error and</span>
+            <span class=
+"comment">// correspondingly adjust the step size</span>
+            <span class="kw">let</span> <span class=
+"ident">delta</span> <span class="op">=</span> <span class=
+"kw">if</span> <span class="ident">err</span> <span class=
+"op">=</span><span class="op">=</span> <span class=
+"number">0.0</span> {
                 <span class="number">10.0</span>
             } <span class="kw">else</span> {
-                <span class="number">0.9</span> <span class="op">*</span> (<span class="self">self</span>.<span class="ident">error_tolerance</span> <span class="op">/</span> <span class="ident">err</span>).<span class="ident">powf</span>(<span class="number">1.0</span> <span class="op">/</span> <span class="ident">f64</span>::<span class="ident">from</span>(<span class="ident">RK_ORDER</span> <span class="op">+</span> <span class="number">1</span>))
+                <span class="number">0.9</span> <span class=
+"op">*</span> (<span class="self">self</span>.<span class=
+"ident">error_tolerance</span> <span class=
+"op">/</span> <span class="ident">err</span>).<span class=
+"ident">powf</span>(<span class="number">1.0</span> <span class=
+"op">/</span> <span class="ident">f64</span>::<span class=
+"ident">from</span>(<span class=
+"ident">RK_ORDER</span> <span class="op">+</span> <span class=
+"number">1</span>))
             };
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h_est</span> <span class="op">=</span> <span class="ident">h</span> <span class="op">*</span> <span class="ident">delta</span>;
+            <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">h_est</span> <span class=
+"op">=</span> <span class="ident">h</span> <span class=
+"op">*</span> <span class="ident">delta</span>;
 
             <span class="comment">// Update n and beta</span>
-            <span class="kw">if</span> <span class="ident">advance</span> {
+            <span class="kw">if</span> <span class=
+"ident">advance</span> {
                 <span class="comment">// Advance n and beta</span>
-                <span class="ident">n</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">dn</span>;
-                <span class="ident">na</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">dna</span>;
-                <span class="ident">beta</span> <span class="op">+</span><span class="op">=</span> <span class="ident">h</span>;
+                <span class="ident">n</span> <span class=
+"op">+</span><span class="op">=</span> <span class=
+"kw-2">&</span><span class="ident">dn</span>;
+                <span class="ident">na</span> <span class=
+"op">+</span><span class="op">=</span> <span class=
+"kw-2">&</span><span class="ident">dna</span>;
+                <span class="ident">beta</span> <span class=
+"op">+</span><span class="op">=</span> <span class=
+"ident">h</span>;
 
-                (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">logger</span>)(<span class="kw-2">&amp;</span><span class="ident">c</span>);
+                (<span class="kw-2">*</span><span class=
+"self">self</span>.<span class="ident">logger</span>)(<span class=
+"kw-2">&</span><span class="ident">c</span>);
             } <span class="kw">else</span> {
-                <span class="ident">steps_discarded</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Discarding integration step.&quot;</span>);
+                <span class=
+"ident">steps_discarded</span> <span class=
+"op">+</span><span class="op">=</span> <span class=
+"number">1</span>;
+                <span class="ident">log</span>::<span class=
+"macro">trace</span><span class="macro">!</span>(<span class=
+"string">"Discarding integration step."</span>);
             }
 
-            <span class="comment">// Adjust final integration step if needed</span>
-            <span class="kw">if</span> <span class="ident">beta</span> <span class="op">+</span> <span class="ident">h_est</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">1</span> {
-                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Fixing overshoot of last integration step.&quot;</span>);
-                <span class="ident">h_est</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">1</span> <span class="op">-</span> <span class="ident">beta</span>;
+            <span class=
+"comment">// Adjust final integration step if needed</span>
+            <span class="kw">if</span> <span class=
+"ident">beta</span> <span class="op">+</span> <span class=
+"ident">h_est</span> <span class="op">&gt;</span> <span class=
+"self">self</span>.<span class=
+"ident">beta_range</span>.<span class="number">1</span> {
+                <span class="ident">log</span>::<span class=
+"macro">trace</span><span class="macro">!</span>(<span class=
+"string">"Fixing overshoot of last integration step."</span>);
+                <span class="ident">h_est</span> <span class=
+"op">=</span> <span class="self">self</span>.<span class=
+"ident">beta_range</span>.<span class=
+"number">1</span> <span class="op">-</span> <span class=
+"ident">beta</span>;
             }
 
-            <span class="ident">h</span> <span class="op">=</span> <span class="ident">h_est</span>;
+            <span class="ident">h</span> <span class=
+"op">=</span> <span class="ident">h_est</span>;
         }
 
-        <span class="ident">log</span>::<span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Number of integration steps: {}&quot;</span>, <span class="ident">step</span>);
-        <span class="ident">log</span>::<span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Number of integration steps discarded: {}&quot;</span>, <span class="ident">steps_discarded</span>);
-        <span class="ident">log</span>::<span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Number of evaluations: {}&quot;</span>, <span class="ident">evals</span>);
+        <span class="ident">log</span>::<span class=
+"macro">info</span><span class="macro">!</span>(<span class=
+"string">"Number of integration steps: {}"</span>, <span class=
+"ident">step</span>);
+        <span class="ident">log</span>::<span class=
+"macro">info</span><span class="macro">!</span>(<span class=
+"string">"Number of integration steps discarded: {}"</span>, <span class="ident">steps_discarded</span>);
+        <span class="ident">log</span>::<span class=
+"macro">info</span><span class="macro">!</span>(<span class=
+"string">"Number of evaluations: {}"</span>, <span class=
+"ident">evals</span>);
 
-        (<span class="ident">n</span>, <span class="ident">na</span>)
+        (<span class="ident">n</span>, <span class=
+"ident">na</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span> <span class="ident">Solver</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">M</span>: <span class="ident">Model</span>,
 {
-    <span class="doccomment">/// Generate the context at a given beta to pass to the logger/interaction</span>
+    <span class=
+"doccomment">/// Generate the context at a given beta to pass to the logger/interaction</span>
     <span class="doccomment">/// functions.</span>
     <span class="kw">fn</span> <span class="ident">context</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">step</span>: <span class="ident">u64</span>,
-        <span class="ident">step_size</span>: <span class="ident">f64</span>,
-        <span class="ident">beta</span>: <span class="ident">f64</span>,
-        <span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-        <span class="ident">na</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">hubble_rate</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">hubble_rate</span>(<span class="ident">beta</span>);
-        <span class="kw">let</span> <span class="ident">normalization</span> <span class="op">=</span>
-            (<span class="ident">hubble_rate</span> <span class="op">*</span> <span class="ident">beta</span> <span class="op">*</span> <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span>.<span class="ident">massless_number_density</span>(<span class="number">0.0</span>, <span class="ident">beta</span>))
+        <span class="kw-2">&</span><span class="self">self</span>,
+        <span class="ident">step</span>: <span class=
+"ident">u64</span>,
+        <span class="ident">step_size</span>: <span class=
+"ident">f64</span>,
+        <span class="ident">beta</span>: <span class=
+"ident">f64</span>,
+        <span class="ident">n</span>: <span class=
+"kw-2">&</span><span class="ident">Array1</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>,
+        <span class="ident">na</span>: <span class=
+"kw-2">&</span><span class="ident">Array1</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>,
+    ) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span> {
+        <span class="kw">let</span> <span class=
+"ident">hubble_rate</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class="ident">model</span>.<span class=
+"ident">hubble_rate</span>(<span class="ident">beta</span>);
+        <span class="kw">let</span> <span class=
+"ident">normalization</span> <span class="op">=</span>
+            (<span class="ident">hubble_rate</span> <span class=
+"op">*</span> <span class="ident">beta</span> <span class=
+"op">*</span> <span class="ident">Statistic</span>::<span class=
+"ident">BoseEinstein</span>.<span class=
+"ident">massless_number_density</span>(<span class=
+"number">0.0</span>, <span class="ident">beta</span>))
                 .<span class="ident">recip</span>();
         <span class="ident">Context</span> {
             <span class="ident">step</span>,
@@ -1473,31 +2545,73 @@
             <span class="ident">beta</span>,
             <span class="ident">hubble_rate</span>,
             <span class="ident">normalization</span>,
-            <span class="ident">eq</span>: <span class="ident">equilibrium_number_densities</span>(<span class="self">self</span>.<span class="ident">model</span>.<span class="ident">particles</span>(), <span class="ident">beta</span>),
-            <span class="ident">n</span>: <span class="ident">n</span>.<span class="ident">clone</span>(),
-            <span class="ident">na</span>: <span class="ident">na</span>.<span class="ident">clone</span>(),
-            <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model</span>,
+            <span class="ident">eq</span>: <span class=
+"ident">equilibrium_number_densities</span>(<span class=
+"self">self</span>.<span class="ident">model</span>.<span class=
+"ident">particles</span>(), <span class="ident">beta</span>),
+            <span class="ident">n</span>: <span class=
+"ident">n</span>.<span class="ident">clone</span>(),
+            <span class="ident">na</span>: <span class=
+"ident">na</span>.<span class="ident">clone</span>(),
+            <span class="ident">model</span>: <span class=
+"kw-2">&</span><span class="self">self</span>.<span class=
+"ident">model</span>,
         }
     }
 }
 
-<span class="doccomment">/// Create an array containing the equilibrium number densities of the model&#39;s</span>
-<span class="doccomment">/// particles at the specified temperature.</span>
+<span class=
+"doccomment">/// Create an array containing the equilibrium number densities of the model's</span>
+<span class=
+"doccomment">/// particles at the specified temperature.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// All particles species are assumed to be in thermal equilibrium at this</span>
-<span class="doccomment">/// energy, with the distribution following either the Bose–Einstein or</span>
-<span class="doccomment">/// Fermi–Dirac distribution as determined by their spin.</span>
+<span class=
+"doccomment">/// All particles species are assumed to be in thermal equilibrium at this</span>
+<span class=
+"doccomment">/// energy, with the distribution following either the Bose–Einstein or</span>
+<span class=
+"doccomment">/// Fermi–Dirac distribution as determined by their spin.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The `normalized` flag</span>
-<span class="kw">fn</span> <span class="ident">equilibrium_number_densities</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">particles</span>: <span class="ident">I</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class=
+"ident">equilibrium_number_densities</span><span class=
+"op">&lt;</span><span class="lifetime">'a</span>, <span class=
+"ident">I</span><span class="op">&gt;</span>(<span class=
+"ident">particles</span>: <span class=
+"ident">I</span>, <span class="ident">beta</span>: <span class=
+"ident">f64</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">Array1</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Particle</span><span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class=
+"ident">IntoIterator</span><span class="op">&lt;</span><span class=
+"ident">Item</span> <span class="op">=</span> <span class=
+"kw-2">&</span><span class="lifetime">'a</span> <span class=
+"ident">Particle</span><span class="op">&gt;</span>,
 {
-    <span class="ident">Array1</span>::<span class="ident">from_iter</span>(
+    <span class="ident">Array1</span>::<span class=
+"ident">from_iter</span>(
         <span class="ident">particles</span>
             .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">normalized_number_density</span>(<span class="number">0.0</span>, <span class="ident">beta</span>)),
+            .<span class="ident">map</span>(<span class=
+"op">|</span><span class="ident">p</span><span class=
+"op">|</span> <span class="ident">p</span>.<span class=
+"ident">normalized_number_density</span>(<span class=
+"number">0.0</span>, <span class="ident">beta</span>)),
     )
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "boltzmann_solver";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>
+</section>
+<section id="search" class="content hidden"></section>
+<section class="footer"></section>
+<script>
+window.rootPath = "../../../";window.currentCrate = "boltzmann_solver";
+</script>
+<script src="../../../aliases.js"></script>
+<script src="../../../main.js"></script>
+<script src="../../../source-script.js"></script>
+<script src="../../../source-files.js"></script>
+<script defer src="../../../search-index.js"></script>
+</body>
+</html>

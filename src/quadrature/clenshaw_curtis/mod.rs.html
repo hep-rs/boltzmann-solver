@@ -1,4 +1,59 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/quadrature-0.1.2/src/clenshaw_curtis/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../quadrature/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="generator" content=
+"HTML Tidy for HTML5 for Linux version 5.6.0">
+<meta charset="utf-8">
+<meta name="viewport" content=
+"width=device-width, initial-scale=1.0">
+<meta name="generator" content="rustdoc">
+<meta name="description" content=
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/quadrature-0.1.2/src/clenshaw_curtis/mod.rs`.">
+<meta name="keywords" content="rust, rustlang, rust-lang">
+<title>mod.rs.html -- source</title>
+<link rel="stylesheet" type="text/css" href=
+"../../../normalize.css">
+<link rel="stylesheet" type="text/css" href="../../../rustdoc.css"
+id="mainThemeStyle">
+<link rel="stylesheet" type="text/css" href="../../../dark.css">
+<link rel="stylesheet" type="text/css" href="../../../light.css"
+id="themeStyle">
+<script src="../../../storage.js"></script><noscript>
+<link rel="stylesheet" href="../../../noscript.css"></noscript>
+<link rel="shortcut icon" href="../../../favicon.ico">
+<style type="text/css">
+#crate-search{background-image:url("../../../down-arrow.svg");}
+</style>
+</head>
+<body class="rustdoc source">
+<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
+<nav class="sidebar">
+<div class="sidebar-menu">☰</div>
+<a href='../../../quadrature/index.html'>
+<div class='logo-container'><img src='../../../rust-logo.png' alt=
+'logo'></div>
+</a></nav>
+<div class="theme-picker"><button id="theme-picker" aria-label=
+"Pick another theme!"><img src="../../../brush.svg" width="18" alt=
+"Pick another theme!"></button>
+<div id="theme-choices"></div>
+</div>
+<script src="../../../theme.js"></script>
+<nav class="sub">
+<form class="search-form">
+<div class="search-container">
+<div><select id="crate-search">
+<option value="All crates">All crates</option>
+</select><input class="search-input" name="search" disabled
+autocomplete="off" spellcheck="false" placeholder=
+"Click or press ‘S’ to search, ‘?’ for more options…" type=
+"search"></div>
+<a id="settings-menu" href="../../../settings.html"><img src=
+"../../../wheel.svg" width="18" alt="Change settings"></a></div>
+</form>
+</nav>
+<section id="main" class="content">
+<pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -137,145 +192,412 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! The `clenshaw_curtis` module provides a `integrate` function with the same signature as `quadrature::integrate`.</span>
-<span class="doccomment">//! The implemented variant of clenshaw curtis quadrature is adaptive, however the weights change for each adaptation. This unfortunately means that the sum needs to be recalculated for each layer of adaptation.</span>
-<span class="doccomment">//! It also does not allocate on the heap, however it does use a `[f64; 129]` to store the function values. It has a hard coded maximum of approximately 257 function evaluations. This guarantees that the algorithm will return.</span>
-<span class="doccomment">//! The clenshaw curtis algorithm exactly integrates polynomials of order N. This implementation starts with an N of approximately 5 and increases up to an N of approximately 257. In general the error in the algorithm decreases exponentially in the number of function evaluations. In summery clenshaw curtis will in general use **more stack space** and **run slower** than the double exponential algorithm, unless clenshaw curtis can get the exact solution.</span>
+</pre>
+<div class="example-wrap">
+<pre class="rust">
+<span class=
+"doccomment">//! The `clenshaw_curtis` module provides a `integrate` function with the same signature as `quadrature::integrate`.</span>
+<span class=
+"doccomment">//! The implemented variant of clenshaw curtis quadrature is adaptive, however the weights change for each adaptation. This unfortunately means that the sum needs to be recalculated for each layer of adaptation.</span>
+<span class=
+"doccomment">//! It also does not allocate on the heap, however it does use a `[f64; 129]` to store the function values. It has a hard coded maximum of approximately 257 function evaluations. This guarantees that the algorithm will return.</span>
+<span class=
+"doccomment">//! The clenshaw curtis algorithm exactly integrates polynomials of order N. This implementation starts with an N of approximately 5 and increases up to an N of approximately 257. In general the error in the algorithm decreases exponentially in the number of function evaluations. In summery clenshaw curtis will in general use **more stack space** and **run slower** than the double exponential algorithm, unless clenshaw curtis can get the exact solution.</span>
 
 <span class="kw">mod</span> <span class="ident">constants</span>;
-<span class="kw">use</span> <span class="self">self</span>::<span class="ident">constants</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class=
+"self">self</span>::<span class=
+"ident">constants</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Output</span>;
+<span class="kw">use</span> <span class=
+"kw">super</span>::<span class="ident">Output</span>;
 
-<span class="doccomment">/// Integrate an analytic function over a finite interval.</span>
-<span class="doccomment">/// f is the function to be integrated.</span>
+<span class=
+"doccomment">/// Integrate an analytic function over a finite interval.</span>
+<span class=
+"doccomment">/// f is the function to be integrated.</span>
 <span class="doccomment">/// a is left limit of integration.</span>
 <span class="doccomment">/// b is right limit of integration</span>
-<span class="doccomment">/// target_absolute_error is the desired bound on error</span>
+<span class=
+"doccomment">/// target_absolute_error is the desired bound on error</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// use quadrature::clenshaw_curtis::integrate;</span>
-<span class="doccomment">/// fn integrand(x: f64) -&gt; f64 {</span>
-<span class="doccomment">///     (-x / 5.0).exp() * x.powf(-1.0 / 3.0)</span>
+<span class=
+"doccomment">/// use quadrature::clenshaw_curtis::integrate;</span>
+<span class=
+"doccomment">/// fn integrand(x: f64) -&gt; f64 {</span>
+<span class=
+"doccomment">///     (-x / 5.0).exp() * x.powf(-1.0 / 3.0)</span>
 <span class="doccomment">/// }</span>
-<span class="doccomment">/// let o = integrate(integrand , 0.0, 10.0, 1e-6);</span>
-<span class="doccomment">/// assert!((o.integral - 3.6798142583691758).abs() &lt;= o.error_estimate)</span>
+<span class=
+"doccomment">/// let o = integrate(integrand , 0.0, 10.0, 1e-6);</span>
+<span class=
+"doccomment">/// assert!((o.integral - 3.6798142583691758).abs() &lt;= o.error_estimate)</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">integrate</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>, <span class="ident">a</span>: <span class="ident">f64</span>, <span class="ident">b</span>: <span class="ident">f64</span>, <span class="ident">target_absolute_error</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Output</span>
-    <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class=
+"ident">integrate</span><span class="op">&lt;</span><span class=
+"ident">F</span><span class="op">&gt;</span>(<span class=
+"ident">f</span>: <span class="ident">F</span>, <span class=
+"ident">a</span>: <span class="ident">f64</span>, <span class=
+"ident">b</span>: <span class="ident">f64</span>, <span class=
+"ident">target_absolute_error</span>: <span class=
+"ident">f64</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">Output</span>
+    <span class="kw">where</span> <span class=
+"ident">F</span>: <span class="ident">Fn</span>(<span class=
+"ident">f64</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">f64</span>
 {
-    <span class="comment">// Apply the linear change of variables x = ct + d</span>
-    <span class="comment">// $$\int_a^b f(x) dx = c \int_{-1}^1 f( ct + d ) dt$$</span>
+    <span class=
+"comment">// Apply the linear change of variables x = ct + d</span>
+    <span class=
+"comment">// $$\int_a^b f(x) dx = c \int_{-1}^1 f( ct + d ) dt$$</span>
     <span class="comment">// c = (b-a)/2, d = (a+b)/2</span>
-    <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="number">0.5</span> <span class="op">*</span> (<span class="ident">b</span> <span class="op">-</span> <span class="ident">a</span>);
-    <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="number">0.5</span> <span class="op">*</span> (<span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span>);
-    <span class="ident">integrate_core</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> {
-                       <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">c</span> <span class="op">*</span> <span class="ident">x</span> <span class="op">+</span> <span class="ident">d</span>);
-                       <span class="kw">if</span> <span class="ident">out</span>.<span class="ident">is_finite</span>() { <span class="ident">out</span> } <span class="kw">else</span> { <span class="number">0.0</span> }
+    <span class="kw">let</span> <span class=
+"ident">c</span> <span class="op">=</span> <span class=
+"number">0.5</span> <span class="op">*</span> (<span class=
+"ident">b</span> <span class="op">-</span> <span class=
+"ident">a</span>);
+    <span class="kw">let</span> <span class=
+"ident">d</span> <span class="op">=</span> <span class=
+"number">0.5</span> <span class="op">*</span> (<span class=
+"ident">a</span> <span class="op">+</span> <span class=
+"ident">b</span>);
+    <span class="ident">integrate_core</span>(<span class=
+"op">|</span><span class="ident">x</span><span class=
+"op">|</span> {
+                       <span class="kw">let</span> <span class=
+"ident">out</span> <span class="op">=</span> <span class=
+"ident">f</span>(<span class="ident">c</span> <span class=
+"op">*</span> <span class="ident">x</span> <span class=
+"op">+</span> <span class="ident">d</span>);
+                       <span class="kw">if</span> <span class=
+"ident">out</span>.<span class=
+"ident">is_finite</span>() { <span class=
+"ident">out</span> } <span class="kw">else</span> { <span class=
+"number">0.0</span> }
                    },
-                   <span class="number">0.25</span> <span class="op">*</span> <span class="ident">target_absolute_error</span> <span class="op">/</span> <span class="ident">c</span>)
-        .<span class="ident">scale</span>(<span class="ident">c</span>)
+                   <span class="number">0.25</span> <span class=
+"op">*</span> <span class=
+"ident">target_absolute_error</span> <span class=
+"op">/</span> <span class="ident">c</span>)
+        .<span class="ident">scale</span>(<span class=
+"ident">c</span>)
 }
 
 <span class="doccomment">/// Integrate f(x) from [-1.0, 1.0]</span>
-<span class="kw">fn</span> <span class="ident">integrate_core</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>, <span class="ident">target_absolute_error</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Output</span>
-    <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span>
+<span class="kw">fn</span> <span class=
+"ident">integrate_core</span><span class=
+"op">&lt;</span><span class="ident">F</span><span class=
+"op">&gt;</span>(<span class="ident">f</span>: <span class=
+"ident">F</span>, <span class=
+"ident">target_absolute_error</span>: <span class=
+"ident">f64</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">Output</span>
+    <span class="kw">where</span> <span class=
+"ident">F</span>: <span class="ident">Fn</span>(<span class=
+"ident">f64</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">f64</span>
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f_value</span> <span class="op">=</span> [::<span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">NAN</span>; <span class="number">129</span>];
-    <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">f_value</span>.<span class="ident">len</span>(), <span class="ident">ABCISSAS</span>.<span class="ident">len</span>());
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_x_idx</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="ident">f_value</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">f</span>(<span class="number">0.0</span>);
+    <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">f_value</span> <span class=
+"op">=</span> [::<span class="ident">std</span>::<span class=
+"ident">f64</span>::<span class="ident">NAN</span>; <span class=
+"number">129</span>];
+    <span class="macro">debug_assert_eq</span><span class=
+"macro">!</span>(<span class="ident">f_value</span>.<span class=
+"ident">len</span>(), <span class=
+"ident">ABCISSAS</span>.<span class="ident">len</span>());
+    <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">max_x_idx</span> <span class=
+"op">=</span> <span class="number">1</span>;
+    <span class="ident">f_value</span>[<span class=
+"number">0</span>] <span class="op">=</span> <span class=
+"ident">f</span>(<span class="number">0.0</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">error_estimate</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">MAX</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">integral</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">MAX</span>;
-    <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">w</span> <span class="kw">in</span> <span class="ident">WEIGHTS</span>.<span class="ident">iter</span>() {
-        <span class="kw">for</span> (<span class="ident">v</span>, <span class="kw-2">&amp;</span><span class="ident">x</span>) <span class="kw">in</span> <span class="ident">f_value</span>[<span class="ident">max_x_idx</span>..<span class="ident">w</span>.<span class="ident">len</span>()]
+    <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class=
+"ident">error_estimate</span> <span class=
+"op">=</span> ::<span class="ident">std</span>::<span class=
+"ident">f64</span>::<span class="ident">MAX</span>;
+    <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">integral</span> <span class=
+"op">=</span> ::<span class="ident">std</span>::<span class=
+"ident">f64</span>::<span class="ident">MAX</span>;
+    <span class="kw">for</span> <span class=
+"kw-2">&</span><span class="ident">w</span> <span class=
+"kw">in</span> <span class="ident">WEIGHTS</span>.<span class=
+"ident">iter</span>() {
+        <span class="kw">for</span> (<span class=
+"ident">v</span>, <span class="kw-2">&</span><span class=
+"ident">x</span>) <span class="kw">in</span> <span class=
+"ident">f_value</span>[<span class=
+"ident">max_x_idx</span>..<span class="ident">w</span>.<span class=
+"ident">len</span>()]
             .<span class="ident">iter_mut</span>()
-            .<span class="ident">zip</span>(<span class="kw-2">&amp;</span><span class="ident">ABCISSAS</span>[<span class="ident">max_x_idx</span>..<span class="ident">w</span>.<span class="ident">len</span>()]) {
-            <span class="kw-2">*</span><span class="ident">v</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">x</span>) <span class="op">+</span> <span class="ident">f</span>(<span class="op">-</span><span class="ident">x</span>);
+            .<span class="ident">zip</span>(<span class=
+"kw-2">&</span><span class="ident">ABCISSAS</span>[<span class=
+"ident">max_x_idx</span>..<span class="ident">w</span>.<span class=
+"ident">len</span>()]) {
+            <span class="kw-2">*</span><span class=
+"ident">v</span> <span class="op">=</span> <span class=
+"ident">f</span>(<span class="ident">x</span>) <span class=
+"op">+</span> <span class="ident">f</span>(<span class=
+"op">-</span><span class="ident">x</span>);
         }
-        <span class="ident">max_x_idx</span> <span class="op">=</span> <span class="ident">w</span>.<span class="ident">len</span>();
+        <span class="ident">max_x_idx</span> <span class=
+"op">=</span> <span class="ident">w</span>.<span class=
+"ident">len</span>();
 
-        <span class="kw">let</span> <span class="ident">last_integral</span> <span class="op">=</span> <span class="ident">integral</span>;
-        <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">f_value</span>[..<span class="ident">w</span>.<span class="ident">len</span>()].<span class="ident">len</span>(), <span class="ident">w</span>.<span class="ident">len</span>());
-        <span class="ident">integral</span> <span class="op">=</span> <span class="ident">f_value</span>[..<span class="ident">w</span>.<span class="ident">len</span>()].<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">w</span>.<span class="ident">iter</span>()).<span class="ident">fold</span>(<span class="number">0.0</span>, <span class="op">|</span><span class="ident">sum</span>, <span class="ident">x</span><span class="op">|</span> <span class="ident">sum</span> <span class="op">+</span> (<span class="ident">x</span>.<span class="number">0</span> <span class="op">*</span> <span class="ident">x</span>.<span class="number">1</span>));
-        <span class="ident">error_estimate</span> <span class="op">=</span> (<span class="ident">last_integral</span> <span class="op">-</span> <span class="ident">integral</span>).<span class="ident">abs</span>();
+        <span class="kw">let</span> <span class=
+"ident">last_integral</span> <span class="op">=</span> <span class=
+"ident">integral</span>;
+        <span class="macro">debug_assert_eq</span><span class=
+"macro">!</span>(<span class="ident">f_value</span>[..<span class=
+"ident">w</span>.<span class="ident">len</span>()].<span class=
+"ident">len</span>(), <span class="ident">w</span>.<span class=
+"ident">len</span>());
+        <span class="ident">integral</span> <span class=
+"op">=</span> <span class="ident">f_value</span>[..<span class=
+"ident">w</span>.<span class="ident">len</span>()].<span class=
+"ident">iter</span>().<span class="ident">zip</span>(<span class=
+"ident">w</span>.<span class="ident">iter</span>()).<span class=
+"ident">fold</span>(<span class="number">0.0</span>, <span class=
+"op">|</span><span class="ident">sum</span>, <span class=
+"ident">x</span><span class="op">|</span> <span class=
+"ident">sum</span> <span class="op">+</span> (<span class=
+"ident">x</span>.<span class="number">0</span> <span class=
+"op">*</span> <span class="ident">x</span>.<span class=
+"number">1</span>));
+        <span class="ident">error_estimate</span> <span class=
+"op">=</span> (<span class=
+"ident">last_integral</span> <span class="op">-</span> <span class=
+"ident">integral</span>).<span class="ident">abs</span>();
 
-        <span class="kw">if</span> <span class="ident">error_estimate</span> <span class="op">&lt;</span> <span class="ident">target_absolute_error</span> {
+        <span class="kw">if</span> <span class=
+"ident">error_estimate</span> <span class=
+"op">&lt;</span> <span class="ident">target_absolute_error</span> {
             <span class="kw">break</span>;
         }
     }
 
     <span class="ident">Output</span> {
-        <span class="ident">num_function_evaluations</span>: (<span class="ident">max_x_idx</span> <span class="op">*</span> <span class="number">2</span> <span class="op">-</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u32</span>,
-        <span class="ident">error_estimate</span>: <span class="ident">error_estimate</span>.<span class="ident">abs</span>(),
-        <span class="ident">integral</span>: <span class="ident">integral</span>,
+        <span class=
+"ident">num_function_evaluations</span>: (<span class=
+"ident">max_x_idx</span> <span class="op">*</span> <span class=
+"number">2</span> <span class="op">-</span> <span class=
+"number">1</span>) <span class="kw">as</span> <span class=
+"ident">u32</span>,
+        <span class="ident">error_estimate</span>: <span class=
+"ident">error_estimate</span>.<span class="ident">abs</span>(),
+        <span class="ident">integral</span>: <span class=
+"ident">integral</span>,
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">trivial_function_works</span>() {
-        <span class="kw">let</span> <span class="ident">o</span> <span class="op">=</span> <span class="ident">integrate</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="number">0.5</span>, <span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1e-14</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">o</span>.<span class="ident">error_estimate</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">1e-14</span>,
-                <span class="string">&quot;error_estimate larger then asked. estimate: {:#?}, asked: {:#?}&quot;</span>,
-                <span class="ident">o</span>.<span class="ident">error_estimate</span>,
+    <span class="kw">use</span> <span class=
+"kw">super</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[<span class=
+"ident">test</span>]</span>
+    <span class="kw">fn</span> <span class=
+"ident">trivial_function_works</span>() {
+        <span class="kw">let</span> <span class=
+"ident">o</span> <span class="op">=</span> <span class=
+"ident">integrate</span>(<span class="op">|</span><span class=
+"kw">_</span><span class="op">|</span> <span class=
+"number">0.5</span>, <span class="op">-</span><span class=
+"number">1.0</span>, <span class="number">1.0</span>, <span class=
+"number">1e-14</span>);
+        <span class="macro">assert</span><span class=
+"macro">!</span>(<span class="ident">o</span>.<span class=
+"ident">error_estimate</span> <span class=
+"op">&lt;</span><span class="op">=</span> <span class=
+"number">1e-14</span>,
+                <span class=
+"string">"error_estimate larger then asked. estimate: {:#?}, asked: {:#?}"</span>,
+                <span class="ident">o</span>.<span class=
+"ident">error_estimate</span>,
                 <span class="number">1e-14</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">demo_function1_works</span>() {
-        <span class="kw">let</span> <span class="ident">o</span> <span class="op">=</span> <span class="ident">integrate</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="op">-</span><span class="ident">x</span> <span class="op">/</span> <span class="number">5.0</span>).<span class="ident">exp</span>() <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powf</span>(<span class="op">-</span><span class="number">1.0</span> <span class="op">/</span> <span class="number">3.0</span>), <span class="number">0.0</span>, <span class="number">10.0</span>, <span class="number">1e-6</span>);
-        <span class="macro">assert</span><span class="macro">!</span>((<span class="ident">o</span>.<span class="ident">integral</span> <span class="op">-</span> <span class="number">3.6798142583691758</span>).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">o</span>.<span class="ident">error_estimate</span>,
-                <span class="string">&quot;error larger then error_estimate&quot;</span>);
+    <span class="attribute">#[<span class=
+"ident">test</span>]</span>
+    <span class="kw">fn</span> <span class=
+"ident">demo_function1_works</span>() {
+        <span class="kw">let</span> <span class=
+"ident">o</span> <span class="op">=</span> <span class=
+"ident">integrate</span>(<span class="op">|</span><span class=
+"ident">x</span><span class="op">|</span> (<span class=
+"op">-</span><span class="ident">x</span> <span class=
+"op">/</span> <span class="number">5.0</span>).<span class=
+"ident">exp</span>() <span class="op">*</span> <span class=
+"ident">x</span>.<span class="ident">powf</span>(<span class=
+"op">-</span><span class="number">1.0</span> <span class=
+"op">/</span> <span class="number">3.0</span>), <span class=
+"number">0.0</span>, <span class="number">10.0</span>, <span class=
+"number">1e-6</span>);
+        <span class="macro">assert</span><span class=
+"macro">!</span>((<span class="ident">o</span>.<span class=
+"ident">integral</span> <span class="op">-</span> <span class=
+"number">3.6798142583691758</span>).<span class=
+"ident">abs</span>() <span class="op">&lt;</span><span class=
+"op">=</span> <span class="ident">o</span>.<span class=
+"ident">error_estimate</span>,
+                <span class=
+"string">"error larger then error_estimate"</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">demo_function2_works</span>() {
-        <span class="kw">let</span> <span class="ident">o</span> <span class="op">=</span> <span class="ident">integrate</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="number">1.0</span> <span class="op">-</span> <span class="ident">x</span>).<span class="ident">powf</span>(<span class="number">5.0</span>) <span class="op">*</span> <span class="ident">x</span>.<span class="ident">powf</span>(<span class="op">-</span><span class="number">1.0</span> <span class="op">/</span> <span class="number">3.0</span>), <span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">1e-6</span>);
-        <span class="macro">assert</span><span class="macro">!</span>((<span class="ident">o</span>.<span class="ident">integral</span> <span class="op">-</span> <span class="number">0.41768525592055004</span>).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">o</span>.<span class="ident">error_estimate</span>,
-                <span class="string">&quot;error larger then error_estimate&quot;</span>);
+    <span class="attribute">#[<span class=
+"ident">test</span>]</span>
+    <span class="kw">fn</span> <span class=
+"ident">demo_function2_works</span>() {
+        <span class="kw">let</span> <span class=
+"ident">o</span> <span class="op">=</span> <span class=
+"ident">integrate</span>(<span class="op">|</span><span class=
+"ident">x</span><span class="op">|</span> (<span class=
+"number">1.0</span> <span class="op">-</span> <span class=
+"ident">x</span>).<span class="ident">powf</span>(<span class=
+"number">5.0</span>) <span class="op">*</span> <span class=
+"ident">x</span>.<span class="ident">powf</span>(<span class=
+"op">-</span><span class="number">1.0</span> <span class=
+"op">/</span> <span class="number">3.0</span>), <span class=
+"number">0.0</span>, <span class="number">1.0</span>, <span class=
+"number">1e-6</span>);
+        <span class="macro">assert</span><span class=
+"macro">!</span>((<span class="ident">o</span>.<span class=
+"ident">integral</span> <span class="op">-</span> <span class=
+"number">0.41768525592055004</span>).<span class=
+"ident">abs</span>() <span class="op">&lt;</span><span class=
+"op">=</span> <span class="ident">o</span>.<span class=
+"ident">error_estimate</span>,
+                <span class=
+"string">"error larger then error_estimate"</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">demo_function3_works</span>() {
-        <span class="kw">let</span> <span class="ident">o</span> <span class="op">=</span> <span class="ident">integrate</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="op">-</span><span class="ident">x</span> <span class="op">/</span> <span class="number">5000.0</span>).<span class="ident">exp</span>() <span class="op">*</span> (<span class="ident">x</span> <span class="op">/</span> <span class="number">1000.0</span>).<span class="ident">powf</span>(<span class="op">-</span><span class="number">1.0</span> <span class="op">/</span> <span class="number">3.0</span>),
+    <span class="attribute">#[<span class=
+"ident">test</span>]</span>
+    <span class="kw">fn</span> <span class=
+"ident">demo_function3_works</span>() {
+        <span class="kw">let</span> <span class=
+"ident">o</span> <span class="op">=</span> <span class=
+"ident">integrate</span>(<span class="op">|</span><span class=
+"ident">x</span><span class="op">|</span> (<span class=
+"op">-</span><span class="ident">x</span> <span class=
+"op">/</span> <span class="number">5000.0</span>).<span class=
+"ident">exp</span>() <span class="op">*</span> (<span class=
+"ident">x</span> <span class="op">/</span> <span class=
+"number">1000.0</span>).<span class=
+"ident">powf</span>(<span class="op">-</span><span class=
+"number">1.0</span> <span class="op">/</span> <span class=
+"number">3.0</span>),
                           <span class="number">0.0</span>,
                           <span class="number">10000.0</span>,
                           <span class="number">1e-6</span>);
-        <span class="macro">assert</span><span class="macro">!</span>((<span class="ident">o</span>.<span class="ident">integral</span> <span class="op">-</span> <span class="number">3679.81425836918</span>).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">o</span>.<span class="ident">error_estimate</span>,
-                <span class="string">&quot;error larger then error_estimate&quot;</span>);
+        <span class="macro">assert</span><span class=
+"macro">!</span>((<span class="ident">o</span>.<span class=
+"ident">integral</span> <span class="op">-</span> <span class=
+"number">3679.81425836918</span>).<span class=
+"ident">abs</span>() <span class="op">&lt;</span><span class=
+"op">=</span> <span class="ident">o</span>.<span class=
+"ident">error_estimate</span>,
+                <span class=
+"string">"error larger then error_estimate"</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">demo_bad_function1_works</span>() {
-        <span class="kw">let</span> <span class="ident">o</span> <span class="op">=</span> <span class="ident">integrate</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="number">1.0</span> <span class="op">-</span> <span class="ident">x</span>).<span class="ident">powf</span>(<span class="number">0.99</span>), <span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">1e-6</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">o</span>.<span class="ident">error_estimate</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">1e-6</span>,
-                <span class="string">&quot;error_estimate larger then asked. estimate: {:#?}, asked: {:#?}&quot;</span>,
-                <span class="ident">o</span>.<span class="ident">error_estimate</span>,
+    <span class="attribute">#[<span class=
+"ident">test</span>]</span>
+    <span class="kw">fn</span> <span class=
+"ident">demo_bad_function1_works</span>() {
+        <span class="kw">let</span> <span class=
+"ident">o</span> <span class="op">=</span> <span class=
+"ident">integrate</span>(<span class="op">|</span><span class=
+"ident">x</span><span class="op">|</span> (<span class=
+"number">1.0</span> <span class="op">-</span> <span class=
+"ident">x</span>).<span class="ident">powf</span>(<span class=
+"number">0.99</span>), <span class=
+"number">0.0</span>, <span class="number">1.0</span>, <span class=
+"number">1e-6</span>);
+        <span class="macro">assert</span><span class=
+"macro">!</span>(<span class="ident">o</span>.<span class=
+"ident">error_estimate</span> <span class=
+"op">&lt;</span><span class="op">=</span> <span class=
+"number">1e-6</span>,
+                <span class=
+"string">"error_estimate larger then asked. estimate: {:#?}, asked: {:#?}"</span>,
+                <span class="ident">o</span>.<span class=
+"ident">error_estimate</span>,
                 <span class="number">1e-6</span>);
-        <span class="macro">assert</span><span class="macro">!</span>((<span class="ident">o</span>.<span class="ident">integral</span> <span class="op">-</span> <span class="number">0.50251256281407035</span>).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">o</span>.<span class="ident">error_estimate</span>,
-                <span class="string">&quot;error larger then error_estimate&quot;</span>);
+        <span class="macro">assert</span><span class=
+"macro">!</span>((<span class="ident">o</span>.<span class=
+"ident">integral</span> <span class="op">-</span> <span class=
+"number">0.50251256281407035</span>).<span class=
+"ident">abs</span>() <span class="op">&lt;</span><span class=
+"op">=</span> <span class="ident">o</span>.<span class=
+"ident">error_estimate</span>,
+                <span class=
+"string">"error larger then error_estimate"</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">demo_bad_function2_works</span>() {
-        <span class="kw">let</span> <span class="ident">o</span> <span class="op">=</span> <span class="ident">integrate</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">abs</span>(), <span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1e-6</span>);
-        <span class="macro">assert</span><span class="macro">!</span>((<span class="ident">o</span>.<span class="ident">integral</span> <span class="op">-</span> <span class="number">1.0</span>).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">o</span>.<span class="ident">error_estimate</span>,
-                <span class="string">&quot;error larger then error_estimate&quot;</span>);
+    <span class="attribute">#[<span class=
+"ident">test</span>]</span>
+    <span class="kw">fn</span> <span class=
+"ident">demo_bad_function2_works</span>() {
+        <span class="kw">let</span> <span class=
+"ident">o</span> <span class="op">=</span> <span class=
+"ident">integrate</span>(<span class="op">|</span><span class=
+"ident">x</span><span class="op">|</span> <span class=
+"ident">x</span>.<span class="ident">abs</span>(), <span class=
+"op">-</span><span class="number">1.0</span>, <span class=
+"number">1.0</span>, <span class="number">1e-6</span>);
+        <span class="macro">assert</span><span class=
+"macro">!</span>((<span class="ident">o</span>.<span class=
+"ident">integral</span> <span class="op">-</span> <span class=
+"number">1.0</span>).<span class="ident">abs</span>() <span class=
+"op">&lt;</span><span class="op">=</span> <span class=
+"ident">o</span>.<span class="ident">error_estimate</span>,
+                <span class=
+"string">"error larger then error_estimate"</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">demo_bad_function3_works</span>() {
-        <span class="kw">let</span> <span class="ident">o</span> <span class="op">=</span> <span class="ident">integrate</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="number">0.5</span> <span class="op">-</span> <span class="ident">x</span>.<span class="ident">abs</span>()).<span class="ident">abs</span>(), <span class="op">-</span><span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1e-6</span>);
-        <span class="macro">assert</span><span class="macro">!</span>((<span class="ident">o</span>.<span class="ident">integral</span> <span class="op">-</span> <span class="number">0.5</span>).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">o</span>.<span class="ident">error_estimate</span>,
-                <span class="string">&quot;error larger then error_estimate&quot;</span>);
+    <span class="attribute">#[<span class=
+"ident">test</span>]</span>
+    <span class="kw">fn</span> <span class=
+"ident">demo_bad_function3_works</span>() {
+        <span class="kw">let</span> <span class=
+"ident">o</span> <span class="op">=</span> <span class=
+"ident">integrate</span>(<span class="op">|</span><span class=
+"ident">x</span><span class="op">|</span> (<span class=
+"number">0.5</span> <span class="op">-</span> <span class=
+"ident">x</span>.<span class="ident">abs</span>()).<span class=
+"ident">abs</span>(), <span class="op">-</span><span class=
+"number">1.0</span>, <span class="number">1.0</span>, <span class=
+"number">1e-6</span>);
+        <span class="macro">assert</span><span class=
+"macro">!</span>((<span class="ident">o</span>.<span class=
+"ident">integral</span> <span class="op">-</span> <span class=
+"number">0.5</span>).<span class="ident">abs</span>() <span class=
+"op">&lt;</span><span class="op">=</span> <span class=
+"ident">o</span>.<span class="ident">error_estimate</span>,
+                <span class=
+"string">"error larger then error_estimate"</span>);
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "quadrature";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>
+</section>
+<section id="search" class="content hidden"></section>
+<section class="footer"></section>
+<script>
+window.rootPath = "../../../";window.currentCrate = "quadrature";
+</script>
+<script src="../../../aliases.js"></script>
+<script src="../../../main.js"></script>
+<script src="../../../source-script.js"></script>
+<script src="../../../source-files.js"></script>
+<script defer src="../../../search-index.js"></script>
+</body>
+</html>

@@ -1,4 +1,59 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.0/src/parallel/zipmacro.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>zipmacro.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../ndarray/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1"> 1</span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="generator" content=
+"HTML Tidy for HTML5 for Linux version 5.6.0">
+<meta charset="utf-8">
+<meta name="viewport" content=
+"width=device-width, initial-scale=1.0">
+<meta name="generator" content="rustdoc">
+<meta name="description" content=
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.0/src/parallel/zipmacro.rs`.">
+<meta name="keywords" content="rust, rustlang, rust-lang">
+<title>zipmacro.rs.html -- source</title>
+<link rel="stylesheet" type="text/css" href=
+"../../../normalize.css">
+<link rel="stylesheet" type="text/css" href="../../../rustdoc.css"
+id="mainThemeStyle">
+<link rel="stylesheet" type="text/css" href="../../../dark.css">
+<link rel="stylesheet" type="text/css" href="../../../light.css"
+id="themeStyle">
+<script src="../../../storage.js"></script><noscript>
+<link rel="stylesheet" href="../../../noscript.css"></noscript>
+<link rel="shortcut icon" href="../../../favicon.ico">
+<style type="text/css">
+#crate-search{background-image:url("../../../down-arrow.svg");}
+</style>
+</head>
+<body class="rustdoc source">
+<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
+<nav class="sidebar">
+<div class="sidebar-menu">☰</div>
+<a href='../../../ndarray/index.html'>
+<div class='logo-container'><img src='../../../rust-logo.png' alt=
+'logo'></div>
+</a></nav>
+<div class="theme-picker"><button id="theme-picker" aria-label=
+"Pick another theme!"><img src="../../../brush.svg" width="18" alt=
+"Pick another theme!"></button>
+<div id="theme-choices"></div>
+</div>
+<script src="../../../theme.js"></script>
+<nav class="sub">
+<form class="search-form">
+<div class="search-container">
+<div><select id="crate-search">
+<option value="All crates">All crates</option>
+</select><input class="search-input" name="search" disabled
+autocomplete="off" spellcheck="false" placeholder=
+"Click or press ‘S’ to search, ‘?’ for more options…" type=
+"search"></div>
+<a id="settings-menu" href="../../../settings.html"><img src=
+"../../../wheel.svg" width="18" alt="Change settings"></a></div>
+</form>
+</nav>
+<section id="main" class="content">
+<pre class="line-numbers"><span id="1"> 1</span>
 <span id="2"> 2</span>
 <span id="3"> 3</span>
 <span id="4"> 4</span>
@@ -59,39 +114,53 @@
 <span id="59">59</span>
 <span id="60">60</span>
 <span id="61">61</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="comment">// Copyright 2017 bluss and ndarray developers.</span>
+</pre>
+<div class="example-wrap">
+<pre class="rust">
+<span class=
+"comment">// Copyright 2017 bluss and ndarray developers.</span>
 <span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
-<span class="comment">// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. This file may not be copied, modified, or distributed</span>
+<span class=
+"comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class=
+"comment">// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class=
+"comment">// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
+<span class=
+"comment">// option. This file may not be copied, modified, or distributed</span>
 <span class="comment">// except according to those terms.</span>
 
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="doccomment">/// Parallelized array zip macro: lock step function application across several</span>
+<span class="attribute">#[<span class=
+"ident">macro_export</span>]</span>
+<span class=
+"doccomment">/// Parallelized array zip macro: lock step function application across several</span>
 <span class="doccomment">/// arrays and producers.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This is a version of the [`azip`] macro that requires the crate feature</span>
+<span class=
+"doccomment">/// This is a version of the [`azip`] macro that requires the crate feature</span>
 <span class="doccomment">/// `rayon` to be enabled.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// See the [`azip`] macro for more details about the macro syntax!</span>
+<span class=
+"doccomment">/// See the [`azip`] macro for more details about the macro syntax!</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This example:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// par_azip!((a in &amp;mut a, &amp;b in &amp;b, &amp;c in &amp;c) { *a = b + c })</span>
+<span class=
+"doccomment">/// par_azip!((a in &amp;mut a, &amp;b in &amp;b, &amp;c in &amp;c) { *a = b + c })</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Is equivalent to:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// Zip::from(&amp;mut a).and(&amp;b).and(&amp;c).par_apply(|a, &amp;b, &amp;c| {</span>
+<span class=
+"doccomment">/// Zip::from(&amp;mut a).and(&amp;b).and(&amp;c).par_apply(|a, &amp;b, &amp;c| {</span>
 <span class="doccomment">///     *a = b + c;</span>
 <span class="doccomment">/// });</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// **Panics** if any of the arrays are not of the same shape.</span>
+<span class=
+"doccomment">/// **Panics** if any of the arrays are not of the same shape.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ## Examples</span>
 <span class="doccomment">///</span>
@@ -99,27 +168,57 @@
 <span class="doccomment">/// extern crate ndarray;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// use ndarray::Array2;</span>
-<span class="doccomment">/// use ndarray::parallel::par_azip;</span>
+<span class=
+"doccomment">/// use ndarray::parallel::par_azip;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// type M = Array2&lt;f32&gt;;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// fn main() {</span>
-<span class="doccomment">///     let mut a = M::zeros((16, 16));</span>
-<span class="doccomment">///     let b = M::from_elem(a.dim(), 1.);</span>
-<span class="doccomment">///     let c = M::from_elem(a.dim(), 2.);</span>
+<span class=
+"doccomment">///     let mut a = M::zeros((16, 16));</span>
+<span class=
+"doccomment">///     let b = M::from_elem(a.dim(), 1.);</span>
+<span class=
+"doccomment">///     let c = M::from_elem(a.dim(), 2.);</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///     // Compute a simple ternary operation:</span>
-<span class="doccomment">///     // elementwise addition of b and c, stored in a</span>
+<span class=
+"doccomment">///     // Compute a simple ternary operation:</span>
+<span class=
+"doccomment">///     // elementwise addition of b and c, stored in a</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///     par_azip!((a in &amp;mut a, &amp;b in &amp;b, &amp;c in &amp;c) *a = b + c);</span>
+<span class=
+"doccomment">///     par_azip!((a in &amp;mut a, &amp;b in &amp;b, &amp;c in &amp;c) *a = b + c);</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///     assert_eq!(a, &amp;b + &amp;c);</span>
+<span class=
+"doccomment">///     assert_eq!(a, &amp;b + &amp;c);</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">par_azip</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">azip</span><span class="op">!</span>(@<span class="ident">build</span> <span class="ident">par_apply</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>)<span class="kw-2">*</span>)
+<span class="macro">macro_rules</span><span class=
+"macro">!</span> <span class="ident">par_azip</span> {
+    ($(<span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">t</span>:<span class=
+"ident">tt</span>)<span class="kw-2">*</span>) <span class=
+"op">=</span><span class="op">&gt;</span> {
+        <span class="macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">azip</span><span class=
+"op">!</span>(@<span class="ident">build</span> <span class=
+"ident">par_apply</span> $(<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">t</span>)<span class="kw-2">*</span>)
     };
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "ndarray";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>
+</section>
+<section id="search" class="content hidden"></section>
+<section class="footer"></section>
+<script>
+window.rootPath = "../../../";window.currentCrate = "ndarray";
+</script>
+<script src="../../../aliases.js"></script>
+<script src="../../../main.js"></script>
+<script src="../../../source-script.js"></script>
+<script src="../../../source-files.js"></script>
+<script defer src="../../../search-index.js"></script>
+</body>
+</html>

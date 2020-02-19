@@ -1,79 +1,487 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `Model` trait in crate `boltzmann_solver`."><meta name="keywords" content="rust, rustlang, rust-lang, Model"><title>boltzmann_solver::model::Model - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc trait"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a><p class='location'>Trait Model</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#required-methods">Required Methods</a><div class="sidebar-links"><a href="#tymethod.entropy_dof">entropy_dof</a><a href="#tymethod.get_beta">get_beta</a><a href="#tymethod.particle_idx">particle_idx</a><a href="#tymethod.particles">particles</a><a href="#tymethod.particles_mut">particles_mut</a><a href="#tymethod.set_beta">set_beta</a><a href="#tymethod.zero">zero</a></div><a class="sidebar-title" href="#provided-methods">Provided Methods</a><div class="sidebar-links"><a href="#method.as_context">as_context</a><a href="#method.hubble_rate">hubble_rate</a><a href="#method.particle">particle</a><a href="#method.particle_mut">particle_mut</a></div><a class="sidebar-title" href="#implementors">Implementors</a></div><p class='location'><a href='../index.html'>boltzmann_solver</a>::<wbr><a href='index.html'>model</a></p><script>window.sidebarCurrent = {name: 'Model', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../src/boltzmann_solver/model.rs.html#26-159' title='goto source code'>[src]</a></span><span class='in-band'>Trait <a href='../index.html'>boltzmann_solver</a>::<wbr><a href='index.html'>model</a>::<wbr><a class="trait" href=''>Model</a></span></h1><div class="docblock type-decl hidden-by-usual-hider"><pre class='rust trait'>pub trait Model <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,&nbsp;</span>{
-    fn <a href='#tymethod.zero' class='fnname'>zero</a>() -&gt; Self;
-<div class='item-spacer'></div>    fn <a href='#tymethod.set_beta' class='fnname'>set_beta</a>(&amp;mut self, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>);
-<div class='item-spacer'></div>    fn <a href='#tymethod.get_beta' class='fnname'>get_beta</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>;
-<div class='item-spacer'></div>    fn <a href='#tymethod.entropy_dof' class='fnname'>entropy_dof</a>(&amp;self, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>;
-<div class='item-spacer'></div>    fn <a href='#tymethod.particles' class='fnname'>particles</a>(&amp;self) -&gt; &amp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../boltzmann_solver/model/struct.Particle.html" title="struct boltzmann_solver::model::Particle">Particle</a>&gt;;
-<div class='item-spacer'></div>    fn <a href='#tymethod.particles_mut' class='fnname'>particles_mut</a>(&amp;mut self) -&gt; &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../boltzmann_solver/model/struct.Particle.html" title="struct boltzmann_solver::model::Particle">Particle</a>&gt;;
-<div class='item-spacer'></div>    fn <a href='#tymethod.particle_idx' class='fnname'>particle_idx</a>&lt;S:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html" title="trait core::convert::AsRef">AsRef</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;&gt;(<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name: S, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a><br>&nbsp;&nbsp;&nbsp;&nbsp;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a>S, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a>&gt;;
-
-    fn <a href='#method.hubble_rate' class='fnname'>hubble_rate</a>(&amp;self, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a> { ... }
-<div class='item-spacer'></div>    fn <a href='#method.particle' class='fnname'>particle</a>&lt;S:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html" title="trait core::convert::AsRef">AsRef</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;&gt;(&amp;self, name: S, i: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; &amp;<a class="struct" href="../../boltzmann_solver/model/struct.Particle.html" title="struct boltzmann_solver::model::Particle">Particle</a> { ... }
-<div class='item-spacer'></div>    fn <a href='#method.particle_mut' class='fnname'>particle_mut</a>(&amp;mut self, name: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>, i: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; &amp;mut <a class="struct" href="../../boltzmann_solver/model/struct.Particle.html" title="struct boltzmann_solver::model::Particle">Particle</a> { ... }
-<div class='item-spacer'></div>    fn <a href='#method.as_context' class='fnname'>as_context</a>(&amp;self) -&gt; <a class="struct" href="../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;Self&gt; { ... }
-}</pre></div><div class='docblock'><p>Contains all the information relevant to a particular model, including
-masses, widths and couplings.  All these attributes can be dependent on the
-inverse temperature \(\beta\).</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="generator" content=
+"HTML Tidy for HTML5 for Linux version 5.6.0">
+<meta charset="utf-8">
+<meta name="viewport" content=
+"width=device-width, initial-scale=1.0">
+<meta name="generator" content="rustdoc">
+<meta name="description" content=
+"API documentation for the Rust `Model` trait in crate `boltzmann_solver`.">
+<meta name="keywords" content="rust, rustlang, rust-lang, Model">
+<title>boltzmann_solver::model::Model - Rust</title>
+<link rel="stylesheet" type="text/css" href="../../normalize.css">
+<link rel="stylesheet" type="text/css" href="../../rustdoc.css" id=
+"mainThemeStyle">
+<link rel="stylesheet" type="text/css" href="../../dark.css">
+<link rel="stylesheet" type="text/css" href="../../light.css" id=
+"themeStyle">
+<script src="../../storage.js"></script><noscript>
+<link rel="stylesheet" href="../../noscript.css"></noscript>
+<link rel="shortcut icon" href="../../favicon.ico">
+<style type="text/css">
+#crate-search{background-image:url("../../down-arrow.svg");}
+</style>
+</head>
+<body class="rustdoc trait">
+<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
+<nav class="sidebar">
+<div class="sidebar-menu">☰</div>
+<a href='../../boltzmann_solver/index.html'>
+<div class='logo-container'><img src='../../rust-logo.png' alt=
+'logo'></div>
+</a>
+<p class='location'>Trait Model</p>
+<div class="sidebar-elems">
+<div class="block items"><a class="sidebar-title" href=
+"#required-methods">Required Methods</a>
+<div class="sidebar-links"><a href=
+"#tymethod.entropy_dof">entropy_dof</a><a href=
+"#tymethod.get_beta">get_beta</a><a href=
+"#tymethod.particle_idx">particle_idx</a><a href=
+"#tymethod.particles">particles</a><a href=
+"#tymethod.particles_mut">particles_mut</a><a href=
+"#tymethod.set_beta">set_beta</a><a href=
+"#tymethod.zero">zero</a></div>
+<a class="sidebar-title" href="#provided-methods">Provided
+Methods</a>
+<div class="sidebar-links"><a href=
+"#method.as_context">as_context</a><a href=
+"#method.hubble_rate">hubble_rate</a><a href=
+"#method.particle">particle</a><a href=
+"#method.particle_mut">particle_mut</a></div>
+<a class="sidebar-title" href=
+"#implementors">Implementors</a></div>
+<p class='location'><a href=
+'../index.html'>boltzmann_solver</a>::<wbr><a href=
+'index.html'>model</a></p>
+<script>
+window.sidebarCurrent = {name: 'Model', ty: 'trait', relpath: ''};
+</script>
+<script defer src="sidebar-items.js"></script></div>
+</nav>
+<div class="theme-picker"><button id="theme-picker" aria-label=
+"Pick another theme!"><img src="../../brush.svg" width="18" alt=
+"Pick another theme!"></button>
+<div id="theme-choices"></div>
 </div>
-            <h2 id='required-methods' class='small-section-header'>Required methods<a href='#required-methods' class='anchor'></a></h2><div class='methods'><h3 id='tymethod.zero' class='method'><code id='zero.v'>fn <a href='#tymethod.zero' class='fnname'>zero</a>() -&gt; Self</code></h3><div class='docblock'><p>Instantiate a new instance of the model at 0 temperature (\(\beta =
-\infty\)).</p>
-<p>This is implemented separately so that the computational peculiarities
-of dealing with \(\beta = \infty\) can be avoided.</p>
-</div><h3 id='tymethod.set_beta' class='method'><code id='set_beta.v'>fn <a href='#tymethod.set_beta' class='fnname'>set_beta</a>(&amp;mut self, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)</code></h3><div class='docblock'><p>Update the model to be valid at the given inverse temperature <code>beta</code>.</p>
-<p>The inverse temperature is always strictly positive, and should never be
-infinite.  The zero temperature case should be obtained from
-<a href="../../boltzmann_solver/model/trait.Model.html#tymethod.zero" title="`Model::zero`"><code>Model::zero</code></a>.</p>
-</div><h3 id='tymethod.get_beta' class='method'><code id='get_beta.v'>fn <a href='#tymethod.get_beta' class='fnname'>get_beta</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></h3><div class='docblock'><p>Return the current value of beta for the model</p>
-</div><h3 id='tymethod.entropy_dof' class='method'><code id='entropy_dof.v'>fn <a href='#tymethod.entropy_dof' class='fnname'>entropy_dof</a>(&amp;self, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></h3><div class='docblock'><p>Return the effective degrees of freedom contributing to the entropy
-density of the Universe at the specified inverse temperature.</p>
-</div><h3 id='tymethod.particles' class='method'><code id='particles.v'>fn <a href='#tymethod.particles' class='fnname'>particles</a>(&amp;self) -&gt; &amp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../boltzmann_solver/model/struct.Particle.html" title="struct boltzmann_solver::model::Particle">Particle</a>&gt;</code></h3><div class='docblock'><p>Return a list of particles in the model.</p>
-</div><h3 id='tymethod.particles_mut' class='method'><code id='particles_mut.v'>fn <a href='#tymethod.particles_mut' class='fnname'>particles_mut</a>(&amp;mut self) -&gt; &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../boltzmann_solver/model/struct.Particle.html" title="struct boltzmann_solver::model::Particle">Particle</a>&gt;</code></h3><div class='docblock'><p>Return a mutable list of particles in the model.</p>
-</div><h3 id='tymethod.particle_idx' class='method'><code id='particle_idx.v'>fn <a href='#tymethod.particle_idx' class='fnname'>particle_idx</a>&lt;S:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html" title="trait core::convert::AsRef">AsRef</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;&gt;(name: S, i: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a>S, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a>&gt;</code></h3><div class='docblock'><p>Return the index corresponding to a particle's name and generation
-index.</p>
-<p>If the particle has no index, the <code>i</code> argument should be ignored.
-Indices must be 0-indexed, so that generational indices are <code>[0, 1, 2]</code>.</p>
-<p>Note that since particles are distinguished from anti-particles based on
-the sign of the integer, <code>particle_idx</code> should not return <code>0</code> unless
-that particle is its own anti-particle (so the distinction is
-irrelevant).</p>
-<p>If the particle is not within the model, the name and index should be
-returned as an error so that they can be subsequently handled.</p>
-</div></div><span class='loading-content'>Loading content...</span>
-            <h2 id='provided-methods' class='small-section-header'>Provided methods<a href='#provided-methods' class='anchor'></a></h2><div class='methods'><h3 id='method.hubble_rate' class='method'><code id='hubble_rate.v'>fn <a href='#method.hubble_rate' class='fnname'>hubble_rate</a>(&amp;self, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></h3><div class='docblock'><p>Return the Hubble rate at the specified inverse temperature.</p>
+<script src="../../theme.js"></script>
+<nav class="sub">
+<form class="search-form">
+<div class="search-container">
+<div><select id="crate-search">
+<option value="All crates">All crates</option>
+</select><input class="search-input" name="search" disabled
+autocomplete="off" spellcheck="false" placeholder=
+"Click or press ‘S’ to search, ‘?’ for more options…" type=
+"search"></div>
+<a id="settings-menu" href="../../settings.html"><img src=
+"../../wheel.svg" width="18" alt="Change settings"></a></div>
+</form>
+</nav>
+<section id="main" class="content">
+<h1 class='fqn'><span class='out-of-band'><span id=
+'render-detail'><a id="toggle-all-docs" href="javascript:void(0)"
+title="collapse all docs">[<span class=
+'inner'>−</span>]</a></span><a class='srclink' href=
+'../../src/boltzmann_solver/model.rs.html#26-159' title=
+'goto source code'>[src]</a></span><span class='in-band'>Trait
+<a href='../index.html'>boltzmann_solver</a>::<wbr><a href=
+'index.html'>model</a>::<wbr><a class="trait" href=
+''>Model</a></span></h1>
+<div class="docblock type-decl hidden-by-usual-hider">
+<pre class='rust trait'>pub trait Model <span class=
+"where fmt-newline">where<br>    Self: <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html"
+title="trait core::marker::Sized">Sized</a>, </span>{
+    fn <a href='#tymethod.zero' class=
+'fnname'>zero</a>() -&gt; Self;
+</pre>
+<div class='item-spacer'></div>
+<pre>    fn <a href='#tymethod.set_beta' class=
+'fnname'>set_beta</a>(&amp;mut self, beta: <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>);
+</pre>
+<div class='item-spacer'></div>
+<pre>    fn <a href='#tymethod.get_beta' class=
+'fnname'>get_beta</a>(&amp;self) -&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>;
+</pre>
+<div class='item-spacer'></div>
+<pre>    fn <a href='#tymethod.entropy_dof' class=
+'fnname'>entropy_dof</a>(&amp;self, beta: <a class="primitive"
+href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>;
+</pre>
+<div class='item-spacer'></div>
+<pre>    fn <a href='#tymethod.particles' class=
+'fnname'>particles</a>(&amp;self) -&gt; &<a class="struct" href=
+"https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html"
+title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href=
+"../../boltzmann_solver/model/struct.Particle.html" title=
+"struct boltzmann_solver::model::Particle">Particle</a>&gt;;
+</pre>
+<div class='item-spacer'></div>
+<pre>    fn <a href='#tymethod.particles_mut' class=
+'fnname'>particles_mut</a>(&amp;mut self) -&gt; &amp;mut <a class=
+"struct" href=
+"https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html"
+title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href=
+"../../boltzmann_solver/model/struct.Particle.html" title=
+"struct boltzmann_solver::model::Particle">Particle</a>&gt;;
+</pre>
+<div class='item-spacer'></div>
+<pre>    fn <a href='#tymethod.particle_idx' class=
+'fnname'>particle_idx</a>&lt;S: <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html"
+title="trait core::convert::AsRef">AsRef</a>&lt;<a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;&gt;(<br>        name: S, <br>        i: <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a><br>    ) -&gt; <a class="enum"
+href=
+"https://doc.rust-lang.org/nightly/core/result/enum.Result.html"
+title="enum core::result::Result">Result</a>&lt;<a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>, <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a>S, <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a><a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a>&gt;;
+
+    fn <a href='#method.hubble_rate' class=
+'fnname'>hubble_rate</a>(&amp;self, beta: <a class="primitive"
+href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a> { ... }
+</pre>
+<div class='item-spacer'></div>
+<pre>    fn <a href='#method.particle' class=
+'fnname'>particle</a>&lt;S: <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html"
+title="trait core::convert::AsRef">AsRef</a>&lt;<a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;&gt;(&amp;self, name: S, i: <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; &<a class="struct"
+href="../../boltzmann_solver/model/struct.Particle.html" title=
+"struct boltzmann_solver::model::Particle">Particle</a> { ... }
+</pre>
+<div class='item-spacer'></div>
+<pre>    fn <a href='#method.particle_mut' class=
+'fnname'>particle_mut</a>(&amp;mut self, name: &<a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>, i: <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; &amp;mut <a class="struct"
+href="../../boltzmann_solver/model/struct.Particle.html" title=
+"struct boltzmann_solver::model::Particle">Particle</a> { ... }
+</pre>
+<div class='item-spacer'></div>
+<pre>    fn <a href='#method.as_context' class=
+'fnname'>as_context</a>(&amp;self) -&gt; <a class="struct" href=
+"../../boltzmann_solver/prelude/struct.Context.html" title=
+"struct boltzmann_solver::prelude::Context">Context</a>&lt;Self&gt; { ... }
+}</pre></div>
+<div class='docblock'>
+<p>Contains all the information relevant to a particular model,
+including masses, widths and couplings. All these attributes can be
+dependent on the inverse temperature \(\beta\).</p>
+</div>
+<h2 id='required-methods' class='small-section-header'>Required
+methods<a href='#required-methods' class='anchor'></a></h2>
+<div class='methods'>
+<h3 id='tymethod.zero' class='method'><code id='zero.v'>fn <a href=
+'#tymethod.zero' class='fnname'>zero</a>() -&gt; Self</code></h3>
+<div class='docblock'>
+<p>Instantiate a new instance of the model at 0 temperature
+(\(\beta = \infty\)).</p>
+<p>This is implemented separately so that the computational
+peculiarities of dealing with \(\beta = \infty\) can be
+avoided.</p>
+</div>
+<h3 id='tymethod.set_beta' class='method'><code id='set_beta.v'>fn
+<a href='#tymethod.set_beta' class='fnname'>set_beta</a>(&amp;mut
+self, beta: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)</code></h3>
+<div class='docblock'>
+<p>Update the model to be valid at the given inverse temperature
+<code>beta</code>.</p>
+<p>The inverse temperature is always strictly positive, and should
+never be infinite. The zero temperature case should be obtained
+from <a href=
+"../../boltzmann_solver/model/trait.Model.html#tymethod.zero"
+title="`Model::zero`"><code>Model::zero</code></a>.</p>
+</div>
+<h3 id='tymethod.get_beta' class='method'><code id='get_beta.v'>fn
+<a href='#tymethod.get_beta' class='fnname'>get_beta</a>(&amp;self)
+-&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></h3>
+<div class='docblock'>
+<p>Return the current value of beta for the model</p>
+</div>
+<h3 id='tymethod.entropy_dof' class='method'><code id=
+'entropy_dof.v'>fn <a href='#tymethod.entropy_dof' class=
+'fnname'>entropy_dof</a>(&amp;self, beta: <a class="primitive"
+href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
+-&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></h3>
+<div class='docblock'>
+<p>Return the effective degrees of freedom contributing to the
+entropy density of the Universe at the specified inverse
+temperature.</p>
+</div>
+<h3 id='tymethod.particles' class='method'><code id=
+'particles.v'>fn <a href='#tymethod.particles' class=
+'fnname'>particles</a>(&amp;self) -&gt; &<a class="struct" href=
+"https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html"
+title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href=
+"../../boltzmann_solver/model/struct.Particle.html" title=
+"struct boltzmann_solver::model::Particle">Particle</a>&gt;</code></h3>
+<div class='docblock'>
+<p>Return a list of particles in the model.</p>
+</div>
+<h3 id='tymethod.particles_mut' class='method'><code id=
+'particles_mut.v'>fn <a href='#tymethod.particles_mut' class=
+'fnname'>particles_mut</a>(&amp;mut self) -&gt; &amp;mut <a class=
+"struct" href=
+"https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html"
+title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href=
+"../../boltzmann_solver/model/struct.Particle.html" title=
+"struct boltzmann_solver::model::Particle">Particle</a>&gt;</code></h3>
+<div class='docblock'>
+<p>Return a mutable list of particles in the model.</p>
+</div>
+<h3 id='tymethod.particle_idx' class='method'><code id=
+'particle_idx.v'>fn <a href='#tymethod.particle_idx' class=
+'fnname'>particle_idx</a>&lt;S:&nbsp;<a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html"
+title="trait core::convert::AsRef">AsRef</a>&lt;<a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;&gt;(name:
+S, i: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>)
+-&gt; <a class="enum" href=
+"https://doc.rust-lang.org/nightly/core/result/enum.Result.html"
+title="enum core::result::Result">Result</a>&lt;<a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>,
+<a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a>S,
+<a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a><a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a>&gt;</code></h3>
+<div class='docblock'>
+<p>Return the index corresponding to a particle's name and
+generation index.</p>
+<p>If the particle has no index, the <code>i</code> argument should
+be ignored. Indices must be 0-indexed, so that generational indices
+are <code>[0, 1, 2]</code>.</p>
+<p>Note that since particles are distinguished from anti-particles
+based on the sign of the integer, <code>particle_idx</code> should
+not return <code>0</code> unless that particle is its own
+anti-particle (so the distinction is irrelevant).</p>
+<p>If the particle is not within the model, the name and index
+should be returned as an error so that they can be subsequently
+handled.</p>
+</div>
+</div>
+<span class='loading-content'>Loading content...</span>
+<h2 id='provided-methods' class='small-section-header'>Provided
+methods<a href='#provided-methods' class='anchor'></a></h2>
+<div class='methods'>
+<h3 id='method.hubble_rate' class='method'><code id=
+'hubble_rate.v'>fn <a href='#method.hubble_rate' class=
+'fnname'>hubble_rate</a>(&amp;self, beta: <a class="primitive"
+href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
+-&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></h3>
+<div class='docblock'>
+<p>Return the Hubble rate at the specified inverse temperature.</p>
 <p>The default implementation assumes the Universe to be radiation
 dominated such that</p>
-<p>\begin{equation}
-H(\beta) = \sqrt{\frac{\pi^2}{90}} g_{*}^{1/2}(\beta) \frac{1}{m_{\text{Pl}}} \frac{1}{\beta^2}.
+<p>\begin{equation} H(\beta) = \sqrt{\frac{\pi^2}{90}}
+g_{*}^{1/2}(\beta) \frac{1}{m_{\text{Pl}}} \frac{1}{\beta^2}.
 \end{equation}</p>
-<p>Which is valid provided that the entropy density of the Universe does
-not change too rapidly.</p>
-<h1 id="warning" class="section-header"><a href="#warning">Warning</a></h1>
-<p>The dominated epoch in the Standard Model of cosmology ends at the
-matter–radiation equality, which occurs at an inverse temperature of
-\(\beta \approx 10^{8}\) GeV^{-1}.</p>
-</div><h3 id='method.particle' class='method'><code id='particle.v'>fn <a href='#method.particle' class='fnname'>particle</a>&lt;S:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html" title="trait core::convert::AsRef">AsRef</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;&gt;(&amp;self, name: S, i: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; &amp;<a class="struct" href="../../boltzmann_solver/model/struct.Particle.html" title="struct boltzmann_solver::model::Particle">Particle</a></code></h3><div class='docblock'><p>Return a reference to the matching particle by name.</p>
-<h1 id="panics" class="section-header"><a href="#panics">Panics</a></h1>
-<p>Panics if then name or particle is not known within the model.</p>
-</div><h3 id='method.particle_mut' class='method'><code id='particle_mut.v'>fn <a href='#method.particle_mut' class='fnname'>particle_mut</a>(&amp;mut self, name: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>, i: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; &amp;mut <a class="struct" href="../../boltzmann_solver/model/struct.Particle.html" title="struct boltzmann_solver::model::Particle">Particle</a></code></h3><div class='docblock'><p>Return a mutable reference to the matching particle by name.</p>
-<h1 id="panics-1" class="section-header"><a href="#panics-1">Panics</a></h1>
-<p>Panics if then name or particle is not known within the model.</p>
-</div><h3 id='method.as_context' class='method'><code id='as_context.v'>fn <a href='#method.as_context' class='fnname'>as_context</a>(&amp;self) -&gt; <a class="struct" href="../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;Self&gt;</code></h3><div class='docblock'><p>Return a instance of <a href="../../boltzmann_solver/prelude/struct.Context.html" title="`Context`"><code>Context</code></a> for the model.</p>
-<p>As this is not within the context of solving the Boltzmann equations,
-the following attributes have a special value:</p>
+<p>Which is valid provided that the entropy density of the Universe
+does not change too rapidly.</p>
+<h1 id="warning" class="section-header"><a href=
+"#warning">Warning</a></h1>
+<p>The dominated epoch in the Standard Model of cosmology ends at
+the matter–radiation equality, which occurs at an inverse
+temperature of \(\beta \approx 10^{8}\) GeV^{-1}.</p>
+</div>
+<h3 id='method.particle' class='method'><code id='particle.v'>fn
+<a href='#method.particle' class=
+'fnname'>particle</a>&lt;S:&nbsp;<a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html"
+title="trait core::convert::AsRef">AsRef</a>&lt;<a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;&gt;(&amp;self,
+name: S, i: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>)
+-&gt; &<a class="struct" href=
+"../../boltzmann_solver/model/struct.Particle.html" title=
+"struct boltzmann_solver::model::Particle">Particle</a></code></h3>
+<div class='docblock'>
+<p>Return a reference to the matching particle by name.</p>
+<h1 id="panics" class="section-header"><a href=
+"#panics">Panics</a></h1>
+<p>Panics if then name or particle is not known within the
+model.</p>
+</div>
+<h3 id='method.particle_mut' class='method'><code id=
+'particle_mut.v'>fn <a href='#method.particle_mut' class=
+'fnname'>particle_mut</a>(&amp;mut self, name: &<a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>,
+i: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>)
+-&gt; &amp;mut <a class="struct" href=
+"../../boltzmann_solver/model/struct.Particle.html" title=
+"struct boltzmann_solver::model::Particle">Particle</a></code></h3>
+<div class='docblock'>
+<p>Return a mutable reference to the matching particle by name.</p>
+<h1 id="panics-1" class="section-header"><a href=
+"#panics-1">Panics</a></h1>
+<p>Panics if then name or particle is not known within the
+model.</p>
+</div>
+<h3 id='method.as_context' class='method'><code id=
+'as_context.v'>fn <a href='#method.as_context' class=
+'fnname'>as_context</a>(&amp;self) -&gt; <a class="struct" href=
+"../../boltzmann_solver/prelude/struct.Context.html" title=
+"struct boltzmann_solver::prelude::Context">Context</a>&lt;Self&gt;</code></h3>
+<div class='docblock'>
+<p>Return a instance of <a href=
+"../../boltzmann_solver/prelude/struct.Context.html" title=
+"`Context`"><code>Context</code></a> for the model.</p>
+<p>As this is not within the context of solving the Boltzmann
+equations, the following attributes have a special value:</p>
 <ul>
 <li><code>step = 0</code>,</li>
 <li><code>step_size = 1.0</code>,</li>
-<li><code>normalization = (hubble_rate * beta * n).recip()</code>, and</li>
-<li><code>eq</code>, <code>n</code>, <code>na</code> are empty arrays.</li>
+<li><code>normalization = (hubble_rate * beta * n).recip()</code>,
+and</li>
+<li><code>eq</code>, <code>n</code>, <code>na</code> are empty
+arrays.</li>
 </ul>
 <p>All other attribute contexts will be as expected.</p>
-</div></div><span class='loading-content'>Loading content...</span>
-            <h2 id='implementors' class='small-section-header'>Implementors<a href='#implementors' class='anchor'></a></h2><div class='item-list' id='implementors-list'><h3 id='impl-Model' class='impl'><code class='in-band'>impl Model for <a class="struct" href="../../boltzmann_solver/model/struct.StandardModel.html" title="struct boltzmann_solver::model::StandardModel">StandardModel</a></code><a href='#impl-Model' class='anchor'></a><a class='srclink' href='../../src/boltzmann_solver/model/standard_model.rs.html#44-194' title='goto source code'>[src]</a></h3><div class='impl-items'><h4 id='method.zero' class="method hidden"><code id='zero.v-1'>fn <a href='#method.zero' class='fnname'>zero</a>() -&gt; Self</code><a class='srclink' href='../../src/boltzmann_solver/model/standard_model.rs.html#45-100' title='goto source code'>[src]</a></h4><h4 id='method.set_beta' class="method"><code id='set_beta.v-1'>fn <a href='#method.set_beta' class='fnname'>set_beta</a>(&amp;mut self, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)</code><a class='srclink' href='../../src/boltzmann_solver/model/standard_model.rs.html#112-161' title='goto source code'>[src]</a></h4><div class='docblock'><p>Update beta for the model.</p>
-<p>This does <strong>not</strong> compute the widths as it is assumed that most
-implementation will add more particles, thus making any Standard Model
-specific computation redundant.</p>
-<p>This does update the thermal masses of all Standard Model particles
-given the Standard Model interactions.  If other interactions are
-included, the contributions of these interactions should also be
-included.</p>
-</div><h4 id='method.get_beta' class="method hidden"><code id='get_beta.v-1'>fn <a href='#method.get_beta' class='fnname'>get_beta</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink' href='../../src/boltzmann_solver/model/standard_model.rs.html#163-165' title='goto source code'>[src]</a></h4><h4 id='method.entropy_dof' class="method hidden"><code id='entropy_dof.v-1'>fn <a href='#method.entropy_dof' class='fnname'>entropy_dof</a>(&amp;self, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink' href='../../src/boltzmann_solver/model/standard_model.rs.html#167-170' title='goto source code'>[src]</a></h4><h4 id='method.particles' class="method hidden"><code id='particles.v-1'>fn <a href='#method.particles' class='fnname'>particles</a>(&amp;self) -&gt; &amp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../boltzmann_solver/model/struct.Particle.html" title="struct boltzmann_solver::model::Particle">Particle</a>&gt;</code><a class='srclink' href='../../src/boltzmann_solver/model/standard_model.rs.html#172-174' title='goto source code'>[src]</a></h4><h4 id='method.particles_mut' class="method hidden"><code id='particles_mut.v-1'>fn <a href='#method.particles_mut' class='fnname'>particles_mut</a>(&amp;mut self) -&gt; &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../boltzmann_solver/model/struct.Particle.html" title="struct boltzmann_solver::model::Particle">Particle</a>&gt;</code><a class='srclink' href='../../src/boltzmann_solver/model/standard_model.rs.html#176-178' title='goto source code'>[src]</a></h4><h4 id='method.particle_idx' class="method hidden"><code id='particle_idx.v-1'>fn <a href='#method.particle_idx' class='fnname'>particle_idx</a>&lt;S:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html" title="trait core::convert::AsRef">AsRef</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;&gt;(name: S, i: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a>S, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a>&gt;</code><a class='srclink' href='../../src/boltzmann_solver/model/standard_model.rs.html#180-193' title='goto source code'>[src]</a></h4></div></div><span class='loading-content'>Loading content...</span><script type="text/javascript" src="../../implementors/boltzmann_solver/model/trait.Model.js" async></script></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "boltzmann_solver";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script defer src="../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>
+</div>
+</div>
+<span class='loading-content'>Loading content...</span>
+<h2 id='implementors' class='small-section-header'>
+Implementors<a href='#implementors' class='anchor'></a></h2>
+<div class='item-list' id='implementors-list'>
+<h3 id='impl-Model' class='impl'><code class='in-band'>impl Model
+for <a class="struct" href=
+"../../boltzmann_solver/model/struct.StandardModel.html" title=
+"struct boltzmann_solver::model::StandardModel">StandardModel</a></code><a href='#impl-Model'
+class='anchor'></a><a class='srclink' href=
+'../../src/boltzmann_solver/model/standard_model.rs.html#44-194'
+title='goto source code'>[src]</a></h3>
+<div class='impl-items'>
+<h4 id='method.zero' class="method hidden"><code id='zero.v-1'>fn
+<a href='#method.zero' class='fnname'>zero</a>() -&gt;
+Self</code><a class='srclink' href=
+'../../src/boltzmann_solver/model/standard_model.rs.html#45-100'
+title='goto source code'>[src]</a></h4>
+<h4 id='method.set_beta' class="method"><code id='set_beta.v-1'>fn
+<a href='#method.set_beta' class='fnname'>set_beta</a>(&amp;mut
+self, beta: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)</code><a class='srclink'
+href=
+'../../src/boltzmann_solver/model/standard_model.rs.html#112-161'
+title='goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Update beta for the model.</p>
+<p>This does <strong>not</strong> compute the widths as it is
+assumed that most implementation will add more particles, thus
+making any Standard Model specific computation redundant.</p>
+<p>This does update the thermal masses of all Standard Model
+particles given the Standard Model interactions. If other
+interactions are included, the contributions of these interactions
+should also be included.</p>
+</div>
+<h4 id='method.get_beta' class="method hidden"><code id=
+'get_beta.v-1'>fn <a href='#method.get_beta' class=
+'fnname'>get_beta</a>(&amp;self) -&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
+href=
+'../../src/boltzmann_solver/model/standard_model.rs.html#163-165'
+title='goto source code'>[src]</a></h4>
+<h4 id='method.entropy_dof' class="method hidden"><code id=
+'entropy_dof.v-1'>fn <a href='#method.entropy_dof' class=
+'fnname'>entropy_dof</a>(&amp;self, beta: <a class="primitive"
+href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
+-&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
+href=
+'../../src/boltzmann_solver/model/standard_model.rs.html#167-170'
+title='goto source code'>[src]</a></h4>
+<h4 id='method.particles' class="method hidden"><code id=
+'particles.v-1'>fn <a href='#method.particles' class=
+'fnname'>particles</a>(&amp;self) -&gt; &<a class="struct" href=
+"https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html"
+title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href=
+"../../boltzmann_solver/model/struct.Particle.html" title=
+"struct boltzmann_solver::model::Particle">Particle</a>&gt;</code><a class='srclink'
+href=
+'../../src/boltzmann_solver/model/standard_model.rs.html#172-174'
+title='goto source code'>[src]</a></h4>
+<h4 id='method.particles_mut' class="method hidden"><code id=
+'particles_mut.v-1'>fn <a href='#method.particles_mut' class=
+'fnname'>particles_mut</a>(&amp;mut self) -&gt; &amp;mut <a class=
+"struct" href=
+"https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html"
+title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href=
+"../../boltzmann_solver/model/struct.Particle.html" title=
+"struct boltzmann_solver::model::Particle">Particle</a>&gt;</code><a class='srclink'
+href=
+'../../src/boltzmann_solver/model/standard_model.rs.html#176-178'
+title='goto source code'>[src]</a></h4>
+<h4 id='method.particle_idx' class="method hidden"><code id=
+'particle_idx.v-1'>fn <a href='#method.particle_idx' class=
+'fnname'>particle_idx</a>&lt;S:&nbsp;<a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html"
+title="trait core::convert::AsRef">AsRef</a>&lt;<a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;&gt;(name:
+S, i: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>)
+-&gt; <a class="enum" href=
+"https://doc.rust-lang.org/nightly/core/result/enum.Result.html"
+title="enum core::result::Result">Result</a>&lt;<a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>,
+<a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a>S,
+<a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a><a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a>&gt;</code><a class='srclink'
+href=
+'../../src/boltzmann_solver/model/standard_model.rs.html#180-193'
+title='goto source code'>[src]</a></h4>
+</div>
+</div>
+<span class='loading-content'>Loading content...</span>
+<script type="text/javascript" src=
+"../../implementors/boltzmann_solver/model/trait.Model.js" async
+></script></section>
+<section id="search" class="content hidden"></section>
+<section class="footer"></section>
+<script>
+window.rootPath = "../../";window.currentCrate = "boltzmann_solver";
+</script>
+<script src="../../aliases.js"></script>
+<script src="../../main.js"></script>
+<script defer src="../../search-index.js"></script>
+</body>
+</html>

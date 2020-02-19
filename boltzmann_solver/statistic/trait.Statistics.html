@@ -1,58 +1,341 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `Statistics` trait in crate `boltzmann_solver`."><meta name="keywords" content="rust, rustlang, rust-lang, Statistics"><title>boltzmann_solver::statistic::Statistics - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc trait"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a><p class='location'>Trait Statistics</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#required-methods">Required Methods</a><div class="sidebar-links"><a href="#tymethod.normalized_number_density">normalized_number_density</a><a href="#tymethod.phase_space">phase_space</a></div><a class="sidebar-title" href="#provided-methods">Provided Methods</a><div class="sidebar-links"><a href="#method.massless_number_density">massless_number_density</a><a href="#method.number_density">number_density</a></div><a class="sidebar-title" href="#implementors">Implementors</a></div><p class='location'><a href='../index.html'>boltzmann_solver</a>::<wbr><a href='index.html'>statistic</a></p><script>window.sidebarCurrent = {name: 'Statistics', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../src/boltzmann_solver/statistic.rs.html#74-135' title='goto source code'>[src]</a></span><span class='in-band'>Trait <a href='../index.html'>boltzmann_solver</a>::<wbr><a href='index.html'>statistic</a>::<wbr><a class="trait" href=''>Statistics</a></span></h1><div class="docblock type-decl hidden-by-usual-hider"><pre class='rust trait'>pub trait Statistics {
-    fn <a href='#tymethod.phase_space' class='fnname'>phase_space</a>(&amp;self, e: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, m: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>;
-<div class='item-spacer'></div>    fn <a href='#tymethod.normalized_number_density' class='fnname'>normalized_number_density</a>(&amp;self, mass: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>;
-
-    fn <a href='#method.number_density' class='fnname'>number_density</a>(&amp;self, mass: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a> { ... }
-<div class='item-spacer'></div>    fn <a href='#method.massless_number_density' class='fnname'>massless_number_density</a>(&amp;self, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a> { ... }
-}</pre></div><div class='docblock'><p>Equilibrium statistics.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="generator" content=
+"HTML Tidy for HTML5 for Linux version 5.6.0">
+<meta charset="utf-8">
+<meta name="viewport" content=
+"width=device-width, initial-scale=1.0">
+<meta name="generator" content="rustdoc">
+<meta name="description" content=
+"API documentation for the Rust `Statistics` trait in crate `boltzmann_solver`.">
+<meta name="keywords" content=
+"rust, rustlang, rust-lang, Statistics">
+<title>boltzmann_solver::statistic::Statistics - Rust</title>
+<link rel="stylesheet" type="text/css" href="../../normalize.css">
+<link rel="stylesheet" type="text/css" href="../../rustdoc.css" id=
+"mainThemeStyle">
+<link rel="stylesheet" type="text/css" href="../../dark.css">
+<link rel="stylesheet" type="text/css" href="../../light.css" id=
+"themeStyle">
+<script src="../../storage.js"></script><noscript>
+<link rel="stylesheet" href="../../noscript.css"></noscript>
+<link rel="shortcut icon" href="../../favicon.ico">
+<style type="text/css">
+#crate-search{background-image:url("../../down-arrow.svg");}
+</style>
+</head>
+<body class="rustdoc trait">
+<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
+<nav class="sidebar">
+<div class="sidebar-menu">☰</div>
+<a href='../../boltzmann_solver/index.html'>
+<div class='logo-container'><img src='../../rust-logo.png' alt=
+'logo'></div>
+</a>
+<p class='location'>Trait Statistics</p>
+<div class="sidebar-elems">
+<div class="block items"><a class="sidebar-title" href=
+"#required-methods">Required Methods</a>
+<div class="sidebar-links"><a href=
+"#tymethod.normalized_number_density">normalized_number_density</a><a href="#tymethod.phase_space">phase_space</a></div>
+<a class="sidebar-title" href="#provided-methods">Provided
+Methods</a>
+<div class="sidebar-links"><a href=
+"#method.massless_number_density">massless_number_density</a><a href="#method.number_density">number_density</a></div>
+<a class="sidebar-title" href=
+"#implementors">Implementors</a></div>
+<p class='location'><a href=
+'../index.html'>boltzmann_solver</a>::<wbr><a href=
+'index.html'>statistic</a></p>
+<script>
+window.sidebarCurrent = {name: 'Statistics', ty: 'trait', relpath: ''};
+</script>
+<script defer src="sidebar-items.js"></script></div>
+</nav>
+<div class="theme-picker"><button id="theme-picker" aria-label=
+"Pick another theme!"><img src="../../brush.svg" width="18" alt=
+"Pick another theme!"></button>
+<div id="theme-choices"></div>
 </div>
-            <h2 id='required-methods' class='small-section-header'>Required methods<a href='#required-methods' class='anchor'></a></h2><div class='methods'><h3 id='tymethod.phase_space' class='method'><code id='phase_space.v'>fn <a href='#tymethod.phase_space' class='fnname'>phase_space</a>(&amp;self, e: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, m: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></h3><div class='docblock'><p>Evaluate the phase space distribution, for a given energy, mass,
+<script src="../../theme.js"></script>
+<nav class="sub">
+<form class="search-form">
+<div class="search-container">
+<div><select id="crate-search">
+<option value="All crates">All crates</option>
+</select><input class="search-input" name="search" disabled
+autocomplete="off" spellcheck="false" placeholder=
+"Click or press ‘S’ to search, ‘?’ for more options…" type=
+"search"></div>
+<a id="settings-menu" href="../../settings.html"><img src=
+"../../wheel.svg" width="18" alt="Change settings"></a></div>
+</form>
+</nav>
+<section id="main" class="content">
+<h1 class='fqn'><span class='out-of-band'><span id=
+'render-detail'><a id="toggle-all-docs" href="javascript:void(0)"
+title="collapse all docs">[<span class=
+'inner'>−</span>]</a></span><a class='srclink' href=
+'../../src/boltzmann_solver/statistic.rs.html#74-135' title=
+'goto source code'>[src]</a></span><span class='in-band'>Trait
+<a href='../index.html'>boltzmann_solver</a>::<wbr><a href=
+'index.html'>statistic</a>::<wbr><a class="trait" href=
+''>Statistics</a></span></h1>
+<div class="docblock type-decl hidden-by-usual-hider">
+<pre class='rust trait'>pub trait Statistics {
+    fn <a href='#tymethod.phase_space' class=
+'fnname'>phase_space</a>(&amp;self, e: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, m: <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, mu: <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>;
+</pre>
+<div class='item-spacer'></div>
+<pre>    fn <a href='#tymethod.normalized_number_density' class=
+'fnname'>normalized_number_density</a>(&amp;self, mass: <a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, mu: <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>;
+
+    fn <a href='#method.number_density' class=
+'fnname'>number_density</a>(&amp;self, mass: <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, mu: <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a> { ... }
+</pre>
+<div class='item-spacer'></div>
+<pre>    fn <a href='#method.massless_number_density' class=
+'fnname'>massless_number_density</a>(&amp;self, mu: <a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a> { ... }
+}</pre></div>
+<div class='docblock'>
+<p>Equilibrium statistics.</p>
+</div>
+<h2 id='required-methods' class='small-section-header'>Required
+methods<a href='#required-methods' class='anchor'></a></h2>
+<div class='methods'>
+<h3 id='tymethod.phase_space' class='method'><code id=
+'phase_space.v'>fn <a href='#tymethod.phase_space' class=
+'fnname'>phase_space</a>(&amp;self, e: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+m: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+mu: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+beta: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
+-&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></h3>
+<div class='docblock'>
+<p>Evaluate the phase space distribution, for a given energy, mass,
 chemical potential and inverse temperature.</p>
-</div><h3 id='tymethod.normalized_number_density' class='method'><code id='normalized_number_density.v'>fn <a href='#tymethod.normalized_number_density' class='fnname'>normalized_number_density</a>(&amp;self, mass: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></h3><div class='docblock'><p>Return number density for a particle following the specified statistic,
-normalized to the number density of a massless boson with a single
-degree of freedom.</p>
-</div></div><span class='loading-content'>Loading content...</span>
-            <h2 id='provided-methods' class='small-section-header'>Provided methods<a href='#provided-methods' class='anchor'></a></h2><div class='methods'><h3 id='method.number_density' class='method'><code id='number_density.v'>fn <a href='#method.number_density' class='fnname'>number_density</a>(&amp;self, mass: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></h3><div class='docblock'><p>Return number density for a particle following the specified statistic.</p>
-<p>\begin{equation}
-n = \frac{1}{2 \pi^2} \int_{m}^{\infty} f_{i} u \sqrt{u^2 - m^2} \dd u.
-\end{equation}</p>
-<p>The naïve implementation will perform a numerical integration.</p>
-<h1 id="note-to-implementors" class="section-header"><a href="#note-to-implementors">Note to Implementors</a></h1>
-<p>If an analytic closed form is available for the integral, it should be
-preferred over the numerical integration.</p>
-</div><h3 id='method.massless_number_density' class='method'><code id='massless_number_density.v'>fn <a href='#method.massless_number_density' class='fnname'>massless_number_density</a>(&amp;self, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></h3><div class='docblock'><p>Return number density for a massless particle following the specified
+</div>
+<h3 id='tymethod.normalized_number_density' class='method'>
+<code id='normalized_number_density.v'>fn <a href=
+'#tymethod.normalized_number_density' class=
+'fnname'>normalized_number_density</a>(&amp;self, mass: <a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+mu: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+beta: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
+-&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></h3>
+<div class='docblock'>
+<p>Return number density for a particle following the specified
+statistic, normalized to the number density of a massless boson
+with a single degree of freedom.</p>
+</div>
+</div>
+<span class='loading-content'>Loading content...</span>
+<h2 id='provided-methods' class='small-section-header'>Provided
+methods<a href='#provided-methods' class='anchor'></a></h2>
+<div class='methods'>
+<h3 id='method.number_density' class='method'><code id=
+'number_density.v'>fn <a href='#method.number_density' class=
+'fnname'>number_density</a>(&amp;self, mass: <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+mu: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+beta: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
+-&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></h3>
+<div class='docblock'>
+<p>Return number density for a particle following the specified
 statistic.</p>
-<p>\begin{equation}
-n = \frac{1}{2 \pi^2} \int_{0}^{\infty} f_{i} u^2 \dd u
-\end{equation}</p>
-<p>The naïve implementation simply calls <a href="../../boltzmann_solver/statistic/trait.Statistics.html#method.number_density" title="`Statistics::number_density`"><code>Statistics::number_density</code></a>
-setting <code>mass = 0.0</code> and then uses numerical integration.</p>
-<h1 id="note-to-implementors-1" class="section-header"><a href="#note-to-implementors-1">Note to Implementors</a></h1>
-<p>If an analytic closed form is available for the integral, it should be
-preferred over the numerical integration.</p>
-</div></div><span class='loading-content'>Loading content...</span>
-            <h2 id='implementors' class='small-section-header'>Implementors<a href='#implementors' class='anchor'></a></h2><div class='item-list' id='implementors-list'><h3 id='impl-Statistics' class='impl'><code class='in-band'>impl Statistics for <a class="enum" href="../../boltzmann_solver/statistic/enum.Statistic.html" title="enum boltzmann_solver::statistic::Statistic">Statistic</a></code><a href='#impl-Statistics' class='anchor'></a><a class='srclink' href='../../src/boltzmann_solver/statistic.rs.html#137-324' title='goto source code'>[src]</a></h3><div class='impl-items'><h4 id='method.phase_space' class="method"><code id='phase_space.v-1'>fn <a href='#method.phase_space' class='fnname'>phase_space</a>(&amp;self, e: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, m: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink' href='../../src/boltzmann_solver/statistic.rs.html#140-165' title='goto source code'>[src]</a></h4><div class='docblock'><p>Evaluate the phase space distribution, \(f\) as defined above for the
-four statistics.</p>
-</div><h4 id='method.number_density-1' class="method"><code id='number_density.v-1'>fn <a href='#method.number_density-1' class='fnname'>number_density</a>(&amp;self, mass: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink' href='../../src/boltzmann_solver/statistic.rs.html#179-268' title='goto source code'>[src]</a></h4><div class='docblock'><p>Return number density for a particle following the specified statistic.</p>
-<p>\begin{equation}
-n = \frac{1}{2 \pi^2} \int_{m}^{\infty} f_{i} u \sqrt{u^2 - m^2} \dd u
-\end{equation}</p>
-<h1 id="implementation-details" class="section-header"><a href="#implementation-details">Implementation Details</a></h1>
-<p>Both the Fermi–Dirac and Bose–Einstein statistic rely on numerical
-integration and thus are fairly slow and are prone to errors in certain
-regimes.  The Maxwell–Boltzmann and Maxwell–Jüttner distributions offer
-exact implementations.</p>
-</div><h4 id='method.normalized_number_density' class="method"><code id='normalized_number_density.v-1'>fn <a href='#method.normalized_number_density' class='fnname'>normalized_number_density</a>(&amp;self, mass: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink' href='../../src/boltzmann_solver/statistic.rs.html#277-295' title='goto source code'>[src]</a></h4><div class='docblock'><p>Return number density for a particle following the specified statistic,
-normalized to the number density of a massless boson with a single
-degree of freedom.</p>
-<h1 id="implementation-details-1" class="section-header"><a href="#implementation-details-1">Implementation Details</a></h1>
-<p>This implementation assumes that the chemical potential is negligible.</p>
-</div><h4 id='method.massless_number_density-1' class="method"><code id='massless_number_density.v-1'>fn <a href='#method.massless_number_density-1' class='fnname'>massless_number_density</a>(&amp;self, mu: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>, beta: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink' href='../../src/boltzmann_solver/statistic.rs.html#308-323' title='goto source code'>[src]</a></h4><div class='docblock'><p>Return number density for a massless particle following the specified
+<p>\begin{equation} n = \frac{1}{2 \pi^2} \int_{m}^{\infty} f_{i} u
+\sqrt{u^2 - m^2} \dd u. \end{equation}</p>
+<p>The naïve implementation will perform a numerical
+integration.</p>
+<h1 id="note-to-implementors" class="section-header"><a href=
+"#note-to-implementors">Note to Implementors</a></h1>
+<p>If an analytic closed form is available for the integral, it
+should be preferred over the numerical integration.</p>
+</div>
+<h3 id='method.massless_number_density' class='method'><code id=
+'massless_number_density.v'>fn <a href=
+'#method.massless_number_density' class=
+'fnname'>massless_number_density</a>(&amp;self, mu: <a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+beta: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
+-&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></h3>
+<div class='docblock'>
+<p>Return number density for a massless particle following the
+specified statistic.</p>
+<p>\begin{equation} n = \frac{1}{2 \pi^2} \int_{0}^{\infty} f_{i}
+u^2 \dd u \end{equation}</p>
+<p>The naïve implementation simply calls <a href=
+"../../boltzmann_solver/statistic/trait.Statistics.html#method.number_density"
+title=
+"`Statistics::number_density`"><code>Statistics::number_density</code></a>
+setting <code>mass = 0.0</code> and then uses numerical
+integration.</p>
+<h1 id="note-to-implementors-1" class="section-header"><a href=
+"#note-to-implementors-1">Note to Implementors</a></h1>
+<p>If an analytic closed form is available for the integral, it
+should be preferred over the numerical integration.</p>
+</div>
+</div>
+<span class='loading-content'>Loading content...</span>
+<h2 id='implementors' class='small-section-header'>
+Implementors<a href='#implementors' class='anchor'></a></h2>
+<div class='item-list' id='implementors-list'>
+<h3 id='impl-Statistics' class='impl'><code class='in-band'>impl
+Statistics for <a class="enum" href=
+"../../boltzmann_solver/statistic/enum.Statistic.html" title=
+"enum boltzmann_solver::statistic::Statistic">Statistic</a></code><a href='#impl-Statistics'
+class='anchor'></a><a class='srclink' href=
+'../../src/boltzmann_solver/statistic.rs.html#137-324' title=
+'goto source code'>[src]</a></h3>
+<div class='impl-items'>
+<h4 id='method.phase_space' class="method"><code id=
+'phase_space.v-1'>fn <a href='#method.phase_space' class=
+'fnname'>phase_space</a>(&amp;self, e: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+m: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+mu: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+beta: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
+-&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
+href='../../src/boltzmann_solver/statistic.rs.html#140-165' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Evaluate the phase space distribution, \(f\) as defined above
+for the four statistics.</p>
+</div>
+<h4 id='method.number_density-1' class="method"><code id=
+'number_density.v-1'>fn <a href='#method.number_density-1' class=
+'fnname'>number_density</a>(&amp;self, mass: <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+mu: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+beta: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
+-&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
+href='../../src/boltzmann_solver/statistic.rs.html#179-268' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Return number density for a particle following the specified
 statistic.</p>
-<p>\begin{equation}
-n = \frac{1}{2 \pi^2} \int_{0}^{\infty} f_{i} u^2 \dd u
-\end{equation}</p>
-<h1 id="implementation-details-2" class="section-header"><a href="#implementation-details-2">Implementation Details</a></h1>
-<p>All four statistics have exact implementations and do not rely on any
-numerical integration.</p>
-</div></div></div><span class='loading-content'>Loading content...</span><script type="text/javascript" src="../../implementors/boltzmann_solver/statistic/trait.Statistics.js" async></script></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "boltzmann_solver";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script defer src="../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>
+<p>\begin{equation} n = \frac{1}{2 \pi^2} \int_{m}^{\infty} f_{i} u
+\sqrt{u^2 - m^2} \dd u \end{equation}</p>
+<h1 id="implementation-details" class="section-header"><a href=
+"#implementation-details">Implementation Details</a></h1>
+<p>Both the Fermi–Dirac and Bose–Einstein statistic rely on
+numerical integration and thus are fairly slow and are prone to
+errors in certain regimes. The Maxwell–Boltzmann and
+Maxwell–Jüttner distributions offer exact implementations.</p>
+</div>
+<h4 id='method.normalized_number_density' class="method"><code id=
+'normalized_number_density.v-1'>fn <a href=
+'#method.normalized_number_density' class=
+'fnname'>normalized_number_density</a>(&amp;self, mass: <a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+mu: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+beta: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
+-&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
+href='../../src/boltzmann_solver/statistic.rs.html#277-295' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Return number density for a particle following the specified
+statistic, normalized to the number density of a massless boson
+with a single degree of freedom.</p>
+<h1 id="implementation-details-1" class="section-header"><a href=
+"#implementation-details-1">Implementation Details</a></h1>
+<p>This implementation assumes that the chemical potential is
+negligible.</p>
+</div>
+<h4 id='method.massless_number_density-1' class="method"><code id=
+'massless_number_density.v-1'>fn <a href=
+'#method.massless_number_density-1' class=
+'fnname'>massless_number_density</a>(&amp;self, mu: <a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+beta: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
+-&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
+href='../../src/boltzmann_solver/statistic.rs.html#308-323' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Return number density for a massless particle following the
+specified statistic.</p>
+<p>\begin{equation} n = \frac{1}{2 \pi^2} \int_{0}^{\infty} f_{i}
+u^2 \dd u \end{equation}</p>
+<h1 id="implementation-details-2" class="section-header"><a href=
+"#implementation-details-2">Implementation Details</a></h1>
+<p>All four statistics have exact implementations and do not rely
+on any numerical integration.</p>
+</div>
+</div>
+</div>
+<span class='loading-content'>Loading content...</span>
+<script type="text/javascript" src=
+"../../implementors/boltzmann_solver/statistic/trait.Statistics.js"
+async></script></section>
+<section id="search" class="content hidden"></section>
+<section class="footer"></section>
+<script>
+window.rootPath = "../../";window.currentCrate = "boltzmann_solver";
+</script>
+<script src="../../aliases.js"></script>
+<script src="../../main.js"></script>
+<script defer src="../../search-index.js"></script>
+</body>
+</html>

@@ -1,4 +1,58 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-utils-0.7.0/src/backoff.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>backoff.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../crossbeam_utils/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="generator" content=
+"HTML Tidy for HTML5 for Linux version 5.6.0">
+<meta charset="utf-8">
+<meta name="viewport" content=
+"width=device-width, initial-scale=1.0">
+<meta name="generator" content="rustdoc">
+<meta name="description" content=
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-utils-0.7.0/src/backoff.rs`.">
+<meta name="keywords" content="rust, rustlang, rust-lang">
+<title>backoff.rs.html -- source</title>
+<link rel="stylesheet" type="text/css" href="../../normalize.css">
+<link rel="stylesheet" type="text/css" href="../../rustdoc.css" id=
+"mainThemeStyle">
+<link rel="stylesheet" type="text/css" href="../../dark.css">
+<link rel="stylesheet" type="text/css" href="../../light.css" id=
+"themeStyle">
+<script src="../../storage.js"></script><noscript>
+<link rel="stylesheet" href="../../noscript.css"></noscript>
+<link rel="shortcut icon" href="../../favicon.ico">
+<style type="text/css">
+#crate-search{background-image:url("../../down-arrow.svg");}
+</style>
+</head>
+<body class="rustdoc source">
+<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
+<nav class="sidebar">
+<div class="sidebar-menu">☰</div>
+<a href='../../crossbeam_utils/index.html'>
+<div class='logo-container'><img src='../../rust-logo.png' alt=
+'logo'></div>
+</a></nav>
+<div class="theme-picker"><button id="theme-picker" aria-label=
+"Pick another theme!"><img src="../../brush.svg" width="18" alt=
+"Pick another theme!"></button>
+<div id="theme-choices"></div>
+</div>
+<script src="../../theme.js"></script>
+<nav class="sub">
+<form class="search-form">
+<div class="search-container">
+<div><select id="crate-search">
+<option value="All crates">All crates</option>
+</select><input class="search-input" name="search" disabled
+autocomplete="off" spellcheck="false" placeholder=
+"Click or press ‘S’ to search, ‘?’ for more options…" type=
+"search"></div>
+<a id="settings-menu" href="../../settings.html"><img src=
+"../../wheel.svg" width="18" alt="Change settings"></a></div>
+</form>
+</nav>
+<section id="main" class="content">
+<pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -290,37 +344,62 @@
 <span id="290">290</span>
 <span id="291">291</span>
 <span id="292">292</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">cell</span>::<span class="ident">Cell</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">fmt</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">sync</span>::<span class="ident">atomic</span>;
+</pre>
+<div class="example-wrap">
+<pre class="rust">
+<span class="kw">use</span> <span class=
+"ident">core</span>::<span class="ident">cell</span>::<span class=
+"ident">Cell</span>;
+<span class="kw">use</span> <span class=
+"ident">core</span>::<span class="ident">fmt</span>;
+<span class="kw">use</span> <span class=
+"ident">core</span>::<span class="ident">sync</span>::<span class=
+"ident">atomic</span>;
 
-<span class="kw">const</span> <span class="ident">SPIN_LIMIT</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">6</span>;
-<span class="kw">const</span> <span class="ident">YIELD_LIMIT</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">10</span>;
+<span class="kw">const</span> <span class=
+"ident">SPIN_LIMIT</span>: <span class=
+"ident">u32</span> <span class="op">=</span> <span class=
+"number">6</span>;
+<span class="kw">const</span> <span class=
+"ident">YIELD_LIMIT</span>: <span class=
+"ident">u32</span> <span class="op">=</span> <span class=
+"number">10</span>;
 
-<span class="doccomment">/// Performs exponential backoff in spin loops.</span>
+<span class=
+"doccomment">/// Performs exponential backoff in spin loops.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Backing off in spin loops reduces contention and improves overall performance.</span>
+<span class=
+"doccomment">/// Backing off in spin loops reduces contention and improves overall performance.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This primitive can execute *YIELD* and *PAUSE* instructions, yield the current thread to the OS</span>
-<span class="doccomment">/// scheduler, and tell when is a good time to block the thread using a different synchronization</span>
-<span class="doccomment">/// mechanism. Each step of the back off procedure takes roughly twice as long as the previous</span>
+<span class=
+"doccomment">/// This primitive can execute *YIELD* and *PAUSE* instructions, yield the current thread to the OS</span>
+<span class=
+"doccomment">/// scheduler, and tell when is a good time to block the thread using a different synchronization</span>
+<span class=
+"doccomment">/// mechanism. Each step of the back off procedure takes roughly twice as long as the previous</span>
 <span class="doccomment">/// step.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Backing off in a lock-free loop:</span>
+<span class=
+"doccomment">/// Backing off in a lock-free loop:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use crossbeam_utils::Backoff;</span>
-<span class="doccomment">/// use std::sync::atomic::AtomicUsize;</span>
-<span class="doccomment">/// use std::sync::atomic::Ordering::SeqCst;</span>
+<span class=
+"doccomment">/// use std::sync::atomic::AtomicUsize;</span>
+<span class=
+"doccomment">/// use std::sync::atomic::Ordering::SeqCst;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// fn fetch_mul(a: &amp;AtomicUsize, b: usize) -&gt; usize {</span>
-<span class="doccomment">///     let backoff = Backoff::new();</span>
+<span class=
+"doccomment">/// fn fetch_mul(a: &amp;AtomicUsize, b: usize) -&gt; usize {</span>
+<span class=
+"doccomment">///     let backoff = Backoff::new();</span>
 <span class="doccomment">///     loop {</span>
-<span class="doccomment">///         let val = a.load(SeqCst);</span>
-<span class="doccomment">///         if a.compare_and_swap(val, val.wrapping_mul(b), SeqCst) == val {</span>
+<span class=
+"doccomment">///         let val = a.load(SeqCst);</span>
+<span class=
+"doccomment">///         if a.compare_and_swap(val, val.wrapping_mul(b), SeqCst) == val {</span>
 <span class="doccomment">///             return val;</span>
 <span class="doccomment">///         }</span>
 <span class="doccomment">///         backoff.spin();</span>
@@ -328,35 +407,47 @@
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Waiting for an [`AtomicBool`] to become `true`:</span>
+<span class=
+"doccomment">/// Waiting for an [`AtomicBool`] to become `true`:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use crossbeam_utils::Backoff;</span>
-<span class="doccomment">/// use std::sync::atomic::AtomicBool;</span>
-<span class="doccomment">/// use std::sync::atomic::Ordering::SeqCst;</span>
+<span class=
+"doccomment">/// use std::sync::atomic::AtomicBool;</span>
+<span class=
+"doccomment">/// use std::sync::atomic::Ordering::SeqCst;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// fn spin_wait(ready: &amp;AtomicBool) {</span>
-<span class="doccomment">///     let backoff = Backoff::new();</span>
+<span class=
+"doccomment">/// fn spin_wait(ready: &amp;AtomicBool) {</span>
+<span class=
+"doccomment">///     let backoff = Backoff::new();</span>
 <span class="doccomment">///     while !ready.load(SeqCst) {</span>
 <span class="doccomment">///         backoff.snooze();</span>
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Waiting for an [`AtomicBool`] to become `true` and parking the thread after a long wait.</span>
-<span class="doccomment">/// Note that whoever sets the atomic variable to `true` must notify the parked thread by calling</span>
+<span class=
+"doccomment">/// Waiting for an [`AtomicBool`] to become `true` and parking the thread after a long wait.</span>
+<span class=
+"doccomment">/// Note that whoever sets the atomic variable to `true` must notify the parked thread by calling</span>
 <span class="doccomment">/// [`unpark()`]:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use crossbeam_utils::Backoff;</span>
-<span class="doccomment">/// use std::sync::atomic::AtomicBool;</span>
-<span class="doccomment">/// use std::sync::atomic::Ordering::SeqCst;</span>
+<span class=
+"doccomment">/// use std::sync::atomic::AtomicBool;</span>
+<span class=
+"doccomment">/// use std::sync::atomic::Ordering::SeqCst;</span>
 <span class="doccomment">/// use std::thread;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// fn blocking_wait(ready: &amp;AtomicBool) {</span>
-<span class="doccomment">///     let backoff = Backoff::new();</span>
+<span class=
+"doccomment">/// fn blocking_wait(ready: &amp;AtomicBool) {</span>
+<span class=
+"doccomment">///     let backoff = Backoff::new();</span>
 <span class="doccomment">///     while !ready.load(SeqCst) {</span>
-<span class="doccomment">///         if backoff.is_completed() {</span>
+<span class=
+"doccomment">///         if backoff.is_completed() {</span>
 <span class="doccomment">///             thread::park();</span>
 <span class="doccomment">///         } else {</span>
 <span class="doccomment">///             backoff.snooze();</span>
@@ -365,13 +456,21 @@
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`is_completed`]: struct.Backoff.html#method.is_completed</span>
-<span class="doccomment">/// [`std::thread::park()`]: https://doc.rust-lang.org/std/thread/fn.park.html</span>
-<span class="doccomment">/// [`Condvar`]: https://doc.rust-lang.org/std/sync/struct.Condvar.html</span>
-<span class="doccomment">/// [`AtomicBool`]: https://doc.rust-lang.org/std/sync/atomic/struct.AtomicBool.html</span>
-<span class="doccomment">/// [`unpark()`]: https://doc.rust-lang.org/std/thread/struct.Thread.html#method.unpark</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Backoff</span> {
-    <span class="ident">step</span>: <span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+<span class=
+"doccomment">/// [`is_completed`]: struct.Backoff.html#method.is_completed</span>
+<span class=
+"doccomment">/// [`std::thread::park()`]: https://doc.rust-lang.org/std/thread/fn.park.html</span>
+<span class=
+"doccomment">/// [`Condvar`]: https://doc.rust-lang.org/std/sync/struct.Condvar.html</span>
+<span class=
+"doccomment">/// [`AtomicBool`]: https://doc.rust-lang.org/std/sync/atomic/struct.AtomicBool.html</span>
+<span class=
+"doccomment">/// [`unpark()`]: https://doc.rust-lang.org/std/thread/struct.Thread.html#method.unpark</span>
+<span class="kw">pub</span> <span class=
+"kw">struct</span> <span class="ident">Backoff</span> {
+    <span class="ident">step</span>: <span class=
+"ident">Cell</span><span class="op">&lt;</span><span class=
+"ident">u32</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Backoff</span> {
@@ -380,13 +479,21 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_utils::Backoff;</span>
+    <span class=
+"doccomment">/// use crossbeam_utils::Backoff;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let backoff = Backoff::new();</span>
+    <span class=
+"doccomment">/// let backoff = Backoff::new();</span>
     <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">Backoff</span> { <span class="ident">step</span>: <span class="ident">Cell</span>::<span class="ident">new</span>(<span class="number">0</span>) }
+    <span class="attribute">#[<span class=
+"ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">new</span>() <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"self">Self</span> {
+        <span class="ident">Backoff</span> { <span class=
+"ident">step</span>: <span class="ident">Cell</span>::<span class=
+"ident">new</span>(<span class="number">0</span>) }
     }
 
     <span class="doccomment">/// Resets the `Backoff`.</span>
@@ -394,194 +501,351 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_utils::Backoff;</span>
+    <span class=
+"doccomment">/// use crossbeam_utils::Backoff;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let backoff = Backoff::new();</span>
+    <span class=
+"doccomment">/// let backoff = Backoff::new();</span>
     <span class="doccomment">/// backoff.reset();</span>
     <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">step</span>.<span class="ident">set</span>(<span class="number">0</span>);
+    <span class="attribute">#[<span class=
+"ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">reset</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) {
+        <span class="self">self</span>.<span class=
+"ident">step</span>.<span class="ident">set</span>(<span class=
+"number">0</span>);
     }
 
-    <span class="doccomment">/// Backs off in a lock-free loop.</span>
+    <span class=
+"doccomment">/// Backs off in a lock-free loop.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This method should be used when we need to retry an operation because another thread made</span>
+    <span class=
+"doccomment">/// This method should be used when we need to retry an operation because another thread made</span>
     <span class="doccomment">/// progress.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The processor may yield using the *YIELD* or *PAUSE* instruction.</span>
+    <span class=
+"doccomment">/// The processor may yield using the *YIELD* or *PAUSE* instruction.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Backing off in a lock-free loop:</span>
+    <span class=
+"doccomment">/// Backing off in a lock-free loop:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_utils::Backoff;</span>
-    <span class="doccomment">/// use std::sync::atomic::AtomicUsize;</span>
-    <span class="doccomment">/// use std::sync::atomic::Ordering::SeqCst;</span>
+    <span class=
+"doccomment">/// use crossbeam_utils::Backoff;</span>
+    <span class=
+"doccomment">/// use std::sync::atomic::AtomicUsize;</span>
+    <span class=
+"doccomment">/// use std::sync::atomic::Ordering::SeqCst;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// fn fetch_mul(a: &amp;AtomicUsize, b: usize) -&gt; usize {</span>
-    <span class="doccomment">///     let backoff = Backoff::new();</span>
+    <span class=
+"doccomment">/// fn fetch_mul(a: &amp;AtomicUsize, b: usize) -&gt; usize {</span>
+    <span class=
+"doccomment">///     let backoff = Backoff::new();</span>
     <span class="doccomment">///     loop {</span>
-    <span class="doccomment">///         let val = a.load(SeqCst);</span>
-    <span class="doccomment">///         if a.compare_and_swap(val, val.wrapping_mul(b), SeqCst) == val {</span>
+    <span class=
+"doccomment">///         let val = a.load(SeqCst);</span>
+    <span class=
+"doccomment">///         if a.compare_and_swap(val, val.wrapping_mul(b), SeqCst) == val {</span>
     <span class="doccomment">///             return val;</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///         backoff.spin();</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let a = AtomicUsize::new(7);</span>
-    <span class="doccomment">/// assert_eq!(fetch_mul(&amp;a, 8), 7);</span>
-    <span class="doccomment">/// assert_eq!(a.load(SeqCst), 56);</span>
+    <span class=
+"doccomment">/// let a = AtomicUsize::new(7);</span>
+    <span class=
+"doccomment">/// assert_eq!(fetch_mul(&amp;a, 8), 7);</span>
+    <span class=
+"doccomment">/// assert_eq!(a.load(SeqCst), 56);</span>
     <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spin</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">step</span>.<span class="ident">get</span>().<span class="ident">min</span>(<span class="ident">SPIN_LIMIT</span>) {
-            <span class="ident">atomic</span>::<span class="ident">spin_loop_hint</span>();
+    <span class="attribute">#[<span class=
+"ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">spin</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) {
+        <span class="kw">for</span> <span class=
+"kw">_</span> <span class="kw">in</span> <span class=
+"number">0</span>..<span class="number">1</span> <span class=
+"op">&lt;</span><span class="op">&lt;</span> <span class=
+"self">self</span>.<span class="ident">step</span>.<span class=
+"ident">get</span>().<span class="ident">min</span>(<span class=
+"ident">SPIN_LIMIT</span>) {
+            <span class="ident">atomic</span>::<span class=
+"ident">spin_loop_hint</span>();
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">step</span>.<span class="ident">get</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">SPIN_LIMIT</span> {
-            <span class="self">self</span>.<span class="ident">step</span>.<span class="ident">set</span>(<span class="self">self</span>.<span class="ident">step</span>.<span class="ident">get</span>() <span class="op">+</span> <span class="number">1</span>);
+        <span class="kw">if</span> <span class=
+"self">self</span>.<span class="ident">step</span>.<span class=
+"ident">get</span>() <span class="op">&lt;</span><span class=
+"op">=</span> <span class="ident">SPIN_LIMIT</span> {
+            <span class="self">self</span>.<span class=
+"ident">step</span>.<span class="ident">set</span>(<span class=
+"self">self</span>.<span class="ident">step</span>.<span class=
+"ident">get</span>() <span class="op">+</span> <span class=
+"number">1</span>);
         }
     }
 
-    <span class="doccomment">/// Backs off in a blocking loop.</span>
+    <span class=
+"doccomment">/// Backs off in a blocking loop.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This method should be used when we need to wait for another thread to make progress.</span>
+    <span class=
+"doccomment">/// This method should be used when we need to wait for another thread to make progress.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The processor may yield using the *YIELD* or *PAUSE* instruction and the current thread</span>
-    <span class="doccomment">/// may yield by giving up a timeslice to the OS scheduler.</span>
+    <span class=
+"doccomment">/// The processor may yield using the *YIELD* or *PAUSE* instruction and the current thread</span>
+    <span class=
+"doccomment">/// may yield by giving up a timeslice to the OS scheduler.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// In `#[no_std]` environments, this method is equivalent to [`spin`].</span>
+    <span class=
+"doccomment">/// In `#[no_std]` environments, this method is equivalent to [`spin`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If possible, use [`is_completed`] to check when it is advised to stop using backoff and</span>
-    <span class="doccomment">/// block the current thread using a different synchronization mechanism instead.</span>
+    <span class=
+"doccomment">/// If possible, use [`is_completed`] to check when it is advised to stop using backoff and</span>
+    <span class=
+"doccomment">/// block the current thread using a different synchronization mechanism instead.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`spin`]: struct.Backoff.html#method.spin</span>
-    <span class="doccomment">/// [`is_completed`]: struct.Backoff.html#method.is_completed</span>
+    <span class=
+"doccomment">/// [`spin`]: struct.Backoff.html#method.spin</span>
+    <span class=
+"doccomment">/// [`is_completed`]: struct.Backoff.html#method.is_completed</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Waiting for an [`AtomicBool`] to become `true`:</span>
+    <span class=
+"doccomment">/// Waiting for an [`AtomicBool`] to become `true`:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_utils::Backoff;</span>
+    <span class=
+"doccomment">/// use crossbeam_utils::Backoff;</span>
     <span class="doccomment">/// use std::sync::Arc;</span>
-    <span class="doccomment">/// use std::sync::atomic::AtomicBool;</span>
-    <span class="doccomment">/// use std::sync::atomic::Ordering::SeqCst;</span>
+    <span class=
+"doccomment">/// use std::sync::atomic::AtomicBool;</span>
+    <span class=
+"doccomment">/// use std::sync::atomic::Ordering::SeqCst;</span>
     <span class="doccomment">/// use std::thread;</span>
     <span class="doccomment">/// use std::time::Duration;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// fn spin_wait(ready: &amp;AtomicBool) {</span>
-    <span class="doccomment">///     let backoff = Backoff::new();</span>
-    <span class="doccomment">///     while !ready.load(SeqCst) {</span>
+    <span class=
+"doccomment">/// fn spin_wait(ready: &amp;AtomicBool) {</span>
+    <span class=
+"doccomment">///     let backoff = Backoff::new();</span>
+    <span class=
+"doccomment">///     while !ready.load(SeqCst) {</span>
     <span class="doccomment">///         backoff.snooze();</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let ready = Arc::new(AtomicBool::new(false));</span>
+    <span class=
+"doccomment">/// let ready = Arc::new(AtomicBool::new(false));</span>
     <span class="doccomment">/// let ready2 = ready.clone();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// thread::spawn(move || {</span>
-    <span class="doccomment">///     thread::sleep(Duration::from_millis(100));</span>
-    <span class="doccomment">///     ready2.store(true, SeqCst);</span>
+    <span class=
+"doccomment">///     thread::sleep(Duration::from_millis(100));</span>
+    <span class=
+"doccomment">///     ready2.store(true, SeqCst);</span>
     <span class="doccomment">/// });</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(ready.load(SeqCst), false);</span>
+    <span class=
+"doccomment">/// assert_eq!(ready.load(SeqCst), false);</span>
     <span class="doccomment">/// spin_wait(&amp;ready);</span>
-    <span class="doccomment">/// assert_eq!(ready.load(SeqCst), true);</span>
+    <span class=
+"doccomment">/// assert_eq!(ready.load(SeqCst), true);</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AtomicBool`]: https://doc.rust-lang.org/std/sync/atomic/struct.AtomicBool.html</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">snooze</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">step</span>.<span class="ident">get</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">SPIN_LIMIT</span> {
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">step</span>.<span class="ident">get</span>() {
-                <span class="ident">atomic</span>::<span class="ident">spin_loop_hint</span>();
+    <span class=
+"doccomment">/// [`AtomicBool`]: https://doc.rust-lang.org/std/sync/atomic/struct.AtomicBool.html</span>
+    <span class="attribute">#[<span class=
+"ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">snooze</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) {
+        <span class="kw">if</span> <span class=
+"self">self</span>.<span class="ident">step</span>.<span class=
+"ident">get</span>() <span class="op">&lt;</span><span class=
+"op">=</span> <span class="ident">SPIN_LIMIT</span> {
+            <span class="kw">for</span> <span class=
+"kw">_</span> <span class="kw">in</span> <span class=
+"number">0</span>..<span class="number">1</span> <span class=
+"op">&lt;</span><span class="op">&lt;</span> <span class=
+"self">self</span>.<span class="ident">step</span>.<span class=
+"ident">get</span>() {
+                <span class="ident">atomic</span>::<span class=
+"ident">spin_loop_hint</span>();
             }
         } <span class="kw">else</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">step</span>.<span class="ident">get</span>() {
-                <span class="ident">atomic</span>::<span class="ident">spin_loop_hint</span>();
+            <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">not</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>))]</span>
+            <span class="kw">for</span> <span class=
+"kw">_</span> <span class="kw">in</span> <span class=
+"number">0</span>..<span class="number">1</span> <span class=
+"op">&lt;</span><span class="op">&lt;</span> <span class=
+"self">self</span>.<span class="ident">step</span>.<span class=
+"ident">get</span>() {
+                <span class="ident">atomic</span>::<span class=
+"ident">spin_loop_hint</span>();
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-            ::<span class="ident">std</span>::<span class="ident">thread</span>::<span class="ident">yield_now</span>();
+            <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">feature</span> <span class=
+"op">=</span> <span class="string">"std"</span>)]</span>
+            ::<span class="ident">std</span>::<span class=
+"ident">thread</span>::<span class="ident">yield_now</span>();
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">step</span>.<span class="ident">get</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">YIELD_LIMIT</span> {
-            <span class="self">self</span>.<span class="ident">step</span>.<span class="ident">set</span>(<span class="self">self</span>.<span class="ident">step</span>.<span class="ident">get</span>() <span class="op">+</span> <span class="number">1</span>);
+        <span class="kw">if</span> <span class=
+"self">self</span>.<span class="ident">step</span>.<span class=
+"ident">get</span>() <span class="op">&lt;</span><span class=
+"op">=</span> <span class="ident">YIELD_LIMIT</span> {
+            <span class="self">self</span>.<span class=
+"ident">step</span>.<span class="ident">set</span>(<span class=
+"self">self</span>.<span class="ident">step</span>.<span class=
+"ident">get</span>() <span class="op">+</span> <span class=
+"number">1</span>);
         }
     }
 
-    <span class="doccomment">/// Returns `true` if exponential backoff has completed and blocking the thread is advised.</span>
+    <span class=
+"doccomment">/// Returns `true` if exponential backoff has completed and blocking the thread is advised.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Waiting for an [`AtomicBool`] to become `true` and parking the thread after a long wait:</span>
+    <span class=
+"doccomment">/// Waiting for an [`AtomicBool`] to become `true` and parking the thread after a long wait:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_utils::Backoff;</span>
+    <span class=
+"doccomment">/// use crossbeam_utils::Backoff;</span>
     <span class="doccomment">/// use std::sync::Arc;</span>
-    <span class="doccomment">/// use std::sync::atomic::AtomicBool;</span>
-    <span class="doccomment">/// use std::sync::atomic::Ordering::SeqCst;</span>
+    <span class=
+"doccomment">/// use std::sync::atomic::AtomicBool;</span>
+    <span class=
+"doccomment">/// use std::sync::atomic::Ordering::SeqCst;</span>
     <span class="doccomment">/// use std::thread;</span>
     <span class="doccomment">/// use std::time::Duration;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// fn blocking_wait(ready: &amp;AtomicBool) {</span>
-    <span class="doccomment">///     let backoff = Backoff::new();</span>
-    <span class="doccomment">///     while !ready.load(SeqCst) {</span>
-    <span class="doccomment">///         if backoff.is_completed() {</span>
+    <span class=
+"doccomment">/// fn blocking_wait(ready: &amp;AtomicBool) {</span>
+    <span class=
+"doccomment">///     let backoff = Backoff::new();</span>
+    <span class=
+"doccomment">///     while !ready.load(SeqCst) {</span>
+    <span class=
+"doccomment">///         if backoff.is_completed() {</span>
     <span class="doccomment">///             thread::park();</span>
     <span class="doccomment">///         } else {</span>
-    <span class="doccomment">///             backoff.snooze();</span>
+    <span class=
+"doccomment">///             backoff.snooze();</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let ready = Arc::new(AtomicBool::new(false));</span>
+    <span class=
+"doccomment">/// let ready = Arc::new(AtomicBool::new(false));</span>
     <span class="doccomment">/// let ready2 = ready.clone();</span>
-    <span class="doccomment">/// let waiter = thread::current();</span>
+    <span class=
+"doccomment">/// let waiter = thread::current();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// thread::spawn(move || {</span>
-    <span class="doccomment">///     thread::sleep(Duration::from_millis(100));</span>
-    <span class="doccomment">///     ready2.store(true, SeqCst);</span>
+    <span class=
+"doccomment">///     thread::sleep(Duration::from_millis(100));</span>
+    <span class=
+"doccomment">///     ready2.store(true, SeqCst);</span>
     <span class="doccomment">///     waiter.unpark();</span>
     <span class="doccomment">/// });</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(ready.load(SeqCst), false);</span>
+    <span class=
+"doccomment">/// assert_eq!(ready.load(SeqCst), false);</span>
     <span class="doccomment">/// blocking_wait(&amp;ready);</span>
-    <span class="doccomment">/// assert_eq!(ready.load(SeqCst), true);</span>
+    <span class=
+"doccomment">/// assert_eq!(ready.load(SeqCst), true);</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AtomicBool`]: https://doc.rust-lang.org/std/sync/atomic/struct.AtomicBool.html</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_completed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">step</span>.<span class="ident">get</span>() <span class="op">&gt;</span> <span class="ident">YIELD_LIMIT</span>
+    <span class=
+"doccomment">/// [`AtomicBool`]: https://doc.rust-lang.org/std/sync/atomic/struct.AtomicBool.html</span>
+    <span class="attribute">#[<span class=
+"ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">is_completed</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">bool</span> {
+        <span class="self">self</span>.<span class=
+"ident">step</span>.<span class="ident">get</span>() <span class=
+"op">&gt;</span> <span class="ident">YIELD_LIMIT</span>
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `is_completed` instead&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_complete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_completed</span>()
+    <span class="attribute">#[<span class=
+"ident">inline</span>]</span>
+    <span class="attribute">#[<span class=
+"ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="attribute">#[<span class=
+"ident">deprecated</span>(<span class=
+"ident">note</span> <span class="op">=</span> <span class=
+"string">"use `is_completed` instead"</span>)]</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">is_complete</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">bool</span> {
+        <span class="self">self</span>.<span class=
+"ident">is_completed</span>()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Backoff</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Backoff&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;step&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">step</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;is_completed&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">is_completed</span>())
+<span class="kw">impl</span> <span class=
+"ident">fmt</span>::<span class="ident">Debug</span> <span class=
+"kw">for</span> <span class="ident">Backoff</span> {
+    <span class="kw">fn</span> <span class=
+"ident">fmt</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">f</span>: <span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">fmt</span>::<span class=
+"ident">Formatter</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">fmt</span>::<span class=
+"prelude-ty">Result</span> {
+        <span class="ident">f</span>.<span class=
+"ident">debug_struct</span>(<span class="string">"Backoff"</span>)
+            .<span class="ident">field</span>(<span class=
+"string">"step"</span>, <span class="kw-2">&</span><span class=
+"self">self</span>.<span class="ident">step</span>)
+            .<span class="ident">field</span>(<span class=
+"string">"is_completed"</span>, <span class=
+"kw-2">&</span><span class="self">self</span>.<span class=
+"ident">is_completed</span>())
             .<span class="ident">finish</span>()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Backoff</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Backoff</span> {
-        <span class="ident">Backoff</span>::<span class="ident">new</span>()
+<span class="kw">impl</span> <span class=
+"ident">Default</span> <span class="kw">for</span> <span class=
+"ident">Backoff</span> {
+    <span class="kw">fn</span> <span class=
+"ident">default</span>() <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">Backoff</span> {
+        <span class="ident">Backoff</span>::<span class=
+"ident">new</span>()
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "crossbeam_utils";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>
+</section>
+<section id="search" class="content hidden"></section>
+<section class="footer"></section>
+<script>
+window.rootPath = "../../";window.currentCrate = "crossbeam_utils";
+</script>
+<script src="../../aliases.js"></script>
+<script src="../../main.js"></script>
+<script src="../../source-script.js"></script>
+<script src="../../source-files.js"></script>
+<script defer src="../../search-index.js"></script>
+</body>
+</html>

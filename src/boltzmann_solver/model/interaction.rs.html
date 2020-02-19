@@ -1,4 +1,59 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/model/interaction.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>interaction.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="generator" content=
+"HTML Tidy for HTML5 for Linux version 5.6.0">
+<meta charset="utf-8">
+<meta name="viewport" content=
+"width=device-width, initial-scale=1.0">
+<meta name="generator" content="rustdoc">
+<meta name="description" content=
+"Source to the Rust file `src/model/interaction.rs`.">
+<meta name="keywords" content="rust, rustlang, rust-lang">
+<title>interaction.rs.html -- source</title>
+<link rel="stylesheet" type="text/css" href=
+"../../../normalize.css">
+<link rel="stylesheet" type="text/css" href="../../../rustdoc.css"
+id="mainThemeStyle">
+<link rel="stylesheet" type="text/css" href="../../../dark.css">
+<link rel="stylesheet" type="text/css" href="../../../light.css"
+id="themeStyle">
+<script src="../../../storage.js"></script><noscript>
+<link rel="stylesheet" href="../../../noscript.css"></noscript>
+<link rel="shortcut icon" href="../../../favicon.ico">
+<style type="text/css">
+#crate-search{background-image:url("../../../down-arrow.svg");}
+</style>
+</head>
+<body class="rustdoc source">
+<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
+<nav class="sidebar">
+<div class="sidebar-menu">☰</div>
+<a href='../../../boltzmann_solver/index.html'>
+<div class='logo-container'><img src='../../../rust-logo.png' alt=
+'logo'></div>
+</a></nav>
+<div class="theme-picker"><button id="theme-picker" aria-label=
+"Pick another theme!"><img src="../../../brush.svg" width="18" alt=
+"Pick another theme!"></button>
+<div id="theme-choices"></div>
+</div>
+<script src="../../../theme.js"></script>
+<nav class="sub">
+<form class="search-form">
+<div class="search-container">
+<div><select id="crate-search">
+<option value="All crates">All crates</option>
+</select><input class="search-input" name="search" disabled
+autocomplete="off" spellcheck="false" placeholder=
+"Click or press ‘S’ to search, ‘?’ for more options…" type=
+"search"></div>
+<a id="settings-menu" href="../../../settings.html"><img src=
+"../../../wheel.svg" width="18" alt="Change settings"></a></div>
+</form>
+</nav>
+<section id="main" class="content">
+<pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -436,444 +491,1177 @@
 <span id="436">436</span>
 <span id="437">437</span>
 <span id="438">438</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! Common trait and implementations for interactions.</span>
+</pre>
+<div class="example-wrap">
+<pre class="rust">
+<span class=
+"doccomment">//! Common trait and implementations for interactions.</span>
 
-<span class="kw">mod</span> <span class="ident">four_particle</span>;
-<span class="kw">mod</span> <span class="ident">partial_width</span>;
-<span class="kw">mod</span> <span class="ident">rate_density</span>;
-<span class="kw">mod</span> <span class="ident">three_particle</span>;
+<span class="kw">mod</span> <span class=
+"ident">four_particle</span>;
+<span class="kw">mod</span> <span class=
+"ident">partial_width</span>;
+<span class="kw">mod</span> <span class=
+"ident">rate_density</span>;
+<span class="kw">mod</span> <span class=
+"ident">three_particle</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">four_particle</span>::<span class="ident">FourParticle</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">partial_width</span>::<span class="ident">PartialWidth</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rate_density</span>::<span class="ident">RateDensity</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">three_particle</span>::<span class="ident">ThreeParticle</span>;
+<span class="kw">pub</span> <span class=
+"kw">use</span> <span class="ident">four_particle</span>::<span class="ident">FourParticle</span>;
+<span class="kw">pub</span> <span class=
+"kw">use</span> <span class="ident">partial_width</span>::<span class="ident">PartialWidth</span>;
+<span class="kw">pub</span> <span class=
+"kw">use</span> <span class="ident">rate_density</span>::<span class="ident">RateDensity</span>;
+<span class="kw">pub</span> <span class=
+"kw">use</span> <span class="ident">three_particle</span>::<span class="ident">ThreeParticle</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">model</span>::<span class="ident">Model</span>, <span class="ident">solver</span>::<span class="ident">Context</span>};
-<span class="kw">use</span> <span class="ident">ndarray</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use</span> <span class=
+"kw">crate</span>::{<span class="ident">model</span>::<span class=
+"ident">Model</span>, <span class=
+"ident">solver</span>::<span class="ident">Context</span>};
+<span class="kw">use</span> <span class=
+"ident">ndarray</span>::<span class=
+"ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">feature</span> <span class=
+"op">=</span> <span class="string">"serde"</span>)]</span>
+<span class="kw">use</span> <span class=
+"ident">serde</span>::{<span class=
+"ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
-<span class="doccomment">/// List of particles involved in the interaction.</span>
+<span class=
+"doccomment">/// List of particles involved in the interaction.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The particles are signed such that particles are &gt; 0 and antiparticles are &lt;</span>
+<span class=
+"doccomment">/// The particles are signed such that particles are &gt; 0 and antiparticles are &lt;</span>
 <span class="doccomment">/// 0.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InteractionParticles</span> {
+<span class="attribute">#[<span class=
+"ident">derive</span>(<span class=
+"ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class=
+"ident">cfg_attr</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"serde"</span>, <span class=
+"ident">derive</span>(<span class=
+"ident">Deserialize</span>, <span class=
+"ident">Serialize</span>))]</span>
+<span class="kw">pub</span> <span class=
+"kw">struct</span> <span class=
+"ident">InteractionParticles</span> {
     <span class="doccomment">/// Initial state particles</span>
-    <span class="kw">pub</span> <span class="ident">incoming</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class=
+"ident">incoming</span>: <span class="ident">Vec</span><span class=
+"op">&lt;</span><span class="ident">isize</span><span class=
+"op">&gt;</span>,
     <span class="doccomment">/// Final state particles</span>
-    <span class="kw">pub</span> <span class="ident">outgoing</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class=
+"ident">outgoing</span>: <span class="ident">Vec</span><span class=
+"op">&lt;</span><span class="ident">isize</span><span class=
+"op">&gt;</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">InteractionParticles</span> {
-    <span class="doccomment">/// Convert the signed particle numbers to indices which can be used to</span>
-    <span class="doccomment">/// index the model&#39;s particle.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InteractionParticleIndices</span> {
+<span class="kw">impl</span> <span class=
+"ident">InteractionParticles</span> {
+    <span class=
+"doccomment">/// Convert the signed particle numbers to indices which can be used to</span>
+    <span class="doccomment">/// index the model's particle.</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">as_idx</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">InteractionParticleIndices</span> {
         <span class="ident">InteractionParticleIndices</span> {
-            <span class="ident">incoming</span>: <span class="self">self</span>.<span class="ident">incoming</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">abs</span>() <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">collect</span>(),
-            <span class="ident">outgoing</span>: <span class="self">self</span>.<span class="ident">outgoing</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">abs</span>() <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">collect</span>(),
+            <span class="ident">incoming</span>: <span class=
+"self">self</span>.<span class="ident">incoming</span>.<span class=
+"ident">iter</span>().<span class="ident">map</span>(<span class=
+"op">|</span><span class="ident">p</span><span class=
+"op">|</span> <span class="ident">p</span>.<span class=
+"ident">abs</span>() <span class="kw">as</span> <span class=
+"ident">usize</span>).<span class="ident">collect</span>(),
+            <span class="ident">outgoing</span>: <span class=
+"self">self</span>.<span class="ident">outgoing</span>.<span class=
+"ident">iter</span>().<span class="ident">map</span>(<span class=
+"op">|</span><span class="ident">p</span><span class=
+"op">|</span> <span class="ident">p</span>.<span class=
+"ident">abs</span>() <span class="kw">as</span> <span class=
+"ident">usize</span>).<span class="ident">collect</span>(),
         }
     }
 
-    <span class="doccomment">/// Convert the signed particle to its signum (as a floating point).</span>
+    <span class=
+"doccomment">/// Convert the signed particle to its signum (as a floating point).</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is used in calculations of changes in asymmetry to determine which</span>
-    <span class="doccomment">/// sign the change really ought to be.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InteractionParticleSigns</span> {
+    <span class=
+"doccomment">/// This is used in calculations of changes in asymmetry to determine which</span>
+    <span class=
+"doccomment">/// sign the change really ought to be.</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">as_sign</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">InteractionParticleSigns</span> {
         <span class="ident">InteractionParticleSigns</span> {
-            <span class="ident">incoming</span>: <span class="self">self</span>.<span class="ident">incoming</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">signum</span>() <span class="kw">as</span> <span class="ident">f64</span>).<span class="ident">collect</span>(),
-            <span class="ident">outgoing</span>: <span class="self">self</span>.<span class="ident">outgoing</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">signum</span>() <span class="kw">as</span> <span class="ident">f64</span>).<span class="ident">collect</span>(),
+            <span class="ident">incoming</span>: <span class=
+"self">self</span>.<span class="ident">incoming</span>.<span class=
+"ident">iter</span>().<span class="ident">map</span>(<span class=
+"op">|</span><span class="ident">p</span><span class=
+"op">|</span> <span class="ident">p</span>.<span class=
+"ident">signum</span>() <span class="kw">as</span> <span class=
+"ident">f64</span>).<span class="ident">collect</span>(),
+            <span class="ident">outgoing</span>: <span class=
+"self">self</span>.<span class="ident">outgoing</span>.<span class=
+"ident">iter</span>().<span class="ident">map</span>(<span class=
+"op">|</span><span class="ident">p</span><span class=
+"op">|</span> <span class="ident">p</span>.<span class=
+"ident">signum</span>() <span class="kw">as</span> <span class=
+"ident">f64</span>).<span class="ident">collect</span>(),
         }
     }
 }
 
-<span class="doccomment">/// List of particle indices involved in the interaction.</span>
+<span class=
+"doccomment">/// List of particle indices involved in the interaction.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This can be used to obtain the particle from the model&#39;s</span>
+<span class=
+"doccomment">/// This can be used to obtain the particle from the model's</span>
 <span class="doccomment">/// [`Model::particles`] function.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InteractionParticleIndices</span> {
+<span class="attribute">#[<span class=
+"ident">derive</span>(<span class=
+"ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class=
+"ident">cfg_attr</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"serde"</span>, <span class=
+"ident">derive</span>(<span class=
+"ident">Deserialize</span>, <span class=
+"ident">Serialize</span>))]</span>
+<span class="kw">pub</span> <span class=
+"kw">struct</span> <span class=
+"ident">InteractionParticleIndices</span> {
     <span class="doccomment">/// Initial state particles</span>
-    <span class="kw">pub</span> <span class="ident">incoming</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class=
+"ident">incoming</span>: <span class="ident">Vec</span><span class=
+"op">&lt;</span><span class="ident">usize</span><span class=
+"op">&gt;</span>,
     <span class="doccomment">/// Final state particles</span>
-    <span class="kw">pub</span> <span class="ident">outgoing</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class=
+"ident">outgoing</span>: <span class="ident">Vec</span><span class=
+"op">&lt;</span><span class="ident">usize</span><span class=
+"op">&gt;</span>,
 }
 
-<span class="doccomment">/// The signed particle to its signum (as a floating point).</span>
+<span class=
+"doccomment">/// The signed particle to its signum (as a floating point).</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This is used in calculations of changes in asymmetry to determine which sign</span>
+<span class=
+"doccomment">/// This is used in calculations of changes in asymmetry to determine which sign</span>
 <span class="doccomment">/// the change really ought to be.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InteractionParticleSigns</span> {
+<span class="attribute">#[<span class=
+"ident">derive</span>(<span class=
+"ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class=
+"ident">cfg_attr</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"serde"</span>, <span class=
+"ident">derive</span>(<span class=
+"ident">Deserialize</span>, <span class=
+"ident">Serialize</span>))]</span>
+<span class="kw">pub</span> <span class=
+"kw">struct</span> <span class=
+"ident">InteractionParticleSigns</span> {
     <span class="doccomment">/// Initial state particles</span>
-    <span class="kw">pub</span> <span class="ident">incoming</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class=
+"ident">incoming</span>: <span class="ident">Vec</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>,
     <span class="doccomment">/// Final state particles</span>
-    <span class="kw">pub</span> <span class="ident">outgoing</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class=
+"ident">outgoing</span>: <span class="ident">Vec</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>,
 }
 
-<span class="doccomment">/// Generic interaction between particles.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Interaction</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
+<span class=
+"doccomment">/// Generic interaction between particles.</span>
+<span class="kw">pub</span> <span class=
+"kw">trait</span> <span class=
+"ident">Interaction</span><span class="op">&lt;</span><span class=
+"ident">M</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">M</span>: <span class="ident">Model</span>,
 {
-    <span class="doccomment">/// Return the particles involved in this interaction</span>
-    <span class="kw">fn</span> <span class="ident">particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">InteractionParticles</span>;
+    <span class=
+"doccomment">/// Return the particles involved in this interaction</span>
+    <span class="kw">fn</span> <span class=
+"ident">particles</span>(<span class="kw-2">&</span><span class=
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="kw-2">&</span><span class=
+"ident">InteractionParticles</span>;
 
-    <span class="doccomment">/// Return the particles involved in this interaction, not distinguishing</span>
-    <span class="doccomment">/// between particles an antiparticles.</span>
-    <span class="kw">fn</span> <span class="ident">particles_idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">InteractionParticleIndices</span>;
+    <span class=
+"doccomment">/// Return the particles involved in this interaction, not distinguishing</span>
+    <span class=
+"doccomment">/// between particles an antiparticles.</span>
+    <span class="kw">fn</span> <span class=
+"ident">particles_idx</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"kw-2">&</span><span class=
+"ident">InteractionParticleIndices</span>;
 
-    <span class="doccomment">/// Return the sign of the particles, with +1 for a particle and -1 for an</span>
+    <span class=
+"doccomment">/// Return the sign of the particles, with +1 for a particle and -1 for an</span>
     <span class="doccomment">/// antiparticle.</span>
-    <span class="kw">fn</span> <span class="ident">particles_sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">InteractionParticleSigns</span>;
+    <span class="kw">fn</span> <span class=
+"ident">particles_sign</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"kw-2">&</span><span class="ident">InteractionParticleSigns</span>;
 
-    <span class="doccomment">/// Whether this interaction is to be used to determine decays.</span>
+    <span class=
+"doccomment">/// Whether this interaction is to be used to determine decays.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If width calcuilations are disable, then [`width`] is expected to return</span>
-    <span class="doccomment">/// `None` all the time.  If it is enabled, then [`width`] is expected to</span>
-    <span class="doccomment">/// return `None` only when the decay is not kinematically allowed.</span>
-    <span class="kw">fn</span> <span class="ident">width_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class=
+"doccomment">/// If width calcuilations are disable, then [`width`] is expected to return</span>
+    <span class=
+"doccomment">/// `None` all the time.  If it is enabled, then [`width`] is expected to</span>
+    <span class=
+"doccomment">/// return `None` only when the decay is not kinematically allowed.</span>
+    <span class="kw">fn</span> <span class=
+"ident">width_enabled</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">bool</span>;
 
-    <span class="doccomment">/// Calculate the decay width associated with a particular interaction.</span>
+    <span class=
+"doccomment">/// Calculate the decay width associated with a particular interaction.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// There may not be a result if the decay is not kinematically allowed, or</span>
+    <span class=
+"doccomment">/// There may not be a result if the decay is not kinematically allowed, or</span>
     <span class="doccomment">/// not relevant.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The default implementation simply returns `None` and must be implemented</span>
-    <span class="doccomment">/// manually.  Care must be taken to obey [`width_enabled`] in order to</span>
-    <span class="doccomment">/// avoid unnecessary computation (though the incorrect implementation will</span>
-    <span class="doccomment">/// not be detrimental other than in performance).</span>
-    <span class="kw">fn</span> <span class="ident">width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartialWidth</span><span class="op">&gt;</span> {
+    <span class=
+"doccomment">/// The default implementation simply returns `None` and must be implemented</span>
+    <span class=
+"doccomment">/// manually.  Care must be taken to obey [`width_enabled`] in order to</span>
+    <span class=
+"doccomment">/// avoid unnecessary computation (though the incorrect implementation will</span>
+    <span class=
+"doccomment">/// not be detrimental other than in performance).</span>
+    <span class="kw">fn</span> <span class=
+"ident">width</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="kw">_</span>: <span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Option</span><span class=
+"op">&lt;</span><span class="ident">PartialWidth</span><span class=
+"op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 
-    <span class="doccomment">/// Whether this interaction is to be used within the Boltzmann equations.</span>
+    <span class=
+"doccomment">/// Whether this interaction is to be used within the Boltzmann equations.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If this returns true, then [`gamma`] is expected to return `None`.</span>
-    <span class="kw">fn</span> <span class="ident">gamma_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class=
+"doccomment">/// If this returns true, then [`gamma`] is expected to return `None`.</span>
+    <span class="kw">fn</span> <span class=
+"ident">gamma_enabled</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">bool</span>;
 
-    <span class="doccomment">/// Calculate the reaction rate density of this interaction.</span>
+    <span class=
+"doccomment">/// Calculate the reaction rate density of this interaction.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This must return the result *before* it is normalized by the Hubble rate</span>
-    <span class="doccomment">/// or other factors related to the number densities of particles involved.</span>
-    <span class="doccomment">/// It also must *not* be normalized to the integration step size.</span>
+    <span class=
+"doccomment">/// This must return the result *before* it is normalized by the Hubble rate</span>
+    <span class=
+"doccomment">/// or other factors related to the number densities of particles involved.</span>
+    <span class=
+"doccomment">/// It also must *not* be normalized to the integration step size.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Care must be taken to obey [`gamma_enabled`] in order to avoid</span>
-    <span class="doccomment">/// computation.  Specifically, this should always return `None` when</span>
-    <span class="doccomment">/// `self.gamma_enabled() == true`.</span>
-    <span class="kw">fn</span> <span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+    <span class=
+"doccomment">/// Care must be taken to obey [`gamma_enabled`] in order to avoid</span>
+    <span class=
+"doccomment">/// computation.  Specifically, this should always return `None` when</span>
+    <span class=
+"doccomment">/// `self.gamma_enabled() == true`.</span>
+    <span class="kw">fn</span> <span class=
+"ident">gamma</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">c</span>: <span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Option</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>;
 
     <span class="doccomment">/// Asymmetry</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// TODO: Document better</span>
-    <span class="kw">fn</span> <span class="ident">asymmetry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class=
+"ident">asymmetry</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">_c</span>: <span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Option</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 
-    <span class="doccomment">/// Calculate the actual interaction rates density taking into account</span>
-    <span class="doccomment">/// factors related to the number densities of particles involved.</span>
+    <span class=
+"doccomment">/// Calculate the actual interaction rates density taking into account</span>
+    <span class=
+"doccomment">/// factors related to the number densities of particles involved.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The result must not be normalized by the Hubble rate, nor include the</span>
-    <span class="doccomment">/// factors relating to the integration step size.</span>
-    <span class="kw">fn</span> <span class="ident">rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">gamma</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
-        <span class="comment">// If there&#39;s no interaction rate or it is 0 to begin with, there&#39;s no</span>
-        <span class="comment">// need to adjust it to the particles&#39; number densities.</span>
-        <span class="kw">if</span> <span class="ident">gamma</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">gamma</span><span class="op">|</span> <span class="ident">gamma</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>) {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class=
+"doccomment">/// The result must not be normalized by the Hubble rate, nor include the</span>
+    <span class=
+"doccomment">/// factors relating to the integration step size.</span>
+    <span class="kw">fn</span> <span class=
+"ident">rate</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">gamma</span>: <span class=
+"prelude-ty">Option</span><span class="op">&lt;</span><span class=
+"ident">f64</span><span class="op">&gt;</span>, <span class=
+"ident">c</span>: <span class="kw-2">&</span><span class=
+"ident">Context</span><span class="op">&lt;</span><span class=
+"ident">M</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"prelude-ty">Option</span><span class="op">&lt;</span><span class=
+"ident">RateDensity</span><span class="op">&gt;</span> {
+        <span class=
+"comment">// If there's no interaction rate or it is 0 to begin with, there's no</span>
+        <span class=
+"comment">// need to adjust it to the particles' number densities.</span>
+        <span class="kw">if</span> <span class=
+"ident">gamma</span>.<span class="ident">map_or</span>(<span class=
+"bool-val">true</span>, <span class="op">|</span><span class=
+"ident">gamma</span><span class="op">|</span> <span class=
+"ident">gamma</span> <span class="op">=</span><span class=
+"op">=</span> <span class="number">0.0</span>) {
+            <span class="kw">return</span> <span class=
+"prelude-val">None</span>;
         }
-        <span class="kw">let</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class=
+"ident">gamma</span> <span class="op">=</span> <span class=
+"ident">gamma</span>.<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">particles_idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">particles_idx</span>();
-        <span class="kw">let</span> <span class="ident">particles_sign</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">particles_sign</span>();
+        <span class="kw">let</span> <span class=
+"ident">particles_idx</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class="ident">particles_idx</span>();
+        <span class="kw">let</span> <span class=
+"ident">particles_sign</span> <span class=
+"op">=</span> <span class="self">self</span>.<span class=
+"ident">particles_sign</span>();
 
-        <span class="comment">// A NaN should only occur from `0.0 / 0.0`, in which case the correct</span>
+        <span class=
+"comment">// A NaN should only occur from `0.0 / 0.0`, in which case the correct</span>
         <span class="comment">// value ought to be 0.</span>
-        <span class="kw">let</span> <span class="ident">forward</span> <span class="op">=</span> <span class="ident">nan_to_zero</span>(
+        <span class="kw">let</span> <span class=
+"ident">forward</span> <span class="op">=</span> <span class=
+"ident">nan_to_zero</span>(
             <span class="ident">particles_idx</span>
                 .<span class="ident">incoming</span>
                 .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">p</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">p</span>] <span class="op">/</span> <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">p</span>])
+                .<span class="ident">map</span>(<span class=
+"op">|</span><span class="kw-2">&</span><span class=
+"ident">p</span><span class="op">|</span> <span class=
+"ident">c</span>.<span class="ident">n</span>[<span class=
+"ident">p</span>] <span class="op">/</span> <span class=
+"ident">c</span>.<span class="ident">eq</span>[<span class=
+"ident">p</span>])
                 .<span class="ident">product</span>(),
         );
-        <span class="kw">let</span> <span class="ident">backward</span> <span class="op">=</span> <span class="ident">nan_to_zero</span>(
+        <span class="kw">let</span> <span class=
+"ident">backward</span> <span class="op">=</span> <span class=
+"ident">nan_to_zero</span>(
             <span class="ident">particles_idx</span>
                 .<span class="ident">outgoing</span>
                 .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">p</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">p</span>] <span class="op">/</span> <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">p</span>])
+                .<span class="ident">map</span>(<span class=
+"op">|</span><span class="kw-2">&</span><span class=
+"ident">p</span><span class="op">|</span> <span class=
+"ident">c</span>.<span class="ident">n</span>[<span class=
+"ident">p</span>] <span class="op">/</span> <span class=
+"ident">c</span>.<span class="ident">eq</span>[<span class=
+"ident">p</span>])
                 .<span class="ident">product</span>(),
         );
-        <span class="kw">let</span> <span class="ident">asymmetric_forward</span> <span class="op">=</span> <span class="ident">forward</span>
-            <span class="op">-</span> <span class="ident">nan_to_zero</span>(
+        <span class="kw">let</span> <span class=
+"ident">asymmetric_forward</span> <span class=
+"op">=</span> <span class="ident">forward</span>
+            <span class="op">-</span> <span class=
+"ident">nan_to_zero</span>(
                 <span class="ident">particles_idx</span>
                     .<span class="ident">incoming</span>
                     .<span class="ident">iter</span>()
-                    .<span class="ident">zip</span>(<span class="kw-2">&amp;</span><span class="ident">particles_sign</span>.<span class="ident">incoming</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>, <span class="kw-2">&amp;</span><span class="ident">a</span>)<span class="op">|</span> (<span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">p</span>] <span class="op">-</span> <span class="ident">a</span> <span class="op">*</span> <span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">p</span>]) <span class="op">/</span> <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">p</span>])
+                    .<span class="ident">zip</span>(<span class=
+"kw-2">&</span><span class=
+"ident">particles_sign</span>.<span class="ident">incoming</span>)
+                    .<span class="ident">map</span>(<span class=
+"op">|</span>(<span class="kw-2">&</span><span class=
+"ident">p</span>, <span class="kw-2">&</span><span class=
+"ident">a</span>)<span class="op">|</span> (<span class=
+"ident">c</span>.<span class="ident">n</span>[<span class=
+"ident">p</span>] <span class="op">-</span> <span class=
+"ident">a</span> <span class="op">*</span> <span class=
+"ident">c</span>.<span class="ident">na</span>[<span class=
+"ident">p</span>]) <span class="op">/</span> <span class=
+"ident">c</span>.<span class="ident">eq</span>[<span class=
+"ident">p</span>])
                     .<span class="ident">product</span>(),
             );
-        <span class="kw">let</span> <span class="ident">asymmetric_backward</span> <span class="op">=</span> <span class="ident">forward</span>
-            <span class="op">-</span> <span class="ident">nan_to_zero</span>(
+        <span class="kw">let</span> <span class=
+"ident">asymmetric_backward</span> <span class=
+"op">=</span> <span class="ident">forward</span>
+            <span class="op">-</span> <span class=
+"ident">nan_to_zero</span>(
                 <span class="ident">particles_idx</span>
                     .<span class="ident">outgoing</span>
                     .<span class="ident">iter</span>()
-                    .<span class="ident">zip</span>(<span class="kw-2">&amp;</span><span class="ident">particles_sign</span>.<span class="ident">outgoing</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>, <span class="kw-2">&amp;</span><span class="ident">a</span>)<span class="op">|</span> (<span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">p</span>] <span class="op">-</span> <span class="ident">a</span> <span class="op">*</span> <span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">p</span>]) <span class="op">/</span> <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">p</span>])
+                    .<span class="ident">zip</span>(<span class=
+"kw-2">&</span><span class=
+"ident">particles_sign</span>.<span class="ident">outgoing</span>)
+                    .<span class="ident">map</span>(<span class=
+"op">|</span>(<span class="kw-2">&</span><span class=
+"ident">p</span>, <span class="kw-2">&</span><span class=
+"ident">a</span>)<span class="op">|</span> (<span class=
+"ident">c</span>.<span class="ident">n</span>[<span class=
+"ident">p</span>] <span class="op">-</span> <span class=
+"ident">a</span> <span class="op">*</span> <span class=
+"ident">c</span>.<span class="ident">na</span>[<span class=
+"ident">p</span>]) <span class="op">/</span> <span class=
+"ident">c</span>.<span class="ident">eq</span>[<span class=
+"ident">p</span>])
                     .<span class="ident">product</span>(),
             );
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rate</span> <span class="op">=</span> <span class="ident">RateDensity</span> {
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">rate</span> <span class=
+"op">=</span> <span class="ident">RateDensity</span> {
             <span class="ident">forward</span>,
             <span class="ident">backward</span>,
             <span class="ident">asymmetric_forward</span>,
             <span class="ident">asymmetric_backward</span>,
         };
-        <span class="ident">rate</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">gamma</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">rate</span>)
+        <span class="ident">rate</span> <span class=
+"kw-2">*</span><span class="op">=</span> <span class=
+"ident">gamma</span>;
+        <span class="prelude-val">Some</span>(<span class=
+"ident">rate</span>)
     }
 
-    <span class="doccomment">/// Adjust the backward and forward rates such that they do not</span>
-    <span class="doccomment">/// overshoot the equilibrium number densities.</span>
+    <span class=
+"doccomment">/// Adjust the backward and forward rates such that they do not</span>
+    <span class=
+"doccomment">/// overshoot the equilibrium number densities.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The rate density going into this function is expected to be the output</span>
-    <span class="doccomment">/// of [`rate`] and must not be previously normalized to the Hubble rate nor</span>
-    <span class="doccomment">/// include factors relating to the integration step size.</span>
+    <span class=
+"doccomment">/// The rate density going into this function is expected to be the output</span>
+    <span class=
+"doccomment">/// of [`rate`] and must not be previously normalized to the Hubble rate nor</span>
+    <span class=
+"doccomment">/// include factors relating to the integration step size.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The output of this function however *will* be normalized by the HUbble</span>
-    <span class="doccomment">/// rate and *will* factors relating to the numerical integration.</span>
-    <span class="kw">fn</span> <span class="ident">adjust_rate_overshoot</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">rate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span>,
-        <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rate</span> <span class="op">=</span> <span class="ident">rate</span><span class="question-mark">?</span>;
+    <span class=
+"doccomment">/// The output of this function however *will* be normalized by the HUbble</span>
+    <span class=
+"doccomment">/// rate and *will* factors relating to the numerical integration.</span>
+    <span class="kw">fn</span> <span class=
+"ident">adjust_rate_overshoot</span>(
+        <span class="kw-2">&</span><span class="self">self</span>,
+        <span class="ident">rate</span>: <span class=
+"prelude-ty">Option</span><span class="op">&lt;</span><span class=
+"ident">RateDensity</span><span class="op">&gt;</span>,
+        <span class="ident">c</span>: <span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>,
+    ) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Option</span><span class=
+"op">&lt;</span><span class="ident">RateDensity</span><span class=
+"op">&gt;</span> {
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">rate</span> <span class=
+"op">=</span> <span class="ident">rate</span><span class=
+"question-mark">?</span>;
 
-        <span class="ident">rate</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">c</span>.<span class="ident">step_size</span> <span class="op">*</span> <span class="ident">c</span>.<span class="ident">normalization</span>;
+        <span class="ident">rate</span> <span class=
+"kw-2">*</span><span class="op">=</span> <span class=
+"ident">c</span>.<span class="ident">step_size</span> <span class=
+"op">*</span> <span class="ident">c</span>.<span class=
+"ident">normalization</span>;
 
-        <span class="comment">// If an overshoot of the interaction rate is detected, the rate is</span>
-        <span class="comment">// adjusted such that `dn` satisfies:</span>
+        <span class=
+"comment">// If an overshoot of the interaction rate is detected, the rate is</span>
+        <span class=
+"comment">// adjusted such that `dn` satisfies:</span>
         <span class="comment">//</span>
         <span class="comment">// ```text</span>
-        <span class="comment">// n + dn = (eq + (ALPHA - 1) * n) / ALPHA</span>
+        <span class=
+"comment">// n + dn = (eq + (ALPHA - 1) * n) / ALPHA</span>
         <span class="comment">// ```</span>
         <span class="comment">//</span>
-        <span class="comment">// Large values means that the correction towards equilibrium are</span>
-        <span class="comment">// weaker, while smaller values make the move towards equilibrium</span>
-        <span class="comment">// stronger.  Values of ALPHA less than 1 will overshoot the</span>
+        <span class=
+"comment">// Large values means that the correction towards equilibrium are</span>
+        <span class=
+"comment">// weaker, while smaller values make the move towards equilibrium</span>
+        <span class=
+"comment">// stronger.  Values of ALPHA less than 1 will overshoot the</span>
         <span class="comment">// equilibrium.</span>
-        <span class="kw">const</span> <span class="ident">ALPHA_N</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">1.1</span>;
-        <span class="kw">const</span> <span class="ident">ALPHA_NA</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">1.1</span>;
+        <span class="kw">const</span> <span class=
+"ident">ALPHA_N</span>: <span class="ident">f64</span> <span class=
+"op">=</span> <span class="number">1.1</span>;
+        <span class="kw">const</span> <span class=
+"ident">ALPHA_NA</span>: <span class=
+"ident">f64</span> <span class="op">=</span> <span class=
+"number">1.1</span>;
 
-        <span class="kw">let</span> <span class="ident">particles_idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">particles_idx</span>();
-        <span class="kw">let</span> <span class="ident">particles_sign</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">particles_sign</span>();
+        <span class="kw">let</span> <span class=
+"ident">particles_idx</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class="ident">particles_idx</span>();
+        <span class="kw">let</span> <span class=
+"ident">particles_sign</span> <span class=
+"op">=</span> <span class="self">self</span>.<span class=
+"ident">particles_sign</span>();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">net_rate</span> <span class="op">=</span> <span class="ident">rate</span>.<span class="ident">net_rate</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">net_asymmetric_rate</span> <span class="op">=</span> <span class="ident">rate</span>.<span class="ident">net_asymmetric_rate</span>();
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">net_rate</span> <span class=
+"op">=</span> <span class="ident">rate</span>.<span class=
+"ident">net_rate</span>();
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class=
+"ident">net_asymmetric_rate</span> <span class=
+"op">=</span> <span class="ident">rate</span>.<span class=
+"ident">net_asymmetric_rate</span>();
 
-        <span class="kw">if</span> <span class="ident">net_rate</span> <span class="op">!</span><span class="op">=</span> <span class="number">0.0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">net_asymmetric_rate</span> <span class="op">!</span><span class="op">=</span> <span class="number">0.0</span> {
-            <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">p</span>, <span class="ident">a</span>) <span class="kw">in</span> <span class="ident">particles_idx</span>.<span class="ident">incoming</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="kw-2">&amp;</span><span class="ident">particles_sign</span>.<span class="ident">incoming</span>) {
-                <span class="kw">if</span> <span class="ident">overshoots</span>(<span class="ident">c</span>, <span class="ident">p</span>, <span class="op">-</span><span class="ident">net_rate</span>) {
-                    <span class="ident">rate</span>.<span class="ident">forward</span> <span class="op">=</span> (<span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">p</span>] <span class="op">-</span> <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">p</span>]) <span class="op">/</span> <span class="ident">ALPHA_N</span> <span class="op">+</span> <span class="ident">rate</span>.<span class="ident">backward</span>;
-                    <span class="ident">net_rate</span> <span class="op">=</span> <span class="ident">rate</span>.<span class="ident">net_rate</span>();
+        <span class="kw">if</span> <span class=
+"ident">net_rate</span> <span class="op">!</span><span class=
+"op">=</span> <span class="number">0.0</span> <span class=
+"op">|</span><span class="op">|</span> <span class=
+"ident">net_asymmetric_rate</span> <span class=
+"op">!</span><span class="op">=</span> <span class=
+"number">0.0</span> {
+            <span class="kw">for</span> (<span class=
+"kw-2">&</span><span class="ident">p</span>, <span class=
+"ident">a</span>) <span class="kw">in</span> <span class=
+"ident">particles_idx</span>.<span class=
+"ident">incoming</span>.<span class=
+"ident">iter</span>().<span class="ident">zip</span>(<span class=
+"kw-2">&</span><span class=
+"ident">particles_sign</span>.<span class=
+"ident">incoming</span>) {
+                <span class="kw">if</span> <span class=
+"ident">overshoots</span>(<span class=
+"ident">c</span>, <span class="ident">p</span>, <span class=
+"op">-</span><span class="ident">net_rate</span>) {
+                    <span class="ident">rate</span>.<span class=
+"ident">forward</span> <span class="op">=</span> (<span class=
+"ident">c</span>.<span class="ident">n</span>[<span class=
+"ident">p</span>] <span class="op">-</span> <span class=
+"ident">c</span>.<span class="ident">eq</span>[<span class=
+"ident">p</span>]) <span class="op">/</span> <span class=
+"ident">ALPHA_N</span> <span class="op">+</span> <span class=
+"ident">rate</span>.<span class="ident">backward</span>;
+                    <span class=
+"ident">net_rate</span> <span class="op">=</span> <span class=
+"ident">rate</span>.<span class="ident">net_rate</span>();
                 }
-                <span class="kw">if</span> <span class="ident">asymmetry_overshoots</span>(<span class="ident">c</span>, <span class="ident">p</span>, <span class="op">-</span><span class="ident">a</span> <span class="op">*</span> <span class="ident">net_asymmetric_rate</span>) {
-                    <span class="ident">rate</span>.<span class="ident">asymmetric_forward</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">p</span>] <span class="op">/</span> <span class="ident">ALPHA_NA</span> <span class="op">+</span> <span class="ident">rate</span>.<span class="ident">asymmetric_backward</span>;
-                    <span class="ident">net_asymmetric_rate</span> <span class="op">=</span> <span class="ident">rate</span>.<span class="ident">net_asymmetric_rate</span>();
+                <span class="kw">if</span> <span class=
+"ident">asymmetry_overshoots</span>(<span class=
+"ident">c</span>, <span class="ident">p</span>, <span class=
+"op">-</span><span class="ident">a</span> <span class=
+"op">*</span> <span class="ident">net_asymmetric_rate</span>) {
+                    <span class="ident">rate</span>.<span class=
+"ident">asymmetric_forward</span> <span class=
+"op">=</span> <span class="ident">c</span>.<span class=
+"ident">na</span>[<span class="ident">p</span>] <span class=
+"op">/</span> <span class="ident">ALPHA_NA</span> <span class=
+"op">+</span> <span class="ident">rate</span>.<span class=
+"ident">asymmetric_backward</span>;
+                    <span class=
+"ident">net_asymmetric_rate</span> <span class=
+"op">=</span> <span class="ident">rate</span>.<span class=
+"ident">net_asymmetric_rate</span>();
                 }
             }
-            <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">p</span>, <span class="ident">a</span>) <span class="kw">in</span> <span class="ident">particles_idx</span>.<span class="ident">outgoing</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="kw-2">&amp;</span><span class="ident">particles_sign</span>.<span class="ident">outgoing</span>) {
-                <span class="kw">if</span> <span class="ident">overshoots</span>(<span class="ident">c</span>, <span class="ident">p</span>, <span class="ident">net_rate</span>) {
-                    <span class="ident">rate</span>.<span class="ident">backward</span> <span class="op">=</span> (<span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">p</span>] <span class="op">-</span> <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">p</span>]) <span class="op">/</span> <span class="ident">ALPHA_N</span> <span class="op">+</span> <span class="ident">rate</span>.<span class="ident">forward</span>;
-                    <span class="ident">net_rate</span> <span class="op">=</span> <span class="ident">rate</span>.<span class="ident">net_rate</span>();
+            <span class="kw">for</span> (<span class=
+"kw-2">&</span><span class="ident">p</span>, <span class=
+"ident">a</span>) <span class="kw">in</span> <span class=
+"ident">particles_idx</span>.<span class=
+"ident">outgoing</span>.<span class=
+"ident">iter</span>().<span class="ident">zip</span>(<span class=
+"kw-2">&</span><span class=
+"ident">particles_sign</span>.<span class=
+"ident">outgoing</span>) {
+                <span class="kw">if</span> <span class=
+"ident">overshoots</span>(<span class=
+"ident">c</span>, <span class="ident">p</span>, <span class=
+"ident">net_rate</span>) {
+                    <span class="ident">rate</span>.<span class=
+"ident">backward</span> <span class="op">=</span> (<span class=
+"ident">c</span>.<span class="ident">n</span>[<span class=
+"ident">p</span>] <span class="op">-</span> <span class=
+"ident">c</span>.<span class="ident">eq</span>[<span class=
+"ident">p</span>]) <span class="op">/</span> <span class=
+"ident">ALPHA_N</span> <span class="op">+</span> <span class=
+"ident">rate</span>.<span class="ident">forward</span>;
+                    <span class=
+"ident">net_rate</span> <span class="op">=</span> <span class=
+"ident">rate</span>.<span class="ident">net_rate</span>();
                 }
-                <span class="kw">if</span> <span class="ident">asymmetry_overshoots</span>(<span class="ident">c</span>, <span class="ident">p</span>, <span class="ident">a</span> <span class="op">*</span> <span class="ident">net_asymmetric_rate</span>) {
-                    <span class="ident">rate</span>.<span class="ident">asymmetric_backward</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">p</span>] <span class="op">/</span> <span class="ident">ALPHA_NA</span> <span class="op">+</span> <span class="ident">rate</span>.<span class="ident">asymmetric_forward</span>;
-                    <span class="ident">net_asymmetric_rate</span> <span class="op">=</span> <span class="ident">rate</span>.<span class="ident">net_asymmetric_rate</span>();
+                <span class="kw">if</span> <span class=
+"ident">asymmetry_overshoots</span>(<span class=
+"ident">c</span>, <span class="ident">p</span>, <span class=
+"ident">a</span> <span class="op">*</span> <span class=
+"ident">net_asymmetric_rate</span>) {
+                    <span class="ident">rate</span>.<span class=
+"ident">asymmetric_backward</span> <span class=
+"op">=</span> <span class="ident">c</span>.<span class=
+"ident">na</span>[<span class="ident">p</span>] <span class=
+"op">/</span> <span class="ident">ALPHA_NA</span> <span class=
+"op">+</span> <span class="ident">rate</span>.<span class=
+"ident">asymmetric_forward</span>;
+                    <span class=
+"ident">net_asymmetric_rate</span> <span class=
+"op">=</span> <span class="ident">rate</span>.<span class=
+"ident">net_asymmetric_rate</span>();
                 }
             }
         }
 
-        <span class="prelude-val">Some</span>(<span class="ident">rate</span>)
+        <span class="prelude-val">Some</span>(<span class=
+"ident">rate</span>)
     }
 
-    <span class="doccomment">/// Add this interaction to the `dn` and `dna` array.</span>
+    <span class=
+"doccomment">/// Add this interaction to the `dn` and `dna` array.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The changes in `dn` should contain only the effect from the integrated</span>
-    <span class="doccomment">/// collision operator and not take into account the normalization to</span>
-    <span class="doccomment">/// inverse-temperature evolution nor the dilation factor from expansion of</span>
-    <span class="doccomment">/// the Universe.  These factors are handled separately and automatically.</span>
+    <span class=
+"doccomment">/// The changes in `dn` should contain only the effect from the integrated</span>
+    <span class=
+"doccomment">/// collision operator and not take into account the normalization to</span>
+    <span class=
+"doccomment">/// inverse-temperature evolution nor the dilation factor from expansion of</span>
+    <span class=
+"doccomment">/// the Universe.  These factors are handled separately and automatically.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This function automatically adjusts the rate calculated by</span>
-    <span class="doccomment">/// [`Interaction::rate`] so that overshooting is avoided.</span>
-    <span class="kw">fn</span> <span class="ident">change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">dna</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">rate</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">adjust_rate_overshoot</span>(<span class="self">self</span>.<span class="ident">rate</span>(<span class="self">self</span>.<span class="ident">gamma</span>(<span class="ident">c</span>), <span class="ident">c</span>), <span class="ident">c</span>);
+    <span class=
+"doccomment">/// This function automatically adjusts the rate calculated by</span>
+    <span class=
+"doccomment">/// [`Interaction::rate`] so that overshooting is avoided.</span>
+    <span class="kw">fn</span> <span class=
+"ident">change</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">dn</span>: <span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">Array1</span><span class="op">&lt;</span><span class=
+"ident">f64</span><span class="op">&gt;</span>, <span class=
+"ident">dna</span>: <span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="ident">Array1</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>, <span class="ident">c</span>: <span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>) {
+        <span class="kw">let</span> <span class=
+"ident">rate</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class=
+"ident">adjust_rate_overshoot</span>(<span class=
+"self">self</span>.<span class="ident">rate</span>(<span class=
+"self">self</span>.<span class="ident">gamma</span>(<span class=
+"ident">c</span>), <span class="ident">c</span>), <span class=
+"ident">c</span>);
 
-        <span class="kw">if</span> <span class="ident">rate</span>.<span class="ident">is_none</span>() {
+        <span class="kw">if</span> <span class=
+"ident">rate</span>.<span class="ident">is_none</span>() {
             <span class="kw">return</span>;
         }
-        <span class="kw">let</span> <span class="ident">rate</span> <span class="op">=</span> <span class="ident">rate</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class=
+"ident">rate</span> <span class="op">=</span> <span class=
+"ident">rate</span>.<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">particles_idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">particles_idx</span>();
-        <span class="kw">let</span> <span class="ident">particles_sign</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">particles_sign</span>();
+        <span class="kw">let</span> <span class=
+"ident">particles_idx</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class="ident">particles_idx</span>();
+        <span class="kw">let</span> <span class=
+"ident">particles_sign</span> <span class=
+"op">=</span> <span class="self">self</span>.<span class=
+"ident">particles_sign</span>();
 
-        <span class="kw">let</span> <span class="ident">net_rate</span> <span class="op">=</span> <span class="ident">rate</span>.<span class="ident">net_rate</span>();
-        <span class="kw">let</span> <span class="ident">net_asymmetric_rate</span> <span class="op">=</span> <span class="ident">rate</span>.<span class="ident">net_asymmetric_rate</span>();
+        <span class="kw">let</span> <span class=
+"ident">net_rate</span> <span class="op">=</span> <span class=
+"ident">rate</span>.<span class="ident">net_rate</span>();
+        <span class="kw">let</span> <span class=
+"ident">net_asymmetric_rate</span> <span class=
+"op">=</span> <span class="ident">rate</span>.<span class=
+"ident">net_asymmetric_rate</span>();
 
         <span class="comment">// DEBUG</span>
-        <span class="comment">// let particles = self.particles();</span>
+        <span class=
+"comment">// let particles = self.particles();</span>
         <span class="comment">// log::trace!(</span>
-        <span class="comment">//     &quot;γ({:?} ↔ {:?}) = {:&lt;10.3e}&quot;,</span>
+        <span class=
+"comment">//     "γ({:?} ↔ {:?}) = {:&lt;10.3e}",</span>
         <span class="comment">//     particles.incoming,</span>
         <span class="comment">//     particles.outgoing,</span>
         <span class="comment">//     net_rate</span>
         <span class="comment">// );</span>
         <span class="comment">// log::trace!(</span>
-        <span class="comment">//     &quot;γ&#39;({:?} ↔ {:?}) = {:&lt;10.3e}&quot;,</span>
+        <span class=
+"comment">//     "γ'({:?} ↔ {:?}) = {:&lt;10.3e}",</span>
         <span class="comment">//     particles.incoming,</span>
         <span class="comment">//     particles.outgoing,</span>
         <span class="comment">//     net_asymmetric_rate</span>
         <span class="comment">// );</span>
 
-        <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">p</span>, <span class="ident">a</span>) <span class="kw">in</span> <span class="ident">particles_idx</span>.<span class="ident">incoming</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="kw-2">&amp;</span><span class="ident">particles_sign</span>.<span class="ident">incoming</span>) {
-            <span class="ident">dn</span>[<span class="ident">p</span>] <span class="op">-</span><span class="op">=</span> <span class="ident">net_rate</span>;
-            <span class="ident">dna</span>[<span class="ident">p</span>] <span class="op">-</span><span class="op">=</span> <span class="ident">a</span> <span class="op">*</span> <span class="ident">net_asymmetric_rate</span>;
+        <span class="kw">for</span> (<span class=
+"kw-2">&</span><span class="ident">p</span>, <span class=
+"ident">a</span>) <span class="kw">in</span> <span class=
+"ident">particles_idx</span>.<span class=
+"ident">incoming</span>.<span class=
+"ident">iter</span>().<span class="ident">zip</span>(<span class=
+"kw-2">&</span><span class=
+"ident">particles_sign</span>.<span class=
+"ident">incoming</span>) {
+            <span class="ident">dn</span>[<span class=
+"ident">p</span>] <span class="op">-</span><span class=
+"op">=</span> <span class="ident">net_rate</span>;
+            <span class="ident">dna</span>[<span class=
+"ident">p</span>] <span class="op">-</span><span class=
+"op">=</span> <span class="ident">a</span> <span class=
+"op">*</span> <span class="ident">net_asymmetric_rate</span>;
         }
-        <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">p</span>, <span class="ident">a</span>) <span class="kw">in</span> <span class="ident">particles_idx</span>.<span class="ident">outgoing</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="kw-2">&amp;</span><span class="ident">particles_sign</span>.<span class="ident">outgoing</span>) {
-            <span class="ident">dn</span>[<span class="ident">p</span>] <span class="op">+</span><span class="op">=</span> <span class="ident">net_rate</span>;
-            <span class="ident">dna</span>[<span class="ident">p</span>] <span class="op">+</span><span class="op">=</span> <span class="ident">a</span> <span class="op">*</span> <span class="ident">net_asymmetric_rate</span>;
+        <span class="kw">for</span> (<span class=
+"kw-2">&</span><span class="ident">p</span>, <span class=
+"ident">a</span>) <span class="kw">in</span> <span class=
+"ident">particles_idx</span>.<span class=
+"ident">outgoing</span>.<span class=
+"ident">iter</span>().<span class="ident">zip</span>(<span class=
+"kw-2">&</span><span class=
+"ident">particles_sign</span>.<span class=
+"ident">outgoing</span>) {
+            <span class="ident">dn</span>[<span class=
+"ident">p</span>] <span class="op">+</span><span class=
+"op">=</span> <span class="ident">net_rate</span>;
+            <span class="ident">dna</span>[<span class=
+"ident">p</span>] <span class="op">+</span><span class=
+"op">=</span> <span class="ident">a</span> <span class=
+"op">*</span> <span class="ident">net_asymmetric_rate</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">asymmetry</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">asymmetry</span>(<span class="ident">c</span>) {
-            <span class="kw">let</span> <span class="ident">source</span> <span class="op">=</span> <span class="ident">net_rate</span> <span class="op">*</span> <span class="ident">asymmetry</span>;
-            <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">p</span>, <span class="ident">a</span>) <span class="kw">in</span> <span class="ident">particles_idx</span>.<span class="ident">outgoing</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="kw-2">&amp;</span><span class="ident">particles_sign</span>.<span class="ident">outgoing</span>) {
-                <span class="ident">dna</span>[<span class="ident">p</span>] <span class="op">+</span><span class="op">=</span> <span class="ident">a</span> <span class="op">*</span> <span class="ident">source</span>;
+        <span class="kw">if</span> <span class=
+"kw">let</span> <span class="prelude-val">Some</span>(<span class=
+"ident">asymmetry</span>) <span class="op">=</span> <span class=
+"self">self</span>.<span class=
+"ident">asymmetry</span>(<span class="ident">c</span>) {
+            <span class="kw">let</span> <span class=
+"ident">source</span> <span class="op">=</span> <span class=
+"ident">net_rate</span> <span class="op">*</span> <span class=
+"ident">asymmetry</span>;
+            <span class="kw">for</span> (<span class=
+"kw-2">&</span><span class="ident">p</span>, <span class=
+"ident">a</span>) <span class="kw">in</span> <span class=
+"ident">particles_idx</span>.<span class=
+"ident">outgoing</span>.<span class=
+"ident">iter</span>().<span class="ident">zip</span>(<span class=
+"kw-2">&</span><span class=
+"ident">particles_sign</span>.<span class=
+"ident">outgoing</span>) {
+                <span class="ident">dna</span>[<span class=
+"ident">p</span>] <span class="op">+</span><span class=
+"op">=</span> <span class="ident">a</span> <span class=
+"op">*</span> <span class="ident">source</span>;
             }
         }
     }
 }
 
-<span class="doccomment">/// Check whether particle `i` from the model with the given rate change will</span>
+<span class=
+"doccomment">/// Check whether particle `i` from the model with the given rate change will</span>
 <span class="doccomment">/// overshoot equilibrium.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">overshoots</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">i</span>: <span class="ident">usize</span>, <span class="ident">rate</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    (<span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">i</span>] <span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">i</span>] <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">i</span>] <span class="op">+</span> <span class="ident">rate</span> <span class="op">&lt;</span> <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">i</span>]) <span class="op">|</span><span class="op">|</span> (<span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">i</span>] <span class="op">&lt;</span> <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">i</span>] <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">i</span>] <span class="op">+</span> <span class="ident">rate</span> <span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">i</span>])
+<span class="kw">pub</span> <span class="kw">fn</span> <span class=
+"ident">overshoots</span><span class="op">&lt;</span><span class=
+"ident">M</span><span class="op">&gt;</span>(<span class=
+"ident">c</span>: <span class="kw-2">&</span><span class=
+"ident">Context</span><span class="op">&lt;</span><span class=
+"ident">M</span><span class="op">&gt;</span>, <span class=
+"ident">i</span>: <span class="ident">usize</span>, <span class=
+"ident">rate</span>: <span class="ident">f64</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">bool</span> {
+    (<span class="ident">c</span>.<span class=
+"ident">n</span>[<span class="ident">i</span>] <span class=
+"op">&gt;</span> <span class="ident">c</span>.<span class=
+"ident">eq</span>[<span class="ident">i</span>] <span class=
+"kw-2">&</span><span class="op">&</span> <span class=
+"ident">c</span>.<span class="ident">n</span>[<span class=
+"ident">i</span>] <span class="op">+</span> <span class=
+"ident">rate</span> <span class="op">&lt;</span> <span class=
+"ident">c</span>.<span class="ident">eq</span>[<span class=
+"ident">i</span>]) <span class="op">|</span><span class=
+"op">|</span> (<span class="ident">c</span>.<span class=
+"ident">n</span>[<span class="ident">i</span>] <span class=
+"op">&lt;</span> <span class="ident">c</span>.<span class=
+"ident">eq</span>[<span class="ident">i</span>] <span class=
+"kw-2">&</span><span class="op">&</span> <span class=
+"ident">c</span>.<span class="ident">n</span>[<span class=
+"ident">i</span>] <span class="op">+</span> <span class=
+"ident">rate</span> <span class="op">&gt;</span> <span class=
+"ident">c</span>.<span class="ident">eq</span>[<span class=
+"ident">i</span>])
 }
 
-<span class="doccomment">/// Check whether particle asymmetry `i` from the model with the given rate</span>
+<span class=
+"doccomment">/// Check whether particle asymmetry `i` from the model with the given rate</span>
 <span class="doccomment">/// change will overshoot 0.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">asymmetry_overshoots</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">i</span>: <span class="ident">usize</span>, <span class="ident">rate</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    (<span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">i</span>] <span class="op">&gt;</span> <span class="number">0.0</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">i</span>] <span class="op">+</span> <span class="ident">rate</span> <span class="op">&lt;</span> <span class="number">0.0</span>) <span class="op">|</span><span class="op">|</span> (<span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">i</span>] <span class="op">&lt;</span> <span class="number">0.0</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">i</span>] <span class="op">+</span> <span class="ident">rate</span> <span class="op">&gt;</span> <span class="number">0.0</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class=
+"ident">asymmetry_overshoots</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>(<span class="ident">c</span>: <span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>, <span class="ident">i</span>: <span class=
+"ident">usize</span>, <span class="ident">rate</span>: <span class=
+"ident">f64</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">bool</span> {
+    (<span class="ident">c</span>.<span class=
+"ident">na</span>[<span class="ident">i</span>] <span class=
+"op">&gt;</span> <span class="number">0.0</span> <span class=
+"kw-2">&</span><span class="op">&</span> <span class=
+"ident">c</span>.<span class="ident">na</span>[<span class=
+"ident">i</span>] <span class="op">+</span> <span class=
+"ident">rate</span> <span class="op">&lt;</span> <span class=
+"number">0.0</span>) <span class="op">|</span><span class=
+"op">|</span> (<span class="ident">c</span>.<span class=
+"ident">na</span>[<span class="ident">i</span>] <span class=
+"op">&lt;</span> <span class="number">0.0</span> <span class=
+"kw-2">&</span><span class="op">&</span> <span class=
+"ident">c</span>.<span class="ident">na</span>[<span class=
+"ident">i</span>] <span class="op">+</span> <span class=
+"ident">rate</span> <span class="op">&gt;</span> <span class=
+"number">0.0</span>)
 }
 
-<span class="doccomment">/// Converts NaN floating points to 0</span>
-<span class="kw">fn</span> <span class="ident">nan_to_zero</span>(<span class="ident">v</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
-    <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_nan</span>() {
+<span class=
+"doccomment">/// Converts NaN floating points to 0</span>
+<span class="kw">fn</span> <span class=
+"ident">nan_to_zero</span>(<span class=
+"ident">v</span>: <span class="ident">f64</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">f64</span> {
+    <span class="kw">if</span> <span class=
+"ident">v</span>.<span class="ident">is_nan</span>() {
         <span class="number">0.0</span>
     } <span class="kw">else</span> {
         <span class="ident">v</span>
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="question-mark">?</span><span class="ident">Sized</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">Interaction</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">I</span>
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="ident">I</span>: <span class=
+"question-mark">?</span><span class=
+"ident">Sized</span>, <span class="ident">M</span><span class=
+"op">&gt;</span> <span class="ident">Interaction</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span> <span class="kw">for</span> <span class=
+"kw-2">&</span><span class="ident">I</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Interaction</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class=
+"ident">Interaction</span><span class="op">&lt;</span><span class=
+"ident">M</span><span class="op">&gt;</span>,
     <span class="ident">M</span>: <span class="ident">Model</span>,
 {
-    <span class="kw">fn</span> <span class="ident">particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">InteractionParticles</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">particles</span>()
+    <span class="kw">fn</span> <span class=
+"ident">particles</span>(<span class="kw-2">&</span><span class=
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="kw-2">&</span><span class=
+"ident">InteractionParticles</span> {
+        (<span class="kw-2">*</span><span class=
+"self">self</span>).<span class="ident">particles</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">particles_idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">InteractionParticleIndices</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">particles_idx</span>()
+    <span class="kw">fn</span> <span class=
+"ident">particles_idx</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"kw-2">&</span><span class=
+"ident">InteractionParticleIndices</span> {
+        (<span class="kw-2">*</span><span class=
+"self">self</span>).<span class="ident">particles_idx</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">particles_sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">InteractionParticleSigns</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">particles_sign</span>()
+    <span class="kw">fn</span> <span class=
+"ident">particles_sign</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"kw-2">&</span><span class=
+"ident">InteractionParticleSigns</span> {
+        (<span class="kw-2">*</span><span class=
+"self">self</span>).<span class="ident">particles_sign</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">width_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">width_enabled</span>()
+    <span class="kw">fn</span> <span class=
+"ident">width_enabled</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">bool</span> {
+        (<span class="kw-2">*</span><span class=
+"self">self</span>).<span class="ident">width_enabled</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartialWidth</span><span class="op">&gt;</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">width</span>(<span class="ident">c</span>)
+    <span class="kw">fn</span> <span class=
+"ident">width</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">c</span>: <span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Option</span><span class=
+"op">&lt;</span><span class="ident">PartialWidth</span><span class=
+"op">&gt;</span> {
+        (<span class="kw-2">*</span><span class=
+"self">self</span>).<span class="ident">width</span>(<span class=
+"ident">c</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">gamma_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">gamma_enabled</span>()
+    <span class="kw">fn</span> <span class=
+"ident">gamma_enabled</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">bool</span> {
+        (<span class="kw-2">*</span><span class=
+"self">self</span>).<span class="ident">gamma_enabled</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">gamma</span>(<span class="ident">c</span>)
+    <span class="kw">fn</span> <span class=
+"ident">gamma</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">c</span>: <span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Option</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span> {
+        (<span class="kw-2">*</span><span class=
+"self">self</span>).<span class="ident">gamma</span>(<span class=
+"ident">c</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">gamma</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">rate</span>(<span class="ident">gamma</span>, <span class="ident">c</span>)
+    <span class="kw">fn</span> <span class=
+"ident">rate</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">gamma</span>: <span class=
+"prelude-ty">Option</span><span class="op">&lt;</span><span class=
+"ident">f64</span><span class="op">&gt;</span>, <span class=
+"ident">c</span>: <span class="kw-2">&</span><span class=
+"ident">Context</span><span class="op">&lt;</span><span class=
+"ident">M</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"prelude-ty">Option</span><span class="op">&lt;</span><span class=
+"ident">RateDensity</span><span class="op">&gt;</span> {
+        (<span class="kw-2">*</span><span class=
+"self">self</span>).<span class="ident">rate</span>(<span class=
+"ident">gamma</span>, <span class="ident">c</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">adjust_rate_overshoot</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">rate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span>,
-        <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">adjust_rate_overshoot</span>(<span class="ident">rate</span>, <span class="ident">c</span>)
+    <span class="kw">fn</span> <span class=
+"ident">adjust_rate_overshoot</span>(
+        <span class="kw-2">&</span><span class="self">self</span>,
+        <span class="ident">rate</span>: <span class=
+"prelude-ty">Option</span><span class="op">&lt;</span><span class=
+"ident">RateDensity</span><span class="op">&gt;</span>,
+        <span class="ident">c</span>: <span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>,
+    ) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Option</span><span class=
+"op">&lt;</span><span class="ident">RateDensity</span><span class=
+"op">&gt;</span> {
+        (<span class="kw-2">*</span><span class=
+"self">self</span>).<span class=
+"ident">adjust_rate_overshoot</span>(<span class=
+"ident">rate</span>, <span class="ident">c</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">dna</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">change</span>(<span class="ident">dn</span>, <span class="ident">dna</span>, <span class="ident">c</span>)
+    <span class="kw">fn</span> <span class=
+"ident">change</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">dn</span>: <span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">Array1</span><span class="op">&lt;</span><span class=
+"ident">f64</span><span class="op">&gt;</span>, <span class=
+"ident">dna</span>: <span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="ident">Array1</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>, <span class="ident">c</span>: <span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>) {
+        (<span class="kw-2">*</span><span class=
+"self">self</span>).<span class="ident">change</span>(<span class=
+"ident">dn</span>, <span class="ident">dna</span>, <span class=
+"ident">c</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="question-mark">?</span><span class="ident">Sized</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">Interaction</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="ident">I</span>: <span class=
+"question-mark">?</span><span class=
+"ident">Sized</span>, <span class="ident">M</span><span class=
+"op">&gt;</span> <span class="ident">Interaction</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span> <span class="kw">for</span> <span class=
+"ident">Box</span><span class="op">&lt;</span><span class=
+"ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Interaction</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class=
+"ident">Interaction</span><span class="op">&lt;</span><span class=
+"ident">M</span><span class="op">&gt;</span>,
     <span class="ident">M</span>: <span class="ident">Model</span>,
 {
-    <span class="kw">fn</span> <span class="ident">particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">InteractionParticles</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">particles</span>()
+    <span class="kw">fn</span> <span class=
+"ident">particles</span>(<span class="kw-2">&</span><span class=
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="kw-2">&</span><span class=
+"ident">InteractionParticles</span> {
+        <span class="self">self</span>.<span class=
+"ident">as_ref</span>().<span class="ident">particles</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">particles_idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">InteractionParticleIndices</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">particles_idx</span>()
+    <span class="kw">fn</span> <span class=
+"ident">particles_idx</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"kw-2">&</span><span class=
+"ident">InteractionParticleIndices</span> {
+        <span class="self">self</span>.<span class=
+"ident">as_ref</span>().<span class="ident">particles_idx</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">particles_sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">InteractionParticleSigns</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">particles_sign</span>()
+    <span class="kw">fn</span> <span class=
+"ident">particles_sign</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"kw-2">&</span><span class=
+"ident">InteractionParticleSigns</span> {
+        <span class="self">self</span>.<span class=
+"ident">as_ref</span>().<span class="ident">particles_sign</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">width_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">width_enabled</span>()
+    <span class="kw">fn</span> <span class=
+"ident">width_enabled</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">bool</span> {
+        <span class="self">self</span>.<span class=
+"ident">as_ref</span>().<span class="ident">width_enabled</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartialWidth</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">width</span>(<span class="ident">c</span>)
+    <span class="kw">fn</span> <span class=
+"ident">width</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">c</span>: <span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Option</span><span class=
+"op">&lt;</span><span class="ident">PartialWidth</span><span class=
+"op">&gt;</span> {
+        <span class="self">self</span>.<span class=
+"ident">as_ref</span>().<span class=
+"ident">width</span>(<span class="ident">c</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">gamma_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">gamma_enabled</span>()
+    <span class="kw">fn</span> <span class=
+"ident">gamma_enabled</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">bool</span> {
+        <span class="self">self</span>.<span class=
+"ident">as_ref</span>().<span class="ident">gamma_enabled</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">gamma</span>(<span class="ident">c</span>)
+    <span class="kw">fn</span> <span class=
+"ident">gamma</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">c</span>: <span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Option</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span> {
+        <span class="self">self</span>.<span class=
+"ident">as_ref</span>().<span class=
+"ident">gamma</span>(<span class="ident">c</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">gamma</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">rate</span>(<span class="ident">gamma</span>, <span class="ident">c</span>)
+    <span class="kw">fn</span> <span class=
+"ident">rate</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">gamma</span>: <span class=
+"prelude-ty">Option</span><span class="op">&lt;</span><span class=
+"ident">f64</span><span class="op">&gt;</span>, <span class=
+"ident">c</span>: <span class="kw-2">&</span><span class=
+"ident">Context</span><span class="op">&lt;</span><span class=
+"ident">M</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"prelude-ty">Option</span><span class="op">&lt;</span><span class=
+"ident">RateDensity</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class=
+"ident">as_ref</span>().<span class=
+"ident">rate</span>(<span class="ident">gamma</span>, <span class=
+"ident">c</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">adjust_rate_overshoot</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">rate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span>,
-        <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">adjust_rate_overshoot</span>(<span class="ident">rate</span>, <span class="ident">c</span>)
+    <span class="kw">fn</span> <span class=
+"ident">adjust_rate_overshoot</span>(
+        <span class="kw-2">&</span><span class="self">self</span>,
+        <span class="ident">rate</span>: <span class=
+"prelude-ty">Option</span><span class="op">&lt;</span><span class=
+"ident">RateDensity</span><span class="op">&gt;</span>,
+        <span class="ident">c</span>: <span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>,
+    ) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Option</span><span class=
+"op">&lt;</span><span class="ident">RateDensity</span><span class=
+"op">&gt;</span> {
+        <span class="self">self</span>.<span class=
+"ident">as_ref</span>().<span class=
+"ident">adjust_rate_overshoot</span>(<span class=
+"ident">rate</span>, <span class="ident">c</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">dna</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">change</span>(<span class="ident">dn</span>, <span class="ident">dna</span>, <span class="ident">c</span>)
+    <span class="kw">fn</span> <span class=
+"ident">change</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">dn</span>: <span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">Array1</span><span class="op">&lt;</span><span class=
+"ident">f64</span><span class="op">&gt;</span>, <span class=
+"ident">dna</span>: <span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="ident">Array1</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>, <span class="ident">c</span>: <span class=
+"kw-2">&</span><span class="ident">Context</span><span class=
+"op">&lt;</span><span class="ident">M</span><span class=
+"op">&gt;</span>) {
+        <span class="self">self</span>.<span class=
+"ident">as_ref</span>().<span class=
+"ident">change</span>(<span class="ident">dn</span>, <span class=
+"ident">dna</span>, <span class="ident">c</span>)
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "boltzmann_solver";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>
+</section>
+<section id="search" class="content hidden"></section>
+<section class="footer"></section>
+<script>
+window.rootPath = "../../../";window.currentCrate = "boltzmann_solver";
+</script>
+<script src="../../../aliases.js"></script>
+<script src="../../../main.js"></script>
+<script src="../../../source-script.js"></script>
+<script src="../../../source-files.js"></script>
+<script defer src="../../../search-index.js"></script>
+</body>
+</html>

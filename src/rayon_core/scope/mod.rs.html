@@ -1,4 +1,59 @@
-<!DOCTYPE html><html lang="en"><head><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'<head>l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N9HX7G4');</script><!-- End Google Tag Manager --><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/rayon-core-1.7.0/src/scope/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../rayon_core/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="generator" content=
+"HTML Tidy for HTML5 for Linux version 5.6.0">
+<meta charset="utf-8">
+<meta name="viewport" content=
+"width=device-width, initial-scale=1.0">
+<meta name="generator" content="rustdoc">
+<meta name="description" content=
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rayon-core-1.7.0/src/scope/mod.rs`.">
+<meta name="keywords" content="rust, rustlang, rust-lang">
+<title>mod.rs.html -- source</title>
+<link rel="stylesheet" type="text/css" href=
+"../../../normalize.css">
+<link rel="stylesheet" type="text/css" href="../../../rustdoc.css"
+id="mainThemeStyle">
+<link rel="stylesheet" type="text/css" href="../../../dark.css">
+<link rel="stylesheet" type="text/css" href="../../../light.css"
+id="themeStyle">
+<script src="../../../storage.js"></script><noscript>
+<link rel="stylesheet" href="../../../noscript.css"></noscript>
+<link rel="shortcut icon" href="../../../favicon.ico">
+<style type="text/css">
+#crate-search{background-image:url("../../../down-arrow.svg");}
+</style>
+</head>
+<body class="rustdoc source">
+<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
+<nav class="sidebar">
+<div class="sidebar-menu">☰</div>
+<a href='../../../rayon_core/index.html'>
+<div class='logo-container'><img src='../../../rust-logo.png' alt=
+'logo'></div>
+</a></nav>
+<div class="theme-picker"><button id="theme-picker" aria-label=
+"Pick another theme!"><img src="../../../brush.svg" width="18" alt=
+"Pick another theme!"></button>
+<div id="theme-choices"></div>
+</div>
+<script src="../../../theme.js"></script>
+<nav class="sub">
+<form class="search-form">
+<div class="search-container">
+<div><select id="crate-search">
+<option value="All crates">All crates</option>
+</select><input class="search-input" name="search" disabled
+autocomplete="off" spellcheck="false" placeholder=
+"Click or press ‘S’ to search, ‘?’ for more options…" type=
+"search"></div>
+<a id="settings-menu" href="../../../settings.html"><img src=
+"../../../wheel.svg" width="18" alt="Change settings"></a></div>
+</form>
+</nav>
+<section id="main" class="content">
+<pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -644,140 +699,258 @@
 <span id="644">644</span>
 <span id="645">645</span>
 <span id="646">646</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! Methods for custom fork-join scopes, created by the [`scope()`]</span>
-<span class="doccomment">//! function. These are a more flexible alternative to [`join()`].</span>
+</pre>
+<div class="example-wrap">
+<pre class="rust">
+<span class=
+"doccomment">//! Methods for custom fork-join scopes, created by the [`scope()`]</span>
+<span class=
+"doccomment">//! function. These are a more flexible alternative to [`join()`].</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [`scope()`]: fn.scope.html</span>
-<span class="doccomment">//! [`join()`]: ../join/join.fn.html</span>
+<span class=
+"doccomment">//! [`join()`]: ../join/join.fn.html</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">job</span>::{<span class="ident">HeapJob</span>, <span class="ident">JobFifo</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">latch</span>::{<span class="ident">CountLatch</span>, <span class="ident">Latch</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">log</span>::<span class="ident">Event</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">registry</span>::{<span class="ident">in_worker</span>, <span class="ident">Registry</span>, <span class="ident">WorkerThread</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">unwind</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">any</span>::<span class="ident">Any</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">atomic</span>::{<span class="ident">AtomicPtr</span>, <span class="ident">Ordering</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
+<span class="kw">use</span> <span class=
+"kw">crate</span>::<span class="ident">job</span>::{<span class=
+"ident">HeapJob</span>, <span class="ident">JobFifo</span>};
+<span class="kw">use</span> <span class=
+"kw">crate</span>::<span class="ident">latch</span>::{<span class=
+"ident">CountLatch</span>, <span class="ident">Latch</span>};
+<span class="kw">use</span> <span class=
+"kw">crate</span>::<span class="ident">log</span>::<span class=
+"ident">Event</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class=
+"kw">crate</span>::<span class=
+"ident">registry</span>::{<span class=
+"ident">in_worker</span>, <span class=
+"ident">Registry</span>, <span class="ident">WorkerThread</span>};
+<span class="kw">use</span> <span class=
+"kw">crate</span>::<span class="ident">unwind</span>;
+<span class="kw">use</span> <span class=
+"ident">std</span>::<span class="ident">any</span>::<span class=
+"ident">Any</span>;
+<span class="kw">use</span> <span class=
+"ident">std</span>::<span class="ident">fmt</span>;
+<span class="kw">use</span> <span class=
+"ident">std</span>::<span class="ident">marker</span>::<span class=
+"ident">PhantomData</span>;
+<span class="kw">use</span> <span class=
+"ident">std</span>::<span class="ident">mem</span>;
+<span class="kw">use</span> <span class=
+"ident">std</span>::<span class="ident">ptr</span>;
+<span class="kw">use</span> <span class=
+"ident">std</span>::<span class="ident">sync</span>::<span class=
+"ident">atomic</span>::{<span class=
+"ident">AtomicPtr</span>, <span class="ident">Ordering</span>};
+<span class="kw">use</span> <span class=
+"ident">std</span>::<span class="ident">sync</span>::<span class=
+"ident">Arc</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span>;
 
-<span class="doccomment">/// Represents a fork-join scope which can be used to spawn any number of tasks.</span>
-<span class="doccomment">/// See [`scope()`] for more information.</span>
+<span class=
+"doccomment">/// Represents a fork-join scope which can be used to spawn any number of tasks.</span>
+<span class=
+"doccomment">/// See [`scope()`] for more information.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///[`scope()`]: fn.scope.html</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Scope</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span> {
-    <span class="ident">base</span>: <span class="ident">ScopeBase</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span>,
+<span class="kw">pub</span> <span class=
+"kw">struct</span> <span class="ident">Scope</span><span class=
+"op">&lt;</span><span class="lifetime">'scope</span><span class=
+"op">&gt;</span> {
+    <span class="ident">base</span>: <span class=
+"ident">ScopeBase</span><span class="op">&lt;</span><span class=
+"lifetime">'scope</span><span class="op">&gt;</span>,
 }
 
-<span class="doccomment">/// Represents a fork-join scope which can be used to spawn any number of tasks.</span>
-<span class="doccomment">/// Those spawned from the same thread are prioritized in relative FIFO order.</span>
-<span class="doccomment">/// See [`scope_fifo()`] for more information.</span>
+<span class=
+"doccomment">/// Represents a fork-join scope which can be used to spawn any number of tasks.</span>
+<span class=
+"doccomment">/// Those spawned from the same thread are prioritized in relative FIFO order.</span>
+<span class=
+"doccomment">/// See [`scope_fifo()`] for more information.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///[`scope_fifo()`]: fn.scope_fifo.html</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScopeFifo</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span> {
-    <span class="ident">base</span>: <span class="ident">ScopeBase</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span>,
-    <span class="ident">fifos</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">JobFifo</span><span class="op">&gt;</span>,
+<span class=
+"doccomment">///[`scope_fifo()`]: fn.scope_fifo.html</span>
+<span class="kw">pub</span> <span class=
+"kw">struct</span> <span class="ident">ScopeFifo</span><span class=
+"op">&lt;</span><span class="lifetime">'scope</span><span class=
+"op">&gt;</span> {
+    <span class="ident">base</span>: <span class=
+"ident">ScopeBase</span><span class="op">&lt;</span><span class=
+"lifetime">'scope</span><span class="op">&gt;</span>,
+    <span class="ident">fifos</span>: <span class=
+"ident">Vec</span><span class="op">&lt;</span><span class=
+"ident">JobFifo</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">struct</span> <span class="ident">ScopeBase</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// thread where `scope()` was executed (note that individual jobs</span>
-    <span class="doccomment">/// may be executing on different worker threads, though they</span>
-    <span class="doccomment">/// should always be within the same pool of threads)</span>
-    <span class="ident">owner_thread_index</span>: <span class="ident">usize</span>,
+<span class="kw">struct</span> <span class=
+"ident">ScopeBase</span><span class="op">&lt;</span><span class=
+"lifetime">'scope</span><span class="op">&gt;</span> {
+    <span class=
+"doccomment">/// thread where `scope()` was executed (note that individual jobs</span>
+    <span class=
+"doccomment">/// may be executing on different worker threads, though they</span>
+    <span class=
+"doccomment">/// should always be within the same pool of threads)</span>
+    <span class="ident">owner_thread_index</span>: <span class=
+"ident">usize</span>,
 
-    <span class="doccomment">/// thread registry where `scope()` was executed.</span>
-    <span class="ident">registry</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Registry</span><span class="op">&gt;</span>,
+    <span class=
+"doccomment">/// thread registry where `scope()` was executed.</span>
+    <span class="ident">registry</span>: <span class=
+"ident">Arc</span><span class="op">&lt;</span><span class=
+"ident">Registry</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// if some job panicked, the error is stored here; it will be</span>
-    <span class="doccomment">/// propagated to the one who created the scope</span>
-    <span class="ident">panic</span>: <span class="ident">AtomicPtr</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class=
+"doccomment">/// if some job panicked, the error is stored here; it will be</span>
+    <span class=
+"doccomment">/// propagated to the one who created the scope</span>
+    <span class="ident">panic</span>: <span class=
+"ident">AtomicPtr</span><span class="op">&lt;</span><span class=
+"ident">Box</span><span class="op">&lt;</span><span class=
+"kw">dyn</span> <span class="ident">Any</span> <span class=
+"op">+</span> <span class="ident">Send</span> <span class=
+"op">+</span> <span class="lifetime">'static</span><span class=
+"op">&gt;</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// latch to set when the counter drops to zero (and hence this scope is complete)</span>
-    <span class="ident">job_completed_latch</span>: <span class="ident">CountLatch</span>,
+    <span class=
+"doccomment">/// latch to set when the counter drops to zero (and hence this scope is complete)</span>
+    <span class="ident">job_completed_latch</span>: <span class=
+"ident">CountLatch</span>,
 
-    <span class="doccomment">/// You can think of a scope as containing a list of closures to execute,</span>
-    <span class="doccomment">/// all of which outlive `&#39;scope`.  They&#39;re not actually required to be</span>
-    <span class="doccomment">/// `Sync`, but it&#39;s still safe to let the `Scope` implement `Sync` because</span>
-    <span class="doccomment">/// the closures are only *moved* across threads to be executed.</span>
-    <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Scope</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;scope</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class=
+"doccomment">/// You can think of a scope as containing a list of closures to execute,</span>
+    <span class=
+"doccomment">/// all of which outlive `'scope`.  They're not actually required to be</span>
+    <span class=
+"doccomment">/// `Sync`, but it's still safe to let the `Scope` implement `Sync` because</span>
+    <span class=
+"doccomment">/// the closures are only *moved* across threads to be executed.</span>
+    <span class="ident">marker</span>: <span class=
+"ident">PhantomData</span><span class="op">&lt;</span><span class=
+"ident">Box</span><span class="op">&lt;</span><span class=
+"kw">dyn</span> <span class="ident">FnOnce</span>(<span class=
+"kw-2">&</span><span class="ident">Scope</span><span class=
+"op">&lt;</span><span class="lifetime">'scope</span><span class=
+"op">&gt;</span>) <span class="op">+</span> <span class=
+"ident">Send</span> <span class="op">+</span> <span class=
+"ident">Sync</span> <span class="op">+</span> <span class=
+"lifetime">'scope</span><span class="op">&gt;</span><span class=
+"op">&gt;</span>,
 }
 
-<span class="doccomment">/// Create a &quot;fork-join&quot; scope `s` and invokes the closure with a</span>
-<span class="doccomment">/// reference to `s`. This closure can then spawn asynchronous tasks</span>
-<span class="doccomment">/// into `s`. Those tasks may run asynchronously with respect to the</span>
-<span class="doccomment">/// closure; they may themselves spawn additional tasks into `s`. When</span>
-<span class="doccomment">/// the closure returns, it will block until all tasks that have been</span>
+<span class=
+"doccomment">/// Create a "fork-join" scope `s` and invokes the closure with a</span>
+<span class=
+"doccomment">/// reference to `s`. This closure can then spawn asynchronous tasks</span>
+<span class=
+"doccomment">/// into `s`. Those tasks may run asynchronously with respect to the</span>
+<span class=
+"doccomment">/// closure; they may themselves spawn additional tasks into `s`. When</span>
+<span class=
+"doccomment">/// the closure returns, it will block until all tasks that have been</span>
 <span class="doccomment">/// spawned into `s` complete.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// `scope()` is a more flexible building block compared to `join()`,</span>
-<span class="doccomment">/// since a loop can be used to spawn any number of tasks without</span>
-<span class="doccomment">/// recursing. However, that flexibility comes at a performance price:</span>
-<span class="doccomment">/// tasks spawned using `scope()` must be allocated onto the heap,</span>
-<span class="doccomment">/// whereas `join()` can make exclusive use of the stack. **Prefer</span>
-<span class="doccomment">/// `join()` (or, even better, parallel iterators) where possible.**</span>
+<span class=
+"doccomment">/// `scope()` is a more flexible building block compared to `join()`,</span>
+<span class=
+"doccomment">/// since a loop can be used to spawn any number of tasks without</span>
+<span class=
+"doccomment">/// recursing. However, that flexibility comes at a performance price:</span>
+<span class=
+"doccomment">/// tasks spawned using `scope()` must be allocated onto the heap,</span>
+<span class=
+"doccomment">/// whereas `join()` can make exclusive use of the stack. **Prefer</span>
+<span class=
+"doccomment">/// `join()` (or, even better, parallel iterators) where possible.**</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The Rayon `join()` function launches two closures and waits for them</span>
-<span class="doccomment">/// to stop. One could implement `join()` using a scope like so, although</span>
-<span class="doccomment">/// it would be less efficient than the real implementation:</span>
+<span class=
+"doccomment">/// The Rayon `join()` function launches two closures and waits for them</span>
+<span class=
+"doccomment">/// to stop. One could implement `join()` using a scope like so, although</span>
+<span class=
+"doccomment">/// it would be less efficient than the real implementation:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # use rayon_core as rayon;</span>
-<span class="doccomment">/// pub fn join&lt;A,B,RA,RB&gt;(oper_a: A, oper_b: B) -&gt; (RA, RB)</span>
-<span class="doccomment">///     where A: FnOnce() -&gt; RA + Send,</span>
-<span class="doccomment">///           B: FnOnce() -&gt; RB + Send,</span>
+<span class=
+"doccomment">/// pub fn join&lt;A,B,RA,RB&gt;(oper_a: A, oper_b: B) -&gt; (RA, RB)</span>
+<span class=
+"doccomment">///     where A: FnOnce() -&gt; RA + Send,</span>
+<span class=
+"doccomment">///           B: FnOnce() -&gt; RB + Send,</span>
 <span class="doccomment">///           RA: Send,</span>
 <span class="doccomment">///           RB: Send,</span>
 <span class="doccomment">/// {</span>
-<span class="doccomment">///     let mut result_a: Option&lt;RA&gt; = None;</span>
-<span class="doccomment">///     let mut result_b: Option&lt;RB&gt; = None;</span>
+<span class=
+"doccomment">///     let mut result_a: Option&lt;RA&gt; = None;</span>
+<span class=
+"doccomment">///     let mut result_b: Option&lt;RB&gt; = None;</span>
 <span class="doccomment">///     rayon::scope(|s| {</span>
-<span class="doccomment">///         s.spawn(|_| result_a = Some(oper_a()));</span>
-<span class="doccomment">///         s.spawn(|_| result_b = Some(oper_b()));</span>
+<span class=
+"doccomment">///         s.spawn(|_| result_a = Some(oper_a()));</span>
+<span class=
+"doccomment">///         s.spawn(|_| result_b = Some(oper_b()));</span>
 <span class="doccomment">///     });</span>
-<span class="doccomment">///     (result_a.unwrap(), result_b.unwrap())</span>
+<span class=
+"doccomment">///     (result_a.unwrap(), result_b.unwrap())</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # A note on threading</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The closure given to `scope()` executes in the Rayon thread-pool,</span>
-<span class="doccomment">/// as do those given to `spawn()`. This means that you can&#39;t access</span>
-<span class="doccomment">/// thread-local variables (well, you can, but they may have</span>
+<span class=
+"doccomment">/// The closure given to `scope()` executes in the Rayon thread-pool,</span>
+<span class=
+"doccomment">/// as do those given to `spawn()`. This means that you can't access</span>
+<span class=
+"doccomment">/// thread-local variables (well, you can, but they may have</span>
 <span class="doccomment">/// unexpected values).</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Task execution</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Task execution potentially starts as soon as `spawn()` is called.</span>
-<span class="doccomment">/// The task will end sometime before `scope()` returns. Note that the</span>
-<span class="doccomment">/// *closure* given to scope may return much earlier. In general</span>
-<span class="doccomment">/// the lifetime of a scope created like `scope(body) goes something like this:</span>
+<span class=
+"doccomment">/// Task execution potentially starts as soon as `spawn()` is called.</span>
+<span class=
+"doccomment">/// The task will end sometime before `scope()` returns. Note that the</span>
+<span class=
+"doccomment">/// *closure* given to scope may return much earlier. In general</span>
+<span class=
+"doccomment">/// the lifetime of a scope created like `scope(body) goes something like this:</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// - Scope begins when `scope(body)` is called</span>
-<span class="doccomment">/// - Scope body `body()` is invoked</span>
-<span class="doccomment">///     - Scope tasks may be spawned</span>
+<span class=
+"doccomment">/// - Scope begins when `scope(body)` is called</span>
+<span class=
+"doccomment">/// - Scope body `body()` is invoked</span>
+<span class=
+"doccomment">///     - Scope tasks may be spawned</span>
 <span class="doccomment">/// - Scope body returns</span>
-<span class="doccomment">/// - Scope tasks execute, possibly spawning more tasks</span>
-<span class="doccomment">/// - Once all tasks are done, scope ends and `scope()` returns</span>
+<span class=
+"doccomment">/// - Scope tasks execute, possibly spawning more tasks</span>
+<span class=
+"doccomment">/// - Once all tasks are done, scope ends and `scope()` returns</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// To see how and when tasks are joined, consider this example:</span>
+<span class=
+"doccomment">/// To see how and when tasks are joined, consider this example:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # use rayon_core as rayon;</span>
 <span class="doccomment">/// // point start</span>
 <span class="doccomment">/// rayon::scope(|s| {</span>
 <span class="doccomment">///     s.spawn(|s| { // task s.1</span>
-<span class="doccomment">///         s.spawn(|s| { // task s.1.1</span>
+<span class=
+"doccomment">///         s.spawn(|s| { // task s.1.1</span>
 <span class="doccomment">///             rayon::scope(|t| {</span>
-<span class="doccomment">///                 t.spawn(|_| ()); // task t.1</span>
-<span class="doccomment">///                 t.spawn(|_| ()); // task t.2</span>
+<span class=
+"doccomment">///                 t.spawn(|_| ()); // task t.1</span>
+<span class=
+"doccomment">///                 t.spawn(|_| ()); // task t.2</span>
 <span class="doccomment">///             });</span>
 <span class="doccomment">///         });</span>
 <span class="doccomment">///     });</span>
@@ -788,171 +961,286 @@
 <span class="doccomment">/// // point end</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The various tasks that are run will execute roughly like so:</span>
+<span class=
+"doccomment">/// The various tasks that are run will execute roughly like so:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```notrust</span>
 <span class="doccomment">/// | (start)</span>
 <span class="doccomment">/// |</span>
 <span class="doccomment">/// | (scope `s` created)</span>
-<span class="doccomment">/// +-----------------------------------------------+ (task s.2)</span>
-<span class="doccomment">/// +-------+ (task s.1)                            |</span>
-<span class="doccomment">/// |       |                                       |</span>
-<span class="doccomment">/// |       +---+ (task s.1.1)                      |</span>
-<span class="doccomment">/// |       |   |                                   |</span>
-<span class="doccomment">/// |       |   | (scope `t` created)               |</span>
-<span class="doccomment">/// |       |   +----------------+ (task t.2)       |</span>
-<span class="doccomment">/// |       |   +---+ (task t.1) |                  |</span>
-<span class="doccomment">/// | (mid) |   |   |            |                  |</span>
-<span class="doccomment">/// :       |   + &lt;-+------------+ (scope `t` ends) |</span>
-<span class="doccomment">/// :       |   |                                   |</span>
-<span class="doccomment">/// |&lt;------+---+-----------------------------------+ (scope `s` ends)</span>
+<span class=
+"doccomment">/// +-----------------------------------------------+ (task s.2)</span>
+<span class=
+"doccomment">/// +-------+ (task s.1)                            |</span>
+<span class=
+"doccomment">/// |       |                                       |</span>
+<span class=
+"doccomment">/// |       +---+ (task s.1.1)                      |</span>
+<span class=
+"doccomment">/// |       |   |                                   |</span>
+<span class=
+"doccomment">/// |       |   | (scope `t` created)               |</span>
+<span class=
+"doccomment">/// |       |   +----------------+ (task t.2)       |</span>
+<span class=
+"doccomment">/// |       |   +---+ (task t.1) |                  |</span>
+<span class=
+"doccomment">/// | (mid) |   |   |            |                  |</span>
+<span class=
+"doccomment">/// :       |   + &lt;-+------------+ (scope `t` ends) |</span>
+<span class=
+"doccomment">/// :       |   |                                   |</span>
+<span class=
+"doccomment">/// |&lt;------+---+-----------------------------------+ (scope `s` ends)</span>
 <span class="doccomment">/// |</span>
 <span class="doccomment">/// | (end)</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The point here is that everything spawned into scope `s` will</span>
-<span class="doccomment">/// terminate (at latest) at the same point -- right before the</span>
-<span class="doccomment">/// original call to `rayon::scope` returns. This includes new</span>
-<span class="doccomment">/// subtasks created by other subtasks (e.g., task `s.1.1`). If a new</span>
-<span class="doccomment">/// scope is created (such as `t`), the things spawned into that scope</span>
-<span class="doccomment">/// will be joined before that scope returns, which in turn occurs</span>
-<span class="doccomment">/// before the creating task (task `s.1.1` in this case) finishes.</span>
+<span class=
+"doccomment">/// The point here is that everything spawned into scope `s` will</span>
+<span class=
+"doccomment">/// terminate (at latest) at the same point -- right before the</span>
+<span class=
+"doccomment">/// original call to `rayon::scope` returns. This includes new</span>
+<span class=
+"doccomment">/// subtasks created by other subtasks (e.g., task `s.1.1`). If a new</span>
+<span class=
+"doccomment">/// scope is created (such as `t`), the things spawned into that scope</span>
+<span class=
+"doccomment">/// will be joined before that scope returns, which in turn occurs</span>
+<span class=
+"doccomment">/// before the creating task (task `s.1.1` in this case) finishes.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// There is no guaranteed order of execution for spawns in a scope,</span>
-<span class="doccomment">/// given that other threads may steal tasks at any time. However, they</span>
-<span class="doccomment">/// are generally prioritized in a LIFO order on the thread from which</span>
-<span class="doccomment">/// they were spawned. So in this example, absent any stealing, we can</span>
-<span class="doccomment">/// expect `s.2` to execute before `s.1`, and `t.2` before `t.1`. Other</span>
-<span class="doccomment">/// threads always steal from the other end of the deque, like FIFO</span>
-<span class="doccomment">/// order.  The idea is that &quot;recent&quot; tasks are most likely to be fresh</span>
-<span class="doccomment">/// in the local CPU&#39;s cache, while other threads can steal older</span>
-<span class="doccomment">/// &quot;stale&quot; tasks.  For an alternate approach, consider</span>
+<span class=
+"doccomment">/// There is no guaranteed order of execution for spawns in a scope,</span>
+<span class=
+"doccomment">/// given that other threads may steal tasks at any time. However, they</span>
+<span class=
+"doccomment">/// are generally prioritized in a LIFO order on the thread from which</span>
+<span class=
+"doccomment">/// they were spawned. So in this example, absent any stealing, we can</span>
+<span class=
+"doccomment">/// expect `s.2` to execute before `s.1`, and `t.2` before `t.1`. Other</span>
+<span class=
+"doccomment">/// threads always steal from the other end of the deque, like FIFO</span>
+<span class=
+"doccomment">/// order.  The idea is that "recent" tasks are most likely to be fresh</span>
+<span class=
+"doccomment">/// in the local CPU's cache, while other threads can steal older</span>
+<span class=
+"doccomment">/// "stale" tasks.  For an alternate approach, consider</span>
 <span class="doccomment">/// [`scope_fifo()`] instead.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`scope_fifo()`]: fn.scope_fifo.html</span>
+<span class=
+"doccomment">/// [`scope_fifo()`]: fn.scope_fifo.html</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Accessing stack data</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// In general, spawned tasks may access stack data in place that</span>
-<span class="doccomment">/// outlives the scope itself. Other data must be fully owned by the</span>
+<span class=
+"doccomment">/// In general, spawned tasks may access stack data in place that</span>
+<span class=
+"doccomment">/// outlives the scope itself. Other data must be fully owned by the</span>
 <span class="doccomment">/// spawned task.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # use rayon_core as rayon;</span>
-<span class="doccomment">/// let ok: Vec&lt;i32&gt; = vec![1, 2, 3];</span>
+<span class=
+"doccomment">/// let ok: Vec&lt;i32&gt; = vec![1, 2, 3];</span>
 <span class="doccomment">/// rayon::scope(|s| {</span>
-<span class="doccomment">///     let bad: Vec&lt;i32&gt; = vec![4, 5, 6];</span>
+<span class=
+"doccomment">///     let bad: Vec&lt;i32&gt; = vec![4, 5, 6];</span>
 <span class="doccomment">///     s.spawn(|_| {</span>
-<span class="doccomment">///         // We can access `ok` because outlives the scope `s`.</span>
-<span class="doccomment">///         println!(&quot;ok: {:?}&quot;, ok);</span>
+<span class=
+"doccomment">///         // We can access `ok` because outlives the scope `s`.</span>
+<span class=
+"doccomment">///         println!("ok: {:?}", ok);</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///         // If we just try to use `bad` here, the closure will borrow `bad`</span>
-<span class="doccomment">///         // (because we are just printing it out, and that only requires a</span>
-<span class="doccomment">///         // borrow), which will result in a compilation error. Read on</span>
+<span class=
+"doccomment">///         // If we just try to use `bad` here, the closure will borrow `bad`</span>
+<span class=
+"doccomment">///         // (because we are just printing it out, and that only requires a</span>
+<span class=
+"doccomment">///         // borrow), which will result in a compilation error. Read on</span>
 <span class="doccomment">///         // for options.</span>
-<span class="doccomment">///         // println!(&quot;bad: {:?}&quot;, bad);</span>
+<span class=
+"doccomment">///         // println!("bad: {:?}", bad);</span>
 <span class="doccomment">///    });</span>
 <span class="doccomment">/// });</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// As the comments example above suggest, to reference `bad` we must</span>
-<span class="doccomment">/// take ownership of it. One way to do this is to detach the closure</span>
-<span class="doccomment">/// from the surrounding stack frame, using the `move` keyword. This</span>
-<span class="doccomment">/// will cause it to take ownership of *all* the variables it touches,</span>
-<span class="doccomment">/// in this case including both `ok` *and* `bad`:</span>
+<span class=
+"doccomment">/// As the comments example above suggest, to reference `bad` we must</span>
+<span class=
+"doccomment">/// take ownership of it. One way to do this is to detach the closure</span>
+<span class=
+"doccomment">/// from the surrounding stack frame, using the `move` keyword. This</span>
+<span class=
+"doccomment">/// will cause it to take ownership of *all* the variables it touches,</span>
+<span class=
+"doccomment">/// in this case including both `ok` *and* `bad`:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # use rayon_core as rayon;</span>
-<span class="doccomment">/// let ok: Vec&lt;i32&gt; = vec![1, 2, 3];</span>
+<span class=
+"doccomment">/// let ok: Vec&lt;i32&gt; = vec![1, 2, 3];</span>
 <span class="doccomment">/// rayon::scope(|s| {</span>
-<span class="doccomment">///     let bad: Vec&lt;i32&gt; = vec![4, 5, 6];</span>
+<span class=
+"doccomment">///     let bad: Vec&lt;i32&gt; = vec![4, 5, 6];</span>
 <span class="doccomment">///     s.spawn(move |_| {</span>
-<span class="doccomment">///         println!(&quot;ok: {:?}&quot;, ok);</span>
-<span class="doccomment">///         println!(&quot;bad: {:?}&quot;, bad);</span>
+<span class=
+"doccomment">///         println!("ok: {:?}", ok);</span>
+<span class=
+"doccomment">///         println!("bad: {:?}", bad);</span>
 <span class="doccomment">///     });</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///     // That closure is fine, but now we can&#39;t use `ok` anywhere else,</span>
-<span class="doccomment">///     // since it is owend by the previous task:</span>
-<span class="doccomment">///     // s.spawn(|_| println!(&quot;ok: {:?}&quot;, ok));</span>
+<span class=
+"doccomment">///     // That closure is fine, but now we can't use `ok` anywhere else,</span>
+<span class=
+"doccomment">///     // since it is owend by the previous task:</span>
+<span class=
+"doccomment">///     // s.spawn(|_| println!("ok: {:?}", ok));</span>
 <span class="doccomment">/// });</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// While this works, it could be a problem if we want to use `ok` elsewhere.</span>
-<span class="doccomment">/// There are two choices. We can keep the closure as a `move` closure, but</span>
-<span class="doccomment">/// instead of referencing the variable `ok`, we create a shadowed variable that</span>
-<span class="doccomment">/// is a borrow of `ok` and capture *that*:</span>
+<span class=
+"doccomment">/// While this works, it could be a problem if we want to use `ok` elsewhere.</span>
+<span class=
+"doccomment">/// There are two choices. We can keep the closure as a `move` closure, but</span>
+<span class=
+"doccomment">/// instead of referencing the variable `ok`, we create a shadowed variable that</span>
+<span class=
+"doccomment">/// is a borrow of `ok` and capture *that*:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # use rayon_core as rayon;</span>
-<span class="doccomment">/// let ok: Vec&lt;i32&gt; = vec![1, 2, 3];</span>
+<span class=
+"doccomment">/// let ok: Vec&lt;i32&gt; = vec![1, 2, 3];</span>
 <span class="doccomment">/// rayon::scope(|s| {</span>
-<span class="doccomment">///     let bad: Vec&lt;i32&gt; = vec![4, 5, 6];</span>
-<span class="doccomment">///     let ok: &amp;Vec&lt;i32&gt; = &amp;ok; // shadow the original `ok`</span>
+<span class=
+"doccomment">///     let bad: Vec&lt;i32&gt; = vec![4, 5, 6];</span>
+<span class=
+"doccomment">///     let ok: &amp;Vec&lt;i32&gt; = &amp;ok; // shadow the original `ok`</span>
 <span class="doccomment">///     s.spawn(move |_| {</span>
-<span class="doccomment">///         println!(&quot;ok: {:?}&quot;, ok); // captures the shadowed version</span>
-<span class="doccomment">///         println!(&quot;bad: {:?}&quot;, bad);</span>
+<span class=
+"doccomment">///         println!("ok: {:?}", ok); // captures the shadowed version</span>
+<span class=
+"doccomment">///         println!("bad: {:?}", bad);</span>
 <span class="doccomment">///     });</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///     // Now we too can use the shadowed `ok`, since `&amp;Vec&lt;i32&gt;` references</span>
-<span class="doccomment">///     // can be shared freely. Note that we need a `move` closure here though,</span>
-<span class="doccomment">///     // because otherwise we&#39;d be trying to borrow the shadowed `ok`,</span>
-<span class="doccomment">///     // and that doesn&#39;t outlive `scope`.</span>
-<span class="doccomment">///     s.spawn(move |_| println!(&quot;ok: {:?}&quot;, ok));</span>
+<span class=
+"doccomment">///     // Now we too can use the shadowed `ok`, since `&amp;Vec&lt;i32&gt;` references</span>
+<span class=
+"doccomment">///     // can be shared freely. Note that we need a `move` closure here though,</span>
+<span class=
+"doccomment">///     // because otherwise we'd be trying to borrow the shadowed `ok`,</span>
+<span class=
+"doccomment">///     // and that doesn't outlive `scope`.</span>
+<span class=
+"doccomment">///     s.spawn(move |_| println!("ok: {:?}", ok));</span>
 <span class="doccomment">/// });</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Another option is not to use the `move` keyword but instead to take ownership</span>
+<span class=
+"doccomment">/// Another option is not to use the `move` keyword but instead to take ownership</span>
 <span class="doccomment">/// of individual variables:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # use rayon_core as rayon;</span>
-<span class="doccomment">/// let ok: Vec&lt;i32&gt; = vec![1, 2, 3];</span>
+<span class=
+"doccomment">/// let ok: Vec&lt;i32&gt; = vec![1, 2, 3];</span>
 <span class="doccomment">/// rayon::scope(|s| {</span>
-<span class="doccomment">///     let bad: Vec&lt;i32&gt; = vec![4, 5, 6];</span>
+<span class=
+"doccomment">///     let bad: Vec&lt;i32&gt; = vec![4, 5, 6];</span>
 <span class="doccomment">///     s.spawn(|_| {</span>
-<span class="doccomment">///         // Transfer ownership of `bad` into a local variable (also named `bad`).</span>
-<span class="doccomment">///         // This will force the closure to take ownership of `bad` from the environment.</span>
+<span class=
+"doccomment">///         // Transfer ownership of `bad` into a local variable (also named `bad`).</span>
+<span class=
+"doccomment">///         // This will force the closure to take ownership of `bad` from the environment.</span>
 <span class="doccomment">///         let bad = bad;</span>
-<span class="doccomment">///         println!(&quot;ok: {:?}&quot;, ok); // `ok` is only borrowed.</span>
-<span class="doccomment">///         println!(&quot;bad: {:?}&quot;, bad); // refers to our local variable, above.</span>
+<span class=
+"doccomment">///         println!("ok: {:?}", ok); // `ok` is only borrowed.</span>
+<span class=
+"doccomment">///         println!("bad: {:?}", bad); // refers to our local variable, above.</span>
 <span class="doccomment">///     });</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///     s.spawn(|_| println!(&quot;ok: {:?}&quot;, ok)); // we too can borrow `ok`</span>
+<span class=
+"doccomment">///     s.spawn(|_| println!("ok: {:?}", ok)); // we too can borrow `ok`</span>
 <span class="doccomment">/// });</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Panics</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If a panic occurs, either in the closure given to `scope()` or in</span>
-<span class="doccomment">/// any of the spawned jobs, that panic will be propagated and the</span>
-<span class="doccomment">/// call to `scope()` will panic. If multiple panics occurs, it is</span>
-<span class="doccomment">/// non-deterministic which of their panic values will propagate.</span>
-<span class="doccomment">/// Regardless, once a task is spawned using `scope.spawn()`, it will</span>
-<span class="doccomment">/// execute, even if the spawning task should later panic. `scope()`</span>
-<span class="doccomment">/// returns once all spawned jobs have completed, and any panics are</span>
+<span class=
+"doccomment">/// If a panic occurs, either in the closure given to `scope()` or in</span>
+<span class=
+"doccomment">/// any of the spawned jobs, that panic will be propagated and the</span>
+<span class=
+"doccomment">/// call to `scope()` will panic. If multiple panics occurs, it is</span>
+<span class=
+"doccomment">/// non-deterministic which of their panic values will propagate.</span>
+<span class=
+"doccomment">/// Regardless, once a task is spawned using `scope.spawn()`, it will</span>
+<span class=
+"doccomment">/// execute, even if the spawning task should later panic. `scope()`</span>
+<span class=
+"doccomment">/// returns once all spawned jobs have completed, and any panics are</span>
 <span class="doccomment">/// propagated at that point.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scope</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span>, <span class="ident">OP</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">op</span>: <span class="ident">OP</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class=
+"ident">scope</span><span class="op">&lt;</span><span class=
+"lifetime">'scope</span>, <span class=
+"ident">OP</span>, <span class="ident">R</span><span class=
+"op">&gt;</span>(<span class="ident">op</span>: <span class=
+"ident">OP</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">R</span>
 <span class="kw">where</span>
-    <span class="ident">OP</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span><span class="op">&gt;</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="ident">Scope</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span> <span class="op">+</span> <span class="lifetime">&#39;scope</span> <span class="op">+</span> <span class="ident">Send</span>,
+    <span class="ident">OP</span>: <span class=
+"kw">for</span><span class="op">&lt;</span><span class=
+"lifetime">'s</span><span class="op">&gt;</span> <span class=
+"ident">FnOnce</span>(<span class="kw-2">&</span><span class=
+"lifetime">'s</span> <span class="ident">Scope</span><span class=
+"op">&lt;</span><span class="lifetime">'scope</span><span class=
+"op">&gt;</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">R</span> <span class=
+"op">+</span> <span class="lifetime">'scope</span> <span class=
+"op">+</span> <span class="ident">Send</span>,
     <span class="ident">R</span>: <span class="ident">Send</span>,
 {
-    <span class="ident">in_worker</span>(<span class="op">|</span><span class="ident">owner_thread</span>, <span class="kw">_</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">scope</span> <span class="op">=</span> <span class="ident">Scope</span>::<span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span>::<span class="ident">new</span>(<span class="ident">owner_thread</span>);
-        <span class="kw">unsafe</span> { <span class="ident">scope</span>.<span class="ident">base</span>.<span class="ident">complete</span>(<span class="ident">owner_thread</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">op</span>(<span class="kw-2">&amp;</span><span class="ident">scope</span>)) }
+    <span class="ident">in_worker</span>(<span class=
+"op">|</span><span class="ident">owner_thread</span>, <span class=
+"kw">_</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class=
+"ident">scope</span> <span class="op">=</span> <span class=
+"ident">Scope</span>::<span class="op">&lt;</span><span class=
+"lifetime">'scope</span><span class="op">&gt;</span>::<span class=
+"ident">new</span>(<span class="ident">owner_thread</span>);
+        <span class="kw">unsafe</span> { <span class=
+"ident">scope</span>.<span class="ident">base</span>.<span class=
+"ident">complete</span>(<span class=
+"ident">owner_thread</span>, <span class="op">|</span><span class=
+"op">|</span> <span class="ident">op</span>(<span class=
+"kw-2">&</span><span class="ident">scope</span>)) }
     })
 }
 
-<span class="doccomment">/// Create a &quot;fork-join&quot; scope `s` with FIFO order, and invokes the</span>
-<span class="doccomment">/// closure with a reference to `s`. This closure can then spawn</span>
-<span class="doccomment">/// asynchronous tasks into `s`. Those tasks may run asynchronously with</span>
-<span class="doccomment">/// respect to the closure; they may themselves spawn additional tasks</span>
-<span class="doccomment">/// into `s`. When the closure returns, it will block until all tasks</span>
-<span class="doccomment">/// that have been spawned into `s` complete.</span>
+<span class=
+"doccomment">/// Create a "fork-join" scope `s` with FIFO order, and invokes the</span>
+<span class=
+"doccomment">/// closure with a reference to `s`. This closure can then spawn</span>
+<span class=
+"doccomment">/// asynchronous tasks into `s`. Those tasks may run asynchronously with</span>
+<span class=
+"doccomment">/// respect to the closure; they may themselves spawn additional tasks</span>
+<span class=
+"doccomment">/// into `s`. When the closure returns, it will block until all tasks</span>
+<span class=
+"doccomment">/// that have been spawned into `s` complete.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Task execution</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Tasks in a `scope_fifo()` run similarly to [`scope()`], but there&#39;s a</span>
-<span class="doccomment">/// difference in the order of execution. Consider a similar example:</span>
+<span class=
+"doccomment">/// Tasks in a `scope_fifo()` run similarly to [`scope()`], but there's a</span>
+<span class=
+"doccomment">/// difference in the order of execution. Consider a similar example:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`scope()`]: fn.scope.html</span>
 <span class="doccomment">///</span>
@@ -960,101 +1248,183 @@
 <span class="doccomment">/// # use rayon_core as rayon;</span>
 <span class="doccomment">/// // point start</span>
 <span class="doccomment">/// rayon::scope_fifo(|s| {</span>
-<span class="doccomment">///     s.spawn_fifo(|s| { // task s.1</span>
-<span class="doccomment">///         s.spawn_fifo(|s| { // task s.1.1</span>
-<span class="doccomment">///             rayon::scope_fifo(|t| {</span>
-<span class="doccomment">///                 t.spawn_fifo(|_| ()); // task t.1</span>
-<span class="doccomment">///                 t.spawn_fifo(|_| ()); // task t.2</span>
+<span class=
+"doccomment">///     s.spawn_fifo(|s| { // task s.1</span>
+<span class=
+"doccomment">///         s.spawn_fifo(|s| { // task s.1.1</span>
+<span class=
+"doccomment">///             rayon::scope_fifo(|t| {</span>
+<span class=
+"doccomment">///                 t.spawn_fifo(|_| ()); // task t.1</span>
+<span class=
+"doccomment">///                 t.spawn_fifo(|_| ()); // task t.2</span>
 <span class="doccomment">///             });</span>
 <span class="doccomment">///         });</span>
 <span class="doccomment">///     });</span>
-<span class="doccomment">///     s.spawn_fifo(|s| { // task s.2</span>
+<span class=
+"doccomment">///     s.spawn_fifo(|s| { // task s.2</span>
 <span class="doccomment">///     });</span>
 <span class="doccomment">///     // point mid</span>
 <span class="doccomment">/// });</span>
 <span class="doccomment">/// // point end</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The various tasks that are run will execute roughly like so:</span>
+<span class=
+"doccomment">/// The various tasks that are run will execute roughly like so:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```notrust</span>
 <span class="doccomment">/// | (start)</span>
 <span class="doccomment">/// |</span>
 <span class="doccomment">/// | (FIFO scope `s` created)</span>
-<span class="doccomment">/// +--------------------+ (task s.1)</span>
+<span class=
+"doccomment">/// +--------------------+ (task s.1)</span>
 <span class="doccomment">/// +-------+ (task s.2) |</span>
-<span class="doccomment">/// |       |            +---+ (task s.1.1)</span>
+<span class=
+"doccomment">/// |       |            +---+ (task s.1.1)</span>
 <span class="doccomment">/// |       |            |   |</span>
-<span class="doccomment">/// |       |            |   | (FIFO scope `t` created)</span>
-<span class="doccomment">/// |       |            |   +----------------+ (task t.1)</span>
-<span class="doccomment">/// |       |            |   +---+ (task t.2) |</span>
-<span class="doccomment">/// | (mid) |            |   |   |            |</span>
-<span class="doccomment">/// :       |            |   + &lt;-+------------+ (scope `t` ends)</span>
+<span class=
+"doccomment">/// |       |            |   | (FIFO scope `t` created)</span>
+<span class=
+"doccomment">/// |       |            |   +----------------+ (task t.1)</span>
+<span class=
+"doccomment">/// |       |            |   +---+ (task t.2) |</span>
+<span class=
+"doccomment">/// | (mid) |            |   |   |            |</span>
+<span class=
+"doccomment">/// :       |            |   + &lt;-+------------+ (scope `t` ends)</span>
 <span class="doccomment">/// :       |            |   |</span>
-<span class="doccomment">/// |&lt;------+------------+---+ (scope `s` ends)</span>
+<span class=
+"doccomment">/// |&lt;------+------------+---+ (scope `s` ends)</span>
 <span class="doccomment">/// |</span>
 <span class="doccomment">/// | (end)</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Under `scope_fifo()`, the spawns are prioritized in a FIFO order on</span>
-<span class="doccomment">/// the thread from which they were spawned, as opposed to `scope()`&#39;s</span>
-<span class="doccomment">/// LIFO.  So in this example, we can expect `s.1` to execute before</span>
-<span class="doccomment">/// `s.2`, and `t.1` before `t.2`. Other threads also steal tasks in</span>
-<span class="doccomment">/// FIFO order, as usual. Overall, this has roughly the same order as</span>
-<span class="doccomment">/// the now-deprecated [`breadth_first`] option, except the effect is</span>
-<span class="doccomment">/// isolated to a particular scope. If spawns are intermingled from any</span>
-<span class="doccomment">/// combination of `scope()` and `scope_fifo()`, or from different</span>
-<span class="doccomment">/// threads, their order is only specified with respect to spawns in the</span>
+<span class=
+"doccomment">/// Under `scope_fifo()`, the spawns are prioritized in a FIFO order on</span>
+<span class=
+"doccomment">/// the thread from which they were spawned, as opposed to `scope()`'s</span>
+<span class=
+"doccomment">/// LIFO.  So in this example, we can expect `s.1` to execute before</span>
+<span class=
+"doccomment">/// `s.2`, and `t.1` before `t.2`. Other threads also steal tasks in</span>
+<span class=
+"doccomment">/// FIFO order, as usual. Overall, this has roughly the same order as</span>
+<span class=
+"doccomment">/// the now-deprecated [`breadth_first`] option, except the effect is</span>
+<span class=
+"doccomment">/// isolated to a particular scope. If spawns are intermingled from any</span>
+<span class=
+"doccomment">/// combination of `scope()` and `scope_fifo()`, or from different</span>
+<span class=
+"doccomment">/// threads, their order is only specified with respect to spawns in the</span>
 <span class="doccomment">/// same scope and thread.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// For more details on this design, see Rayon [RFC #1].</span>
+<span class=
+"doccomment">/// For more details on this design, see Rayon [RFC #1].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`breadth_first`]: struct.ThreadPoolBuilder.html#method.breadth_first</span>
-<span class="doccomment">/// [RFC #1]: https://github.com/rayon-rs/rfcs/blob/master/accepted/rfc0001-scope-scheduling.md</span>
+<span class=
+"doccomment">/// [`breadth_first`]: struct.ThreadPoolBuilder.html#method.breadth_first</span>
+<span class=
+"doccomment">/// [RFC #1]: https://github.com/rayon-rs/rfcs/blob/master/accepted/rfc0001-scope-scheduling.md</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Panics</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If a panic occurs, either in the closure given to `scope_fifo()` or</span>
-<span class="doccomment">/// in any of the spawned jobs, that panic will be propagated and the</span>
-<span class="doccomment">/// call to `scope_fifo()` will panic. If multiple panics occurs, it is</span>
-<span class="doccomment">/// non-deterministic which of their panic values will propagate.</span>
-<span class="doccomment">/// Regardless, once a task is spawned using `scope.spawn_fifo()`, it</span>
-<span class="doccomment">/// will execute, even if the spawning task should later panic.</span>
-<span class="doccomment">/// `scope_fifo()` returns once all spawned jobs have completed, and any</span>
-<span class="doccomment">/// panics are propagated at that point.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scope_fifo</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span>, <span class="ident">OP</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">op</span>: <span class="ident">OP</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>
+<span class=
+"doccomment">/// If a panic occurs, either in the closure given to `scope_fifo()` or</span>
+<span class=
+"doccomment">/// in any of the spawned jobs, that panic will be propagated and the</span>
+<span class=
+"doccomment">/// call to `scope_fifo()` will panic. If multiple panics occurs, it is</span>
+<span class=
+"doccomment">/// non-deterministic which of their panic values will propagate.</span>
+<span class=
+"doccomment">/// Regardless, once a task is spawned using `scope.spawn_fifo()`, it</span>
+<span class=
+"doccomment">/// will execute, even if the spawning task should later panic.</span>
+<span class=
+"doccomment">/// `scope_fifo()` returns once all spawned jobs have completed, and any</span>
+<span class=
+"doccomment">/// panics are propagated at that point.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class=
+"ident">scope_fifo</span><span class="op">&lt;</span><span class=
+"lifetime">'scope</span>, <span class=
+"ident">OP</span>, <span class="ident">R</span><span class=
+"op">&gt;</span>(<span class="ident">op</span>: <span class=
+"ident">OP</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">R</span>
 <span class="kw">where</span>
-    <span class="ident">OP</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span><span class="op">&gt;</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="ident">ScopeFifo</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span> <span class="op">+</span> <span class="lifetime">&#39;scope</span> <span class="op">+</span> <span class="ident">Send</span>,
+    <span class="ident">OP</span>: <span class=
+"kw">for</span><span class="op">&lt;</span><span class=
+"lifetime">'s</span><span class="op">&gt;</span> <span class=
+"ident">FnOnce</span>(<span class="kw-2">&</span><span class=
+"lifetime">'s</span> <span class=
+"ident">ScopeFifo</span><span class="op">&lt;</span><span class=
+"lifetime">'scope</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">R</span> <span class="op">+</span> <span class=
+"lifetime">'scope</span> <span class="op">+</span> <span class=
+"ident">Send</span>,
     <span class="ident">R</span>: <span class="ident">Send</span>,
 {
-    <span class="ident">in_worker</span>(<span class="op">|</span><span class="ident">owner_thread</span>, <span class="kw">_</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">scope</span> <span class="op">=</span> <span class="ident">ScopeFifo</span>::<span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span>::<span class="ident">new</span>(<span class="ident">owner_thread</span>);
-        <span class="kw">unsafe</span> { <span class="ident">scope</span>.<span class="ident">base</span>.<span class="ident">complete</span>(<span class="ident">owner_thread</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">op</span>(<span class="kw-2">&amp;</span><span class="ident">scope</span>)) }
+    <span class="ident">in_worker</span>(<span class=
+"op">|</span><span class="ident">owner_thread</span>, <span class=
+"kw">_</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class=
+"ident">scope</span> <span class="op">=</span> <span class=
+"ident">ScopeFifo</span>::<span class="op">&lt;</span><span class=
+"lifetime">'scope</span><span class="op">&gt;</span>::<span class=
+"ident">new</span>(<span class="ident">owner_thread</span>);
+        <span class="kw">unsafe</span> { <span class=
+"ident">scope</span>.<span class="ident">base</span>.<span class=
+"ident">complete</span>(<span class=
+"ident">owner_thread</span>, <span class="op">|</span><span class=
+"op">|</span> <span class="ident">op</span>(<span class=
+"kw-2">&</span><span class="ident">scope</span>)) }
     })
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span> <span class="ident">Scope</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">owner_thread</span>: <span class="kw-2">&amp;</span><span class="ident">WorkerThread</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="lifetime">'scope</span><span class=
+"op">&gt;</span> <span class="ident">Scope</span><span class=
+"op">&lt;</span><span class="lifetime">'scope</span><span class=
+"op">&gt;</span> {
+    <span class="kw">fn</span> <span class=
+"ident">new</span>(<span class=
+"ident">owner_thread</span>: <span class=
+"kw-2">&</span><span class="ident">WorkerThread</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">Scope</span> {
-            <span class="ident">base</span>: <span class="ident">ScopeBase</span>::<span class="ident">new</span>(<span class="ident">owner_thread</span>),
+            <span class="ident">base</span>: <span class=
+"ident">ScopeBase</span>::<span class=
+"ident">new</span>(<span class="ident">owner_thread</span>),
         }
     }
 
-    <span class="doccomment">/// Spawns a job into the fork-join scope `self`. This job will</span>
-    <span class="doccomment">/// execute sometime before the fork-join scope completes.  The</span>
-    <span class="doccomment">/// job is specified as a closure, and this closure receives its</span>
-    <span class="doccomment">/// own reference to the scope `self` as argument. This can be</span>
-    <span class="doccomment">/// used to inject new jobs into `self`.</span>
+    <span class=
+"doccomment">/// Spawns a job into the fork-join scope `self`. This job will</span>
+    <span class=
+"doccomment">/// execute sometime before the fork-join scope completes.  The</span>
+    <span class=
+"doccomment">/// job is specified as a closure, and this closure receives its</span>
+    <span class=
+"doccomment">/// own reference to the scope `self` as argument. This can be</span>
+    <span class=
+"doccomment">/// used to inject new jobs into `self`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Returns</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Nothing. The spawned closures cannot pass back values to the</span>
-    <span class="doccomment">/// caller directly, though they can write to local variables on</span>
-    <span class="doccomment">/// the stack (if those variables outlive the scope) or</span>
-    <span class="doccomment">/// communicate through shared channels.</span>
+    <span class=
+"doccomment">/// Nothing. The spawned closures cannot pass back values to the</span>
+    <span class=
+"doccomment">/// caller directly, though they can write to local variables on</span>
+    <span class=
+"doccomment">/// the stack (if those variables outlive the scope) or</span>
+    <span class=
+"doccomment">/// communicate through shared channels.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// (The intention is to eventualy integrate with Rust futures to</span>
-    <span class="doccomment">/// support spawns of functions that compute a value.)</span>
+    <span class=
+"doccomment">/// (The intention is to eventualy integrate with Rust futures to</span>
+    <span class=
+"doccomment">/// support spawns of functions that compute a value.)</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1065,15 +1435,20 @@
     <span class="doccomment">/// let mut value_c = None;</span>
     <span class="doccomment">/// rayon::scope(|s| {</span>
     <span class="doccomment">///     s.spawn(|s1| {</span>
-    <span class="doccomment">///           // ^ this is the same scope as `s`; this handle `s1`</span>
-    <span class="doccomment">///           //   is intended for use by the spawned task,</span>
-    <span class="doccomment">///           //   since scope handles cannot cross thread boundaries.</span>
+    <span class=
+"doccomment">///           // ^ this is the same scope as `s`; this handle `s1`</span>
+    <span class=
+"doccomment">///           //   is intended for use by the spawned task,</span>
+    <span class=
+"doccomment">///           //   since scope handles cannot cross thread boundaries.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///         value_a = Some(22);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///         // the scope `s` will not end until all these tasks are done</span>
+    <span class=
+"doccomment">///         // the scope `s` will not end until all these tasks are done</span>
     <span class="doccomment">///         s1.spawn(|_| {</span>
-    <span class="doccomment">///             value_b = Some(44);</span>
+    <span class=
+"doccomment">///             value_b = Some(44);</span>
     <span class="doccomment">///         });</span>
     <span class="doccomment">///     });</span>
     <span class="doccomment">///</span>
@@ -1081,215 +1456,529 @@
     <span class="doccomment">///         value_c = Some(66);</span>
     <span class="doccomment">///     });</span>
     <span class="doccomment">/// });</span>
-    <span class="doccomment">/// assert_eq!(value_a, Some(22));</span>
-    <span class="doccomment">/// assert_eq!(value_b, Some(44));</span>
-    <span class="doccomment">/// assert_eq!(value_c, Some(66));</span>
+    <span class=
+"doccomment">/// assert_eq!(value_a, Some(22));</span>
+    <span class=
+"doccomment">/// assert_eq!(value_b, Some(44));</span>
+    <span class=
+"doccomment">/// assert_eq!(value_c, Some(66));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # See also</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The [`scope` function] has more extensive documentation about</span>
+    <span class=
+"doccomment">/// The [`scope` function] has more extensive documentation about</span>
     <span class="doccomment">/// task spawning.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`scope` function]: fn.scope.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn</span><span class="op">&lt;</span><span class="ident">BODY</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">body</span>: <span class="ident">BODY</span>)
+    <span class=
+"doccomment">/// [`scope` function]: fn.scope.html</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">spawn</span><span class=
+"op">&lt;</span><span class="ident">BODY</span><span class=
+"op">&gt;</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">body</span>: <span class=
+"ident">BODY</span>)
     <span class="kw">where</span>
-        <span class="ident">BODY</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Scope</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;scope</span>,
+        <span class="ident">BODY</span>: <span class=
+"ident">FnOnce</span>(<span class="kw-2">&</span><span class=
+"ident">Scope</span><span class="op">&lt;</span><span class=
+"lifetime">'scope</span><span class="op">&gt;</span>) <span class=
+"op">+</span> <span class="ident">Send</span> <span class=
+"op">+</span> <span class="lifetime">'scope</span>,
     {
-        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">increment</span>();
+        <span class="self">self</span>.<span class=
+"ident">base</span>.<span class="ident">increment</span>();
         <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">job_ref</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">HeapJob</span>::<span class="ident">new</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">execute_job</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">body</span>(<span class="self">self</span>))
+            <span class="kw">let</span> <span class=
+"ident">job_ref</span> <span class="op">=</span> <span class=
+"ident">Box</span>::<span class="ident">new</span>(<span class=
+"ident">HeapJob</span>::<span class="ident">new</span>(<span class=
+"kw">move</span> <span class="op">|</span><span class=
+"op">|</span> {
+                <span class="self">self</span>.<span class=
+"ident">base</span>.<span class=
+"ident">execute_job</span>(<span class=
+"kw">move</span> <span class="op">|</span><span class=
+"op">|</span> <span class="ident">body</span>(<span class=
+"self">self</span>))
             }))
             .<span class="ident">as_job_ref</span>();
 
-            <span class="comment">// Since `Scope` implements `Sync`, we can&#39;t be sure that we&#39;re still in a</span>
-            <span class="comment">// thread of this pool, so we can&#39;t just push to the local worker thread.</span>
-            <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">registry</span>.<span class="ident">inject_or_push</span>(<span class="ident">job_ref</span>);
+            <span class=
+"comment">// Since `Scope` implements `Sync`, we can't be sure that we're still in a</span>
+            <span class=
+"comment">// thread of this pool, so we can't just push to the local worker thread.</span>
+            <span class="self">self</span>.<span class=
+"ident">base</span>.<span class=
+"ident">registry</span>.<span class="ident">inject_or_push</span>(<span class="ident">job_ref</span>);
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span> <span class="ident">ScopeFifo</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">owner_thread</span>: <span class="kw-2">&amp;</span><span class="ident">WorkerThread</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">num_threads</span> <span class="op">=</span> <span class="ident">owner_thread</span>.<span class="ident">registry</span>().<span class="ident">num_threads</span>();
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="lifetime">'scope</span><span class=
+"op">&gt;</span> <span class="ident">ScopeFifo</span><span class=
+"op">&lt;</span><span class="lifetime">'scope</span><span class=
+"op">&gt;</span> {
+    <span class="kw">fn</span> <span class=
+"ident">new</span>(<span class=
+"ident">owner_thread</span>: <span class=
+"kw-2">&</span><span class="ident">WorkerThread</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">let</span> <span class=
+"ident">num_threads</span> <span class="op">=</span> <span class=
+"ident">owner_thread</span>.<span class=
+"ident">registry</span>().<span class="ident">num_threads</span>();
         <span class="ident">ScopeFifo</span> {
-            <span class="ident">base</span>: <span class="ident">ScopeBase</span>::<span class="ident">new</span>(<span class="ident">owner_thread</span>),
-            <span class="ident">fifos</span>: (<span class="number">0</span>..<span class="ident">num_threads</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">JobFifo</span>::<span class="ident">new</span>()).<span class="ident">collect</span>(),
+            <span class="ident">base</span>: <span class=
+"ident">ScopeBase</span>::<span class=
+"ident">new</span>(<span class="ident">owner_thread</span>),
+            <span class="ident">fifos</span>: (<span class=
+"number">0</span>..<span class=
+"ident">num_threads</span>).<span class=
+"ident">map</span>(<span class="op">|</span><span class=
+"kw">_</span><span class="op">|</span> <span class=
+"ident">JobFifo</span>::<span class=
+"ident">new</span>()).<span class="ident">collect</span>(),
         }
     }
 
-    <span class="doccomment">/// Spawns a job into the fork-join scope `self`. This job will</span>
-    <span class="doccomment">/// execute sometime before the fork-join scope completes.  The</span>
-    <span class="doccomment">/// job is specified as a closure, and this closure receives its</span>
-    <span class="doccomment">/// own reference to the scope `self` as argument. This can be</span>
-    <span class="doccomment">/// used to inject new jobs into `self`.</span>
+    <span class=
+"doccomment">/// Spawns a job into the fork-join scope `self`. This job will</span>
+    <span class=
+"doccomment">/// execute sometime before the fork-join scope completes.  The</span>
+    <span class=
+"doccomment">/// job is specified as a closure, and this closure receives its</span>
+    <span class=
+"doccomment">/// own reference to the scope `self` as argument. This can be</span>
+    <span class=
+"doccomment">/// used to inject new jobs into `self`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # See also</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This method is akin to [`Scope::spawn()`], but with a FIFO</span>
-    <span class="doccomment">/// priority.  The [`scope_fifo` function] has more details about</span>
+    <span class=
+"doccomment">/// This method is akin to [`Scope::spawn()`], but with a FIFO</span>
+    <span class=
+"doccomment">/// priority.  The [`scope_fifo` function] has more details about</span>
     <span class="doccomment">/// this distinction.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Scope::spawn()`]: struct.Scope.html#method.spawn</span>
-    <span class="doccomment">/// [`scope_fifo` function]: fn.scope.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn_fifo</span><span class="op">&lt;</span><span class="ident">BODY</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">body</span>: <span class="ident">BODY</span>)
+    <span class=
+"doccomment">/// [`Scope::spawn()`]: struct.Scope.html#method.spawn</span>
+    <span class=
+"doccomment">/// [`scope_fifo` function]: fn.scope.html</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">spawn_fifo</span><span class=
+"op">&lt;</span><span class="ident">BODY</span><span class=
+"op">&gt;</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">body</span>: <span class=
+"ident">BODY</span>)
     <span class="kw">where</span>
-        <span class="ident">BODY</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">ScopeFifo</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;scope</span>,
+        <span class="ident">BODY</span>: <span class=
+"ident">FnOnce</span>(<span class="kw-2">&</span><span class=
+"ident">ScopeFifo</span><span class="op">&lt;</span><span class=
+"lifetime">'scope</span><span class="op">&gt;</span>) <span class=
+"op">+</span> <span class="ident">Send</span> <span class=
+"op">+</span> <span class="lifetime">'scope</span>,
     {
-        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">increment</span>();
+        <span class="self">self</span>.<span class=
+"ident">base</span>.<span class="ident">increment</span>();
         <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">job_ref</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">HeapJob</span>::<span class="ident">new</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">execute_job</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">body</span>(<span class="self">self</span>))
+            <span class="kw">let</span> <span class=
+"ident">job_ref</span> <span class="op">=</span> <span class=
+"ident">Box</span>::<span class="ident">new</span>(<span class=
+"ident">HeapJob</span>::<span class="ident">new</span>(<span class=
+"kw">move</span> <span class="op">|</span><span class=
+"op">|</span> {
+                <span class="self">self</span>.<span class=
+"ident">base</span>.<span class=
+"ident">execute_job</span>(<span class=
+"kw">move</span> <span class="op">|</span><span class=
+"op">|</span> <span class="ident">body</span>(<span class=
+"self">self</span>))
             }))
             .<span class="ident">as_job_ref</span>();
 
-            <span class="comment">// If we&#39;re in the pool, use our scope&#39;s private fifo for this thread to execute</span>
-            <span class="comment">// in a locally-FIFO order.  Otherwise, just use the pool&#39;s global injector.</span>
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">registry</span>.<span class="ident">current_thread</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">worker</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">let</span> <span class="ident">fifo</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fifos</span>[<span class="ident">worker</span>.<span class="ident">index</span>()];
-                    <span class="ident">worker</span>.<span class="ident">push</span>(<span class="ident">fifo</span>.<span class="ident">push</span>(<span class="ident">job_ref</span>));
+            <span class=
+"comment">// If we're in the pool, use our scope's private fifo for this thread to execute</span>
+            <span class=
+"comment">// in a locally-FIFO order.  Otherwise, just use the pool's global injector.</span>
+            <span class="kw">match</span> <span class=
+"self">self</span>.<span class="ident">base</span>.<span class=
+"ident">registry</span>.<span class=
+"ident">current_thread</span>() {
+                <span class="prelude-val">Some</span>(<span class=
+"ident">worker</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+                    <span class="kw">let</span> <span class=
+"ident">fifo</span> <span class="op">=</span> <span class=
+"kw-2">&</span><span class="self">self</span>.<span class=
+"ident">fifos</span>[<span class="ident">worker</span>.<span class=
+"ident">index</span>()];
+                    <span class="ident">worker</span>.<span class=
+"ident">push</span>(<span class="ident">fifo</span>.<span class=
+"ident">push</span>(<span class="ident">job_ref</span>));
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">registry</span>.<span class="ident">inject</span>(<span class="kw-2">&amp;</span>[<span class="ident">job_ref</span>]),
+                <span class="prelude-val">None</span> <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"self">self</span>.<span class="ident">base</span>.<span class=
+"ident">registry</span>.<span class=
+"ident">inject</span>(<span class="kw-2">&</span>[<span class=
+"ident">job_ref</span>]),
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span> <span class="ident">ScopeBase</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create the base of a new scope for the given worker thread</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">owner_thread</span>: <span class="kw-2">&amp;</span><span class="ident">WorkerThread</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="lifetime">'scope</span><span class=
+"op">&gt;</span> <span class="ident">ScopeBase</span><span class=
+"op">&lt;</span><span class="lifetime">'scope</span><span class=
+"op">&gt;</span> {
+    <span class=
+"doccomment">/// Create the base of a new scope for the given worker thread</span>
+    <span class="kw">fn</span> <span class=
+"ident">new</span>(<span class=
+"ident">owner_thread</span>: <span class=
+"kw-2">&</span><span class="ident">WorkerThread</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">ScopeBase</span> {
-            <span class="ident">owner_thread_index</span>: <span class="ident">owner_thread</span>.<span class="ident">index</span>(),
-            <span class="ident">registry</span>: <span class="ident">owner_thread</span>.<span class="ident">registry</span>().<span class="ident">clone</span>(),
-            <span class="ident">panic</span>: <span class="ident">AtomicPtr</span>::<span class="ident">new</span>(<span class="ident">ptr</span>::<span class="ident">null_mut</span>()),
-            <span class="ident">job_completed_latch</span>: <span class="ident">CountLatch</span>::<span class="ident">new</span>(),
-            <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
+            <span class=
+"ident">owner_thread_index</span>: <span class=
+"ident">owner_thread</span>.<span class="ident">index</span>(),
+            <span class="ident">registry</span>: <span class=
+"ident">owner_thread</span>.<span class=
+"ident">registry</span>().<span class="ident">clone</span>(),
+            <span class="ident">panic</span>: <span class=
+"ident">AtomicPtr</span>::<span class=
+"ident">new</span>(<span class="ident">ptr</span>::<span class=
+"ident">null_mut</span>()),
+            <span class=
+"ident">job_completed_latch</span>: <span class=
+"ident">CountLatch</span>::<span class="ident">new</span>(),
+            <span class="ident">marker</span>: <span class=
+"ident">PhantomData</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">job_completed_latch</span>.<span class="ident">increment</span>();
+    <span class="kw">fn</span> <span class=
+"ident">increment</span>(<span class="kw-2">&</span><span class=
+"self">self</span>) {
+        <span class="self">self</span>.<span class=
+"ident">job_completed_latch</span>.<span class=
+"ident">increment</span>();
     }
 
-    <span class="doccomment">/// Executes `func` as a job, either aborting or executing as</span>
+    <span class=
+"doccomment">/// Executes `func` as a job, either aborting or executing as</span>
     <span class="doccomment">/// appropriate.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Unsafe because it must be executed on a worker thread.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">complete</span><span class="op">&lt;</span><span class="ident">FUNC</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">owner_thread</span>: <span class="kw-2">&amp;</span><span class="ident">WorkerThread</span>, <span class="ident">func</span>: <span class="ident">FUNC</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>
+    <span class=
+"doccomment">/// Unsafe because it must be executed on a worker thread.</span>
+    <span class="kw">unsafe</span> <span class=
+"kw">fn</span> <span class="ident">complete</span><span class=
+"op">&lt;</span><span class="ident">FUNC</span>, <span class=
+"ident">R</span><span class="op">&gt;</span>(<span class=
+"kw-2">&</span><span class="self">self</span>, <span class=
+"ident">owner_thread</span>: <span class=
+"kw-2">&</span><span class="ident">WorkerThread</span>, <span class="ident">func</span>: <span class="ident">FUNC</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>
     <span class="kw">where</span>
-        <span class="ident">FUNC</span>: <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>,
+        <span class="ident">FUNC</span>: <span class=
+"ident">FnOnce</span>() <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">R</span>,
     {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">execute_job_closure</span>(<span class="ident">func</span>);
-        <span class="self">self</span>.<span class="ident">steal_till_jobs_complete</span>(<span class="ident">owner_thread</span>);
-        <span class="ident">result</span>.<span class="ident">unwrap</span>() <span class="comment">// only None if `op` panicked, and that would have been propagated</span>
+        <span class="kw">let</span> <span class=
+"ident">result</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class=
+"ident">execute_job_closure</span>(<span class=
+"ident">func</span>);
+        <span class="self">self</span>.<span class=
+"ident">steal_till_jobs_complete</span>(<span class=
+"ident">owner_thread</span>);
+        <span class="ident">result</span>.<span class=
+"ident">unwrap</span>() <span class=
+"comment">// only None if `op` panicked, and that would have been propagated</span>
     }
 
-    <span class="doccomment">/// Executes `func` as a job, either aborting or executing as</span>
+    <span class=
+"doccomment">/// Executes `func` as a job, either aborting or executing as</span>
     <span class="doccomment">/// appropriate.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Unsafe because it must be executed on a worker thread.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">execute_job</span><span class="op">&lt;</span><span class="ident">FUNC</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">FUNC</span>)
+    <span class=
+"doccomment">/// Unsafe because it must be executed on a worker thread.</span>
+    <span class="kw">unsafe</span> <span class=
+"kw">fn</span> <span class="ident">execute_job</span><span class=
+"op">&lt;</span><span class="ident">FUNC</span><span class=
+"op">&gt;</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">func</span>: <span class=
+"ident">FUNC</span>)
     <span class="kw">where</span>
-        <span class="ident">FUNC</span>: <span class="ident">FnOnce</span>(),
+        <span class="ident">FUNC</span>: <span class=
+"ident">FnOnce</span>(),
     {
-        <span class="kw">let</span> <span class="kw">_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">execute_job_closure</span>(<span class="ident">func</span>);
+        <span class="kw">let</span> <span class=
+"kw">_</span>: <span class="prelude-ty">Option</span><span class=
+"op">&lt;</span>()<span class="op">&gt;</span> <span class=
+"op">=</span> <span class="self">self</span>.<span class=
+"ident">execute_job_closure</span>(<span class=
+"ident">func</span>);
     }
 
-    <span class="doccomment">/// Executes `func` as a job in scope. Adjusts the &quot;job completed&quot;</span>
-    <span class="doccomment">/// counters and also catches any panic and stores it into</span>
+    <span class=
+"doccomment">/// Executes `func` as a job in scope. Adjusts the "job completed"</span>
+    <span class=
+"doccomment">/// counters and also catches any panic and stores it into</span>
     <span class="doccomment">/// `scope`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Unsafe because this must be executed on a worker thread.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">execute_job_closure</span><span class="op">&lt;</span><span class="ident">FUNC</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">FUNC</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+    <span class=
+"doccomment">/// Unsafe because this must be executed on a worker thread.</span>
+    <span class="kw">unsafe</span> <span class=
+"kw">fn</span> <span class=
+"ident">execute_job_closure</span><span class=
+"op">&lt;</span><span class="ident">FUNC</span>, <span class=
+"ident">R</span><span class="op">&gt;</span>(<span class=
+"kw-2">&</span><span class="self">self</span>, <span class=
+"ident">func</span>: <span class="ident">FUNC</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"prelude-ty">Option</span><span class="op">&lt;</span><span class=
+"ident">R</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">FUNC</span>: <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>,
+        <span class="ident">FUNC</span>: <span class=
+"ident">FnOnce</span>() <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">R</span>,
     {
-        <span class="kw">match</span> <span class="ident">unwind</span>::<span class="ident">halt_unwinding</span>(<span class="ident">func</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="self">self</span>.<span class="ident">job_completed_ok</span>();
-                <span class="prelude-val">Some</span>(<span class="ident">r</span>)
+        <span class="kw">match</span> <span class=
+"ident">unwind</span>::<span class=
+"ident">halt_unwinding</span>(<span class="ident">func</span>) {
+            <span class="prelude-val">Ok</span>(<span class=
+"ident">r</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+                <span class="self">self</span>.<span class=
+"ident">job_completed_ok</span>();
+                <span class="prelude-val">Some</span>(<span class=
+"ident">r</span>)
             }
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="self">self</span>.<span class="ident">job_panicked</span>(<span class="ident">err</span>);
+            <span class="prelude-val">Err</span>(<span class=
+"ident">err</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+                <span class="self">self</span>.<span class=
+"ident">job_panicked</span>(<span class="ident">err</span>);
                 <span class="prelude-val">None</span>
             }
         }
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">job_panicked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">err</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>) {
-        <span class="comment">// capture the first error we see, free the rest</span>
-        <span class="kw">let</span> <span class="ident">nil</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">null_mut</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">err</span>); <span class="comment">// box up the fat ptr</span>
+    <span class="kw">unsafe</span> <span class=
+"kw">fn</span> <span class="ident">job_panicked</span>(<span class=
+"kw-2">&</span><span class="self">self</span>, <span class=
+"ident">err</span>: <span class="ident">Box</span><span class=
+"op">&lt;</span><span class="kw">dyn</span> <span class=
+"ident">Any</span> <span class="op">+</span> <span class=
+"ident">Send</span> <span class="op">+</span> <span class=
+"lifetime">'static</span><span class="op">&gt;</span>) {
+        <span class=
+"comment">// capture the first error we see, free the rest</span>
+        <span class="kw">let</span> <span class=
+"ident">nil</span> <span class="op">=</span> <span class=
+"ident">ptr</span>::<span class="ident">null_mut</span>();
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">err</span> <span class=
+"op">=</span> <span class="ident">Box</span>::<span class=
+"ident">new</span>(<span class="ident">err</span>); <span class=
+"comment">// box up the fat ptr</span>
         <span class="kw">if</span> <span class="self">self</span>
             .<span class="ident">panic</span>
-            .<span class="ident">compare_exchange</span>(<span class="ident">nil</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">err</span>, <span class="ident">Ordering</span>::<span class="ident">Release</span>, <span class="ident">Ordering</span>::<span class="ident">Relaxed</span>)
+            .<span class=
+"ident">compare_exchange</span>(<span class=
+"ident">nil</span>, <span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="kw-2">*</span><span class=
+"ident">err</span>, <span class=
+"ident">Ordering</span>::<span class=
+"ident">Release</span>, <span class=
+"ident">Ordering</span>::<span class="ident">Relaxed</span>)
             .<span class="ident">is_ok</span>()
         {
-            <span class="macro">log</span><span class="macro">!</span>(<span class="ident">JobPanickedErrorStored</span> {
-                <span class="ident">owner_thread</span>: <span class="self">self</span>.<span class="ident">owner_thread_index</span>
+            <span class="macro">log</span><span class=
+"macro">!</span>(<span class=
+"ident">JobPanickedErrorStored</span> {
+                <span class=
+"ident">owner_thread</span>: <span class=
+"self">self</span>.<span class="ident">owner_thread_index</span>
             });
-            <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">err</span>); <span class="comment">// ownership now transferred into self.panic</span>
+            <span class="ident">mem</span>::<span class=
+"ident">forget</span>(<span class="ident">err</span>); <span class=
+"comment">// ownership now transferred into self.panic</span>
         } <span class="kw">else</span> {
-            <span class="macro">log</span><span class="macro">!</span>(<span class="ident">JobPanickedErrorNotStored</span> {
-                <span class="ident">owner_thread</span>: <span class="self">self</span>.<span class="ident">owner_thread_index</span>
+            <span class="macro">log</span><span class=
+"macro">!</span>(<span class=
+"ident">JobPanickedErrorNotStored</span> {
+                <span class=
+"ident">owner_thread</span>: <span class=
+"self">self</span>.<span class="ident">owner_thread_index</span>
             });
         }
 
-        <span class="self">self</span>.<span class="ident">job_completed_latch</span>.<span class="ident">set</span>();
+        <span class="self">self</span>.<span class=
+"ident">job_completed_latch</span>.<span class=
+"ident">set</span>();
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">job_completed_ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="macro">log</span><span class="macro">!</span>(<span class="ident">JobCompletedOk</span> {
-            <span class="ident">owner_thread</span>: <span class="self">self</span>.<span class="ident">owner_thread_index</span>
+    <span class="kw">unsafe</span> <span class=
+"kw">fn</span> <span class=
+"ident">job_completed_ok</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) {
+        <span class="macro">log</span><span class=
+"macro">!</span>(<span class="ident">JobCompletedOk</span> {
+            <span class="ident">owner_thread</span>: <span class=
+"self">self</span>.<span class="ident">owner_thread_index</span>
         });
-        <span class="self">self</span>.<span class="ident">job_completed_latch</span>.<span class="ident">set</span>();
+        <span class="self">self</span>.<span class=
+"ident">job_completed_latch</span>.<span class=
+"ident">set</span>();
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">steal_till_jobs_complete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">owner_thread</span>: <span class="kw-2">&amp;</span><span class="ident">WorkerThread</span>) {
-        <span class="comment">// wait for job counter to reach 0:</span>
-        <span class="ident">owner_thread</span>.<span class="ident">wait_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">job_completed_latch</span>);
+    <span class="kw">unsafe</span> <span class=
+"kw">fn</span> <span class=
+"ident">steal_till_jobs_complete</span>(<span class=
+"kw-2">&</span><span class="self">self</span>, <span class=
+"ident">owner_thread</span>: <span class=
+"kw-2">&</span><span class="ident">WorkerThread</span>) {
+        <span class=
+"comment">// wait for job counter to reach 0:</span>
+        <span class="ident">owner_thread</span>.<span class=
+"ident">wait_until</span>(<span class="kw-2">&</span><span class=
+"self">self</span>.<span class="ident">job_completed_latch</span>);
 
-        <span class="comment">// propagate panic, if any occurred; at this point, all</span>
-        <span class="comment">// outstanding jobs have completed, so we can use a relaxed</span>
+        <span class=
+"comment">// propagate panic, if any occurred; at this point, all</span>
+        <span class=
+"comment">// outstanding jobs have completed, so we can use a relaxed</span>
         <span class="comment">// ordering:</span>
-        <span class="kw">let</span> <span class="ident">panic</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">panic</span>.<span class="ident">swap</span>(<span class="ident">ptr</span>::<span class="ident">null_mut</span>(), <span class="ident">Ordering</span>::<span class="ident">Relaxed</span>);
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">panic</span>.<span class="ident">is_null</span>() {
-            <span class="macro">log</span><span class="macro">!</span>(<span class="ident">ScopeCompletePanicked</span> {
-                <span class="ident">owner_thread</span>: <span class="ident">owner_thread</span>.<span class="ident">index</span>()
+        <span class="kw">let</span> <span class=
+"ident">panic</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class="ident">panic</span>.<span class=
+"ident">swap</span>(<span class="ident">ptr</span>::<span class=
+"ident">null_mut</span>(), <span class=
+"ident">Ordering</span>::<span class="ident">Relaxed</span>);
+        <span class="kw">if</span> <span class=
+"op">!</span><span class="ident">panic</span>.<span class=
+"ident">is_null</span>() {
+            <span class="macro">log</span><span class=
+"macro">!</span>(<span class="ident">ScopeCompletePanicked</span> {
+                <span class=
+"ident">owner_thread</span>: <span class=
+"ident">owner_thread</span>.<span class="ident">index</span>()
             });
-            <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">transmute</span>(<span class="ident">panic</span>);
-            <span class="ident">unwind</span>::<span class="ident">resume_unwinding</span>(<span class="kw-2">*</span><span class="ident">value</span>);
+            <span class="kw">let</span> <span class=
+"ident">value</span>: <span class="ident">Box</span><span class=
+"op">&lt;</span><span class="ident">Box</span><span class=
+"op">&lt;</span><span class="kw">dyn</span> <span class=
+"ident">Any</span> <span class="op">+</span> <span class=
+"ident">Send</span> <span class="op">+</span> <span class=
+"lifetime">'static</span><span class="op">&gt;</span><span class=
+"op">&gt;</span> <span class="op">=</span> <span class=
+"ident">mem</span>::<span class=
+"ident">transmute</span>(<span class="ident">panic</span>);
+            <span class="ident">unwind</span>::<span class=
+"ident">resume_unwinding</span>(<span class=
+"kw-2">*</span><span class="ident">value</span>);
         } <span class="kw">else</span> {
-            <span class="macro">log</span><span class="macro">!</span>(<span class="ident">ScopeCompleteNoPanic</span> {
-                <span class="ident">owner_thread</span>: <span class="ident">owner_thread</span>.<span class="ident">index</span>()
+            <span class="macro">log</span><span class=
+"macro">!</span>(<span class="ident">ScopeCompleteNoPanic</span> {
+                <span class=
+"ident">owner_thread</span>: <span class=
+"ident">owner_thread</span>.<span class="ident">index</span>()
             });
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Scope</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Scope&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;pool_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">base</span>.<span class="ident">registry</span>.<span class="ident">id</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;owner_thread_index&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">base</span>.<span class="ident">owner_thread_index</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;panic&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">base</span>.<span class="ident">panic</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;job_completed_latch&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">base</span>.<span class="ident">job_completed_latch</span>)
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="lifetime">'scope</span><span class=
+"op">&gt;</span> <span class="ident">fmt</span>::<span class=
+"ident">Debug</span> <span class="kw">for</span> <span class=
+"ident">Scope</span><span class="op">&lt;</span><span class=
+"lifetime">'scope</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class=
+"ident">fmt</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">fmt</span>: <span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">fmt</span>::<span class=
+"ident">Formatter</span><span class="op">&lt;</span><span class=
+"lifetime">'_</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="ident">fmt</span>.<span class=
+"ident">debug_struct</span>(<span class="string">"Scope"</span>)
+            .<span class="ident">field</span>(<span class=
+"string">"pool_id"</span>, <span class="kw-2">&</span><span class=
+"self">self</span>.<span class="ident">base</span>.<span class=
+"ident">registry</span>.<span class="ident">id</span>())
+            .<span class="ident">field</span>(<span class=
+"string">"owner_thread_index"</span>, <span class=
+"kw-2">&</span><span class="self">self</span>.<span class=
+"ident">base</span>.<span class="ident">owner_thread_index</span>)
+            .<span class="ident">field</span>(<span class=
+"string">"panic"</span>, <span class="kw-2">&</span><span class=
+"self">self</span>.<span class="ident">base</span>.<span class=
+"ident">panic</span>)
+            .<span class="ident">field</span>(<span class=
+"string">"job_completed_latch"</span>, <span class=
+"kw-2">&</span><span class="self">self</span>.<span class=
+"ident">base</span>.<span class="ident">job_completed_latch</span>)
             .<span class="ident">finish</span>()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ScopeFifo</span><span class="op">&lt;</span><span class="lifetime">&#39;scope</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;ScopeFifo&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;num_fifos&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fifos</span>.<span class="ident">len</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;pool_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">base</span>.<span class="ident">registry</span>.<span class="ident">id</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;owner_thread_index&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">base</span>.<span class="ident">owner_thread_index</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;panic&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">base</span>.<span class="ident">panic</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;job_completed_latch&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">base</span>.<span class="ident">job_completed_latch</span>)
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="lifetime">'scope</span><span class=
+"op">&gt;</span> <span class="ident">fmt</span>::<span class=
+"ident">Debug</span> <span class="kw">for</span> <span class=
+"ident">ScopeFifo</span><span class="op">&lt;</span><span class=
+"lifetime">'scope</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class=
+"ident">fmt</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">fmt</span>: <span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">fmt</span>::<span class=
+"ident">Formatter</span><span class="op">&lt;</span><span class=
+"lifetime">'_</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="ident">fmt</span>.<span class=
+"ident">debug_struct</span>(<span class=
+"string">"ScopeFifo"</span>)
+            .<span class="ident">field</span>(<span class=
+"string">"num_fifos"</span>, <span class=
+"kw-2">&</span><span class="self">self</span>.<span class=
+"ident">fifos</span>.<span class="ident">len</span>())
+            .<span class="ident">field</span>(<span class=
+"string">"pool_id"</span>, <span class="kw-2">&</span><span class=
+"self">self</span>.<span class="ident">base</span>.<span class=
+"ident">registry</span>.<span class="ident">id</span>())
+            .<span class="ident">field</span>(<span class=
+"string">"owner_thread_index"</span>, <span class=
+"kw-2">&</span><span class="self">self</span>.<span class=
+"ident">base</span>.<span class="ident">owner_thread_index</span>)
+            .<span class="ident">field</span>(<span class=
+"string">"panic"</span>, <span class="kw-2">&</span><span class=
+"self">self</span>.<span class="ident">base</span>.<span class=
+"ident">panic</span>)
+            .<span class="ident">field</span>(<span class=
+"string">"job_completed_latch"</span>, <span class=
+"kw-2">&</span><span class="self">self</span>.<span class=
+"ident">base</span>.<span class="ident">job_completed_latch</span>)
             .<span class="ident">finish</span>()
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "rayon_core";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>MathJax.Hub.Config({TeX: {Macros: {dd: "{\\mathop{}\\!\\mathrm{d}}", textsc: ["\\mathrm{\\scriptsize #1}", 1], vt: ["\\boldsymbol{#1}", 1], pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2], ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2], defeq: "\\mathrel{\\vcenter:}=", abs: ["\\lvert #1 \\rvert", 1], angles: ["\\langle #1 \\rangle", 1]}}});</script></body></html>
+</section>
+<section id="search" class="content hidden"></section>
+<section class="footer"></section>
+<script>
+window.rootPath = "../../../";window.currentCrate = "rayon_core";
+</script>
+<script src="../../../aliases.js"></script>
+<script src="../../../main.js"></script>
+<script src="../../../source-script.js"></script>
+<script src="../../../source-files.js"></script>
+<script defer src="../../../search-index.js"></script>
+</body>
+</html>
