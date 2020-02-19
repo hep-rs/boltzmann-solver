@@ -28,7 +28,7 @@ find . -type f -name "*.html" -print0 |
 find . -type f -name "*.html" -print0 |
     xargs -0 -P$(nproc) \
         sed -n -i \
-            -e '/<\/head>/r ../ci/mathjax.html' \
+            -e '/<\/head>/r ../.ci/mathjax.html' \
             -e '1x' \
             -e '2,${x;p}' \
             -e '${x;p}'
