@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::f64;
 
 /// Cubic Hermite spline interpolator using a constant data array
+#[allow(clippy::module_name_repetitions)]
 pub struct ConstCubicHermiteSpline {
     /// Data array arranged in triples of `(xi, yi, mi)` where `xi`, `yi` are x
     /// and y values of a particular point, and `mi` is the gradient for that
@@ -19,6 +20,7 @@ impl ConstCubicHermiteSpline {
     ///
     /// For values of `x` outside of the domain of the underlying data, the
     /// boundary value is returned.
+    #[must_use]
     pub fn sample(&self, x: f64) -> f64 {
         match self
             .data
@@ -77,6 +79,7 @@ impl CubicHermiteSplinePoint {
 /// Cubic Hermite spline interpolator
 #[derive(Debug)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[allow(clippy::module_name_repetitions)]
 pub struct CubicHermiteSpline {
     // `(x, y, m, accurate)` tuples through which the spline goes through, with
     // gradient `m`.  The accurate flag determines whether the interval between
@@ -89,6 +92,7 @@ pub struct CubicHermiteSpline {
 
 impl CubicHermiteSpline {
     /// Create a new empty cubic Hermite Spline.
+    #[must_use]
     pub fn empty() -> Self {
         CubicHermiteSpline {
             data: Vec::new(),
@@ -97,11 +101,13 @@ impl CubicHermiteSpline {
     }
 
     /// Return the number of data points in the underlying data.
+    #[must_use]
     pub fn len(&self) -> usize {
         self.data.len()
     }
 
     /// Check whether the spline is empty
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.data.is_empty()
     }
@@ -188,6 +194,7 @@ impl CubicHermiteSpline {
     /// automatically determined to be false.  If the `x` value is a known
     /// control point, then `true` is returned even if the interval on either
     /// side might not be accurate.
+    #[must_use]
     pub fn accurate(&self, x: f64) -> bool {
         match self.data.binary_search_by(|p| p.x.partial_cmp(&x).unwrap()) {
             Ok(_) => true,
@@ -201,6 +208,7 @@ impl CubicHermiteSpline {
     ///
     /// For values of `x` outside of the domain of the underlying data, the
     /// boundary value is returned.
+    #[must_use]
     pub fn sample(&self, x: f64) -> f64 {
         match self.data.binary_search_by(|p| p.x.partial_cmp(&x).unwrap()) {
             Ok(i) => self.data[i].y,
@@ -227,8 +235,9 @@ impl CubicHermiteSpline {
 ///
 /// This is the analogous version of the recursively generated linearly spaced
 /// interval [`rec_linspace`].
+#[must_use]
 pub fn rec_geomspace(start: f64, end: f64, recursions: u32) -> Vec<f64> {
-    let mut v = Vec::with_capacity(2usize.pow(recursions));
+    let mut v = Vec::with_capacity(2_usize.pow(recursions));
 
     v.push(start);
     v.push(end);
@@ -237,7 +246,7 @@ pub fn rec_geomspace(start: f64, end: f64, recursions: u32) -> Vec<f64> {
     let end = end.ln();
 
     let mut base = 2.0;
-    for i in 2..2u64.pow(recursions) {
+    for i in 2..2_u64.pow(recursions) {
         let i = i as f64;
         if i > base {
             base *= 2.0;
@@ -268,14 +277,15 @@ pub fn rec_geomspace(start: f64, end: f64, recursions: u32) -> Vec<f64> {
 /// \\end{equation}
 ///
 /// The number of recursions is determined by `recursions`.
+#[must_use]
 pub fn rec_linspace(start: f64, end: f64, recursions: u32) -> Vec<f64> {
-    let mut v = Vec::with_capacity(2usize.pow(recursions));
+    let mut v = Vec::with_capacity(2_usize.pow(recursions));
 
     v.push(start);
     v.push(end);
 
     let mut base = 2.0;
-    for i in 2..2u64.pow(recursions) {
+    for i in 2..2_u64.pow(recursions) {
         let i = i as f64;
         if i > base {
             base *= 2.0;
@@ -320,7 +330,7 @@ mod test {
         let mut path = env::temp_dir();
         path.push("spline.csv");
         let mut output = BufWriter::new(fs::File::create(path)?);
-        for &x in Array1::linspace(0.0, 1.0, 2usize.pow(RECURSIONS)).iter() {
+        for &x in Array1::linspace(0.0, 1.0, 2_usize.pow(RECURSIONS)).iter() {
             writeln!(output, "{:e},{:e}", x, spline.sample(x))?;
         }
 

@@ -19,6 +19,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// The particles are signed such that particles are > 0 and antiparticles are <
 /// 0.
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct InteractionParticles {
@@ -31,6 +32,7 @@ pub struct InteractionParticles {
 impl InteractionParticles {
     /// Convert the signed particle numbers to indices which can be used to
     /// index the model's particle.
+    #[must_use]
     pub fn as_idx(&self) -> InteractionParticleIndices {
         InteractionParticleIndices {
             incoming: self.incoming.iter().map(|p| p.abs() as usize).collect(),
@@ -42,6 +44,7 @@ impl InteractionParticles {
     ///
     /// This is used in calculations of changes in asymmetry to determine which
     /// sign the change really ought to be.
+    #[must_use]
     pub fn as_sign(&self) -> InteractionParticleSigns {
         InteractionParticleSigns {
             incoming: self.incoming.iter().map(|p| p.signum() as f64).collect(),
@@ -54,6 +57,7 @@ impl InteractionParticles {
 ///
 /// This can be used to obtain the particle from the model's
 /// [`Model::particles`] function.
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct InteractionParticleIndices {
@@ -67,6 +71,7 @@ pub struct InteractionParticleIndices {
 ///
 /// This is used in calculations of changes in asymmetry to determine which sign
 /// the change really ought to be.
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct InteractionParticleSigns {
@@ -212,10 +217,6 @@ where
         rate: Option<RateDensity>,
         c: &Context<M>,
     ) -> Option<RateDensity> {
-        let mut rate = rate?;
-
-        rate *= c.step_size * c.normalization;
-
         // If an overshoot of the interaction rate is detected, the rate is
         // adjusted such that `dn` satisfies:
         //
@@ -229,6 +230,9 @@ where
         // equilibrium.
         const ALPHA_N: f64 = 1.1;
         const ALPHA_NA: f64 = 1.1;
+
+        let mut rate = rate?;
+        rate *= c.step_size * c.normalization;
 
         let particles_idx = self.particles_idx();
         let particles_sign = self.particles_sign();
@@ -320,12 +324,14 @@ where
 
 /// Check whether particle `i` from the model with the given rate change will
 /// overshoot equilibrium.
+#[must_use]
 pub fn overshoots<M>(c: &Context<M>, i: usize, rate: f64) -> bool {
     (c.n[i] > c.eq[i] && c.n[i] + rate < c.eq[i]) || (c.n[i] < c.eq[i] && c.n[i] + rate > c.eq[i])
 }
 
 /// Check whether particle asymmetry `i` from the model with the given rate
 /// change will overshoot 0.
+#[must_use]
 pub fn asymmetry_overshoots<M>(c: &Context<M>, i: usize, rate: f64) -> bool {
     (c.na[i] > 0.0 && c.na[i] + rate < 0.0) || (c.na[i] < 0.0 && c.na[i] + rate > 0.0)
 }

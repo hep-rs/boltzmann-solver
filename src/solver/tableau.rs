@@ -91,7 +91,7 @@ mod tests {
                         total + &k[i] * RK_E[i]
                     });
 
-                    let err = dy_err.iter().fold(0f64, |e, v| e.max(v.abs()));
+                    let err = dy_err.iter().fold(0_f64, |e, v| e.max(v.abs()));
                     // If the error is within the tolerance, add the result
                     if err < tol {
                         advance = true;
@@ -166,7 +166,7 @@ mod tests {
 
                 let (_t, x) = $solver(x, t, TWO_PI, f);
                 approx_eq(x[0], 1.0, $prec, 0.0);
-                approx_eq(x[1], 0.0, $prec, 10.0f64.powf(-$prec));
+                approx_eq(x[1], 0.0, $prec, 10_f64.powf(-$prec));
             }
         };
     }
