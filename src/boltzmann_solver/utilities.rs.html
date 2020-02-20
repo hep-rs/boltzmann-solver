@@ -371,6 +371,12 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="296">296</span>
 <span id="297">297</span>
 <span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -427,6 +433,8 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class=
 "doccomment">/// assert_eq!(kallen_lambda(1.0, 1.0, 1.0), -3.0);</span>
 <span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class=
 "ident">kallen_lambda</span>(<span class=
 "ident">a</span>: <span class="ident">f64</span>, <span class=
@@ -481,6 +489,8 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="doccomment">///</span>
 <span class=
 "doccomment">/// This function only returns the *absolute value* of the result.</span>
+<span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class=
 "ident">kallen_lambda_sqrt</span>(<span class=
 "ident">a</span>: <span class="ident">f64</span>, <span class=
@@ -530,6 +540,8 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class=
 "doccomment">///   t_{\text{max}} &amp;= \frac{(m_1^2 - m_2^2 - m_3^3 + m_4^4)^2}{4 s}</span>
 <span class="doccomment">/// \\end{aligned}\\end{equation}</span>
+<span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class=
 "ident">t_range</span>(<span class="ident">s</span>: <span class=
 "ident">f64</span>, <span class="ident">m1</span>: <span class=
@@ -614,6 +626,8 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="doccomment">///</span>
 <span class=
 "doccomment">/// The squared masses should be given.</span>
+<span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class=
 "ident">integrate_st</span><span class="op">&lt;</span><span class=
 "ident">F</span><span class="op">&gt;</span>(<span class=
@@ -807,6 +821,8 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class=
 "doccomment">///   D(q^2, m) &amp;= \left[\frac{i}{q^2 - m^2 + i0} + 2 \pi n \delta(q^2 - m^2)]</span>
 <span class="doccomment">/// \\end{aligned}\\end{equation}</span>
+<span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class=
 "ident">propagator</span>(<span class=
 "ident">q2</span>: <span class="ident">f64</span>, <span class=
@@ -981,6 +997,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">a</span>));
     }
 
+    <span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">clippy</span>::<span class="ident">shadow_unrelated</span>)]</span>
     <span class="attribute">#[<span class=
 "ident">test</span>]</span>
     <span class="kw">fn</span> <span class=

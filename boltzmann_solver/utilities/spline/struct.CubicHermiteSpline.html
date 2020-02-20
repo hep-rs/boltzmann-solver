@@ -121,7 +121,7 @@ autocomplete="off" spellcheck="false" placeholder=
 'render-detail'><a id="toggle-all-docs" href="javascript:void(0)"
 title="collapse all docs">[<span class=
 'inner'>−</span>]</a></span><a class='srclink' href=
-'../../../src/boltzmann_solver/utilities/spline.rs.html#80-88'
+'../../../src/boltzmann_solver/utilities/spline.rs.html#83-91'
 title='goto source code'>[src]</a></span><span class=
 'in-band'>Struct <a href=
 '../../index.html'>boltzmann_solver</a>::<wbr><a href=
@@ -142,33 +142,36 @@ pub struct CubicHermiteSpline { /* fields omitted */ }</pre></div>
 title=
 "struct boltzmann_solver::utilities::spline::CubicHermiteSpline">CubicHermiteSpline</a></code><a href='#impl'
 class='anchor'></a><a class='srclink' href=
-'../../../src/boltzmann_solver/utilities/spline.rs.html#90-223'
+'../../../src/boltzmann_solver/utilities/spline.rs.html#93-231'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
-<h4 id='method.empty' class="method"><code id='empty.v'>pub fn
-<a href='#method.empty' class='fnname'>empty</a>() -&gt;
+<h4 id='method.empty' class="method"><code id=
+'empty.v'><span class="docblock attributes">#[must_use]</span> pub
+fn <a href='#method.empty' class='fnname'>empty</a>() -&gt;
 Self</code><a class='srclink' href=
-'../../../src/boltzmann_solver/utilities/spline.rs.html#92-97'
+'../../../src/boltzmann_solver/utilities/spline.rs.html#96-101'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Create a new empty cubic Hermite Spline.</p>
 </div>
-<h4 id='method.len' class="method"><code id='len.v'>pub fn <a href=
+<h4 id='method.len' class="method"><code id='len.v'><span class=
+"docblock attributes">#[must_use]</span> pub fn <a href=
 '#method.len' class='fnname'>len</a>(&amp;self) -&gt; <a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code><a class='srclink'
 href=
-'../../../src/boltzmann_solver/utilities/spline.rs.html#100-102'
+'../../../src/boltzmann_solver/utilities/spline.rs.html#105-107'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Return the number of data points in the underlying data.</p>
 </div>
-<h4 id='method.is_empty' class="method"><code id='is_empty.v'>pub
-fn <a href='#method.is_empty' class=
+<h4 id='method.is_empty' class="method"><code id=
+'is_empty.v'><span class="docblock attributes">#[must_use]</span>
+pub fn <a href='#method.is_empty' class=
 'fnname'>is_empty</a>(&amp;self) -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
 href=
-'../../../src/boltzmann_solver/utilities/spline.rs.html#105-107'
+'../../../src/boltzmann_solver/utilities/spline.rs.html#111-113'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Check whether the spline is empty</p>
@@ -179,7 +182,7 @@ title='goto source code'>[src]</a></h4>
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>)</code><a class='srclink'
 href=
-'../../../src/boltzmann_solver/utilities/spline.rs.html#110-112'
+'../../../src/boltzmann_solver/utilities/spline.rs.html#116-118'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Adjust the minimum number of points before accuracy is
@@ -192,7 +195,7 @@ considered.</p>
 y: <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)</code><a class='srclink'
 href=
-'../../../src/boltzmann_solver/utilities/spline.rs.html#126-159'
+'../../../src/boltzmann_solver/utilities/spline.rs.html#132-165'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Adds a data point to the spline.</p>
@@ -206,14 +209,15 @@ minimum number of points).</p>
 <p>Any addition to the spline which extends the interval will
 result in the new interval being marked as inaccurate.</p>
 </div>
-<h4 id='method.accurate' class="method"><code id='accurate.v'>pub
-fn <a href='#method.accurate' class=
+<h4 id='method.accurate' class="method"><code id=
+'accurate.v'><span class="docblock attributes">#[must_use]</span>
+pub fn <a href='#method.accurate' class=
 'fnname'>accurate</a>(&amp;self, x: <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
 href=
-'../../../src/boltzmann_solver/utilities/spline.rs.html#191-198'
+'../../../src/boltzmann_solver/utilities/spline.rs.html#198-205'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Check whether a given interval is accurate or not.</p>
@@ -222,14 +226,15 @@ automatically determined to be false. If the <code>x</code> value
 is a known control point, then <code>true</code> is returned even
 if the interval on either side might not be accurate.</p>
 </div>
-<h4 id='method.sample' class="method"><code id='sample.v'>pub fn
-<a href='#method.sample' class='fnname'>sample</a>(&amp;self, x:
+<h4 id='method.sample' class="method"><code id=
+'sample.v'><span class="docblock attributes">#[must_use]</span> pub
+fn <a href='#method.sample' class='fnname'>sample</a>(&amp;self, x:
 <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
 href=
-'../../../src/boltzmann_solver/utilities/spline.rs.html#204-222'
+'../../../src/boltzmann_solver/utilities/spline.rs.html#212-230'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Sample the spline at the specific <code>x</code> value.</p>
@@ -248,7 +253,7 @@ href="../../../boltzmann_solver/utilities/spline/struct.CubicHermiteSpline.html"
 title=
 "struct boltzmann_solver::utilities::spline::CubicHermiteSpline">CubicHermiteSpline</a></code><a href='#impl-Debug'
 class='anchor'></a><a class='srclink' href=
-'../../../src/boltzmann_solver/utilities/spline.rs.html#78' title=
+'../../../src/boltzmann_solver/utilities/spline.rs.html#80' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.fmt' class="method hidden"><code id='fmt.v'>fn
@@ -261,7 +266,7 @@ title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class=
 "type" href=
 "https://doc.rust-lang.org/nightly/core/fmt/type.Result.html"
 title="type core::fmt::Result">Result</a></code><a class='srclink'
-href='../../../src/boltzmann_solver/utilities/spline.rs.html#78'
+href='../../../src/boltzmann_solver/utilities/spline.rs.html#80'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Formats the value using the given formatter. <a href=
@@ -278,7 +283,7 @@ Read more</a></p>
 title=
 "struct boltzmann_solver::utilities::spline::CubicHermiteSpline">CubicHermiteSpline</a></code><a href='#impl-Deserialize%3C%27de%3E'
 class='anchor'></a><a class='srclink' href=
-'../../../src/boltzmann_solver/utilities/spline.rs.html#79' title=
+'../../../src/boltzmann_solver/utilities/spline.rs.html#81' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.deserialize' class="method hidden"><code id=
@@ -295,7 +300,7 @@ title="type serde::de::Deserializer::Error">Error</a>&gt;
 &nbsp;&nbsp;&nbsp;&nbsp;__D: <a class="trait" href=
 "../../../serde/de/trait.Deserializer.html" title=
 "trait serde::de::Deserializer">Deserializer</a>&lt;'de&gt;,&nbsp;</span></code><a class='srclink'
-href='../../../src/boltzmann_solver/utilities/spline.rs.html#79'
+href='../../../src/boltzmann_solver/utilities/spline.rs.html#81'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Deserialize this value from the given Serde deserializer.
@@ -312,7 +317,7 @@ title="trait serde::ser::Serialize">Serialize</a> for <a class=
 title=
 "struct boltzmann_solver::utilities::spline::CubicHermiteSpline">CubicHermiteSpline</a></code><a href='#impl-Serialize'
 class='anchor'></a><a class='srclink' href=
-'../../../src/boltzmann_solver/utilities/spline.rs.html#79' title=
+'../../../src/boltzmann_solver/utilities/spline.rs.html#81' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.serialize' class="method hidden"><code id=
@@ -331,7 +336,7 @@ title="type serde::ser::Serializer::Error">Error</a>&gt;
 &nbsp;&nbsp;&nbsp;&nbsp;__S: <a class="trait" href=
 "../../../serde/ser/trait.Serializer.html" title=
 "trait serde::ser::Serializer">Serializer</a>,&nbsp;</span></code><a class='srclink'
-href='../../../src/boltzmann_solver/utilities/spline.rs.html#79'
+href='../../../src/boltzmann_solver/utilities/spline.rs.html#81'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Serialize this value into the given Serde serializer. <a href=

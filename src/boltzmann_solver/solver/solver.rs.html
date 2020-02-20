@@ -825,6 +825,16 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="749">749</span>
 <span id="750">750</span>
 <span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -950,6 +960,9 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="doccomment">/// Boltzmann solver builder</span>
+<span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">clippy</span>::<span class="ident">module_name_repetitions</span>)]</span>
 <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">SolverBuilder</span><span class=
@@ -1057,6 +1070,8 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class=
 "doccomment">/// // let solver = solver_builder.build();</span>
     <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">new</span>() <span class=
 "op">-</span><span class="op">&gt;</span> <span class=
@@ -1692,14 +1707,14 @@ autocomplete="off" spellcheck="false" placeholder=
                 <span class="ident">log</span>::<span class=
 "macro">debug</span><span class="macro">!</span>(<span class=
 "string">"Precomputing step {} / {}"</span>, <span class=
-"ident">i</span>, <span class="number">2usize</span>.<span class=
+"ident">i</span>, <span class="number">2_usize</span>.<span class=
 "ident">pow</span>(<span class="ident">N</span>) <span class=
 "op">+</span> <span class="number">4</span>);
             } <span class="kw">else</span> {
                 <span class="ident">log</span>::<span class=
 "macro">trace</span><span class="macro">!</span>(<span class=
 "string">"Precomputing step {} / {}"</span>, <span class=
-"ident">i</span>, <span class="number">2usize</span>.<span class=
+"ident">i</span>, <span class="number">2_usize</span>.<span class=
 "ident">pow</span>(<span class="ident">N</span>) <span class=
 "op">+</span> <span class="number">4</span>);
             }
@@ -1721,6 +1736,12 @@ autocomplete="off" spellcheck="false" placeholder=
         }
     }
     <span class="doccomment">/// Build the Boltzmann solver.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// This will produce an error if some of the configurations options are</span>
+    <span class="doccomment">/// deemed to be invalid.</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">build</span>(<span class=
 "self">self</span>) <span class="op">-</span><span class=
@@ -1920,6 +1941,9 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">clippy</span>::<span class="ident">similar_names</span>)]</span>
+    <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class="ident">feature</span> <span class=
 "op">=</span> <span class="string">"parallel"</span>)]</span>
     <span class="kw">fn</span> <span class=
@@ -2007,6 +2031,12 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="attribute">#[<span class=
 "ident">allow</span>(<span class=
 "ident">clippy</span>::<span class="ident">cognitive_complexity</span>)]</span>
+    <span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">clippy</span>::<span class="ident">similar_names</span>)]</span>
+    <span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">clippy</span>::<span class="ident">too_many_lines</span>)]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">solve</span>(<span class=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
@@ -2100,10 +2130,10 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="kw">let</span> <span class=
 "kw-2">mut</span> <span class=
 "ident">steps_discarded</span> <span class=
-"op">=</span> <span class="number">0u64</span>;
+"op">=</span> <span class="number">0_u64</span>;
         <span class="kw">let</span> <span class=
 "kw-2">mut</span> <span class="ident">evals</span> <span class=
-"op">=</span> <span class="number">0u64</span>;
+"op">=</span> <span class="number">0_u64</span>;
         <span class="kw">let</span> <span class=
 "kw-2">mut</span> <span class="ident">beta</span> <span class=
 "op">=</span> <span class="self">self</span>.<span class=
@@ -2384,7 +2414,7 @@ autocomplete="off" spellcheck="false" placeholder=
                 .<span class="ident">chain</span>(<span class=
 "ident">dna_err</span>.<span class="ident">iter</span>())
                 .<span class="ident">fold</span>(<span class=
-"number">0f64</span>, <span class="op">|</span><span class=
+"number">0_f64</span>, <span class="op">|</span><span class=
 "ident">e</span>, <span class="ident">v</span><span class=
 "op">|</span> <span class="ident">e</span>.<span class=
 "ident">max</span>(<span class="ident">v</span>.<span class=

@@ -417,6 +417,21 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="341">341</span>
 <span id="342">342</span>
 <span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -524,6 +539,8 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class=
 "doccomment">/// factor of two such that a spin-½ particle has `spin == 1` and a spin-1</span>
     <span class="doccomment">/// particle has `spin == 2`.</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">new</span>(<span class=
 "ident">spin</span>: <span class="ident">u8</span>, <span class=
@@ -595,6 +612,8 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// This function returns self and should be used in constructors.</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">real</span>(<span class=
 "kw-2">mut</span> <span class="self">self</span>) <span class=
@@ -611,6 +630,8 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// This function returns self and should be used in constructors.</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">complex</span>(<span class=
 "kw-2">mut</span> <span class="self">self</span>) <span class=
@@ -632,6 +653,8 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// This function returns self and should be used in constructors.</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">dof</span>(<span class=
 "kw-2">mut</span> <span class="self">self</span>, <span class=
@@ -645,6 +668,8 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class="doccomment">/// Specify the particle's name</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">name</span><span class=
 "op">&lt;</span><span class="ident">S</span>: <span class=
@@ -662,6 +687,8 @@ autocomplete="off" spellcheck="false" placeholder=
 
     <span class=
 "doccomment">/// Returns true if the particle is real (real scalar, Majorana fermion)</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">is_real</span>(<span class=
 "kw-2">&</span><span class="self">self</span>) <span class=
@@ -673,6 +700,8 @@ autocomplete="off" spellcheck="false" placeholder=
 
     <span class=
 "doccomment">/// Returns true if the particle is complex (complex scalar, Dirac fermion)</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">is_complex</span>(<span class=
 "kw-2">&</span><span class="self">self</span>) <span class=
@@ -684,6 +713,8 @@ autocomplete="off" spellcheck="false" placeholder=
 
     <span class=
 "doccomment">/// Returns true if the particle is bosonic.</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">is_bosonic</span>(<span class=
 "kw-2">&</span><span class="self">self</span>) <span class=
@@ -697,6 +728,8 @@ autocomplete="off" spellcheck="false" placeholder=
 
     <span class=
 "doccomment">/// Returns true if the particle is fermionic.</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">is_fermionic</span>(<span class=
 "kw-2">&</span><span class="self">self</span>) <span class=
@@ -741,6 +774,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// is `n + 1`; and for integer spin `n &gt; 0`, the degrees of freedom are `2` for</span>
     <span class=
 "doccomment">/// massless or `2n + 1` for massive.</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class=
 "ident">degrees_of_freedom</span>(<span class=
@@ -764,10 +799,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">n</span> <span class="op">%</span> <span class=
 "number">2</span> <span class="op">=</span><span class=
 "op">=</span> <span class="number">1</span> <span class=
-"op">=</span><span class="op">&gt;</span> (<span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"ident">f64</span>::<span class="ident">from</span>(<span class=
 "ident">n</span> <span class="op">+</span> <span class=
-"number">1</span>) <span class="kw">as</span> <span class=
-"ident">f64</span> <span class="op">*</span> <span class=
+"number">1</span>) <span class="op">*</span> <span class=
 "ident">dof</span>,
             (<span class="ident">n</span>, <span class=
 "ident">m</span>) <span class="kw">if</span> <span class=
@@ -781,9 +816,9 @@ autocomplete="off" spellcheck="false" placeholder=
                     <span class="number">2.0</span> <span class=
 "op">*</span> <span class="ident">dof</span>
                 } <span class="kw">else</span> {
-                    (<span class="ident">n</span> <span class=
+                    <span class="ident">f64</span>::<span class=
+"ident">from</span>(<span class="ident">n</span> <span class=
 "op">+</span> <span class="number">1</span>) <span class=
-"kw">as</span> <span class="ident">f64</span> <span class=
 "op">*</span> <span class="ident">dof</span>
                 }
             }
@@ -797,6 +832,8 @@ autocomplete="off" spellcheck="false" placeholder=
 
     <span class=
 "doccomment">/// Return the quantum statistic that this particle obeys.</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">fn</span> <span class=
 "ident">statistic</span>(<span class="kw-2">&</span><span class=
 "self">self</span>) <span class="op">-</span><span class=
@@ -813,6 +850,8 @@ autocomplete="off" spellcheck="false" placeholder=
 
     <span class=
 "doccomment">/// Return the equilibrium phase space occupation of the particle.</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">phase_space</span>(<span class=
 "kw-2">&</span><span class="self">self</span>, <span class=
@@ -832,6 +871,8 @@ autocomplete="off" spellcheck="false" placeholder=
 
     <span class=
 "doccomment">/// Return the equilibrium number density of the particle.</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class=
 "ident">number_density</span>(<span class=
@@ -853,6 +894,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Return the equilibrium number density of the particle, normalized to the</span>
     <span class=
 "doccomment">/// number density of a massless boson with one degree of freedom.</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class=
 "ident">normalized_number_density</span>(<span class=
@@ -873,6 +916,8 @@ autocomplete="off" spellcheck="false" placeholder=
 
     <span class=
 "doccomment">/// Return the entropy degrees of freedom associated with this particle.</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">entropy_dof</span>(<span class=
 "kw-2">&</span><span class="self">self</span>, <span class=

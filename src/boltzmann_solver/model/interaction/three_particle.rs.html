@@ -358,6 +358,8 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="282">282</span>
 <span id="283">283</span>
 <span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -603,6 +605,8 @@ autocomplete="off" spellcheck="false" placeholder=
 
     <span class=
 "doccomment">/// Adjust whether this interaction will calculate decay widths.</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">enable_width</span>(<span class=
 "kw-2">mut</span> <span class="self">self</span>, <span class=
@@ -617,6 +621,8 @@ autocomplete="off" spellcheck="false" placeholder=
 
     <span class=
 "doccomment">/// Adjust whether this interaction will calculate decay widths.</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">enable_gamma</span>(<span class=
 "kw-2">mut</span> <span class="self">self</span>, <span class=
@@ -932,9 +938,9 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Override the default implementation of [`rate`] to make use of the</span>
+"doccomment">/// Override the default implementation of [`Interaction::rate`] to make use</span>
     <span class=
-"doccomment">/// adjusted reaction rate density.</span>
+"doccomment">/// of the adjusted reaction rate density.</span>
     <span class="kw">fn</span> <span class=
 "ident">rate</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class=

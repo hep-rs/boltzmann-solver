@@ -512,6 +512,14 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="436">436</span>
 <span id="437">437</span>
 <span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -557,6 +565,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// The particles are signed such that particles are &gt; 0 and antiparticles are &lt;</span>
 <span class="doccomment">/// 0.</span>
 <span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">clippy</span>::<span class="ident">module_name_repetitions</span>)]</span>
+<span class="attribute">#[<span class=
 "ident">derive</span>(<span class=
 "ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="attribute">#[<span class=
@@ -586,6 +597,8 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class=
 "doccomment">/// Convert the signed particle numbers to indices which can be used to</span>
     <span class="doccomment">/// index the model's particle.</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">as_idx</span>(<span class=
 "kw-2">&</span><span class="self">self</span>) <span class=
@@ -616,6 +629,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// This is used in calculations of changes in asymmetry to determine which</span>
     <span class=
 "doccomment">/// sign the change really ought to be.</span>
+    <span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">as_sign</span>(<span class=
 "kw-2">&</span><span class="self">self</span>) <span class=
@@ -647,6 +662,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// This can be used to obtain the particle from the model's</span>
 <span class="doccomment">/// [`Model::particles`] function.</span>
 <span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">clippy</span>::<span class="ident">module_name_repetitions</span>)]</span>
+<span class="attribute">#[<span class=
 "ident">derive</span>(<span class=
 "ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="attribute">#[<span class=
@@ -677,6 +695,9 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class=
 "doccomment">/// This is used in calculations of changes in asymmetry to determine which sign</span>
 <span class="doccomment">/// the change really ought to be.</span>
+<span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">clippy</span>::<span class="ident">module_name_repetitions</span>)]</span>
 <span class="attribute">#[<span class=
 "ident">derive</span>(<span class=
 "ident">Debug</span>, <span class="ident">Clone</span>)]</span>
@@ -743,11 +764,13 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Whether this interaction is to be used to determine decays.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// If width calcuilations are disable, then [`width`] is expected to return</span>
+"doccomment">/// If width calcuilations are disable, then [`Interaction::width`] is</span>
     <span class=
-"doccomment">/// `None` all the time.  If it is enabled, then [`width`] is expected to</span>
+"doccomment">/// expected to return `None` all the time.  If it is enabled, then</span>
     <span class=
-"doccomment">/// return `None` only when the decay is not kinematically allowed.</span>
+"doccomment">/// [`Interaction::width`] is expected to return `None` only when the decay</span>
+    <span class=
+"doccomment">/// is not kinematically allowed.</span>
     <span class="kw">fn</span> <span class=
 "ident">width_enabled</span>(<span class=
 "kw-2">&</span><span class="self">self</span>) <span class=
@@ -764,11 +787,11 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class=
 "doccomment">/// The default implementation simply returns `None` and must be implemented</span>
     <span class=
-"doccomment">/// manually.  Care must be taken to obey [`width_enabled`] in order to</span>
+"doccomment">/// manually.  Care must be taken to obey [`Interaction::width_enabled`] in</span>
     <span class=
-"doccomment">/// avoid unnecessary computation (though the incorrect implementation will</span>
+"doccomment">/// order to avoid unnecessary computation (though the incorrect</span>
     <span class=
-"doccomment">/// not be detrimental other than in performance).</span>
+"doccomment">/// implementation will not be detrimental other than in performance).</span>
     <span class="kw">fn</span> <span class=
 "ident">width</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="kw">_</span>: <span class=
@@ -785,7 +808,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Whether this interaction is to be used within the Boltzmann equations.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// If this returns true, then [`gamma`] is expected to return `None`.</span>
+"doccomment">/// If this returns true, then [`Interaction::gamma`] is expected to return</span>
+    <span class="doccomment">/// `None`.</span>
     <span class="kw">fn</span> <span class=
 "ident">gamma_enabled</span>(<span class=
 "kw-2">&</span><span class="self">self</span>) <span class=
@@ -803,9 +827,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// It also must *not* be normalized to the integration step size.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// Care must be taken to obey [`gamma_enabled`] in order to avoid</span>
+"doccomment">/// Care must be taken to obey [`Interaction::gamma_enabled`] in order to</span>
     <span class=
-"doccomment">/// computation.  Specifically, this should always return `None` when</span>
+"doccomment">/// avoid computation.  Specifically, this should always return `None` when</span>
     <span class=
 "doccomment">/// `self.gamma_enabled() == true`.</span>
     <span class="kw">fn</span> <span class=
@@ -976,16 +1000,16 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Adjust the backward and forward rates such that they do not</span>
+"doccomment">/// Adjust the backward and forward rates such that they do not overshoot</span>
     <span class=
-"doccomment">/// overshoot the equilibrium number densities.</span>
+"doccomment">/// the equilibrium number densities.</span>
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// The rate density going into this function is expected to be the output</span>
     <span class=
-"doccomment">/// of [`rate`] and must not be previously normalized to the Hubble rate nor</span>
+"doccomment">/// of [`Interaction::rate`] and must not be previously normalized to the</span>
     <span class=
-"doccomment">/// include factors relating to the integration step size.</span>
+"doccomment">/// Hubble rate nor include factors relating to the integration step size.</span>
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// The output of this function however *will* be normalized by the HUbble</span>
@@ -1005,17 +1029,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> <span class="prelude-ty">Option</span><span class=
 "op">&lt;</span><span class="ident">RateDensity</span><span class=
 "op">&gt;</span> {
-        <span class="kw">let</span> <span class=
-"kw-2">mut</span> <span class="ident">rate</span> <span class=
-"op">=</span> <span class="ident">rate</span><span class=
-"question-mark">?</span>;
-
-        <span class="ident">rate</span> <span class=
-"kw-2">*</span><span class="op">=</span> <span class=
-"ident">c</span>.<span class="ident">step_size</span> <span class=
-"op">*</span> <span class="ident">c</span>.<span class=
-"ident">normalization</span>;
-
         <span class=
 "comment">// If an overshoot of the interaction rate is detected, the rate is</span>
         <span class=
@@ -1040,6 +1053,16 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">ALPHA_NA</span>: <span class=
 "ident">f64</span> <span class="op">=</span> <span class=
 "number">1.1</span>;
+
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">rate</span> <span class=
+"op">=</span> <span class="ident">rate</span><span class=
+"question-mark">?</span>;
+        <span class="ident">rate</span> <span class=
+"kw-2">*</span><span class="op">=</span> <span class=
+"ident">c</span>.<span class="ident">step_size</span> <span class=
+"op">*</span> <span class="ident">c</span>.<span class=
+"ident">normalization</span>;
 
         <span class="kw">let</span> <span class=
 "ident">particles_idx</span> <span class="op">=</span> <span class=
@@ -1303,6 +1326,8 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class=
 "doccomment">/// Check whether particle `i` from the model with the given rate change will</span>
 <span class="doccomment">/// overshoot equilibrium.</span>
+<span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class=
 "ident">overshoots</span><span class="op">&lt;</span><span class=
 "ident">M</span><span class="op">&gt;</span>(<span class=
@@ -1338,6 +1363,8 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class=
 "doccomment">/// Check whether particle asymmetry `i` from the model with the given rate</span>
 <span class="doccomment">/// change will overshoot 0.</span>
+<span class="attribute">#[<span class=
+"ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class=
 "ident">asymmetry_overshoots</span><span class=
 "op">&lt;</span><span class="ident">M</span><span class=
