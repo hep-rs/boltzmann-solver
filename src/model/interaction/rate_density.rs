@@ -18,11 +18,13 @@ pub struct RateDensity {
 
 impl RateDensity {
     /// Return the net forward rate for the number density.
+    #[must_use]
     pub fn net_rate(&self) -> f64 {
         self.forward - self.backward
     }
 
     /// Return the net forward rate for the number density asymmetry.
+    #[must_use]
     pub fn net_asymmetric_rate(&self) -> f64 {
         self.asymmetric_forward - self.asymmetric_backward
     }

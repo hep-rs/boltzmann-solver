@@ -28,6 +28,7 @@ const INTEGRATION_PRECISION: f64 = 1e-10;
 /// assert_eq!(kallen_lambda(5.0, 2.0, 0.5), 2.25);
 /// assert_eq!(kallen_lambda(1.0, 1.0, 1.0), -3.0);
 /// ```
+#[must_use]
 pub fn kallen_lambda(a: f64, b: f64, c: f64) -> f64 {
     a.powi(2) + b.powi(2) + c.powi(2) - 2.0 * (a * b + a * c + b * c)
 }
@@ -55,6 +56,7 @@ pub fn kallen_lambda(a: f64, b: f64, c: f64) -> f64 {
 /// # Warning
 ///
 /// This function only returns the *absolute value* of the result.
+#[must_use]
 pub fn kallen_lambda_sqrt(a: f64, b: f64, c: f64) -> f64 {
     let max = if a > b { a } else { b };
     let max = if max > c { max } else { c };
@@ -74,6 +76,7 @@ pub fn kallen_lambda_sqrt(a: f64, b: f64, c: f64) -> f64 {
 ///       - \frac{\lambda^{\frac{1}{2}}(s, m_1^2, m_2^2) \lambda^{\frac{1}{2}}(s, m_3^2, m_4^2)}{s} \\\\
 ///   t_{\text{max}} &= \frac{(m_1^2 - m_2^2 - m_3^3 + m_4^4)^2}{4 s}
 /// \\end{aligned}\\end{equation}
+#[must_use]
 pub fn t_range(s: f64, m1: f64, m2: f64, m3: f64, m4: f64) -> (f64, f64) {
     debug_assert!(
         s * (1.0 + 5.0 * f64::EPSILON) >= m1 + m2,
@@ -107,6 +110,7 @@ pub fn t_range(s: f64, m1: f64, m2: f64, m3: f64, m4: f64) -> (f64, f64) {
 /// and \\(t_{\text{min},\text{max}}\\) are determined from [`t_range`].
 ///
 /// The squared masses should be given.
+#[must_use]
 pub fn integrate_st<F>(amplitude: F, beta: f64, m1: f64, m2: f64, m3: f64, m4: f64) -> f64
 where
     F: Fn(f64, f64) -> f64,
@@ -174,6 +178,7 @@ where
 ///   S(q^2, m) &= \left[\frac{i}{q^2 - m^2 + i0} - 2 \pi n \delta(q^2 - m^2)] (\slashed p + m) \\\\
 ///   D(q^2, m) &= \left[\frac{i}{q^2 - m^2 + i0} + 2 \pi n \delta(q^2 - m^2)]
 /// \\end{aligned}\\end{equation}
+#[must_use]
 pub fn propagator(q2: f64, p: &Particle) -> Complex<f64> {
     // TODO: Implement Dirac delta?
     1.0 / (q2 - p.mass2 + Complex::i() * p.mass * p.width)
@@ -220,6 +225,7 @@ mod tests {
         assert_eq!(super::kallen_lambda(a, b, c), super::kallen_lambda(c, b, a));
     }
 
+    #[allow(clippy::shadow_unrelated)]
     #[test]
     fn integrate_st() {
         const BETA: f64 = 1e-2;

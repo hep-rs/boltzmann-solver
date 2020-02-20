@@ -17,11 +17,13 @@ pub struct PartialWidth {
 
 impl PartialWidth {
     /// Return the parent particle index
+    #[must_use]
     pub fn parent_idx(&self) -> usize {
         usize::try_from(self.parent.abs()).expect("parent particle index")
     }
 
     /// Return the daughter particle indices
+    #[must_use]
     pub fn daughters_idx(&self) -> Vec<usize> {
         self.daughters
             .iter()

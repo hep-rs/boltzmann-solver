@@ -133,6 +133,13 @@
 
 // Enable feature(test) on nightly builds to make use of the `test` crate.
 #![cfg_attr(feature = "nightly", feature(test))]
+// Configure warnings
+#![warn(missing_docs)]
+#![warn(clippy::all)]
+#![warn(clippy::pedantic)]
+#![allow(clippy::doc_markdown)]
+#![allow(clippy::non_ascii_literal)]
+#![allow(clippy::cast_precision_loss)] // Check this warning occasionally
 
 #[cfg(feature = "nightly")]
 extern crate test;

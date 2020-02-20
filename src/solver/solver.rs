@@ -51,6 +51,7 @@ impl error::Error for Error {
 }
 
 /// Boltzmann solver builder
+#[allow(clippy::module_name_repetitions)]
 pub struct SolverBuilder<M> {
     model: Option<M>,
     initial_densities: Option<Array1<f64>>,
@@ -97,6 +98,7 @@ impl<M> SolverBuilder<M> {
     ///
     /// // let solver = solver_builder.build();
     /// ```
+    #[must_use]
     pub fn new() -> Self {
         Self {
             model: None,
@@ -363,9 +365,9 @@ where
         .enumerate()
         {
             if i % 64 == 0 {
-                log::debug!("Precomputing step {} / {}", i, 2usize.pow(N) + 4);
+                log::debug!("Precomputing step {} / {}", i, 2_usize.pow(N) + 4);
             } else {
-                log::trace!("Precomputing step {} / {}", i, 2usize.pow(N) + 4);
+                log::trace!("Precomputing step {} / {}", i, 2_usize.pow(N) + 4);
             }
             model.set_beta(beta);
             let c = model.as_context();
@@ -395,9 +397,9 @@ where
         .enumerate()
         {
             if i % 64 == 0 {
-                log::debug!("Precomputing step {} / {}", i, 2usize.pow(N) + 4);
+                log::debug!("Precomputing step {} / {}", i, 2_usize.pow(N) + 4);
             } else {
-                log::trace!("Precomputing step {} / {}", i, 2usize.pow(N) + 4);
+                log::trace!("Precomputing step {} / {}", i, 2_usize.pow(N) + 4);
             }
             model.set_beta(beta);
             let c = model.as_context();
@@ -408,6 +410,11 @@ where
         }
     }
     /// Build the Boltzmann solver.
+    ///
+    /// # Errors
+    ///
+    /// This will produce an error if some of the configurations options are
+    /// deemed to be invalid.
     pub fn build(self) -> Result<Solver<M>, Error> {
         let mut model = self.model.ok_or(Error::UndefinedModel)?;
         model.set_beta(self.beta_range.0);
@@ -488,6 +495,7 @@ where
         }
     }
 
+    #[allow(clippy::similar_names)]
     #[cfg(feature = "parallel")]
     fn compute_ki(&self, ki: &mut Array1<f64>, kai: &mut Array1<f64>, ci: &Context<M>) {
         let n = ki.dim();
@@ -521,6 +529,8 @@ where
     /// derivative in energy being calculated solely from the previous
     /// time-step.
     #[allow(clippy::cognitive_complexity)]
+    #[allow(clippy::similar_names)]
+    #[allow(clippy::too_many_lines)]
     pub fn solve(&mut self) -> (Array1<f64>, Array1<f64>) {
         use super::tableau::rk87::*;
 
@@ -546,8 +556,8 @@ where
         };
 
         let mut step = 0;
-        let mut steps_discarded = 0u64;
-        let mut evals = 0u64;
+        let mut steps_discarded = 0_u64;
+        let mut evals = 0_u64;
         let mut beta = self.beta_range.0;
         let mut h = beta * f64::sqrt(self.step_precision.min * self.step_precision.max);
         let mut advance;
@@ -640,7 +650,7 @@ where
             let err = dn_err
                 .iter()
                 .chain(dna_err.iter())
-                .fold(0f64, |e, v| e.max(v.abs()));
+                .fold(0_f64, |e, v| e.max(v.abs()));
 
             // If the error is within the tolerance, we'll be advancing the
             // iteration step

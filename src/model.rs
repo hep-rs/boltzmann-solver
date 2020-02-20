@@ -94,6 +94,8 @@ where
     /// that particle is its own anti-particle (so the distinction is
     /// irrelevant).
     ///
+    /// # Errors
+    ///
     /// If the particle is not within the model, the name and index should be
     /// returned as an error so that they can be subsequently handled.
     fn particle_idx<S: AsRef<str>>(name: S, i: usize) -> Result<usize, (S, usize)>;
@@ -159,6 +161,7 @@ where
 }
 
 /// Supertrait for [`Model`] for the handling of interactions.
+#[allow(clippy::module_name_repetitions)]
 #[cfg(not(feature = "parallel"))]
 pub trait ModelInteractions
 where
@@ -209,6 +212,7 @@ where
 
 /// Supertrait for [`Model`] for the handling of interactions.
 #[cfg(feature = "parallel")]
+#[allow(clippy::module_name_repetitions)]
 pub trait ModelInteractions
 where
     Self: Model + Sync,

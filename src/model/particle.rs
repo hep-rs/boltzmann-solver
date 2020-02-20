@@ -53,6 +53,7 @@ impl Particle {
     /// The mass is specified in units of GeV, and the spin is multiplied by a
     /// factor of two such that a spin-½ particle has `spin == 1` and a spin-1
     /// particle has `spin == 2`.
+    #[must_use]
     pub fn new(spin: u8, mass: f64, width: f64) -> Self {
         Self {
             spin,
@@ -84,6 +85,7 @@ impl Particle {
     /// Indicate that the particle is real.
     ///
     /// This function returns self and should be used in constructors.
+    #[must_use]
     pub fn real(mut self) -> Self {
         self.complex = false;
         self
@@ -92,6 +94,7 @@ impl Particle {
     /// Indicate that the particle is complex.
     ///
     /// This function returns self and should be used in constructors.
+    #[must_use]
     pub fn complex(mut self) -> Self {
         self.complex = true;
         self
@@ -103,33 +106,39 @@ impl Particle {
     /// 'pseudo' particle such as \\(B-L\\), this should be set to zero.
     ///
     /// This function returns self and should be used in constructors.
+    #[must_use]
     pub fn dof(mut self, dof: f64) -> Self {
         self.dof = dof;
         self
     }
 
     /// Specify the particle's name
+    #[must_use]
     pub fn name<S: Into<String>>(mut self, name: S) -> Self {
         self.name = name.into();
         self
     }
 
     /// Returns true if the particle is real (real scalar, Majorana fermion)
+    #[must_use]
     pub fn is_real(&self) -> bool {
         !self.complex
     }
 
     /// Returns true if the particle is complex (complex scalar, Dirac fermion)
+    #[must_use]
     pub fn is_complex(&self) -> bool {
         self.complex
     }
 
     /// Returns true if the particle is bosonic.
+    #[must_use]
     pub fn is_bosonic(&self) -> bool {
         self.spin % 2 == 0
     }
 
     /// Returns true if the particle is fermionic.
+    #[must_use]
     pub fn is_fermionic(&self) -> bool {
         self.spin % 2 == 1
     }
@@ -156,16 +165,17 @@ impl Particle {
     /// or more generally, for half-integer spins `n/2`, the degrees of freedom
     /// is `n + 1`; and for integer spin `n > 0`, the degrees of freedom are `2` for
     /// massless or `2n + 1` for massive.
+    #[must_use]
     pub fn degrees_of_freedom(&self) -> f64 {
         let dof = self.dof * if self.complex { 2.0 } else { 1.0 };
         match (self.spin, self.mass) {
             (0, _) => dof,
-            (n, _) if n % 2 == 1 => (n + 1) as f64 * dof,
+            (n, _) if n % 2 == 1 => f64::from(n + 1) * dof,
             (n, m) if n % 2 == 0 => {
                 if m == 0.0 {
                     2.0 * dof
                 } else {
-                    (n + 1) as f64 * dof
+                    f64::from(n + 1) * dof
                 }
             }
             _ => unimplemented!("Particles with spin greater than 2 are not supported."),
@@ -173,6 +183,7 @@ impl Particle {
     }
 
     /// Return the quantum statistic that this particle obeys.
+    #[must_use]
     fn statistic(&self) -> Statistic {
         if self.is_fermionic() {
             Statistic::FermiDirac
@@ -182,17 +193,20 @@ impl Particle {
     }
 
     /// Return the equilibrium phase space occupation of the particle.
+    #[must_use]
     pub fn phase_space(&self, e: f64, mu: f64, beta: f64) -> f64 {
         self.statistic().phase_space(e, self.mass, mu, beta) * self.degrees_of_freedom()
     }
 
     /// Return the equilibrium number density of the particle.
+    #[must_use]
     pub fn number_density(&self, mu: f64, beta: f64) -> f64 {
         self.statistic().number_density(self.mass, mu, beta) * self.degrees_of_freedom()
     }
 
     /// Return the equilibrium number density of the particle, normalized to the
     /// number density of a massless boson with one degree of freedom.
+    #[must_use]
     pub fn normalized_number_density(&self, mu: f64, beta: f64) -> f64 {
         self.statistic()
             .normalized_number_density(self.mass, mu, beta)
@@ -200,6 +214,7 @@ impl Particle {
     }
 
     /// Return the entropy degrees of freedom associated with this particle.
+    #[must_use]
     pub fn entropy_dof(&self, beta: f64) -> f64 {
         if self.is_bosonic() {
             data::BOSON_GSTAR.sample((self.mass * beta).ln()).exp() * self.degrees_of_freedom()
