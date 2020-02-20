@@ -636,11 +636,6 @@ where
                 dna[eq] = -na[eq];
             }
 
-            log::trace!("     dn = {:>10.3e}", dn);
-            log::trace!("    dna = {:>10.3e}", dna);
-            log::trace!(" dn_err = {:>10.3e}", dn_err);
-            log::trace!("dna_err = {:>10.3e}", dna_err);
-
             // Get the local error using L∞-norm
             let err = dn_err
                 .iter()
@@ -657,6 +652,12 @@ where
                     err,
                     self.error_tolerance
                 );
+
+                // DEBUG
+                // log::trace!("     dn = {:>10.3e}", dn);
+                // log::trace!("    dna = {:>10.3e}", dna);
+                // log::trace!(" dn_err = {:>10.3e}", dn_err);
+                // log::trace!("dna_err = {:>10.3e}", dna_err);
             }
 
             // Compute the change in step size based on the current error and
