@@ -231,8 +231,8 @@ where
         self.asymmetry.as_ref().map(|a| a(c.model))
     }
 
-    /// Override the default implementation of [`rate`] to make use of the
-    /// adjusted reaction rate density.
+    /// Override the default implementation of [`Interaction::rate`] to make use
+    /// of the adjusted reaction rate density.
     fn rate(&self, gamma_tilde: Option<f64>, c: &Context<M>) -> Option<RateDensity> {
         // If there's no interaction rate or it is 0 to begin with, there's no
         // need to adjust it to the particles' number densities.

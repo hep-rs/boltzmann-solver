@@ -94,9 +94,10 @@ where
 
     /// Whether this interaction is to be used to determine decays.
     ///
-    /// If width calcuilations are disable, then [`width`] is expected to return
-    /// `None` all the time.  If it is enabled, then [`width`] is expected to
-    /// return `None` only when the decay is not kinematically allowed.
+    /// If width calcuilations are disable, then [`Interaction::width`] is
+    /// expected to return `None` all the time.  If it is enabled, then
+    /// [`Interaction::width`] is expected to return `None` only when the decay
+    /// is not kinematically allowed.
     fn width_enabled(&self) -> bool;
 
     /// Calculate the decay width associated with a particular interaction.
@@ -105,16 +106,17 @@ where
     /// not relevant.
     ///
     /// The default implementation simply returns `None` and must be implemented
-    /// manually.  Care must be taken to obey [`width_enabled`] in order to
-    /// avoid unnecessary computation (though the incorrect implementation will
-    /// not be detrimental other than in performance).
+    /// manually.  Care must be taken to obey [`Interaction::width_enabled`] in
+    /// order to avoid unnecessary computation (though the incorrect
+    /// implementation will not be detrimental other than in performance).
     fn width(&self, _: &Context<M>) -> Option<PartialWidth> {
         None
     }
 
     /// Whether this interaction is to be used within the Boltzmann equations.
     ///
-    /// If this returns true, then [`gamma`] is expected to return `None`.
+    /// If this returns true, then [`Interaction::gamma`] is expected to return
+    /// `None`.
     fn gamma_enabled(&self) -> bool;
 
     /// Calculate the reaction rate density of this interaction.
@@ -123,8 +125,8 @@ where
     /// or other factors related to the number densities of particles involved.
     /// It also must *not* be normalized to the integration step size.
     ///
-    /// Care must be taken to obey [`gamma_enabled`] in order to avoid
-    /// computation.  Specifically, this should always return `None` when
+    /// Care must be taken to obey [`Interaction::gamma_enabled`] in order to
+    /// avoid computation.  Specifically, this should always return `None` when
     /// `self.gamma_enabled() == true`.
     fn gamma(&self, c: &Context<M>) -> Option<f64>;
 
@@ -196,12 +198,12 @@ where
         Some(rate)
     }
 
-    /// Adjust the backward and forward rates such that they do not
-    /// overshoot the equilibrium number densities.
+    /// Adjust the backward and forward rates such that they do not overshoot
+    /// the equilibrium number densities.
     ///
     /// The rate density going into this function is expected to be the output
-    /// of [`rate`] and must not be previously normalized to the Hubble rate nor
-    /// include factors relating to the integration step size.
+    /// of [`Interaction::rate`] and must not be previously normalized to the
+    /// Hubble rate nor include factors relating to the integration step size.
     ///
     /// The output of this function however *will* be normalized by the HUbble
     /// rate and *will* factors relating to the numerical integration.
