@@ -824,6 +824,7 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="748">748</span>
 <span id="749">749</span>
 <span id="750">750</span>
+<span id="751">751</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -2374,23 +2375,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">eq</span>];
             }
 
-            <span class="ident">log</span>::<span class=
-"macro">trace</span><span class="macro">!</span>(<span class=
-"string">"     dn = {:&gt;10.3e}"</span>, <span class=
-"ident">dn</span>);
-            <span class="ident">log</span>::<span class=
-"macro">trace</span><span class="macro">!</span>(<span class=
-"string">"    dna = {:&gt;10.3e}"</span>, <span class=
-"ident">dna</span>);
-            <span class="ident">log</span>::<span class=
-"macro">trace</span><span class="macro">!</span>(<span class=
-"string">" dn_err = {:&gt;10.3e}"</span>, <span class=
-"ident">dn_err</span>);
-            <span class="ident">log</span>::<span class=
-"macro">trace</span><span class="macro">!</span>(<span class=
-"string">"dna_err = {:&gt;10.3e}"</span>, <span class=
-"ident">dna_err</span>);
-
             <span class=
 "comment">// Get the local error using L∞-norm</span>
             <span class="kw">let</span> <span class=
@@ -2423,6 +2407,16 @@ autocomplete="off" spellcheck="false" placeholder=
                     <span class="self">self</span>.<span class=
 "ident">error_tolerance</span>
                 );
+
+                <span class="comment">// DEBUG</span>
+                <span class=
+"comment">// log::trace!("     dn = {:&gt;10.3e}", dn);</span>
+                <span class=
+"comment">// log::trace!("    dna = {:&gt;10.3e}", dna);</span>
+                <span class=
+"comment">// log::trace!(" dn_err = {:&gt;10.3e}", dn_err);</span>
+                <span class=
+"comment">// log::trace!("dna_err = {:&gt;10.3e}", dna_err);</span>
             }
 
             <span class=
