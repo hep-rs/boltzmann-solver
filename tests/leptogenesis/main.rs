@@ -67,6 +67,18 @@ where
     W: io::Write + 'static,
     S: AsRef<str> + fmt::Display,
 {
+    // Set equilibrium conditions for the vector bosons.
+    builder = builder.in_equilibrium(
+        [
+            LeptogenesisModel::particle_idx("A", 0).unwrap(),
+            LeptogenesisModel::particle_idx("W", 0).unwrap(),
+            LeptogenesisModel::particle_idx("G", 0).unwrap(),
+        ]
+        .iter()
+        .cloned(),
+    );
+
+    // Add the logger if needed
     if let Some(mut csv) = csv {
         // If we have a CSV file to write to, track the number densities as they
         // evolve.
