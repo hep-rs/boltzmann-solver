@@ -51,6 +51,42 @@ impl InteractionParticles {
             outgoing: self.outgoing.iter().map(|p| p.signum() as f64).collect(),
         }
     }
+
+    /// Output a 'pretty' version of the interaction particles using the
+    /// particle names from the model.
+    ///
+    /// # Errors
+    ///
+    /// If any particles can't be found in the model, this will produce an
+    /// error.
+    pub fn display<M>(&self, model: &M) -> Result<String, ()>
+    where
+        M: Model,
+    {
+        let mut s = String::new();
+
+        if let Some(&p) = self.incoming.first() {
+            s.push_str(&model.particle_name(p).map_err(|_| ())?);
+            s.push(' ');
+        }
+        for &p in self.incoming.iter().skip(1) {
+            s.push_str(&model.particle_name(p).map_err(|_| ())?);
+            s.push(' ');
+        }
+
+        s.push_str("->");
+
+        if let Some(&p) = self.outgoing.first() {
+            s.push(' ');
+            s.push_str(&model.particle_name(p).map_err(|_| ())?);
+        }
+        for &p in self.outgoing.iter().skip(1) {
+            s.push(' ');
+            s.push_str(&model.particle_name(p).map_err(|_| ())?);
+        }
+
+        Ok(s)
+    }
 }
 
 /// List of particle indices involved in the interaction.
