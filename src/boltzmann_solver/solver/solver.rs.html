@@ -850,6 +850,12 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="774">774</span>
 <span id="775">775</span>
 <span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -1275,6 +1281,11 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// These particles are specified by their index.</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// Multiple calls of this function will combine the results together, and</span>
+    <span class=
+"doccomment">/// any (accidental) duplications are removed by [`SolverBuilder::build`].</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class=
 "ident">in_equilibrium</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">eq</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
@@ -1285,9 +1296,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">usize</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class=
-"ident">in_equilibrium</span> <span class=
-"op">=</span> <span class="ident">eq</span>.<span class=
-"ident">into_iter</span>().<span class="ident">collect</span>();
+"ident">in_equilibrium</span>.<span class=
+"ident">extend</span>(<span class="ident">eq</span>);
         <span class="self">self</span>
     }
 
@@ -1303,6 +1313,11 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// These particles are specified by their index.</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// Multiple calls of this function will combine the results together, and</span>
+    <span class=
+"doccomment">/// any (accidental) duplications are removed by [`SolverBuilder::build`].</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">no_asymmetry</span><span class=
 "op">&lt;</span><span class="ident">I</span><span class=
@@ -1317,9 +1332,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">usize</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class=
-"ident">no_asymmetry</span> <span class="op">=</span> <span class=
-"ident">na</span>.<span class=
-"ident">into_iter</span>().<span class="ident">collect</span>();
+"ident">no_asymmetry</span>.<span class=
+"ident">extend</span>(<span class="ident">na</span>);
         <span class="self">self</span>
     }
 

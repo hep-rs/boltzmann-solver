@@ -66,7 +66,8 @@ id="themeStyle">
 <a class="sidebar-title" href="#methods">Methods</a>
 <div class="sidebar-links"><a href=
 "#method.as_idx">as_idx</a><a href=
-"#method.as_sign">as_sign</a></div>
+"#method.as_sign">as_sign</a><a href=
+"#method.display">display</a></div>
 <a class="sidebar-title" href="#implementations">Trait
 Implementations</a>
 <div class="sidebar-links"><a href="#impl-Clone">Clone</a><a href=
@@ -179,7 +180,7 @@ title=
 "struct boltzmann_solver::model::interaction::InteractionParticles">
 InteractionParticles</a></code><a href='#impl' class=
 'anchor'></a><a class='srclink' href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#32-54'
+'../../../src/boltzmann_solver/model/interaction.rs.html#32-90'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.as_idx' class="method"><code id=
@@ -211,6 +212,34 @@ title='goto source code'>[src]</a></h4>
 point).</p>
 <p>This is used in calculations of changes in asymmetry to
 determine which sign the change really ought to be.</p>
+</div>
+<h4 id='method.display' class="method"><code id='display.v'>pub fn
+<a href='#method.display' class=
+'fnname'>display</a>&lt;M&gt;(&amp;self, model: <a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.reference.html">&</a>M)
+-&gt; <a class="enum" href=
+"https://doc.rust-lang.org/nightly/core/result/enum.Result.html"
+title="enum core::result::Result">Result</a>&lt;<a class="struct"
+href=
+"https://doc.rust-lang.org/nightly/alloc/string/struct.String.html"
+title="struct alloc::string::String">String</a>, <a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;
+<span class="where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;M: <a class="trait" href=
+"../../../boltzmann_solver/model/trait.Model.html" title=
+"trait boltzmann_solver::model::Model">Model</a>,&nbsp;</span></code><a class='srclink'
+href=
+'../../../src/boltzmann_solver/model/interaction.rs.html#62-89'
+title='goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Output a 'pretty' version of the interaction particles using the
+particle names from the model.</p>
+<h1 id="errors" class="section-header"><a href=
+"#errors">Errors</a></h1>
+<p>If any particles can't be found in the model, this will produce
+an error.</p>
 </div>
 </div>
 <h2 id='implementations' class='small-section-header'>Trait
