@@ -194,11 +194,14 @@ impl<M> SolverBuilder<M> {
     /// deviates from 0.
     ///
     /// These particles are specified by their index.
+    ///
+    /// Multiple calls of this function will combine the results together, and
+    /// any (accidental) duplications are removed by [`SolverBuilder::build`].
     pub fn in_equilibrium<I>(mut self, eq: I) -> Self
     where
         I: IntoIterator<Item = usize>,
     {
-        self.in_equilibrium = eq.into_iter().collect();
+        self.in_equilibrium.extend(eq);
         self
     }
 
@@ -209,11 +212,14 @@ impl<M> SolverBuilder<M> {
     /// of the particle and antiparticles from deviating from their equilibrium.
     ///
     /// These particles are specified by their index.
+    ///
+    /// Multiple calls of this function will combine the results together, and
+    /// any (accidental) duplications are removed by [`SolverBuilder::build`].
     pub fn no_asymmetry<I>(mut self, na: I) -> Self
     where
         I: IntoIterator<Item = usize>,
     {
-        self.no_asymmetry = na.into_iter().collect();
+        self.no_asymmetry.extend(na);
         self
     }
 
