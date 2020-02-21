@@ -415,7 +415,7 @@ where
     ///
     /// This will produce an error if some of the configurations options are
     /// deemed to be invalid.
-    pub fn build(self) -> Result<Solver<M>, Error> {
+    pub fn build(mut self) -> Result<Solver<M>, Error> {
         let mut model = self.model.ok_or(Error::UndefinedModel)?;
         model.set_beta(self.beta_range.0);
         let particles = model.particles();
@@ -440,13 +440,28 @@ where
         Self::check_initial_asymmetries(&initial_asymmetries, &particles)?;
 
         // Make sure that there aren't too many particles held in equilibrium or
-        // forbidden from developping any asymmetry.
+        // forbidden from developing any asymmetry.  We also sort and remove
+        // duplicates.  For the asymmetries, any particle which is its own
+        // antiparticle is also prevented from developing an asymmetry.
+        self.in_equilibrium.sort_unstable();
+        self.in_equilibrium.dedup();
         if self.in_equilibrium.len() > particles.len() {
             log::error!("There are more particles held in equilibrium ({}) than particles in the model ({}).",
                         self.in_equilibrium.len(),
                         particles.len());
             return Err(Error::TooManyInEquilibrium);
         }
+
+        self.no_asymmetry
+            .extend(model.particles().iter().enumerate().filter_map(|(i, p)| {
+                if p.own_antiparticle {
+                    Some(i)
+                } else {
+                    None
+                }
+            }));
+        self.no_asymmetry.sort_unstable();
+        self.no_asymmetry.dedup();
         if self.no_asymmetry.len() > particles.len() {
             log::error!(
                 "There are more particles with 0 asymmetry ({}) than particles in the model ({}).",

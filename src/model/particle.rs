@@ -27,15 +27,32 @@ use std::{collections::HashMap, f64};
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct Particle {
     // The spin is stored as twice the spin, so a spin-½ particle has `spin ==
-    // 1` and a spin-1 particle has `spin == 2`
+    // 1` and a spin-1 particle has `spin == 2`.
     spin: u8,
-    /// Mass of the particle in GeV
+    /// Whether the particle is its own antiparticle or not.
+    ///
+    /// By default, this is assumed to be false and can be set to true with
+    /// [`Particle::own_antiparticle`].
+    pub own_antiparticle: bool,
+    /// Mass of the particle in GeV.
+    ///
+    /// This should be updated using [`Particle::set_mass`] so that both the
+    /// mass and squared mass are updated simultaneously.
     pub mass: f64,
-    /// Squared mass of the particle in GeV²
+    /// Squared mass of the particle in GeV².
+    ///
+    /// This should be updated using [`Particle::set_mass`] so that both the
+    /// mass and squared mass are updated simultaneously.
     pub mass2: f64,
-    /// Width of the particle in GeV
+    /// Width of the particle in GeV.
+    ///
+    /// This should be updated using [`Particle::set_width`] so that both the
+    /// width and squared width are updated simultaneously.
     pub width: f64,
-    /// Squared width of the particle in GeV²
+    /// Squared width of the particle in GeV².
+    ///
+    /// This should be updated using [`Particle::set_width`] so that both the
+    /// width and squared width are updated simultaneously.
     pub width2: f64,
     /// Decays
     pub decays: HashMap<Vec<isize>, f64>,
@@ -57,6 +74,7 @@ impl Particle {
     pub fn new(spin: u8, mass: f64, width: f64) -> Self {
         Self {
             spin,
+            own_antiparticle: false,
             mass,
             mass2: mass.powi(2),
             width,
@@ -97,6 +115,14 @@ impl Particle {
     #[must_use]
     pub fn complex(mut self) -> Self {
         self.complex = true;
+        self
+    }
+
+    /// Indicate that the particle is its own antiparticle, thereby preventing
+    /// any asymmetry from being generated in its density.
+    #[must_use]
+    pub fn own_antiparticle(mut self) -> Self {
+        self.own_antiparticle = true;
         self
     }
 

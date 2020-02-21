@@ -44,10 +44,19 @@ pub struct StandardModel {
 impl Model for StandardModel {
     fn zero() -> Self {
         let particles = vec![
-            Particle::new(0, 0.0, 0.0).name("none").dof(0.0), // dummy particle so particles start at index `1`
-            Particle::new(2, 0.0, 0.0).name("A"),             // hypercharge gauge boson
-            Particle::new(2, 0.0, 0.0).name("W").dof(3.0),    // SU(2) gauge boson
-            Particle::new(2, 0.0, 0.0).name("G").dof(8.0),    // SU(3) gauge boson
+            Particle::new(0, 0.0, 0.0)
+                .name("none")
+                .dof(0.0)
+                .own_antiparticle(), // dummy particle so particles start at index `1`
+            Particle::new(2, 0.0, 0.0).name("A").own_antiparticle(), // hypercharge gauge boson
+            Particle::new(2, 0.0, 0.0)
+                .name("W")
+                .dof(3.0)
+                .own_antiparticle(), // SU(2) gauge boson
+            Particle::new(2, 0.0, 0.0)
+                .name("G")
+                .dof(8.0)
+                .own_antiparticle(), // SU(3) gauge boson
             Particle::new(0, 0.0, 0.0).name("H").dof(2.0).complex(), // Higgs
             Particle::new(1, 0.0, 0.0).name("L1").dof(2.0),
             Particle::new(1, 0.0, 0.0).name("L2").dof(2.0),
