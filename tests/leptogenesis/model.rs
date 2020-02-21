@@ -152,11 +152,11 @@ impl Model for LeptogenesisModel {
         self.sm.entropy_dof(beta)
     }
 
-    fn particles(&self) -> &Vec<Particle> {
+    fn particles(&self) -> &[Particle] {
         &self.sm.particles
     }
 
-    fn particles_mut(&mut self) -> &mut Vec<Particle> {
+    fn particles_mut(&mut self) -> &mut [Particle] {
         &mut self.sm.particles
     }
 

@@ -78,10 +78,10 @@ where
     }
 
     /// Return a list of particles in the model.
-    fn particles(&self) -> &Vec<Particle>;
+    fn particles(&self) -> &[Particle];
 
     /// Return a mutable list of particles in the model.
-    fn particles_mut(&mut self) -> &mut Vec<Particle>;
+    fn particles_mut(&mut self) -> &mut [Particle];
 
     /// Return the index corresponding to a particle's name and generation
     /// index.
