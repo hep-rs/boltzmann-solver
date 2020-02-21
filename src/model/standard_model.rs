@@ -178,11 +178,11 @@ impl Model for StandardModel {
         data::STANDARD_MODEL_GSTAR.sample(beta.ln())
     }
 
-    fn particles(&self) -> &Vec<Particle> {
+    fn particles(&self) -> &[Particle] {
         &self.particles
     }
 
-    fn particles_mut(&mut self) -> &mut Vec<Particle> {
+    fn particles_mut(&mut self) -> &mut [Particle] {
         &mut self.particles
     }
 
