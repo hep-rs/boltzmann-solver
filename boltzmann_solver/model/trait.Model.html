@@ -71,7 +71,8 @@ Methods</a>
 "#method.as_context">as_context</a><a href=
 "#method.hubble_rate">hubble_rate</a><a href=
 "#method.particle">particle</a><a href=
-"#method.particle_mut">particle_mut</a></div>
+"#method.particle_mut">particle_mut</a><a href=
+"#method.particle_name">particle_name</a></div>
 <a class="sidebar-title" href=
 "#implementors">Implementors</a></div>
 <p class='location'><a href=
@@ -106,7 +107,7 @@ autocomplete="off" spellcheck="false" placeholder=
 'render-detail'><a id="toggle-all-docs" href="javascript:void(0)"
 title="collapse all docs">[<span class=
 'inner'>−</span>]</a></span><a class='srclink' href=
-'../../src/boltzmann_solver/model.rs.html#26-161' title=
+'../../src/boltzmann_solver/model.rs.html#26-185' title=
 'goto source code'>[src]</a></span><span class='in-band'>Trait
 <a href='../index.html'>boltzmann_solver</a>::<wbr><a href=
 'index.html'>model</a>::<wbr><a class="trait" href=
@@ -139,20 +140,22 @@ href=
 </pre>
 <div class='item-spacer'></div>
 <pre>    fn <a href='#tymethod.particles' class=
-'fnname'>particles</a>(&amp;self) -&gt; &<a class="struct" href=
-"https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html"
-title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href=
-"../../boltzmann_solver/model/struct.Particle.html" title=
-"struct boltzmann_solver::model::Particle">Particle</a>&gt;;
+'fnname'>particles</a>(&amp;self) -&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;[</a><a class="struct"
+href="../../boltzmann_solver/model/struct.Particle.html" title=
+"struct boltzmann_solver::model::Particle">Particle</a><a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>;
 </pre>
 <div class='item-spacer'></div>
 <pre>    fn <a href='#tymethod.particles_mut' class=
-'fnname'>particles_mut</a>(&amp;mut self) -&gt; &amp;mut <a class=
-"struct" href=
-"https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html"
-title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href=
-"../../boltzmann_solver/model/struct.Particle.html" title=
-"struct boltzmann_solver::model::Particle">Particle</a>&gt;;
+'fnname'>particles_mut</a>(&amp;mut self) -&gt; <a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;mut [</a><a class="struct"
+href="../../boltzmann_solver/model/struct.Particle.html" title=
+"struct boltzmann_solver::model::Particle">Particle</a><a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>;
 </pre>
 <div class='item-spacer'></div>
 <pre>    fn <a href='#tymethod.particle_idx' class=
@@ -180,6 +183,19 @@ href=
 href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive"
 href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a> { ... }
+</pre>
+<div class='item-spacer'></div>
+<pre>    fn <a href='#method.particle_name' class=
+'fnname'>particle_name</a>(&amp;self, i: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.isize.html">isize</a>) -&gt; <a class="enum"
+href=
+"https://doc.rust-lang.org/nightly/core/result/enum.Result.html"
+title="enum core::result::Result">Result</a>&lt;<a class="struct"
+href=
+"https://doc.rust-lang.org/nightly/alloc/string/struct.String.html"
+title="struct alloc::string::String">String</a>, <a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.isize.html">isize</a>&gt; { ... }
 </pre>
 <div class='item-spacer'></div>
 <pre>    fn <a href='#method.particle' class=
@@ -259,22 +275,25 @@ temperature.</p>
 </div>
 <h3 id='tymethod.particles' class='method'><code id=
 'particles.v'>fn <a href='#tymethod.particles' class=
-'fnname'>particles</a>(&amp;self) -&gt; &<a class="struct" href=
-"https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html"
-title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href=
-"../../boltzmann_solver/model/struct.Particle.html" title=
-"struct boltzmann_solver::model::Particle">Particle</a>&gt;</code></h3>
+'fnname'>particles</a>(&amp;self) -&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;[</a><a class="struct"
+href="../../boltzmann_solver/model/struct.Particle.html" title=
+"struct boltzmann_solver::model::Particle">Particle</a><a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a></code></h3>
 <div class='docblock'>
 <p>Return a list of particles in the model.</p>
 </div>
 <h3 id='tymethod.particles_mut' class='method'><code id=
 'particles_mut.v'>fn <a href='#tymethod.particles_mut' class=
-'fnname'>particles_mut</a>(&amp;mut self) -&gt; &amp;mut <a class=
-"struct" href=
-"https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html"
-title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href=
+'fnname'>particles_mut</a>(&amp;mut self) -&gt; <a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;mut
+[</a><a class="struct" href=
 "../../boltzmann_solver/model/struct.Particle.html" title=
-"struct boltzmann_solver::model::Particle">Particle</a>&gt;</code></h3>
+"struct boltzmann_solver::model::Particle">Particle</a><a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a></code></h3>
 <div class='docblock'>
 <p>Return a mutable list of particles in the model.</p>
 </div>
@@ -339,6 +358,29 @@ does not change too rapidly.</p>
 <p>The dominated epoch in the Standard Model of cosmology ends at
 the matter–radiation equality, which occurs at an inverse
 temperature of \(\beta \approx 10^{8}\) GeV^{-1}.</p>
+</div>
+<h3 id='method.particle_name' class='method'><code id=
+'particle_name.v'>fn <a href='#method.particle_name' class=
+'fnname'>particle_name</a>(&amp;self, i: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.isize.html">isize</a>)
+-&gt; <a class="enum" href=
+"https://doc.rust-lang.org/nightly/core/result/enum.Result.html"
+title="enum core::result::Result">Result</a>&lt;<a class="struct"
+href=
+"https://doc.rust-lang.org/nightly/alloc/string/struct.String.html"
+title="struct alloc::string::String">String</a>, <a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.isize.html">isize</a>&gt;</code></h3>
+<div class='docblock'>
+<p>Convert a signed particle number to the corresponding particle
+name.</p>
+<p>If the particle number is negative and the particle is not its
+own antiparticle, the particle name is prepending with
+<code>~</code>.</p>
+<h1 id="errors-1" class="section-header"><a href=
+"#errors-1">Errors</a></h1>
+<p>If the particle is not found within the model, the number is
+returned is it can be handled separately.</p>
 </div>
 <h3 id='method.particle' class='method'><code id='particle.v'>fn
 <a href='#method.particle' class=
@@ -407,20 +449,20 @@ for <a class="struct" href=
 "../../boltzmann_solver/model/struct.StandardModel.html" title=
 "struct boltzmann_solver::model::StandardModel">StandardModel</a></code><a href='#impl-Model'
 class='anchor'></a><a class='srclink' href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#44-194'
+'../../src/boltzmann_solver/model/standard_model.rs.html#44-203'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.zero' class="method hidden"><code id='zero.v-1'>fn
 <a href='#method.zero' class='fnname'>zero</a>() -&gt;
 Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#45-100'
+'../../src/boltzmann_solver/model/standard_model.rs.html#45-109'
 title='goto source code'>[src]</a></h4>
 <h4 id='method.set_beta' class="method"><code id='set_beta.v-1'>fn
 <a href='#method.set_beta' class='fnname'>set_beta</a>(&amp;mut
 self, beta: <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)</code><a class='srclink'
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#112-161'
+'../../src/boltzmann_solver/model/standard_model.rs.html#121-170'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Update beta for the model.</p>
@@ -437,7 +479,7 @@ should also be included.</p>
 'fnname'>get_beta</a>(&amp;self) -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#163-165'
+'../../src/boltzmann_solver/model/standard_model.rs.html#172-174'
 title='goto source code'>[src]</a></h4>
 <h4 id='method.entropy_dof' class="method hidden"><code id=
 'entropy_dof.v-1'>fn <a href='#method.entropy_dof' class=
@@ -446,28 +488,31 @@ href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#167-170'
+'../../src/boltzmann_solver/model/standard_model.rs.html#176-179'
 title='goto source code'>[src]</a></h4>
 <h4 id='method.particles' class="method hidden"><code id=
 'particles.v-1'>fn <a href='#method.particles' class=
-'fnname'>particles</a>(&amp;self) -&gt; &<a class="struct" href=
-"https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html"
-title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href=
-"../../boltzmann_solver/model/struct.Particle.html" title=
-"struct boltzmann_solver::model::Particle">Particle</a>&gt;</code><a class='srclink'
+'fnname'>particles</a>(&amp;self) -&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;[</a><a class="struct"
+href="../../boltzmann_solver/model/struct.Particle.html" title=
+"struct boltzmann_solver::model::Particle">Particle</a><a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a></code><a class='srclink'
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#172-174'
+'../../src/boltzmann_solver/model/standard_model.rs.html#181-183'
 title='goto source code'>[src]</a></h4>
 <h4 id='method.particles_mut' class="method hidden"><code id=
 'particles_mut.v-1'>fn <a href='#method.particles_mut' class=
-'fnname'>particles_mut</a>(&amp;mut self) -&gt; &amp;mut <a class=
-"struct" href=
-"https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html"
-title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href=
+'fnname'>particles_mut</a>(&amp;mut self) -&gt; <a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;mut
+[</a><a class="struct" href=
 "../../boltzmann_solver/model/struct.Particle.html" title=
-"struct boltzmann_solver::model::Particle">Particle</a>&gt;</code><a class='srclink'
+"struct boltzmann_solver::model::Particle">Particle</a><a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a></code><a class='srclink'
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#176-178'
+'../../src/boltzmann_solver/model/standard_model.rs.html#185-187'
 title='goto source code'>[src]</a></h4>
 <h4 id='method.particle_idx' class="method hidden"><code id=
 'particle_idx.v-1'>fn <a href='#method.particle_idx' class=
@@ -490,7 +535,7 @@ title="enum core::result::Result">Result</a>&lt;<a class=
 href=
 "https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a>&gt;</code><a class='srclink'
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#180-193'
+'../../src/boltzmann_solver/model/standard_model.rs.html#189-202'
 title='goto source code'>[src]</a></h4>
 </div>
 </div>

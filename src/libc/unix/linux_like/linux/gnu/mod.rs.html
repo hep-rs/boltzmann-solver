@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libc-0.2.66/src/unix/linux_like/linux/gnu/mod.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libc-0.2.67/src/unix/linux_like/linux/gnu/mod.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>mod.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href=
@@ -1135,6 +1135,55 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="1055">1055</span>
 <span id="1056">1056</span>
 <span id="1057">1057</span>
+<span id="1058">1058</span>
+<span id="1059">1059</span>
+<span id="1060">1060</span>
+<span id="1061">1061</span>
+<span id="1062">1062</span>
+<span id="1063">1063</span>
+<span id="1064">1064</span>
+<span id="1065">1065</span>
+<span id="1066">1066</span>
+<span id="1067">1067</span>
+<span id="1068">1068</span>
+<span id="1069">1069</span>
+<span id="1070">1070</span>
+<span id="1071">1071</span>
+<span id="1072">1072</span>
+<span id="1073">1073</span>
+<span id="1074">1074</span>
+<span id="1075">1075</span>
+<span id="1076">1076</span>
+<span id="1077">1077</span>
+<span id="1078">1078</span>
+<span id="1079">1079</span>
+<span id="1080">1080</span>
+<span id="1081">1081</span>
+<span id="1082">1082</span>
+<span id="1083">1083</span>
+<span id="1084">1084</span>
+<span id="1085">1085</span>
+<span id="1086">1086</span>
+<span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
+<span id="1090">1090</span>
+<span id="1091">1091</span>
+<span id="1092">1092</span>
+<span id="1093">1093</span>
+<span id="1094">1094</span>
+<span id="1095">1095</span>
+<span id="1096">1096</span>
+<span id="1097">1097</span>
+<span id="1098">1098</span>
+<span id="1099">1099</span>
+<span id="1100">1100</span>
+<span id="1101">1101</span>
+<span id="1102">1102</span>
+<span id="1103">1103</span>
+<span id="1104">1104</span>
+<span id="1105">1105</span>
+<span id="1106">1106</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -1149,6 +1198,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw">type</span> <span class=
 "ident">__rlimit_resource_t</span> <span class=
 "op">=</span> ::<span class="ident">c_uint</span>;
+<span class="kw">pub</span> <span class=
+"kw">type</span> <span class="ident">Lmid_t</span> <span class=
+"op">=</span> ::<span class="ident">c_long</span>;
 
 <span class="macro">s</span><span class="macro">!</span> {
     <span class="kw">pub</span> <span class=
@@ -1981,6 +2033,69 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">c_short</span> <span class="op">=</span> <span class=
 "number">9</span>;
 
+<span class="comment">// dlfcn.h</span>
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">LM_ID_BASE</span>: ::<span class=
+"ident">c_long</span> <span class="op">=</span> <span class=
+"number">0</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">LM_ID_NEWLM</span>: ::<span class=
+"ident">c_long</span> <span class="op">=</span> <span class=
+"op">-</span><span class="number">1</span>;
+
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">RTLD_DI_LMID</span>: ::<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
+"number">1</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">RTLD_DI_LINKMAP</span>: ::<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
+"number">2</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">RTLD_DI_CONFIGADDR</span>: ::<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
+"number">3</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">RTLD_DI_SERINFO</span>: ::<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
+"number">4</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">RTLD_DI_SERINFOSIZE</span>: ::<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
+"number">5</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">RTLD_DI_ORIGIN</span>: ::<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
+"number">6</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">RTLD_DI_PROFILENAME</span>: ::<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
+"number">7</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">RTLD_DI_PROFILEOUT</span>: ::<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
+"number">8</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">RTLD_DI_TLS_MODID</span>: ::<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
+"number">9</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">RTLD_DI_TLS_DATA</span>: ::<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
+"number">10</span>;
+
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">SOCK_NONBLOCK</span>: ::<span class=
@@ -2059,39 +2174,39 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">LC_PAPER_MASK</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> (<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
 "number">1</span> <span class="op">&lt;</span><span class=
-"op">&lt;</span> <span class="ident">LC_PAPER</span>);
+"op">&lt;</span> <span class="ident">LC_PAPER</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">LC_NAME_MASK</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> (<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
 "number">1</span> <span class="op">&lt;</span><span class=
-"op">&lt;</span> <span class="ident">LC_NAME</span>);
+"op">&lt;</span> <span class="ident">LC_NAME</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">LC_ADDRESS_MASK</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> (<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
 "number">1</span> <span class="op">&lt;</span><span class=
-"op">&lt;</span> <span class="ident">LC_ADDRESS</span>);
+"op">&lt;</span> <span class="ident">LC_ADDRESS</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">LC_TELEPHONE_MASK</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> (<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
 "number">1</span> <span class="op">&lt;</span><span class=
-"op">&lt;</span> <span class="ident">LC_TELEPHONE</span>);
+"op">&lt;</span> <span class="ident">LC_TELEPHONE</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">LC_MEASUREMENT_MASK</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> (<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
 "number">1</span> <span class="op">&lt;</span><span class=
-"op">&lt;</span> <span class="ident">LC_MEASUREMENT</span>);
+"op">&lt;</span> <span class="ident">LC_MEASUREMENT</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">LC_IDENTIFICATION_MASK</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> (<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
 "number">1</span> <span class="op">&lt;</span><span class=
-"op">&lt;</span> <span class="ident">LC_IDENTIFICATION</span>);
+"op">&lt;</span> <span class="ident">LC_IDENTIFICATION</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">LC_ALL_MASK</span>: ::<span class=
@@ -3683,9 +3798,9 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">NFT_LOOKUP_F_INV</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> (<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
 "number">1</span> <span class="op">&lt;</span><span class=
-"op">&lt;</span> <span class="number">0</span>);
+"op">&lt;</span> <span class="number">0</span>;
 
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
@@ -3701,9 +3816,9 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">NFT_DYNSET_F_INV</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> (<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
 "number">1</span> <span class="op">&lt;</span><span class=
-"op">&lt;</span> <span class="number">0</span>);
+"op">&lt;</span> <span class="number">0</span>;
 
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
@@ -3953,9 +4068,9 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">NFT_LIMIT_F_INV</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> (<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
 "number">1</span> <span class="op">&lt;</span><span class=
-"op">&lt;</span> <span class="number">0</span>);
+"op">&lt;</span> <span class="number">0</span>;
 
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
@@ -3976,9 +4091,9 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">NFT_QUOTA_F_INV</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> (<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
 "number">1</span> <span class="op">&lt;</span><span class=
-"op">&lt;</span> <span class="number">0</span>);
+"op">&lt;</span> <span class="number">0</span>;
 
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
@@ -4291,6 +4406,33 @@ autocomplete="off" spellcheck="false" placeholder=
 
 <span class="kw">extern</span> <span class="string">"C"</span> {
     <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">qsort_r</span>(
+        <span class="ident">base</span>: <span class=
+"kw-2">*</span><span class="kw-2">mut</span> ::<span class=
+"ident">c_void</span>,
+        <span class="ident">num</span>: ::<span class=
+"ident">size_t</span>,
+        <span class="ident">size</span>: ::<span class=
+"ident">size_t</span>,
+        <span class="ident">compar</span>: ::<span class=
+"prelude-ty">Option</span><span class="op">&lt;</span>
+            <span class="kw">unsafe</span> <span class=
+"kw">extern</span> <span class="string">"C"</span> <span class=
+"kw">fn</span>(
+                <span class="kw-2">*</span><span class=
+"kw">const</span> ::<span class="ident">c_void</span>,
+                <span class="kw-2">*</span><span class=
+"kw">const</span> ::<span class="ident">c_void</span>,
+                <span class="kw-2">*</span><span class=
+"kw-2">mut</span> ::<span class="ident">c_void</span>,
+            ) <span class="op">-</span><span class=
+"op">&gt;</span> ::<span class="ident">c_int</span>,
+        <span class="op">&gt;</span>,
+        <span class="ident">arg</span>: <span class=
+"kw-2">*</span><span class="kw-2">mut</span> ::<span class=
+"ident">c_void</span>,
+    );
+    <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">sendmmsg</span>(
         <span class="ident">sockfd</span>: ::<span class=
 "ident">c_int</span>,
@@ -4472,6 +4614,21 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">c_uint</span>,
     ) <span class="op">-</span><span class=
 "op">&gt;</span> ::<span class="ident">ssize_t</span>;
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">memmem</span>(
+        <span class="ident">haystack</span>: <span class=
+"kw-2">*</span><span class="kw">const</span> ::<span class=
+"ident">c_void</span>,
+        <span class="ident">haystacklen</span>: ::<span class=
+"ident">size_t</span>,
+        <span class="ident">needle</span>: <span class=
+"kw-2">*</span><span class="kw">const</span> ::<span class=
+"ident">c_void</span>,
+        <span class="ident">needlelen</span>: ::<span class=
+"ident">size_t</span>,
+    ) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="kw-2">*</span><span class=
+"kw-2">mut</span> ::<span class="ident">c_void</span>;
 }
 
 <span class="attribute">#[<span class=
@@ -4703,6 +4860,36 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="ident">name</span>: <span class=
 "kw-2">*</span><span class="kw">const</span> ::<span class=
 "ident">c_char</span>,
+    ) <span class="op">-</span><span class=
+"op">&gt;</span> ::<span class="ident">c_int</span>;
+}
+
+<span class="attribute">#[<span class=
+"ident">link</span>(<span class="ident">name</span> <span class=
+"op">=</span> <span class="string">"dl"</span>)]</span>
+<span class="kw">extern</span> <span class="string">"C"</span> {
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">dlmopen</span>(
+        <span class="ident">lmid</span>: <span class=
+"ident">Lmid_t</span>,
+        <span class="ident">filename</span>: <span class=
+"kw-2">*</span><span class="kw">const</span> ::<span class=
+"ident">c_char</span>,
+        <span class="ident">flag</span>: ::<span class=
+"ident">c_int</span>,
+    ) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="kw-2">*</span><span class=
+"kw-2">mut</span> ::<span class="ident">c_void</span>;
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">dlinfo</span>(
+        <span class="ident">handle</span>: <span class=
+"kw-2">*</span><span class="kw-2">mut</span> ::<span class=
+"ident">c_void</span>,
+        <span class="ident">request</span>: ::<span class=
+"ident">c_int</span>,
+        <span class="ident">info</span>: <span class=
+"kw-2">*</span><span class="kw-2">mut</span> ::<span class=
+"ident">c_void</span>,
     ) <span class="op">-</span><span class=
 "op">&gt;</span> ::<span class="ident">c_int</span>;
 }

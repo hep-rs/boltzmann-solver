@@ -205,6 +205,8 @@ all items</span></h1>
 'struct.signalfd_siginfo.html'>signalfd_siginfo</a></li>
 <li><a href='struct.sigset_t.html'>sigset_t</a></li>
 <li><a href='struct.sigval.html'>sigval</a></li>
+<li><a href=
+'struct.sock_extended_err.html'>sock_extended_err</a></li>
 <li><a href='struct.sockaddr.html'>sockaddr</a></li>
 <li><a href='struct.sockaddr_alg.html'>sockaddr_alg</a></li>
 <li><a href='struct.sockaddr_in.html'>sockaddr_in</a></li>
@@ -280,6 +282,7 @@ all items</span></h1>
 <li><a href='fn.RT_ADDRCLASS.html'>RT_ADDRCLASS</a></li>
 <li><a href='fn.RT_LOCALADDR.html'>RT_LOCALADDR</a></li>
 <li><a href='fn.RT_TOS.html'>RT_TOS</a></li>
+<li><a href='fn.SO_EE_OFFENDER.html'>SO_EE_OFFENDER</a></li>
 <li><a href='fn.WCOREDUMP.html'>WCOREDUMP</a></li>
 <li><a href='fn.WEXITSTATUS.html'>WEXITSTATUS</a></li>
 <li><a href='fn.WIFCONTINUED.html'>WIFCONTINUED</a></li>
@@ -311,6 +314,7 @@ all items</span></h1>
 <li><a href='fn.backtrace.html'>backtrace</a></li>
 <li><a href='fn.bind.html'>bind</a></li>
 <li><a href='fn.brk.html'>brk</a></li>
+<li><a href='fn.bsearch.html'>bsearch</a></li>
 <li><a href='fn.calloc.html'>calloc</a></li>
 <li><a href='fn.cfgetispeed.html'>cfgetispeed</a></li>
 <li><a href='fn.cfgetospeed.html'>cfgetospeed</a></li>
@@ -341,6 +345,8 @@ all items</span></h1>
 <li><a href='fn.dladdr.html'>dladdr</a></li>
 <li><a href='fn.dlclose.html'>dlclose</a></li>
 <li><a href='fn.dlerror.html'>dlerror</a></li>
+<li><a href='fn.dlinfo.html'>dlinfo</a></li>
+<li><a href='fn.dlmopen.html'>dlmopen</a></li>
 <li><a href='fn.dlopen.html'>dlopen</a></li>
 <li><a href='fn.dlsym.html'>dlsym</a></li>
 <li><a href='fn.dup.html'>dup</a></li>
@@ -563,6 +569,7 @@ all items</span></h1>
 <li><a href='fn.memchr.html'>memchr</a></li>
 <li><a href='fn.memcmp.html'>memcmp</a></li>
 <li><a href='fn.memcpy.html'>memcpy</a></li>
+<li><a href='fn.memmem.html'>memmem</a></li>
 <li><a href='fn.memmove.html'>memmove</a></li>
 <li><a href='fn.memrchr.html'>memrchr</a></li>
 <li><a href='fn.memset.html'>memset</a></li>
@@ -813,6 +820,8 @@ all items</span></h1>
 <li><a href='fn.pwrite64.html'>pwrite64</a></li>
 <li><a href='fn.pwritev.html'>pwritev</a></li>
 <li><a href='fn.pwritev64.html'>pwritev64</a></li>
+<li><a href='fn.qsort.html'>qsort</a></li>
+<li><a href='fn.qsort_r.html'>qsort_r</a></li>
 <li><a href='fn.quotactl.html'>quotactl</a></li>
 <li><a href='fn.raise.html'>raise</a></li>
 <li><a href='fn.rand.html'>rand</a></li>
@@ -1057,6 +1066,7 @@ all items</span></h1>
 <li><a href='type.Elf64_Sxword.html'>Elf64_Sxword</a></li>
 <li><a href='type.Elf64_Word.html'>Elf64_Word</a></li>
 <li><a href='type.Elf64_Xword.html'>Elf64_Xword</a></li>
+<li><a href='type.Lmid_t.html'>Lmid_t</a></li>
 <li><a href='type.__fsword_t.html'>__fsword_t</a></li>
 <li><a href=
 'type.__priority_which_t.html'>__priority_which_t</a></li>
@@ -2405,6 +2415,8 @@ all items</span></h1>
 <li><a href='constant.LIO_READ.html'>LIO_READ</a></li>
 <li><a href='constant.LIO_WAIT.html'>LIO_WAIT</a></li>
 <li><a href='constant.LIO_WRITE.html'>LIO_WRITE</a></li>
+<li><a href='constant.LM_ID_BASE.html'>LM_ID_BASE</a></li>
+<li><a href='constant.LM_ID_NEWLM.html'>LM_ID_NEWLM</a></li>
 <li><a href='constant.LOCK_EX.html'>LOCK_EX</a></li>
 <li><a href='constant.LOCK_NB.html'>LOCK_NB</a></li>
 <li><a href='constant.LOCK_SH.html'>LOCK_SH</a></li>
@@ -3804,6 +3816,24 @@ all items</span></h1>
 <li><a href='constant.RTF_XRESOLVE.html'>RTF_XRESOLVE</a></li>
 <li><a href='constant.RTLD_DEEPBIND.html'>RTLD_DEEPBIND</a></li>
 <li><a href='constant.RTLD_DEFAULT.html'>RTLD_DEFAULT</a></li>
+<li><a href=
+'constant.RTLD_DI_CONFIGADDR.html'>RTLD_DI_CONFIGADDR</a></li>
+<li><a href=
+'constant.RTLD_DI_LINKMAP.html'>RTLD_DI_LINKMAP</a></li>
+<li><a href='constant.RTLD_DI_LMID.html'>RTLD_DI_LMID</a></li>
+<li><a href='constant.RTLD_DI_ORIGIN.html'>RTLD_DI_ORIGIN</a></li>
+<li><a href=
+'constant.RTLD_DI_PROFILENAME.html'>RTLD_DI_PROFILENAME</a></li>
+<li><a href=
+'constant.RTLD_DI_PROFILEOUT.html'>RTLD_DI_PROFILEOUT</a></li>
+<li><a href=
+'constant.RTLD_DI_SERINFO.html'>RTLD_DI_SERINFO</a></li>
+<li><a href=
+'constant.RTLD_DI_SERINFOSIZE.html'>RTLD_DI_SERINFOSIZE</a></li>
+<li><a href=
+'constant.RTLD_DI_TLS_DATA.html'>RTLD_DI_TLS_DATA</a></li>
+<li><a href=
+'constant.RTLD_DI_TLS_MODID.html'>RTLD_DI_TLS_MODID</a></li>
 <li><a href='constant.RTLD_GLOBAL.html'>RTLD_GLOBAL</a></li>
 <li><a href='constant.RTLD_LAZY.html'>RTLD_LAZY</a></li>
 <li><a href='constant.RTLD_LOCAL.html'>RTLD_LOCAL</a></li>
@@ -4145,6 +4175,18 @@ all items</span></h1>
 'constant.SO_DETACH_FILTER.html'>SO_DETACH_FILTER</a></li>
 <li><a href='constant.SO_DOMAIN.html'>SO_DOMAIN</a></li>
 <li><a href='constant.SO_DONTROUTE.html'>SO_DONTROUTE</a></li>
+<li><a href=
+'constant.SO_EE_ORIGIN_ICMP.html'>SO_EE_ORIGIN_ICMP</a></li>
+<li><a href=
+'constant.SO_EE_ORIGIN_ICMP6.html'>SO_EE_ORIGIN_ICMP6</a></li>
+<li><a href=
+'constant.SO_EE_ORIGIN_LOCAL.html'>SO_EE_ORIGIN_LOCAL</a></li>
+<li><a href=
+'constant.SO_EE_ORIGIN_NONE.html'>SO_EE_ORIGIN_NONE</a></li>
+<li><a href=
+'constant.SO_EE_ORIGIN_TIMESTAMPING.html'>SO_EE_ORIGIN_TIMESTAMPING</a></li>
+<li><a href=
+'constant.SO_EE_ORIGIN_TXSTATUS.html'>SO_EE_ORIGIN_TXSTATUS</a></li>
 <li><a href='constant.SO_ERROR.html'>SO_ERROR</a></li>
 <li><a href='constant.SO_GET_FILTER.html'>SO_GET_FILTER</a></li>
 <li><a href=

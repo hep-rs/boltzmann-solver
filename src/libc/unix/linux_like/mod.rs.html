@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libc-0.2.66/src/unix/linux_like/mod.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libc-0.2.67/src/unix/linux_like/mod.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>mod.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href=
@@ -1643,6 +1643,27 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="1567">1567</span>
 <span id="1568">1568</span>
 <span id="1569">1569</span>
+<span id="1570">1570</span>
+<span id="1571">1571</span>
+<span id="1572">1572</span>
+<span id="1573">1573</span>
+<span id="1574">1574</span>
+<span id="1575">1575</span>
+<span id="1576">1576</span>
+<span id="1577">1577</span>
+<span id="1578">1578</span>
+<span id="1579">1579</span>
+<span id="1580">1580</span>
+<span id="1581">1581</span>
+<span id="1582">1582</span>
+<span id="1583">1583</span>
+<span id="1584">1584</span>
+<span id="1585">1585</span>
+<span id="1586">1586</span>
+<span id="1587">1587</span>
+<span id="1588">1588</span>
+<span id="1589">1589</span>
+<span id="1590">1590</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -2086,6 +2107,24 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">msg_hdr</span>: ::<span class="ident">msghdr</span>,
         <span class="kw">pub</span> <span class=
 "ident">msg_len</span>: ::<span class="ident">c_uint</span>,
+    }
+
+    <span class="kw">pub</span> <span class=
+"kw">struct</span> <span class="ident">sock_extended_err</span> {
+        <span class="kw">pub</span> <span class=
+"ident">ee_errno</span>: <span class="ident">u32</span>,
+        <span class="kw">pub</span> <span class=
+"ident">ee_origin</span>: <span class="ident">u8</span>,
+        <span class="kw">pub</span> <span class=
+"ident">ee_type</span>: <span class="ident">u8</span>,
+        <span class="kw">pub</span> <span class=
+"ident">ee_code</span>: <span class="ident">u8</span>,
+        <span class="kw">pub</span> <span class=
+"ident">ee_pad</span>: <span class="ident">u8</span>,
+        <span class="kw">pub</span> <span class=
+"ident">ee_info</span>: <span class="ident">u32</span>,
+        <span class="kw">pub</span> <span class=
+"ident">ee_data</span>: <span class="ident">u32</span>
     }
 }
 
@@ -3124,39 +3163,39 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">LC_CTYPE_MASK</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> (<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
 "number">1</span> <span class="op">&lt;</span><span class=
-"op">&lt;</span> <span class="ident">LC_CTYPE</span>);
+"op">&lt;</span> <span class="ident">LC_CTYPE</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">LC_NUMERIC_MASK</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> (<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
 "number">1</span> <span class="op">&lt;</span><span class=
-"op">&lt;</span> <span class="ident">LC_NUMERIC</span>);
+"op">&lt;</span> <span class="ident">LC_NUMERIC</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">LC_TIME_MASK</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> (<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
 "number">1</span> <span class="op">&lt;</span><span class=
-"op">&lt;</span> <span class="ident">LC_TIME</span>);
+"op">&lt;</span> <span class="ident">LC_TIME</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">LC_COLLATE_MASK</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> (<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
 "number">1</span> <span class="op">&lt;</span><span class=
-"op">&lt;</span> <span class="ident">LC_COLLATE</span>);
+"op">&lt;</span> <span class="ident">LC_COLLATE</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">LC_MONETARY_MASK</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> (<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
 "number">1</span> <span class="op">&lt;</span><span class=
-"op">&lt;</span> <span class="ident">LC_MONETARY</span>);
+"op">&lt;</span> <span class="ident">LC_MONETARY</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">LC_MESSAGES_MASK</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> (<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
 "number">1</span> <span class="op">&lt;</span><span class=
-"op">&lt;</span> <span class="ident">LC_MESSAGES</span>);
+"op">&lt;</span> <span class="ident">LC_MESSAGES</span>;
 <span class="comment">// LC_ALL_MASK defined per platform</span>
 
 <span class="kw">pub</span> <span class=
@@ -5388,50 +5427,50 @@ autocomplete="off" spellcheck="false" placeholder=
 "number">0x60</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
-"ident">IPOPT_END</span>: <span class="ident">u8</span> <span class="op">=</span> (<span class="number">0</span> <span class="op">|</span> <span class="ident">IPOPT_CONTROL</span>);
+"ident">IPOPT_END</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0</span> <span class="op">|</span> <span class="ident">IPOPT_CONTROL</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">IPOPT_NOOP</span>: <span class=
-"ident">u8</span> <span class="op">=</span> (<span class=
+"ident">u8</span> <span class="op">=</span> <span class=
 "number">1</span> <span class="op">|</span> <span class=
-"ident">IPOPT_CONTROL</span>);
+"ident">IPOPT_CONTROL</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
-"ident">IPOPT_SEC</span>: <span class="ident">u8</span> <span class="op">=</span> (<span class="number">2</span> <span class="op">|</span> <span class="ident">IPOPT_CONTROL</span> <span class="op">|</span> <span class="ident">IPOPT_COPY</span>);
+"ident">IPOPT_SEC</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">2</span> <span class="op">|</span> <span class="ident">IPOPT_CONTROL</span> <span class="op">|</span> <span class="ident">IPOPT_COPY</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">IPOPT_LSRR</span>: <span class=
-"ident">u8</span> <span class="op">=</span> (<span class=
+"ident">u8</span> <span class="op">=</span> <span class=
 "number">3</span> <span class="op">|</span> <span class=
 "ident">IPOPT_CONTROL</span> <span class="op">|</span> <span class=
-"ident">IPOPT_COPY</span>);
+"ident">IPOPT_COPY</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">IPOPT_TIMESTAMP</span>: <span class=
-"ident">u8</span> <span class="op">=</span> (<span class=
+"ident">u8</span> <span class="op">=</span> <span class=
 "number">4</span> <span class="op">|</span> <span class=
-"ident">IPOPT_MEASUREMENT</span>);
+"ident">IPOPT_MEASUREMENT</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class="ident">IPOPT_RR</span>: <span class=
-"ident">u8</span> <span class="op">=</span> (<span class=
+"ident">u8</span> <span class="op">=</span> <span class=
 "number">7</span> <span class="op">|</span> <span class=
-"ident">IPOPT_CONTROL</span>);
+"ident">IPOPT_CONTROL</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
-"ident">IPOPT_SID</span>: <span class="ident">u8</span> <span class="op">=</span> (<span class="number">8</span> <span class="op">|</span> <span class="ident">IPOPT_CONTROL</span> <span class="op">|</span> <span class="ident">IPOPT_COPY</span>);
+"ident">IPOPT_SID</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">8</span> <span class="op">|</span> <span class="ident">IPOPT_CONTROL</span> <span class="op">|</span> <span class="ident">IPOPT_COPY</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">IPOPT_SSRR</span>: <span class=
-"ident">u8</span> <span class="op">=</span> (<span class=
+"ident">u8</span> <span class="op">=</span> <span class=
 "number">9</span> <span class="op">|</span> <span class=
 "ident">IPOPT_CONTROL</span> <span class="op">|</span> <span class=
-"ident">IPOPT_COPY</span>);
+"ident">IPOPT_COPY</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class="ident">IPOPT_RA</span>: <span class=
-"ident">u8</span> <span class="op">=</span> (<span class=
+"ident">u8</span> <span class="op">=</span> <span class=
 "number">20</span> <span class="op">|</span> <span class=
 "ident">IPOPT_CONTROL</span> <span class="op">|</span> <span class=
-"ident">IPOPT_COPY</span>);
+"ident">IPOPT_COPY</span>;
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">IPVERSION</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">4</span>;
@@ -5818,6 +5857,37 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">u16</span> <span class="op">=</span> <span class=
 "number">0xFFFE</span>;
 
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">SO_EE_ORIGIN_NONE</span>: <span class=
+"ident">u8</span> <span class="op">=</span> <span class=
+"number">0</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">SO_EE_ORIGIN_LOCAL</span>: <span class=
+"ident">u8</span> <span class="op">=</span> <span class=
+"number">1</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">SO_EE_ORIGIN_ICMP</span>: <span class=
+"ident">u8</span> <span class="op">=</span> <span class=
+"number">2</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">SO_EE_ORIGIN_ICMP6</span>: <span class=
+"ident">u8</span> <span class="op">=</span> <span class=
+"number">3</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">SO_EE_ORIGIN_TXSTATUS</span>: <span class=
+"ident">u8</span> <span class="op">=</span> <span class=
+"number">4</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">SO_EE_ORIGIN_TIMESTAMPING</span>: <span class=
+"ident">u8</span> <span class="op">=</span> <span class=
+"ident">SO_EE_ORIGIN_TXSTATUS</span>;
+
 <span class="macro">const_fn</span><span class="macro">!</span> {
     {<span class="kw">const</span>} <span class=
 "kw">fn</span> <span class="ident">CMSG_ALIGN</span>(<span class=
@@ -6140,6 +6210,21 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">u8</span> {
         <span class="ident">x</span> <span class=
 "op">&</span> ::<span class="ident">IPTOS_ECN_MASK</span>
+    }
+
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class=
+"ident">SO_EE_OFFENDER</span>(<span class=
+"ident">ee</span>: <span class="kw-2">*</span><span class=
+"kw">const</span> ::<span class=
+"ident">sock_extended_err</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"kw-2">*</span><span class="kw-2">mut</span> ::<span class=
+"ident">sockaddr</span> {
+        <span class="ident">ee</span>.<span class=
+"ident">offset</span>(<span class="number">1</span>) <span class=
+"kw">as</span> <span class="kw-2">*</span><span class=
+"kw-2">mut</span> ::<span class="ident">sockaddr</span>
     }
 }
 

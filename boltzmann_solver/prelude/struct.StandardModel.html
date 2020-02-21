@@ -319,14 +319,14 @@ more</a></p>
 "../../boltzmann_solver/model/struct.StandardModel.html" title=
 "struct boltzmann_solver::model::StandardModel">StandardModel</a></code><a href='#impl-Model'
 class='anchor'></a><a class='srclink' href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#44-194'
+'../../src/boltzmann_solver/model/standard_model.rs.html#44-203'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.zero' class="method hidden"><code id='zero.v'>fn
 <a href=
 '../../boltzmann_solver/model/trait.Model.html#tymethod.zero'
 class='fnname'>zero</a>() -&gt; Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#45-100'
+'../../src/boltzmann_solver/model/standard_model.rs.html#45-109'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Instantiate a new instance of the model at 0 temperature ((\beta
@@ -341,7 +341,7 @@ class='fnname'>set_beta</a>(&amp;mut self, beta: <a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)</code><a class='srclink'
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#112-161'
+'../../src/boltzmann_solver/model/standard_model.rs.html#121-170'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Update beta for the model.</p>
@@ -360,7 +360,7 @@ class='fnname'>get_beta</a>(&amp;self) -&gt; <a class="primitive"
 href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#163-165'
+'../../src/boltzmann_solver/model/standard_model.rs.html#172-174'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Return the current value of beta for the model</p>
@@ -374,7 +374,7 @@ class='fnname'>entropy_dof</a>(&amp;self, beta: <a class=
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#167-170'
+'../../src/boltzmann_solver/model/standard_model.rs.html#176-179'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Return the effective degrees of freedom contributing to the
@@ -386,13 +386,15 @@ Read more</a></p>
 <h4 id='method.particles' class="method hidden"><code id=
 'particles.v-1'>fn <a href=
 '../../boltzmann_solver/model/trait.Model.html#tymethod.particles'
-class='fnname'>particles</a>(&amp;self) -&gt; &<a class="struct"
-href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html"
-title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href=
-"../../boltzmann_solver/model/struct.Particle.html" title=
-"struct boltzmann_solver::model::Particle">Particle</a>&gt;</code><a class='srclink'
+class='fnname'>particles</a>(&amp;self) -&gt; <a class="primitive"
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#172-174'
+"https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;[</a><a class="struct"
+href="../../boltzmann_solver/model/struct.Particle.html" title=
+"struct boltzmann_solver::model::Particle">Particle</a><a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a></code><a class='srclink'
+href=
+'../../src/boltzmann_solver/model/standard_model.rs.html#181-183'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Return a list of particles in the model.</p>
@@ -400,14 +402,16 @@ title='goto source code'>[src]</a></h4>
 <h4 id='method.particles_mut' class="method hidden"><code id=
 'particles_mut.v'>fn <a href=
 '../../boltzmann_solver/model/trait.Model.html#tymethod.particles_mut'
-class='fnname'>particles_mut</a>(&amp;mut self) -&gt; &amp;mut
-<a class="struct" href=
-"https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html"
-title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href=
+class='fnname'>particles_mut</a>(&amp;mut self) -&gt; <a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;mut
+[</a><a class="struct" href=
 "../../boltzmann_solver/model/struct.Particle.html" title=
-"struct boltzmann_solver::model::Particle">Particle</a>&gt;</code><a class='srclink'
+"struct boltzmann_solver::model::Particle">Particle</a><a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a></code><a class='srclink'
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#176-178'
+'../../src/boltzmann_solver/model/standard_model.rs.html#185-187'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Return a mutable list of particles in the model.</p>
@@ -434,7 +438,7 @@ title="enum core::result::Result">Result</a>&lt;<a class=
 href=
 "https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a>&gt;</code><a class='srclink'
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#180-193'
+'../../src/boltzmann_solver/model/standard_model.rs.html#189-202'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Return the index corresponding to a particle's name and
@@ -458,6 +462,28 @@ href='../../src/boltzmann_solver/model.rs.html#68-78' title=
 "../../boltzmann_solver/model/trait.Model.html#method.hubble_rate">Read
 more</a></p>
 </div>
+<h4 id='method.particle_name' class="method hidden"><code id=
+'particle_name.v'>fn <a href=
+'../../boltzmann_solver/model/trait.Model.html#method.particle_name'
+class='fnname'>particle_name</a>(&amp;self, i: <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.isize.html">isize</a>)
+-&gt; <a class="enum" href=
+"https://doc.rust-lang.org/nightly/core/result/enum.Result.html"
+title="enum core::result::Result">Result</a>&lt;<a class="struct"
+href=
+"https://doc.rust-lang.org/nightly/alloc/string/struct.String.html"
+title="struct alloc::string::String">String</a>, <a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.isize.html">isize</a>&gt;</code><a class='srclink'
+href='../../src/boltzmann_solver/model.rs.html#112-125' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock hidden'>
+<p>Convert a signed particle number to the corresponding particle
+name. <a href=
+"../../boltzmann_solver/model/trait.Model.html#method.particle_name">
+Read more</a></p>
+</div>
 <h4 id='method.particle' class="method hidden"><code id=
 'particle.v'>fn <a href=
 '../../boltzmann_solver/model/trait.Model.html#method.particle'
@@ -471,7 +497,7 @@ name: S, i: <a class="primitive" href=
 -&gt; &<a class="struct" href=
 "../../boltzmann_solver/model/struct.Particle.html" title=
 "struct boltzmann_solver::model::Particle">Particle</a></code><a class='srclink'
-href='../../src/boltzmann_solver/model.rs.html#108-116' title=
+href='../../src/boltzmann_solver/model.rs.html#132-140' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Return a reference to the matching particle by name. <a href=
@@ -489,7 +515,7 @@ i: <a class="primitive" href=
 -&gt; &amp;mut <a class="struct" href=
 "../../boltzmann_solver/model/struct.Particle.html" title=
 "struct boltzmann_solver::model::Particle">Particle</a></code><a class='srclink'
-href='../../src/boltzmann_solver/model.rs.html#123-131' title=
+href='../../src/boltzmann_solver/model.rs.html#147-155' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Return a mutable reference to the matching particle by name.
@@ -503,7 +529,7 @@ Read more</a></p>
 class='fnname'>as_context</a>(&amp;self) -&gt; <a class="struct"
 href="../../boltzmann_solver/prelude/struct.Context.html" title=
 "struct boltzmann_solver::prelude::Context">Context</a>&lt;Self&gt;</code><a class='srclink'
-href='../../src/boltzmann_solver/model.rs.html#144-160' title=
+href='../../src/boltzmann_solver/model.rs.html#168-184' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Return a instance of <a href=

@@ -346,6 +346,30 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="271">271</span>
 <span id="272">272</span>
 <span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -503,9 +527,8 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="kw">fn</span> <span class=
 "ident">particles</span>(<span class="kw-2">&</span><span class=
 "self">self</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="kw-2">&</span><span class=
-"ident">Vec</span><span class="op">&lt;</span><span class=
-"ident">Particle</span><span class="op">&gt;</span>;
+"op">&gt;</span> <span class="kw-2">&</span>[<span class=
+"ident">Particle</span>];
 
     <span class=
 "doccomment">/// Return a mutable list of particles in the model.</span>
@@ -514,9 +537,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
 "self">self</span>) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="kw-2">&</span><span class=
-"kw-2">mut</span> <span class="ident">Vec</span><span class=
-"op">&lt;</span><span class="ident">Particle</span><span class=
-"op">&gt;</span>;
+"kw-2">mut</span> [<span class="ident">Particle</span>];
 
     <span class=
 "doccomment">/// Return the index corresponding to a particle's name and generation</span>
@@ -552,6 +573,63 @@ autocomplete="off" spellcheck="false" placeholder=
 "prelude-ty">Result</span><span class="op">&lt;</span><span class=
 "ident">usize</span>, (<span class="ident">S</span>, <span class=
 "ident">usize</span>)<span class="op">&gt;</span>;
+
+    <span class=
+"doccomment">/// Convert a signed particle number to the corresponding particle name.</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// If the particle number is negative and the particle is not its own</span>
+    <span class=
+"doccomment">/// antiparticle, the particle name is prepending with `~`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// If the particle is not found within the model, the number is returned is</span>
+    <span class=
+"doccomment">/// it can be handled separately.</span>
+    <span class="kw">fn</span> <span class=
+"ident">particle_name</span>(<span class=
+"kw-2">&</span><span class="self">self</span>, <span class=
+"ident">i</span>: <span class="ident">isize</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"prelude-ty">Result</span><span class="op">&lt;</span><span class=
+"ident">String</span>, <span class="ident">isize</span><span class=
+"op">&gt;</span> {
+        <span class="kw">let</span> <span class=
+"ident">sign</span> <span class="op">=</span> <span class=
+"ident">i</span>.<span class="ident">signum</span>();
+        <span class="kw">let</span> <span class=
+"ident">idx</span> <span class="op">=</span> <span class=
+"ident">i</span>.<span class="ident">abs</span>() <span class=
+"kw">as</span> <span class="ident">usize</span>;
+
+        <span class="kw">if</span> <span class=
+"kw">let</span> <span class="prelude-val">Some</span>(<span class=
+"ident">p</span>) <span class="op">=</span> <span class=
+"self">self</span>.<span class=
+"ident">particles</span>().<span class=
+"ident">get</span>(<span class="ident">idx</span>) {
+            <span class="kw">if</span> <span class=
+"op">!</span><span class="ident">p</span>.<span class=
+"ident">own_antiparticle</span> <span class=
+"kw-2">&</span><span class="op">&</span> <span class=
+"ident">sign</span> <span class="op">&lt;</span> <span class=
+"number">0</span> {
+                <span class="prelude-val">Ok</span>(<span class=
+"macro">format</span><span class="macro">!</span>(<span class=
+"string">"~{}"</span>, <span class="ident">p</span>.<span class=
+"ident">name</span>))
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Ok</span>(<span class=
+"ident">p</span>.<span class="ident">name</span>.<span class=
+"ident">clone</span>())
+            }
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Err</span>(<span class=
+"ident">i</span>)
+        }
+    }
 
     <span class=
 "doccomment">/// Return a reference to the matching particle by name.</span>

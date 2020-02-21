@@ -835,6 +835,21 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="759">759</span>
 <span id="760">760</span>
 <span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -1744,12 +1759,12 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// deemed to be invalid.</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">build</span>(<span class=
-"self">self</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="prelude-ty">Result</span><span class=
-"op">&lt;</span><span class="ident">Solver</span><span class=
-"op">&lt;</span><span class="ident">M</span><span class=
-"op">&gt;</span>, <span class="ident">Error</span><span class=
-"op">&gt;</span> {
+"kw-2">mut</span> <span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"prelude-ty">Result</span><span class="op">&lt;</span><span class=
+"ident">Solver</span><span class="op">&lt;</span><span class=
+"ident">M</span><span class="op">&gt;</span>, <span class=
+"ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class=
 "kw-2">mut</span> <span class="ident">model</span> <span class=
 "op">=</span> <span class="self">self</span>.<span class=
@@ -1816,7 +1831,16 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class=
 "comment">// Make sure that there aren't too many particles held in equilibrium or</span>
         <span class=
-"comment">// forbidden from developping any asymmetry.</span>
+"comment">// forbidden from developing any asymmetry.  We also sort and remove</span>
+        <span class=
+"comment">// duplicates.  For the asymmetries, any particle which is its own</span>
+        <span class=
+"comment">// antiparticle is also prevented from developing an asymmetry.</span>
+        <span class="self">self</span>.<span class=
+"ident">in_equilibrium</span>.<span class=
+"ident">sort_unstable</span>();
+        <span class="self">self</span>.<span class=
+"ident">in_equilibrium</span>.<span class="ident">dedup</span>();
         <span class="kw">if</span> <span class=
 "self">self</span>.<span class=
 "ident">in_equilibrium</span>.<span class=
@@ -1834,6 +1858,30 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Error</span>::<span class=
 "ident">TooManyInEquilibrium</span>);
         }
+
+        <span class="self">self</span>.<span class=
+"ident">no_asymmetry</span>
+            .<span class="ident">extend</span>(<span class=
+"ident">model</span>.<span class=
+"ident">particles</span>().<span class=
+"ident">iter</span>().<span class=
+"ident">enumerate</span>().<span class=
+"ident">filter_map</span>(<span class="op">|</span>(<span class=
+"ident">i</span>, <span class="ident">p</span>)<span class=
+"op">|</span> {
+                <span class="kw">if</span> <span class=
+"ident">p</span>.<span class="ident">own_antiparticle</span> {
+                    <span class=
+"prelude-val">Some</span>(<span class="ident">i</span>)
+                } <span class="kw">else</span> {
+                    <span class="prelude-val">None</span>
+                }
+            }));
+        <span class="self">self</span>.<span class=
+"ident">no_asymmetry</span>.<span class=
+"ident">sort_unstable</span>();
+        <span class="self">self</span>.<span class=
+"ident">no_asymmetry</span>.<span class="ident">dedup</span>();
         <span class="kw">if</span> <span class=
 "self">self</span>.<span class=
 "ident">no_asymmetry</span>.<span class=

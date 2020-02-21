@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libc-0.2.66/src/unix/mod.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libc-0.2.67/src/unix/mod.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>mod.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href=
@@ -1626,6 +1626,23 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="1550">1550</span>
 <span id="1551">1551</span>
 <span id="1552">1552</span>
+<span id="1553">1553</span>
+<span id="1554">1554</span>
+<span id="1555">1555</span>
+<span id="1556">1556</span>
+<span id="1557">1557</span>
+<span id="1558">1558</span>
+<span id="1559">1559</span>
+<span id="1560">1560</span>
+<span id="1561">1561</span>
+<span id="1562">1562</span>
+<span id="1563">1563</span>
+<span id="1564">1564</span>
+<span id="1565">1565</span>
+<span id="1566">1566</span>
+<span id="1567">1567</span>
+<span id="1568">1568</span>
+<span id="1569">1569</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -2793,6 +2810,51 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">c</span>: <span class="ident">c_int</span>) <span class=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">c_int</span>;
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">qsort</span>(
+        <span class="ident">base</span>: <span class=
+"kw-2">*</span><span class="kw-2">mut</span> <span class=
+"ident">c_void</span>,
+        <span class="ident">num</span>: <span class=
+"ident">size_t</span>,
+        <span class="ident">size</span>: <span class=
+"ident">size_t</span>,
+        <span class="ident">compar</span>: ::<span class=
+"prelude-ty">Option</span><span class="op">&lt;</span>
+            <span class="kw">unsafe</span> <span class=
+"kw">extern</span> <span class="string">"C"</span> <span class=
+"kw">fn</span>(<span class="kw-2">*</span><span class=
+"kw">const</span> <span class="ident">c_void</span>, <span class=
+"kw-2">*</span><span class="kw">const</span> <span class=
+"ident">c_void</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">c_int</span>,
+        <span class="op">&gt;</span>,
+    );
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">bsearch</span>(
+        <span class="ident">key</span>: <span class=
+"kw-2">*</span><span class="kw">const</span> <span class=
+"ident">c_void</span>,
+        <span class="ident">base</span>: <span class=
+"kw-2">*</span><span class="kw">const</span> <span class=
+"ident">c_void</span>,
+        <span class="ident">num</span>: <span class=
+"ident">size_t</span>,
+        <span class="ident">size</span>: <span class=
+"ident">size_t</span>,
+        <span class="ident">compar</span>: ::<span class=
+"prelude-ty">Option</span><span class="op">&lt;</span>
+            <span class="kw">unsafe</span> <span class=
+"kw">extern</span> <span class="string">"C"</span> <span class=
+"kw">fn</span>(<span class="kw-2">*</span><span class=
+"kw">const</span> <span class="ident">c_void</span>, <span class=
+"kw-2">*</span><span class="kw">const</span> <span class=
+"ident">c_void</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">c_int</span>,
+        <span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="kw-2">*</span><span class=
+"kw-2">mut</span> <span class="ident">c_void</span>;
     <span class="attribute">#[<span class="ident">cfg_attr</span>(
         <span class="ident">all</span>(<span class=
 "ident">target_os</span> <span class="op">=</span> <span class=
