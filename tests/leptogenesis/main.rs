@@ -586,11 +586,12 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
 
     let mut csvs = [Vec::new(), Vec::new()];
     for i in 0..models.len() {
-        for interaction in models[i].interactions() {
+        let model = &models[i];
+        for interaction in model.interactions() {
             let ptcl = interaction.particles();
             let mut csv = csv::Writer::from_path({
                 let mut path = output_dirs[i].clone();
-                path.push(format!("{:?}:{:?}.csv", ptcl.incoming, ptcl.outgoing));
+                path.push(format!("{}.csv", ptcl.display(model).unwrap()));
                 path
             })
             .unwrap();
