@@ -100,6 +100,30 @@ where
     /// returned as an error so that they can be subsequently handled.
     fn particle_idx<S: AsRef<str>>(name: S, i: usize) -> Result<usize, (S, usize)>;
 
+    /// Convert a signed particle number to the corresponding particle name.
+    ///
+    /// If the particle number is negative and the particle is not its own
+    /// antiparticle, the particle name is prepending with `~`.
+    ///
+    /// # Errors
+    ///
+    /// If the particle is not found within the model, the number is returned is
+    /// it can be handled separately.
+    fn particle_name(&self, i: isize) -> Result<String, isize> {
+        let sign = i.signum();
+        let idx = i.abs() as usize;
+
+        if let Some(p) = self.particles().get(idx) {
+            if !p.own_antiparticle && sign < 0 {
+                Ok(format!("~{}", p.name))
+            } else {
+                Ok(p.name.clone())
+            }
+        } else {
+            Err(i)
+        }
+    }
+
     /// Return a reference to the matching particle by name.
     ///
     /// # Panics
