@@ -111,6 +111,46 @@ pub fn hln() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
     interactions
 }
 
+pub fn hha() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
+    let mut interactions = Vec::new();
+
+    let p_h = LeptogenesisModel::particle_idx("H", 0).unwrap();
+    let p_a = LeptogenesisModel::particle_idx("A", 0).unwrap();
+    let m2 = move |m: &LeptogenesisModel| {
+        let ptcl = m.particles();
+        0.25 * m.sm.g1.powi(2) * (ptcl[p_a].mass2 - 4.0 * ptcl[p_h].mass2)
+    };
+
+    interactions.append(&mut interaction::ThreeParticle::new_all(
+        m2,
+        isize::try_from(p_h).unwrap(),
+        isize::try_from(p_h).unwrap(),
+        -isize::try_from(p_a).unwrap(),
+    ));
+
+    interactions
+}
+
+pub fn hhw() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
+    let mut interactions = Vec::new();
+
+    let p_h = LeptogenesisModel::particle_idx("H", 0).unwrap();
+    let p_w = LeptogenesisModel::particle_idx("W", 0).unwrap();
+    let m2 = move |m: &LeptogenesisModel| {
+        let ptcl = m.particles();
+        0.25 * m.sm.g2.powi(2) * (ptcl[p_w].mass2 - 4.0 * ptcl[p_h].mass2)
+    };
+
+    interactions.append(&mut interaction::ThreeParticle::new_all(
+        m2,
+        isize::try_from(p_h).unwrap(),
+        isize::try_from(p_h).unwrap(),
+        -isize::try_from(p_w).unwrap(),
+    ));
+
+    interactions
+}
+
 /// Interaction:
 /// H, H ↔ -L(i3), -L(i4)
 pub fn hhll1() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
