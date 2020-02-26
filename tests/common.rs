@@ -1,3 +1,4 @@
+use boltzmann_solver::prelude::*;
 use fern::colors;
 use std::{
     env::temp_dir,
@@ -74,4 +75,38 @@ pub fn output_dir<P: AsRef<Path>>(subdir: P) -> PathBuf {
     }
 
     dir
+}
+
+/// Box an interaction
+#[cfg(feature = "parallel")]
+pub fn into_interaction_box<I, M>(interaction: I) -> Box<dyn Interaction<M> + Sync>
+where
+    I: Interaction<M> + Sync + 'static,
+    M: Model,
+{
+    Box::new(interaction)
+}
+
+/// Box an interaction
+#[cfg(not(feature = "parallel"))]
+pub fn into_interaction_box<I, M>(interaction: I) -> Box<dyn Interaction<M>>
+where
+    I: Interaction<M> + 'static,
+    M: Model,
+{
+    Box::new(interaction)
+}
+
+/// Filter interactions based whether they involve first-generation particles
+/// only or not.
+pub fn one_generation<I, M>(interaction: &I) -> bool
+where
+    I: Interaction<M>,
+    M: Model,
+{
+    let ptcl = interaction.particles_idx();
+    ptcl.incoming.iter().chain(&ptcl.outgoing).all(|i| match i {
+        1 | 2 | 3 | 4 | 5 | 8 | 11 | 14 | 17 | 20 => true,
+        _ => false,
+    })
 }
