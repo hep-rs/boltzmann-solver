@@ -20,40 +20,6 @@ use rayon::prelude::*;
 use std::fs::File;
 use std::{error, fmt, io, sync::RwLock};
 
-/// Box an interaction
-#[cfg(feature = "parallel")]
-fn into_interaction_box<I, M>(interaction: I) -> Box<dyn Interaction<M> + Sync>
-where
-    I: Interaction<M> + Sync + 'static,
-    M: Model,
-{
-    Box::new(interaction)
-}
-
-/// Box an interaction
-#[cfg(not(feature = "parallel"))]
-fn into_interaction_box<I, M>(interaction: I) -> Box<dyn Interaction<M>>
-where
-    I: Interaction<M> + 'static,
-    M: Model,
-{
-    Box::new(interaction)
-}
-
-/// Filter iteraction based whether they involve first-generation particles only
-/// or not.
-fn one_generation<I, M>(interaction: &I) -> bool
-where
-    I: Interaction<M>,
-    M: Model,
-{
-    let ptcl = interaction.particles_idx();
-    ptcl.incoming.iter().chain(&ptcl.outgoing).all(|i| match i {
-        1 | 2 | 3 | 4 | 5 | 8 | 11 | 14 | 17 | 20 => true,
-        _ => false,
-    })
-}
-
 /// Solve the Boltzmann equations and return the final values.
 ///
 /// The model function is specified by `model`, and optionally a CSV writer can
@@ -164,12 +130,13 @@ pub fn decay_only_1gen() -> Result<(), Box<dyn error::Error>> {
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
-    model.interactions.extend(
-        interaction::hln()
-            .drain(..)
-            .filter(one_generation)
-            .map(into_interaction_box),
-    );
+    for i in &[interaction::hln, interaction::hhw, interaction::hha] {
+        model.interactions.extend(
+            i().drain(..)
+                .filter(common::one_generation)
+                .map(common::into_interaction_box),
+        );
+    }
 
     // Collect the names now as SolverBuilder takes ownership of the model
     // later.
@@ -211,9 +178,11 @@ pub fn decay_only_3gen() -> Result<(), Box<dyn error::Error>> {
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
-    model
-        .interactions
-        .extend(interaction::hln().drain(..).map(into_interaction_box));
+    for i in &[interaction::hln, interaction::hhw, interaction::hha] {
+        model
+            .interactions
+            .extend(i().drain(..).map(common::into_interaction_box));
+    }
 
     // Collect the names now as SolverBuilder takes ownership of the model
     // later.
@@ -256,12 +225,18 @@ pub fn washout_only_1gen() -> Result<(), Box<dyn error::Error>> {
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
-    model.interactions.extend(
-        interaction::hhll1()
-            .drain(..)
-            .filter(one_generation)
-            .map(into_interaction_box),
-    );
+    for i in &[interaction::hha, interaction::hhw] {
+        model
+            .interactions
+            .extend(i().drain(..).map(common::into_interaction_box));
+    }
+    for i in &[interaction::hhll1, interaction::hhll2] {
+        model.interactions.extend(
+            i().drain(..)
+                .filter(common::one_generation)
+                .map(common::into_interaction_box),
+        );
+    }
 
     // Collect the names now as SolverBuilder takes ownership of the model
     // later.
@@ -307,17 +282,18 @@ pub fn decay_washout_1gen() -> Result<(), Box<dyn error::Error>> {
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
-    model.interactions.extend(
-        interaction::hln()
-            .drain(..)
-            .filter(one_generation)
-            .map(into_interaction_box),
-    );
+    for i in &[interaction::hln, interaction::hhw, interaction::hha] {
+        model.interactions.extend(
+            i().drain(..)
+                .filter(common::one_generation)
+                .map(common::into_interaction_box),
+        );
+    }
     model.interactions.extend(
         interaction::hhll1()
             .drain(..)
-            .filter(one_generation)
-            .map(into_interaction_box),
+            .filter(common::one_generation)
+            .map(common::into_interaction_box),
     );
 
     // Collect the names now as SolverBuilder takes ownership of the model
@@ -347,7 +323,7 @@ pub fn decay_washout_1gen() -> Result<(), Box<dyn error::Error>> {
 }
 
 // FIXME
-// #[test]
+#[test]
 #[cfg(not(debug_assertions))]
 pub fn decay_washout_3gen() -> Result<(), Box<dyn error::Error>> {
     // common::setup_logging(2);
@@ -358,15 +334,16 @@ pub fn decay_washout_3gen() -> Result<(), Box<dyn error::Error>> {
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
-    model
-        .interactions
-        .extend(interaction::hln().drain(..).map(into_interaction_box));
-    model
-        .interactions
-        .extend(interaction::hhll1().drain(..).map(into_interaction_box));
-    model
-        .interactions
-        .extend(interaction::hhll2().drain(..).map(into_interaction_box));
+    for i in &[interaction::hln, interaction::hhw, interaction::hha] {
+        model
+            .interactions
+            .extend(i().drain(..).map(common::into_interaction_box));
+    }
+    for i in &[interaction::hhll1, interaction::hhll2] {
+        model
+            .interactions
+            .extend(i().drain(..).map(common::into_interaction_box));
+    }
 
     // Collect the names now as SolverBuilder takes ownership of the model
     // later.
@@ -472,18 +449,18 @@ fn masses_widths() -> Result<(), Box<dyn error::Error>> {
     // common::setup_logging(2);
 
     let mut model = LeptogenesisModel::zero();
-    model
-        .interactions
-        .extend(interaction::hle().drain(..).map(into_interaction_box));
-    model
-        .interactions
-        .extend(interaction::hln().drain(..).map(into_interaction_box));
-    model
-        .interactions
-        .extend(interaction::hqu().drain(..).map(into_interaction_box));
-    model
-        .interactions
-        .extend(interaction::hqd().drain(..).map(into_interaction_box));
+    for i in &[
+        interaction::hle,
+        interaction::hln,
+        interaction::hqu,
+        interaction::hqd,
+        interaction::hha,
+        interaction::hhw,
+    ] {
+        model
+            .interactions
+            .extend(i().drain(..).map(common::into_interaction_box));
+    }
 
     // Create the CSV files
     let output_dir = common::output_dir("leptogenesis");
@@ -534,24 +511,33 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
     let beta = (1e-17, 1e-2);
 
     for model in &mut models {
-        model.interactions.extend(
-            interaction::hln()
-                .drain(..)
-                .filter(one_generation)
-                .map(into_interaction_box),
-        );
-        model.interactions.extend(
-            interaction::hhll1()
-                .drain(..)
-                .filter(one_generation)
-                .map(into_interaction_box),
-        );
-        // model.interactions.extend(
-        //     interaction::hhll2()
-        //         .drain(..)
-        //         .filter(one_generation)
-        //         .map(into_interaction_box),
-        // );
+        for i in &[
+            interaction::hle,
+            interaction::hqu,
+            interaction::hqd,
+            interaction::hln,
+            interaction::hha,
+            interaction::hhw,
+        ] {
+            model.interactions.extend(
+                i().drain(..)
+                    .filter(common::one_generation)
+                    .map(common::into_interaction_box),
+            );
+        }
+
+        for i in &[
+            interaction::hhll1,
+            interaction::hhll2,
+            interaction::nlqd,
+            interaction::nlqu,
+        ] {
+            model.interactions.extend(
+                i().drain(..)
+                    .filter(common::one_generation)
+                    .map(common::into_interaction_box),
+            );
+        }
     }
 
     // Precompute gamma for models[0]
