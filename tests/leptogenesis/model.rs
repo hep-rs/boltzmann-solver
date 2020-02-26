@@ -54,9 +54,12 @@ impl Model for LeptogenesisModel {
 
         let mn = array![1e10, 1e15, 5e15];
 
-        sm.particles.push(Particle::new(1, mn[0], 0.0).name("N1"));
-        sm.particles.push(Particle::new(1, mn[1], 0.0).name("N2"));
-        sm.particles.push(Particle::new(1, mn[2], 0.0).name("N3"));
+        sm.particles
+            .push(Particle::new(1, mn[0], 0.0).name("N1").own_antiparticle());
+        sm.particles
+            .push(Particle::new(1, mn[1], 0.0).name("N2").own_antiparticle());
+        sm.particles
+            .push(Particle::new(1, mn[2], 0.0).name("N3").own_antiparticle());
 
         // epsilon[[i, j]] is the asymmetry in Ni -> H Lj.
         let yvd_yv: Array2<Complex<f64>> = Array2::from_shape_fn((3, 3), |(i, j)| {
