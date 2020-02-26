@@ -249,7 +249,60 @@ pub fn washout_only_1gen() -> Result<(), Box<dyn error::Error>> {
 
     // Add a primordial asymmetry in L1
     let mut initial_asymmetries = Array1::zeros(model.particles().len());
-    initial_asymmetries[LeptogenesisModel::particle_idx("L", 0).unwrap()] = 1.0;
+    initial_asymmetries[LeptogenesisModel::particle_idx("L", 0).unwrap()] = 1e-3;
+
+    let builder = SolverBuilder::new()
+        .no_asymmetry(no_asymmetry)
+        .initial_asymmetries(initial_asymmetries)
+        .model(model)
+        .beta_range(1e-17, 1e-3)
+        .step_precision(1e-6, 1e-1);
+
+    let (n, na) = solve(builder, &names, Some(csv))?;
+
+    // Check that the solution is fine
+    println!("Final number density: {:.3e}", n);
+    println!("Final number density asymmetry: {:.3e}", na);
+
+    // FIXME
+    // let nai = na[LeptogenesisModel::particle_idx("L", 0).unwrap()].abs();
+    // assert!(nai < 1e-5);
+
+    Ok(())
+}
+
+/// Test the effects of a washout terms on their own in the 3-generation case.
+// #[test]
+#[cfg(not(debug_assertions))]
+pub fn washout_only_3gen() -> Result<(), Box<dyn error::Error>> {
+    // common::setup_logging(2);
+
+    // Create the CSV file
+    let output_dir = common::output_dir("leptogenesis/washout_only/3gen");
+    let csv = csv::Writer::from_path(output_dir.join("n.csv"))?;
+
+    // Get the solution
+    let mut model = LeptogenesisModel::zero();
+    for i in &[interaction::hhll1, interaction::hhll2] {
+        model
+            .interactions
+            .extend(i().drain(..).map(common::into_interaction_box));
+    }
+
+    // Collect the names now as SolverBuilder takes ownership of the model
+    // later.
+    let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
+
+    // Prevent any asymmetry from being generated in the N_i and H.
+    let no_asymmetry: Vec<usize> = (0..3)
+        .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
+        .collect();
+
+    // Add a primordial asymmetry in Li
+    let mut initial_asymmetries = Array1::zeros(model.particles().len());
+    initial_asymmetries[LeptogenesisModel::particle_idx("L", 0).unwrap()] = 1e-3;
+    initial_asymmetries[LeptogenesisModel::particle_idx("L", 1).unwrap()] = 2e-3;
+    initial_asymmetries[LeptogenesisModel::particle_idx("L", 2).unwrap()] = 3e-3;
 
     let builder = SolverBuilder::new()
         .no_asymmetry(no_asymmetry)
@@ -547,10 +600,10 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
         .chain(&rec_geomspace(1e-17, 1e-2, N))
         .enumerate()
     {
-        if i % 64 == 0 {
-            log::debug!("Precomputing step {} / {}", i, 2usize.pow(N) + 4);
+        if i % 64 == 3 {
+            log::debug!("Precomputing step {} / {}", i, 2usize.pow(N) + 4 - 1);
         } else {
-            log::trace!("Precomputing step {} / {}", i, 2usize.pow(N) + 4);
+            log::trace!("Precomputing step {} / {}", i, 2usize.pow(N) + 4 - 1);
         }
 
         let model = &mut models[0];
@@ -593,7 +646,7 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
                 path
             })
             .unwrap();
-            csv.serialize(("beta", "gamma"))?;
+            csv.serialize(("beta", "gamma", "gamma normalized"))?;
 
             #[cfg(feature = "parallel")]
             csvs[i].push(RwLock::new(csv));
@@ -625,13 +678,21 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
                 .for_each(|(interaction, csv)| {
                     csv.write()
                         .unwrap()
-                        .serialize((beta, interaction.gamma(&c)))
+                        .serialize((
+                            beta,
+                            interaction.gamma(&c),
+                            interaction.gamma(&c).map(|g| g * c.normalization),
+                        ))
                         .unwrap();
                 });
 
             #[cfg(not(feature = "parallel"))]
             for (interaction, csv) in models[i].interactions().iter().zip(&mut csvs[i]) {
-                csv.serialize((beta, interaction.gamma(&c)))?;
+                csv.serialize((
+                    beta,
+                    interaction.gamma(&c),
+                    interaction.gamma(&c).map(|g| g * c.normalization),
+                ))?;
             }
         }
     }
