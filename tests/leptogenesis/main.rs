@@ -552,6 +552,57 @@ fn masses_widths() -> Result<(), Box<dyn error::Error>> {
     Ok(())
 }
 
+/// Test that gauge couplings keep the Higgs in equilibrium
+#[test]
+pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
+    // common::setup_logging(1);
+
+    // Create the CSV file
+    let output_dir = common::output_dir("leptogenesis/higgs_equilibrium");
+
+    let v: Vec<(usize, f64)> = Array1::geomspace(1e-17, 2e-4, 50)
+        .unwrap()
+        .iter()
+        .cloned()
+        .enumerate()
+        .collect();
+
+    #[cfg(feature = "parallel")]
+    let iter = v.into_par_iter();
+    #[cfg(not(feature = "parallel"))]
+    let iter = v.into_iter();
+
+    iter.for_each(|(i, beta)| {
+        let csv = csv::Writer::from_path(output_dir.join(format!("{:03}.csv", i))).unwrap();
+
+        let mut model = LeptogenesisModel::zero();
+        for i in &[
+            interaction::hha,
+            // interaction::hhw,
+        ] {
+            model
+                .interactions
+                .extend(i().drain(..).map(common::into_interaction_box));
+        }
+
+        // Collect the names now as SolverBuilder takes ownership of the model
+        // later.
+        let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
+
+        let builder = SolverBuilder::new()
+            .model(model)
+            .beta_range(beta, beta * 10.0)
+            .initial_densities(vec![(
+                LeptogenesisModel::particle_idx("H", 0).unwrap(),
+                1e1,
+            )]);
+
+        solve(builder, &names, Some(csv)).unwrap();
+    });
+
+    Ok(())
+}
+
 #[test]
 #[cfg(not(debug_assertions))]
 fn gammas() -> Result<(), Box<dyn error::Error>> {
