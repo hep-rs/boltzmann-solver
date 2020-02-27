@@ -208,25 +208,19 @@ where
 
         // Get the masses
         let m0 = ptcl[self.particles_idx.incoming[0]].mass;
-        let m1 = ptcl[self.particles_idx.outgoing[0]].mass;
-        let m2 = ptcl[self.particles_idx.outgoing[1]].mass;
 
         // The interaction rate goes from heaviest ↔ lighter two.
         //
         // TODO: What happens when the decaying particle's mass is not
         // greater than the sum of the masses of the daughter particles?
-        if m0 < m1 || m0 < m2 {
-            None
-        } else {
-            // 0.002_423_011_225_182_300_4 = ζ(3) / 16 π³
-            Some(
-                0.002_423_011_225_182_300_4
-                    * (self.squared_amplitude)(&c.model).abs()
-                    * bessel::k1_on_k2(m0 * c.beta)
-                    / c.beta.powi(3)
-                    / m0,
-            )
-        }
+        // 0.002_423_011_225_182_300_4 = ζ(3) / 16 π³
+        Some(
+            0.002_423_011_225_182_300_4
+                * (self.squared_amplitude)(&c.model).abs()
+                * bessel::k1_on_k2(m0 * c.beta)
+                / c.beta.powi(3)
+                / m0,
+        )
     }
 
     fn asymmetry(&self, c: &Context<M>) -> Option<f64> {
