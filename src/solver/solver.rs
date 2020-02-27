@@ -12,8 +12,12 @@ use std::{error, fmt, iter::FromIterator, mem, ptr};
 /// Error type returned by the solver builder in case there is an error.
 #[derive(Debug)]
 pub enum Error {
+    /// One or more initial density is specified multiple times.
+    DuplicateInitialDensities,
     /// The initial number densities are invalid.
     InvalidInitialDensities,
+    /// One or more initial density asymmetry is specified multiple times.
+    DuplicateInitialAsymmetries,
     /// The initial asymmetries are invalid.
     InvalidInitialAsymmetries,
     /// The number of particles held in equilibrium exceeds the number of
@@ -29,7 +33,14 @@ pub enum Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Error::DuplicateInitialDensities => {
+                write!(f, "one or more initial density is specified multiple times")
+            }
             Error::InvalidInitialDensities => write!(f, "initial number densities are invalid"),
+            Error::DuplicateInitialAsymmetries => write!(
+                f,
+                "one or more initial density asymmetry is specified multiple times"
+            ),
             Error::InvalidInitialAsymmetries => {
                 write!(f, "initial number density asymmetries are invalid")
             }
@@ -54,8 +65,8 @@ impl error::Error for Error {
 #[allow(clippy::module_name_repetitions)]
 pub struct SolverBuilder<M> {
     model: Option<M>,
-    initial_densities: Option<Array1<f64>>,
-    initial_asymmetries: Option<Array1<f64>>,
+    initial_densities: Vec<(usize, f64)>,
+    initial_asymmetries: Vec<(usize, f64)>,
     beta_range: (f64, f64),
     in_equilibrium: Vec<usize>,
     no_asymmetry: Vec<usize>,
@@ -102,8 +113,8 @@ impl<M> SolverBuilder<M> {
     pub fn new() -> Self {
         Self {
             model: None,
-            initial_densities: None,
-            initial_asymmetries: None,
+            initial_densities: Vec::new(),
+            initial_asymmetries: Vec::new(),
             beta_range: (1e-20, 1e0),
             in_equilibrium: Vec::new(),
             no_asymmetry: Vec::new(),
@@ -126,24 +137,37 @@ impl<M> SolverBuilder<M> {
 
     /// Specify initial number densities explicitly.
     ///
+    /// The specification is given as an iterator of `(usize, f64)` tuples where
+    /// the first entry is the index of the particle whose equilibrium is
+    /// specified.
+    ///
     /// If unspecified, all number densities are assumed to be in equilibrium to
     /// begin with.
     ///
-    /// The list of number densities must be in the same order as the particles
-    /// in the model.
-    pub fn initial_densities(mut self, n: Array1<f64>) -> Self {
-        self.initial_densities = Some(n);
+    /// Repeated initial conditions will result in an error.
+    pub fn initial_densities<I>(mut self, n: I) -> Self
+    where
+        I: IntoIterator<Item = (usize, f64)>,
+    {
+        self.initial_densities.extend(n);
         self
     }
 
     /// Specify initial number density asymmetries explicitly.
     ///
+    /// The specification is given as an iterator of `(usize, f64)` tuples where
+    /// the first entry is the index of the particle whose asymmetry is
+    /// specified.
+    ///
     /// If unspecified, all asymmetries are assumed to be 0 to begin with.
     ///
-    /// The list of number densities must be in the same order as the particles
-    /// in the model.
-    pub fn initial_asymmetries(mut self, na: Array1<f64>) -> Self {
-        self.initial_asymmetries = Some(na);
+    /// The list of number density asymmetries must be in the same order as the
+    /// particles in the model.
+    pub fn initial_asymmetries<I>(mut self, na: I) -> Self
+    where
+        I: IntoIterator<Item = (usize, f64)>,
+    {
+        self.initial_asymmetries.extend(na);
         self
     }
 
@@ -301,50 +325,59 @@ impl<M> SolverBuilder<M> {
 
     /// Check the validity of the initial densities, making sure we have the
     /// right number of initial conditions and they are all finite.
-    fn check_initial_densities(
-        initial_densities: &Array1<f64>,
+    fn check_initial_densities<I>(
+        beta: f64,
         particles: &[Particle],
-    ) -> Result<(), Error> {
-        if initial_densities.len() != particles.len() {
-            log::error!(
-                "Initial densities is not the same length as the number of particles in the model."
-            );
-            return Err(Error::InvalidInitialDensities);
-        } else if initial_densities
-            .iter()
-            .any(|v| !v.is_finite() || v.is_nan())
-        {
+        initial_densities: I,
+    ) -> Result<Array1<f64>, Error>
+    where
+        I: IntoIterator<Item = (usize, f64)>,
+    {
+        let mut n = Array1::from_iter(
+            particles
+                .iter()
+                .map(|p| p.normalized_number_density(0.0, beta)),
+        );
+
+        for (i, ni) in initial_densities {
+            n[i] = ni;
+        }
+
+        if n.iter().any(|v| !v.is_finite() || v.is_nan()) {
             log::error!(
                 "Some of initial densities are not finite or NaN:\n{:.3e}",
-                initial_densities
+                n
             );
             return Err(Error::InvalidInitialDensities);
         }
 
-        Ok(())
+        Ok(n)
     }
 
     /// Check the validity of the initial asymmetries, making sure we have the
     /// right number of initial conditions and they are all finite.
-    fn check_initial_asymmetries(
-        initial_asymmetries: &Array1<f64>,
+    fn check_initial_asymmetries<I>(
         particles: &[Particle],
-    ) -> Result<(), Error> {
-        if initial_asymmetries.len() != particles.len() {
-            log::error!("Initial asymmetries is not the same length as the number of particles in the model.");
-            return Err(Error::InvalidInitialAsymmetries);
-        } else if initial_asymmetries
-            .iter()
-            .any(|v| !v.is_finite() || v.is_nan())
-        {
+        initial_asymmetries: I,
+    ) -> Result<Array1<f64>, Error>
+    where
+        I: IntoIterator<Item = (usize, f64)>,
+    {
+        let mut na = Array1::zeros(particles.len());
+
+        for (i, nai) in initial_asymmetries {
+            na[i] = nai;
+        }
+
+        if na.iter().any(|v| !v.is_finite() || v.is_nan()) {
             log::error!(
-                "Some of initial asymmetries are not finite or NaN:\n{:.3e}",
-                initial_asymmetries
+                "Some of initial densities are not finite or NaN:\n{:.3e}",
+                na
             );
             return Err(Error::InvalidInitialAsymmetries);
         }
 
-        Ok(())
+        Ok(na)
     }
 }
 
@@ -429,21 +462,31 @@ where
 
         // If no initial densities were given, all particles are assumed to be
         // in equilibrium.
-        let initial_densities = self.initial_densities.unwrap_or_else(|| {
-            Array1::from_iter(
-                particles
-                    .iter()
-                    .map(|p| p.normalized_number_density(0.0, beta_range.0)),
-            )
-        });
-        Self::check_initial_densities(&initial_densities, &particles)?;
+
+        let initial_densities_len = self.initial_densities.len();
+        self.initial_densities.sort_unstable_by_key(|t| t.0);
+        self.initial_densities.dedup_by_key(|t| t.0);
+        if initial_densities_len != self.initial_densities.len() {
+            log::error!("At least one initial number density was specified twice.");
+            return Err(Error::DuplicateInitialDensities);
+        }
+        let initial_densities = Self::check_initial_densities(
+            beta_range.0,
+            &particles,
+            self.initial_densities.iter().cloned(),
+        )?;
 
         // If no initial asymmetries were given, all particles are assumed to be
         // in equilibrium with no asymmetry.
-        let initial_asymmetries = self
-            .initial_asymmetries
-            .unwrap_or_else(|| Array1::zeros(particles.len()));
-        Self::check_initial_asymmetries(&initial_asymmetries, &particles)?;
+        let initial_asymmetries_len = self.initial_asymmetries.len();
+        self.initial_asymmetries.sort_unstable_by_key(|t| t.0);
+        self.initial_asymmetries.dedup_by_key(|t| t.0);
+        if initial_asymmetries_len != self.initial_asymmetries.len() {
+            log::error!("At least one initial number density was specified twice.");
+            return Err(Error::DuplicateInitialAsymmetries);
+        }
+        let initial_asymmetries = Array1::zeros(particles.len());
+        Self::check_initial_asymmetries(&particles, self.initial_asymmetries.iter().cloned())?;
 
         // Make sure that there aren't too many particles held in equilibrium or
         // forbidden from developing any asymmetry.  We also sort and remove
@@ -582,6 +625,13 @@ where
         let mut beta = self.beta_range.0;
         let mut h = beta * f64::sqrt(self.step_precision.min * self.step_precision.max);
         let mut advance;
+
+        // Run logger for 0th step
+        {
+            self.model.set_beta(beta);
+            let c = self.context(step, h, beta, &n, &na);
+            (*self.logger)(&c);
+        }
 
         while beta < self.beta_range.1 {
             step += 1;
