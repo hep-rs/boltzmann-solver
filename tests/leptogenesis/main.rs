@@ -14,11 +14,11 @@ use boltzmann_solver::{
 #[cfg(not(debug_assertions))]
 use itertools::iproduct;
 use ndarray::prelude::*;
-#[cfg(all(not(debug_assertions), feature = "parallel"))]
+#[cfg(feature = "parallel")]
 use rayon::prelude::*;
-#[cfg(not(debug_assertions))]
-use std::fs::File;
 use std::{error, fmt, io, sync::RwLock};
+#[cfg(not(debug_assertions))]
+use std::{fs, fs::File};
 
 /// Solve the Boltzmann equations and return the final values.
 ///
@@ -122,7 +122,7 @@ fn particle_indices() {
 /// 1-generation case.
 #[test]
 pub fn decay_only_1gen() -> Result<(), Box<dyn error::Error>> {
-    // common::setup_logging(2);
+    // common::setup_logging(1);
 
     // Create the CSV file
     let output_dir = common::output_dir("leptogenesis/decay_only/1gen");
@@ -142,16 +142,7 @@ pub fn decay_only_1gen() -> Result<(), Box<dyn error::Error>> {
     // later.
     let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
 
-    // Prevent any asymmetry from being generated in the N_i and H.
-    let no_asymmetry: Vec<usize> = (0..3)
-        .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
-        .collect();
-
-    let builder = SolverBuilder::new()
-        .no_asymmetry(no_asymmetry)
-        .model(model)
-        .beta_range(1e-17, 1e-3)
-        .step_precision(1e-6, 1e-1);
+    let builder = SolverBuilder::new().model(model).beta_range(1e-17, 1e-3);
 
     let (n, na) = solve(builder, &names, Some(csv))?;
 
@@ -170,7 +161,7 @@ pub fn decay_only_1gen() -> Result<(), Box<dyn error::Error>> {
 /// 3-generation case.
 #[test]
 pub fn decay_only_3gen() -> Result<(), Box<dyn error::Error>> {
-    // common::setup_logging(2);
+    // common::setup_logging(1);
 
     // Create the CSV file
     let output_dir = common::output_dir("leptogenesis/decay_only/3gen");
@@ -188,16 +179,7 @@ pub fn decay_only_3gen() -> Result<(), Box<dyn error::Error>> {
     // later.
     let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
 
-    // Prevent any asymmetry from being generated in the N_i and H.
-    let no_asymmetry: Vec<usize> = (0..3)
-        .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
-        .collect();
-
-    let builder = SolverBuilder::new()
-        .no_asymmetry(no_asymmetry)
-        .model(model)
-        .beta_range(1e-17, 1e-3)
-        .step_precision(1e-6, 1e-1);
+    let builder = SolverBuilder::new().model(model).beta_range(1e-17, 1e-3);
 
     let (n, na) = solve(builder, &names, Some(csv))?;
 
@@ -217,7 +199,7 @@ pub fn decay_only_3gen() -> Result<(), Box<dyn error::Error>> {
 #[test]
 #[cfg(not(debug_assertions))]
 pub fn washout_only_1gen() -> Result<(), Box<dyn error::Error>> {
-    // common::setup_logging(2);
+    common::setup_logging(1);
 
     // Create the CSV file
     let output_dir = common::output_dir("leptogenesis/washout_only/1gen");
@@ -242,21 +224,13 @@ pub fn washout_only_1gen() -> Result<(), Box<dyn error::Error>> {
     // later.
     let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
 
-    // Prevent any asymmetry from being generated in the N_i and H.
-    let no_asymmetry: Vec<usize> = (0..3)
-        .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
-        .collect();
-
-    // Add a primordial asymmetry in L1
-    let mut initial_asymmetries = Array1::zeros(model.particles().len());
-    initial_asymmetries[LeptogenesisModel::particle_idx("L", 0).unwrap()] = 1e-3;
-
     let builder = SolverBuilder::new()
-        .no_asymmetry(no_asymmetry)
-        .initial_asymmetries(initial_asymmetries)
+        .initial_asymmetries(vec![(
+            LeptogenesisModel::particle_idx("L", 0).unwrap(),
+            1e-2,
+        )])
         .model(model)
-        .beta_range(1e-17, 1e-3)
-        .step_precision(1e-6, 1e-1);
+        .beta_range(1e-17, 1e-3);
 
     let (n, na) = solve(builder, &names, Some(csv))?;
 
@@ -272,10 +246,10 @@ pub fn washout_only_1gen() -> Result<(), Box<dyn error::Error>> {
 }
 
 /// Test the effects of a washout terms on their own in the 3-generation case.
-// #[test]
+#[test]
 #[cfg(not(debug_assertions))]
 pub fn washout_only_3gen() -> Result<(), Box<dyn error::Error>> {
-    // common::setup_logging(2);
+    // common::setup_logging(1);
 
     // Create the CSV file
     let output_dir = common::output_dir("leptogenesis/washout_only/3gen");
@@ -293,23 +267,14 @@ pub fn washout_only_3gen() -> Result<(), Box<dyn error::Error>> {
     // later.
     let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
 
-    // Prevent any asymmetry from being generated in the N_i and H.
-    let no_asymmetry: Vec<usize> = (0..3)
-        .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
-        .collect();
-
-    // Add a primordial asymmetry in Li
-    let mut initial_asymmetries = Array1::zeros(model.particles().len());
-    initial_asymmetries[LeptogenesisModel::particle_idx("L", 0).unwrap()] = 1e-3;
-    initial_asymmetries[LeptogenesisModel::particle_idx("L", 1).unwrap()] = 2e-3;
-    initial_asymmetries[LeptogenesisModel::particle_idx("L", 2).unwrap()] = 3e-3;
-
     let builder = SolverBuilder::new()
-        .no_asymmetry(no_asymmetry)
-        .initial_asymmetries(initial_asymmetries)
+        .initial_asymmetries(vec![
+            (LeptogenesisModel::particle_idx("L", 0).unwrap(), 1e-2),
+            (LeptogenesisModel::particle_idx("L", 1).unwrap(), 2e-2),
+            (LeptogenesisModel::particle_idx("L", 2).unwrap(), 3e-2),
+        ])
         .model(model)
-        .beta_range(1e-17, 1e-3)
-        .step_precision(1e-6, 1e-1);
+        .beta_range(1e-17, 1e-3);
 
     let (n, na) = solve(builder, &names, Some(csv))?;
 
@@ -327,7 +292,7 @@ pub fn washout_only_3gen() -> Result<(), Box<dyn error::Error>> {
 #[test]
 #[cfg(not(debug_assertions))]
 pub fn decay_washout_1gen() -> Result<(), Box<dyn error::Error>> {
-    // common::setup_logging(2);
+    // common::setup_logging(1);
 
     // Create the CSV files
     let output_dir = common::output_dir("leptogenesis/decay_washout/1gen");
@@ -353,14 +318,7 @@ pub fn decay_washout_1gen() -> Result<(), Box<dyn error::Error>> {
     // later.
     let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
 
-    let no_asymmetry: Vec<usize> = (0..3)
-        .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
-        .collect();
-
-    let builder = SolverBuilder::new()
-        .no_asymmetry(no_asymmetry)
-        .model(model)
-        .beta_range(1e-17, 1e-3);
+    let builder = SolverBuilder::new().model(model).beta_range(1e-17, 1e-3);
 
     let (n, na) = solve(builder, &names, Some(csv))?;
 
@@ -375,11 +333,10 @@ pub fn decay_washout_1gen() -> Result<(), Box<dyn error::Error>> {
     Ok(())
 }
 
-// FIXME
 #[test]
 #[cfg(not(debug_assertions))]
 pub fn decay_washout_3gen() -> Result<(), Box<dyn error::Error>> {
-    // common::setup_logging(2);
+    // common::setup_logging(1);
 
     // Create the CSV file
     let output_dir = common::output_dir("leptogenesis/decay_washout/3gen");
@@ -402,14 +359,7 @@ pub fn decay_washout_3gen() -> Result<(), Box<dyn error::Error>> {
     // later.
     let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
 
-    let no_asymmetry: Vec<usize> = (0..3)
-        .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
-        .collect();
-
-    let builder = SolverBuilder::new()
-        .no_asymmetry(no_asymmetry)
-        .model(model)
-        .beta_range(1e-17, 1e-3);
+    let builder = SolverBuilder::new().model(model).beta_range(1e-17, 1e-3);
 
     let (n, na) = solve(builder, &names, Some(csv))?;
 
@@ -433,7 +383,7 @@ pub fn decay_washout_3gen() -> Result<(), Box<dyn error::Error>> {
 #[ignore]
 #[cfg(not(debug_assertions))]
 pub fn scan() -> Result<(), Box<dyn error::Error>> {
-    // common::setup_logging(2);
+    // common::setup_logging(1);
 
     // Create the CSV file
     let output_dir = common::output_dir("leptogenesis");
@@ -455,15 +405,8 @@ pub fn scan() -> Result<(), Box<dyn error::Error>> {
         model.yv.mapv_inplace(|yi| yi / 1e-4 * y);
         model.mn[0] = m;
 
-        let no_asymmetry: Vec<usize> = (0..3)
-            .map(|i| LeptogenesisModel::particle_idx("N", i).unwrap())
-            .collect();
-
         let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
-        let builder = SolverBuilder::new()
-            .no_asymmetry(no_asymmetry)
-            .model(model)
-            .beta_range(1e-17, 1e-3);
+        let builder = SolverBuilder::new().model(model).beta_range(1e-17, 1e-3);
 
         let (n, na) = solve(builder, &names, None::<csv::Writer<File>>)?;
 
@@ -499,7 +442,7 @@ pub fn scan() -> Result<(), Box<dyn error::Error>> {
 #[test]
 fn masses_widths() -> Result<(), Box<dyn error::Error>> {
     // Setup logging
-    // common::setup_logging(2);
+    // common::setup_logging(1);
 
     let mut model = LeptogenesisModel::zero();
     for i in &[
@@ -607,7 +550,7 @@ pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
 #[cfg(not(debug_assertions))]
 fn gammas() -> Result<(), Box<dyn error::Error>> {
     // Setup logging
-    // common::setup_logging(2);
+    // common::setup_logging(1);
 
     // We'll be using models[0] as the precomputed (default) model, and
     // models[1] as the comparison.
@@ -675,8 +618,8 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
     // Create the CSV files
     let base_output_dir = common::output_dir("leptogenesis/gamma");
     let output_dirs = [
-        common::output_dir("leptogenesis/gamma/precomp"),
-        common::output_dir("leptogenesis/gamma/noprecomp"),
+        common::output_dir("leptogenesis/gamma/spline"),
+        common::output_dir("leptogenesis/gamma/raw"),
     ];
 
     let mut normalization_csv = csv::Writer::from_path({
@@ -691,8 +634,21 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
         let model = &models[i];
         for interaction in model.interactions() {
             let ptcl = interaction.particles();
+            let ptcl_idx = interaction.particles_idx();
+            let mut ptcl_idx: Vec<_> = ptcl_idx
+                .incoming
+                .iter()
+                .chain(&ptcl_idx.outgoing)
+                .map(|i| format!("{:02}", i))
+                .collect();
+            ptcl_idx.sort_unstable();
+
             let mut csv = csv::Writer::from_path({
                 let mut path = output_dirs[i].clone();
+                path.push(format!("{}", ptcl_idx.join(" ")));
+                if !path.is_dir() {
+                    fs::create_dir(&path)?;
+                }
                 path.push(format!("{}.csv", ptcl.display(model).unwrap()));
                 path
             })
