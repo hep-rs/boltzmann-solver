@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.8.0/src/deferred.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.8.2/src/deferred.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>deferred.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -209,10 +209,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="134">134</span>
 <span id="135">135</span>
 <span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -228,6 +224,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">core</span>::<span class="ident">mem</span>;
 <span class="kw">use</span> <span class=
 "ident">core</span>::<span class="ident">ptr</span>;
+
+<span class="kw">use</span> <span class=
+"ident">maybe_uninit</span>::<span class=
+"ident">MaybeUninit</span>;
 
 <span class=
 "doccomment">/// Number of words a piece of `Data` can hold.</span>
@@ -315,24 +315,16 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span> <span class="ident">mem</span>::<span class=
 "ident">align_of</span>::<span class="op">&lt;</span><span class=
 "ident">Data</span><span class="op">&gt;</span>() {
-                <span class=
-"comment">// TODO(taiki-e): when the minimum supported Rust version is bumped to 1.36+,</span>
-                <span class=
-"comment">// replace this with `mem::MaybeUninit`.</span>
-                <span class="attribute">#[<span class=
-"ident">allow</span>(<span class="ident">deprecated</span>)]</span>
                 <span class="kw">let</span> <span class=
-"kw-2">mut</span> <span class="ident">data</span>: <span class=
-"ident">Data</span> <span class="op">=</span> <span class=
-"ident">mem</span>::<span class="ident">uninitialized</span>();
-                <span class="ident">ptr</span>::<span class=
-"ident">write</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class="ident">data</span> <span class=
-"kw">as</span> <span class="kw-2">*</span><span class=
-"kw-2">mut</span> <span class="ident">Data</span> <span class=
-"kw">as</span> <span class="kw-2">*</span><span class=
-"kw-2">mut</span> <span class="ident">F</span>, <span class=
-"ident">f</span>);
+"op">=</span> <span class="ident">MaybeUninit</span>::<span class=
+"op">&lt;</span><span class="ident">Data</span><span class=
+"op">&gt;</span>::<span class="ident">uninit</span>();
+                <span class="ident">ptr</span>::<span class=
+"ident">write</span>(<span class="ident">data</span>.<span class=
+"ident">as_mut_ptr</span>() <span class="kw">as</span> <span class=
+"kw-2">*</span><span class="kw-2">mut</span> <span class=
+"ident">F</span>, <span class="ident">f</span>);
 
                 <span class="kw">unsafe</span> <span class=
 "kw">fn</span> <span class="ident">call</span><span class=
@@ -353,7 +345,8 @@ autocomplete="off" spellcheck="false" placeholder=
                     <span class="ident">call</span>: <span class=
 "ident">call</span>::<span class="op">&lt;</span><span class=
 "ident">F</span><span class="op">&gt;</span>,
-                    <span class="ident">data</span>,
+                    <span class="ident">data</span>: <span class=
+"ident">data</span>.<span class="ident">assume_init</span>(),
                     <span class=
 "ident">_marker</span>: <span class="ident">PhantomData</span>,
                 }
@@ -364,25 +357,18 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> <span class="op">=</span> <span class=
 "ident">Box</span>::<span class="ident">new</span>(<span class=
 "ident">f</span>);
-                <span class=
-"comment">// TODO(taiki-e): when the minimum supported Rust version is bumped to 1.36+,</span>
-                <span class=
-"comment">// replace this with `mem::MaybeUninit`.</span>
-                <span class="attribute">#[<span class=
-"ident">allow</span>(<span class="ident">deprecated</span>)]</span>
                 <span class="kw">let</span> <span class=
-"kw-2">mut</span> <span class="ident">data</span>: <span class=
-"ident">Data</span> <span class="op">=</span> <span class=
-"ident">mem</span>::<span class="ident">uninitialized</span>();
-                <span class="ident">ptr</span>::<span class=
-"ident">write</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class="ident">data</span> <span class=
-"kw">as</span> <span class="kw-2">*</span><span class=
-"kw-2">mut</span> <span class="ident">Data</span> <span class=
-"kw">as</span> <span class="kw-2">*</span><span class=
-"kw-2">mut</span> <span class="ident">Box</span><span class=
-"op">&lt;</span><span class="ident">F</span><span class=
-"op">&gt;</span>, <span class="ident">b</span>);
+"op">=</span> <span class="ident">MaybeUninit</span>::<span class=
+"op">&lt;</span><span class="ident">Data</span><span class=
+"op">&gt;</span>::<span class="ident">uninit</span>();
+                <span class="ident">ptr</span>::<span class=
+"ident">write</span>(<span class="ident">data</span>.<span class=
+"ident">as_mut_ptr</span>() <span class="kw">as</span> <span class=
+"kw-2">*</span><span class="kw-2">mut</span> <span class=
+"ident">Box</span><span class="op">&lt;</span><span class=
+"ident">F</span><span class="op">&gt;</span>, <span class=
+"ident">b</span>);
 
                 <span class="kw">unsafe</span> <span class=
 "kw">fn</span> <span class="ident">call</span><span class=
@@ -407,7 +393,8 @@ autocomplete="off" spellcheck="false" placeholder=
                     <span class="ident">call</span>: <span class=
 "ident">call</span>::<span class="op">&lt;</span><span class=
 "ident">F</span><span class="op">&gt;</span>,
-                    <span class="ident">data</span>,
+                    <span class="ident">data</span>: <span class=
+"ident">data</span>.<span class="ident">assume_init</span>(),
                     <span class=
 "ident">_marker</span>: <span class="ident">PhantomData</span>,
                 }

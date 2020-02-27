@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-deque-0.7.2/src/lib.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-deque-0.7.3/src/lib.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>lib.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -2069,6 +2069,26 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="1994">1994</span>
 <span id="1995">1995</span>
 <span id="1996">1996</span>
+<span id="1997">1997</span>
+<span id="1998">1998</span>
+<span id="1999">1999</span>
+<span id="2000">2000</span>
+<span id="2001">2001</span>
+<span id="2002">2002</span>
+<span id="2003">2003</span>
+<span id="2004">2004</span>
+<span id="2005">2005</span>
+<span id="2006">2006</span>
+<span id="2007">2007</span>
+<span id="2008">2008</span>
+<span id="2009">2009</span>
+<span id="2010">2010</span>
+<span id="2011">2011</span>
+<span id="2012">2012</span>
+<span id="2013">2013</span>
+<span id="2014">2014</span>
+<span id="2015">2015</span>
+<span id="2016">2016</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -2226,6 +2246,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">crossbeam_utils</span> <span class=
 "kw">as</span> <span class="ident">utils</span>;
 
+<span class="kw">extern</span> <span class=
+"kw">crate</span> <span class="ident">maybe_uninit</span>;
+
 <span class="kw">use</span> <span class=
 "ident">std</span>::<span class="ident">cell</span>::{<span class=
 "ident">Cell</span>, <span class="ident">UnsafeCell</span>};
@@ -2240,8 +2263,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">std</span>::<span class="ident">marker</span>::<span class=
 "ident">PhantomData</span>;
 <span class="kw">use</span> <span class=
-"ident">std</span>::<span class="ident">mem</span>::{<span class=
-"self">self</span>, <span class="ident">ManuallyDrop</span>};
+"ident">std</span>::<span class="ident">mem</span>;
 <span class="kw">use</span> <span class=
 "ident">std</span>::<span class="ident">ptr</span>;
 <span class="kw">use</span> <span class=
@@ -2258,6 +2280,10 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="kw">use</span> <span class=
 "ident">utils</span>::{<span class=
 "ident">Backoff</span>, <span class="ident">CachePadded</span>};
+
+<span class="kw">use</span> <span class=
+"ident">maybe_uninit</span>::<span class=
+"ident">MaybeUninit</span>;
 
 <span class="comment">// Minimum buffer capacity.</span>
 <span class="kw">const</span> <span class=
@@ -2525,11 +2551,9 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="kw">while</span> <span class=
 "ident">i</span> <span class="op">!</span><span class=
 "op">=</span> <span class="ident">b</span> {
-                <span class="ident">ptr</span>::<span class=
-"ident">drop_in_place</span>(<span class=
-"ident">buffer</span>.<span class=
+                <span class="ident">buffer</span>.<span class=
 "ident">deref</span>().<span class="ident">at</span>(<span class=
-"ident">i</span>));
+"ident">i</span>).<span class="ident">drop_in_place</span>();
                 <span class="ident">i</span> <span class=
 "op">=</span> <span class="ident">i</span>.<span class=
 "ident">wrapping_add</span>(<span class="number">1</span>);
@@ -3590,6 +3614,21 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">Steal</span><span class="op">&lt;</span>()<span class=
 "op">&gt;</span> {
+        <span class="kw">if</span> <span class=
+"ident">Arc</span>::<span class="ident">ptr_eq</span>(<span class=
+"kw-2">&</span><span class="self">self</span>.<span class=
+"ident">inner</span>, <span class="kw-2">&</span><span class=
+"ident">dest</span>.<span class="ident">inner</span>) {
+            <span class="kw">if</span> <span class=
+"ident">dest</span>.<span class="ident">is_empty</span>() {
+                <span class="kw">return</span> <span class=
+"ident">Steal</span>::<span class="ident">Empty</span>;
+            } <span class="kw">else</span> {
+                <span class="kw">return</span> <span class=
+"ident">Steal</span>::<span class="ident">Success</span>(());
+            }
+        }
+
         <span class="comment">// Load the front index.</span>
         <span class="kw">let</span> <span class=
 "kw-2">mut</span> <span class="ident">f</span> <span class=
@@ -3971,6 +4010,25 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">Steal</span><span class="op">&lt;</span><span class=
 "ident">T</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class=
+"ident">Arc</span>::<span class="ident">ptr_eq</span>(<span class=
+"kw-2">&</span><span class="self">self</span>.<span class=
+"ident">inner</span>, <span class="kw-2">&</span><span class=
+"ident">dest</span>.<span class="ident">inner</span>) {
+            <span class="kw">match</span> <span class=
+"ident">dest</span>.<span class="ident">pop</span>() {
+                <span class="prelude-val">None</span> <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"kw">return</span> <span class="ident">Steal</span>::<span class=
+"ident">Empty</span>,
+                <span class="prelude-val">Some</span>(<span class=
+"ident">task</span>) <span class="op">=</span><span class=
+"op">&gt;</span> <span class="kw">return</span> <span class=
+"ident">Steal</span>::<span class=
+"ident">Success</span>(<span class="ident">task</span>),
+            }
+        }
+
         <span class="comment">// Load the front index.</span>
         <span class="kw">let</span> <span class=
 "kw-2">mut</span> <span class="ident">f</span> <span class=
@@ -4444,7 +4502,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// The task.</span>
     <span class="ident">task</span>: <span class=
 "ident">UnsafeCell</span><span class="op">&lt;</span><span class=
-"ident">ManuallyDrop</span><span class="op">&lt;</span><span class=
+"ident">MaybeUninit</span><span class="op">&lt;</span><span class=
 "ident">T</span><span class="op">&gt;</span><span class=
 "op">&gt;</span>,
 
@@ -4513,8 +4571,20 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> <span class="ident">Block</span><span class=
 "op">&lt;</span><span class="ident">T</span><span class=
 "op">&gt;</span> {
+        <span class=
+"comment">// SAFETY: This is safe because:</span>
+        <span class=
+"comment">//  [1] `Block::next` (AtomicPtr) may be safely zero initialized.</span>
+        <span class=
+"comment">//  [2] `Block::slots` (Array) may be safely zero initialized because of [3, 4].</span>
+        <span class=
+"comment">//  [3] `Slot::task` (UnsafeCell) may be safely zero initialized because it</span>
+        <span class="comment">//       holds a MaybeUninit.</span>
+        <span class=
+"comment">//  [4] `Slot::state` (AtomicUsize) may be safely zero initialized.</span>
         <span class="kw">unsafe</span> { <span class=
-"ident">mem</span>::<span class="ident">zeroed</span>() }
+"ident">MaybeUninit</span>::<span class=
+"ident">zeroed</span>().<span class="ident">assume_init</span>() }
     }
 
     <span class=
@@ -4885,7 +4955,7 @@ autocomplete="off" spellcheck="false" placeholder=
                     <span class="ident">slot</span>.<span class=
 "ident">task</span>.<span class="ident">get</span>().<span class=
 "ident">write</span>(<span class=
-"ident">ManuallyDrop</span>::<span class=
+"ident">MaybeUninit</span>::<span class=
 "ident">new</span>(<span class="ident">task</span>));
                     <span class="ident">slot</span>.<span class=
 "ident">state</span>.<span class=
@@ -5096,13 +5166,10 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="ident">slot</span>.<span class=
 "ident">wait_write</span>();
             <span class="kw">let</span> <span class=
-"ident">m</span> <span class="op">=</span> <span class=
-"ident">slot</span>.<span class="ident">task</span>.<span class=
-"ident">get</span>().<span class="ident">read</span>();
-            <span class="kw">let</span> <span class=
 "ident">task</span> <span class="op">=</span> <span class=
-"ident">ManuallyDrop</span>::<span class=
-"ident">into_inner</span>(<span class="ident">m</span>);
+"ident">slot</span>.<span class="ident">task</span>.<span class=
+"ident">get</span>().<span class="ident">read</span>().<span class=
+"ident">assume_init</span>();
 
             <span class=
 "comment">// Destroy the block if we've reached the end, or if another thread wanted to destroy</span>
@@ -5397,13 +5464,10 @@ autocomplete="off" spellcheck="false" placeholder=
                         <span class=
 "ident">slot</span>.<span class="ident">wait_write</span>();
                         <span class="kw">let</span> <span class=
-"ident">m</span> <span class="op">=</span> <span class=
-"ident">slot</span>.<span class="ident">task</span>.<span class=
-"ident">get</span>().<span class="ident">read</span>();
-                        <span class="kw">let</span> <span class=
 "ident">task</span> <span class="op">=</span> <span class=
-"ident">ManuallyDrop</span>::<span class=
-"ident">into_inner</span>(<span class="ident">m</span>);
+"ident">slot</span>.<span class="ident">task</span>.<span class=
+"ident">get</span>().<span class="ident">read</span>().<span class=
+"ident">assume_init</span>();
 
                         <span class=
 "comment">// Write it into the destination queue.</span>
@@ -5434,13 +5498,10 @@ autocomplete="off" spellcheck="false" placeholder=
                         <span class=
 "ident">slot</span>.<span class="ident">wait_write</span>();
                         <span class="kw">let</span> <span class=
-"ident">m</span> <span class="op">=</span> <span class=
-"ident">slot</span>.<span class="ident">task</span>.<span class=
-"ident">get</span>().<span class="ident">read</span>();
-                        <span class="kw">let</span> <span class=
 "ident">task</span> <span class="op">=</span> <span class=
-"ident">ManuallyDrop</span>::<span class=
-"ident">into_inner</span>(<span class="ident">m</span>);
+"ident">slot</span>.<span class="ident">task</span>.<span class=
+"ident">get</span>().<span class="ident">read</span>().<span class=
+"ident">assume_init</span>();
 
                         <span class=
 "comment">// Write it into the destination queue.</span>
@@ -5774,13 +5835,10 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="ident">slot</span>.<span class=
 "ident">wait_write</span>();
             <span class="kw">let</span> <span class=
-"ident">m</span> <span class="op">=</span> <span class=
-"ident">slot</span>.<span class="ident">task</span>.<span class=
-"ident">get</span>().<span class="ident">read</span>();
-            <span class="kw">let</span> <span class=
 "ident">task</span> <span class="op">=</span> <span class=
-"ident">ManuallyDrop</span>::<span class=
-"ident">into_inner</span>(<span class="ident">m</span>);
+"ident">slot</span>.<span class="ident">task</span>.<span class=
+"ident">get</span>().<span class="ident">read</span>().<span class=
+"ident">assume_init</span>();
 
             <span class="kw">match</span> <span class=
 "ident">dest</span>.<span class="ident">flavor</span> {
@@ -5805,13 +5863,10 @@ autocomplete="off" spellcheck="false" placeholder=
                         <span class=
 "ident">slot</span>.<span class="ident">wait_write</span>();
                         <span class="kw">let</span> <span class=
-"ident">m</span> <span class="op">=</span> <span class=
-"ident">slot</span>.<span class="ident">task</span>.<span class=
-"ident">get</span>().<span class="ident">read</span>();
-                        <span class="kw">let</span> <span class=
 "ident">task</span> <span class="op">=</span> <span class=
-"ident">ManuallyDrop</span>::<span class=
-"ident">into_inner</span>(<span class="ident">m</span>);
+"ident">slot</span>.<span class="ident">task</span>.<span class=
+"ident">get</span>().<span class="ident">read</span>().<span class=
+"ident">assume_init</span>();
 
                         <span class=
 "comment">// Write it into the destination queue.</span>
@@ -5845,13 +5900,10 @@ autocomplete="off" spellcheck="false" placeholder=
                         <span class=
 "ident">slot</span>.<span class="ident">wait_write</span>();
                         <span class="kw">let</span> <span class=
-"ident">m</span> <span class="op">=</span> <span class=
-"ident">slot</span>.<span class="ident">task</span>.<span class=
-"ident">get</span>().<span class="ident">read</span>();
-                        <span class="kw">let</span> <span class=
 "ident">task</span> <span class="op">=</span> <span class=
-"ident">ManuallyDrop</span>::<span class=
-"ident">into_inner</span>(<span class="ident">m</span>);
+"ident">slot</span>.<span class="ident">task</span>.<span class=
+"ident">get</span>().<span class="ident">read</span>().<span class=
+"ident">assume_init</span>();
 
                         <span class=
 "comment">// Write it into the destination queue.</span>
@@ -6033,12 +6085,14 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">*</span><span class="ident">block</span>).<span class=
 "ident">slots</span>.<span class=
 "ident">get_unchecked</span>(<span class="ident">offset</span>);
-                    <span class=
-"ident">ManuallyDrop</span>::<span class=
-"ident">drop</span>(<span class="kw-2">&</span><span class=
-"kw-2">mut</span> <span class="kw-2">*</span>(<span class=
-"kw-2">*</span><span class="ident">slot</span>).<span class=
-"ident">task</span>.<span class="ident">get</span>());
+                    <span class="kw">let</span> <span class=
+"ident">p</span> <span class="op">=</span> <span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"kw-2">*</span><span class="ident">slot</span>.<span class=
+"ident">task</span>.<span class="ident">get</span>();
+                    <span class="ident">p</span>.<span class=
+"ident">as_mut_ptr</span>().<span class=
+"ident">drop_in_place</span>();
                 } <span class="kw">else</span> {
                     <span class=
 "comment">// Deallocate the block and move to the next one.</span>

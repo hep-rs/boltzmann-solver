@@ -11,6 +11,7 @@ ALIASES["lazy_static"] = {};
 ALIASES["libc"] = {};
 ALIASES["log"] = {};
 ALIASES["matrixmultiply"] = {};
+ALIASES["maybe_uninit"] = {};
 ALIASES["memoffset"] = {};
 ALIASES["ndarray"] = {};
 ALIASES["num_complex"] = {};

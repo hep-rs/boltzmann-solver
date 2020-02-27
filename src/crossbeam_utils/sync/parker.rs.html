@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-utils-0.7.0/src/sync/parker.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-utils-0.7.2/src/sync/parker.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>parker.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href=
@@ -385,6 +385,10 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="309">309</span>
 <span id="310">310</span>
 <span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -394,16 +398,16 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">std</span>::<span class="ident">marker</span>::<span class=
 "ident">PhantomData</span>;
 <span class="kw">use</span> <span class=
-"ident">std</span>::<span class="ident">sync</span>::{<span class=
-"ident">Arc</span>, <span class=
-"ident">Condvar</span>, <span class="ident">Mutex</span>};
-<span class="kw">use</span> <span class=
 "ident">std</span>::<span class="ident">sync</span>::<span class=
 "ident">atomic</span>::<span class="ident">AtomicUsize</span>;
 <span class="kw">use</span> <span class=
 "ident">std</span>::<span class="ident">sync</span>::<span class=
 "ident">atomic</span>::<span class=
 "ident">Ordering</span>::<span class="ident">SeqCst</span>;
+<span class="kw">use</span> <span class=
+"ident">std</span>::<span class="ident">sync</span>::{<span class=
+"ident">Arc</span>, <span class=
+"ident">Condvar</span>, <span class="ident">Mutex</span>};
 <span class="kw">use</span> <span class=
 "ident">std</span>::<span class="ident">time</span>::<span class=
 "ident">Duration</span>;
@@ -766,13 +770,15 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
         <span class=
 "comment">// If we were previously notified then we consume this notification and return quickly.</span>
-        <span class="kw">if</span> <span class=
-"self">self</span>.<span class="ident">state</span>.<span class=
+        <span class="kw">if</span> <span class="self">self</span>
+            .<span class="ident">state</span>
+            .<span class=
 "ident">compare_exchange</span>(<span class=
 "ident">NOTIFIED</span>, <span class=
 "ident">EMPTY</span>, <span class=
-"ident">SeqCst</span>, <span class=
-"ident">SeqCst</span>).<span class="ident">is_ok</span>() {
+"ident">SeqCst</span>, <span class="ident">SeqCst</span>)
+            .<span class="ident">is_ok</span>()
+        {
             <span class="kw">return</span>;
         }
 
@@ -867,7 +873,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "comment">// got a notification</span>
                         <span class=
 "prelude-val">Err</span>(<span class="kw">_</span>) <span class=
-"op">=</span><span class="op">&gt;</span> {} <span class=
+"op">=</span><span class="op">&gt;</span> {}     <span class=
 "comment">// spurious wakeup, go back to sleep</span>
                     }
                 }
@@ -898,7 +904,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {} <span class=
 "comment">// got a notification</span>
                     <span class="ident">PARKED</span> <span class=
-"op">=</span><span class="op">&gt;</span> {} <span class=
+"op">=</span><span class="op">&gt;</span> {}   <span class=
 "comment">// no notification</span>
                     <span class="ident">n</span> <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
@@ -927,14 +933,14 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">NOTIFIED</span>, <span class="ident">SeqCst</span>) {
             <span class="ident">EMPTY</span> <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
-"kw">return</span>, <span class=
+"kw">return</span>,    <span class=
 "comment">// no one was waiting</span>
             <span class="ident">NOTIFIED</span> <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
 "kw">return</span>, <span class=
 "comment">// already unparked</span>
             <span class="ident">PARKED</span> <span class=
-"op">=</span><span class="op">&gt;</span> {} <span class=
+"op">=</span><span class="op">&gt;</span> {}        <span class=
 "comment">// gotta go wake someone up</span>
             <span class="kw">_</span> <span class=
 "op">=</span><span class="op">&gt;</span> <span class=

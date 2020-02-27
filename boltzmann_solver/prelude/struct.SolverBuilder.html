@@ -124,7 +124,7 @@ autocomplete="off" spellcheck="false" placeholder=
 'render-detail'><a id="toggle-all-docs" href="javascript:void(0)"
 title="collapse all docs">[<span class=
 'inner'>−</span>]</a></span><a class='srclink' href=
-'../../src/boltzmann_solver/solver/solver.rs.html#55-66' title=
+'../../src/boltzmann_solver/solver/solver.rs.html#66-77' title=
 'goto source code'>[src]</a></span><span class='in-band'>Struct
 <a href='../index.html'>boltzmann_solver</a>::<wbr><a href=
 'index.html'>prelude</a>::<wbr><a class="struct" href=
@@ -142,14 +142,14 @@ pub struct SolverBuilder&lt;M&gt; { /* fields omitted */ }</pre></div>
 "../../boltzmann_solver/prelude/struct.SolverBuilder.html" title=
 "struct boltzmann_solver::prelude::SolverBuilder">SolverBuilder</a>&lt;M&gt;</code><a href='#impl'
 class='anchor'></a><a class='srclink' href=
-'../../src/boltzmann_solver/solver/solver.rs.html#81-349' title=
+'../../src/boltzmann_solver/solver/solver.rs.html#92-382' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.new' class="method"><code id='new.v'><span class=
 "docblock attributes">#[must_use]</span> pub fn <a href=
 '#method.new' class='fnname'>new</a>() -&gt; Self</code><a class=
 'srclink' href=
-'../../src/boltzmann_solver/solver/solver.rs.html#102-115' title=
+'../../src/boltzmann_solver/solver/solver.rs.html#113-126' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Creates a new builder for the Boltzmann solver.</p>
@@ -182,7 +182,7 @@ one after the other.</p>
 <h4 id='method.model' class="method"><code id='model.v'>pub fn
 <a href='#method.model' class='fnname'>model</a>(self, model: M)
 -&gt; Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/solver/solver.rs.html#122-125' title=
+'../../src/boltzmann_solver/solver/solver.rs.html#133-136' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Set a model function.</p>
@@ -193,38 +193,59 @@ changed.</p>
 </div>
 <h4 id='method.initial_densities' class="method"><code id=
 'initial_densities.v'>pub fn <a href='#method.initial_densities'
-class='fnname'>initial_densities</a>(self, n: <a class="type" href=
-"../../ndarray/aliases/type.Array1.html" title=
-"type ndarray::aliases::Array1">Array1</a>&lt;<a class="primitive"
+class='fnname'>initial_densities</a>&lt;I&gt;(self, n: I) -&gt;
+Self <span class="where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;I: <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/iter/traits/collect/trait.IntoIterator.html"
+title=
+"trait core::iter::traits::collect::IntoIterator">IntoIterator</a>&lt;Item
+= <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a><a class="primitive"
 href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;)
--&gt; Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/solver/solver.rs.html#134-137' title=
-'goto source code'>[src]</a></h4>
+"https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>,
+<a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a><a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a>&gt;,&nbsp;</span></code><a class='srclink'
+href='../../src/boltzmann_solver/solver/solver.rs.html#148-154'
+title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Specify initial number densities explicitly.</p>
+<p>The specification is given as an iterator of <code>(usize,
+f64)</code> tuples where the first entry is the index of the
+particle whose equilibrium is specified.</p>
 <p>If unspecified, all number densities are assumed to be in
 equilibrium to begin with.</p>
-<p>The list of number densities must be in the same order as the
-particles in the model.</p>
+<p>Repeated initial conditions will result in an error.</p>
 </div>
 <h4 id='method.initial_asymmetries' class="method"><code id=
 'initial_asymmetries.v'>pub fn <a href=
 '#method.initial_asymmetries' class=
-'fnname'>initial_asymmetries</a>(self, na: <a class="type" href=
-"../../ndarray/aliases/type.Array1.html" title=
-"type ndarray::aliases::Array1">Array1</a>&lt;<a class="primitive"
+'fnname'>initial_asymmetries</a>&lt;I&gt;(self, na: I) -&gt; Self
+<span class="where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;I: <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/iter/traits/collect/trait.IntoIterator.html"
+title=
+"trait core::iter::traits::collect::IntoIterator">IntoIterator</a>&lt;Item
+= <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a><a class="primitive"
 href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;)
--&gt; Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/solver/solver.rs.html#145-148' title=
-'goto source code'>[src]</a></h4>
+"https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>,
+<a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a><a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a>&gt;,&nbsp;</span></code><a class='srclink'
+href='../../src/boltzmann_solver/solver/solver.rs.html#166-172'
+title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Specify initial number density asymmetries explicitly.</p>
+<p>The specification is given as an iterator of <code>(usize,
+f64)</code> tuples where the first entry is the index of the
+particle whose asymmetry is specified.</p>
 <p>If unspecified, all asymmetries are assumed to be 0 to begin
 with.</p>
-<p>The list of number densities must be in the same order as the
-particles in the model.</p>
+<p>The list of number density asymmetries must be in the same order
+as the particles in the model.</p>
 </div>
 <h4 id='method.beta_range' class="method"><code id=
 'beta_range.v'>pub fn <a href='#method.beta_range' class=
@@ -233,7 +254,7 @@ particles in the model.</p>
 end: <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
 -&gt; Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/solver/solver.rs.html#162-169' title=
+'../../src/boltzmann_solver/solver/solver.rs.html#186-193' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Set the range of inverse temperature values over which the
@@ -257,7 +278,7 @@ class='fnname'>temperature_range</a>(self, start: <a class=
 end: <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
 -&gt; Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/solver/solver.rs.html#181-188' title=
+'../../src/boltzmann_solver/solver/solver.rs.html#205-212' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Set the range of temperature values over which the phase space
@@ -282,7 +303,7 @@ title=
 "trait core::iter::traits::collect::IntoIterator">IntoIterator</a>&lt;Item
 = <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>&gt;,&nbsp;</span></code><a class='srclink'
-href='../../src/boltzmann_solver/solver/solver.rs.html#200-206'
+href='../../src/boltzmann_solver/solver/solver.rs.html#224-230'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Specify the particles which must remain in equilibrium.</p>
@@ -306,7 +327,7 @@ title=
 "trait core::iter::traits::collect::IntoIterator">IntoIterator</a>&lt;Item
 = <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>&gt;,&nbsp;</span></code><a class='srclink'
-href='../../src/boltzmann_solver/solver/solver.rs.html#218-224'
+href='../../src/boltzmann_solver/solver/solver.rs.html#242-248'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Specify the particles which never develop an asymmetry.</p>
@@ -330,7 +351,7 @@ title="trait core::ops::function::Fn">Fn</a>(&<a class="struct"
 href="../../boltzmann_solver/prelude/struct.Context.html" title=
 "struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) +
 'static,&nbsp;</span></code><a class='srclink' href=
-'../../src/boltzmann_solver/solver/solver.rs.html#237-243' title=
+'../../src/boltzmann_solver/solver/solver.rs.html#261-267' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Set the logger.</p>
@@ -351,7 +372,7 @@ solutions and log these in a CSV file.</p>
 max: <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
 -&gt; Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/solver/solver.rs.html#269-276' title=
+'../../src/boltzmann_solver/solver/solver.rs.html#293-300' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Specify how large or small the step size is allowed to
@@ -380,7 +401,7 @@ than desired.</p>
 'fnname'>error_tolerance</a>(self, tol: <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
 -&gt; Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/solver/solver.rs.html#287-291' title=
+'../../src/boltzmann_solver/solver/solver.rs.html#311-315' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Specify the local error tolerance.</p>
@@ -402,7 +423,7 @@ tolerance.</p>
 'fnname'>skip_precomputation</a>(self, v: <a class="primitive"
 href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>)
 -&gt; Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/solver/solver.rs.html#297-300' title=
+'../../src/boltzmann_solver/solver/solver.rs.html#321-324' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Upon calling <a href=
@@ -422,7 +443,7 @@ skip the precomputation of interactions.</p>
 "../../boltzmann_solver/model/trait.ModelInteractions.html" title=
 "trait boltzmann_solver::model::ModelInteractions">ModelInteractions</a>,&nbsp;</span></code><a href='#impl-1'
 class='anchor'></a><a class='srclink' href=
-'../../src/boltzmann_solver/solver/solver.rs.html#351-498' title=
+'../../src/boltzmann_solver/solver/solver.rs.html#384-541' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.build' class="method"><code id='build.v'>pub fn
@@ -433,7 +454,7 @@ title="enum core::result::Result">Result</a>&lt;<a class="struct"
 href="../../boltzmann_solver/prelude/struct.Solver.html" title=
 "struct boltzmann_solver::prelude::Solver">Solver</a>&lt;M&gt;,
 Error&gt;</code><a class='srclink' href=
-'../../src/boltzmann_solver/solver/solver.rs.html#424-497' title=
+'../../src/boltzmann_solver/solver/solver.rs.html#457-540' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Build the Boltzmann solver.</p>
@@ -454,14 +475,14 @@ title="trait core::default::Default">Default</a> for <a class=
 "../../boltzmann_solver/prelude/struct.SolverBuilder.html" title=
 "struct boltzmann_solver::prelude::SolverBuilder">SolverBuilder</a>&lt;M&gt;</code><a href='#impl-Default'
 class='anchor'></a><a class='srclink' href=
-'../../src/boltzmann_solver/solver/solver.rs.html#500-504' title=
+'../../src/boltzmann_solver/solver/solver.rs.html#543-547' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.default' class="method hidden"><code id=
 'default.v'>fn <a href=
 'https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default'
 class='fnname'>default</a>() -&gt; Self</code><a class='srclink'
-href='../../src/boltzmann_solver/solver/solver.rs.html#501-503'
+href='../../src/boltzmann_solver/solver/solver.rs.html#544-546'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Returns the "default value" for a type. <a href=

@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.14/src/expr.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.16/src/expr.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>expr.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -3309,6 +3309,26 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="3234">3234</span>
 <span id="3235">3235</span>
 <span id="3236">3236</span>
+<span id="3237">3237</span>
+<span id="3238">3238</span>
+<span id="3239">3239</span>
+<span id="3240">3240</span>
+<span id="3241">3241</span>
+<span id="3242">3242</span>
+<span id="3243">3243</span>
+<span id="3244">3244</span>
+<span id="3245">3245</span>
+<span id="3246">3246</span>
+<span id="3247">3247</span>
+<span id="3248">3248</span>
+<span id="3249">3249</span>
+<span id="3250">3250</span>
+<span id="3251">3251</span>
+<span id="3252">3252</span>
+<span id="3253">3253</span>
+<span id="3254">3254</span>
+<span id="3255">3255</span>
+<span id="3256">3256</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -6070,6 +6090,10 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="kw">use</span> <span class=
 "kw">crate</span>::<span class="ident">path</span>;
 
+    <span class="kw">crate</span>::<span class=
+"macro">custom_keyword</span><span class=
+"macro">!</span>(<span class="ident">raw</span>);
+
     <span class=
 "comment">// When we're parsing expressions which occur before blocks, like in an if</span>
     <span class=
@@ -6760,6 +6784,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&lt;</span><span class="ident">Expr</span><span class=
 "op">&gt;</span> {
         <span class="kw">let</span> <span class=
+"ident">begin</span> <span class="op">=</span> <span class=
+"ident">input</span>.<span class="ident">fork</span>();
+        <span class="kw">let</span> <span class=
 "ident">ahead</span> <span class="op">=</span> <span class=
 "ident">input</span>.<span class="ident">fork</span>();
         <span class="kw">let</span> <span class=
@@ -6795,26 +6822,74 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">input</span>.<span class="ident">peek</span>(<span class=
 "macro">Token</span><span class="macro">!</span>[<span class=
 "kw-2">&</span>]) {
-                <span class="prelude-val">Ok</span>(<span class=
-"ident">Expr</span>::<span class=
-"ident">Reference</span>(<span class="ident">ExprReference</span> {
-                    <span class="ident">attrs</span>,
-                    <span class=
+                <span class="kw">let</span> <span class=
 "ident">and_token</span>: <span class=
+"macro">Token</span><span class="macro">!</span>[<span class=
+"kw-2">&</span>] <span class="op">=</span> <span class=
 "ident">input</span>.<span class="ident">parse</span>()<span class=
-"question-mark">?</span>,
-                    <span class="ident">raw</span>: <span class=
-"ident">Reserved</span>::<span class="ident">default</span>(),
+"question-mark">?</span>;
+                <span class="kw">let</span> <span class=
+"ident">raw</span>: <span class=
+"prelude-ty">Option</span><span class="op">&lt;</span><span class=
+"ident">raw</span><span class="op">&gt;</span> <span class=
+"op">=</span> <span class="kw">if</span> <span class=
+"ident">input</span>.<span class="ident">peek</span>(<span class=
+"ident">raw</span>)
+                    <span class="kw-2">&</span><span class=
+"op">&</span> (<span class="ident">input</span>.<span class=
+"ident">peek2</span>(<span class="macro">Token</span><span class=
+"macro">!</span>[<span class="kw-2">mut</span>]) <span class=
+"op">|</span><span class="op">|</span> <span class=
+"ident">input</span>.<span class="ident">peek2</span>(<span class=
+"macro">Token</span><span class="macro">!</span>[<span class=
+"kw">const</span>]))
+                {
                     <span class=
-"ident">mutability</span>: <span class=
+"prelude-val">Some</span>(<span class=
 "ident">input</span>.<span class="ident">parse</span>()<span class=
-"question-mark">?</span>,
-                    <span class="ident">expr</span>: <span class=
+"question-mark">?</span>)
+                } <span class="kw">else</span> {
+                    <span class="prelude-val">None</span>
+                };
+                <span class="kw">let</span> <span class=
+"ident">mutability</span>: <span class=
+"prelude-ty">Option</span><span class="op">&lt;</span><span class=
+"macro">Token</span><span class="macro">!</span>[<span class=
+"kw-2">mut</span>]<span class="op">&gt;</span> <span class=
+"op">=</span> <span class="ident">input</span>.<span class=
+"ident">parse</span>()<span class="question-mark">?</span>;
+                <span class="kw">if</span> <span class=
+"ident">raw</span>.<span class=
+"ident">is_some</span>() <span class="kw-2">&</span><span class=
+"op">&</span> <span class="ident">mutability</span>.<span class=
+"ident">is_none</span>() {
+                    <span class="ident">input</span>.<span class=
+"ident">parse</span>::<span class="op">&lt;</span><span class=
+"macro">Token</span><span class="macro">!</span>[<span class=
+"kw">const</span>]<span class="op">&gt;</span>()<span class=
+"question-mark">?</span>;
+                }
+                <span class="kw">let</span> <span class=
+"ident">expr</span> <span class="op">=</span> <span class=
 "ident">Box</span>::<span class="ident">new</span>(<span class=
 "ident">unary_expr</span>(<span class=
 "ident">input</span>, <span class=
-"ident">allow_struct</span>)<span class="question-mark">?</span>),
-                }))
+"ident">allow_struct</span>)<span class="question-mark">?</span>);
+                <span class="kw">if</span> <span class=
+"ident">raw</span>.<span class="ident">is_some</span>() {
+                    <span class=
+"prelude-val">Ok</span>(<span class="ident">Expr</span>::<span class="ident">Verbatim</span>(<span class="ident">verbatim</span>::<span class="ident">between</span>(<span class="ident">begin</span>, <span class="ident">input</span>)))
+                } <span class="kw">else</span> {
+                    <span class=
+"prelude-val">Ok</span>(<span class="ident">Expr</span>::<span class="ident">Reference</span>(<span class="ident">ExprReference</span> {
+                        <span class="ident">attrs</span>,
+                        <span class="ident">and_token</span>,
+                        <span class=
+"ident">raw</span>: <span class="ident">Reserved</span>::<span class="ident">default</span>(),
+                        <span class="ident">mutability</span>,
+                        <span class="ident">expr</span>,
+                    }))
+                }
             } <span class="kw">else</span> <span class=
 "kw">if</span> <span class="ident">input</span>.<span class=
 "ident">peek</span>(<span class="macro">Token</span><span class=
@@ -8142,10 +8217,13 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="kw">if</span> <span class=
 "ident">input</span>.<span class="ident">peek</span>(<span class=
 "macro">Token</span><span class="macro">!</span>[.]) <span class=
-"op">|</span><span class="op">|</span> <span class=
-"ident">input</span>.<span class="ident">peek</span>(<span class=
-"macro">Token</span><span class="macro">!</span>[<span class=
-"question-mark">?</span>]) {
+"kw-2">&</span><span class="op">&</span> <span class=
+"op">!</span><span class="ident">input</span>.<span class=
+"ident">peek</span>(<span class="macro">Token</span><span class=
+"macro">!</span>[..]) <span class="op">|</span><span class=
+"op">|</span> <span class="ident">input</span>.<span class=
+"ident">peek</span>(<span class="macro">Token</span><span class=
+"macro">!</span>[<span class="question-mark">?</span>]) {
             <span class="ident">expr</span> <span class=
 "op">=</span> <span class=
 "ident">trailer_helper</span>(<span class="ident">input</span>, <span class="ident">expr</span>)<span class="question-mark">?</span>;

@@ -354,12 +354,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="278">278</span>
 <span id="279">279</span>
 <span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
-<span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -869,18 +863,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">particles_idx</span>.<span class=
 "ident">incoming</span>[<span class=
 "number">0</span>]].<span class="ident">mass</span>;
-        <span class="kw">let</span> <span class=
-"ident">m1</span> <span class="op">=</span> <span class=
-"ident">ptcl</span>[<span class="self">self</span>.<span class=
-"ident">particles_idx</span>.<span class=
-"ident">outgoing</span>[<span class=
-"number">0</span>]].<span class="ident">mass</span>;
-        <span class="kw">let</span> <span class=
-"ident">m2</span> <span class="op">=</span> <span class=
-"ident">ptcl</span>[<span class="self">self</span>.<span class=
-"ident">particles_idx</span>.<span class=
-"ident">outgoing</span>[<span class=
-"number">1</span>]].<span class="ident">mass</span>;
 
         <span class=
 "comment">// The interaction rate goes from heaviest ↔ lighter two.</span>
@@ -889,35 +871,26 @@ autocomplete="off" spellcheck="false" placeholder=
 "comment">// TODO: What happens when the decaying particle's mass is not</span>
         <span class=
 "comment">// greater than the sum of the masses of the daughter particles?</span>
-        <span class="kw">if</span> <span class=
-"ident">m0</span> <span class="op">&lt;</span> <span class=
-"ident">m1</span> <span class="op">|</span><span class=
-"op">|</span> <span class="ident">m0</span> <span class=
-"op">&lt;</span> <span class="ident">m2</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class=
+        <span class=
 "comment">// 0.002_423_011_225_182_300_4 = ζ(3) / 16 π³</span>
-            <span class="prelude-val">Some</span>(
-                <span class=
-"number">0.002_423_011_225_182_300_4</span>
-                    <span class="op">*</span> (<span class=
+        <span class="prelude-val">Some</span>(
+            <span class="number">0.002_423_011_225_182_300_4</span>
+                <span class="op">*</span> (<span class=
 "self">self</span>.<span class=
 "ident">squared_amplitude</span>)(<span class=
 "kw-2">&</span><span class="ident">c</span>.<span class=
 "ident">model</span>).<span class="ident">abs</span>()
-                    <span class="op">*</span> <span class=
+                <span class="op">*</span> <span class=
 "ident">bessel</span>::<span class=
 "ident">k1_on_k2</span>(<span class="ident">m0</span> <span class=
 "op">*</span> <span class="ident">c</span>.<span class=
 "ident">beta</span>)
-                    <span class="op">/</span> <span class=
+                <span class="op">/</span> <span class=
 "ident">c</span>.<span class="ident">beta</span>.<span class=
 "ident">powi</span>(<span class="number">3</span>)
-                    <span class="op">/</span> <span class=
+                <span class="op">/</span> <span class=
 "ident">m0</span>,
-            )
-        }
+        )
     }
 
     <span class="kw">fn</span> <span class=

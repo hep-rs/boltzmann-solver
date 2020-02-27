@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.8/src/fallback.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.9/src/fallback.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>fallback.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -3457,13 +3457,13 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">c</span> <span class="op">=</span><span class=
 "op">=</span> <span class="string">'\''</span> {
                 <span class=
-"comment">// escape_default turns this into "\'" which is unnecessary.</span>
+"comment">// escape_debug turns this into "\'" which is unnecessary.</span>
                 <span class="ident">text</span>.<span class=
 "ident">push</span>(<span class="ident">c</span>);
             } <span class="kw">else</span> {
                 <span class="ident">text</span>.<span class=
 "ident">extend</span>(<span class="ident">c</span>.<span class=
-"ident">escape_default</span>());
+"ident">escape_debug</span>());
             }
         }
         <span class="ident">text</span>.<span class=
@@ -3487,13 +3487,13 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">t</span> <span class="op">=</span><span class=
 "op">=</span> <span class="string">'"'</span> {
             <span class=
-"comment">// escape_default turns this into '\"' which is unnecessary.</span>
+"comment">// escape_debug turns this into '\"' which is unnecessary.</span>
             <span class="ident">text</span>.<span class=
 "ident">push</span>(<span class="ident">t</span>);
         } <span class="kw">else</span> {
             <span class="ident">text</span>.<span class=
 "ident">extend</span>(<span class="ident">t</span>.<span class=
-"ident">escape_default</span>());
+"ident">escape_debug</span>());
         }
         <span class="ident">text</span>.<span class=
 "ident">push</span>(<span class="string">'\''</span>);

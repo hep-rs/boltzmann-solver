@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-utils-0.7.0/src/atomic/atomic_cell.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-utils-0.7.2/src/atomic/atomic_cell.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>atomic_cell.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href=
@@ -964,18 +964,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="888">888</span>
 <span id="889">889</span>
 <span id="890">890</span>
-<span id="891">891</span>
-<span id="892">892</span>
-<span id="893">893</span>
-<span id="894">894</span>
-<span id="895">895</span>
-<span id="896">896</span>
-<span id="897">897</span>
-<span id="898">898</span>
-<span id="899">899</span>
-<span id="900">900</span>
-<span id="901">901</span>
-<span id="902">902</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -2129,123 +2117,88 @@ autocomplete="off" spellcheck="false" placeholder=
             }
         }
     };
-    (<span class="macro-nonterminal">$</span><span class=
-"macro-nonterminal">t</span>:<span class=
-"ident">ty</span>, <span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">size</span>:<span class=
-"ident">tt</span>, <span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">atomic</span>:<span class=
-"ident">ty</span>, <span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">example</span>:<span class=
-"ident">tt</span>) <span class="op">=</span><span class=
-"op">&gt;</span> {
-        <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class=
-"ident">target_has_atomic</span> <span class=
-"op">=</span> <span class="macro-nonterminal">$</span><span class=
-"macro-nonterminal">size</span>)]</span>
-        <span class="macro">impl_arithmetic</span><span class=
-"macro">!</span>(<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">t</span>, <span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">atomic</span>, <span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">example</span>);
-    };
 }
 
-<span class="macro">cfg_if</span><span class="macro">!</span> {
-    <span class="kw">if</span> <span class=
-"attribute">#[<span class="ident">cfg</span>(<span class=
-"ident">feature</span> <span class="op">=</span> <span class=
-"string">"nightly"</span>)]</span> {
-        <span class="macro">impl_arithmetic</span><span class=
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">has_atomic_u8</span>)]</span>
+<span class="macro">impl_arithmetic</span><span class=
 "macro">!</span>(<span class="ident">u8</span>, <span class=
-"string">"8"</span>, <span class=
-"ident">atomic</span>::<span class="ident">AtomicU8</span>, <span class="string">"let a = AtomicCell::new(7u8);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
+"ident">atomic</span>::<span class=
+"ident">AtomicU8</span>, <span class=
+"string">"let a = AtomicCell::new(7u8);"</span>);
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">has_atomic_u8</span>)]</span>
+<span class="macro">impl_arithmetic</span><span class=
 "macro">!</span>(<span class="ident">i8</span>, <span class=
-"string">"8"</span>, <span class=
-"ident">atomic</span>::<span class="ident">AtomicI8</span>, <span class="string">"let a = AtomicCell::new(7i8);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
+"ident">atomic</span>::<span class=
+"ident">AtomicI8</span>, <span class=
+"string">"let a = AtomicCell::new(7i8);"</span>);
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">has_atomic_u16</span>)]</span>
+<span class="macro">impl_arithmetic</span><span class=
 "macro">!</span>(<span class="ident">u16</span>, <span class=
-"string">"16"</span>, <span class=
 "ident">atomic</span>::<span class=
 "ident">AtomicU16</span>, <span class=
 "string">"let a = AtomicCell::new(7u16);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">has_atomic_u16</span>)]</span>
+<span class="macro">impl_arithmetic</span><span class=
 "macro">!</span>(<span class="ident">i16</span>, <span class=
-"string">"16"</span>, <span class=
 "ident">atomic</span>::<span class=
 "ident">AtomicI16</span>, <span class=
 "string">"let a = AtomicCell::new(7i16);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">has_atomic_u32</span>)]</span>
+<span class="macro">impl_arithmetic</span><span class=
 "macro">!</span>(<span class="ident">u32</span>, <span class=
-"string">"32"</span>, <span class=
 "ident">atomic</span>::<span class=
 "ident">AtomicU32</span>, <span class=
 "string">"let a = AtomicCell::new(7u32);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">has_atomic_u32</span>)]</span>
+<span class="macro">impl_arithmetic</span><span class=
 "macro">!</span>(<span class="ident">i32</span>, <span class=
-"string">"32"</span>, <span class=
 "ident">atomic</span>::<span class=
 "ident">AtomicI32</span>, <span class=
 "string">"let a = AtomicCell::new(7i32);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">has_atomic_u64</span>)]</span>
+<span class="macro">impl_arithmetic</span><span class=
 "macro">!</span>(<span class="ident">u64</span>, <span class=
-"string">"64"</span>, <span class=
 "ident">atomic</span>::<span class=
 "ident">AtomicU64</span>, <span class=
 "string">"let a = AtomicCell::new(7u64);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">has_atomic_u64</span>)]</span>
+<span class="macro">impl_arithmetic</span><span class=
 "macro">!</span>(<span class="ident">i64</span>, <span class=
-"string">"64"</span>, <span class=
 "ident">atomic</span>::<span class=
 "ident">AtomicI64</span>, <span class=
 "string">"let a = AtomicCell::new(7i64);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">has_atomic_u128</span>)]</span>
+<span class="macro">impl_arithmetic</span><span class=
 "macro">!</span>(<span class="ident">u128</span>, <span class=
+"ident">atomic</span>::<span class=
+"ident">AtomicU128</span>, <span class=
 "string">"let a = AtomicCell::new(7u128);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">has_atomic_u128</span>)]</span>
+<span class="macro">impl_arithmetic</span><span class=
 "macro">!</span>(<span class="ident">i128</span>, <span class=
-"string">"let a = AtomicCell::new(7i128);"</span>);
-    } <span class="kw">else</span> {
-        <span class="macro">impl_arithmetic</span><span class=
-"macro">!</span>(<span class="ident">u8</span>, <span class=
-"string">"let a = AtomicCell::new(7u8);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
-"macro">!</span>(<span class="ident">i8</span>, <span class=
-"string">"let a = AtomicCell::new(7i8);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
-"macro">!</span>(<span class="ident">u16</span>, <span class=
-"string">"let a = AtomicCell::new(7u16);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
-"macro">!</span>(<span class="ident">i16</span>, <span class=
-"string">"let a = AtomicCell::new(7i16);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
-"macro">!</span>(<span class="ident">u32</span>, <span class=
-"string">"let a = AtomicCell::new(7u32);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
-"macro">!</span>(<span class="ident">i32</span>, <span class=
-"string">"let a = AtomicCell::new(7i32);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
-"macro">!</span>(<span class="ident">u64</span>, <span class=
-"string">"let a = AtomicCell::new(7u64);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
-"macro">!</span>(<span class="ident">i64</span>, <span class=
-"string">"let a = AtomicCell::new(7i64);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
-"macro">!</span>(<span class="ident">u128</span>, <span class=
-"string">"let a = AtomicCell::new(7u128);"</span>);
-        <span class="macro">impl_arithmetic</span><span class=
-"macro">!</span>(<span class="ident">i128</span>, <span class=
-"string">"let a = AtomicCell::new(7i128);"</span>);
-    }
-}
+"ident">atomic</span>::<span class=
+"ident">AtomicI128</span>, <span class=
+"string">"let  a = AtomicCell::new(7i128);"</span>);
 
 <span class="macro">impl_arithmetic</span><span class=
 "macro">!</span>(
@@ -2713,14 +2666,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">atomic_op</span>);
 
             <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"nightly"</span>)]</span>
-            {
-                <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class=
-"ident">target_has_atomic</span> <span class=
-"op">=</span> <span class="string">"8"</span>)]</span>
-                <span class="macro">atomic</span><span class=
+"ident">has_atomic_u8</span>)]</span>
+            <span class="macro">atomic</span><span class=
 "macro">!</span>(@<span class="ident">check</span>, <span class=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">t</span>, <span class=
@@ -2730,11 +2678,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">a</span>, <span class=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">atomic_op</span>);
-                <span class="attribute">#[<span class=
+            <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class=
-"ident">target_has_atomic</span> <span class=
-"op">=</span> <span class="string">"16"</span>)]</span>
-                <span class="macro">atomic</span><span class=
+"ident">has_atomic_u16</span>)]</span>
+            <span class="macro">atomic</span><span class=
 "macro">!</span>(@<span class="ident">check</span>, <span class=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">t</span>, <span class=
@@ -2744,11 +2691,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">a</span>, <span class=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">atomic_op</span>);
-                <span class="attribute">#[<span class=
+            <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class=
-"ident">target_has_atomic</span> <span class=
-"op">=</span> <span class="string">"32"</span>)]</span>
-                <span class="macro">atomic</span><span class=
+"ident">has_atomic_u32</span>)]</span>
+            <span class="macro">atomic</span><span class=
 "macro">!</span>(@<span class="ident">check</span>, <span class=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">t</span>, <span class=
@@ -2758,11 +2704,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">a</span>, <span class=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">atomic_op</span>);
-                <span class="attribute">#[<span class=
+            <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class=
-"ident">target_has_atomic</span> <span class=
-"op">=</span> <span class="string">"64"</span>)]</span>
-                <span class="macro">atomic</span><span class=
+"ident">has_atomic_u64</span>)]</span>
+            <span class="macro">atomic</span><span class=
 "macro">!</span>(@<span class="ident">check</span>, <span class=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">t</span>, <span class=
@@ -2772,7 +2717,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">a</span>, <span class=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">atomic_op</span>);
-            }
 
             <span class="kw">break</span> <span class=
 "macro-nonterminal">$</span><span class=

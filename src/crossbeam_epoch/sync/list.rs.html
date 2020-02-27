@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.8.0/src/sync/list.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.8.2/src/sync/list.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>list.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href=
@@ -552,6 +552,15 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="476">476</span>
 <span id="477">477</span>
 <span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -1075,7 +1084,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">with_tag</span>(<span class="number">0</span>);
 
                 <span class=
-"comment">// The tag should never be zero, because removing a node after a logically deleted</span>
+"comment">// The tag should always be zero, because removing a node after a logically deleted</span>
                 <span class=
 "comment">// node leaves the list in an invalid state.</span>
                 <span class="macro">debug_assert</span><span class=
@@ -1084,8 +1093,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">=</span> <span class=
 "number">0</span>);
 
-                <span class="kw">match</span> <span class=
-"self">self</span>
+                <span class=
+"comment">// Try to unlink `curr` from the list, and get the new value of `self.pred`.</span>
+                <span class="kw">let</span> <span class=
+"ident">succ</span> <span class="op">=</span> <span class=
+"kw">match</span> <span class="self">self</span>
                     .<span class="ident">pred</span>
                     .<span class=
 "ident">compare_and_set</span>(<span class=
@@ -1098,11 +1110,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "prelude-val">Ok</span>(<span class="kw">_</span>) <span class=
 "op">=</span><span class="op">&gt;</span> {
                         <span class=
-"comment">// We succeeded in unlinking this element from the list, so we have to</span>
+"comment">// We succeeded in unlinking `curr`, so we have to schedule</span>
                         <span class=
-"comment">// schedule deallocation. Deferred drop is okay, because `list.delete()`</span>
+"comment">// deallocation. Deferred drop is okay, because `list.delete()` can only be</span>
                         <span class=
-"comment">// can only be called if `T: 'static`.</span>
+"comment">// called if `T: 'static`.</span>
                         <span class="kw">unsafe</span> {
                             <span class=
 "ident">C</span>::<span class="ident">finalize</span>(<span class=
@@ -1112,35 +1124,48 @@ autocomplete="off" spellcheck="false" placeholder=
                         }
 
                         <span class=
-"comment">// Move over the removed by only advancing `curr`, not `pred`.</span>
-                        <span class="self">self</span>.<span class=
-"ident">curr</span> <span class="op">=</span> <span class=
-"ident">succ</span>;
-                        <span class="kw">continue</span>;
+"comment">// `succ` is the new value of `self.pred`.</span>
+                        <span class="ident">succ</span>
                     }
                     <span class=
-"prelude-val">Err</span>(<span class="kw">_</span>) <span class=
+"prelude-val">Err</span>(<span class="ident">e</span>) <span class=
 "op">=</span><span class="op">&gt;</span> {
                         <span class=
-"comment">// A concurrent thread modified the predecessor node. Since it might've</span>
-                        <span class=
-"comment">// been deleted, we need to restart from `head`.</span>
-                        <span class="self">self</span>.<span class=
+"comment">// `e.current` is the current value of `self.pred`.</span>
+                        <span class="ident">e</span>.<span class=
+"ident">current</span>
+                    }
+                };
+
+                <span class=
+"comment">// If the predecessor node is already marked as deleted, we need to restart from</span>
+                <span class="comment">// `head`.</span>
+                <span class="kw">if</span> <span class=
+"ident">succ</span>.<span class="ident">tag</span>() <span class=
+"op">!</span><span class="op">=</span> <span class=
+"number">0</span> {
+                    <span class="self">self</span>.<span class=
 "ident">pred</span> <span class="op">=</span> <span class=
 "self">self</span>.<span class="ident">head</span>;
-                        <span class="self">self</span>.<span class=
+                    <span class="self">self</span>.<span class=
 "ident">curr</span> <span class="op">=</span> <span class=
 "self">self</span>.<span class="ident">head</span>.<span class=
 "ident">load</span>(<span class=
 "ident">Acquire</span>, <span class="self">self</span>.<span class=
 "ident">guard</span>);
 
-                        <span class="kw">return</span> <span class=
+                    <span class="kw">return</span> <span class=
 "prelude-val">Some</span>(<span class=
 "prelude-val">Err</span>(<span class=
 "ident">IterError</span>::<span class="ident">Stalled</span>));
-                    }
                 }
+
+                <span class=
+"comment">// Move over the removed by only advancing `curr`, not `pred`.</span>
+                <span class="self">self</span>.<span class=
+"ident">curr</span> <span class="op">=</span> <span class=
+"ident">succ</span>;
+                <span class="kw">continue</span>;
             }
 
             <span class="comment">// Move one step forward.</span>

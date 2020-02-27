@@ -61,7 +61,18 @@
 <div class="sidebar-links"><a href=
 "#method.empty_or_trailing">empty_or_trailing</a><a href=
 "#method.first">first</a><a href=
-"#method.insert">insert</a><a href="#method.into_pairs">into_pairs</a><a href="#method.is_empty">is_empty</a><a href="#method.iter">iter</a><a href="#method.iter_mut">iter_mut</a><a href="#method.last">last</a><a href="#method.last_mut">last_mut</a><a href="#method.len">len</a><a href="#method.new">new</a><a href="#method.pairs">pairs</a><a href="#method.pairs_mut">pairs_mut</a><a href="#method.parse_separated_nonempty">parse_separated_nonempty</a><a href="#method.parse_separated_nonempty_with">parse_separated_nonempty_with</a><a href="#method.parse_terminated">parse_terminated</a><a href="#method.parse_terminated_with">parse_terminated_with</a><a href="#method.pop">pop</a><a href="#method.push">push</a><a href="#method.push_punct">push_punct</a><a href="#method.push_value">push_value</a><a href="#method.trailing_punct">trailing_punct</a></div>
+"#method.first_mut">first_mut</a><a href=
+"#method.insert">insert</a><a href=
+"#method.into_pairs">into_pairs</a><a href=
+"#method.is_empty">is_empty</a><a href=
+"#method.iter">iter</a><a href=
+"#method.iter_mut">iter_mut</a><a href=
+"#method.last">last</a><a href=
+"#method.last_mut">last_mut</a><a href=
+"#method.len">len</a><a href="#method.new">new</a><a href=
+"#method.pairs">pairs</a><a href=
+"#method.pairs_mut">pairs_mut</a><a href=
+"#method.parse_separated_nonempty">parse_separated_nonempty</a><a href="#method.parse_separated_nonempty_with">parse_separated_nonempty_with</a><a href="#method.parse_terminated">parse_terminated</a><a href="#method.parse_terminated_with">parse_terminated_with</a><a href="#method.pop">pop</a><a href="#method.push">push</a><a href="#method.push_punct">push_punct</a><a href="#method.push_value">push_value</a><a href="#method.trailing_punct">trailing_punct</a></div>
 <a class="sidebar-title" href="#implementations">Trait
 Implementations</a>
 <div class="sidebar-links"><a href="#impl-Clone">Clone</a><a href=
@@ -148,7 +159,7 @@ documentation</a> for details about punctuated sequences.</p>
 "../../syn/punctuated/struct.Punctuated.html" title=
 "struct syn::punctuated::Punctuated">Punctuated</a>&lt;T,
 P&gt;</code><a href='#impl' class='anchor'></a><a class='srclink'
-href='../../src/syn/punctuated.rs.html#51-339' title=
+href='../../src/syn/punctuated.rs.html#51-336' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.new' class="method"><code id='new.v'>pub fn <a href=
@@ -195,6 +206,19 @@ href='../../src/syn/punctuated.rs.html#75-77' title=
 <div class='docblock'>
 <p>Borrows the first element in this sequence.</p>
 </div>
+<h4 id='method.first_mut' class="method"><code id='first_mut.v'>pub
+fn <a href='#method.first_mut' class=
+'fnname'>first_mut</a>(&amp;mut self) -&gt; <a class="enum" href=
+"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
+title="enum core::option::Option">Option</a>&lt;<a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut</a>
+T&gt;</code><a class='srclink' href=
+'../../src/syn/punctuated.rs.html#80-82' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Mutably borrows the first element in this sequence.</p>
+</div>
 <h4 id='method.last' class="method"><code id='last.v'>pub fn
 <a href='#method.last' class='fnname'>last</a>(&amp;self) -&gt;
 <a class="enum" href=
@@ -202,7 +226,7 @@ href='../../src/syn/punctuated.rs.html#75-77' title=
 title="enum core::option::Option">Option</a>&lt;<a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.reference.html">&</a>T&gt;</code><a class='srclink'
-href='../../src/syn/punctuated.rs.html#80-86' title=
+href='../../src/syn/punctuated.rs.html#85-87' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Borrows the last element in this sequence.</p>
@@ -215,7 +239,7 @@ title="enum core::option::Option">Option</a>&lt;<a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut</a>
 T&gt;</code><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#89-95' title=
+'../../src/syn/punctuated.rs.html#90-92' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Mutably borrows the last element in this sequence.</p>
@@ -249,7 +273,7 @@ T;</span></code></div>
 'fnname'>iter</a>(&amp;self) -&gt; <a class="struct" href=
 "../../syn/punctuated/struct.Iter.html" title=
 "struct syn::punctuated::Iter">Iter</a>&lt;T&gt;</code><a class=
-'srclink' href='../../src/syn/punctuated.rs.html#98-105' title=
+'srclink' href='../../src/syn/punctuated.rs.html#95-102' title=
 'goto source code'>[src]</a>
 <div class='docblock'>
 <p>Returns an iterator over borrowed syntax tree nodes of type
@@ -286,7 +310,7 @@ mut</a> T;</span></code><code id='iter_mut.v'>pub fn <a href=
 <a class="struct" href="../../syn/punctuated/struct.IterMut.html"
 title=
 "struct syn::punctuated::IterMut">IterMut</a>&lt;T&gt;</code><a class='srclink'
-href='../../src/syn/punctuated.rs.html#109-116' title=
+href='../../src/syn/punctuated.rs.html#106-113' title=
 'goto source code'>[src]</a>
 <div class='docblock'>
 <p>Returns an iterator over mutably borrowed syntax tree nodes of
@@ -326,7 +350,7 @@ P&gt;;</span></code><code id='pairs.v'>pub fn <a href=
 "struct" href="../../syn/punctuated/struct.Pairs.html" title=
 "struct syn::punctuated::Pairs">Pairs</a>&lt;T,
 P&gt;</code><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#120-125' title=
+'../../src/syn/punctuated.rs.html#117-122' title=
 'goto source code'>[src]</a>
 <div class='docblock'>
 <p>Returns an iterator over the contents of this sequence as
@@ -369,7 +393,7 @@ mut</a> P&gt;;</span></code><code id='pairs_mut.v'>pub fn <a href=
 "../../syn/punctuated/struct.PairsMut.html" title=
 "struct syn::punctuated::PairsMut">PairsMut</a>&lt;T,
 P&gt;</code><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#129-134' title=
+'../../src/syn/punctuated.rs.html#126-131' title=
 'goto source code'>[src]</a>
 <div class='docblock'>
 <p>Returns an iterator over the contents of this sequence as
@@ -407,7 +431,7 @@ P&gt;;</span></code><code id='into_pairs.v'>pub fn <a href=
 <a class="struct" href="../../syn/punctuated/struct.IntoPairs.html"
 title="struct syn::punctuated::IntoPairs">IntoPairs</a>&lt;T,
 P&gt;</code><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#138-143' title=
+'../../src/syn/punctuated.rs.html#135-140' title=
 'goto source code'>[src]</a>
 <div class='docblock'>
 <p>Returns an iterator over the contents of this sequence as owned
@@ -416,7 +440,7 @@ punctuated pairs.</p>
 <h4 id='method.push_value' class="method"><code id=
 'push_value.v'>pub fn <a href='#method.push_value' class=
 'fnname'>push_value</a>(&amp;mut self, value: T)</code><a class=
-'srclink' href='../../src/syn/punctuated.rs.html#157-160' title=
+'srclink' href='../../src/syn/punctuated.rs.html#154-157' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Appends a syntax tree node onto the end of this punctuated
@@ -435,7 +459,7 @@ punctuation when this method is called.</p>
 'push_punct.v'>pub fn <a href='#method.push_punct' class=
 'fnname'>push_punct</a>(&amp;mut self, punctuation:
 P)</code><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#169-173' title=
+'../../src/syn/punctuated.rs.html#166-170' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Appends a trailing punctuation onto the end of this punctuated
@@ -454,7 +478,7 @@ title="enum core::option::Option">Option</a>&lt;<a class="enum"
 href="../../syn/punctuated/enum.Pair.html" title=
 "enum syn::punctuated::Pair">Pair</a>&lt;T,
 P&gt;&gt;</code><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#177-183' title=
+'../../src/syn/punctuated.rs.html#174-180' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Removes the last punctuated pair from this sequence, or
@@ -465,7 +489,7 @@ P&gt;&gt;</code><a class='srclink' href=
 'fnname'>trailing_punct</a>(&amp;self) -&gt; <a class="primitive"
 href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
-href='../../src/syn/punctuated.rs.html#187-189' title=
+href='../../src/syn/punctuated.rs.html#184-186' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Determines whether this punctuated sequence ends with a trailing
@@ -476,7 +500,7 @@ punctuation.</p>
 class='fnname'>empty_or_trailing</a>(&amp;self) -&gt; <a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
-href='../../src/syn/punctuated.rs.html#195-197' title=
+href='../../src/syn/punctuated.rs.html#192-194' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Returns true if either this <code>Punctuated</code> is empty, or
@@ -491,7 +515,7 @@ value: T) <span class="where fmt-newline">where<br>
 "https://doc.rust-lang.org/nightly/core/default/trait.Default.html"
 title=
 "trait core::default::Default">Default</a>,&nbsp;</span></code><a class='srclink'
-href='../../src/syn/punctuated.rs.html#204-212' title=
+href='../../src/syn/punctuated.rs.html#201-209' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Appends a syntax tree node onto the end of this punctuated
@@ -510,7 +534,7 @@ value: T) <span class="where fmt-newline">where<br>
 "https://doc.rust-lang.org/nightly/core/default/trait.Default.html"
 title=
 "trait core::default::Default">Default</a>,&nbsp;</span></code><a class='srclink'
-href='../../src/syn/punctuated.rs.html#220-231' title=
+href='../../src/syn/punctuated.rs.html#217-228' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Inserts an element at position <code>index</code>.</p>
@@ -533,7 +557,7 @@ class='fnname'>parse_terminated</a>(input: <a class="type" href=
 &nbsp;&nbsp;&nbsp;&nbsp;P: <a class="trait" href=
 "../../syn/parse/trait.Parse.html" title=
 "trait syn::parse::Parse">Parse</a>,&nbsp;</span></code><a class=
-'srclink' href='../../src/syn/punctuated.rs.html#242-248' title=
+'srclink' href='../../src/syn/punctuated.rs.html#239-245' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Parses zero or more occurrences of <code>T</code> separated by
@@ -564,7 +588,7 @@ title="type syn::parse::Result">Result</a>&lt;Self&gt; <span class=
 &nbsp;&nbsp;&nbsp;&nbsp;P: <a class="trait" href=
 "../../syn/parse/trait.Parse.html" title=
 "trait syn::parse::Parse">Parse</a>,&nbsp;</span></code><a class=
-'srclink' href='../../src/syn/punctuated.rs.html#262-285' title=
+'srclink' href='../../src/syn/punctuated.rs.html#259-282' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Parses zero or more occurrences of <code>T</code> using the
@@ -594,7 +618,7 @@ stream is expected to be parsed.</p>
 "trait syn::token::Token">Token</a> + <a class="trait" href=
 "../../syn/parse/trait.Parse.html" title=
 "trait syn::parse::Parse">Parse</a>,&nbsp;</span></code><a class=
-'srclink' href='../../src/syn/punctuated.rs.html#298-304' title=
+'srclink' href='../../src/syn/punctuated.rs.html#295-301' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Parses one or more occurrences of <code>T</code> separated by
@@ -629,7 +653,7 @@ title="type syn::parse::Result">Result</a>&lt;Self&gt; <span class=
 "trait syn::token::Token">Token</a> + <a class="trait" href=
 "../../syn/parse/trait.Parse.html" title=
 "trait syn::parse::Parse">Parse</a>,&nbsp;</span></code><a class=
-'srclink' href='../../src/syn/punctuated.rs.html#318-338' title=
+'srclink' href='../../src/syn/punctuated.rs.html#315-335' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Parses one or more occurrences of <code>T</code> using the given
@@ -698,14 +722,14 @@ title="trait core::default::Default">Default</a> for <a class=
 "struct" href="../../syn/punctuated/struct.Punctuated.html" title=
 "struct syn::punctuated::Punctuated">Punctuated</a>&lt;T,
 P&gt;</code><a href='#impl-Default' class='anchor'></a><a class=
-'srclink' href='../../src/syn/punctuated.rs.html#438-442' title=
+'srclink' href='../../src/syn/punctuated.rs.html#435-439' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.default' class="method hidden"><code id=
 'default.v'>fn <a href=
 'https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default'
 class='fnname'>default</a>() -&gt; Self</code><a class='srclink'
-href='../../src/syn/punctuated.rs.html#439-441' title=
+href='../../src/syn/punctuated.rs.html#436-438' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Returns the "default value" for a type. <a href=
@@ -724,7 +748,7 @@ title=
 "struct syn::punctuated::Punctuated">Punctuated</a>&lt;T,
 P&gt;</code><a href='#impl-Extend%3CPair%3CT%2C%20P%3E%3E' class=
 'anchor'></a><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#386-403' title=
+'../../src/syn/punctuated.rs.html#383-400' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.extend-1' class="method hidden"><code id=
@@ -737,7 +761,7 @@ title=
 = <a class="enum" href="../../syn/punctuated/enum.Pair.html" title=
 "enum syn::punctuated::Pair">Pair</a>&lt;T, P&gt;&gt;&gt;(&amp;mut
 self, i: I)</code><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#387-402' title=
+'../../src/syn/punctuated.rs.html#384-399' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Extends a collection with the contents of an iterator. <a href=
@@ -759,7 +783,7 @@ title=
 title=
 "trait core::default::Default">Default</a>,&nbsp;</span></code><a href='#impl-Extend%3CT%3E'
 class='anchor'></a><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#367-376' title=
+'../../src/syn/punctuated.rs.html#364-373' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.extend' class="method hidden"><code id='extend.v'>fn
@@ -770,7 +794,7 @@ class='fnname'>extend</a>&lt;I:&nbsp;<a class="trait" href=
 title=
 "trait core::iter::traits::collect::IntoIterator">IntoIterator</a>&lt;Item
 = T&gt;&gt;(&amp;mut self, i: I)</code><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#371-375' title=
+'../../src/syn/punctuated.rs.html#368-372' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Extends a collection with the contents of an iterator. <a href=
@@ -789,7 +813,7 @@ href="../../syn/punctuated/enum.Pair.html" title=
 "struct syn::punctuated::Punctuated">Punctuated</a>&lt;T,
 P&gt;</code><a href='#impl-FromIterator%3CPair%3CT%2C%20P%3E%3E'
 class='anchor'></a><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#378-384' title=
+'../../src/syn/punctuated.rs.html#375-381' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.from_iter-1' class="method hidden"><code id=
@@ -802,7 +826,7 @@ title=
 = <a class="enum" href="../../syn/punctuated/enum.Pair.html" title=
 "enum syn::punctuated::Pair">Pair</a>&lt;T, P&gt;&gt;&gt;(i: I)
 -&gt; Self</code><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#379-383' title=
+'../../src/syn/punctuated.rs.html#376-380' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Creates a value from an iterator. <a href=
@@ -824,7 +848,7 @@ for <a class="struct" href=
 title=
 "trait core::default::Default">Default</a>,&nbsp;</span></code><a href='#impl-FromIterator%3CT%3E'
 class='anchor'></a><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#356-365' title=
+'../../src/syn/punctuated.rs.html#353-362' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.from_iter' class="method hidden"><code id=
@@ -835,7 +859,7 @@ class='fnname'>from_iter</a>&lt;I:&nbsp;<a class="trait" href=
 title=
 "trait core::iter::traits::collect::IntoIterator">IntoIterator</a>&lt;Item
 = T&gt;&gt;(i: I) -&gt; Self</code><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#360-364' title=
+'../../src/syn/punctuated.rs.html#357-361' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Creates a value from an iterator. <a href=
@@ -854,7 +878,7 @@ for <a class="struct" href=
 "struct syn::punctuated::Punctuated">Punctuated</a>&lt;T,
 P&gt;</code><a href='#impl-Index%3Cusize%3E' class=
 'anchor'></a><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#859-872' title=
+'../../src/syn/punctuated.rs.html#856-869' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='associatedtype.Output' class="type"><code id=
@@ -874,7 +898,7 @@ href=
 "https://doc.rust-lang.org/nightly/core/ops/index/trait.Index.html#associatedtype.Output"
 title=
 "type core::ops::index::Index::Output">Output</a></code><a class=
-'srclink' href='../../src/syn/punctuated.rs.html#862-871' title=
+'srclink' href='../../src/syn/punctuated.rs.html#859-868' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the indexing (<code>container[index]</code>)
@@ -892,7 +916,7 @@ for <a class="struct" href=
 "struct syn::punctuated::Punctuated">Punctuated</a>&lt;T,
 P&gt;</code><a href='#impl-IndexMut%3Cusize%3E' class=
 'anchor'></a><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#874-885' title=
+'../../src/syn/punctuated.rs.html#871-882' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.index_mut' class="method hidden"><code id=
@@ -905,7 +929,7 @@ class='fnname'>index_mut</a>(&amp;mut self, index: <a class=
 "https://doc.rust-lang.org/nightly/core/ops/index/trait.Index.html#associatedtype.Output"
 title=
 "type core::ops::index::Index::Output">Output</a></code><a class=
-'srclink' href='../../src/syn/punctuated.rs.html#875-884' title=
+'srclink' href='../../src/syn/punctuated.rs.html#872-881' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the mutable indexing (<code>container[index]</code>)
@@ -922,7 +946,7 @@ for <a class="struct" href=
 "struct syn::punctuated::Punctuated">Punctuated</a>&lt;T,
 P&gt;</code><a href='#impl-IntoIterator' class=
 'anchor'></a><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#405-418' title=
+'../../src/syn/punctuated.rs.html#402-415' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='associatedtype.Item' class="type"><code id='Item.t'>type
@@ -948,7 +972,7 @@ class='fnname'>into_iter</a>(self) -&gt; Self::<a class="type"
 href="https://doc.rust-lang.org/nightly/core/iter/traits/collect/trait.IntoIterator.html#associatedtype.IntoIter"
 title=
 "type core::iter::traits::collect::IntoIterator::IntoIter">IntoIter</a></code><a class='srclink'
-href='../../src/syn/punctuated.rs.html#409-417' title=
+href='../../src/syn/punctuated.rs.html#406-414' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Creates an iterator from a value. <a href=
@@ -966,7 +990,7 @@ for &amp;'a <a class="struct" href=
 "struct syn::punctuated::Punctuated">Punctuated</a>&lt;T,
 P&gt;</code><a href='#impl-IntoIterator-1' class=
 'anchor'></a><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#420-427' title=
+'../../src/syn/punctuated.rs.html#417-424' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='associatedtype.Item-1' class="type"><code id=
@@ -994,7 +1018,7 @@ class='fnname'>into_iter</a>(self) -&gt; Self::<a class="type"
 href="https://doc.rust-lang.org/nightly/core/iter/traits/collect/trait.IntoIterator.html#associatedtype.IntoIter"
 title=
 "type core::iter::traits::collect::IntoIterator::IntoIter">IntoIter</a></code><a class='srclink'
-href='../../src/syn/punctuated.rs.html#424-426' title=
+href='../../src/syn/punctuated.rs.html#421-423' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Creates an iterator from a value. <a href=
@@ -1012,7 +1036,7 @@ for &amp;'a mut <a class="struct" href=
 "struct syn::punctuated::Punctuated">Punctuated</a>&lt;T,
 P&gt;</code><a href='#impl-IntoIterator-2' class=
 'anchor'></a><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#429-436' title=
+'../../src/syn/punctuated.rs.html#426-433' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='associatedtype.Item-2' class="type"><code id=
@@ -1041,7 +1065,7 @@ class='fnname'>into_iter</a>(self) -&gt; Self::<a class="type"
 href="https://doc.rust-lang.org/nightly/core/iter/traits/collect/trait.IntoIterator.html#associatedtype.IntoIter"
 title=
 "type core::iter::traits::collect::IntoIterator::IntoIter">IntoIter</a></code><a class='srclink'
-href='../../src/syn/punctuated.rs.html#433-435' title=
+href='../../src/syn/punctuated.rs.html#430-432' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Creates an iterator from a value. <a href=
@@ -1063,7 +1087,7 @@ Read more</a></p>
 "../../quote/to_tokens/trait.ToTokens.html" title=
 "trait quote::to_tokens::ToTokens">ToTokens</a>,&nbsp;</span></code><a href='#impl-ToTokens'
 class='anchor'></a><a class='srclink' href=
-'../../src/syn/punctuated.rs.html#893-901' title=
+'../../src/syn/punctuated.rs.html#890-898' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.to_tokens' class="method hidden"><code id=
@@ -1072,7 +1096,7 @@ class='anchor'></a><a class='srclink' href=
 class='fnname'>to_tokens</a>(&amp;self, tokens: &amp;mut <a class=
 "struct" href="../../proc_macro2/struct.TokenStream.html" title=
 "struct proc_macro2::TokenStream">TokenStream</a>)</code><a class=
-'srclink' href='../../src/syn/punctuated.rs.html#898-900' title=
+'srclink' href='../../src/syn/punctuated.rs.html#895-897' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Write <code>self</code> to the given <code>TokenStream</code>.

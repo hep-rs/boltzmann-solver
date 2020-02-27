@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.14/src/punctuated.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.16/src/punctuated.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>punctuated.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -988,9 +988,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="913">913</span>
 <span id="914">914</span>
 <span id="915">915</span>
-<span id="916">916</span>
-<span id="917">917</span>
-<span id="918">918</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -1179,6 +1176,20 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
+"doccomment">/// Mutably borrows the first element in this sequence.</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">first_mut</span>(<span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Option</span><span class=
+"op">&lt;</span><span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="ident">T</span><span class=
+"op">&gt;</span> {
+        <span class="self">self</span>.<span class=
+"ident">iter_mut</span>().<span class="ident">next</span>()
+    }
+
+    <span class=
 "doccomment">/// Borrows the last element in this sequence.</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">last</span>(<span class=
@@ -1187,21 +1198,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "prelude-ty">Option</span><span class="op">&lt;</span><span class=
 "kw-2">&</span><span class="ident">T</span><span class=
 "op">&gt;</span> {
-        <span class="kw">if</span> <span class=
-"self">self</span>.<span class="ident">last</span>.<span class=
-"ident">is_some</span>() {
-            <span class="self">self</span>.<span class=
-"ident">last</span>.<span class=
-"ident">as_ref</span>().<span class="ident">map</span>(<span class=
-"ident">Box</span>::<span class="ident">as_ref</span>)
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class=
-"ident">inner</span>.<span class="ident">last</span>().<span class=
-"ident">map</span>(<span class="op">|</span><span class=
-"ident">pair</span><span class="op">|</span> <span class=
-"kw-2">&</span><span class="ident">pair</span>.<span class=
-"number">0</span>)
-        }
+        <span class="self">self</span>.<span class=
+"ident">iter</span>().<span class="ident">next_back</span>()
     }
 
     <span class=
@@ -1214,22 +1212,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&lt;</span><span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class="ident">T</span><span class=
 "op">&gt;</span> {
-        <span class="kw">if</span> <span class=
-"self">self</span>.<span class="ident">last</span>.<span class=
-"ident">is_some</span>() {
-            <span class="self">self</span>.<span class=
-"ident">last</span>.<span class=
-"ident">as_mut</span>().<span class="ident">map</span>(<span class=
-"ident">Box</span>::<span class="ident">as_mut</span>)
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class=
-"ident">inner</span>.<span class=
-"ident">last_mut</span>().<span class=
-"ident">map</span>(<span class="op">|</span><span class=
-"ident">pair</span><span class="op">|</span> <span class=
-"kw-2">&</span><span class="kw-2">mut</span> <span class=
-"ident">pair</span>.<span class="number">0</span>)
-        }
+        <span class="self">self</span>.<span class=
+"ident">iter_mut</span>().<span class="ident">next_back</span>()
     }
 
     <span class=

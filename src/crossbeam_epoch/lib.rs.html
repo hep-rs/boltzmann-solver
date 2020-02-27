@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.8.0/src/lib.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.8.2/src/lib.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>lib.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -179,6 +179,8 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="104">104</span>
 <span id="105">105</span>
 <span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -264,7 +266,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">//! [`Collector`]: struct.Collector.html</span>
 <span class="doccomment">//! [`Shared`]: struct.Shared.html</span>
 <span class="doccomment">//! [`pin`]: fn.pin.html</span>
-<span class="doccomment">//! [`defer`]: fn.defer.html</span>
+<span class=
+"doccomment">//! [`defer`]: struct.Guard.html#method.defer</span>
 
 <span class="attribute">#![<span class=
 "ident">warn</span>(<span class=
@@ -292,6 +295,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span> <span class="string">"std"</span>)]</span>
 <span class="kw">extern</span> <span class=
 "kw">crate</span> <span class="ident">core</span>;
+
+<span class="kw">extern</span> <span class=
+"kw">crate</span> <span class="ident">maybe_uninit</span>;
 
 <span class="macro">cfg_if</span><span class="macro">!</span> {
     <span class="kw">if</span> <span class=

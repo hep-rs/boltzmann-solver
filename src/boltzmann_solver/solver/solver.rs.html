@@ -856,6 +856,56 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="780">780</span>
 <span id="781">781</span>
 <span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -897,8 +947,14 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="kw">pub</span> <span class=
 "kw">enum</span> <span class="ident">Error</span> {
     <span class=
+"doccomment">/// One or more initial density is specified multiple times.</span>
+    <span class="ident">DuplicateInitialDensities</span>,
+    <span class=
 "doccomment">/// The initial number densities are invalid.</span>
     <span class="ident">InvalidInitialDensities</span>,
+    <span class=
+"doccomment">/// One or more initial density asymmetry is specified multiple times.</span>
+    <span class="ident">DuplicateInitialAsymmetries</span>,
     <span class=
 "doccomment">/// The initial asymmetries are invalid.</span>
     <span class="ident">InvalidInitialAsymmetries</span>,
@@ -930,11 +986,26 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="kw">match</span> <span class=
 "self">self</span> {
             <span class="ident">Error</span>::<span class=
+"ident">DuplicateInitialDensities</span> <span class=
+"op">=</span><span class="op">&gt;</span> {
+                <span class="macro">write</span><span class=
+"macro">!</span>(<span class="ident">f</span>, <span class=
+"string">"one or more initial density is specified multiple times"</span>)
+            }
+            <span class="ident">Error</span>::<span class=
 "ident">InvalidInitialDensities</span> <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
 "macro">write</span><span class="macro">!</span>(<span class=
 "ident">f</span>, <span class=
 "string">"initial number densities are invalid"</span>),
+            <span class="ident">Error</span>::<span class=
+"ident">DuplicateInitialAsymmetries</span> <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"macro">write</span><span class="macro">!</span>(
+                <span class="ident">f</span>,
+                <span class=
+"string">"one or more initial density asymmetry is specified multiple times"</span>
+            ),
             <span class="ident">Error</span>::<span class=
 "ident">InvalidInitialAsymmetries</span> <span class=
 "op">=</span><span class="op">&gt;</span> {
@@ -993,14 +1064,12 @@ autocomplete="off" spellcheck="false" placeholder=
 "prelude-ty">Option</span><span class="op">&lt;</span><span class=
 "ident">M</span><span class="op">&gt;</span>,
     <span class="ident">initial_densities</span>: <span class=
-"prelude-ty">Option</span><span class="op">&lt;</span><span class=
-"ident">Array1</span><span class="op">&lt;</span><span class=
-"ident">f64</span><span class="op">&gt;</span><span class=
+"ident">Vec</span><span class="op">&lt;</span>(<span class=
+"ident">usize</span>, <span class="ident">f64</span>)<span class=
 "op">&gt;</span>,
     <span class="ident">initial_asymmetries</span>: <span class=
-"prelude-ty">Option</span><span class="op">&lt;</span><span class=
-"ident">Array1</span><span class="op">&lt;</span><span class=
-"ident">f64</span><span class="op">&gt;</span><span class=
+"ident">Vec</span><span class="op">&lt;</span>(<span class=
+"ident">usize</span>, <span class="ident">f64</span>)<span class=
 "op">&gt;</span>,
     <span class="ident">beta_range</span>: (<span class=
 "ident">f64</span>, <span class="ident">f64</span>),
@@ -1102,10 +1171,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "prelude-val">None</span>,
             <span class=
 "ident">initial_densities</span>: <span class=
-"prelude-val">None</span>,
+"ident">Vec</span>::<span class="ident">new</span>(),
             <span class=
 "ident">initial_asymmetries</span>: <span class=
-"prelude-val">None</span>,
+"ident">Vec</span>::<span class="ident">new</span>(),
             <span class="ident">beta_range</span>: (<span class=
 "number">1e-20</span>, <span class="number">1e0</span>),
             <span class="ident">in_equilibrium</span>: <span class=
@@ -1150,24 +1219,35 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Specify initial number densities explicitly.</span>
     <span class="doccomment">///</span>
     <span class=
+"doccomment">/// The specification is given as an iterator of `(usize, f64)` tuples where</span>
+    <span class=
+"doccomment">/// the first entry is the index of the particle whose equilibrium is</span>
+    <span class="doccomment">/// specified.</span>
+    <span class="doccomment">///</span>
+    <span class=
 "doccomment">/// If unspecified, all number densities are assumed to be in equilibrium to</span>
     <span class="doccomment">/// begin with.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// The list of number densities must be in the same order as the particles</span>
-    <span class="doccomment">/// in the model.</span>
+"doccomment">/// Repeated initial conditions will result in an error.</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class=
-"ident">initial_densities</span>(<span class=
-"kw-2">mut</span> <span class="self">self</span>, <span class=
-"ident">n</span>: <span class="ident">Array1</span><span class=
-"op">&lt;</span><span class="ident">f64</span><span class=
-"op">&gt;</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="self">Self</span> {
+"ident">initial_densities</span><span class=
+"op">&lt;</span><span class="ident">I</span><span class=
+"op">&gt;</span>(<span class="kw-2">mut</span> <span class=
+"self">self</span>, <span class="ident">n</span>: <span class=
+"ident">I</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">I</span>: <span class=
+"ident">IntoIterator</span><span class="op">&lt;</span><span class=
+"ident">Item</span> <span class="op">=</span> (<span class=
+"ident">usize</span>, <span class="ident">f64</span>)<span class=
+"op">&gt;</span>,
+    {
         <span class="self">self</span>.<span class=
-"ident">initial_densities</span> <span class=
-"op">=</span> <span class="prelude-val">Some</span>(<span class=
-"ident">n</span>);
+"ident">initial_densities</span>.<span class=
+"ident">extend</span>(<span class="ident">n</span>);
         <span class="self">self</span>
     }
 
@@ -1175,23 +1255,35 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Specify initial number density asymmetries explicitly.</span>
     <span class="doccomment">///</span>
     <span class=
+"doccomment">/// The specification is given as an iterator of `(usize, f64)` tuples where</span>
+    <span class=
+"doccomment">/// the first entry is the index of the particle whose asymmetry is</span>
+    <span class="doccomment">/// specified.</span>
+    <span class="doccomment">///</span>
+    <span class=
 "doccomment">/// If unspecified, all asymmetries are assumed to be 0 to begin with.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// The list of number densities must be in the same order as the particles</span>
-    <span class="doccomment">/// in the model.</span>
+"doccomment">/// The list of number density asymmetries must be in the same order as the</span>
+    <span class="doccomment">/// particles in the model.</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class=
-"ident">initial_asymmetries</span>(<span class=
-"kw-2">mut</span> <span class="self">self</span>, <span class=
-"ident">na</span>: <span class="ident">Array1</span><span class=
-"op">&lt;</span><span class="ident">f64</span><span class=
-"op">&gt;</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="self">Self</span> {
+"ident">initial_asymmetries</span><span class=
+"op">&lt;</span><span class="ident">I</span><span class=
+"op">&gt;</span>(<span class="kw-2">mut</span> <span class=
+"self">self</span>, <span class="ident">na</span>: <span class=
+"ident">I</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">I</span>: <span class=
+"ident">IntoIterator</span><span class="op">&lt;</span><span class=
+"ident">Item</span> <span class="op">=</span> (<span class=
+"ident">usize</span>, <span class="ident">f64</span>)<span class=
+"op">&gt;</span>,
+    {
         <span class="self">self</span>.<span class=
-"ident">initial_asymmetries</span> <span class=
-"op">=</span> <span class="prelude-val">Some</span>(<span class=
-"ident">na</span>);
+"ident">initial_asymmetries</span>.<span class=
+"ident">extend</span>(<span class="ident">na</span>);
         <span class="self">self</span>
     }
 
@@ -1492,47 +1584,62 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class=
 "doccomment">/// right number of initial conditions and they are all finite.</span>
     <span class="kw">fn</span> <span class=
-"ident">check_initial_densities</span>(
-        <span class="ident">initial_densities</span>: <span class=
-"kw-2">&</span><span class="ident">Array1</span><span class=
-"op">&lt;</span><span class="ident">f64</span><span class=
-"op">&gt;</span>,
+"ident">check_initial_densities</span><span class=
+"op">&lt;</span><span class="ident">I</span><span class=
+"op">&gt;</span>(
+        <span class="ident">beta</span>: <span class=
+"ident">f64</span>,
         <span class="ident">particles</span>: <span class=
 "kw-2">&</span>[<span class="ident">Particle</span>],
+        <span class="ident">initial_densities</span>: <span class=
+"ident">I</span>,
     ) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="prelude-ty">Result</span><span class=
-"op">&lt;</span>(), <span class="ident">Error</span><span class=
-"op">&gt;</span> {
+"op">&lt;</span><span class="ident">Array1</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>, <span class="ident">Error</span><span class=
+"op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">I</span>: <span class=
+"ident">IntoIterator</span><span class="op">&lt;</span><span class=
+"ident">Item</span> <span class="op">=</span> (<span class=
+"ident">usize</span>, <span class="ident">f64</span>)<span class=
+"op">&gt;</span>,
+    {
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">n</span> <span class=
+"op">=</span> <span class="ident">Array1</span>::<span class=
+"ident">from_iter</span>(
+            <span class="ident">particles</span>
+                .<span class="ident">iter</span>()
+                .<span class="ident">map</span>(<span class=
+"op">|</span><span class="ident">p</span><span class=
+"op">|</span> <span class="ident">p</span>.<span class=
+"ident">normalized_number_density</span>(<span class=
+"number">0.0</span>, <span class="ident">beta</span>)),
+        );
+
+        <span class="kw">for</span> (<span class=
+"ident">i</span>, <span class="ident">ni</span>) <span class=
+"kw">in</span> <span class="ident">initial_densities</span> {
+            <span class="ident">n</span>[<span class=
+"ident">i</span>] <span class="op">=</span> <span class=
+"ident">ni</span>;
+        }
+
         <span class="kw">if</span> <span class=
-"ident">initial_densities</span>.<span class=
-"ident">len</span>() <span class="op">!</span><span class=
-"op">=</span> <span class="ident">particles</span>.<span class=
-"ident">len</span>() {
-            <span class="ident">log</span>::<span class=
-"macro">error</span><span class="macro">!</span>(
-                <span class=
-"string">"Initial densities is not the same length as the number of particles in the model."</span>
-            );
-            <span class="kw">return</span> <span class=
-"prelude-val">Err</span>(<span class=
-"ident">Error</span>::<span class=
-"ident">InvalidInitialDensities</span>);
-        } <span class="kw">else</span> <span class=
-"kw">if</span> <span class="ident">initial_densities</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class=
-"op">|</span><span class="ident">v</span><span class=
-"op">|</span> <span class="op">!</span><span class=
-"ident">v</span>.<span class=
+"ident">n</span>.<span class="ident">iter</span>().<span class=
+"ident">any</span>(<span class="op">|</span><span class=
+"ident">v</span><span class="op">|</span> <span class=
+"op">!</span><span class="ident">v</span>.<span class=
 "ident">is_finite</span>() <span class="op">|</span><span class=
 "op">|</span> <span class="ident">v</span>.<span class=
-"ident">is_nan</span>())
-        {
+"ident">is_nan</span>()) {
             <span class="ident">log</span>::<span class=
 "macro">error</span><span class="macro">!</span>(
                 <span class=
 "string">"Some of initial densities are not finite or NaN:\n{:.3e}"</span>,
-                <span class="ident">initial_densities</span>
+                <span class="ident">n</span>
             );
             <span class="kw">return</span> <span class=
 "prelude-val">Err</span>(<span class=
@@ -1540,7 +1647,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">InvalidInitialDensities</span>);
         }
 
-        <span class="prelude-val">Ok</span>(())
+        <span class="prelude-val">Ok</span>(<span class=
+"ident">n</span>)
     }
 
     <span class=
@@ -1548,43 +1656,53 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class=
 "doccomment">/// right number of initial conditions and they are all finite.</span>
     <span class="kw">fn</span> <span class=
-"ident">check_initial_asymmetries</span>(
-        <span class=
-"ident">initial_asymmetries</span>: <span class="kw-2">&</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+"ident">check_initial_asymmetries</span><span class=
+"op">&lt;</span><span class="ident">I</span><span class=
+"op">&gt;</span>(
         <span class="ident">particles</span>: <span class=
 "kw-2">&</span>[<span class="ident">Particle</span>],
+        <span class=
+"ident">initial_asymmetries</span>: <span class="ident">I</span>,
     ) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="prelude-ty">Result</span><span class=
-"op">&lt;</span>(), <span class="ident">Error</span><span class=
-"op">&gt;</span> {
+"op">&lt;</span><span class="ident">Array1</span><span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>, <span class="ident">Error</span><span class=
+"op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">I</span>: <span class=
+"ident">IntoIterator</span><span class="op">&lt;</span><span class=
+"ident">Item</span> <span class="op">=</span> (<span class=
+"ident">usize</span>, <span class="ident">f64</span>)<span class=
+"op">&gt;</span>,
+    {
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">na</span> <span class=
+"op">=</span> <span class="ident">Array1</span>::<span class=
+"ident">zeros</span>(<span class=
+"ident">particles</span>.<span class="ident">len</span>());
+
+        <span class="kw">for</span> (<span class=
+"ident">i</span>, <span class="ident">nai</span>) <span class=
+"kw">in</span> <span class="ident">initial_asymmetries</span> {
+            <span class="ident">na</span>[<span class=
+"ident">i</span>] <span class="op">=</span> <span class=
+"ident">nai</span>;
+        }
+
         <span class="kw">if</span> <span class=
-"ident">initial_asymmetries</span>.<span class=
-"ident">len</span>() <span class="op">!</span><span class=
-"op">=</span> <span class="ident">particles</span>.<span class=
-"ident">len</span>() {
-            <span class="ident">log</span>::<span class=
-"macro">error</span><span class="macro">!</span>(<span class=
-"string">"Initial asymmetries is not the same length as the number of particles in the model."</span>);
-            <span class="kw">return</span> <span class=
-"prelude-val">Err</span>(<span class=
-"ident">Error</span>::<span class=
-"ident">InvalidInitialAsymmetries</span>);
-        } <span class="kw">else</span> <span class=
-"kw">if</span> <span class="ident">initial_asymmetries</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class=
-"op">|</span><span class="ident">v</span><span class=
-"op">|</span> <span class="op">!</span><span class=
-"ident">v</span>.<span class=
+"ident">na</span>.<span class="ident">iter</span>().<span class=
+"ident">any</span>(<span class="op">|</span><span class=
+"ident">v</span><span class="op">|</span> <span class=
+"op">!</span><span class="ident">v</span>.<span class=
 "ident">is_finite</span>() <span class="op">|</span><span class=
 "op">|</span> <span class="ident">v</span>.<span class=
-"ident">is_nan</span>())
-        {
+"ident">is_nan</span>()) {
             <span class="ident">log</span>::<span class=
 "macro">error</span><span class="macro">!</span>(
                 <span class=
-"string">"Some of initial asymmetries are not finite or NaN:\n{:.3e}"</span>,
-                <span class="ident">initial_asymmetries</span>
+"string">"Some of initial densities are not finite or NaN:\n{:.3e}"</span>,
+                <span class="ident">na</span>
             );
             <span class="kw">return</span> <span class=
 "prelude-val">Err</span>(<span class=
@@ -1592,7 +1710,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">InvalidInitialAsymmetries</span>);
         }
 
-        <span class="prelude-val">Ok</span>(())
+        <span class="prelude-val">Ok</span>(<span class=
+"ident">na</span>)
     }
 }
 
@@ -1798,49 +1917,94 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class=
 "comment">// If no initial densities were given, all particles are assumed to be</span>
         <span class="comment">// in equilibrium.</span>
+
+        <span class="kw">let</span> <span class=
+"ident">initial_densities_len</span> <span class=
+"op">=</span> <span class="self">self</span>.<span class=
+"ident">initial_densities</span>.<span class="ident">len</span>();
+        <span class="self">self</span>.<span class=
+"ident">initial_densities</span>.<span class=
+"ident">sort_unstable_by_key</span>(<span class=
+"op">|</span><span class="ident">t</span><span class=
+"op">|</span> <span class="ident">t</span>.<span class=
+"number">0</span>);
+        <span class="self">self</span>.<span class=
+"ident">initial_densities</span>.<span class=
+"ident">dedup_by_key</span>(<span class="op">|</span><span class=
+"ident">t</span><span class="op">|</span> <span class=
+"ident">t</span>.<span class="number">0</span>);
+        <span class="kw">if</span> <span class=
+"ident">initial_densities_len</span> <span class=
+"op">!</span><span class="op">=</span> <span class=
+"self">self</span>.<span class=
+"ident">initial_densities</span>.<span class="ident">len</span>() {
+            <span class="ident">log</span>::<span class=
+"macro">error</span><span class="macro">!</span>(<span class=
+"string">"At least one initial number density was specified twice."</span>);
+            <span class="kw">return</span> <span class=
+"prelude-val">Err</span>(<span class=
+"ident">Error</span>::<span class=
+"ident">DuplicateInitialDensities</span>);
+        }
         <span class="kw">let</span> <span class=
 "ident">initial_densities</span> <span class=
-"op">=</span> <span class="self">self</span>.<span class=
+"op">=</span> <span class="self">Self</span>::<span class=
+"ident">check_initial_densities</span>(
+            <span class="ident">beta_range</span>.<span class=
+"number">0</span>,
+            <span class="kw-2">&</span><span class=
+"ident">particles</span>,
+            <span class="self">self</span>.<span class=
 "ident">initial_densities</span>.<span class=
-"ident">unwrap_or_else</span>(<span class="op">|</span><span class=
-"op">|</span> {
-            <span class="ident">Array1</span>::<span class=
-"ident">from_iter</span>(
-                <span class="ident">particles</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class=
-"op">|</span><span class="ident">p</span><span class=
-"op">|</span> <span class="ident">p</span>.<span class=
-"ident">normalized_number_density</span>(<span class=
-"number">0.0</span>, <span class=
-"ident">beta_range</span>.<span class="number">0</span>)),
-            )
-        });
-        <span class="self">Self</span>::<span class=
-"ident">check_initial_densities</span>(<span class=
-"kw-2">&</span><span class=
-"ident">initial_densities</span>, <span class=
-"kw-2">&</span><span class="ident">particles</span>)<span class=
-"question-mark">?</span>;
+"ident">iter</span>().<span class="ident">cloned</span>(),
+        )<span class="question-mark">?</span>;
 
         <span class=
 "comment">// If no initial asymmetries were given, all particles are assumed to be</span>
         <span class=
 "comment">// in equilibrium with no asymmetry.</span>
         <span class="kw">let</span> <span class=
+"ident">initial_asymmetries_len</span> <span class=
+"op">=</span> <span class="self">self</span>.<span class=
+"ident">initial_asymmetries</span>.<span class=
+"ident">len</span>();
+        <span class="self">self</span>.<span class=
+"ident">initial_asymmetries</span>.<span class=
+"ident">sort_unstable_by_key</span>(<span class=
+"op">|</span><span class="ident">t</span><span class=
+"op">|</span> <span class="ident">t</span>.<span class=
+"number">0</span>);
+        <span class="self">self</span>.<span class=
+"ident">initial_asymmetries</span>.<span class=
+"ident">dedup_by_key</span>(<span class="op">|</span><span class=
+"ident">t</span><span class="op">|</span> <span class=
+"ident">t</span>.<span class="number">0</span>);
+        <span class="kw">if</span> <span class=
+"ident">initial_asymmetries_len</span> <span class=
+"op">!</span><span class="op">=</span> <span class=
+"self">self</span>.<span class=
+"ident">initial_asymmetries</span>.<span class=
+"ident">len</span>() {
+            <span class="ident">log</span>::<span class=
+"macro">error</span><span class="macro">!</span>(<span class=
+"string">"At least one initial number density was specified twice."</span>);
+            <span class="kw">return</span> <span class=
+"prelude-val">Err</span>(<span class=
+"ident">Error</span>::<span class=
+"ident">DuplicateInitialAsymmetries</span>);
+        }
+        <span class="kw">let</span> <span class=
 "ident">initial_asymmetries</span> <span class=
-"op">=</span> <span class="self">self</span>
-            .<span class="ident">initial_asymmetries</span>
-            .<span class="ident">unwrap_or_else</span>(<span class=
-"op">|</span><span class="op">|</span> <span class=
-"ident">Array1</span>::<span class=
-"ident">zeros</span>(<span class="ident">particles</span>.<span class="ident">len</span>()));
+"op">=</span> <span class="ident">Array1</span>::<span class=
+"ident">zeros</span>(<span class=
+"ident">particles</span>.<span class="ident">len</span>());
         <span class="self">Self</span>::<span class=
 "ident">check_initial_asymmetries</span>(<span class=
-"kw-2">&</span><span class=
-"ident">initial_asymmetries</span>, <span class=
-"kw-2">&</span><span class="ident">particles</span>)<span class=
-"question-mark">?</span>;
+"kw-2">&</span><span class="ident">particles</span>, <span class=
+"self">self</span>.<span class=
+"ident">initial_asymmetries</span>.<span class=
+"ident">iter</span>().<span class=
+"ident">cloned</span>())<span class="question-mark">?</span>;
 
         <span class=
 "comment">// Make sure that there aren't too many particles held in equilibrium or</span>
@@ -2211,6 +2375,23 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">step_precision</span>.<span class="ident">max</span>);
         <span class="kw">let</span> <span class=
 "kw-2">mut</span> <span class="ident">advance</span>;
+
+        <span class="comment">// Run logger for 0th step</span>
+        {
+            <span class="self">self</span>.<span class=
+"ident">model</span>.<span class=
+"ident">set_beta</span>(<span class="ident">beta</span>);
+            <span class="kw">let</span> <span class=
+"ident">c</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class="ident">context</span>(<span class=
+"ident">step</span>, <span class="ident">h</span>, <span class=
+"ident">beta</span>, <span class="kw-2">&</span><span class=
+"ident">n</span>, <span class="kw-2">&</span><span class=
+"ident">na</span>);
+            (<span class="kw-2">*</span><span class=
+"self">self</span>.<span class="ident">logger</span>)(<span class=
+"kw-2">&</span><span class="ident">c</span>);
+        }
 
         <span class="kw">while</span> <span class=
 "ident">beta</span> <span class="op">&lt;</span> <span class=

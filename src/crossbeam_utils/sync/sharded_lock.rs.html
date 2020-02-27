@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-utils-0.7.0/src/sync/sharded_lock.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-utils-0.7.2/src/sync/sharded_lock.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>sharded_lock.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href=
@@ -674,6 +674,14 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="598">598</span>
 <span id="599">599</span>
 <span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -699,16 +707,16 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">UnwindSafe</span>};
 <span class="kw">use</span> <span class=
 "ident">std</span>::<span class="ident">sync</span>::{<span class=
-"ident">Mutex</span>, <span class=
-"ident">RwLock</span>, <span class=
-"ident">RwLockReadGuard</span>, <span class=
-"ident">RwLockWriteGuard</span>};
-<span class="kw">use</span> <span class=
-"ident">std</span>::<span class="ident">sync</span>::{<span class=
 "ident">LockResult</span>, <span class=
 "ident">PoisonError</span>, <span class=
 "ident">TryLockError</span>, <span class=
 "ident">TryLockResult</span>};
+<span class="kw">use</span> <span class=
+"ident">std</span>::<span class="ident">sync</span>::{<span class=
+"ident">Mutex</span>, <span class=
+"ident">RwLock</span>, <span class=
+"ident">RwLockReadGuard</span>, <span class=
+"ident">RwLockWriteGuard</span>};
 <span class="kw">use</span> <span class=
 "ident">std</span>::<span class=
 "ident">thread</span>::{<span class="self">self</span>, <span class="ident">ThreadId</span>};
@@ -895,16 +903,19 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="ident">shards</span>: (<span class=
 "number">0</span>..<span class="ident">NUM_SHARDS</span>)
                 .<span class="ident">map</span>(<span class=
-"op">|</span><span class="kw">_</span><span class=
-"op">|</span> <span class="ident">CachePadded</span>::<span class=
-"ident">new</span>(<span class="ident">Shard</span> {
-                    <span class="ident">lock</span>: <span class=
-"ident">RwLock</span>::<span class="ident">new</span>(()),
+"op">|</span><span class="kw">_</span><span class="op">|</span> {
                     <span class=
+"ident">CachePadded</span>::<span class=
+"ident">new</span>(<span class="ident">Shard</span> {
+                        <span class=
+"ident">lock</span>: <span class=
+"ident">RwLock</span>::<span class="ident">new</span>(()),
+                        <span class=
 "ident">write_guard</span>: <span class=
 "ident">UnsafeCell</span>::<span class=
 "ident">new</span>(<span class="prelude-val">None</span>),
-                }))
+                    })
+                })
                 .<span class="ident">collect</span>::<span class=
 "op">&lt;</span><span class="ident">Vec</span><span class=
 "op">&lt;</span><span class="kw">_</span><span class=
@@ -1152,7 +1163,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Poisoned</span>(<span class=
 "ident">PoisonError</span>::<span class=
 "ident">new</span>(<span class="ident">guard</span>)))
-            },
+            }
             <span class="prelude-val">Err</span>(<span class=
 "ident">TryLockError</span>::<span class=
 "ident">WouldBlock</span>) <span class="op">=</span><span class=
@@ -1321,7 +1332,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "bool-val">true</span>;
                     <span class="ident">err</span>.<span class=
 "ident">into_inner</span>()
-                },
+                }
                 <span class="prelude-val">Err</span>(<span class=
 "ident">TryLockError</span>::<span class=
 "ident">WouldBlock</span>) <span class="op">=</span><span class=
@@ -1549,27 +1560,29 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>.<span class="ident">try_read</span>() {
             <span class="prelude-val">Ok</span>(<span class=
 "ident">guard</span>) <span class="op">=</span><span class=
-"op">&gt;</span> <span class="ident">f</span>.<span class=
+"op">&gt;</span> <span class="ident">f</span>
+                .<span class=
 "ident">debug_struct</span>(<span class=
-"string">"ShardedLock"</span>).<span class=
-"ident">field</span>(<span class=
+"string">"ShardedLock"</span>)
+                .<span class="ident">field</span>(<span class=
 "string">"data"</span>, <span class="kw-2">&</span><span class=
 "kw-2">&</span><span class="kw-2">*</span><span class=
-"ident">guard</span>).<span class="ident">finish</span>(),
+"ident">guard</span>)
+                .<span class="ident">finish</span>(),
             <span class="prelude-val">Err</span>(<span class=
 "ident">TryLockError</span>::<span class=
 "ident">Poisoned</span>(<span class=
 "ident">err</span>)) <span class="op">=</span><span class=
-"op">&gt;</span> {
-                <span class="ident">f</span>.<span class=
+"op">&gt;</span> <span class="ident">f</span>
+                .<span class=
 "ident">debug_struct</span>(<span class=
-"string">"ShardedLock"</span>).<span class=
-"ident">field</span>(<span class=
+"string">"ShardedLock"</span>)
+                .<span class="ident">field</span>(<span class=
 "string">"data"</span>, <span class="kw-2">&</span><span class=
 "kw-2">&</span><span class="kw-2">*</span><span class=
 "kw-2">*</span><span class="ident">err</span>.<span class=
-"ident">get_ref</span>()).<span class="ident">finish</span>()
-            },
+"ident">get_ref</span>())
+                .<span class="ident">finish</span>(),
             <span class="prelude-val">Err</span>(<span class=
 "ident">TryLockError</span>::<span class=
 "ident">WouldBlock</span>) <span class="op">=</span><span class=
@@ -1594,11 +1607,11 @@ autocomplete="off" spellcheck="false" placeholder=
                 }
                 <span class="ident">f</span>.<span class=
 "ident">debug_struct</span>(<span class=
-"string">"ShardedLock"</span>).<span class=
-"ident">field</span>(<span class=
+"string">"ShardedLock"</span>)
+                    .<span class="ident">field</span>(<span class=
 "string">"data"</span>, <span class="kw-2">&</span><span class=
-"ident">LockedPlaceholder</span>).<span class=
-"ident">finish</span>()
+"ident">LockedPlaceholder</span>)
+                    .<span class="ident">finish</span>()
             }
         }
     }
