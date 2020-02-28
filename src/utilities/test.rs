@@ -1,20 +1,17 @@
 //! Utility function for testing
 
-use log::debug;
-
 /// Check whether two numbers are equal to each other within the specified
-/// precision and absolute error.
+/// relative and and absolute error.
 ///
-/// Note that the absolute error really should be `0.0`.  Floating points
-/// are designed to handle values across a very broad range and their
-/// relative error really is more important.  Having said that, in this
-/// situation small values will appear when we have a vanishing number
-/// density and therefore it is reasonable to ignore large relative errors
-/// for very small values as they ultimately have a small physical impact.
+/// Note that the absolute error really should be `0.0`.  Floating points are
+/// designed to handle values across a very broad range and their relative error
+/// really is more important.  Having said that, in this situation small values
+/// will appear when we have a vanishing number density and therefore it is
+/// reasonable to ignore large relative errors for very small values as they
+/// ultimately have a small physical impact.
 ///
-/// The precision is specified in decimal
-/// significant figures.
-pub(crate) fn approx_eq(a: f64, b: f64, precision: f64, abs: f64) {
+/// The relative error is specified in decimal significant figures.
+pub(crate) fn approx_eq(a: f64, b: f64, eps_rel: f64, eps_abs: f64) {
     // If neither are numbers, they are not comparable
     if a.is_nan() {
         panic!("a is NaN.");
@@ -26,7 +23,7 @@ pub(crate) fn approx_eq(a: f64, b: f64, precision: f64, abs: f64) {
     // If they are already identical, return.  They could both be infinite
     // at this stage (which is fine)
     if a == b {
-        debug!("a and b are identical");
+        log::debug!("a and b are identical");
         return;
     }
 
@@ -41,11 +38,11 @@ pub(crate) fn approx_eq(a: f64, b: f64, precision: f64, abs: f64) {
     }
 
     // Check if their absolute error is acceptable
-    if (a - b).abs() < abs {
-        debug!(
+    if (a - b).abs() < eps_abs {
+        log::debug!(
             "a and b are within the absolute error ({} < {}).",
             (a - b).abs(),
-            abs
+            eps_abs
         );
         return;
     }
@@ -59,13 +56,13 @@ pub(crate) fn approx_eq(a: f64, b: f64, precision: f64, abs: f64) {
     let b_scaled = b / scale;
 
     let p = (a_scaled - b_scaled).abs();
-    if p <= 10_f64.powf(-precision) {
-        debug!(
+    if p <= 10_f64.powf(-eps_rel) {
+        log::debug!(
             "a ({:e}) and b ({:e}) have the necessary precision ({:.3} ≥ {:.3})",
             a,
             b,
             -p.log10(),
-            precision
+            eps_rel
         );
     } else {
         panic!(
@@ -73,7 +70,7 @@ pub(crate) fn approx_eq(a: f64, b: f64, precision: f64, abs: f64) {
             a,
             b,
             -p.log10(),
-            precision
+            eps_rel
         )
     }
 }
