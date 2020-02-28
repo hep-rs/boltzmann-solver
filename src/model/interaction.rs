@@ -74,7 +74,7 @@ impl InteractionParticles {
             s.push(' ');
         }
 
-        s.push_str("->");
+        s.push_str("↔");
 
         if let Some(&p) = self.outgoing.first() {
             s.push(' ');
@@ -327,18 +327,23 @@ where
 
         // DEBUG
         // let particles = self.particles();
-        // log::trace!(
-        //     "γ({:?} ↔ {:?}) = {:<10.3e}",
-        //     particles.incoming,
-        //     particles.outgoing,
-        //     net_rate
-        // );
-        // log::trace!(
-        //     "γ'({:?} ↔ {:?}) = {:<10.3e}",
-        //     particles.incoming,
-        //     particles.outgoing,
-        //     net_asymmetric_rate
-        // );
+        // if let Ok(interaction) = particles.display(c.model) {
+        //     log::trace!("γ({}) = {:<10.3e}", interaction, net_rate);
+        //     log::trace!("γ'({}) = {:<10.3e}", interaction, net_asymmetric_rate);
+        // } else {
+        //     log::trace!(
+        //         "γ({:?} ↔ {:?}) = {:<10.3e}",
+        //         particles.incoming,
+        //         particles.outgoing,
+        //         net_rate
+        //     );
+        //     log::trace!(
+        //         "γ'({:?} ↔ {:?}) = {:<10.3e}",
+        //         particles.incoming,
+        //         particles.outgoing,
+        //         net_asymmetric_rate
+        //     );
+        // }
 
         for (&p, a) in particles_idx.incoming.iter().zip(&particles_sign.incoming) {
             dn[p] -= net_rate;
