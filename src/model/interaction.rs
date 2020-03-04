@@ -267,11 +267,20 @@ where
         const ALPHA_N: f64 = 1.1;
         const ALPHA_NA: f64 = 1.1;
 
-        let mut rate = rate?;
-        rate *= c.step_size * c.normalization;
+        let mut rate = rate? * c.step_size * c.normalization;
 
         let particles_idx = self.particles_idx();
         let particles_sign = self.particles_sign();
+
+        // DEBUG
+        // let particles = self.particles();
+        // log::trace!(
+        //     "{:<10}: ↔ {:<12.3e} | → {:<12.3e} | ← {:<12.3e}",
+        //     particles.display(c.model).unwrap(),
+        //     rate.net_rate(),
+        //     rate.forward,
+        //     rate.backward
+        // );
 
         let mut net_rate = rate.net_rate();
         let mut net_asymmetric_rate = rate.net_asymmetric_rate();
@@ -280,6 +289,12 @@ where
             for (&p, a) in particles_idx.incoming.iter().zip(&particles_sign.incoming) {
                 if overshoots(c, p, -net_rate) {
                     rate.forward = (c.n[p] - c.eq[p]) / ALPHA_N + rate.backward;
+                    // log::trace!(
+                    //     "    adj → : ↔ {:<12.3e} | → {:<12.3e} | ← {:<12.3e}",
+                    //     rate.net_rate(),
+                    //     rate.forward,
+                    //     rate.backward
+                    // );
                     net_rate = rate.net_rate();
                 }
                 if asymmetry_overshoots(c, p, -a * net_asymmetric_rate) {
@@ -290,6 +305,12 @@ where
             for (&p, a) in particles_idx.outgoing.iter().zip(&particles_sign.outgoing) {
                 if overshoots(c, p, net_rate) {
                     rate.backward = (c.n[p] - c.eq[p]) / ALPHA_N + rate.forward;
+                    // log::trace!(
+                    //     "    adj ← : ↔ {:<12.3e} | → {:<12.3e} | ← {:<12.3e}",
+                    //     rate.net_rate(),
+                    //     rate.forward,
+                    //     rate.backward
+                    // );
                     net_rate = rate.net_rate();
                 }
                 if asymmetry_overshoots(c, p, a * net_asymmetric_rate) {
@@ -378,6 +399,7 @@ pub fn asymmetry_overshoots<M>(c: &Context<M>, i: usize, rate: f64) -> bool {
 }
 
 /// Converts NaN floating points to 0
+#[must_use]
 fn nan_to_zero(v: f64) -> f64 {
     if v.is_nan() {
         0.0

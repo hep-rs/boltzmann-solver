@@ -403,10 +403,10 @@ where
         .chain(&rec_geomspace(beta_range.0, beta_range.1, N))
         .enumerate()
         {
-            if i % 64 == 0 {
-                log::debug!("Precomputing step {} / {}", i, 2_usize.pow(N) + 4);
+            if i % 64 == 3 {
+                log::debug!("Precomputing step {} / {}", i, 2_usize.pow(N) + 3);
             } else {
-                log::trace!("Precomputing step {} / {}", i, 2_usize.pow(N) + 4);
+                log::trace!("Precomputing step {} / {}", i, 2_usize.pow(N) + 3);
             }
             model.set_beta(beta);
             let c = model.as_context();
@@ -435,10 +435,10 @@ where
         .chain(&rec_geomspace(beta_range.0, beta_range.1, N))
         .enumerate()
         {
-            if i % 64 == 0 {
-                log::debug!("Precomputing step {} / {}", i, 2_usize.pow(N) + 4);
+            if i % 64 == 3 {
+                log::debug!("Precomputing step {} / {}", i, 2_usize.pow(N) + 3);
             } else {
-                log::trace!("Precomputing step {} / {}", i, 2_usize.pow(N) + 4);
+                log::trace!("Precomputing step {} / {}", i, 2_usize.pow(N) + 3);
             }
             model.set_beta(beta);
             let c = model.as_context();
@@ -657,16 +657,15 @@ where
             // Log the progress of the integration
             if step % 100 == 0 {
                 log::info!("Step {}, β = {:.4e}", step, beta);
-            // log::info!("n = {:.3e}", n);
             } else if step % 10 == 0 {
                 log::debug!("Step {}, β = {:.4e}", step, beta);
-            // log::debug!("n = {:.3e}", n);
             } else {
                 log::trace!("Step {}, β = {:.4e}, h = {:.4e}", step, beta, h);
-                // log::trace!("n = {:.3e}", n);
             }
 
             for i in 0..RK_S {
+                // DEBUG
+                // log::trace!("i = {}", i);
                 evals += 1;
 
                 // Compute the sub-step values
