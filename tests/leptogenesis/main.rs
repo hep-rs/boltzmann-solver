@@ -441,7 +441,6 @@ pub fn scan() -> Result<(), Box<dyn error::Error>> {
 
 #[test]
 fn masses_widths() -> Result<(), Box<dyn error::Error>> {
-    // Setup logging
     // common::setup_logging(1);
 
     let mut model = LeptogenesisModel::zero();
@@ -519,14 +518,14 @@ pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
         let csv = csv::Writer::from_path(output_dir.join(format!("{:03}.csv", i))).unwrap();
 
         let mut model = LeptogenesisModel::zero();
-        for i in &[
-            interaction::hha,
-            // interaction::hhw,
-        ] {
+        for i in &[interaction::hha, interaction::hhw] {
             model
                 .interactions
                 .extend(i().drain(..).map(common::into_interaction_box));
         }
+
+        let p_h = LeptogenesisModel::particle_idx("H", 0).unwrap();
+        let n_eq = model.particles()[p_h].normalized_number_density(0.0, beta);
 
         // Collect the names now as SolverBuilder takes ownership of the model
         // later.
@@ -535,10 +534,7 @@ pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
         let builder = SolverBuilder::new()
             .model(model)
             .beta_range(beta, beta * 10.0)
-            .initial_densities(vec![(
-                LeptogenesisModel::particle_idx("H", 0).unwrap(),
-                1e1,
-            )]);
+            .initial_densities(vec![(p_h, 1.1 * n_eq)]);
 
         solve(builder, &names, Some(csv)).unwrap();
     });
@@ -549,7 +545,6 @@ pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
 #[test]
 #[cfg(not(debug_assertions))]
 fn gammas() -> Result<(), Box<dyn error::Error>> {
-    // Setup logging
     // common::setup_logging(1);
 
     // We'll be using models[0] as the precomputed (default) model, and
@@ -565,6 +560,8 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
             interaction::hln,
             interaction::hha,
             interaction::hhw,
+            interaction::ffa,
+            interaction::ffw,
         ] {
             model.interactions.extend(
                 i().drain(..)
