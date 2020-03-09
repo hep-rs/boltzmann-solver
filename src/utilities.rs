@@ -186,7 +186,7 @@ pub fn propagator(q2: f64, p: &Particle) -> Complex<f64> {
 
 #[cfg(test)]
 mod tests {
-    use crate::utilities::test::*;
+    use crate::utilities::test::approx_eq;
 
     #[test]
     fn t_range() {

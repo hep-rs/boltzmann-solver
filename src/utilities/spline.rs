@@ -346,7 +346,7 @@ mod benches {
 
     #[bench]
     fn spline_add_linear(b: &mut Bencher) {
-        let data: Vec<_> = Array1::linspace(0.0, 1.0, 2usize.pow(RECURSIONS))
+        let data: Vec<_> = Array1::linspace(0.0, 1.0, 2_usize.pow(RECURSIONS))
             .iter()
             .map(|&x| (x, f(x)))
             .collect();
@@ -387,7 +387,7 @@ mod benches {
             }
         }
 
-        let xs = Array1::linspace(0.0, 1.0, 2usize.pow(RECURSIONS));
+        let xs = Array1::linspace(0.0, 1.0, 2_usize.pow(RECURSIONS));
 
         b.iter(|| {
             for &x in &xs {

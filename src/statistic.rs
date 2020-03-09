@@ -326,7 +326,7 @@ impl Statistics for Statistic {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::utilities::test::*;
+    use crate::utilities::test::approx_eq;
     use std::f64;
 
     type Row6 = (f64, f64, f64, f64, f64, f64);
