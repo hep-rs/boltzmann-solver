@@ -236,30 +236,31 @@ where
             return None;
         }
         let gamma_tilde = gamma_tilde.unwrap();
+        let particles_sign = self.particles_sign();
 
         // Get the masses
         let p0 = self.particles_idx.incoming[0];
         let p1 = self.particles_idx.outgoing[0];
         let p2 = self.particles_idx.outgoing[1];
 
-        let forward = gamma_tilde * c.n[p0];
-        let backward =
-            gamma_tilde * c.eq[p0] * nan_to_zero((c.n[p1] / c.eq[p1]) * (c.n[p2] / c.eq[p2]));
+        let [n0, n1, n2] = [c.n[p0], c.n[p1], c.n[p2]];
+        let [na0, na1, na2] = [c.na[p0], c.na[p1], c.na[p2]];
+        let [eq0, eq1, eq2] = [c.eq[p0], c.eq[p1], c.eq[p2]];
+        let [a0, a1, a2] = [
+            particles_sign.incoming[0],
+            particles_sign.outgoing[0],
+            particles_sign.outgoing[1],
+        ];
 
-        let particles_sign = self.particles_sign();
+        let forward = gamma_tilde * n0;
+        let backward = gamma_tilde * eq0 * nan_to_one((n1 / eq1) * (n2 / eq2));
 
-        let asymmetric_forward = gamma_tilde * particles_sign.incoming[0] * c.na[p0];
+        let asymmetric_forward = gamma_tilde * a0 * na0;
         let asymmetric_backward = gamma_tilde
-            * c.eq[p0]
-            * nan_to_zero(
-                (c.n[p1] * particles_sign.outgoing[1] * c.na[p2]
-                    + c.n[p2] * particles_sign.outgoing[0] * c.na[p1]
-                    - particles_sign.outgoing[0]
-                        * particles_sign.outgoing[1]
-                        * c.na[p1]
-                        * c.na[p2])
-                    / (c.eq[p1] * c.eq[p2]),
-            );
+            * eq0
+            * (a1 * nan_to_zero(na1 / eq1) * nan_to_one(n2 / eq2)
+                + a2 * nan_to_zero(na2 / eq2) * nan_to_one(n1 / eq1)
+                - a2 * a1 * nan_to_zero(na1 * na2 / (eq1 * eq2)));
 
         Some(RateDensity {
             forward,
@@ -274,6 +275,15 @@ where
 fn nan_to_zero(v: f64) -> f64 {
     if v.is_nan() {
         0.0
+    } else {
+        v
+    }
+}
+
+/// Converts NaN floating points to 0
+fn nan_to_one(v: f64) -> f64 {
+    if v.is_nan() {
+        1.0
     } else {
         v
     }

@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::{fmt, ops};
 
 /// Partial width from a particle.
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct RateDensity {
     /// Forward rate for the number density
