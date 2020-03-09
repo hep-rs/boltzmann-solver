@@ -589,9 +589,9 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
         .enumerate()
     {
         if i % 64 == 3 {
-            log::debug!("Precomputing step {} / {}", i, 2usize.pow(N) + 4 - 1);
+            log::debug!("Precomputing step {} / {}", i, 2_usize.pow(N) + 4 - 1);
         } else {
-            log::trace!("Precomputing step {} / {}", i, 2usize.pow(N) + 4 - 1);
+            log::trace!("Precomputing step {} / {}", i, 2_usize.pow(N) + 4 - 1);
         }
 
         let model = &mut models[0];

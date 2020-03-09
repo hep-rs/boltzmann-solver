@@ -253,7 +253,7 @@ impl Particle {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::utilities::test::*;
+    use crate::utilities::test::approx_eq;
 
     #[test]
     fn real_scalar() {

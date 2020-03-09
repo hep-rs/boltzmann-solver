@@ -37,7 +37,7 @@ pub mod rk98;
 
 #[cfg(test)]
 mod tests {
-    use crate::utilities::test::*;
+    use crate::utilities::test::approx_eq;
     use ndarray::{array, prelude::*};
     use std::{f64::consts::PI, mem, ptr};
 
