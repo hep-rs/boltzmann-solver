@@ -77,6 +77,11 @@ where
         1.35977e-19 * self.entropy_dof(beta).sqrt() * beta.powi(-2)
     }
 
+    /// Return the number of particles in the model.
+    fn len_particles(&self) -> usize {
+        self.particles().len()
+    }
+
     /// Return a list of particles in the model.
     fn particles(&self) -> &[Particle];
 
