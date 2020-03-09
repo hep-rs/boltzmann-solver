@@ -334,7 +334,7 @@ impl<M> SolverBuilder<M> {
         I: IntoIterator<Item = (usize, f64)>,
     {
         let mut n: Array1<_> = particles
-                .iter()
+            .iter()
             .map(|p| p.normalized_number_density(0.0, beta))
             .collect();
 
@@ -822,8 +822,8 @@ fn equilibrium_number_densities<'a, I>(particles: I, beta: f64) -> Array1<f64>
 where
     I: IntoIterator<Item = &'a Particle>,
 {
-        particles
-            .into_iter()
+    particles
+        .into_iter()
         .map(|p| p.normalized_number_density(0.0, beta))
         .collect()
 }
