@@ -354,6 +354,16 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="278">278</span>
 <span id="279">279</span>
 <span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -943,6 +953,10 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="kw">let</span> <span class=
 "ident">gamma_tilde</span> <span class="op">=</span> <span class=
 "ident">gamma_tilde</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class=
+"ident">particles_sign</span> <span class=
+"op">=</span> <span class="self">self</span>.<span class=
+"ident">particles_sign</span>();
 
         <span class="comment">// Get the masses</span>
         <span class="kw">let</span> <span class=
@@ -961,73 +975,89 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">particles_idx</span>.<span class=
 "ident">outgoing</span>[<span class="number">1</span>];
 
+        <span class="kw">let</span> [<span class=
+"ident">n0</span>, <span class="ident">n1</span>, <span class=
+"ident">n2</span>] <span class="op">=</span> [<span class=
+"ident">c</span>.<span class="ident">n</span>[<span class=
+"ident">p0</span>], <span class="ident">c</span>.<span class=
+"ident">n</span>[<span class="ident">p1</span>], <span class=
+"ident">c</span>.<span class="ident">n</span>[<span class=
+"ident">p2</span>]];
+        <span class="kw">let</span> [<span class=
+"ident">na0</span>, <span class="ident">na1</span>, <span class=
+"ident">na2</span>] <span class="op">=</span> [<span class=
+"ident">c</span>.<span class="ident">na</span>[<span class=
+"ident">p0</span>], <span class="ident">c</span>.<span class=
+"ident">na</span>[<span class="ident">p1</span>], <span class=
+"ident">c</span>.<span class="ident">na</span>[<span class=
+"ident">p2</span>]];
+        <span class="kw">let</span> [<span class=
+"ident">eq0</span>, <span class="ident">eq1</span>, <span class=
+"ident">eq2</span>] <span class="op">=</span> [<span class=
+"ident">c</span>.<span class="ident">eq</span>[<span class=
+"ident">p0</span>], <span class="ident">c</span>.<span class=
+"ident">eq</span>[<span class="ident">p1</span>], <span class=
+"ident">c</span>.<span class="ident">eq</span>[<span class=
+"ident">p2</span>]];
+        <span class="kw">let</span> [<span class=
+"ident">a0</span>, <span class="ident">a1</span>, <span class=
+"ident">a2</span>] <span class="op">=</span> [
+            <span class="ident">particles_sign</span>.<span class=
+"ident">incoming</span>[<span class="number">0</span>],
+            <span class="ident">particles_sign</span>.<span class=
+"ident">outgoing</span>[<span class="number">0</span>],
+            <span class="ident">particles_sign</span>.<span class=
+"ident">outgoing</span>[<span class="number">1</span>],
+        ];
+
         <span class="kw">let</span> <span class=
 "ident">forward</span> <span class="op">=</span> <span class=
 "ident">gamma_tilde</span> <span class="op">*</span> <span class=
-"ident">c</span>.<span class="ident">n</span>[<span class=
-"ident">p0</span>];
+"ident">n0</span>;
         <span class="kw">let</span> <span class=
-"ident">backward</span> <span class="op">=</span>
-            <span class="ident">gamma_tilde</span> <span class=
-"op">*</span> <span class="ident">c</span>.<span class=
-"ident">eq</span>[<span class="ident">p0</span>] <span class=
-"op">*</span> <span class="ident">nan_to_zero</span>((<span class=
-"ident">c</span>.<span class="ident">n</span>[<span class=
-"ident">p1</span>] <span class="op">/</span> <span class=
-"ident">c</span>.<span class="ident">eq</span>[<span class=
-"ident">p1</span>]) <span class="op">*</span> (<span class=
-"ident">c</span>.<span class="ident">n</span>[<span class=
-"ident">p2</span>] <span class="op">/</span> <span class=
-"ident">c</span>.<span class="ident">eq</span>[<span class=
-"ident">p2</span>]));
-
-        <span class="kw">let</span> <span class=
-"ident">particles_sign</span> <span class=
-"op">=</span> <span class="self">self</span>.<span class=
-"ident">particles_sign</span>();
+"ident">backward</span> <span class="op">=</span> <span class=
+"ident">gamma_tilde</span> <span class="op">*</span> <span class=
+"ident">eq0</span> <span class="op">*</span> <span class=
+"ident">nan_to_one</span>((<span class=
+"ident">n1</span> <span class="op">/</span> <span class=
+"ident">eq1</span>) <span class="op">*</span> (<span class=
+"ident">n2</span> <span class="op">/</span> <span class=
+"ident">eq2</span>));
 
         <span class="kw">let</span> <span class=
 "ident">asymmetric_forward</span> <span class=
 "op">=</span> <span class="ident">gamma_tilde</span> <span class=
-"op">*</span> <span class=
-"ident">particles_sign</span>.<span class="ident">incoming</span>[<span class="number">0</span>] <span class="op">*</span> <span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">p0</span>];
+"op">*</span> <span class="ident">a0</span> <span class=
+"op">*</span> <span class="ident">na0</span>;
         <span class="kw">let</span> <span class=
 "ident">asymmetric_backward</span> <span class=
 "op">=</span> <span class="ident">gamma_tilde</span>
             <span class="op">*</span> <span class=
-"ident">c</span>.<span class="ident">eq</span>[<span class=
-"ident">p0</span>]
-            <span class="op">*</span> <span class=
-"ident">nan_to_zero</span>(
-                (<span class="ident">c</span>.<span class=
-"ident">n</span>[<span class="ident">p1</span>] <span class=
-"op">*</span> <span class=
-"ident">particles_sign</span>.<span class="ident">outgoing</span>[<span class="number">1</span>] <span class="op">*</span> <span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">p2</span>]
-                    <span class="op">+</span> <span class=
-"ident">c</span>.<span class="ident">n</span>[<span class=
-"ident">p2</span>] <span class="op">*</span> <span class=
-"ident">particles_sign</span>.<span class=
-"ident">outgoing</span>[<span class="number">0</span>] <span class=
-"op">*</span> <span class="ident">c</span>.<span class=
-"ident">na</span>[<span class="ident">p1</span>]
-                    <span class="op">-</span> <span class=
-"ident">particles_sign</span>.<span class=
-"ident">outgoing</span>[<span class="number">0</span>]
-                        <span class="op">*</span> <span class=
-"ident">particles_sign</span>.<span class=
-"ident">outgoing</span>[<span class="number">1</span>]
-                        <span class="op">*</span> <span class=
-"ident">c</span>.<span class="ident">na</span>[<span class=
-"ident">p1</span>]
-                        <span class="op">*</span> <span class=
-"ident">c</span>.<span class="ident">na</span>[<span class=
-"ident">p2</span>])
-                    <span class="op">/</span> (<span class=
-"ident">c</span>.<span class="ident">eq</span>[<span class=
-"ident">p1</span>] <span class="op">*</span> <span class=
-"ident">c</span>.<span class="ident">eq</span>[<span class=
-"ident">p2</span>]),
-            );
+"ident">eq0</span>
+            <span class="op">*</span> (<span class=
+"ident">a1</span> <span class="op">*</span> <span class=
+"ident">nan_to_zero</span>(<span class=
+"ident">na1</span> <span class="op">/</span> <span class=
+"ident">eq1</span>) <span class="op">*</span> <span class=
+"ident">nan_to_one</span>(<span class=
+"ident">n2</span> <span class="op">/</span> <span class=
+"ident">eq2</span>)
+                <span class="op">+</span> <span class=
+"ident">a2</span> <span class="op">*</span> <span class=
+"ident">nan_to_zero</span>(<span class=
+"ident">na2</span> <span class="op">/</span> <span class=
+"ident">eq2</span>) <span class="op">*</span> <span class=
+"ident">nan_to_one</span>(<span class=
+"ident">n1</span> <span class="op">/</span> <span class=
+"ident">eq1</span>)
+                <span class="op">-</span> <span class=
+"ident">a2</span> <span class="op">*</span> <span class=
+"ident">a1</span> <span class="op">*</span> <span class=
+"ident">nan_to_zero</span>(<span class=
+"ident">na1</span> <span class="op">*</span> <span class=
+"ident">na2</span> <span class="op">/</span> (<span class=
+"ident">eq1</span> <span class="op">*</span> <span class=
+"ident">eq2</span>)));
 
         <span class="prelude-val">Some</span>(<span class=
 "ident">RateDensity</span> {
@@ -1049,6 +1079,21 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="kw">if</span> <span class=
 "ident">v</span>.<span class="ident">is_nan</span>() {
         <span class="number">0.0</span>
+    } <span class="kw">else</span> {
+        <span class="ident">v</span>
+    }
+}
+
+<span class=
+"doccomment">/// Converts NaN floating points to 0</span>
+<span class="kw">fn</span> <span class=
+"ident">nan_to_one</span>(<span class=
+"ident">v</span>: <span class="ident">f64</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">f64</span> {
+    <span class="kw">if</span> <span class=
+"ident">v</span>.<span class="ident">is_nan</span>() {
+        <span class="number">1.0</span>
     } <span class="kw">else</span> {
         <span class="ident">v</span>
     }

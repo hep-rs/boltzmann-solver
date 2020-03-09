@@ -70,6 +70,7 @@ Methods</a>
 <div class="sidebar-links"><a href=
 "#method.as_context">as_context</a><a href=
 "#method.hubble_rate">hubble_rate</a><a href=
+"#method.len_particles">len_particles</a><a href=
 "#method.particle">particle</a><a href=
 "#method.particle_mut">particle_mut</a><a href=
 "#method.particle_name">particle_name</a></div>
@@ -107,7 +108,7 @@ autocomplete="off" spellcheck="false" placeholder=
 'render-detail'><a id="toggle-all-docs" href="javascript:void(0)"
 title="collapse all docs">[<span class=
 'inner'>−</span>]</a></span><a class='srclink' href=
-'../../src/boltzmann_solver/model.rs.html#26-185' title=
+'../../src/boltzmann_solver/model.rs.html#26-196' title=
 'goto source code'>[src]</a></span><span class='in-band'>Trait
 <a href='../index.html'>boltzmann_solver</a>::<wbr><a href=
 'index.html'>model</a>::<wbr><a class="trait" href=
@@ -183,6 +184,12 @@ href=
 href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>) -&gt; <a class="primitive"
 href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a> { ... }
+</pre>
+<div class='item-spacer'></div>
+<pre>    fn <a href='#method.len_particles' class=
+'fnname'>len_particles</a>(&amp;self) -&gt; <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a> { ... }
 </pre>
 <div class='item-spacer'></div>
 <pre>    fn <a href='#method.particle_name' class=
@@ -359,6 +366,14 @@ does not change too rapidly.</p>
 the matter–radiation equality, which occurs at an inverse
 temperature of \(\beta \approx 10^{8}\) GeV^{-1}.</p>
 </div>
+<h3 id='method.len_particles' class='method'><code id=
+'len_particles.v'>fn <a href='#method.len_particles' class=
+'fnname'>len_particles</a>(&amp;self) -&gt; <a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code></h3>
+<div class='docblock'>
+<p>Return the number of particles in the model.</p>
+</div>
 <h3 id='method.particle_name' class='method'><code id=
 'particle_name.v'>fn <a href='#method.particle_name' class=
 'fnname'>particle_name</a>(&amp;self, i: <a class="primitive" href=
@@ -432,10 +447,12 @@ equations, the following attributes have a special value:</p>
 <ul>
 <li><code>step = 0</code>,</li>
 <li><code>step_size = 1.0</code>,</li>
-<li><code>normalization = (hubble_rate * beta * n).recip()</code>,
-and</li>
-<li><code>eq</code>, <code>n</code>, <code>na</code> are empty
-arrays.</li>
+<li><code>normalization = (hubble_rate * beta *
+n).recip()</code>,</li>
+<li><code>n</code> has the equilibrium number densities of the
+particles, and</li>
+<li><code>na</code> has a zeroed array of the same length as the
+number of particles.</li>
 </ul>
 <p>All other attribute contexts will be as expected.</p>
 </div>

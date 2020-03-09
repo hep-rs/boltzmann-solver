@@ -903,9 +903,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="827">827</span>
 <span id="828">828</span>
 <span id="829">829</span>
-<span id="830">830</span>
-<span id="831">831</span>
-<span id="832">832</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -936,9 +933,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class=
 "ident">std</span>::{<span class="ident">error</span>, <span class=
-"ident">fmt</span>, <span class="ident">iter</span>::<span class=
-"ident">FromIterator</span>, <span class=
-"ident">mem</span>, <span class="ident">ptr</span>};
+"ident">fmt</span>, <span class="ident">mem</span>, <span class=
+"ident">ptr</span>};
 
 <span class=
 "doccomment">/// Error type returned by the solver builder in case there is an error.</span>
@@ -1607,17 +1603,17 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span>,
     {
         <span class="kw">let</span> <span class=
-"kw-2">mut</span> <span class="ident">n</span> <span class=
-"op">=</span> <span class="ident">Array1</span>::<span class=
-"ident">from_iter</span>(
-            <span class="ident">particles</span>
+"kw-2">mut</span> <span class="ident">n</span>: <span class=
+"ident">Array1</span><span class="op">&lt;</span><span class=
+"kw">_</span><span class="op">&gt;</span> <span class=
+"op">=</span> <span class="ident">particles</span>
                 .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class=
+            .<span class="ident">map</span>(<span class=
 "op">|</span><span class="ident">p</span><span class=
 "op">|</span> <span class="ident">p</span>.<span class=
 "ident">normalized_number_density</span>(<span class=
-"number">0.0</span>, <span class="ident">beta</span>)),
-        );
+"number">0.0</span>, <span class="ident">beta</span>))
+            .<span class="ident">collect</span>();
 
         <span class="kw">for</span> (<span class=
 "ident">i</span>, <span class="ident">ni</span>) <span class=
@@ -1773,20 +1769,20 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="kw">if</span> <span class=
 "ident">i</span> <span class="op">%</span> <span class=
 "number">64</span> <span class="op">=</span><span class=
-"op">=</span> <span class="number">0</span> {
+"op">=</span> <span class="number">3</span> {
                 <span class="ident">log</span>::<span class=
 "macro">debug</span><span class="macro">!</span>(<span class=
 "string">"Precomputing step {} / {}"</span>, <span class=
 "ident">i</span>, <span class="number">2_usize</span>.<span class=
 "ident">pow</span>(<span class="ident">N</span>) <span class=
-"op">+</span> <span class="number">4</span>);
+"op">+</span> <span class="number">3</span>);
             } <span class="kw">else</span> {
                 <span class="ident">log</span>::<span class=
 "macro">trace</span><span class="macro">!</span>(<span class=
 "string">"Precomputing step {} / {}"</span>, <span class=
 "ident">i</span>, <span class="number">2_usize</span>.<span class=
 "ident">pow</span>(<span class="ident">N</span>) <span class=
-"op">+</span> <span class="number">4</span>);
+"op">+</span> <span class="number">3</span>);
             }
             <span class="ident">model</span>.<span class=
 "ident">set_beta</span>(<span class="ident">beta</span>);
@@ -1851,20 +1847,20 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="kw">if</span> <span class=
 "ident">i</span> <span class="op">%</span> <span class=
 "number">64</span> <span class="op">=</span><span class=
-"op">=</span> <span class="number">0</span> {
+"op">=</span> <span class="number">3</span> {
                 <span class="ident">log</span>::<span class=
 "macro">debug</span><span class="macro">!</span>(<span class=
 "string">"Precomputing step {} / {}"</span>, <span class=
 "ident">i</span>, <span class="number">2_usize</span>.<span class=
 "ident">pow</span>(<span class="ident">N</span>) <span class=
-"op">+</span> <span class="number">4</span>);
+"op">+</span> <span class="number">3</span>);
             } <span class="kw">else</span> {
                 <span class="ident">log</span>::<span class=
 "macro">trace</span><span class="macro">!</span>(<span class=
 "string">"Precomputing step {} / {}"</span>, <span class=
 "ident">i</span>, <span class="number">2_usize</span>.<span class=
 "ident">pow</span>(<span class="ident">N</span>) <span class=
-"op">+</span> <span class="number">4</span>);
+"op">+</span> <span class="number">3</span>);
             }
             <span class="ident">model</span>.<span class=
 "ident">set_beta</span>(<span class="ident">beta</span>);
@@ -2457,8 +2453,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro">info</span><span class="macro">!</span>(<span class=
 "string">"Step {}, β = {:.4e}"</span>, <span class=
 "ident">step</span>, <span class="ident">beta</span>);
-            <span class=
-"comment">// log::info!("n = {:.3e}", n);</span>
             } <span class="kw">else</span> <span class=
 "kw">if</span> <span class="ident">step</span> <span class=
 "op">%</span> <span class="number">10</span> <span class=
@@ -2468,21 +2462,20 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro">debug</span><span class="macro">!</span>(<span class=
 "string">"Step {}, β = {:.4e}"</span>, <span class=
 "ident">step</span>, <span class="ident">beta</span>);
-            <span class=
-"comment">// log::debug!("n = {:.3e}", n);</span>
             } <span class="kw">else</span> {
                 <span class="ident">log</span>::<span class=
 "macro">trace</span><span class="macro">!</span>(<span class=
 "string">"Step {}, β = {:.4e}, h = {:.4e}"</span>, <span class=
 "ident">step</span>, <span class="ident">beta</span>, <span class=
 "ident">h</span>);
-                <span class=
-"comment">// log::trace!("n = {:.3e}", n);</span>
             }
 
             <span class="kw">for</span> <span class=
 "ident">i</span> <span class="kw">in</span> <span class=
 "number">0</span>..<span class="ident">RK_S</span> {
+                <span class="comment">// DEBUG</span>
+                <span class=
+"comment">// log::trace!("i = {}", i);</span>
                 <span class="ident">evals</span> <span class=
 "op">+</span><span class="op">=</span> <span class=
 "number">1</span>;
@@ -2878,16 +2871,14 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">&</span><span class="lifetime">'a</span> <span class=
 "ident">Particle</span><span class="op">&gt;</span>,
 {
-    <span class="ident">Array1</span>::<span class=
-"ident">from_iter</span>(
         <span class="ident">particles</span>
             .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class=
+        .<span class="ident">map</span>(<span class=
 "op">|</span><span class="ident">p</span><span class=
 "op">|</span> <span class="ident">p</span>.<span class=
 "ident">normalized_number_density</span>(<span class=
-"number">0.0</span>, <span class="ident">beta</span>)),
-    )
+"number">0.0</span>, <span class="ident">beta</span>))
+        .<span class="ident">collect</span>()
 }
 </pre></div>
 </section>

@@ -370,6 +370,17 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="295">295</span>
 <span id="296">296</span>
 <span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -520,6 +531,17 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">*</span> <span class="ident">beta</span>.<span class=
 "ident">powi</span>(<span class="op">-</span><span class=
 "number">2</span>)
+    }
+
+    <span class=
+"doccomment">/// Return the number of particles in the model.</span>
+    <span class="kw">fn</span> <span class=
+"ident">len_particles</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">usize</span> {
+        <span class="self">self</span>.<span class=
+"ident">particles</span>().<span class="ident">len</span>()
     }
 
     <span class=
@@ -723,9 +745,11 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// - `step = 0`,</span>
     <span class="doccomment">/// - `step_size = 1.0`,</span>
     <span class=
-"doccomment">/// - `normalization = (hubble_rate * beta * n).recip()`, and</span>
+"doccomment">/// - `normalization = (hubble_rate * beta * n).recip()`,</span>
     <span class=
-"doccomment">/// - `eq`, `n`, `na` are empty arrays.</span>
+"doccomment">/// - `n` has the equilibrium number densities of the particles, and</span>
+    <span class=
+"doccomment">/// - `na` has a zeroed array of the same length as the number of particles.</span>
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// All other attribute contexts will be as expected.</span>
@@ -745,6 +769,19 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">massless_number_density</span>(<span class=
 "number">0.0</span>, <span class="ident">beta</span>);
         <span class="kw">let</span> <span class=
+"ident">eq</span>: <span class="ident">Array1</span><span class=
+"op">&lt;</span><span class="kw">_</span><span class=
+"op">&gt;</span> <span class="op">=</span> <span class=
+"self">self</span>
+            .<span class="ident">particles</span>()
+            .<span class="ident">iter</span>()
+            .<span class="ident">map</span>(<span class=
+"op">|</span><span class="ident">p</span><span class=
+"op">|</span> <span class="ident">p</span>.<span class=
+"ident">normalized_number_density</span>(<span class=
+"number">0.0</span>, <span class="ident">beta</span>))
+            .<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class=
 "ident">hubble_rate</span> <span class="op">=</span> <span class=
 "self">self</span>.<span class=
 "ident">hubble_rate</span>(<span class="ident">beta</span>);
@@ -761,14 +798,13 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">beta</span> <span class="op">*</span> <span class=
 "ident">n</span>).<span class="ident">recip</span>(),
             <span class="ident">eq</span>: <span class=
-"ident">Array1</span>::<span class=
-"ident">zeros</span>(<span class="number">0</span>),
+"ident">eq</span>.<span class="ident">clone</span>(),
             <span class="ident">n</span>: <span class=
-"ident">Array1</span>::<span class=
-"ident">zeros</span>(<span class="number">0</span>),
+"ident">eq</span>,
             <span class="ident">na</span>: <span class=
 "ident">Array1</span>::<span class=
-"ident">zeros</span>(<span class="number">0</span>),
+"ident">zeros</span>(<span class="self">self</span>.<span class=
+"ident">len_particles</span>()),
             <span class="ident">model</span>: <span class=
 "kw-2">&</span><span class="self">self</span>,
         }

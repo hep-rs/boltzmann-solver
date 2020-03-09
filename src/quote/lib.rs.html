@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.2/src/lib.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.3/src/lib.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>lib.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -1021,6 +1021,12 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="946">946</span>
 <span id="947">947</span>
 <span id="948">948</span>
+<span id="949">949</span>
+<span id="950">950</span>
+<span id="951">951</span>
+<span id="952">952</span>
+<span id="953">953</span>
+<span id="954">954</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -1129,12 +1135,16 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="doccomment">//! };</span>
 <span class="doccomment">//! ```</span>
 
+<span class="attribute">#![<span class=
+"ident">forbid</span>(<span class=
+"ident">unsafe_code</span>)]</span>
+
 <span class=
 "comment">// Quote types in rustdoc of other crates get linked to here.</span>
 <span class="attribute">#![<span class=
 "ident">doc</span>(<span class=
 "ident">html_root_url</span> <span class="op">=</span> <span class=
-"string">"https://docs.rs/quote/1.0.2"</span>)]</span>
+"string">"https://docs.rs/quote/1.0.3"</span>)]</span>
 
 <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class="ident">all</span>(
@@ -1163,7 +1173,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">path</span> <span class="op">=</span> <span class=
 "string">"runtime.rs"</span>]</span>
 <span class="kw">pub</span> <span class=
-"kw">mod</span> <span class="ident">__rt</span>;
+"kw">mod</span> <span class="ident">__private</span>;
 
 <span class="kw">pub</span> <span class=
 "kw">use</span> <span class="kw">crate</span>::<span class=
@@ -1672,7 +1682,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">quote_spanned</span><span class=
 "op">!</span>(<span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">Span</span>::<span class=
 "ident">call_site</span>()<span class="op">=</span><span class=
 "op">&gt;</span> $(<span class=
@@ -1830,13 +1840,13 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">mut</span> <span class="ident">_s</span> <span class=
 "op">=</span> <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">TokenStream</span>::<span class="ident">new</span>();
         <span class="kw">let</span> <span class=
 "ident">_span</span>: <span class=
 "macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">Span</span> <span class="op">=</span> <span class=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">span</span>;
@@ -2091,7 +2101,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> <span class=
 "macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">RepInterp</span>(<span class="ident">_x</span>),
             <span class="prelude-val">None</span> <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
@@ -2266,13 +2276,13 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="kw">use</span> <span class=
 "macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">ext</span>::<span class="kw-2">*</span>;
         <span class="kw">let</span> <span class=
 "ident">has_iter</span> <span class="op">=</span> <span class=
 "macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">ThereIsNoIteratorInRepetition</span>;
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
@@ -2286,7 +2296,7 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="kw">let</span> <span class=
 "kw">_</span>: <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">HasIterator</span> <span class="op">=</span> <span class=
 "ident">has_iter</span>;
         <span class=
@@ -2393,7 +2403,7 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="kw">use</span> <span class=
 "macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">ext</span>::<span class="kw-2">*</span>;
         <span class="kw">let</span> <span class=
 "kw-2">mut</span> <span class="ident">_i</span> <span class=
@@ -2402,7 +2412,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">has_iter</span> <span class="op">=</span> <span class=
 "macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">ThereIsNoIteratorInRepetition</span>;
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
@@ -2416,7 +2426,7 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="kw">let</span> <span class=
 "kw">_</span>: <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">HasIterator</span> <span class="op">=</span> <span class=
 "ident">has_iter</span>;
         <span class="kw">while</span> <span class=
@@ -2669,10 +2679,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">mut</span> <span class="ident">g</span> <span class=
 "op">=</span> <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">Group</span>::<span class="ident">new</span>(
                 <span class=
-"macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__rt</span>::<span class="ident">Delimiter</span>::<span class="ident">Parenthesis</span>,
+"macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__private</span>::<span class="ident">Delimiter</span>::<span class="ident">Parenthesis</span>,
                 <span class=
 "macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">quote_spanned</span><span class="op">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">span</span><span class="op">=</span><span class="op">&gt;</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner</span>)<span class="kw-2">*</span>),
             );
@@ -2683,7 +2693,7 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="prelude-val">Some</span>(<span class=
 "macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">TokenTree</span>::<span class=
 "ident">from</span>(<span class="ident">g</span>))
         });
@@ -2706,10 +2716,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">mut</span> <span class="ident">g</span> <span class=
 "op">=</span> <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">Group</span>::<span class="ident">new</span>(
                 <span class=
-"macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__rt</span>::<span class="ident">Delimiter</span>::<span class="ident">Bracket</span>,
+"macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__private</span>::<span class="ident">Delimiter</span>::<span class="ident">Bracket</span>,
                 <span class=
 "macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">quote_spanned</span><span class="op">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">span</span><span class="op">=</span><span class="op">&gt;</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner</span>)<span class="kw-2">*</span>),
             );
@@ -2720,7 +2730,7 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="prelude-val">Some</span>(<span class=
 "macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">TokenTree</span>::<span class=
 "ident">from</span>(<span class="ident">g</span>))
         });
@@ -2743,10 +2753,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">mut</span> <span class="ident">g</span> <span class=
 "op">=</span> <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">Group</span>::<span class="ident">new</span>(
                 <span class=
-"macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__rt</span>::<span class="ident">Delimiter</span>::<span class="ident">Brace</span>,
+"macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__private</span>::<span class="ident">Delimiter</span>::<span class="ident">Brace</span>,
                 <span class=
 "macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">quote_spanned</span><span class="op">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">span</span><span class="op">=</span><span class="op">&gt;</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner</span>)<span class="kw-2">*</span>),
             );
@@ -2757,7 +2767,7 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="prelude-val">Some</span>(<span class=
 "macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">TokenTree</span>::<span class=
 "ident">from</span>(<span class="ident">g</span>))
         });
@@ -2772,7 +2782,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_add</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -2791,7 +2801,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_add_eq</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -2809,7 +2819,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_and</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -2828,7 +2838,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_and_and</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -2847,7 +2857,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_and_eq</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -2865,7 +2875,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_at</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -2883,7 +2893,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_bang</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -2901,7 +2911,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_caret</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -2920,7 +2930,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_caret_eq</span>(<span class=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -2938,7 +2948,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_colon</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -2956,7 +2966,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_colon2</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -2974,7 +2984,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_comma</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -2992,7 +3002,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_div</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3011,7 +3021,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_div_eq</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3029,7 +3039,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_dot</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3047,7 +3057,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_dot2</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3065,7 +3075,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_dot3</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3083,7 +3093,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_dot_dot_eq</span>(<span class=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3101,7 +3111,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_eq</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3120,7 +3130,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_eq_eq</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3139,7 +3149,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_ge</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3157,7 +3167,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_gt</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3176,7 +3186,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_le</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3194,7 +3204,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_lt</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3213,7 +3223,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_mul_eq</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3232,7 +3242,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_ne</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3250,7 +3260,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_or</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3269,7 +3279,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_or_eq</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3288,7 +3298,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_or_or</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3306,7 +3316,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_pound</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3325,7 +3335,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_question</span>(<span class=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3344,7 +3354,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_rarrow</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3363,7 +3373,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_larrow</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3381,7 +3391,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_rem</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3400,7 +3410,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_rem_eq</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3419,7 +3429,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_fat_arrow</span>(<span class=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3437,7 +3447,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_semi</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3456,7 +3466,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_shl</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3475,7 +3485,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_shl_eq</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3494,7 +3504,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_shr</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3513,7 +3523,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_shr_eq</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3531,7 +3541,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_star</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3549,7 +3559,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_sub</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3568,7 +3578,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">push_sub_eq</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -3584,12 +3594,36 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">span</span>:<span class=
 "ident">ident</span> <span class=
 "macro-nonterminal">$</span><span class=
+"macro-nonterminal">ident</span>:<span class=
+"ident">ident</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+        <span class="macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
+"ident">push_ident</span>(<span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">tokens</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">span</span>, <span class=
+"macro">stringify</span><span class="macro">!</span>(<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">ident</span>));
+    };
+
+    (<span class="macro-nonterminal">$</span><span class=
+"macro-nonterminal">tokens</span>:<span class=
+"ident">ident</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">span</span>:<span class=
+"ident">ident</span> <span class=
+"macro-nonterminal">$</span><span class=
 "macro-nonterminal">other</span>:<span class=
 "ident">tt</span>) <span class="op">=</span><span class=
 "op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
-"macro-nonterminal">__rt</span>::<span class=
+"macro-nonterminal">__private</span>::<span class=
 "ident">parse</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class=
 "macro-nonterminal">$</span><span class=
