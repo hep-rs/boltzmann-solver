@@ -5,9 +5,8 @@ mod common;
 mod model;
 
 use crate::model::{interaction, LeptogenesisModel};
-use boltzmann_solver::prelude::*;
-#[cfg(not(debug_assertions))]
 use boltzmann_solver::{
+    prelude::*,
     statistic::{Statistic, Statistics},
     utilities::spline::rec_geomspace,
 };
@@ -16,9 +15,7 @@ use itertools::iproduct;
 use ndarray::prelude::*;
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
-use std::{error, fmt, io, sync::RwLock};
-#[cfg(not(debug_assertions))]
-use std::{fs, fs::File};
+use std::{error, fmt, fs, io, sync::RwLock};
 
 /// Solve the Boltzmann equations and return the final values.
 ///
@@ -408,7 +405,7 @@ pub fn scan() -> Result<(), Box<dyn error::Error>> {
         let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
         let builder = SolverBuilder::new().model(model).beta_range(1e-17, 1e-3);
 
-        let (n, na) = solve(builder, &names, None::<csv::Writer<File>>)?;
+        let (n, na) = solve(builder, &names, None::<csv::Writer<fs::File>>)?;
 
         // Write to the CSV file
         csv.serialize((
@@ -543,7 +540,6 @@ pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
 }
 
 #[test]
-#[cfg(not(debug_assertions))]
 fn gammas() -> Result<(), Box<dyn error::Error>> {
     // common::setup_logging(1);
 
@@ -570,6 +566,7 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
             );
         }
 
+        #[cfg(not(debug_assertions))]
         for i in &[
             interaction::hhll1,
             interaction::hhll2,
@@ -620,7 +617,7 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
     ];
 
     let mut normalization_csv = csv::Writer::from_path({
-        let mut path = base_output_dir.clone();
+        let mut path = base_output_dir;
         path.push("normalization.csv");
         path
     })?;
@@ -642,7 +639,7 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
 
             let mut csv = csv::Writer::from_path({
                 let mut path = output_dirs[i].clone();
-                path.push(format!("{}", ptcl_idx.join(" ")));
+                path.push(ptcl_idx.join(" "));
                 if !path.is_dir() {
                     fs::create_dir(&path)?;
                 }
@@ -650,7 +647,13 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
                 path
             })
             .unwrap();
-            csv.serialize(("beta", "gamma", "gamma normalized"))?;
+            csv.serialize((
+                "beta",
+                "forward",
+                "backward",
+                "forward [normalized]",
+                "backward [normalized]",
+            ))?;
 
             #[cfg(feature = "parallel")]
             csvs[i].push(RwLock::new(csv));
@@ -680,22 +683,28 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
                 .par_iter()
                 .zip(&mut csvs[i])
                 .for_each(|(interaction, csv)| {
+                    let rate = interaction.rate(interaction.gamma(&c), &c);
                     csv.write()
                         .unwrap()
                         .serialize((
                             beta,
-                            interaction.gamma(&c),
-                            interaction.gamma(&c).map(|g| g * c.normalization),
+                            rate.map(|r| r.forward),
+                            rate.map(|r| r.backward),
+                            rate.map(|r| r.forward * c.normalization),
+                            rate.map(|r| r.backward * c.normalization),
                         ))
                         .unwrap();
                 });
 
             #[cfg(not(feature = "parallel"))]
             for (interaction, csv) in models[i].interactions().iter().zip(&mut csvs[i]) {
+                let rate = interaction.rate(interaction.gamma(&c), &c);
                 csv.serialize((
                     beta,
-                    interaction.gamma(&c),
-                    interaction.gamma(&c).map(|g| g * c.normalization),
+                    rate.map(|r| r.forward),
+                    rate.map(|r| r.backward),
+                    rate.map(|r| r.forward * c.normalization),
+                    rate.map(|r| r.backward * c.normalization),
                 ))?;
             }
         }

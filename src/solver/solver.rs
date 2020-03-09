@@ -7,7 +7,7 @@ use crate::{
 use ndarray::{prelude::*, Zip};
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
-use std::{error, fmt, iter::FromIterator, mem, ptr};
+use std::{error, fmt, mem, ptr};
 
 /// Error type returned by the solver builder in case there is an error.
 #[derive(Debug)]
@@ -333,11 +333,10 @@ impl<M> SolverBuilder<M> {
     where
         I: IntoIterator<Item = (usize, f64)>,
     {
-        let mut n = Array1::from_iter(
-            particles
+        let mut n: Array1<_> = particles
                 .iter()
-                .map(|p| p.normalized_number_density(0.0, beta)),
-        );
+            .map(|p| p.normalized_number_density(0.0, beta))
+            .collect();
 
         for (i, ni) in initial_densities {
             n[i] = ni;
@@ -823,9 +822,8 @@ fn equilibrium_number_densities<'a, I>(particles: I, beta: f64) -> Array1<f64>
 where
     I: IntoIterator<Item = &'a Particle>,
 {
-    Array1::from_iter(
         particles
             .into_iter()
-            .map(|p| p.normalized_number_density(0.0, beta)),
-    )
+        .map(|p| p.normalized_number_density(0.0, beta))
+        .collect()
 }
