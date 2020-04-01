@@ -40,7 +40,7 @@ pub fn kallen_lambda(a: f64, b: f64, c: f64) -> f64 {
 /// \\end{equation}
 ///
 /// This implementation is more precise than taking the square root of
-/// [`kallen_lambda`] in cases where the arguments are span several orders of
+/// [`kallen_lambda`] in cases where the arguments span several orders of
 /// magnitude.
 ///
 /// # Example
@@ -55,13 +55,18 @@ pub fn kallen_lambda(a: f64, b: f64, c: f64) -> f64 {
 ///
 /// # Warning
 ///
-/// This function only returns the *absolute value* of the result.
+/// When the result would otherwise be imaginary, this function returns `0.0`.
 #[must_use]
 pub fn kallen_lambda_sqrt(a: f64, b: f64, c: f64) -> f64 {
     let max = if a > b { a } else { b };
     let max = if max > c { max } else { c };
 
-    max * kallen_lambda(1.0, b / max, c / max).abs().sqrt()
+    let v = kallen_lambda(a / max, b / max, c / max);
+    if v < 0.0 {
+        0.0
+    } else {
+        max * v.sqrt()
+    }
 }
 
 /// Return the minimum and maximum value of the Mandelstam variable \\(t\\)
@@ -215,7 +220,7 @@ mod tests {
     #[allow(clippy::float_cmp)]
     #[test]
     fn kallen_lambda() {
-        let (a, b, c) = (1.0, 2.0, 3.0);
+        let (mut a, b, c) = (1.0, 2.0, 3.0);
         assert_eq!(super::kallen_lambda(a, b, c), -8.0);
 
         assert_eq!(super::kallen_lambda(a, b, c), super::kallen_lambda(a, c, b));
@@ -223,6 +228,74 @@ mod tests {
         assert_eq!(super::kallen_lambda(a, b, c), super::kallen_lambda(b, c, a));
         assert_eq!(super::kallen_lambda(a, b, c), super::kallen_lambda(c, a, b));
         assert_eq!(super::kallen_lambda(a, b, c), super::kallen_lambda(c, b, a));
+
+        assert_eq!(super::kallen_lambda_sqrt(a, b, c), 0.0);
+
+        a = 10.0;
+        assert_eq!(super::kallen_lambda_sqrt(a, b, c), 1.000_000_000_000_000_4);
+        approx_eq(
+            super::kallen_lambda_sqrt(a, b, c),
+            super::kallen_lambda_sqrt(a, c, b),
+            12.0,
+            0.0,
+        );
+        approx_eq(
+            super::kallen_lambda_sqrt(a, b, c),
+            super::kallen_lambda_sqrt(b, a, c),
+            12.0,
+            0.0,
+        );
+        approx_eq(
+            super::kallen_lambda_sqrt(a, b, c),
+            super::kallen_lambda_sqrt(b, c, a),
+            12.0,
+            0.0,
+        );
+        approx_eq(
+            super::kallen_lambda_sqrt(a, b, c),
+            super::kallen_lambda_sqrt(c, a, b),
+            12.0,
+            0.0,
+        );
+        approx_eq(
+            super::kallen_lambda_sqrt(a, b, c),
+            super::kallen_lambda_sqrt(c, b, a),
+            12.0,
+            0.0,
+        );
+
+        a = 1e16;
+        assert_eq!(super::kallen_lambda_sqrt(a, b, c), 9.999_999_999_999_994e15);
+        approx_eq(
+            super::kallen_lambda_sqrt(a, b, c),
+            super::kallen_lambda_sqrt(a, c, b),
+            12.0,
+            0.0,
+        );
+        approx_eq(
+            super::kallen_lambda_sqrt(a, b, c),
+            super::kallen_lambda_sqrt(b, a, c),
+            12.0,
+            0.0,
+        );
+        approx_eq(
+            super::kallen_lambda_sqrt(a, b, c),
+            super::kallen_lambda_sqrt(b, c, a),
+            12.0,
+            0.0,
+        );
+        approx_eq(
+            super::kallen_lambda_sqrt(a, b, c),
+            super::kallen_lambda_sqrt(c, a, b),
+            12.0,
+            0.0,
+        );
+        approx_eq(
+            super::kallen_lambda_sqrt(a, b, c),
+            super::kallen_lambda_sqrt(c, b, a),
+            12.0,
+            0.0,
+        );
     }
 
     #[allow(clippy::shadow_unrelated)]
