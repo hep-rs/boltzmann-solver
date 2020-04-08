@@ -167,18 +167,13 @@ where
     /// - `step = 0`,
     /// - `step_size = 1.0`,
     /// - `normalization = (hubble_rate * beta * n).recip()`,
-    /// - `n` has the equilibrium number densities of the particles, and
-    /// - `na` has a zeroed array of the same length as the number of particles.
+    /// - `n` is an array of `1.0`, and
+    /// - `na` is an array of `0.0`.
     ///
     /// All other attribute contexts will be as expected.
     fn as_context(&self) -> Context<'_, Self> {
         let beta = self.get_beta();
         let n = Statistic::BoseEinstein.massless_number_density(0.0, beta);
-        let eq: Array1<_> = self
-            .particles()
-            .iter()
-            .map(|p| p.normalized_number_density(0.0, beta))
-            .collect();
         let hubble_rate = self.hubble_rate(beta);
 
         Context {
@@ -187,8 +182,12 @@ where
             beta,
             hubble_rate,
             normalization: (hubble_rate * beta * n).recip(),
-            eq: eq.clone(),
-            n: eq,
+            eq: self
+                .particles()
+                .iter()
+                .map(|p| p.normalized_number_density(0.0, beta))
+                .collect(),
+            n: Array1::ones(self.len_particles()),
             na: Array1::zeros(self.len_particles()),
             model: &self,
         }
