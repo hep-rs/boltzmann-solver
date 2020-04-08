@@ -55,18 +55,15 @@ pub fn kallen_lambda(a: f64, b: f64, c: f64) -> f64 {
 ///
 /// # Warning
 ///
-/// When the result would otherwise be imaginary, this function returns `0.0`.
+/// The result returns the root of the *absolute value*, thus returning a result
+/// even if `kallen_lambda` is negative.  It is up to the user to determine
+/// whether this is valid or not.
 #[must_use]
 pub fn kallen_lambda_sqrt(a: f64, b: f64, c: f64) -> f64 {
     let max = if a > b { a } else { b };
     let max = if max > c { max } else { c };
 
-    let v = kallen_lambda(a / max, b / max, c / max);
-    if v < 0.0 {
-        0.0
-    } else {
-        max * v.sqrt()
-    }
+    max * kallen_lambda(a / max, b / max, c / max).abs().sqrt()
 }
 
 /// Return the minimum and maximum value of the Mandelstam variable \\(t\\)
@@ -228,8 +225,6 @@ mod tests {
         assert_eq!(super::kallen_lambda(a, b, c), super::kallen_lambda(b, c, a));
         assert_eq!(super::kallen_lambda(a, b, c), super::kallen_lambda(c, a, b));
         assert_eq!(super::kallen_lambda(a, b, c), super::kallen_lambda(c, b, a));
-
-        assert_eq!(super::kallen_lambda_sqrt(a, b, c), 0.0);
 
         a = 10.0;
         assert_eq!(super::kallen_lambda_sqrt(a, b, c), 1.000_000_000_000_000_4);
