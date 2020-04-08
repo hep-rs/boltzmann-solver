@@ -196,7 +196,7 @@ pub fn decay_only_3gen() -> Result<(), Box<dyn error::Error>> {
 #[test]
 #[cfg(not(debug_assertions))]
 pub fn washout_only_1gen() -> Result<(), Box<dyn error::Error>> {
-    common::setup_logging(1);
+    // common::setup_logging(1);
 
     // Create the CSV file
     let output_dir = common::output_dir("leptogenesis/washout_only/1gen");
@@ -437,7 +437,7 @@ pub fn scan() -> Result<(), Box<dyn error::Error>> {
 }
 
 #[test]
-fn masses_widths() -> Result<(), Box<dyn error::Error>> {
+fn masses_widths_number_densities() -> Result<(), Box<dyn error::Error>> {
     // common::setup_logging(1);
 
     let mut model = LeptogenesisModel::zero();
@@ -471,6 +471,13 @@ fn masses_widths() -> Result<(), Box<dyn error::Error>> {
     }
     masses.write_record(None::<&[u8]>)?;
 
+    let mut ns = csv::Writer::from_path(output_dir.join("number_densities.csv"))?;
+    ns.write_field("beta")?;
+    for p in model.particles() {
+        ns.write_field(&p.name)?;
+    }
+    ns.write_record(None::<&[u8]>)?;
+
     for &beta in Array1::geomspace(1e-17, 1e-2, 1024).unwrap().into_iter() {
         model.set_beta(beta);
         model.update_widths();
@@ -486,6 +493,12 @@ fn masses_widths() -> Result<(), Box<dyn error::Error>> {
             masses.write_field(format!("{:e}", p.mass))?;
         }
         masses.write_record(None::<&[u8]>)?;
+
+        ns.write_field(format!("{:e}", beta))?;
+        for p in model.particles() {
+            ns.write_field(format!("{:e}", p.normalized_number_density(0.0, beta)))?;
+        }
+        ns.write_record(None::<&[u8]>)?;
     }
 
     Ok(())
@@ -645,12 +658,13 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
                 }
                 path.push(format!("{}.csv", ptcl.display(model).unwrap()));
                 path
-            })
-            .unwrap();
+            })?;
             csv.serialize((
                 "beta",
+                "gamma",
                 "forward",
                 "backward",
+                "gamma [normalized]",
                 "forward [normalized]",
                 "backward [normalized]",
             ))?;
@@ -663,7 +677,7 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
     }
 
     // Write out all the outputs
-    for &beta in Array1::geomspace(beta.0, beta.1, 100).unwrap().iter() {
+    for &beta in Array1::geomspace(beta.0, beta.1, 512).unwrap().iter() {
         for i in 0..models.len() {
             models[i].set_beta(beta);
             let c = models[i].as_context();
@@ -683,13 +697,16 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
                 .par_iter()
                 .zip(&mut csvs[i])
                 .for_each(|(interaction, csv)| {
-                    let rate = interaction.rate(interaction.gamma(&c), &c);
+                    let gamma = interaction.gamma(&c);
+                    let rate = interaction.rate(gamma, &c);
                     csv.write()
                         .unwrap()
                         .serialize((
                             beta,
+                            gamma,
                             rate.map(|r| r.forward),
                             rate.map(|r| r.backward),
+                            gamma.map(|g| g * c.normalization),
                             rate.map(|r| r.forward * c.normalization),
                             rate.map(|r| r.backward * c.normalization),
                         ))
@@ -698,11 +715,14 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
 
             #[cfg(not(feature = "parallel"))]
             for (interaction, csv) in models[i].interactions().iter().zip(&mut csvs[i]) {
-                let rate = interaction.rate(interaction.gamma(&c), &c);
+                let gamma = interaction.gamma(&c);
+                let rate = interaction.rate(gamma, &c);
                 csv.serialize((
                     beta,
+                    gamma,
                     rate.map(|r| r.forward),
                     rate.map(|r| r.backward),
+                    gamma.map(|g| g * c.normalization),
                     rate.map(|r| r.forward * c.normalization),
                     rate.map(|r| r.backward * c.normalization),
                 ))?;
