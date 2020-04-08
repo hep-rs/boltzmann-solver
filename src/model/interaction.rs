@@ -196,38 +196,30 @@ where
 
         // A NaN should only occur from `0.0 / 0.0`, in which case the correct
         // value ought to be 0.
-        let forward = nan_to_zero(
-            particles_idx
+        let forward = particles_idx
+            .incoming
+            .iter()
+            .map(|&p| checked_div(c.n[p], c.eq[p]))
+            .product::<f64>();
+        let backward = particles_idx
+            .outgoing
+            .iter()
+            .map(|&p| checked_div(c.n[p], c.eq[p]))
+            .product::<f64>();
+        let asymmetric_forward = forward
+            - particles_idx
                 .incoming
                 .iter()
-                .map(|&p| c.n[p] / c.eq[p])
-                .product(),
-        );
-        let backward = nan_to_zero(
-            particles_idx
+                .zip(&particles_sign.incoming)
+                .map(|(&p, &a)| checked_div(c.n[p] - a * c.na[p], c.eq[p]))
+                .product::<f64>();
+        let asymmetric_backward = forward
+            - particles_idx
                 .outgoing
                 .iter()
-                .map(|&p| c.n[p] / c.eq[p])
-                .product(),
-        );
-        let asymmetric_forward = forward
-            - nan_to_zero(
-                particles_idx
-                    .incoming
-                    .iter()
-                    .zip(&particles_sign.incoming)
-                    .map(|(&p, &a)| (c.n[p] - a * c.na[p]) / c.eq[p])
-                    .product(),
-            );
-        let asymmetric_backward = forward
-            - nan_to_zero(
-                particles_idx
-                    .outgoing
-                    .iter()
-                    .zip(&particles_sign.outgoing)
-                    .map(|(&p, &a)| (c.n[p] - a * c.na[p]) / c.eq[p])
-                    .product(),
-            );
+                .zip(&particles_sign.outgoing)
+                .map(|(&p, &a)| checked_div(c.n[p] - a * c.na[p], c.eq[p]))
+                .product::<f64>();
 
         let mut rate = RateDensity {
             forward,
@@ -400,7 +392,9 @@ pub fn asymmetry_overshoots<M>(c: &Context<M>, i: usize, rate: f64) -> bool {
 
 /// Converts NaN floating points to 0
 #[must_use]
-fn nan_to_zero(v: f64) -> f64 {
+#[inline]
+pub(crate) fn checked_div(a: f64, b: f64) -> f64 {
+    let v = a / b;
     if v.is_nan() {
         0.0
     } else {
