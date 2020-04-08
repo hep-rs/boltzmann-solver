@@ -1,0 +1,426 @@
+\documentclass{scrartcl}
+
+\usepackage{mathtools}
+
+\mathtoolsset{
+  showonlyrefs,
+}
+
+\usepackage[compat=1.1.0]{tikz-feynman}
+\usepackage{jpellis}
+
+\usepackage{cleveref}
+
+\title{Boltzmann Solver}
+\author{Joshua P.~Ellis}
+
+\begin{document}
+
+\maketitle
+
+\vfill
+
+\tableofcontents
+
+\clearpage
+
+\section{Phase Space integration}%
+\label{sec:phase_space_integration}
+
+Given an \(n\) particle initial or final state, the phase space integration is
+given by:
+\begin{equation}
+  \dd \Phi_n(q; p_1, \dots, p_n)
+  \defeq \dd \Pi_1 \cdots \dd \Pi_n (2 \pi)^4
+  \delta^4(p_1 + \cdots + p_n - q)
+\end{equation}
+where
+\begin{equation}
+  \dd \Pi
+  \defeq \frac{g}{2 E} \ddbar^3{\vt p}
+  = \frac{\vt p^2}{2 E} \frac{\dd \abs{\vt p} \dd \Omega}{(2\pi)^3}
+  = \frac{\abs{\vt p}}{2} \frac{\dd E \dd \Omega}{(2 \pi)^3}
+\end{equation}
+where the last equality is achieved by noting that \(m^2 = E^2 - \abs{\vt p}^2\)
+thereby implying that \(\abs{\vt p} \dd \abs{\vt p} \equiv E \dd E\).
+
+\subsection{Two-Body Phase Space}%
+\label{sec:two-body_phase_space}
+
+The two-body phase space, \(\Phi_2\), is the smallest non-trivial space that can
+be integrated over easily.
+
+Defining the two-body phase space \(\Phi_2(q_{12}; p_1, p_2)\), where \(q_{12} =
+(p_1 + p_2)\) is the 4-momentum shared between these two particle and \(s_{12}^2
+\defeq q_{12}^2\) is the centre-of-mass energy of these two particles.
+\begin{align}
+  \dd \Phi_2(q_{12}; p_1, p_2)
+   & = \dd \Pi_1 \dd \Pi_2 (2 \pi)^4 \delta^4(p_1 + p_2 - q_{12})                                                   \\
+   & = \frac{g_1}{2 E_1} \ddbar^3{\vt p_1} \frac{g_2}{2 E_2} \ddbar^3{\vt p_2}
+  (2\pi) \delta(E_1 + E_2 - E_{12}) (2\pi)^3 \delta^3(\vt p_1 + \vt p_2 - \vt q_{12})                               \\
+  %  & = \frac{g_1 g_2}{4 (2 \pi)^2} \frac{\dd^3 \vt p_1}{E_1} \frac{\dd^3 \vt p_2}{E_2}
+  % \delta(E_1 + E_2 - E_{12}) \delta^3(\vt p_1 + \vt p_2 - \vt q_{12})                                               \\
+  \intertext{The integral over \(\vt p_2\) can be done trivially with the Dirac delta (note that after this integration, \(E_2\) no longer depends on \(\abs{\vt p_2}\) and now depends on \(\abs{\vt q_{12} - \vt p_1}\))}
+   & = \frac{g_1 g_2}{16 \pi^2} \frac{\dd^3 \vt p_1}{E_1} \frac{1}{E_2}
+  \delta(E_1 + E_2 - E_{12})
+  \intertext{The final quantity is Lorentz invariant, so we may choose the centre-of-mass frame for the calculations in which \(p_1 = (E_1, \vt p)\), \(p_2 = (E_2, - \vt p)\), and \(q_{12} = (\sqrt{s_{12}}, \vt 0)\).}
+   & = \frac{g_1 g_2}{16 \pi^2} \frac{\abs{\vt p}^2 \dd \abs{\vt p}}{E_1 E_2}
+  \delta(E_1 + E_2 - \sqrt{s_{12}}) \dd \Omega
+  \intertext{Given that \(E_1 = \sqrt{\abs{\vt p}^2 + m_1^2}\) and similarly for \(E_2\), the zeros of the Dirac delta can be found at \(\abs{\vt p} = \lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2) / 2 \sqrt{s_{12}}\):}
+   & = \frac{g_1 g_2}{16 \pi^2} \frac{\abs{\vt p}^2 \dd \abs{\vt p}}{E_1 E_2}
+  \left[ \ddfrac{(E_1 + E_2)}{\abs{\vt p}} \right]^{-1}
+  \delta\left( \abs{\vt p} - \frac{\lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2)}{2 \sqrt{s_{12}}} \right) \dd \Omega \\
+   & = \frac{g_1 g_2}{16 \pi^2} \dd \abs{\vt p} \frac{\abs{\vt p}^2 }{4 E_1 E_2}
+  \left[ \frac{\abs{\vt p}}{E_1} + \frac{\abs{\vt p}}{E_2} \right]^{-1}
+  \delta\left( \abs{\vt p} - \frac{\lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2)}{2 \sqrt{s_{12}}} \right) \dd \Omega \\
+   & = \frac{g_1 g_2}{16 \pi^2}
+  \frac{\lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2) / 2 \sqrt{s_{12}}}{E_1 + E_2} \dd \Omega                        \\
+   & = g_1 g_2 \frac{\lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2)}{32 \pi^2 s_{12}} \dd \Omega                       \\
+   & \stackrel{\int \dd \Omega}{=} g_1 g_2 \frac{\lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2)}{8 \pi s_{12}}
+\end{align}
+
+\subsubsection{Phase Space Decomposition}%
+\label{sec:phase_space_decomposition}
+
+We will be introducing new intermediate momenta \(q_{ij} = p_i + p_j\) such that
+\(q_{ij}^2 = s_{ij}\), and then integrating over them and introducing Dirac
+deltas in order to enforce momentum conservation.  We will use the following two
+identities:
+\begin{align}
+  1 & = \int \ddbar^4{q_{ij}} (2 \pi)^4 \delta(q_{ij} - p_i - p_j) \Theta(q_{ij}^0) \\
+  1 & = \int \ddbar{s_{ij}} (2\pi) \delta(s_{ij} - q_{ij}^2)
+\end{align}
+The first enforces momentum conservation, the second enforces an `on-shell'
+condition.  The \(\Theta\) is the Heaviside theta function which is equal to 0
+when its argument is negative, and 1 otherwise and ensures that the integration
+happens for \(\sqrt{s_{ij}} > 0\) only.  Combined, they can be expressed as
+\begin{equation}
+  1 = \int \ddbar^3{\vt q_{ij}} \frac{1}{2 E_{ij}} \ddbar{s_{ij}} (2 \pi)^4 \delta^4(q_{ij} - p_i - p_j) = \int \dd \Pi_{ij} \ddbar{s_{ij}} (2 \pi)^4 \delta^4(q_{ij} - p_i - p_j)
+\end{equation}
+where \(E_{ij} = q_{ij}^0\) is the time-like component of \(q_{ij}\).
+
+The goal now will be to express \(\dd \Phi_n(q; p_1, \dots, p_n)\) in terms of a
+product of smaller phase spaces (and then recursively apply this until only
+two-body phase spaces remain).
+
+\begin{align}
+  \dd \Phi_n(q; p_1, p_2, \dots, p_n)
+   & = \dd \Pi_1 \dd \Pi_2 \cdots \dd \Pi_n (2 \pi)^4 \delta^4(p_1 + p_2 + \cdots + p_n - q)                 \\
+   & = \dd \Pi_1 \dd \Pi_2 \cdots \dd \Pi_n (2 \pi)^4 \delta^4(p_1 + p_2 + \cdots + p_n - q)                 \\
+   & \quad \times \dd \Pi_{12} \ddbar{s_{ij}} (2 \pi)^4 \delta^4(q_{12} - p_1 - p_2)
+  \intertext{The combination of \(\dd \Pi_1 \dd \Pi_2 (2 \pi)^4 \delta^4(q_{12} - p_1 - p_2)\) is exactly equal to \(\dd \Phi_2(q_{12}; p_1, p_2)\).}
+   & = \dd \Phi_2(q_{12}; p_1, p_2) \ddbar{s_{12}}                                                           \\
+   & \quad \times \dd \Pi_{12} \dd \Pi_3 \cdots \dd \Pi_n (2\pi)^4 \delta^4(q_{12} + p_3 + \cdots + p_n - q) \\
+   & = \dd \Phi_2(q_{12}; p_1, p_2) \ddbar{s_{12}} \dd \Phi_{n-1}(q; q_{12}, p_3, \ldots, p_n)
+\end{align}
+
+\subsection{\(1 \leftrightarrow n\) Interactions}
+
+The reaction density is given by
+\begin{equation}
+  \gamma(a \to \vt b) \int \dd \Pi_a \dd \Pi_{\vt b} (2\pi)^4 \delta^4(p_a - p_{\vt c}) \abs{\pzcM(a \to \vt b)}^2 f_a^{(0)}
+\end{equation}
+
+% \subsubsection{\(1 \leftrightarrow 1\) Mixing}%
+% \label{sec:1-to-1_mixing}
+
+% The reaction density is given by
+% \begin{equation}
+%   \gamma(a \to b) = \int \dd \Pi_a \dd \Pi_b (2 \pi)^4 \delta^4(p_a - p_b) \abs{\pzcM(a \leftrightarrow b)}^2 f_a^{(0)}
+% \end{equation}
+% which can be evaluated using the 2-body phase space, with \(q_{ab} = 2 p_b\):
+% \begin{align}
+%   \dd \Pi_a \dd \Pi_b (2 \pi)^4 \delta^4(p_a - p_b)
+%    & = \dd \Phi(q_{ab}; p_a, p_b)                                                                 \\
+%    & = \frac{g_a g_b \lambda^{\frac{1}{2}}(q_{ab}^2, m_a^2, m_b^2)}{32 \pi^2 q_{ab}^2} \dd \Omega
+% \end{align}
+% Thus the reaction density is
+% \begin{equation}
+%   \gamma(a \to b) = \frac{4 \pi g_a g_b \lambda^{\frac{1}{2}(q_{ab}^2, m_a^2, m_b^2)}}{32 \pi^2 }\abs{\pzcM}^2 f_a^{(0)}
+% \end{equation}
+
+% The reverse rate is
+% \begin{align}
+%   \gamma(b \to a)
+%    & = \int \dd \Pi_b \dd \Pi_a (2 \pi)^4 \delta^4(p_b - p_a) \abs{\pzcM}^2 f_b^{(0)}                      \\
+%    & = \frac{4\pi g_a g_b \lambda^{\frac{1}{2}}(q_{ab}^2, m_a^2, m_b^2)}{32 \pi^2} \abs{\pzcM}^2 f_b^{(0)}
+% \end{align}
+% Thus the change in \(n_a\) is:
+% \begin{align}
+%   \ddfrac{n_a}{t}
+%    & = \frac{n_b}{n_b^{(0)}} \gamma(b \to a) - \frac{n_a}{n_a^{(0)}} \gamma(a \to b)                                                                 \\
+%    & = \frac{g_a g_b \lambda^{\frac{1}{2}}(q_{ab}^2, m_a^2, m_b^2)}{8\pi} \left[ \frac{n_b}{n_b^{(0)}} f_b^{(0)} - \frac{n_a}{n_a^{(0)}} f_a \right]
+% \end{align}
+
+\subsubsection{\(1 \leftrightarrow 2\) Decay}
+
+The reaction density is given by
+\begin{equation}
+  \gamma(a \rightarrow bc) =
+  \int \dd \Pi_a \dd \Pi_b \dd \Pi_c (2\pi)^4
+  \delta^4(p_a - p_b - p_c)
+  \abs{\pzcM(a \leftrightarrow bc)}^2 f_a^{(0)}.
+\end{equation}
+As we are summing over all internal degrees of freedom, the final amplitude has
+no dependence on any integration variable and can be taken outside the integral.
+
+The integration over the final state particles can be done easily as it is
+exactly a two-particle phase space,
+\begin{equation}
+  \begin{aligned}
+    \int \dd \Pi_b \dd \Pi_c (2\pi)^4 \delta^4(p_a - p_b - p_c)
+     & \equiv \int \dd \Phi_2(p_a; p_b, p_c)                                    \\
+    %  & = g_b g_c \frac{\lambda^{\frac{1}{2}}(m_a^2, m_b^2, m_c^2)}{32 \pi^2 m_a^2} \dd \Omega_{bc} \\
+     & = g_b g_c \frac{\lambda^{\frac{1}{2}}(m_a^2, m_b^2, m_c^2)}{8 \pi m_a^2}
+  \end{aligned}
+\end{equation}
+In the limit that \(m_b, m_c \to 0\), this simplifies to \(g_b g_c / 8 \pi\).
+
+% When combined with the squared amplitude, can be related to the
+% 0-temperature decay width as
+% \begin{equation}
+%   \begin{aligned}
+%     \dd \Gamma
+%            & = \frac{\abs{\pzcM}^2}{32\pi^2}
+%     \overbrace{\frac{\lambda^{\frac{1}{2}}(m_a^2, m_b^2, m_c^2)}{2 m_a}}^{\abs{\vt p_a}}
+%     \frac{1}{m_a^2} \dd \Omega_{bc}                                                                 \\
+%     \Gamma & = \frac{\abs{\pzcM}^2}{16\pi} \frac{\lambda^{\frac{1}{2}}(m_a^2, m_b^2, m_c^2)}{m_a^3}
+%   \end{aligned}
+% \end{equation}
+
+As for the integration over the initial particle's phase space:
+\begin{equation}
+  % \begin{aligned}
+  \int \dd \Pi_a f_a^{(0)}
+  = g_a \int f_a^{(0)} \frac{\abs{\vt p_a}}{2} \frac{\dd E_a \dd \Omega_a}{(2\pi)^3}
+  = g_a \frac{m_a K_1(m_a \beta)}{4 \pi^2 \beta}
+  % \end{aligned}
+\end{equation}
+
+This the interaction density can be expressed in a succinct closed form as
+\begin{equation}
+  \gamma(a \to bc) = g_a g_b g_c \abs{\pzcM}^2
+  \frac{\lambda^{\frac{1}{2}}(m_a^2, m_b^2, m_c^2)}{32 \pi^3 m_a \beta} K_1(m_a \beta).
+\end{equation}
+which goes towards 0 quite quickly when \(m_a \beta > 1\).  Having said that,
+the forward interaction rate is scaled by \(n_a / n_a^{(0)}\) where \(n_a^{(0)}
+\propto K_2(m_a \beta)\) which also goes to 0 quickly when \(m_a \beta > 1\).
+Thus in order to avoid having \(0 / 0\) in the computation, we combine the two:
+\begin{equation}
+  \begin{aligned}
+    \frac{N_a}{N_a^{(0)}} \gamma(a \to bc)
+     & = N_a \left( \frac{g_a m_a^2 K_2(m_a \beta)}{2 \pi^2 \beta} \right)^{-1} \gamma(a \to bc) \\
+     & = N_a g_b g_c \abs{\pzcM}^2
+    \frac{\lambda^{\frac{1}{2}}(m_a^2, m_b^2, m_c^2)}{16 \pi m_a^3}
+    \frac{K_1(m_a \beta)}{K_2(m_a \beta)}                                                        \\
+     & = n_a \zeta(3) g_b g_c \abs{\pzcM}^2
+    \frac{\lambda^{\frac{1}{2}}(m_a^2, m_b^2, m_c^2)}{16 \pi^3 m_a^3 \beta^3}
+    \frac{K_1(m_a \beta)}{K_2(m_a \beta)},
+  \end{aligned}
+\end{equation}
+where \(N_a\) is the non-normalized number density, and \(n_a\) is normalized to
+a single massless bosonic degree of freedom.  The ratio of Bessel function
+behaves as
+\begin{equation}
+  \frac{K_1(x)}{K_2(x)} = \begin{cases}
+    \frac{x}{2} + \calO(x^3)                                              & x \ll 1 \\
+    1 - \frac{3}{2x} + \frac{15}{8 x^2} + \calO\left(\frac{1}{x^3}\right) & x \gg 1
+  \end{cases}.
+\end{equation}
+
+The backward rate is given by
+\begin{equation}
+  \gamma(bc \to a) = \int \dd\Pi_a \dd\Pi_b \dd\Pi_c (2\pi)^4 \delta^4(p_a - p_b - p_c) \abs{\pzcM(a \leftrightarrow bc)}^2 f_b^{(0)} f_c^{(0)}
+\end{equation}
+The time-like component of the Dirac delta enforces that \(E_a = E_b + E_c\) and
+thus we have that
+\begin{equation}
+  f_b^{(0)} f_c^{(0)} = e^{(E_b + E_c) \beta} = e^{E_a \beta} = f_a^{(0)}
+\end{equation}
+thus recovering the same equation the forward rate.  As for the rate scaled by
+the number densities of the initial state particles, there is no easy
+cancelation (unless the particle have \emph{exactly} the same masses).
+
+\subsubsection{\(1 \leftrightarrow 3\) Decay}%
+\label{sec:1-to-3_decay}
+
+\subsection{\(2 \leftrightarrow n\) Scattering}%
+\label{sec:2-to-n_scattering}
+
+The reaction density is given by
+\begin{equation}
+  \gamma(ab \to \vt c)
+  = \int \dd \Pi_a \dd \Pi_b \dd \Pi_{\vt c} (2 \pi)^4 \delta^4 (p_a + p_b - p_{\vt c}) \abs{\pzcM(ab \to \vt c)}^2 f_a^{(0)} f_b^{(0)}.
+\end{equation}
+The integration over the initial states can be done first
+\begin{align}
+  \gamma(ab \to \vt c)
+   & = \int \dd \Pi_a \dd \Pi_b \dd \Pi_{\vt c} (2 \pi)^4 \delta^4 (p_a + p_b - p_{\vt c}) \abs{\pzcM(ab \to \vt c)}^2 f_a^{(0)} f_b^{(0)}                                                            \\
+   & = \int \dd \Phi_2(q_{ab}; p_a, p_b) \ddbar{s} \dd \Pi_{ab} \dd \Pi_{\vt c} (2 \pi)^4 \delta^4(q_{ab} - p_{\vt c}) \abs{\pzcM(ab \to \vt c)}^2 f^{(0)}_a f^{(0)}_b
+  \intertext{The zero-chemical-potential phase space distributions can be expressed in terms of the centre-of-mass energy: \(f^{(0)}_a f^{(0)}_b = \exp[-(E_a + E_b)\beta] = \exp[- E_{ab} \beta]\).  Furthermore, we can choose a reference frame such that the solid angle integration in \(\dd \Phi_2(q_{ab}; p_a, p_b)\) is trivial (and therefore \(\Phi_2(q_{ab}; p_a, p_b) = g_a g_b \lambda^{\frac{1}{2}}(s, m_a^2, m_b^2) / 8 \pi s\))}
+   & = \int \ddbar{s} \underbrace{\Phi_2(q_{ab}; p_a, p_b) \dd \Pi_{\vt c} (2 \pi)^4 \delta^4(q_{ab} - p_{\vt c}) \abs{\pzcM(ab \to \vt c)}^2}_{\defeq \hat \sigma(s)} \dd \Pi_{ab} e^{-E_{ab} \beta} \\
+   & = \int \ddbar{s} \hat \sigma(s) \ddbar^3{\vt p_{ab}} \frac{1}{2 E_{ab}} e^{-E_{ab} \beta}                                                                                                        \\
+   & = \frac{1}{32 \pi^4} \int \hat \sigma(s) \abs{\vt p_{ab}} e^{-E_{ab} \beta} \dd E_{ab} \dd \Omega_{ab} \dd s                                                                                     \\
+   & = \frac{1}{32 \pi^4} \int \hat \sigma(s) \sqrt{E_{ab}^2 - s} e^{-E_{ab} \beta} \dd E_{ab} \dd \Omega_{ab} \dd s                                                                                  \\
+   & = \frac{1}{8 \pi^3 \beta} \int \hat \sigma(s) \sqrt{s} K_1(\sqrt{s} \beta) \dd s
+\end{align}
+Note that there is an alternative definition for \(\hat \sigma\) which has an
+additional factor of \(8 \pi\), and thus changing the \(1 / 8 \pi^3\)
+prefactor to \(1 / 64 \pi^4\).
+
+\subsubsection{\(2 \leftrightarrow 2\) Scattering}%
+\label{sec:2-to-2_scattering}
+
+When both initial and final states have two particles, both initial and final
+two-body phase spaces can be greatly simplified.
+
+\begin{align}
+  \hat \sigma(s)
+   & = \Phi_2(q_{ab}; p_a, p_b) \int \dd \Phi_2(q_{ab}; p_c, p_d) \abs{\pzcM(ab \to cd)}^2                                                      \\
+   & = \Phi_2(q_{ab}; p_a, p_b) \frac{g_c g_d \lambda^{\frac{1}{2}}(s, m_c^2, m_d^2)}{32 \pi^2 s} \int \dd \Omega_{cd} \abs{\pzcM(ab \to cd)}^2
+  \intertext{The integration over \(\phi_{cd}\) can be done trivially as we are averaging over polarization.  One only needs only to integrate over \(\cos \theta_{cd}\).  We can arbitrarily orient this such \(\cos \theta_{cd} = \cos \theta_c\), and by using the relation \cref{eq:t_angular}, the angular integral can be related to an integral over the \(t\) Mandelstam variable:}
+   & = \frac{g_a g_b \lambda^{\frac{1}{2}}(s, m_a^2, m_b^2)}{8 \pi s} \frac{g_c g_d \lambda^{\frac{1}{2}}(s, m_c^2, m_d^2)}{16 \pi s}
+  \int \ddfrac{\cos \theta}{t} \dd t \abs{\pzcM(ab \to cd)}^2                                                                                   \\
+   & = \frac{g_a g_b g_c g_d}{64 \pi^2 s} \int \dd t \abs{\pzcM(ab \to cd)}^2
+\end{align}
+
+As a result, the full expression for a \(2 \to 2\) reaction is:
+\begin{align}
+  \gamma(ab \to cd) = \frac{g_a g_b g_c g_d}{512 \pi^5 \beta} \int \abs{\pzcM(ab \to cd)}^2 \frac{K_1(\sqrt{s} \beta)}{\sqrt s} \dd s \dd t
+\end{align}
+
+\subsubsection{Mandelstam Variables}%
+\label{sec:mandelstam_variables}
+
+Note that in the centre-of-mass frame of reference, we have:
+\begin{align}
+  p_a & = (E_a, \abs{\vt p}, 0, 0)                                       & p_b & = (E_b, -\abs{\vt p}, 0, 0) \\
+  p_c & = (E_c, \abs{\vt p} \cos \theta, 0, \abs{\vt p} \sin \theta)     &
+  p_d & = (E_c, - \abs{\vt p} \cos \theta, 0, - \abs{\vt p} \sin \theta)
+\end{align}
+and the Mandelstam variables
+\begin{align}
+  s & = (p_a + p_b)^2 = (p_c + p_d)^2 \\
+  t & = (p_a - p_c)^2 = (p_b - p_d)^2 \\
+  u & = (p_a - p_d)^2 = (p_b - p_c)^2
+\end{align}
+By requiring everything to be on-shell, we can solve all the energies and
+\(\abs{\vt p}\) in terms of only masses and \(s\):
+\begin{align}
+  E_a & = \frac{s + m_a^2 - m_b^2}{2 \sqrt{s}} &
+  E_b & = \frac{s + m_b^2 - m_a^2}{2 \sqrt{s}}   \\
+  E_c & = \frac{s + m_c^2 - m_d^2}{2 \sqrt{s}} &
+  E_d & = \frac{s + m_d^2 - m_c^2}{2 \sqrt{s}}   \\
+\end{align}
+\begin{equation}
+  \begin{aligned}
+    \abs{\vt p}   & = \frac{\lambda^{\frac{1}{2}}(s, m_a^2, m_b^2)}{2 \sqrt{s}} = \frac{\lambda^{\frac{1}{2}}(s, m_c^2, m_d^2)}{2 \sqrt{s}} \\
+    \abs{\vt p}^2 & = \frac{\lambda^{\frac{1}{2}}(s, m_a^2, m_b^2) \lambda^{\frac{1}{2}}(s, m_c^2, m_d^2)}{4 s}
+  \end{aligned}
+\end{equation}
+
+Now the \(t\) Mandelstam variable is:
+\begin{align}
+  t & = (E_a - E_c)^2 - 2 \abs{\vt p}^2 + 2 \abs{\vt p}^2 \cos \theta                                                \\
+    & = \frac{\left( m_a^2 - m_b^2 - m_c^2 + m_d^2 \right)^2}{4 s}
+  - \frac{\lambda^{\frac{1}{2}}(s, m_a^2, m_b^2) \lambda^{\frac{1}{2}}(s, m_3^2, m_4^2)}{2 s}                        \\
+    & \qquad + \frac{\lambda^{\frac{1}{2}}(s, m_a^2, m_b^2) \lambda^{\frac{1}{2}}(s, m_3^2, m_4^2)}{2 s} \cos \theta
+\end{align}
+And in particular, one can relate a differential in \(\cos \theta\) to a differential in \(t\):
+\begin{equation}
+  \label{eq:t_angular}
+  \ddfrac{t}{\cos \theta} = 2 \abs{\vt p}^2 = \frac{\lambda^{\frac{1}{2}}(s, m_a^2, m_b^2) \lambda^{\frac{1}{2}}(s, m_c^2, m_d^2)}{2 s}
+\end{equation}
+
+As for the domain of integration of \(t\), it is not difficult to see that
+\(\theta \in [0, \pi]\) corresponds to
+\begin{equation}
+  t \in \left[
+    \frac{\left( m_a^2 - m_b^2 - m_c^2 + m_d^2 \right)^2}{4 s},
+    \frac{\left( m_a^2 - m_b^2 - m_c^2 + m_d^2 \right)^2}{4 s}
+    - \frac{\lambda^{\frac{1}{2}}(s, m_a^2, m_b^2) \lambda^{\frac{1}{2}}(s, m_c^2, m_d^2)}{s}
+    \right]
+\end{equation}
+
+\section{Boltzmann Equations}%
+\label{sec:boltzmann_equation}
+
+\subsection{Three-Body Interactions}%
+\label{sec:three-body_interactions}
+
+Given a three-body interaction with (tree-level) squared amplitude
+\(\abs{\pzcM}^2\), then there are six possible interactions (ignoring their
+\(\mathcal{CPT}\) counterparts):
+\begin{equation}
+  \begin{aligned}
+    a           & \to bc                         & \qquad
+    \overline b & \to \overline ac               & \qquad
+    \overline c \to \overline ab                          \\
+    a           & \gets bc                       &
+    \overline b & \gets \overline ac
+                & \overline c \gets \overline ab
+  \end{aligned}
+\end{equation}
+The number density for \(a\) therefore is:
+\begin{equation}
+  \begin{aligned}
+    \ddfrac{n_a}{t} =
+     & - \left( \frac{n_a}{n_a^{(0)}} - \frac{n_b}{n_b^{(0)}} \frac{n_c}{n_c^{(0)}} \right) \gamma(a \leftrightarrow bc)                       \\
+     & + \left( \frac{n_b}{n_b^{(0)}} - \frac{n_a}{n_a^{(0)}} \frac{n_c}{n_c^{(0)}} \right) \gamma(\overline b \leftrightarrow \overline a c)  \\
+     & + \left( \frac{n_c}{n_c^{(0)}} - \frac{n_a}{n_a^{(0)}} \frac{n_b}{n_b^{(0)}} \right) \gamma(\overline c \leftrightarrow \overline a b).
+  \end{aligned}
+\end{equation}
+
+\subsection{Asymmetry Evolution}%
+\label{sec:asymmetry_evolution}
+
+We define the asymmetry in the phase space and number densities as
+\begin{align}
+  \Delta f_a & \defeq f_a - f_{\overline a}, &
+  \Delta n_a & \defeq n_a - n_{\overline a},
+\end{align}
+and taking \(\mu_a = - \mu_{\overline a}\) (which is valid provided
+interactions \(a \overline a \leftrightarrow (\dots)\) are fast), then we have
+that
+\begin{align}
+  \Delta f_a & \defeq f_a^{(0)} \left( e^{-\mu \beta} - e^{\mu \beta} \right), &
+  \Delta n_a & \defeq n_a^{(0)} \left( e^{-\mu \beta} - e^{\mu \beta} \right).
+\end{align}
+As a result, the asymmetry in the phase space can the related to the number
+density asymmetry through
+\begin{equation}
+  \Delta f_a = f_a^{(0)} \left( e^{-\mu \beta} - e^{\mu \beta} \right)
+  = f_a^{(0)} \frac{\Delta n_a}{n_a^{(0)}}
+\end{equation}
+
+The rate of change in the number density asymmetry is
+\begin{equation}
+  \begin{aligned}
+    \ddfrac{\Delta n_a}{t}
+     & = - \int_{\vt a}^{\vt b} \abs{\pzcM}^2 \left[ \prod_{i \in \vt a} \Delta f_i - \prod_{i \in \vt b} \Delta f_i \right]                                                         \\
+     & = - \int_{\vt a}^{\vt b} \abs{\pzcM}^2 \left[ \prod_{i \in \vt a} \frac{\Delta n_i}{n_i^{(0)}} f_i^{(0)} - \prod_{i \in \vt b} \frac{\Delta n_i}{n_i^{(0)}} f_i^{(0)} \right] \\
+     & = - \left[ \gamma(\vt a \to \vt b) \prod_{i \in \vt a} \frac{\Delta n_i}{n_i^{(0)}} - \gamma(\vt b \to \vt a) \prod_{i \in \vt b} \frac{\Delta n_i}{n_i^{(0)}} \right]
+  \end{aligned}
+\end{equation}
+On the other hand, one can also look at the change in the number density
+asymmetries from looking at the change in the number densities of the particle
+and antiparticle respectively:
+\begin{equation}
+  \begin{aligned}
+    \ddfrac{\Delta n_a}{t}
+     & = \ddfrac{n_a}{t} - \ddfrac{n_{\overline a}}{t}                                                                                                                                                                                  \\
+     & = - \left[ \gamma(\vt a \to \vt b) \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} - \gamma(\vt b \to \vt a) \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right]                                                                         \\
+     & \quad + \left[ \gamma(\overline{\vt a} \to \overline{\vt b}) \prod_{i \in \vt a} \frac{n_{\overline i}}{n_i^{(0)}} - \gamma(\overline{\vt b} \to \overline{\vt a}) \prod_{i \in \vt b} \frac{n_{\overline i}}{n_i^{(0)}} \right] \\
+     & = - \gamma(\vt a \to \vt b) \left[ \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} + \prod_{i \in \vt b} \frac{n_{\overline i}}{n_i^{(0)}} \right]
+    - \gamma(\vt b \to \vt a) \left[ \prod_{i \in \vt a} \frac{n_{\overline i}}{n_i^{(0)}} + \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right]
+  \end{aligned}
+\end{equation}
+where we have used \(\mathcal{CPT}\) invariance to equal the rates \(\vt a \to
+\vt b\) and \(\overline{\vt b} \to \overline{\vt a}\).  Further assuming
+\(\mathcal{CP}\) symmetry, this can be simplified further to
+\begin{equation}
+  \ddfrac{\Delta n_a}{t} = - \gamma(\vt a \leftrightarrow \vt b) \left[ \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} + \prod_{i \in \vt a} \frac{n_{\overline i}}{n_i^{(0)}} + \prod_{i \in \vt b} \frac{n_{\overline i}}{n_i^{(0)}} + \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right]
+\end{equation}
+
+
+\end{document}
