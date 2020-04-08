@@ -17,6 +17,12 @@ use ndarray::prelude::*;
 use rayon::prelude::*;
 use std::{error, fmt, fs, io, sync::RwLock};
 
+/// Common initialization function, used to setup common logging for all
+/// functions.
+fn init() {
+    common::setup_logging(0);
+}
+
 /// Solve the Boltzmann equations and return the final values.
 ///
 /// The model function is specified by `model`, and optionally a CSV writer can
@@ -97,6 +103,8 @@ where
 
 #[test]
 fn particle_indices() {
+    init();
+
     let model = LeptogenesisModel::zero();
 
     for (i, p) in model.particles().iter().enumerate() {
@@ -119,7 +127,7 @@ fn particle_indices() {
 /// 1-generation case.
 #[test]
 pub fn decay_only_1gen() -> Result<(), Box<dyn error::Error>> {
-    // common::setup_logging(1);
+    init();
 
     // Create the CSV file
     let output_dir = common::output_dir("leptogenesis/decay_only/1gen");
@@ -158,7 +166,7 @@ pub fn decay_only_1gen() -> Result<(), Box<dyn error::Error>> {
 /// 3-generation case.
 #[test]
 pub fn decay_only_3gen() -> Result<(), Box<dyn error::Error>> {
-    // common::setup_logging(1);
+    init();
 
     // Create the CSV file
     let output_dir = common::output_dir("leptogenesis/decay_only/3gen");
@@ -196,7 +204,7 @@ pub fn decay_only_3gen() -> Result<(), Box<dyn error::Error>> {
 #[test]
 #[cfg(not(debug_assertions))]
 pub fn washout_only_1gen() -> Result<(), Box<dyn error::Error>> {
-    // common::setup_logging(1);
+    init();
 
     // Create the CSV file
     let output_dir = common::output_dir("leptogenesis/washout_only/1gen");
@@ -246,7 +254,7 @@ pub fn washout_only_1gen() -> Result<(), Box<dyn error::Error>> {
 #[test]
 #[cfg(not(debug_assertions))]
 pub fn washout_only_3gen() -> Result<(), Box<dyn error::Error>> {
-    // common::setup_logging(1);
+    init();
 
     // Create the CSV file
     let output_dir = common::output_dir("leptogenesis/washout_only/3gen");
@@ -289,7 +297,7 @@ pub fn washout_only_3gen() -> Result<(), Box<dyn error::Error>> {
 #[test]
 #[cfg(not(debug_assertions))]
 pub fn decay_washout_1gen() -> Result<(), Box<dyn error::Error>> {
-    // common::setup_logging(1);
+    init();
 
     // Create the CSV files
     let output_dir = common::output_dir("leptogenesis/decay_washout/1gen");
@@ -333,7 +341,7 @@ pub fn decay_washout_1gen() -> Result<(), Box<dyn error::Error>> {
 #[test]
 #[cfg(not(debug_assertions))]
 pub fn decay_washout_3gen() -> Result<(), Box<dyn error::Error>> {
-    // common::setup_logging(1);
+    init();
 
     // Create the CSV file
     let output_dir = common::output_dir("leptogenesis/decay_washout/3gen");
@@ -380,7 +388,7 @@ pub fn decay_washout_3gen() -> Result<(), Box<dyn error::Error>> {
 #[ignore]
 #[cfg(not(debug_assertions))]
 pub fn scan() -> Result<(), Box<dyn error::Error>> {
-    // common::setup_logging(1);
+    init();
 
     // Create the CSV file
     let output_dir = common::output_dir("leptogenesis");
@@ -438,7 +446,7 @@ pub fn scan() -> Result<(), Box<dyn error::Error>> {
 
 #[test]
 fn masses_widths_number_densities() -> Result<(), Box<dyn error::Error>> {
-    // common::setup_logging(1);
+    init();
 
     let mut model = LeptogenesisModel::zero();
     for i in &[
@@ -507,7 +515,7 @@ fn masses_widths_number_densities() -> Result<(), Box<dyn error::Error>> {
 /// Test that gauge couplings keep the Higgs in equilibrium
 #[test]
 pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
-    // common::setup_logging(1);
+    init();
 
     // Create the CSV file
     let output_dir = common::output_dir("leptogenesis/higgs_equilibrium");
@@ -554,7 +562,7 @@ pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
 
 #[test]
 fn gammas() -> Result<(), Box<dyn error::Error>> {
-    // common::setup_logging(1);
+    init();
 
     // We'll be using models[0] as the precomputed (default) model, and
     // models[1] as the comparison.
