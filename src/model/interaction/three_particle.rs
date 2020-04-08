@@ -1,7 +1,7 @@
 use crate::{
     model::{
         interaction::{
-            Interaction, InteractionParticleIndices, InteractionParticleSigns,
+            checked_div, Interaction, InteractionParticleIndices, InteractionParticleSigns,
             InteractionParticles, PartialWidth, RateDensity,
         },
         Model,
@@ -11,6 +11,8 @@ use crate::{
 };
 use special_functions::bessel;
 use std::fmt;
+
+const M_BETA_THRESHOLD: f64 = 1e1;
 
 /// Three particle interaction, all determined from the underlying squared amplitude.
 pub struct ThreeParticle<M> {
@@ -168,16 +170,16 @@ where
         let ptcl = c.model.particles();
 
         // Get the *squared* masses
-        let m0 = ptcl[self.particles_idx.incoming[0]].mass2;
-        let m1 = ptcl[self.particles_idx.outgoing[0]].mass2;
-        let m2 = ptcl[self.particles_idx.outgoing[1]].mass2;
+        let p0 = &ptcl[self.particles_idx.incoming[0]];
+        let p1 = &ptcl[self.particles_idx.outgoing[0]];
+        let p2 = &ptcl[self.particles_idx.outgoing[1]];
 
-        if m0 > m1 + m2 {
-            let p = kallen_lambda_sqrt(m0, m1, m2) / (2.0 * m0);
+        if p0.mass > p1.mass + p2.mass {
+            let p = kallen_lambda_sqrt(p0.mass2, p1.mass2, p2.mass2) / (2.0 * p0.mass);
 
             // 1 / 8 π ≅ 0.039788735772973836
             let width =
-                0.039_788_735_772_973_836 * p / m0 * (self.squared_amplitude)(c.model).abs();
+                0.039_788_735_772_973_836 * p / p0.mass * (self.squared_amplitude)(c.model).abs();
 
             Some(PartialWidth {
                 width,
@@ -193,12 +195,22 @@ where
         self.gamma_enabled
     }
 
-    /// Note that for three particle interactions, this does *not* return the
-    /// reaction rate density, but can be obtained multiplied by the decaying
-    /// particle's number density.
+    /// Unlike other function, this is computed in one of two ways:
     ///
-    /// The reason for this is that it prevents the computation of \\(\gamma / n
-    /// \\) which becomes numerically unstable when \\(n\\) becomes very small.
+    /// 1. If incoming particle's mass is greater than the temperature by a
+    ///    specific threshold, then the result is divided analytically by the
+    ///    normalized equilibrium number density of the particle (and
+    ///    multiplying the result by the equilibrium number density will yield
+    ///    the correct interaction density).  This is done in order to avoid a
+    ///    `0 / 0` division to the reaction rate being proportional to \\(K_1(m
+    ///    \beta)\\), while the number density is proportional to \\(K_2(m
+    ///    \beta)\\).
+    /// 2. Otherwise, calculate the usual reaction rate.
+    ///
+    /// Note that in order to obtain the analytical normalized equilibrium
+    /// density, we must assume that \\(m \beta \gg 1 \\) so that it
+    /// approaximates Maxwell--Boltzmann distribution, hence why we must use a
+    /// threshold to switch between the two methods.
     fn gamma(&self, c: &Context<M>) -> Option<f64> {
         if !self.gamma_enabled {
             return None;
@@ -206,21 +218,33 @@ where
 
         let ptcl = c.model.particles();
 
-        // Get the masses
-        let m0 = ptcl[self.particles_idx.incoming[0]].mass;
+        // Get the particles
+        let p0 = &ptcl[self.particles_idx.incoming[0]];
+        let p1 = &ptcl[self.particles_idx.outgoing[0]];
+        let p2 = &ptcl[self.particles_idx.outgoing[1]];
 
-        // The interaction rate goes from heaviest ↔ lighter two.
-        //
-        // TODO: What happens when the decaying particle's mass is not
-        // greater than the sum of the masses of the daughter particles?
-        // 0.002_423_011_225_182_300_4 = ζ(3) / 16 π³
-        Some(
-            0.002_423_011_225_182_300_4
-                * (self.squared_amplitude)(&c.model).abs()
-                * bessel::k1_on_k2(m0 * c.beta)
-                / c.beta.powi(3)
-                / m0,
-        )
+        if p0.mass * c.beta > M_BETA_THRESHOLD {
+            // ζ(3) / 16 π³ ≅ 0.0024230112251823
+            let z = p0.mass * c.beta;
+            Some(
+                0.002_423_011_225_182_3
+                    * (self.squared_amplitude)(&c.model).abs()
+                    * kallen_lambda_sqrt(p0.mass2, p1.mass2, p2.mass2)
+                    / z.powi(3)
+                    * bessel::k1_on_k2(z)
+                    / p0.degrees_of_freedom(),
+            )
+        } else {
+            // 1 / 32 π³ ≅ 0.001007860451037484
+            let z = p0.mass * c.beta;
+            Some(
+                0.001_007_860_451_037_484
+                    * (self.squared_amplitude)(&c.model).abs()
+                    * kallen_lambda_sqrt(p0.mass2, p1.mass2, p2.mass2)
+                    / z
+                    * bessel::k1(z),
+            )
+        }
     }
 
     fn asymmetry(&self, c: &Context<M>) -> Option<f64> {
@@ -229,62 +253,78 @@ where
 
     /// Override the default implementation of [`Interaction::rate`] to make use
     /// of the adjusted reaction rate density.
-    fn rate(&self, gamma_tilde: Option<f64>, c: &Context<M>) -> Option<RateDensity> {
+    fn rate(&self, gamma: Option<f64>, c: &Context<M>) -> Option<RateDensity> {
         // If there's no interaction rate or it is 0 to begin with, there's no
         // need to adjust it to the particles' number densities.
-        if gamma_tilde.map_or(true, |gamma| gamma == 0.0) {
+        if gamma.map_or(true, |gamma| gamma == 0.0) {
             return None;
         }
-        let gamma_tilde = gamma_tilde.unwrap();
+
+        // let ptcl = c.model.particles();
+        let gamma = gamma.unwrap();
         let particles_sign = self.particles_sign();
+        let ptcl = c.model.particles();
 
-        // Get the masses
-        let p0 = self.particles_idx.incoming[0];
-        let p1 = self.particles_idx.outgoing[0];
-        let p2 = self.particles_idx.outgoing[1];
+        // Get the particles
+        let p0 = &ptcl[self.particles_idx.incoming[0]];
+        let p1 = &ptcl[self.particles_idx.outgoing[0]];
+        let p2 = &ptcl[self.particles_idx.outgoing[1]];
 
-        let [n0, n1, n2] = [c.n[p0], c.n[p1], c.n[p2]];
-        let [na0, na1, na2] = [c.na[p0], c.na[p1], c.na[p2]];
-        let [eq0, eq1, eq2] = [c.eq[p0], c.eq[p1], c.eq[p2]];
+        // Get the indices
+        let i0 = self.particles_idx.incoming[0];
+        let i1 = self.particles_idx.outgoing[0];
+        let i2 = self.particles_idx.outgoing[1];
+        let [n0, n1, n2] = [c.n[i0], c.n[i1], c.n[i2]];
+        let [na0, na1, na2] = [c.na[i0], c.na[i1], c.na[i2]];
+        let [eq0, eq1, eq2] = [c.eq[i0], c.eq[i1], c.eq[i2]];
         let [a0, a1, a2] = [
             particles_sign.incoming[0],
             particles_sign.outgoing[0],
             particles_sign.outgoing[1],
         ];
 
-        let forward = gamma_tilde * n0;
-        let backward = gamma_tilde * eq0 * nan_to_one((n1 / eq1) * (n2 / eq2));
+        if p0.mass * c.beta > M_BETA_THRESHOLD {
+            let (forward, asymmetric_forward) = if p0.mass > p1.mass + p2.mass {
+                (gamma * n0, gamma * a0 * na0)
+            } else {
+                (0.0, 0.0)
+            };
 
-        let asymmetric_forward = gamma_tilde * a0 * na0;
-        let asymmetric_backward = gamma_tilde
-            * eq0
-            * (a1 * nan_to_zero(na1 / eq1) * nan_to_one(n2 / eq2)
-                + a2 * nan_to_zero(na2 / eq2) * nan_to_one(n1 / eq1)
-                - a2 * a1 * nan_to_zero(na1 * na2 / (eq1 * eq2)));
+            let gamma = gamma * eq0;
+            let backward = gamma * checked_div(n1, eq1) * checked_div(n2, eq2);
+            let asymmetric_backward = gamma
+                * (checked_div(a1 * na1, eq1) * checked_div(n2, eq2)
+                    + checked_div(a2 * na2, eq2) * checked_div(n1, eq1)
+                    - checked_div(a1 * na1, eq1) * checked_div(a2 * na2, eq2));
 
-        Some(RateDensity {
-            forward,
-            backward,
-            asymmetric_forward,
-            asymmetric_backward,
-        })
-    }
-}
+            Some(RateDensity {
+                forward,
+                backward,
+                asymmetric_forward,
+                asymmetric_backward,
+            })
+        } else {
+            let (forward, asymmetric_forward) = if p0.mass > p1.mass + p2.mass {
+                (
+                    gamma * checked_div(n0, eq0),
+                    gamma * checked_div(a0 * na0, eq0),
+                )
+            } else {
+                (0.0, 0.0)
+            };
 
-/// Converts NaN floating points to 0
-fn nan_to_zero(v: f64) -> f64 {
-    if v.is_nan() {
-        0.0
-    } else {
-        v
-    }
-}
+            let backward = gamma * checked_div(n1, eq1) * checked_div(n2, eq2);
+            let asymmetric_backward = gamma
+                * (checked_div(a1 * na1, eq1) * checked_div(n2, eq2)
+                    + checked_div(a2 * na2, eq2) * checked_div(n1, eq1)
+                    - checked_div(a1 * na1, eq1) * checked_div(a2 * na2, eq2));
 
-/// Converts NaN floating points to 0
-fn nan_to_one(v: f64) -> f64 {
-    if v.is_nan() {
-        1.0
-    } else {
-        v
+            Some(RateDensity {
+                forward,
+                backward,
+                asymmetric_forward,
+                asymmetric_backward,
+            })
+        }
     }
 }
