@@ -661,6 +661,8 @@ where
             } else {
                 log::trace!("Step {}, β = {:.4e}, h = {:.4e}", step, beta, h);
             }
+            log::trace!("      n = {:<+10.3e}", n);
+            log::trace!("     na = {:<+10.3e}", na);
 
             for i in 0..RK_S {
                 // DEBUG
@@ -701,6 +703,7 @@ where
                         *dna += bi * kai;
                         *dna_err += ei * kai;
                     });
+                log::trace!("=> k[{:02}] = {:<+10.3e}", i, bi * &k[i]);
             }
 
             self.model.set_beta(beta);
@@ -725,7 +728,7 @@ where
             // iteration step
             if err < self.error_tolerance {
                 advance = true;
-            } else {
+            } else if log::log_enabled!(log::Level::Trace) {
                 log::trace!(
                     "Error is not within tolerance ({:e} > {:e}).",
                     err,
@@ -733,10 +736,10 @@ where
                 );
 
                 // DEBUG
-                // log::trace!("     dn = {:>10.3e}", dn);
-                // log::trace!("    dna = {:>10.3e}", dna);
-                // log::trace!(" dn_err = {:>10.3e}", dn_err);
-                // log::trace!("dna_err = {:>10.3e}", dna_err);
+                log::trace!("     dn = {:<+10.3e}", dn);
+                log::trace!("    dna = {:<+10.3e}", dna);
+                log::trace!(" dn_err = {:<+10.3e}", dn_err);
+                log::trace!("dna_err = {:<+10.3e}", dna_err);
             }
 
             // Compute the change in step size based on the current error and
