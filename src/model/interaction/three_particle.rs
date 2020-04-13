@@ -158,12 +158,13 @@ where
         &self.particles_sign
     }
 
+    #[inline(always)]
     fn width_enabled(&self) -> bool {
         self.width_enabled
     }
 
     fn width(&self, c: &Context<M>) -> Option<PartialWidth> {
-        if !self.width_enabled {
+        if !self.width_enabled() {
             return None;
         }
 
@@ -191,6 +192,7 @@ where
         }
     }
 
+    #[inline(always)]
     fn gamma_enabled(&self) -> bool {
         self.gamma_enabled
     }
@@ -199,20 +201,22 @@ where
     ///
     /// 1. If incoming particle's mass is greater than the temperature by a
     ///    specific threshold, then the result is divided analytically by the
-    ///    normalized equilibrium number density of the particle (and
+    ///    normalized equilibrium number density of the particle such that
     ///    multiplying the result by the equilibrium number density will yield
     ///    the correct interaction density).  This is done in order to avoid a
-    ///    `0 / 0` division to the reaction rate being proportional to \\(K_1(m
-    ///    \beta)\\), while the number density is proportional to \\(K_2(m
-    ///    \beta)\\).
+    ///    `0 / 0` division as the reaction rate is propoertional \\(K_1(m
+    ///    \beta)\\), while the number density of the decaying particle
+    ///    proportional to \\(K_2(m \beta)\\), and the ratio of Bessel function
+    ///    tends to 1 (while each individually tends to 0 very quickly).
     /// 2. Otherwise, calculate the usual reaction rate.
     ///
     /// Note that in order to obtain the analytical normalized equilibrium
-    /// density, we must assume that \\(m \beta \gg 1 \\) so that it
-    /// approaximates Maxwell--Boltzmann distribution, hence why we must use a
-    /// threshold to switch between the two methods.
+    /// density, we must assume that \\(m \beta \gg 1 \\) so that the number
+    /// density approximates a Maxwell--Boltzmann distribution (irrespective of
+    /// the original statistic), hence why we must use a threshold to switch
+    /// between the two methods.
     fn gamma(&self, c: &Context<M>) -> Option<f64> {
-        if !self.gamma_enabled {
+        if !self.gamma_enabled() {
             return None;
         }
 
@@ -230,8 +234,7 @@ where
                 0.002_423_011_225_182_3
                     * (self.squared_amplitude)(&c.model).abs()
                     * kallen_lambda_sqrt(p0.mass2, p1.mass2, p2.mass2)
-                    / z.powi(3)
-                    * bessel::k1_on_k2(z)
+                    * (bessel::k1_on_k2(z) / z.powi(3))
                     / p0.degrees_of_freedom(),
             )
         } else {
@@ -241,8 +244,7 @@ where
                 0.001_007_860_451_037_484
                     * (self.squared_amplitude)(&c.model).abs()
                     * kallen_lambda_sqrt(p0.mass2, p1.mass2, p2.mass2)
-                    / z
-                    * bessel::k1(z),
+                    * (bessel::k1(z) / z),
             )
         }
     }
@@ -260,71 +262,69 @@ where
             return None;
         }
 
-        // let ptcl = c.model.particles();
         let gamma = gamma.unwrap();
-        let particles_sign = self.particles_sign();
         let ptcl = c.model.particles();
 
-        // Get the particles
-        let p0 = &ptcl[self.particles_idx.incoming[0]];
-        let p1 = &ptcl[self.particles_idx.outgoing[0]];
-        let p2 = &ptcl[self.particles_idx.outgoing[1]];
-
-        // Get the indices
-        let i0 = self.particles_idx.incoming[0];
-        let i1 = self.particles_idx.outgoing[0];
-        let i2 = self.particles_idx.outgoing[1];
-        let [n0, n1, n2] = [c.n[i0], c.n[i1], c.n[i2]];
-        let [na0, na1, na2] = [c.na[i0], c.na[i1], c.na[i2]];
-        let [eq0, eq1, eq2] = [c.eq[i0], c.eq[i1], c.eq[i2]];
-        let [a0, a1, a2] = [
-            particles_sign.incoming[0],
-            particles_sign.outgoing[0],
-            particles_sign.outgoing[1],
+        // Get the various quantities associated with each particle.
+        let [i0, i1, i2] = [
+            self.particles_idx.incoming[0],
+            self.particles_idx.outgoing[0],
+            self.particles_idx.outgoing[1],
         ];
+        let [p0, p1, p2] = [&ptcl[i0], &ptcl[i1], &ptcl[i2]];
+        let [n0, n1, n2] = [c.n[i0], c.n[i1], c.n[i2]];
+        let [na0, na1, na2] = [
+            self.particles_sign.incoming[0] * c.na[i0],
+            self.particles_sign.outgoing[0] * c.na[i1],
+            self.particles_sign.outgoing[1] * c.na[i2],
+        ];
+        let [eq0, eq1, eq2] = [c.eq[i0], c.eq[i1], c.eq[i2]];
 
+        let can_decay = p0.mass > p1.mass + p2.mass;
+
+        let (forward, asymmetric_forward, backward, asymmetric_backward);
         if p0.mass * c.beta > M_BETA_THRESHOLD {
-            let (forward, asymmetric_forward) = if p0.mass > p1.mass + p2.mass {
-                (gamma * n0, gamma * a0 * na0)
+            // Above the M_BETA_THRESHOLD, `gamma` is already divided by eq0, so
+            // we need not divide by `eq0` to calculate the forward rates, and we
+            // have to multiply by `eq0` to get the backward rate.
+            if can_decay {
+                forward = gamma * n0;
+                asymmetric_forward = gamma * na0;
             } else {
-                (0.0, 0.0)
+                forward = 0.0;
+                asymmetric_forward = 0.0;
             };
 
             let gamma = gamma * eq0;
-            let backward = gamma * checked_div(n1, eq1) * checked_div(n2, eq2);
-            let asymmetric_backward = gamma
-                * (checked_div(a1 * na1, eq1) * checked_div(n2, eq2)
-                    + checked_div(a2 * na2, eq2) * checked_div(n1, eq1)
-                    - checked_div(a1 * na1, eq1) * checked_div(a2 * na2, eq2));
-
-            Some(RateDensity {
-                forward,
-                backward,
-                asymmetric_forward,
-                asymmetric_backward,
-            })
+            backward = gamma * checked_div(n1, eq1) * checked_div(n2, eq2);
+            asymmetric_backward = gamma
+                * (checked_div(na1, eq1) * checked_div(n2, eq2)
+                    + checked_div(na2, eq2) * checked_div(n1, eq1)
+                    - checked_div(na1, eq1) * checked_div(na2, eq2));
         } else {
-            let (forward, asymmetric_forward) = if p0.mass > p1.mass + p2.mass {
-                (
-                    gamma * checked_div(n0, eq0),
-                    gamma * checked_div(a0 * na0, eq0),
-                )
+            // Below the M_BETA_THRESHOLD, `gamma` is the usual rate which must
+            // be scaled by factors of `n / eq` to get the actual forward and
+            // backward rates.
+            if can_decay {
+                forward = gamma * checked_div(n0, eq0);
+                asymmetric_forward = gamma * checked_div(na0, eq0);
             } else {
-                (0.0, 0.0)
+                forward = 0.0;
+                asymmetric_forward = 0.0;
             };
 
-            let backward = gamma * checked_div(n1, eq1) * checked_div(n2, eq2);
-            let asymmetric_backward = gamma
-                * (checked_div(a1 * na1, eq1) * checked_div(n2, eq2)
-                    + checked_div(a2 * na2, eq2) * checked_div(n1, eq1)
-                    - checked_div(a1 * na1, eq1) * checked_div(a2 * na2, eq2));
-
-            Some(RateDensity {
-                forward,
-                backward,
-                asymmetric_forward,
-                asymmetric_backward,
-            })
+            backward = gamma * checked_div(n1, eq1) * checked_div(n2, eq2);
+            asymmetric_backward = gamma
+                * (checked_div(na1, eq1) * checked_div(n2, eq2)
+                    + checked_div(na2, eq2) * checked_div(n1, eq1)
+                    - checked_div(na1, eq1) * checked_div(na2, eq2));
         }
+
+        Some(RateDensity {
+            forward,
+            backward,
+            asymmetric_forward,
+            asymmetric_backward,
+        })
     }
 }
