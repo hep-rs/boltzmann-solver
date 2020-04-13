@@ -179,7 +179,7 @@ where
 
             // 1 / 8 π ≅ 0.039788735772973836
             let width =
-                0.039_788_735_772_973_836 * p / p0.mass * (self.squared_amplitude)(c.model).abs();
+                0.039_788_735_772_973_836 * p / p0.mass2 * (self.squared_amplitude)(c.model).abs();
 
             Some(PartialWidth {
                 width,
