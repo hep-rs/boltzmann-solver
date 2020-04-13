@@ -187,7 +187,7 @@ where
         let gamma = integrate_st(
             |s, t| {
                 let u = m0 + m1 + m2 + m3 - s - t;
-                (self.squared_amplitude)(&c.model, s, t, u)
+                (self.squared_amplitude)(&c.model, s, t, u).abs()
             },
             c.beta,
             m0,
