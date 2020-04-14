@@ -9,6 +9,10 @@ use ndarray::{prelude::*, Zip};
 use rayon::prelude::*;
 use std::{error, fmt, mem, ptr};
 
+// Number of recursive subdivisions in beta range (so there are 2^N
+// subdivisions).
+const PRECOMPUTE_SUBDIV: u32 = 12;
+
 /// Error type returned by the solver builder in case there is an error.
 #[derive(Debug)]
 pub enum Error {
@@ -387,10 +391,6 @@ where
     /// Precompute the interaction rates.
     #[cfg(not(feature = "parallel"))]
     fn precompute(model: &mut M, beta_range: (f64, f64)) {
-        // Number of recursive subdivisions in beta range (so there are 2^N
-        // subdivisions).
-        const N: u32 = 10;
-
         log::info!("Pre-computing γ...");
         for (i, &beta) in vec![
             0.98 * beta_range.0,
@@ -399,13 +399,25 @@ where
             1.02 * beta_range.1,
         ]
         .iter()
-        .chain(&rec_geomspace(beta_range.0, beta_range.1, N))
+        .chain(&rec_geomspace(
+            beta_range.0,
+            beta_range.1,
+            PRECOMPUTE_SUBDIV,
+        ))
         .enumerate()
         {
             if i % 64 == 3 {
-                log::debug!("Precomputing step {} / {}", i, 2_usize.pow(N) + 3);
+                log::debug!(
+                    "Precomputing step {} / {}",
+                    i,
+                    2_usize.pow(PRECOMPUTE_SUBDIV) + 3
+                );
             } else {
-                log::trace!("Precomputing step {} / {}", i, 2_usize.pow(N) + 3);
+                log::trace!(
+                    "Precomputing step {} / {}",
+                    i,
+                    2_usize.pow(PRECOMPUTE_SUBDIV) + 3
+                );
             }
             model.set_beta(beta);
             let c = model.as_context();
@@ -419,10 +431,6 @@ where
     /// Precompute the interaction rates.
     #[cfg(feature = "parallel")]
     fn precompute(model: &mut M, beta_range: (f64, f64)) {
-        // Number of recursive subdivisions in beta range (so there are 2^N
-        // subdivisions).
-        const N: u32 = 10;
-
         log::info!("Pre-computing γ...");
         for (i, &beta) in vec![
             0.98 * beta_range.0,
@@ -431,13 +439,25 @@ where
             1.02 * beta_range.1,
         ]
         .iter()
-        .chain(&rec_geomspace(beta_range.0, beta_range.1, N))
+        .chain(&rec_geomspace(
+            beta_range.0,
+            beta_range.1,
+            PRECOMPUTE_SUBDIV,
+        ))
         .enumerate()
         {
             if i % 64 == 3 {
-                log::debug!("Precomputing step {} / {}", i, 2_usize.pow(N) + 3);
+                log::debug!(
+                    "Precomputing step {} / {}",
+                    i,
+                    2_usize.pow(PRECOMPUTE_SUBDIV) + 3
+                );
             } else {
-                log::trace!("Precomputing step {} / {}", i, 2_usize.pow(N) + 3);
+                log::trace!(
+                    "Precomputing step {} / {}",
+                    i,
+                    2_usize.pow(PRECOMPUTE_SUBDIV) + 3
+                );
             }
             model.set_beta(beta);
             let c = model.as_context();
