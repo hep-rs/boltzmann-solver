@@ -267,49 +267,67 @@ where
         // DEBUG
         // let particles = self.particles();
         // log::trace!(
-        //     "{:<10}: ↔ {:<12.3e} | → {:<12.3e} | ← {:<12.3e}",
+        //     "{:<10}: ↔ {:<12.3e} | → {:<12.3e} | ← {:<12.3e} | a↔ {:<12.3e} | a→ {:<12.3e} | a← {:<12.3e}",
         //     particles.display(c.model).unwrap(),
         //     rate.net_rate(),
         //     rate.forward,
-        //     rate.backward
+        //     rate.backward,
+        //     rate.net_asymmetric_rate(),
+        //     rate.asymmetric_forward,
+        //     rate.asymmetric_backward
         // );
 
         let mut net_rate = rate.net_rate();
         let mut net_asymmetric_rate = rate.net_asymmetric_rate();
 
-        if net_rate != 0.0 || net_asymmetric_rate != 0.0 {
+        let mut changed = net_rate != 0.0 || net_asymmetric_rate != 0.0;
+        while changed {
+            changed = false;
+
             for (&p, a) in particles_idx.incoming.iter().zip(&particles_sign.incoming) {
                 if overshoots(c, p, -net_rate) {
                     rate.forward = (c.n[p] - c.eq[p]) / ALPHA_N + rate.backward;
-                    // log::trace!(
-                    //     "    adj → : ↔ {:<12.3e} | → {:<12.3e} | ← {:<12.3e}",
-                    //     rate.net_rate(),
-                    //     rate.forward,
-                    //     rate.backward
-                    // );
+                    changed = ((net_rate - rate.net_rate()) / net_rate).abs() > 1e-10;
                     net_rate = rate.net_rate();
                 }
                 if asymmetry_overshoots(c, p, -a * net_asymmetric_rate) {
                     rate.asymmetric_forward = c.na[p] / ALPHA_NA + rate.asymmetric_backward;
+                    changed = ((net_asymmetric_rate - rate.net_asymmetric_rate())
+                        / net_asymmetric_rate)
+                        .abs()
+                        > 1e-10;
                     net_asymmetric_rate = rate.net_asymmetric_rate();
                 }
             }
+
             for (&p, a) in particles_idx.outgoing.iter().zip(&particles_sign.outgoing) {
                 if overshoots(c, p, net_rate) {
                     rate.backward = (c.n[p] - c.eq[p]) / ALPHA_N + rate.forward;
-                    // log::trace!(
-                    //     "    adj ← : ↔ {:<12.3e} | → {:<12.3e} | ← {:<12.3e}",
-                    //     rate.net_rate(),
-                    //     rate.forward,
-                    //     rate.backward
-                    // );
+                    changed = ((net_rate - rate.net_rate()) / net_rate).abs() > 1e-10;
                     net_rate = rate.net_rate();
                 }
                 if asymmetry_overshoots(c, p, a * net_asymmetric_rate) {
                     rate.asymmetric_backward = c.na[p] / ALPHA_NA + rate.asymmetric_forward;
+                    changed = ((net_asymmetric_rate - rate.net_asymmetric_rate())
+                        / net_asymmetric_rate)
+                        .abs()
+                        > 1e-10;
                     net_asymmetric_rate = rate.net_asymmetric_rate();
                 }
             }
+
+            // if changed {
+            //     log::trace!(
+            //         "  updated : ↔ {:<12.3e} | → {:<12.3e} | ← {:<12.3e} | a↔ {:<12.3e} | a→ {:<12.3e} | a← {:<12.3e}",
+            //         particles.display(c.model).unwrap(),
+            //         rate.net_rate(),
+            //         rate.forward,
+            //         rate.backward,
+            //         rate.net_asymmetric_rate(),
+            //         rate.asymmetric_forward,
+            //         rate.asymmetric_backward
+            //     );
+            // }
         }
 
         Some(rate)
@@ -341,11 +359,11 @@ where
         // DEBUG
         // let particles = self.particles();
         // if let Ok(interaction) = particles.display(c.model) {
-        //     log::trace!("γ({}) = {:<10.3e}", interaction, net_rate);
+        //     log::trace!(" γ({}) = {:<10.3e}", interaction, net_rate);
         //     log::trace!("γ'({}) = {:<10.3e}", interaction, net_asymmetric_rate);
         // } else {
         //     log::trace!(
-        //         "γ({:?} ↔ {:?}) = {:<10.3e}",
+        //         " γ({:?} ↔ {:?}) = {:<10.3e}",
         //         particles.incoming,
         //         particles.outgoing,
         //         net_rate
