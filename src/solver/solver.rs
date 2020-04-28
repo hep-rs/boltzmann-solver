@@ -422,12 +422,6 @@ where
                     i,
                     2_usize.pow(PRECOMPUTE_SUBDIV) + 3
                 );
-            } else {
-                log::trace!(
-                    "Precomputing step {} / {}",
-                    i,
-                    2_usize.pow(PRECOMPUTE_SUBDIV) + 3
-                );
             }
             model.set_beta(beta);
             let c = model.as_context();
@@ -458,12 +452,6 @@ where
         {
             if i % 64 == 3 {
                 log::debug!(
-                    "Precomputing step {} / {}",
-                    i,
-                    2_usize.pow(PRECOMPUTE_SUBDIV) + 3
-                );
-            } else {
-                log::trace!(
                     "Precomputing step {} / {}",
                     i,
                     2_usize.pow(PRECOMPUTE_SUBDIV) + 3
