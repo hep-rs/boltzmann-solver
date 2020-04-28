@@ -668,6 +668,7 @@ where
             } else if h_on_beta < self.step_precision.min {
                 h = beta * self.step_precision.min;
                 log::debug!("Step size too small, increased h to {:.3e}", h);
+
                 // Irrespective of the local error, if we're at the minimum step
                 // size we will be integrating this step.
                 advance = true;
@@ -723,7 +724,6 @@ where
                         *dna += bi * kai;
                         *dna_err += ei * kai;
                     });
-                log::trace!("=> k[{:02}] = {:<+10.3e}", i, bi * &k[i]);
             }
 
             self.model.set_beta(beta);
@@ -744,6 +744,12 @@ where
                 .chain(dna_err.iter())
                 .fold(0_f64, |e, v| e.max(v.abs()));
 
+            // DEBUG
+            // log::trace!("     dn = {:<+10.3e}", dn);
+            // log::trace!("    dna = {:<+10.3e}", dna);
+            // log::trace!(" dn_err = {:<+10.3e}", dn_err);
+            // log::trace!("dna_err = {:<+10.3e}", dna_err);
+
             // If the error is within the tolerance, we'll be advancing the
             // iteration step
             if err < self.error_tolerance {
@@ -754,12 +760,6 @@ where
                     err,
                     self.error_tolerance
                 );
-
-                // DEBUG
-                log::trace!("     dn = {:<+10.3e}", dn);
-                log::trace!("    dna = {:<+10.3e}", dna);
-                log::trace!(" dn_err = {:<+10.3e}", dn_err);
-                log::trace!("dna_err = {:<+10.3e}", dna_err);
             }
 
             // Compute the change in step size based on the current error and
