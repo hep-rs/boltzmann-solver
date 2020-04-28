@@ -343,7 +343,12 @@ impl<M> SolverBuilder<M> {
             .collect();
 
         for (i, ni) in initial_densities {
-            n[i] = ni;
+            if let Some(v) = n.get_mut(i) {
+                *v = ni;
+            } else {
+                log::error!("Out of bounds initial density.");
+                return Err(Error::InvalidInitialDensities);
+            }
         }
 
         if n.iter().any(|v| !v.is_finite() || v.is_nan()) {
@@ -369,7 +374,12 @@ impl<M> SolverBuilder<M> {
         let mut na = Array1::zeros(particles.len());
 
         for (i, nai) in initial_asymmetries {
-            na[i] = nai;
+            if let Some(v) = na.get_mut(i) {
+                *v = nai;
+            } else {
+                log::error!("Out of bounds initial asymmetry.");
+                return Err(Error::InvalidInitialAsymmetries);
+            }
         }
 
         if na.iter().any(|v| !v.is_finite() || v.is_nan()) {
