@@ -329,7 +329,7 @@ impl<M> SolverBuilder<M> {
 
     /// Check the validity of the initial densities, making sure we have the
     /// right number of initial conditions and they are all finite.
-    fn check_initial_densities<I>(
+    fn generate_initial_densities<I>(
         beta: f64,
         particles: &[Particle],
         initial_densities: I,
@@ -364,7 +364,7 @@ impl<M> SolverBuilder<M> {
 
     /// Check the validity of the initial asymmetries, making sure we have the
     /// right number of initial conditions and they are all finite.
-    fn check_initial_asymmetries<I>(
+    fn generate_initial_asymmetries<I>(
         particles: &[Particle],
         initial_asymmetries: I,
     ) -> Result<Array1<f64>, Error>
@@ -499,7 +499,7 @@ where
             log::error!("At least one initial number density was specified twice.");
             return Err(Error::DuplicateInitialDensities);
         }
-        let initial_densities = Self::check_initial_densities(
+        let initial_densities = Self::generate_initial_densities(
             beta_range.0,
             &particles,
             self.initial_densities.iter().cloned(),
@@ -514,8 +514,10 @@ where
             log::error!("At least one initial number density was specified twice.");
             return Err(Error::DuplicateInitialAsymmetries);
         }
-        let initial_asymmetries = Array1::zeros(particles.len());
-        Self::check_initial_asymmetries(&particles, self.initial_asymmetries.iter().cloned())?;
+        let initial_asymmetries = Self::generate_initial_asymmetries(
+            &particles,
+            self.initial_asymmetries.iter().cloned(),
+        )?;
 
         // Make sure that there aren't too many particles held in equilibrium or
         // forbidden from developing any asymmetry.  We also sort and remove
