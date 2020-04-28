@@ -227,6 +227,11 @@ where
         let p1 = &ptcl[self.particles_idx.outgoing[0]];
         let p2 = &ptcl[self.particles_idx.outgoing[1]];
 
+        // If the decay is kinematically forbidden, return 0.
+        if p0.mass < p1.mass + p2.mass {
+            return Some(0.0);
+        }
+
         if p0.mass * c.beta > M_BETA_THRESHOLD {
             // ζ(3) / 16 π³ ≅ 0.0024230112251823
             let z = p0.mass * c.beta;
@@ -271,7 +276,7 @@ where
             self.particles_idx.outgoing[0],
             self.particles_idx.outgoing[1],
         ];
-        let [p0, p1, p2] = [&ptcl[i0], &ptcl[i1], &ptcl[i2]];
+        let p0 = &ptcl[i0];
         let [n0, n1, n2] = [c.n[i0], c.n[i1], c.n[i2]];
         let [na0, na1, na2] = [
             self.particles_sign.incoming[0] * c.na[i0],
@@ -280,44 +285,32 @@ where
         ];
         let [eq0, eq1, eq2] = [c.eq[i0], c.eq[i1], c.eq[i2]];
 
-        let can_decay = p0.mass > p1.mass + p2.mass;
-
         let (forward, asymmetric_forward, backward, asymmetric_backward);
         if p0.mass * c.beta > M_BETA_THRESHOLD {
             // Above the M_BETA_THRESHOLD, `gamma` is already divided by eq0, so
             // we need not divide by `eq0` to calculate the forward rates, and we
             // have to multiply by `eq0` to get the backward rate.
-            if can_decay {
-                forward = gamma * n0;
-                asymmetric_forward = gamma * na0;
-            } else {
-                forward = 0.0;
-                asymmetric_forward = 0.0;
-            };
+
+            forward = gamma * n0;
+            asymmetric_forward = gamma * na0;
 
             let gamma = gamma * eq0;
             backward = gamma * checked_div(n1, eq1) * checked_div(n2, eq2);
             asymmetric_backward = gamma
-                * (checked_div(na1, eq1) * checked_div(n2, eq2)
-                    + checked_div(na2, eq2) * checked_div(n1, eq1)
-                    - checked_div(na1, eq1) * checked_div(na2, eq2));
+                * (checked_div(na1 * n2, eq1 * eq2) + checked_div(na2 * n1, eq1 * eq2)
+                    - checked_div(na1 * na2, eq1 * eq2));
         } else {
             // Below the M_BETA_THRESHOLD, `gamma` is the usual rate which must
             // be scaled by factors of `n / eq` to get the actual forward and
             // backward rates.
-            if can_decay {
-                forward = gamma * checked_div(n0, eq0);
-                asymmetric_forward = gamma * checked_div(na0, eq0);
-            } else {
-                forward = 0.0;
-                asymmetric_forward = 0.0;
-            };
+
+            forward = gamma * checked_div(n0, eq0);
+            asymmetric_forward = gamma * checked_div(na0, eq0);
 
             backward = gamma * checked_div(n1, eq1) * checked_div(n2, eq2);
             asymmetric_backward = gamma
-                * (checked_div(na1, eq1) * checked_div(n2, eq2)
-                    + checked_div(na2, eq2) * checked_div(n1, eq1)
-                    - checked_div(na1, eq1) * checked_div(na2, eq2));
+                * (checked_div(na1 * n2, eq1 * eq2) + checked_div(na2 * n1, eq1 * eq2)
+                    - checked_div(na1 * na2, eq1 * eq2));
         }
 
         Some(RateDensity {
