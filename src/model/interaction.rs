@@ -14,6 +14,35 @@ use crate::{model::Model, solver::Context};
 use ndarray::prelude::*;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+use std::{collections::HashMap, hash};
+
+struct IdentityHasher {
+    state: u64,
+}
+
+impl hash::Hasher for IdentityHasher {
+    fn finish(&self) -> u64 {
+        self.state
+    }
+
+    fn write(&mut self, bytes: &[u8]) {
+        let mut s: [u8; 8] = [0, 0, 0, 0, 0, 0, 0, 0];
+        for i in (0..bytes.len()).take(8) {
+            s[i] = bytes[i]
+        }
+        self.state = u64::from_be_bytes(s);
+    }
+}
+
+struct BuildIdentityHasher;
+
+impl hash::BuildHasher for BuildIdentityHasher {
+    type Hasher = IdentityHasher;
+
+    fn build_hasher(&self) -> Self::Hasher {
+        IdentityHasher { state: 0 }
+    }
+}
 
 /// List of particles involved in the interaction.
 ///
@@ -150,7 +179,7 @@ where
     /// manually.  Care must be taken to obey [`Interaction::width_enabled`] in
     /// order to avoid unnecessary computation (though the incorrect
     /// implementation will not be detrimental other than in performance).
-    fn width(&self, _: &Context<M>) -> Option<PartialWidth> {
+    fn width(&self, _c: &Context<M>) -> Option<PartialWidth> {
         None
     }
 
@@ -167,13 +196,23 @@ where
     /// It also must *not* be normalized to the integration step size.
     ///
     /// Care must be taken to obey [`Interaction::gamma_enabled`] in order to
-    /// avoid computation.  Specifically, this should always return `None` when
-    /// `self.gamma_enabled() == true`.
+    /// avoid unnecessary computations.  Specifically, this should always return
+    /// `None` when `self.gamma_enabled() == true`.
     fn gamma(&self, c: &Context<M>) -> Option<f64>;
 
-    /// Asymmetry
+    /// Asymmetry between the interaction and its \\(\mathcal{CP}\\) conjugate:
     ///
-    /// TODO: Document better
+    /// \\begin{equation}
+    ///   \delta\gamma
+    ///     \defeq \gamma(\vt a \to \vt b) - \gamma(\overline{\vt a} \to \overline{\vt b})
+    ///     = \gamma(\vt a \to \vt b) - \gamma(\vt b \to \vt a)
+    /// \\end{equation}
+    ///
+    /// If there is no (relevant) asymmetry, then this should return `None`.
+    ///
+    /// Note that his is not the same as the asymmetry specified in creating the
+    /// interaction, with the latter being defined as the asymmetry in the
+    /// squared amplitudes and the former being subsequently computed.
     fn asymmetry(&self, _c: &Context<M>) -> Option<f64> {
         None
     }
@@ -183,51 +222,85 @@ where
     ///
     /// The result must not be normalized by the Hubble rate, nor include the
     /// factors relating to the integration step size.
-    fn rate(&self, gamma: Option<f64>, c: &Context<M>) -> Option<RateDensity> {
-        // If there's no interaction rate or it is 0 to begin with, there's no
-        // need to adjust it to the particles' number densities.
-        if gamma.map_or(true, |gamma| gamma == 0.0) {
+    ///
+    /// The rate density is defined such that the change initial state particles
+    /// is proportional to the negative of the rates contained, while the change
+    /// for final state particles is proportional to the rates themselves.
+    fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
+        let gamma = self.gamma(c).unwrap_or(0.0);
+        let asymmetry = self.asymmetry(c).unwrap_or(0.0);
+
+        // If both rates are 0, there's no need to adjust it to the particles'
+        // number densities.
+        if gamma == 0.0 && asymmetry == 0.0 {
             return None;
         }
-        let gamma = gamma.unwrap();
 
         let particles_idx = self.particles_idx();
         let particles_sign = self.particles_sign();
 
         // A NaN should only occur from `0.0 / 0.0`, in which case the correct
-        // value ought to be 0.
-        let forward = particles_idx
+        // value ought to be 0 as there are no actual particles to decay (in the
+        // numerator).
+        let forward_prefactor = particles_idx
             .incoming
             .iter()
             .map(|&p| checked_div(c.n[p], c.eq[p]))
             .product::<f64>();
-        let backward = particles_idx
+        let backward_prefactor = particles_idx
             .outgoing
             .iter()
             .map(|&p| checked_div(c.n[p], c.eq[p]))
             .product::<f64>();
-        let asymmetric_forward = forward
-            - particles_idx
-                .incoming
-                .iter()
-                .zip(&particles_sign.incoming)
-                .map(|(&p, &a)| checked_div(c.n[p] - a * c.na[p], c.eq[p]))
-                .product::<f64>();
-        let asymmetric_backward = forward
-            - particles_idx
-                .outgoing
-                .iter()
-                .zip(&particles_sign.outgoing)
-                .map(|(&p, &a)| checked_div(c.n[p] - a * c.na[p], c.eq[p]))
-                .product::<f64>();
 
-        let mut rate = RateDensity {
-            forward,
-            backward,
-            asymmetric_forward,
-            asymmetric_backward,
-        };
-        rate *= gamma;
+        let mut rate = RateDensity::zero();
+        rate.symmetric = gamma * (forward_prefactor - backward_prefactor);
+        rate.asymmetric = asymmetry * (forward_prefactor + backward_prefactor)
+            + gamma
+                * (checked_div(
+                    particles_idx
+                        .incoming
+                        .iter()
+                        .zip(&particles_sign.incoming)
+                        .enumerate()
+                        .map(|(i, (&p, &a))| {
+                            a * c.na[p]
+                                * particles_idx
+                                    .incoming
+                                    .iter()
+                                    .enumerate()
+                                    .filter_map(|(j, &p)| if i == j { None } else { Some(c.n[p]) })
+                                    .product::<f64>()
+                        })
+                        .sum::<f64>(),
+                    particles_idx
+                        .incoming
+                        .iter()
+                        .map(|&p| c.n[p])
+                        .product::<f64>(),
+                ) - checked_div(
+                    particles_idx
+                        .outgoing
+                        .iter()
+                        .zip(&particles_sign.outgoing)
+                        .enumerate()
+                        .map(|(i, (&p, &a))| {
+                            a * c.na[p]
+                                * particles_idx
+                                    .outgoing
+                                    .iter()
+                                    .enumerate()
+                                    .filter_map(|(j, &p)| if i == j { None } else { Some(c.n[p]) })
+                                    .product::<f64>()
+                        })
+                        .sum::<f64>(),
+                    particles_idx
+                        .outgoing
+                        .iter()
+                        .map(|&p| c.n[p])
+                        .product::<f64>(),
+                ));
+
         Some(rate)
     }
 
@@ -240,92 +313,77 @@ where
     ///
     /// The output of this function however *will* be normalized by the HUbble
     /// rate and *will* factors relating to the numerical integration.
-    fn adjust_rate_overshoot(
-        &self,
-        rate: Option<RateDensity>,
-        c: &Context<M>,
-    ) -> Option<RateDensity> {
-        // If an overshoot of the interaction rate is detected, the rate is
-        // adjusted such that `dn` satisfies:
-        //
-        // ```text
-        // n + dn = (eq + (ALPHA - 1) * n) / ALPHA
-        // ```
-        //
-        // Large values means that the correction towards equilibrium are
-        // weaker, while smaller values make the move towards equilibrium
-        // stronger.  Values of ALPHA less than 1 will overshoot the
-        // equilibrium.
-        const ALPHA_N: f64 = 1.1;
-        const ALPHA_NA: f64 = 1.1;
+    fn adjusted_rate(&self, c: &Context<M>) -> Option<RateDensity> {
+        let mut rate = self.rate(c)? * c.step_size * c.normalization;
 
-        let mut rate = rate? * c.step_size * c.normalization;
+        // No need to do anything of both rates are 0.
+        if rate.symmetric == 0.0 && rate.asymmetric == 0.0 {
+            return None;
+        }
 
         let particles_idx = self.particles_idx();
         let particles_sign = self.particles_sign();
 
+        // Aggregate the particles to take into account multiplicities.
+        let mut counts = HashMap::with_capacity_and_hasher(
+            particles_idx.incoming.len() + particles_idx.outgoing.len(),
+            BuildIdentityHasher,
+        );
+        for (&p, &a) in particles_idx.incoming.iter().zip(&particles_sign.incoming) {
+            let c = counts.entry(p).or_insert((0.0, 0.0));
+            (*c).0 -= 1.0;
+            (*c).1 -= a;
+        }
+        for (&p, &a) in particles_idx.outgoing.iter().zip(&particles_sign.outgoing) {
+            let c = counts.entry(p).or_insert((0.0, 0.0));
+            (*c).0 += 1.0;
+            (*c).1 += a;
+        }
+
         // DEBUG
-        // let particles = self.particles();
-        // log::trace!(
-        //     "{:<10}: ↔ {:<12.3e} | → {:<12.3e} | ← {:<12.3e} | a↔ {:<12.3e} | a→ {:<12.3e} | a← {:<12.3e}",
-        //     particles.display(c.model).unwrap(),
-        //     rate.net_rate(),
-        //     rate.forward,
-        //     rate.backward,
-        //     rate.net_asymmetric_rate(),
-        //     rate.asymmetric_forward,
-        //     rate.asymmetric_backward
-        // );
+        // if log::log_enabled!(log::Level::Info) {
+        //     log::info!(
+        //         "γ({}) = {:>10.3e} | {:>10.3e}",
+        //         self.particles().display(c.model).unwrap(),
+        //         rate.symmetric,
+        //         rate.asymmetric,
+        //     );
+        //     log::info!("counts: {:?}", counts);
+        // }
 
-        let mut net_rate = rate.net_rate();
-        let mut net_asymmetric_rate = rate.net_asymmetric_rate();
-
-        let mut changed = net_rate != 0.0 || net_asymmetric_rate != 0.0;
+        let mut changed = true;
         while changed {
             changed = false;
 
-            for (&p, a) in particles_idx.incoming.iter().zip(&particles_sign.incoming) {
-                if overshoots(c, p, -net_rate) {
-                    rate.forward = (c.n[p] - c.eq[p]) / ALPHA_N + rate.backward;
-                    changed = ((net_rate - rate.net_rate()) / net_rate).abs() > 1e-10;
-                    net_rate = rate.net_rate();
+            for (&p, &(symmetric_count, asymmetric_count)) in counts.iter() {
+                // In the rate adjustment, the division by the count should
+                // never be division by 0 as there should never be an overshoot
+                // if the multiplicity factor is 0.
+                if overshoots(c, p, symmetric_count * rate.symmetric) {
+                    let new_rate =
+                        ((c.n[p] - c.eq[p]) / symmetric_count).abs() * rate.symmetric.signum();
+                    changed = changed
+                        || (rate.symmetric - new_rate).abs()
+                            / (rate.symmetric.abs() + new_rate.abs())
+                            > 1e-10;
+                    rate.symmetric = new_rate;
                 }
-                if asymmetry_overshoots(c, p, -a * net_asymmetric_rate) {
-                    rate.asymmetric_forward = c.na[p] / ALPHA_NA + rate.asymmetric_backward;
-                    changed = ((net_asymmetric_rate - rate.net_asymmetric_rate())
-                        / net_asymmetric_rate)
-                        .abs()
-                        > 1e-10;
-                    net_asymmetric_rate = rate.net_asymmetric_rate();
-                }
-            }
-
-            for (&p, a) in particles_idx.outgoing.iter().zip(&particles_sign.outgoing) {
-                if overshoots(c, p, net_rate) {
-                    rate.backward = (c.n[p] - c.eq[p]) / ALPHA_N + rate.forward;
-                    changed = ((net_rate - rate.net_rate()) / net_rate).abs() > 1e-10;
-                    net_rate = rate.net_rate();
-                }
-                if asymmetry_overshoots(c, p, a * net_asymmetric_rate) {
-                    rate.asymmetric_backward = c.na[p] / ALPHA_NA + rate.asymmetric_forward;
-                    changed = ((net_asymmetric_rate - rate.net_asymmetric_rate())
-                        / net_asymmetric_rate)
-                        .abs()
-                        > 1e-10;
-                    net_asymmetric_rate = rate.net_asymmetric_rate();
+                if asymmetry_overshoots(c, p, asymmetric_count * rate.asymmetric) {
+                    let new_rate = (c.na[p] / asymmetric_count).abs() * rate.asymmetric.signum();
+                    changed = changed
+                        || (rate.asymmetric - new_rate).abs()
+                            / (rate.asymmetric.abs() + new_rate.abs())
+                            > 1e-10;
+                    rate.asymmetric = new_rate;
                 }
             }
 
-            // if changed {
-            //     log::trace!(
-            //         "  updated : ↔ {:<12.3e} | → {:<12.3e} | ← {:<12.3e} | a↔ {:<12.3e} | a→ {:<12.3e} | a← {:<12.3e}",
-            //         particles.display(c.model).unwrap(),
-            //         rate.net_rate(),
-            //         rate.forward,
-            //         rate.backward,
-            //         rate.net_asymmetric_rate(),
-            //         rate.asymmetric_forward,
-            //         rate.asymmetric_backward
+            // if changed && log::log_enabled!(log::Level::Info) {
+            //     log::info!(
+            //         "--> γ({}) = {:>10.3e} | {:>10.3e}",
+            //         self.particles().display(c.model).unwrap(),
+            //         rate.symmetric,
+            //         rate.asymmetric,
             //     );
             // }
         }
@@ -343,52 +401,17 @@ where
     /// This function automatically adjusts the rate calculated by
     /// [`Interaction::rate`] so that overshooting is avoided.
     fn change(&self, dn: &mut Array1<f64>, dna: &mut Array1<f64>, c: &Context<M>) {
-        let rate = self.adjust_rate_overshoot(self.rate(self.gamma(c), c), c);
+        if let Some(rate) = self.adjusted_rate(c) {
+            let particles_idx = self.particles_idx();
+            let particles_sign = self.particles_sign();
 
-        if rate.is_none() {
-            return;
-        }
-        let rate = rate.unwrap();
-
-        let particles_idx = self.particles_idx();
-        let particles_sign = self.particles_sign();
-
-        let net_rate = rate.net_rate();
-        let net_asymmetric_rate = rate.net_asymmetric_rate();
-
-        // DEBUG
-        // let particles = self.particles();
-        // if let Ok(interaction) = particles.display(c.model) {
-        //     log::trace!(" γ({}) = {:<10.3e}", interaction, net_rate);
-        //     log::trace!("γ'({}) = {:<10.3e}", interaction, net_asymmetric_rate);
-        // } else {
-        //     log::trace!(
-        //         " γ({:?} ↔ {:?}) = {:<10.3e}",
-        //         particles.incoming,
-        //         particles.outgoing,
-        //         net_rate
-        //     );
-        //     log::trace!(
-        //         "γ'({:?} ↔ {:?}) = {:<10.3e}",
-        //         particles.incoming,
-        //         particles.outgoing,
-        //         net_asymmetric_rate
-        //     );
-        // }
-
-        for (&p, a) in particles_idx.incoming.iter().zip(&particles_sign.incoming) {
-            dn[p] -= net_rate;
-            dna[p] -= a * net_asymmetric_rate;
-        }
-        for (&p, a) in particles_idx.outgoing.iter().zip(&particles_sign.outgoing) {
-            dn[p] += net_rate;
-            dna[p] += a * net_asymmetric_rate;
-        }
-
-        if let Some(asymmetry) = self.asymmetry(c) {
-            let source = net_rate * asymmetry;
+            for (&p, a) in particles_idx.incoming.iter().zip(&particles_sign.incoming) {
+                dn[p] -= rate.symmetric;
+                dna[p] -= a * rate.asymmetric;
+            }
             for (&p, a) in particles_idx.outgoing.iter().zip(&particles_sign.outgoing) {
-                dna[p] += a * source;
+                dn[p] += rate.symmetric;
+                dna[p] += a * rate.asymmetric;
             }
         }
     }
@@ -453,16 +476,15 @@ where
         (*self).gamma(c)
     }
 
-    fn rate(&self, gamma: Option<f64>, c: &Context<M>) -> Option<RateDensity> {
-        (*self).rate(gamma, c)
+    fn asymmetry(&self, c: &Context<M>) -> Option<f64> {
+        (*self).asymmetry(c)
+    }
+    fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
+        (*self).rate(c)
     }
 
-    fn adjust_rate_overshoot(
-        &self,
-        rate: Option<RateDensity>,
-        c: &Context<M>,
-    ) -> Option<RateDensity> {
-        (*self).adjust_rate_overshoot(rate, c)
+    fn adjusted_rate(&self, c: &Context<M>) -> Option<RateDensity> {
+        (*self).adjusted_rate(c)
     }
 
     fn change(&self, dn: &mut Array1<f64>, dna: &mut Array1<f64>, c: &Context<M>) {
@@ -503,16 +525,16 @@ where
         self.as_ref().gamma(c)
     }
 
-    fn rate(&self, gamma: Option<f64>, c: &Context<M>) -> Option<RateDensity> {
-        self.as_ref().rate(gamma, c)
+    fn asymmetry(&self, c: &Context<M>) -> Option<f64> {
+        self.as_ref().asymmetry(c)
     }
 
-    fn adjust_rate_overshoot(
-        &self,
-        rate: Option<RateDensity>,
-        c: &Context<M>,
-    ) -> Option<RateDensity> {
-        self.as_ref().adjust_rate_overshoot(rate, c)
+    fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
+        self.as_ref().rate(c)
+    }
+
+    fn adjusted_rate(&self, c: &Context<M>) -> Option<RateDensity> {
+        self.as_ref().adjusted_rate(c)
     }
 
     fn change(&self, dn: &mut Array1<f64>, dna: &mut Array1<f64>, c: &Context<M>) {

@@ -1,32 +1,36 @@
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::{fmt, ops};
+use std::{default, fmt, ops};
 
-/// Partial width from a particle.
+/// Rate density associate with an interaction.
+///
+/// The rate density is defined such that if it is positive, it converts
+/// incoming particles into outgoing particles.  As a result, the change initial
+/// state particles is proportional to the negative of the rates contained,
+/// while the change for final state particles is proportional to the rates
+/// themselves.
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct RateDensity {
-    /// Forward rate for the number density
-    pub forward: f64,
-    /// Backward rate for the number density
-    pub backward: f64,
-    /// Forward rate for the number density asymmetry
-    pub asymmetric_forward: f64,
-    /// Backward rate for the number density asymmetry
-    pub asymmetric_backward: f64,
+    /// Net symmetric rate
+    pub symmetric: f64,
+    /// Net asymmetric rate
+    pub asymmetric: f64,
 }
 
 impl RateDensity {
-    /// Return the net forward rate for the number density.
-    #[must_use]
-    pub fn net_rate(&self) -> f64 {
-        self.forward - self.backward
+    /// Create a new instanse with both rates being 0.
+    pub fn zero() -> Self {
+        RateDensity {
+            symmetric: 0.0,
+            asymmetric: 0.0,
+        }
     }
+}
 
-    /// Return the net forward rate for the number density asymmetry.
-    #[must_use]
-    pub fn net_asymmetric_rate(&self) -> f64 {
-        self.asymmetric_forward - self.asymmetric_backward
+impl default::Default for RateDensity {
+    fn default() -> Self {
+        Self::zero()
     }
 }
 
@@ -34,8 +38,8 @@ impl fmt::Display for RateDensity {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "RateDensity {{ forward: {:e}, backward: {:e}, ... }}",
-            self.forward, self.backward
+            "RateDensity {{ symmetric: {:e}, asymmetric: {:e} }}",
+            self.symmetric, self.asymmetric
         )
     }
 }
@@ -45,19 +49,15 @@ impl ops::Mul<f64> for RateDensity {
 
     fn mul(self, rhs: f64) -> Self {
         Self {
-            forward: self.forward * rhs,
-            backward: self.backward * rhs,
-            asymmetric_forward: self.asymmetric_forward * rhs,
-            asymmetric_backward: self.asymmetric_backward * rhs,
+            symmetric: self.symmetric * rhs,
+            asymmetric: self.asymmetric * rhs,
         }
     }
 }
 
 impl ops::MulAssign<f64> for RateDensity {
     fn mul_assign(&mut self, rhs: f64) {
-        self.forward *= rhs;
-        self.backward *= rhs;
-        self.asymmetric_forward *= rhs;
-        self.asymmetric_backward *= rhs;
+        self.symmetric *= rhs;
+        self.asymmetric *= rhs;
     }
 }
