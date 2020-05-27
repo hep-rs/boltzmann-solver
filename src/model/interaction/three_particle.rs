@@ -89,6 +89,18 @@ where
     }
 
     /// Specify the asymmetry between this process and its CP-conjugate.
+    ///
+    /// This asymmetry is specified in terms of the asymmetry in the squared
+    /// amplitudes:
+    ///
+    /// \\begin{equation}
+    ///   \delta \abs{\mathcal{M}}^2
+    ///     \defeq \abs{\mathcal{M}(p_1 \to p_2 p_3)}^2 - \abs{\mathcal{M}(\overline{p_1} \to \overline{p_2} \overline{p_3})}^2
+    ///     = \abs{\mathcal{M}(p_1 \to p_2 p_3)}^2 - \abs{\mathcal{M}(p_2 p_3 \to p_1)}^2
+    /// \\end{equation}
+    ///
+    /// This asymmetry is subsequently used to compute the asymmetry in the
+    /// interaction rate given by [`Interaction::asymmetry`].
     pub fn set_asymmetry<F>(mut self, asymmetry: F) -> Self
     where
         F: Fn(&M) -> f64 + Sync + 'static,
@@ -171,16 +183,16 @@ where
         let ptcl = c.model.particles();
 
         // Get the *squared* masses
-        let p0 = &ptcl[self.particles_idx.incoming[0]];
-        let p1 = &ptcl[self.particles_idx.outgoing[0]];
-        let p2 = &ptcl[self.particles_idx.outgoing[1]];
+        let p1 = &ptcl[self.particles_idx.incoming[0]];
+        let p2 = &ptcl[self.particles_idx.outgoing[0]];
+        let p3 = &ptcl[self.particles_idx.outgoing[1]];
 
-        if p0.mass > p1.mass + p2.mass {
-            let p = kallen_lambda_sqrt(p0.mass2, p1.mass2, p2.mass2) / (2.0 * p0.mass);
+        if p1.mass > p2.mass + p3.mass {
+            let p = kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2) / (2.0 * p1.mass);
 
             // 1 / 8 π ≅ 0.039788735772973836
             let width =
-                0.039_788_735_772_973_836 * p / p0.mass2 * (self.squared_amplitude)(c.model).abs();
+                0.039_788_735_772_973_836 * p / p1.mass2 * (self.squared_amplitude)(c.model).abs();
 
             Some(PartialWidth {
                 width,
@@ -223,51 +235,86 @@ where
         let ptcl = c.model.particles();
 
         // Get the particles
-        let p0 = &ptcl[self.particles_idx.incoming[0]];
-        let p1 = &ptcl[self.particles_idx.outgoing[0]];
-        let p2 = &ptcl[self.particles_idx.outgoing[1]];
+        let p1 = &ptcl[self.particles_idx.incoming[0]];
+        let p2 = &ptcl[self.particles_idx.outgoing[0]];
+        let p3 = &ptcl[self.particles_idx.outgoing[1]];
 
         // If the decay is kinematically forbidden, return 0.
-        if p0.mass < p1.mass + p2.mass {
+        if p1.mass < p2.mass + p3.mass {
             return Some(0.0);
         }
 
-        if p0.mass * c.beta > M_BETA_THRESHOLD {
+        if p1.mass * c.beta > M_BETA_THRESHOLD {
             // ζ(3) / 16 π³ ≅ 0.0024230112251823
-            let z = p0.mass * c.beta;
+            let z = p1.mass * c.beta;
             Some(
                 0.002_423_011_225_182_3
                     * (self.squared_amplitude)(&c.model).abs()
-                    * kallen_lambda_sqrt(p0.mass2, p1.mass2, p2.mass2)
+                    * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
                     * (bessel::k1_on_k2(z) / z.powi(3))
-                    / p0.degrees_of_freedom(),
+                    / p1.degrees_of_freedom(),
             )
         } else {
             // 1 / 32 π³ ≅ 0.001007860451037484
-            let z = p0.mass * c.beta;
+            let z = p1.mass * c.beta;
             Some(
                 0.001_007_860_451_037_484
                     * (self.squared_amplitude)(&c.model).abs()
-                    * kallen_lambda_sqrt(p0.mass2, p1.mass2, p2.mass2)
+                    * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
                     * (bessel::k1(z) / z),
             )
         }
     }
 
     fn asymmetry(&self, c: &Context<M>) -> Option<f64> {
-        self.asymmetry.as_ref().map(|a| a(c.model))
+        let asymmetry = self.asymmetry.as_ref()?;
+
+        let ptcl = c.model.particles();
+
+        // Get the particles
+        let p1 = &ptcl[self.particles_idx.incoming[0]];
+        let p2 = &ptcl[self.particles_idx.outgoing[0]];
+        let p3 = &ptcl[self.particles_idx.outgoing[1]];
+
+        // If the decay is kinematically forbidden, return 0.
+        if p1.mass < p2.mass + p3.mass {
+            return Some(0.0);
+        }
+
+        if p1.mass * c.beta > M_BETA_THRESHOLD {
+            // ζ(3) / 16 π³ ≅ 0.0024230112251823
+            let z = p1.mass * c.beta;
+            Some(
+                0.002_423_011_225_182_3
+                    * asymmetry(&c.model).abs()
+                    * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
+                    * (bessel::k1_on_k2(z) / z.powi(3))
+                    / p1.degrees_of_freedom(),
+            )
+        } else {
+            // 1 / 32 π³ ≅ 0.001007860451037484
+            let z = p1.mass * c.beta;
+            Some(
+                0.001_007_860_451_037_484
+                    * asymmetry(&c.model).abs()
+                    * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
+                    * (bessel::k1(z) / z),
+            )
+        }
     }
 
     /// Override the default implementation of [`Interaction::rate`] to make use
     /// of the adjusted reaction rate density.
-    fn rate(&self, gamma: Option<f64>, c: &Context<M>) -> Option<RateDensity> {
-        // If there's no interaction rate or it is 0 to begin with, there's no
-        // need to adjust it to the particles' number densities.
-        if gamma.map_or(true, |gamma| gamma == 0.0) {
+    fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
+        let gamma = self.gamma(c).unwrap_or(0.0);
+        let asymmetry = self.asymmetry(c).unwrap_or(0.0);
+
+        // If both rates are 0, there's no need to adjust it to the particles'
+        // number densities.
+        if gamma == 0.0 && asymmetry == 0.0 {
             return None;
         }
 
-        let gamma = gamma.unwrap();
         let ptcl = c.model.particles();
 
         // Get the various quantities associated with each particle.
@@ -276,48 +323,34 @@ where
             self.particles_idx.outgoing[0],
             self.particles_idx.outgoing[1],
         ];
-        let p0 = &ptcl[i0];
-        let [n0, n1, n2] = [c.n[i0], c.n[i1], c.n[i2]];
-        let [na0, na1, na2] = [
+        let p1 = &ptcl[i0];
+        let [n1, n2, n3] = [c.n[i0], c.n[i1], c.n[i2]];
+        let [na1, na2, na3] = [
             self.particles_sign.incoming[0] * c.na[i0],
             self.particles_sign.outgoing[0] * c.na[i1],
             self.particles_sign.outgoing[1] * c.na[i2],
         ];
-        let [eq0, eq1, eq2] = [c.eq[i0], c.eq[i1], c.eq[i2]];
+        let [eq1, eq2, eq3] = [c.eq[i0], c.eq[i1], c.eq[i2]];
 
-        let (forward, asymmetric_forward, backward, asymmetric_backward);
-        if p0.mass * c.beta > M_BETA_THRESHOLD {
-            // Above the M_BETA_THRESHOLD, `gamma` is already divided by eq0, so
-            // we need not divide by `eq0` to calculate the forward rates, and we
-            // have to multiply by `eq0` to get the backward rate.
-
-            forward = gamma * n0;
-            asymmetric_forward = gamma * na0;
-
-            let gamma = gamma * eq0;
-            backward = gamma * checked_div(n1, eq1) * checked_div(n2, eq2);
-            asymmetric_backward = gamma
-                * (checked_div(na1 * n2, eq1 * eq2) + checked_div(na2 * n1, eq1 * eq2)
-                    - checked_div(na1 * na2, eq1 * eq2));
+        let mut rate = RateDensity::zero();
+        if p1.mass * c.beta > M_BETA_THRESHOLD {
+            // Above the M_BETA_THRESHOLD, `gamma` is already divided by eq1, so
+            // we need not divide by `eq1` to calculate the forward rates, and we
+            // have to multiply by `eq1` to get the backward rate.
+            rate.symmetric = gamma * (n1 - eq1 * checked_div(n2, eq2) * checked_div(n3, eq3));
+            rate.asymmetric = asymmetry * (n1 + eq1 * checked_div(n2, eq2) * checked_div(n3, eq3))
+                + gamma * (na1 - eq1 * checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
         } else {
             // Below the M_BETA_THRESHOLD, `gamma` is the usual rate which must
             // be scaled by factors of `n / eq` to get the actual forward and
             // backward rates.
-
-            forward = gamma * checked_div(n0, eq0);
-            asymmetric_forward = gamma * checked_div(na0, eq0);
-
-            backward = gamma * checked_div(n1, eq1) * checked_div(n2, eq2);
-            asymmetric_backward = gamma
-                * (checked_div(na1 * n2, eq1 * eq2) + checked_div(na2 * n1, eq1 * eq2)
-                    - checked_div(na1 * na2, eq1 * eq2));
+            rate.symmetric =
+                gamma * (checked_div(n1, eq1) - checked_div(n2, eq2) * checked_div(n3, eq3));
+            rate.asymmetric = asymmetry
+                * (checked_div(n1, eq1) + checked_div(n2, eq2) * checked_div(n3, eq3))
+                + gamma * (checked_div(na1, eq1) - checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
         }
 
-        Some(RateDensity {
-            forward,
-            backward,
-            asymmetric_forward,
-            asymmetric_backward,
-        })
+        Some(rate)
     }
 }

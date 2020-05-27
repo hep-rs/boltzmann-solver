@@ -18,6 +18,8 @@ pub struct FourParticle<M> {
     /// Squared amplitude as a function of the model.
     squared_amplitude: Box<dyn Fn(&M, f64, f64, f64) -> f64 + Sync>,
     gamma_spline: RwLock<CubicHermiteSpline>,
+    asymmetry: Option<Box<dyn Fn(&M, f64, f64, f64) -> f64 + Sync>>,
+    asymmetry_spline: RwLock<CubicHermiteSpline>,
     gamma_enabled: bool,
     width_enabled: bool,
 }
@@ -33,7 +35,7 @@ impl<M> FourParticle<M> {
     /// The squared amplitude is defined of the form
     ///
     /// \\begin{equation}
-    ///   \abs{\mathcal{M}(p_1 p_2 \leftrightarrow p_3 p_4)}(s, t, u)
+    ///   \abs{\mathcal{M}(p_1 p_2 \leftrightarrow p_3 p_4)}^2(s, t, u)
     /// \\end{equation}
     ///
     /// where \\(s\\), \\(t\\) and \\(u\\) are the usual Mandelstam variables.
@@ -57,6 +59,8 @@ impl<M> FourParticle<M> {
             particles_sign,
             squared_amplitude: Box::new(squared_amplitude),
             gamma_spline: RwLock::new(CubicHermiteSpline::empty()),
+            asymmetry: None,
+            asymmetry_spline: RwLock::new(CubicHermiteSpline::empty()),
             width_enabled: false,
             gamma_enabled: true,
         }
@@ -75,7 +79,7 @@ impl<M> FourParticle<M> {
     /// The squared amplitude is defined of the form:
     ///
     /// \\begin{equation}
-    ///    \abs{\mathcal{M}(p_1 p_2 \leftrightarrow p_3 p_4)}(s, t, u)
+    ///    \abs{\mathcal{M}(p_1 p_2 \leftrightarrow p_3 p_4)}^2(s, t, u)
     /// \\end{equation}
     ///
     /// where \\(s\\), \\(t\\) and \\(u\\) are the usual Mandelstam variables.
@@ -107,6 +111,27 @@ impl<M> FourParticle<M> {
         }
 
         v
+    }
+
+    /// Specify the asymmetry between this process and its CP-conjugate.
+    ///
+    /// This asymmetry is specified in terms of the asymmetry in the squared
+    /// amplitudes:
+    ///
+    /// \\begin{equation}
+    ///   \delta \abs{\mathcal{M}}^2
+    ///     \defeq \abs{\mathcal{M}(p_1 p_2 \to p_3 p_4)}^2 - \abs{\mathcal{M}(\overline{p_1} \overline{p_2} \to \overline{p_3} \overline{p_4})}^2
+    ///     = \abs{\mathcal{M}(p_1 p_2 \to p_3 p_4)}^2 - \abs{\mathcal{M}(p_3 p_4 \to p_1 p_2)}^2
+    /// \\end{equation}
+    ///
+    /// This asymmetry is subsequently used to compute the asymmetry in the
+    /// interaction rate given by [`Interaction::asymmetry`].
+    pub fn set_asymmetry<F>(mut self, asymmetry: F) -> Self
+    where
+        F: Fn(&M, f64, f64, f64) -> f64 + Sync + 'static,
+    {
+        self.asymmetry = Some(Box::new(asymmetry));
+        self
     }
 
     /// Adjust whether this interaction will calculate decay widths.
@@ -194,15 +219,53 @@ where
             m1,
             m2,
             m3,
-        );
-
-        // TODO Should this be done?
-        let gamma = gamma.abs();
+        )
+        // FIXME: Should we take the absolute value?
+        .abs();
 
         if let Ok(mut gamma_spline) = self.gamma_spline.write() {
             gamma_spline.add(ln_beta, gamma.ln());
         }
 
         Some(gamma)
+    }
+
+    fn asymmetry(&self, c: &Context<M>) -> Option<f64> {
+        let asymmetry = self.asymmetry.as_ref()?;
+
+        let ln_beta = c.beta.ln();
+
+        if let Ok(asymmetry_spline) = self.asymmetry_spline.read() {
+            if asymmetry_spline.accurate(ln_beta) {
+                return Some(asymmetry_spline.sample(ln_beta).exp());
+            }
+        }
+        let ptcl = c.model.particles();
+
+        // Get the *squared* masses
+        let m0 = ptcl[self.particles_idx.incoming[0]].mass2;
+        let m1 = ptcl[self.particles_idx.incoming[1]].mass2;
+        let m2 = ptcl[self.particles_idx.outgoing[0]].mass2;
+        let m3 = ptcl[self.particles_idx.outgoing[1]].mass2;
+
+        let asymmetry = integrate_st(
+            |s, t| {
+                let u = m0 + m1 + m2 + m3 - s - t;
+                asymmetry(&c.model, s, t, u).abs()
+            },
+            c.beta,
+            m0,
+            m1,
+            m2,
+            m3,
+        )
+        // FIXME: Should we take the absolute value?
+        .abs();
+
+        if let Ok(mut asymmetry_spline) = self.asymmetry_spline.write() {
+            asymmetry_spline.add(ln_beta, asymmetry.ln());
+        }
+
+        Some(asymmetry)
     }
 }
