@@ -21,11 +21,17 @@ csv = "1.1"
 fern = { version = "0.6", features = ["colored"] }
 itertools = "0.9"
 num = "0.2"
+serde_json = "1.0"
 
 [features]
-default = ["parallel"]
-# default = []
+default = ["parallel", "serialization"]
 
 nightly = []
-serialization = ["serde", "ndarray/serde"]
+serialization = ["serde", "ndarray/serde", "num/serde"]
 parallel = ["rayon", "ndarray/rayon"]
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
