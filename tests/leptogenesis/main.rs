@@ -525,69 +525,39 @@ pub fn scan() -> Result<(), Box<dyn error::Error>> {
 }
 
 #[test]
-fn masses_widths_number_densities() -> Result<(), Box<dyn error::Error>> {
+fn evolution() -> Result<(), Box<dyn error::Error>> {
     init();
-
-    let mut model = LeptogenesisModel::zero();
-    for i in &[
-        interaction::hle,
-        interaction::hln,
-        interaction::hqu,
-        interaction::hqd,
-        interaction::hha,
-        interaction::hhw,
-    ] {
-        model
-            .interactions
-            .extend(i().drain(..).map(common::into_interaction_box));
-    }
 
     // Create the CSV files
     let output_dir = common::output_dir("leptogenesis");
 
-    let mut widths = csv::Writer::from_path(output_dir.join("width.csv"))?;
-    widths.write_field("beta")?;
-    for p in model.particles() {
-        widths.write_field(&p.name)?;
-    }
-    widths.write_record(None::<&[u8]>)?;
-
-    let mut masses = csv::Writer::from_path(output_dir.join("mass.csv"))?;
-    masses.write_field("beta")?;
-    for p in model.particles() {
-        masses.write_field(&p.name)?;
-    }
-    masses.write_record(None::<&[u8]>)?;
-
-    let mut ns = csv::Writer::from_path(output_dir.join("number_densities.csv"))?;
-    ns.write_field("beta")?;
-    for p in model.particles() {
-        ns.write_field(&p.name)?;
-    }
-    ns.write_record(None::<&[u8]>)?;
+    let mut data = Vec::new();
 
     for &beta in Array1::geomspace(1e-17, 1e-2, 1024).unwrap().into_iter() {
+        let mut model = LeptogenesisModel::zero();
+        for i in &[
+            interaction::hle,
+            interaction::hln,
+            interaction::hqu,
+            interaction::hqd,
+            interaction::hha,
+            interaction::hhw,
+            interaction::ffa,
+            interaction::ffw,
+        ] {
+            model
+                .interactions
+                .extend(i().drain(..).map(common::into_interaction_box));
+        }
         model.set_beta(beta);
         model.update_widths();
-
-        widths.write_field(format!("{:e}", beta))?;
-        for p in model.particles() {
-            widths.write_field(format!("{:e}", p.width))?;
-        }
-        widths.write_record(None::<&[u8]>)?;
-
-        masses.write_field(format!("{:e}", beta))?;
-        for p in model.particles() {
-            masses.write_field(format!("{:e}", p.mass))?;
-        }
-        masses.write_record(None::<&[u8]>)?;
-
-        ns.write_field(format!("{:e}", beta))?;
-        for p in model.particles() {
-            ns.write_field(format!("{:e}", p.normalized_number_density(0.0, beta)))?;
-        }
-        ns.write_record(None::<&[u8]>)?;
+        data.push(model);
     }
+
+    serde_json::to_writer(
+        io::BufWriter::new(fs::File::create(output_dir.join("evolution.json"))?),
+        &data,
+    )?;
 
     Ok(())
 }
