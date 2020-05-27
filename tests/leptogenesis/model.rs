@@ -7,25 +7,32 @@
 
 pub mod interaction;
 
-use boltzmann_solver::{constants::PI, prelude::*};
+use boltzmann_solver::prelude::*;
 use ndarray::{array, prelude::*};
 use num::Complex;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::f64;
 
-////////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////
 // Model
-////////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////
 
 /// Leptogenesis model parameters
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct LeptogenesisModel {
     pub sm: StandardModel,
+    /// Coupling between H L(i1) and N(i2)
     pub yv: Array2<Complex<f64>>,
+    /// The matrix `yv^\dagger yv`
+    pub yvd_yv: Array2<Complex<f64>>,
     pub mn: Array1<f64>,
     #[cfg(feature = "parallel")]
+    #[serde(skip)]
     pub interactions: Vec<Box<dyn Interaction<Self> + Sync>>,
     #[cfg(not(feature = "parallel"))]
+    #[serde(skip)]
     pub interactions: Vec<Box<dyn Interaction<Self>>>,
-    pub epsilon: Array2<f64>,
 }
 
 impl Model for LeptogenesisModel {
@@ -51,9 +58,11 @@ impl Model for LeptogenesisModel {
             ],
         ] * 1e-4
             * 30.0;
+        let yvd_yv: Array2<Complex<f64>> = Array2::from_shape_fn((3, 3), |(i, j)| {
+            (0..3).map(|k| yv[[k, i]].conj() * yv[[k, j]]).sum()
+        });
 
         let mn = array![1e10, 1e15, 5e15];
-
         sm.particles
             .push(Particle::new(1, mn[0], 0.0).name("N1").own_antiparticle());
         sm.particles
@@ -61,49 +70,29 @@ impl Model for LeptogenesisModel {
         sm.particles
             .push(Particle::new(1, mn[2], 0.0).name("N3").own_antiparticle());
 
-        // epsilon[[i, j]] is the asymmetry in Ni -> H Lj.
-        let yvd_yv: Array2<Complex<f64>> = Array2::from_shape_fn((3, 3), |(i, j)| {
-            (0..3).map(|k| yv[[k, i]].conj() * yv[[k, j]]).sum()
-        });
-        let epsilon = Array2::from_shape_fn((3, 3), |(i, a)| {
-            (0..3)
-                .map(|j| {
-                    if j == i {
-                        0.0
-                    } else {
-                        let x = (mn[j] / mn[i]).powi(2);
-                        let g =
-                            x.sqrt() * (1.0 / (1.0 - x) + 1.0 - (1.0 + x) * f64::ln((1.0 + x) / x));
+        // let epsilon = Array2::from_shape_fn((3, 3), |(i, a)| {
+        //     (0..3)
+        //         .map(|j| {
+        //             if j == i {
+        //                 0.0
+        //             } else {
+        //                 let x = (mn[j] / mn[i]).powi(2);
+        //                 let g =
+        //                     x.sqrt() * (1.0 / (1.0 - x) + 1.0 - (1.0 + x) * f64::ln((1.0 + x) / x));
 
-                        (yv[[a, i]].conj() * yvd_yv[[i, j]] * yv[[a, j]]).im * (g + 1.0 / (1.0 - x))
-                    }
-                })
-                .sum::<f64>()
-                / (8.0 * PI * yvd_yv[[i, i]].re)
-        });
-
-        let interactions = Vec::new();
-
-        // Add them on a per-test basis in order to avoid every test using all
-        // of them, possibly risking slowing down many tests.
-
-        // interactions.append(&mut interaction::hh());
-        // interactions.append(&mut interaction::nn());
-        // interactions.append(&mut interaction::hle());
-        // interactions.append(&mut interaction::hln());
-        // interactions.append(&mut interaction::hqu());
-        // interactions.append(&mut interaction::hqd());
-        // interactions.append(&mut interaction::hhll1());
-        // interactions.append(&mut interaction::hhll2());
-        // interactions.append(&mut interaction::nlqd());
-        // interactions.append(&mut interaction::nlqu());
+        //                 (yv[[a, i]].conj() * yvd_yv[[i, j]] * yv[[a, j]]).im * (g + 1.0 / (1.0 - x))
+        //             }
+        //         })
+        //         .sum::<f64>()
+        //         / (8.0 * PI * yvd_yv[[i, i]].re)
+        // });
 
         LeptogenesisModel {
             sm,
             yv,
+            yvd_yv,
             mn,
-            interactions,
-            epsilon,
+            interactions: Vec::new(),
         }
     }
 
