@@ -645,6 +645,56 @@ pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
     Ok(())
 }
 
+/// Test that gauge couplings keep the lepton doublets in equilibrium
+#[test]
+pub fn lepton_equilibrium() -> Result<(), Box<dyn error::Error>> {
+    init();
+
+    // Create the CSV file
+    let output_dir = common::output_dir("leptogenesis/lepton_equilibrium");
+
+    let v: Vec<(usize, f64)> = Array1::geomspace(1e-17, 1e-4, 50)
+        .unwrap()
+        .iter()
+        .cloned()
+        .enumerate()
+        .collect();
+
+    #[cfg(feature = "parallel")]
+    let iter = v.into_par_iter();
+    #[cfg(not(feature = "parallel"))]
+    let iter = v.into_iter();
+
+    iter.for_each(|(i, beta)| {
+        let csv = csv::Writer::from_path(output_dir.join(format!("{:03}.csv", i))).unwrap();
+
+        let mut model = LeptogenesisModel::zero();
+        for i in &[interaction::ffa, interaction::ffw] {
+            model.interactions.extend(
+                i().drain(..)
+                    .filter(one_generation)
+                    .map(into_interaction_box),
+            );
+        }
+
+        let p_l = LeptogenesisModel::particle_idx("L", 0).unwrap();
+        let n_eq = model.particles()[p_l].normalized_number_density(0.0, beta);
+
+        // Collect the names now as SolverBuilder takes ownership of the model
+        // later.
+        let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
+
+        let builder = SolverBuilder::new()
+            .model(model)
+            .beta_range(beta, beta * 10.0)
+            .initial_densities(vec![(p_l, 1.1 * n_eq)]);
+
+        solve(builder, &names, Some(csv)).unwrap();
+    });
+
+    Ok(())
+}
+
 #[test]
 fn gammas() -> Result<(), Box<dyn error::Error>> {
     init();
