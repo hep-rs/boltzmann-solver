@@ -20,6 +20,7 @@ pub struct RateDensity {
 
 impl RateDensity {
     /// Create a new instanse with both rates being 0.
+    #[must_use]
     pub fn zero() -> Self {
         RateDensity {
             symmetric: 0.0,

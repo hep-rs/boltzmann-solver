@@ -170,7 +170,6 @@ where
         &self.particles_sign
     }
 
-    #[inline(always)]
     fn width_enabled(&self) -> bool {
         self.width_enabled
     }
@@ -204,7 +203,6 @@ where
         }
     }
 
-    #[inline(always)]
     fn gamma_enabled(&self) -> bool {
         self.gamma_enabled
     }

@@ -355,7 +355,7 @@ where
         while changed {
             changed = false;
 
-            for (&p, &(symmetric_count, asymmetric_count)) in counts.iter() {
+            for (&p, &(symmetric_count, asymmetric_count)) in &counts {
                 // In the rate adjustment, the division by the count should
                 // never be division by 0 as there should never be an overshoot
                 // if the multiplicity factor is 0.
