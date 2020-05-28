@@ -10,7 +10,11 @@ use crate::{
 };
 use std::{fmt, sync::RwLock};
 
-/// Three particle interaction, all determined from the underlying squared amplitude.
+// TODO: Define a trait alias for MandelstamFn once it is stabilised
+// (https://github.com/rust-lang/rust/issues/41517)
+
+/// Three particle interaction, all determined from the underlying squared
+/// amplitude.
 pub struct FourParticle<M> {
     particles: InteractionParticles,
     particles_idx: InteractionParticleIndices,
@@ -18,6 +22,7 @@ pub struct FourParticle<M> {
     /// Squared amplitude as a function of the model.
     squared_amplitude: Box<dyn Fn(&M, f64, f64, f64) -> f64 + Sync>,
     gamma_spline: RwLock<CubicHermiteSpline>,
+    #[allow(clippy::type_complexity)]
     asymmetry: Option<Box<dyn Fn(&M, f64, f64, f64) -> f64 + Sync>>,
     asymmetry_spline: RwLock<CubicHermiteSpline>,
     gamma_enabled: bool,
@@ -88,7 +93,8 @@ impl<M> FourParticle<M> {
     where
         F: Fn(&M, f64, f64, f64) -> f64 + Sync + Copy + 'static,
     {
-        let mut v = vec![Self::new(squared_amplitude, p1, p2, p3, p4)];
+        let mut v = Vec::with_capacity(3);
+        v.push(Self::new(squared_amplitude, p1, p2, p3, p4));
 
         // Avoid doubling up interactions if they have the same particles
         if p2 != -p3 {
@@ -248,7 +254,7 @@ where
         let m2 = ptcl[self.particles_idx.outgoing[0]].mass2;
         let m3 = ptcl[self.particles_idx.outgoing[1]].mass2;
 
-        let asymmetry = integrate_st(
+        let delta_gamma = integrate_st(
             |s, t| {
                 let u = m0 + m1 + m2 + m3 - s - t;
                 asymmetry(&c.model, s, t, u).abs()
@@ -263,9 +269,9 @@ where
         .abs();
 
         if let Ok(mut asymmetry_spline) = self.asymmetry_spline.write() {
-            asymmetry_spline.add(ln_beta, asymmetry.ln());
+            asymmetry_spline.add(ln_beta, delta_gamma.ln());
         }
 
-        Some(asymmetry)
+        Some(delta_gamma)
     }
 }
