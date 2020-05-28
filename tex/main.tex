@@ -347,6 +347,81 @@ As for the domain of integration of \(t\), it is not difficult to see that
 \section{Boltzmann Equations}%
 \label{sec:boltzmann_equation}
 
+We consider an interaction \(ab \leftrightarrow cd\), by \(\mathcal{CPT}\)
+invariance we have that:
+\begin{equation}
+  \gamma(ab \to cd) = \gamma(\overline{c} \overline{d} \to \overline{a} \overline{b})
+\end{equation}
+and the \(\mathcal{CP}\) asymmetry is taken into account with \(\epsilon\) such
+that
+\begin{equation}
+  \gamma(ab \to cd) - \gamma(\overline{a} \overline{b} \to \overline{c} \overline{d})
+  = \epsilon
+  = \gamma(\overline{c} \overline{d} \to \overline{a} \overline{b}) - \gamma(cd \to ab).
+\end{equation}
+and using \(\mathcal{CPT}\) invariance as well, this can be written as
+\begin{equation}
+  \epsilon = \gamma(ab \to cd) - \gamma(cd \to ab).
+\end{equation}
+As a result, any forward or backward process and their \(\mathcal{CP}\)
+conjugate can expressed in terms of the original forward rate \(\gamma\), and
+the asymmetry \(\epsilon\).
+
+We will also be defined the asymmetry between the particle and anti-particle
+number densities
+\begin{equation}
+  \Delta_a \defeq n_a - n_{\overline a}.
+\end{equation}
+and it is worth noting that generally
+\begin{equation}
+  \abs{\epsilon} \ll \gamma \qquad\qquad \abs{\Delta_a} \ll n_a,
+\end{equation}
+and in the \(\mathcal{CP}\)-conserving limit, both \(\epsilon\) and \(\Delta_a\)
+go to zero.
+
+The change in number density for \(a\) and \(\overline{a}\) are:
+\begin{align}
+  \ddfrac{n_a}{t}
+   & = \frac{n_c n_d}{n_c^{(0)} n_d^{(0)}} \gamma(cd \to ab)
+  - \frac{n_a n_b}{n_a^{(0)} n_b^{(0)}} \gamma(ab \to cd)                                                                      \\
+   & = \left[
+  \frac{n_c n_d}{n_c^{(0)} n_d^{(0)}}
+  - \frac{n_a n_b}{n_a^{(0)} n_b^{(0)}}
+  \right] \gamma
+  + \frac{n_c n_d}{n_c^{(0)} n_d^{(0)}} \epsilon,                                                                              \\
+  \ddfrac{n_{\overline a}}{t}
+   & = \frac{n_{\overline c} n_{\overline d}}{n_c^{(0)} n_d^{(0)}} \gamma(\overline c \overline d \to \overline a \overline b)
+  - \frac{n_{\overline a} n_{\overline b}}{n_a^{(0)} n_b^{(0)}} \gamma(\overline a \overline b \to \overline d \overline c)    \\
+   & = \left[
+  \frac{n_{\overline c} n_{\overline d}}{n_c^{(0)} n_d^{(0)}}
+  - \frac{n_{\overline a} n_{\overline b}}{n_a^{(0)} n_b^{(0)}}
+  \right] \gamma
+  + \frac{n_{\overline a} n_{\overline b}}{n_a^{(0)} n_b^{(0)}} \epsilon.                                                      \\
+\end{align}
+
+In the \(\mathcal{CP}\) conserving limit, both of these simplify to
+\begin{equation}
+  \ddfrac{n_a}{t} = \ddfrac{n_{\overline a}}{t}
+  = \left[ \frac{n_c n_d}{n_c^{(0)} n_d^{(0)}}  - \frac{n_a n_b}{n_a^{(0)} n_b^{(0)}} \right] \gamma(ab \to cd)
+\end{equation}
+
+Computing the rate of change of the \(\mathcal{CP}\) asymmetry (obviously before
+taking any limits), we obtain:
+\begin{equation}
+  \begin{aligned}
+    \ddfrac{\Delta_a}{t}
+     & = \ddfrac{n_a}{t} - \ddfrac{n_{\overline a}}{t} \\
+     & = \left[
+    \frac{\Delta_c n_d + \Delta_d n_c}{n_c^{(0)} n_d^{(0)}}
+    - \frac{\Delta_a n_b + \Delta_b n_a}{n_a^{(0)} n_b^{(0)}} \right] \gamma
+    - \left[
+    \frac{n_a n_b}{n_a^{(0)} n_b^{(0)}} + \frac{n_c n_d}{n_c^{(0)} n_d^{(0)}}
+    \right] \epsilon
+  \end{aligned}
+\end{equation}
+where we have omitted terms proportional to \(\Delta^2\) and \(\epsilon \Delta\)
+(for any combination of \(\Delta_i\)).
+
 \subsection{Three-Body Interactions}%
 \label{sec:three-body_interactions}
 
