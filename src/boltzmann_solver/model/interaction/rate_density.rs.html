@@ -137,6 +137,7 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="61">61</span>
 <span id="62">62</span>
 <span id="63">63</span>
+<span id="64">64</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -147,10 +148,22 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">serde</span>::{<span class=
 "ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class=
-"ident">std</span>::{<span class="ident">fmt</span>, <span class=
-"ident">ops</span>};
+"ident">std</span>::{<span class=
+"ident">default</span>, <span class=
+"ident">fmt</span>, <span class="ident">ops</span>};
 
-<span class="doccomment">/// Partial width from a particle.</span>
+<span class=
+"doccomment">/// Rate density associate with an interaction.</span>
+<span class="doccomment">///</span>
+<span class=
+"doccomment">/// The rate density is defined such that if it is positive, it converts</span>
+<span class=
+"doccomment">/// incoming particles into outgoing particles.  As a result, the change initial</span>
+<span class=
+"doccomment">/// state particles is proportional to the negative of the rates contained,</span>
+<span class=
+"doccomment">/// while the change for final state particles is proportional to the rates</span>
+<span class="doccomment">/// themselves.</span>
 <span class="attribute">#[<span class=
 "ident">derive</span>(<span class=
 "ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
@@ -163,54 +176,42 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">RateDensity</span> {
-    <span class=
-"doccomment">/// Forward rate for the number density</span>
+    <span class="doccomment">/// Net symmetric rate</span>
     <span class="kw">pub</span> <span class=
-"ident">forward</span>: <span class="ident">f64</span>,
-    <span class=
-"doccomment">/// Backward rate for the number density</span>
+"ident">symmetric</span>: <span class="ident">f64</span>,
+    <span class="doccomment">/// Net asymmetric rate</span>
     <span class="kw">pub</span> <span class=
-"ident">backward</span>: <span class="ident">f64</span>,
-    <span class=
-"doccomment">/// Forward rate for the number density asymmetry</span>
-    <span class="kw">pub</span> <span class=
-"ident">asymmetric_forward</span>: <span class="ident">f64</span>,
-    <span class=
-"doccomment">/// Backward rate for the number density asymmetry</span>
-    <span class="kw">pub</span> <span class=
-"ident">asymmetric_backward</span>: <span class="ident">f64</span>,
+"ident">asymmetric</span>: <span class="ident">f64</span>,
 }
 
 <span class="kw">impl</span> <span class=
 "ident">RateDensity</span> {
     <span class=
-"doccomment">/// Return the net forward rate for the number density.</span>
+"doccomment">/// Create a new instanse with both rates being 0.</span>
     <span class="attribute">#[<span class=
 "ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class=
-"kw">fn</span> <span class="ident">net_rate</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
+"kw">fn</span> <span class="ident">zero</span>() <span class=
 "op">-</span><span class="op">&gt;</span> <span class=
-"ident">f64</span> {
-        <span class="self">self</span>.<span class=
-"ident">forward</span> <span class="op">-</span> <span class=
-"self">self</span>.<span class="ident">backward</span>
+"self">Self</span> {
+        <span class="ident">RateDensity</span> {
+            <span class="ident">symmetric</span>: <span class=
+"number">0.0</span>,
+            <span class="ident">asymmetric</span>: <span class=
+"number">0.0</span>,
+        }
     }
+}
 
-    <span class=
-"doccomment">/// Return the net forward rate for the number density asymmetry.</span>
-    <span class="attribute">#[<span class=
-"ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class=
-"kw">fn</span> <span class=
-"ident">net_asymmetric_rate</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"ident">f64</span> {
-        <span class="self">self</span>.<span class=
-"ident">asymmetric_forward</span> <span class=
-"op">-</span> <span class="self">self</span>.<span class=
-"ident">asymmetric_backward</span>
+<span class="kw">impl</span> <span class=
+"ident">default</span>::<span class=
+"ident">Default</span> <span class="kw">for</span> <span class=
+"ident">RateDensity</span> {
+    <span class="kw">fn</span> <span class=
+"ident">default</span>() <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span>::<span class=
+"ident">zero</span>()
     }
 }
 
@@ -230,10 +231,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro">!</span>(
             <span class="ident">f</span>,
             <span class=
-"string">"RateDensity {{ forward: {:e}, backward: {:e}, ... }}"</span>,
+"string">"RateDensity {{ symmetric: {:e}, asymmetric: {:e} }}"</span>,
             <span class="self">self</span>.<span class=
-"ident">forward</span>, <span class="self">self</span>.<span class=
-"ident">backward</span>
+"ident">symmetric</span>, <span class=
+"self">self</span>.<span class="ident">asymmetric</span>
         )
     }
 }
@@ -253,22 +254,14 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "self">Self</span> {
         <span class="self">Self</span> {
-            <span class="ident">forward</span>: <span class=
-"self">self</span>.<span class="ident">forward</span> <span class=
-"op">*</span> <span class="ident">rhs</span>,
-            <span class="ident">backward</span>: <span class=
-"self">self</span>.<span class="ident">backward</span> <span class=
-"op">*</span> <span class="ident">rhs</span>,
-            <span class=
-"ident">asymmetric_forward</span>: <span class=
+            <span class="ident">symmetric</span>: <span class=
 "self">self</span>.<span class=
-"ident">asymmetric_forward</span> <span class=
-"op">*</span> <span class="ident">rhs</span>,
-            <span class=
-"ident">asymmetric_backward</span>: <span class=
+"ident">symmetric</span> <span class="op">*</span> <span class=
+"ident">rhs</span>,
+            <span class="ident">asymmetric</span>: <span class=
 "self">self</span>.<span class=
-"ident">asymmetric_backward</span> <span class=
-"op">*</span> <span class="ident">rhs</span>,
+"ident">asymmetric</span> <span class="op">*</span> <span class=
+"ident">rhs</span>,
         }
     }
 }
@@ -283,19 +276,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">mut</span> <span class="self">self</span>, <span class=
 "ident">rhs</span>: <span class="ident">f64</span>) {
         <span class="self">self</span>.<span class=
-"ident">forward</span> <span class="kw-2">*</span><span class=
+"ident">symmetric</span> <span class="kw-2">*</span><span class=
 "op">=</span> <span class="ident">rhs</span>;
         <span class="self">self</span>.<span class=
-"ident">backward</span> <span class="kw-2">*</span><span class=
+"ident">asymmetric</span> <span class="kw-2">*</span><span class=
 "op">=</span> <span class="ident">rhs</span>;
-        <span class="self">self</span>.<span class=
-"ident">asymmetric_forward</span> <span class=
-"kw-2">*</span><span class="op">=</span> <span class=
-"ident">rhs</span>;
-        <span class="self">self</span>.<span class=
-"ident">asymmetric_backward</span> <span class=
-"kw-2">*</span><span class="op">=</span> <span class=
-"ident">rhs</span>;
     }
 }
 </pre></div>
@@ -305,7 +290,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../../../";window.currentCrate = "boltzmann_solver";
 </script>
-<script src="../../../../aliases.js"></script>
 <script src="../../../../main.js"></script>
 <script src="../../../../source-script.js"></script>
 <script src="../../../../source-files.js"></script>

@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.16/src/mac.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.27/src/mac.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>mac.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -312,6 +312,11 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="237">237</span>
 <span id="238">238</span>
 <span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -329,7 +334,8 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="kw">use</span> <span class=
 "ident">proc_macro2</span>::{<span class=
 "ident">Delimiter</span>, <span class=
-"ident">Span</span>, <span class="ident">TokenTree</span>};
+"ident">Group</span>, <span class="ident">Span</span>, <span class=
+"ident">TokenTree</span>};
 
 <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class="ident">feature</span> <span class=
@@ -357,7 +363,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A macro invocation: `println!("{}", mac)`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">Macro</span> #<span class=
@@ -381,7 +387,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A grouping token that surrounds a macro body: `m!(...)` or `m!{...}` or `m![...]`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">enum</span> <span class="ident">MacroDelimiter</span> {
@@ -475,13 +481,37 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">cfg</span>(<span class="ident">feature</span> <span class=
 "op">=</span> <span class="string">"parsing"</span>)]</span>
 <span class="kw">fn</span> <span class=
-"ident">delimiter_span</span>(<span class=
-"ident">delimiter</span>: <span class="kw-2">&</span><span class=
+"ident">delimiter_span_close</span>(<span class=
+"ident">macro_delimiter</span>: <span class=
+"kw-2">&</span><span class=
 "ident">MacroDelimiter</span>) <span class=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">Span</span> {
-    <span class="kw">match</span> <span class=
-"ident">delimiter</span> {
+    <span class="kw">let</span> <span class=
+"ident">delimiter</span> <span class="op">=</span> <span class=
+"kw">match</span> <span class="ident">macro_delimiter</span> {
+        <span class="ident">MacroDelimiter</span>::<span class=
+"ident">Paren</span>(<span class="kw">_</span>) <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"ident">Delimiter</span>::<span class="ident">Parenthesis</span>,
+        <span class="ident">MacroDelimiter</span>::<span class=
+"ident">Brace</span>(<span class="kw">_</span>) <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"ident">Delimiter</span>::<span class="ident">Brace</span>,
+        <span class="ident">MacroDelimiter</span>::<span class=
+"ident">Bracket</span>(<span class="kw">_</span>) <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"ident">Delimiter</span>::<span class="ident">Bracket</span>,
+    };
+    <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">group</span> <span class=
+"op">=</span> <span class="ident">Group</span>::<span class=
+"ident">new</span>(<span class=
+"ident">delimiter</span>, <span class=
+"ident">TokenStream</span>::<span class="ident">new</span>());
+    <span class="ident">group</span>.<span class=
+"ident">set_span</span>(<span class="kw">match</span> <span class=
+"ident">macro_delimiter</span> {
         <span class="ident">MacroDelimiter</span>::<span class=
 "ident">Paren</span>(<span class="ident">token</span>) <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
@@ -495,7 +525,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">token</span>) <span class="op">=</span><span class=
 "op">&gt;</span> <span class="ident">token</span>.<span class=
 "ident">span</span>,
-    }
+    });
+    <span class="ident">group</span>.<span class=
+"ident">span_close</span>()
 }
 
 <span class="kw">impl</span> <span class="ident">Macro</span> {
@@ -657,13 +689,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "prelude-ty">Result</span><span class="op">&lt;</span><span class=
 "ident">F</span>::<span class="ident">Output</span><span class=
 "op">&gt;</span> {
-        <span class=
-"comment">// TODO: see if we can get a group.span_close() span in here as the</span>
-        <span class=
-"comment">// scope, rather than the span of the whole group.</span>
         <span class="kw">let</span> <span class=
 "ident">scope</span> <span class="op">=</span> <span class=
-"ident">delimiter_span</span>(<span class=
+"ident">delimiter_span_close</span>(<span class=
 "kw-2">&</span><span class="self">self</span>.<span class=
 "ident">delimiter</span>);
         <span class="kw">crate</span>::<span class=
@@ -864,7 +892,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "syn";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

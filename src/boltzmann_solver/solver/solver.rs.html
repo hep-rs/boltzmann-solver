@@ -903,6 +903,29 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="827">827</span>
 <span id="828">828</span>
 <span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -935,6 +958,14 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">std</span>::{<span class="ident">error</span>, <span class=
 "ident">fmt</span>, <span class="ident">mem</span>, <span class=
 "ident">ptr</span>};
+
+<span class=
+"comment">// Number of recursive subdivisions in beta range (so there are 2^N</span>
+<span class="comment">// subdivisions).</span>
+<span class="kw">const</span> <span class=
+"ident">PRECOMPUTE_SUBDIV</span>: <span class=
+"ident">u32</span> <span class="op">=</span> <span class=
+"number">12</span>;
 
 <span class=
 "doccomment">/// Error type returned by the solver builder in case there is an error.</span>
@@ -1580,7 +1611,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class=
 "doccomment">/// right number of initial conditions and they are all finite.</span>
     <span class="kw">fn</span> <span class=
-"ident">check_initial_densities</span><span class=
+"ident">generate_initial_densities</span><span class=
 "op">&lt;</span><span class="ident">I</span><span class=
 "op">&gt;</span>(
         <span class="ident">beta</span>: <span class=
@@ -1618,9 +1649,23 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="kw">for</span> (<span class=
 "ident">i</span>, <span class="ident">ni</span>) <span class=
 "kw">in</span> <span class="ident">initial_densities</span> {
-            <span class="ident">n</span>[<span class=
-"ident">i</span>] <span class="op">=</span> <span class=
+            <span class="kw">if</span> <span class=
+"kw">let</span> <span class="prelude-val">Some</span>(<span class=
+"ident">v</span>) <span class="op">=</span> <span class=
+"ident">n</span>.<span class="ident">get_mut</span>(<span class=
+"ident">i</span>) {
+                <span class="kw-2">*</span><span class=
+"ident">v</span> <span class="op">=</span> <span class=
 "ident">ni</span>;
+            } <span class="kw">else</span> {
+                <span class="ident">log</span>::<span class=
+"macro">error</span><span class="macro">!</span>(<span class=
+"string">"Out of bounds initial density."</span>);
+                <span class="kw">return</span> <span class=
+"prelude-val">Err</span>(<span class=
+"ident">Error</span>::<span class=
+"ident">InvalidInitialDensities</span>);
+            }
         }
 
         <span class="kw">if</span> <span class=
@@ -1652,7 +1697,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class=
 "doccomment">/// right number of initial conditions and they are all finite.</span>
     <span class="kw">fn</span> <span class=
-"ident">check_initial_asymmetries</span><span class=
+"ident">generate_initial_asymmetries</span><span class=
 "op">&lt;</span><span class="ident">I</span><span class=
 "op">&gt;</span>(
         <span class="ident">particles</span>: <span class=
@@ -1681,9 +1726,23 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="kw">for</span> (<span class=
 "ident">i</span>, <span class="ident">nai</span>) <span class=
 "kw">in</span> <span class="ident">initial_asymmetries</span> {
-            <span class="ident">na</span>[<span class=
-"ident">i</span>] <span class="op">=</span> <span class=
+            <span class="kw">if</span> <span class=
+"kw">let</span> <span class="prelude-val">Some</span>(<span class=
+"ident">v</span>) <span class="op">=</span> <span class=
+"ident">na</span>.<span class="ident">get_mut</span>(<span class=
+"ident">i</span>) {
+                <span class="kw-2">*</span><span class=
+"ident">v</span> <span class="op">=</span> <span class=
 "ident">nai</span>;
+            } <span class="kw">else</span> {
+                <span class="ident">log</span>::<span class=
+"macro">error</span><span class="macro">!</span>(<span class=
+"string">"Out of bounds initial asymmetry."</span>);
+                <span class="kw">return</span> <span class=
+"prelude-val">Err</span>(<span class=
+"ident">Error</span>::<span class=
+"ident">InvalidInitialAsymmetries</span>);
+            }
         }
 
         <span class="kw">if</span> <span class=
@@ -1733,13 +1792,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">mut</span> <span class="ident">M</span>, <span class=
 "ident">beta_range</span>: (<span class=
 "ident">f64</span>, <span class="ident">f64</span>)) {
-        <span class=
-"comment">// Number of recursive subdivisions in beta range (so there are 2^N</span>
-        <span class="comment">// subdivisions).</span>
-        <span class="kw">const</span> <span class=
-"ident">N</span>: <span class="ident">u32</span> <span class=
-"op">=</span> <span class="number">10</span>;
-
         <span class="ident">log</span>::<span class=
 "macro">info</span><span class="macro">!</span>(<span class=
 "string">"Pre-computing γ..."</span>);
@@ -1762,8 +1814,13 @@ autocomplete="off" spellcheck="false" placeholder=
         ]
         .<span class="ident">iter</span>()
         .<span class="ident">chain</span>(<span class=
-"kw-2">&</span><span class=
-"ident">rec_geomspace</span>(<span class="ident">beta_range</span>.<span class="number">0</span>, <span class="ident">beta_range</span>.<span class="number">1</span>, <span class="ident">N</span>))
+"kw-2">&</span><span class="ident">rec_geomspace</span>(
+            <span class="ident">beta_range</span>.<span class=
+"number">0</span>,
+            <span class="ident">beta_range</span>.<span class=
+"number">1</span>,
+            <span class="ident">PRECOMPUTE_SUBDIV</span>,
+        ))
         .<span class="ident">enumerate</span>()
         {
             <span class="kw">if</span> <span class=
@@ -1771,18 +1828,15 @@ autocomplete="off" spellcheck="false" placeholder=
 "number">64</span> <span class="op">=</span><span class=
 "op">=</span> <span class="number">3</span> {
                 <span class="ident">log</span>::<span class=
-"macro">debug</span><span class="macro">!</span>(<span class=
-"string">"Precomputing step {} / {}"</span>, <span class=
-"ident">i</span>, <span class="number">2_usize</span>.<span class=
-"ident">pow</span>(<span class="ident">N</span>) <span class=
-"op">+</span> <span class="number">3</span>);
-            } <span class="kw">else</span> {
-                <span class="ident">log</span>::<span class=
-"macro">trace</span><span class="macro">!</span>(<span class=
-"string">"Precomputing step {} / {}"</span>, <span class=
-"ident">i</span>, <span class="number">2_usize</span>.<span class=
-"ident">pow</span>(<span class="ident">N</span>) <span class=
-"op">+</span> <span class="number">3</span>);
+"macro">debug</span><span class="macro">!</span>(
+                    <span class=
+"string">"Precomputing step {} / {}"</span>,
+                    <span class="ident">i</span>,
+                    <span class=
+"number">2_usize</span>.<span class="ident">pow</span>(<span class=
+"ident">PRECOMPUTE_SUBDIV</span>) <span class=
+"op">+</span> <span class="number">3</span>
+                );
             }
             <span class="ident">model</span>.<span class=
 "ident">set_beta</span>(<span class="ident">beta</span>);
@@ -1811,13 +1865,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">mut</span> <span class="ident">M</span>, <span class=
 "ident">beta_range</span>: (<span class=
 "ident">f64</span>, <span class="ident">f64</span>)) {
-        <span class=
-"comment">// Number of recursive subdivisions in beta range (so there are 2^N</span>
-        <span class="comment">// subdivisions).</span>
-        <span class="kw">const</span> <span class=
-"ident">N</span>: <span class="ident">u32</span> <span class=
-"op">=</span> <span class="number">10</span>;
-
         <span class="ident">log</span>::<span class=
 "macro">info</span><span class="macro">!</span>(<span class=
 "string">"Pre-computing γ..."</span>);
@@ -1840,8 +1887,13 @@ autocomplete="off" spellcheck="false" placeholder=
         ]
         .<span class="ident">iter</span>()
         .<span class="ident">chain</span>(<span class=
-"kw-2">&</span><span class=
-"ident">rec_geomspace</span>(<span class="ident">beta_range</span>.<span class="number">0</span>, <span class="ident">beta_range</span>.<span class="number">1</span>, <span class="ident">N</span>))
+"kw-2">&</span><span class="ident">rec_geomspace</span>(
+            <span class="ident">beta_range</span>.<span class=
+"number">0</span>,
+            <span class="ident">beta_range</span>.<span class=
+"number">1</span>,
+            <span class="ident">PRECOMPUTE_SUBDIV</span>,
+        ))
         .<span class="ident">enumerate</span>()
         {
             <span class="kw">if</span> <span class=
@@ -1849,18 +1901,15 @@ autocomplete="off" spellcheck="false" placeholder=
 "number">64</span> <span class="op">=</span><span class=
 "op">=</span> <span class="number">3</span> {
                 <span class="ident">log</span>::<span class=
-"macro">debug</span><span class="macro">!</span>(<span class=
-"string">"Precomputing step {} / {}"</span>, <span class=
-"ident">i</span>, <span class="number">2_usize</span>.<span class=
-"ident">pow</span>(<span class="ident">N</span>) <span class=
-"op">+</span> <span class="number">3</span>);
-            } <span class="kw">else</span> {
-                <span class="ident">log</span>::<span class=
-"macro">trace</span><span class="macro">!</span>(<span class=
-"string">"Precomputing step {} / {}"</span>, <span class=
-"ident">i</span>, <span class="number">2_usize</span>.<span class=
-"ident">pow</span>(<span class="ident">N</span>) <span class=
-"op">+</span> <span class="number">3</span>);
+"macro">debug</span><span class="macro">!</span>(
+                    <span class=
+"string">"Precomputing step {} / {}"</span>,
+                    <span class="ident">i</span>,
+                    <span class=
+"number">2_usize</span>.<span class="ident">pow</span>(<span class=
+"ident">PRECOMPUTE_SUBDIV</span>) <span class=
+"op">+</span> <span class="number">3</span>
+                );
             }
             <span class="ident">model</span>.<span class=
 "ident">set_beta</span>(<span class="ident">beta</span>);
@@ -1945,7 +1994,7 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="kw">let</span> <span class=
 "ident">initial_densities</span> <span class=
 "op">=</span> <span class="self">Self</span>::<span class=
-"ident">check_initial_densities</span>(
+"ident">generate_initial_densities</span>(
             <span class="ident">beta_range</span>.<span class=
 "number">0</span>,
             <span class="kw-2">&</span><span class=
@@ -1991,16 +2040,14 @@ autocomplete="off" spellcheck="false" placeholder=
         }
         <span class="kw">let</span> <span class=
 "ident">initial_asymmetries</span> <span class=
-"op">=</span> <span class="ident">Array1</span>::<span class=
-"ident">zeros</span>(<span class=
-"ident">particles</span>.<span class="ident">len</span>());
-        <span class="self">Self</span>::<span class=
-"ident">check_initial_asymmetries</span>(<span class=
-"kw-2">&</span><span class="ident">particles</span>, <span class=
-"self">self</span>.<span class=
+"op">=</span> <span class="self">Self</span>::<span class=
+"ident">generate_initial_asymmetries</span>(
+            <span class="kw-2">&</span><span class=
+"ident">particles</span>,
+            <span class="self">self</span>.<span class=
 "ident">initial_asymmetries</span>.<span class=
-"ident">iter</span>().<span class=
-"ident">cloned</span>())<span class="question-mark">?</span>;
+"ident">iter</span>().<span class="ident">cloned</span>(),
+        )<span class="question-mark">?</span>;
 
         <span class=
 "comment">// Make sure that there aren't too many particles held in equilibrium or</span>
@@ -2270,7 +2317,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span>) {
         <span class="kw">use</span> <span class=
 "kw">super</span>::<span class="ident">tableau</span>::<span class=
-"ident">rk87</span>::<span class="kw-2">*</span>;
+"ident">rk87</span>::{<span class="ident">RK_A</span>, <span class=
+"ident">RK_B</span>, <span class="ident">RK_C</span>, <span class=
+"ident">RK_E</span>, <span class=
+"ident">RK_ORDER</span>, <span class="ident">RK_S</span>};
 
         <span class=
 "comment">// Initialize all the variables that will be used in the integration</span>
@@ -2435,6 +2485,7 @@ autocomplete="off" spellcheck="false" placeholder=
                 <span class="ident">log</span>::<span class=
 "macro">debug</span><span class="macro">!</span>(<span class=
 "string">"Step size too small, increased h to {:.3e}"</span>, <span class="ident">h</span>);
+
                 <span class=
 "comment">// Irrespective of the local error, if we're at the minimum step</span>
                 <span class=
@@ -2469,6 +2520,14 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">step</span>, <span class="ident">beta</span>, <span class=
 "ident">h</span>);
             }
+            <span class="ident">log</span>::<span class=
+"macro">trace</span><span class="macro">!</span>(<span class=
+"string">"      n = {:&lt;+10.3e}"</span>, <span class=
+"ident">n</span>);
+            <span class="ident">log</span>::<span class=
+"macro">trace</span><span class="macro">!</span>(<span class=
+"string">"     na = {:&lt;+10.3e}"</span>, <span class=
+"ident">na</span>);
 
             <span class="kw">for</span> <span class=
 "ident">i</span> <span class="kw">in</span> <span class=
@@ -2656,6 +2715,16 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">max</span>(<span class="ident">v</span>.<span class=
 "ident">abs</span>()));
 
+            <span class="comment">// DEBUG</span>
+            <span class=
+"comment">// log::trace!("     dn = {:&lt;+10.3e}", dn);</span>
+            <span class=
+"comment">// log::trace!("    dna = {:&lt;+10.3e}", dna);</span>
+            <span class=
+"comment">// log::trace!(" dn_err = {:&lt;+10.3e}", dn_err);</span>
+            <span class=
+"comment">// log::trace!("dna_err = {:&lt;+10.3e}", dna_err);</span>
+
             <span class=
 "comment">// If the error is within the tolerance, we'll be advancing the</span>
             <span class="comment">// iteration step</span>
@@ -2664,7 +2733,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>.<span class="ident">error_tolerance</span> {
                 <span class="ident">advance</span> <span class=
 "op">=</span> <span class="bool-val">true</span>;
-            } <span class="kw">else</span> {
+            } <span class="kw">else</span> <span class=
+"kw">if</span> <span class="ident">log</span>::<span class=
+"macro">log_enabled</span><span class="macro">!</span>(<span class=
+"ident">log</span>::<span class="ident">Level</span>::<span class=
+"ident">Trace</span>) {
                 <span class="ident">log</span>::<span class=
 "macro">trace</span><span class="macro">!</span>(
                     <span class=
@@ -2673,16 +2746,6 @@ autocomplete="off" spellcheck="false" placeholder=
                     <span class="self">self</span>.<span class=
 "ident">error_tolerance</span>
                 );
-
-                <span class="comment">// DEBUG</span>
-                <span class=
-"comment">// log::trace!("     dn = {:&gt;10.3e}", dn);</span>
-                <span class=
-"comment">// log::trace!("    dna = {:&gt;10.3e}", dna);</span>
-                <span class=
-"comment">// log::trace!(" dn_err = {:&gt;10.3e}", dn_err);</span>
-                <span class=
-"comment">// log::trace!("dna_err = {:&gt;10.3e}", dna_err);</span>
             }
 
             <span class=
@@ -2887,7 +2950,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../../";window.currentCrate = "boltzmann_solver";
 </script>
-<script src="../../../aliases.js"></script>
 <script src="../../../main.js"></script>
 <script src="../../../source-script.js"></script>
 <script src="../../../source-files.js"></script>

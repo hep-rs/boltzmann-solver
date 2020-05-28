@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive-1.0.104/src/internals/attr.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive-1.0.110/src/internals/attr.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>attr.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href=
@@ -2018,6 +2018,19 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="1942">1942</span>
 <span id="1943">1943</span>
 <span id="1944">1944</span>
+<span id="1945">1945</span>
+<span id="1946">1946</span>
+<span id="1947">1947</span>
+<span id="1948">1948</span>
+<span id="1949">1949</span>
+<span id="1950">1950</span>
+<span id="1951">1951</span>
+<span id="1952">1952</span>
+<span id="1953">1953</span>
+<span id="1954">1954</span>
+<span id="1955">1955</span>
+<span id="1956">1956</span>
+<span id="1957">1957</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -2107,10 +2120,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Symbol</span>) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">Attr</span> {
-            <span class="ident">cx</span>: <span class=
-"ident">cx</span>,
-            <span class="ident">name</span>: <span class=
-"ident">name</span>,
+            <span class="ident">cx</span>,
+            <span class="ident">name</span>,
             <span class="ident">tokens</span>: <span class=
 "ident">TokenStream</span>::<span class="ident">new</span>(),
             <span class="ident">value</span>: <span class=
@@ -2283,10 +2294,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Symbol</span>) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">VecAttr</span> {
-            <span class="ident">cx</span>: <span class=
-"ident">cx</span>,
-            <span class="ident">name</span>: <span class=
-"ident">name</span>,
+            <span class="ident">cx</span>,
+            <span class="ident">name</span>,
             <span class=
 "ident">first_dup_tokens</span>: <span class=
 "ident">TokenStream</span>::<span class="ident">new</span>(),
@@ -2461,9 +2470,7 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class=
 "ident">deserialize_renamed</span>: <span class=
 "ident">de_renamed</span>,
-            <span class=
-"ident">deserialize_aliases</span>: <span class=
-"ident">deserialize_aliases</span>,
+            <span class="ident">deserialize_aliases</span>,
         }
     }
 
@@ -2576,6 +2583,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "prelude-ty">Option</span><span class="op">&lt;</span><span class=
 "ident">syn</span>::<span class="ident">Path</span><span class=
 "op">&gt;</span>,
+    <span class="ident">is_packed</span>: <span class=
+"ident">bool</span>,
 }
 
 <span class="doccomment">/// Styles of representing an enum.</span>
@@ -3595,6 +3604,34 @@ autocomplete="off" spellcheck="false" placeholder=
             }
         }
 
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">is_packed</span> <span class=
+"op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">for</span> <span class=
+"ident">attr</span> <span class="kw">in</span> <span class=
+"kw-2">&</span><span class="ident">item</span>.<span class=
+"ident">attrs</span> {
+            <span class="kw">if</span> <span class=
+"ident">attr</span>.<span class="ident">path</span>.<span class=
+"ident">is_ident</span>(<span class="string">"repr"</span>) {
+                <span class="kw">let</span> <span class=
+"kw">_</span> <span class="op">=</span> <span class=
+"ident">attr</span>.<span class=
+"ident">parse_args_with</span>(<span class=
+"op">|</span><span class="ident">input</span>: <span class=
+"ident">ParseStream</span><span class="op">|</span> {
+                    <span class=
+"ident">is_packed</span> <span class="op">|</span><span class=
+"op">=</span> <span class="ident">input</span>.<span class=
+"ident">parse</span>::<span class="op">&lt;</span><span class=
+"ident">Ident</span><span class="op">&gt;</span>()<span class=
+"question-mark">?</span> <span class="op">=</span><span class=
+"op">=</span> <span class="string">"packed"</span>;
+                    <span class="prelude-val">Ok</span>(())
+                });
+            }
+        }
+
         <span class="ident">Container</span> {
             <span class="ident">name</span>: <span class=
 "ident">Name</span>::<span class=
@@ -3649,6 +3686,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "bool-val">false</span>,
             <span class="ident">serde_path</span>: <span class=
 "ident">serde_path</span>.<span class="ident">get</span>(),
+            <span class="ident">is_packed</span>,
         }
     }
 
@@ -3776,6 +3814,15 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Path</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class=
 "ident">remote</span>.<span class="ident">as_ref</span>()
+    }
+
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">is_packed</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">bool</span> {
+        <span class="self">self</span>.<span class=
+"ident">is_packed</span>
     }
 
     <span class="kw">pub</span> <span class=
@@ -3920,8 +3967,7 @@ autocomplete="off" spellcheck="false" placeholder=
                 }
             }
             <span class="ident">TagType</span>::<span class=
-"ident">Internal</span> { <span class=
-"ident">tag</span>: <span class="ident">tag</span> }
+"ident">Internal</span> { <span class="ident">tag</span> }
         }
         (<span class="prelude-val">Some</span>((<span class=
 "ident">untagged_tokens</span>, <span class=
@@ -3983,12 +4029,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "prelude-val">Some</span>((<span class="kw">_</span>, <span class=
 "ident">content</span>))) <span class="op">=</span><span class=
 "op">&gt;</span> <span class="ident">TagType</span>::<span class=
-"ident">Adjacent</span> {
-            <span class="ident">tag</span>: <span class=
-"ident">tag</span>,
-            <span class="ident">content</span>: <span class=
-"ident">content</span>,
-        },
+"ident">Adjacent</span> { <span class=
+"ident">tag</span>, <span class="ident">content</span> },
         (<span class="prelude-val">Some</span>((<span class=
 "ident">untagged_tokens</span>, <span class=
 "kw">_</span>)), <span class=
@@ -5811,8 +5853,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Vec</span>::<span class="ident">new</span>(),
                     <span class="ident">qself</span>: <span class=
 "prelude-val">None</span>,
-                    <span class="ident">path</span>: <span class=
-"ident">path</span>,
+                    <span class="ident">path</span>,
                 };
                 <span class=
 "ident">deserialize_with</span>.<span class=
@@ -5865,8 +5906,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Vec</span>::<span class="ident">new</span>(),
                     <span class="ident">qself</span>: <span class=
 "prelude-val">None</span>,
-                    <span class="ident">path</span>: <span class=
-"ident">path</span>,
+                    <span class="ident">path</span>,
                 };
                 <span class=
 "ident">deserialize_with</span>.<span class=
@@ -5917,9 +5957,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">ser_bound</span>.<span class="ident">get</span>(),
             <span class="ident">de_bound</span>: <span class=
 "ident">de_bound</span>.<span class="ident">get</span>(),
-            <span class=
-"ident">borrowed_lifetimes</span>: <span class=
-"ident">borrowed_lifetimes</span>,
+            <span class="ident">borrowed_lifetimes</span>,
             <span class="ident">getter</span>: <span class=
 "ident">getter</span>.<span class="ident">get</span>(),
             <span class="ident">flatten</span>: <span class=
@@ -7355,7 +7393,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../../";window.currentCrate = "serde_derive";
 </script>
-<script src="../../../aliases.js"></script>
 <script src="../../../main.js"></script>
 <script src="../../../source-script.js"></script>
 <script src="../../../source-files.js"></script>

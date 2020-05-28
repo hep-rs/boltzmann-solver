@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.0/src/impl_constructors.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.1/src/impl_constructors.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>impl_constructors.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -562,6 +562,99 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="487">487</span>
 <span id="488">488</span>
 <span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -590,6 +683,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">num_traits</span>::{<span class=
 "ident">Float</span>, <span class="ident">One</span>, <span class=
 "ident">Zero</span>};
+<span class="kw">use</span> <span class=
+"ident">std</span>::<span class="ident">mem</span>::<span class=
+"ident">MaybeUninit</span>;
 
 <span class="kw">use</span> <span class=
 "kw">crate</span>::<span class="ident">dimension</span>;
@@ -838,8 +934,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// # Some(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// #</span>
-    <span class=
-"doccomment">/// # fn main() { example().unwrap() }</span>
+    <span class="doccomment">/// # example().unwrap();</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">geomspace</span>(<span class=
@@ -1201,21 +1296,62 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Dim</span> <span class="op">=</span> <span class=
 "ident">D</span><span class="op">&gt;</span>,
     {
+        <span class="self">Self</span>::<span class=
+"ident">from_shape_simple_fn</span>(<span class=
+"ident">shape</span>, <span class="ident">A</span>::<span class=
+"ident">default</span>)
+    }
+
+    <span class=
+"doccomment">/// Create an array with values created by the function `f`.</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// `f` is called with no argument, and it should return the element to</span>
+    <span class=
+"doccomment">/// create. If the precise index of the element to create is needed,</span>
+    <span class=
+"doccomment">/// use [`from_shape_fn`](ArrayBase::from_shape_fn) instead.</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// This constructor can be useful if the element order is not important,</span>
+    <span class=
+"doccomment">/// for example if they are identical or random.</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// **Panics** if the product of non-zero axis lengths overflows `isize`.</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class=
+"ident">from_shape_simple_fn</span><span class=
+"op">&lt;</span><span class="ident">Sh</span>, <span class=
+"ident">F</span><span class="op">&gt;</span>(<span class=
+"ident">shape</span>: <span class="ident">Sh</span>, <span class=
+"kw-2">mut</span> <span class="ident">f</span>: <span class=
+"ident">F</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">Sh</span>: <span class=
+"ident">ShapeBuilder</span><span class="op">&lt;</span><span class=
+"ident">Dim</span> <span class="op">=</span> <span class=
+"ident">D</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class=
+"ident">FnMut</span>() <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">A</span>,
+    {
         <span class="kw">let</span> <span class=
 "ident">shape</span> <span class="op">=</span> <span class=
 "ident">shape</span>.<span class="ident">into_shape</span>();
         <span class="kw">let</span> <span class=
-"ident">size</span> <span class="op">=</span> <span class=
+"ident">len</span> <span class="op">=</span> <span class=
 "macro">size_of_shape_checked_unwrap</span><span class=
 "macro">!</span>(<span class="kw-2">&</span><span class=
 "ident">shape</span>.<span class="ident">dim</span>);
         <span class="kw">let</span> <span class=
 "ident">v</span> <span class="op">=</span> <span class=
-"ident">to_vec</span>((<span class="number">0</span>..<span class=
-"ident">size</span>).<span class="ident">map</span>(<span class=
-"op">|</span><span class="kw">_</span><span class=
-"op">|</span> <span class="ident">A</span>::<span class=
-"ident">default</span>()));
+"ident">to_vec_mapped</span>(<span class=
+"number">0</span>..<span class="ident">len</span>, <span class=
+"kw">move</span> <span class="op">|</span><span class=
+"kw">_</span><span class="op">|</span> <span class=
+"ident">f</span>());
         <span class="kw">unsafe</span> { <span class=
 "self">Self</span>::<span class=
 "ident">from_shape_vec_unchecked</span>(<span class=
@@ -1231,6 +1367,22 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// **Panics** if the product of non-zero axis lengths overflows `isize`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use ndarray::{Array, arr2};</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// // Create a table of i × j (with i and j from 1 to 3)</span>
+    <span class=
+"doccomment">/// let ij_table = Array::from_shape_fn((3, 3), |(i, j)| (1 + i) * (1 + j));</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     ij_table,</span>
+    <span class="doccomment">///     arr2(&amp;[[1, 2, 3],</span>
+    <span class="doccomment">///            [2, 4, 6],</span>
+    <span class="doccomment">///            [3, 6, 9]])</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">from_shape_fn</span><span class=
 "op">&lt;</span><span class="ident">Sh</span>, <span class=
@@ -1408,6 +1560,8 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class=
 "doccomment">/// provided shape and strides. (No cloning of elements needed.)</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
     <span class=
 "doccomment">/// The caller must ensure that the following conditions are met:</span>
     <span class="doccomment">///</span>
@@ -1499,16 +1653,20 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Create an array with uninitalized elements, shape `shape`.</span>
     <span class="doccomment">///</span>
     <span class=
+"doccomment">/// Prefer to use [`maybe_uninit()`](ArrayBase::maybe_uninit) if possible, because it is</span>
+    <span class="doccomment">/// easier to use correctly.</span>
+    <span class="doccomment">///</span>
+    <span class=
 "doccomment">/// **Panics** if the number of elements in `shape` would overflow isize.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ### Safety</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// Accessing uninitalized values is undefined behaviour. You must</span>
+"doccomment">/// Accessing uninitalized values is undefined behaviour. You must overwrite *all* the elements</span>
     <span class=
-"doccomment">/// overwrite *all* the elements in the array after it is created; for</span>
+"doccomment">/// in the array after it is created; for example using</span>
     <span class=
-"doccomment">/// example using the methods `.fill()` or `.assign()`.</span>
+"doccomment">/// [`raw_view_mut`](ArrayBase::raw_view_mut) or other low-level element access.</span>
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// The contents of the array is indeterminate before initialization and it</span>
@@ -1520,48 +1678,14 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class=
 "doccomment">/// This constructor is limited to elements where `A: Copy` (no destructors)</span>
     <span class=
-"doccomment">/// to avoid users shooting themselves too hard in the foot; it is not</span>
+"doccomment">/// to avoid users shooting themselves too hard in the foot.</span>
+    <span class="doccomment">/// </span>
     <span class=
-"doccomment">/// a problem to drop an array created with this method even before elements</span>
+"doccomment">/// (Also note that the constructors `from_shape_vec` and</span>
     <span class=
-"doccomment">/// are initialized. (Note that constructors `from_shape_vec` and</span>
+"doccomment">/// `from_shape_vec_unchecked` allow the user yet more control, in the sense</span>
     <span class=
-"doccomment">/// `from_shape_vec_unchecked` allow the user yet more control).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ### Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// extern crate ndarray;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use ndarray::{s, Array2};</span>
-    <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// // Example Task: Let's create a column shifted copy of a in b</span>
-    <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// fn shift_by_two(a: &amp;Array2&lt;f32&gt;) -&gt; Array2&lt;f32&gt; {</span>
-    <span class=
-"doccomment">///     let mut b = unsafe { Array2::uninitialized(a.dim()) };</span>
-    <span class="doccomment">///</span>
-    <span class=
-"doccomment">///     // two first columns in b are two last in a</span>
-    <span class=
-"doccomment">///     // rest of columns in b are the initial columns in a</span>
-    <span class=
-"doccomment">///     b.slice_mut(s![.., ..2]).assign(&amp;a.slice(s![.., -2..]));</span>
-    <span class=
-"doccomment">///     b.slice_mut(s![.., 2..]).assign(&amp;a.slice(s![.., ..-2]));</span>
-    <span class="doccomment">///</span>
-    <span class=
-"doccomment">///     // `b` is safe to use with all operations at this point</span>
-    <span class="doccomment">///     b</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class=
-"doccomment">/// #   shift_by_two(&amp;Array2::zeros((8, 8)));</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
+"doccomment">/// that Arrays can be created from arbitrary vectors.)</span>
     <span class="kw">pub</span> <span class=
 "kw">unsafe</span> <span class="kw">fn</span> <span class=
 "ident">uninitialized</span><span class=
@@ -1596,6 +1720,145 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">shape</span>, <span class="ident">v</span>)
     }
 }
+
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="ident">S</span>, <span class=
+"ident">A</span>, <span class="ident">D</span><span class=
+"op">&gt;</span> <span class="ident">ArrayBase</span><span class=
+"op">&lt;</span><span class="ident">S</span>, <span class=
+"ident">D</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">S</span>: <span class=
+"ident">DataOwned</span><span class="op">&lt;</span><span class=
+"ident">Elem</span> <span class="op">=</span> <span class=
+"ident">MaybeUninit</span><span class="op">&lt;</span><span class=
+"ident">A</span><span class="op">&gt;</span><span class=
+"op">&gt;</span>,
+    <span class="ident">D</span>: <span class=
+"ident">Dimension</span>,
+{
+    <span class=
+"doccomment">/// Create an array with uninitalized elements, shape `shape`.</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// The uninitialized elements of type `A` are represented by the type `MaybeUninit&lt;A&gt;`,</span>
+    <span class=
+"doccomment">/// an easier way to handle uninit values correctly.</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// Only *when* the array is completely initialized with valid elements, can it be</span>
+    <span class=
+"doccomment">/// converted to an array of `A` elements using [`.assume_init()`].</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// **Panics** if the number of elements in `shape` would overflow isize.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ### Safety</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// The whole of the array must be initialized before it is converted</span>
+    <span class=
+"doccomment">/// using [`.assume_init()`] or otherwise traversed.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ### Examples</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// It is possible to assign individual values through `*elt = MaybeUninit::new(value)`</span>
+    <span class="doccomment">/// and so on.</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// [`.assume_init()`]: ArrayBase::assume_init</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use ndarray::{s, Array2};</span>
+    <span class="doccomment">/// use ndarray::Zip;</span>
+    <span class="doccomment">/// use ndarray::Axis;</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// // Example Task: Let's create a column shifted copy of the input</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// fn shift_by_two(a: &amp;Array2&lt;f32&gt;) -&gt; Array2&lt;f32&gt; {</span>
+    <span class=
+"doccomment">///     // create an uninitialized array</span>
+    <span class=
+"doccomment">///     let mut b = Array2::maybe_uninit(a.dim());</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">///     // two first columns in b are two last in a</span>
+    <span class=
+"doccomment">///     // rest of columns in b are the initial columns in a</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">///     assign_to(a.slice(s![.., -2..]), b.slice_mut(s![.., ..2]));</span>
+    <span class=
+"doccomment">///     assign_to(a.slice(s![.., 2..]), b.slice_mut(s![.., ..-2]));</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">///     // Now we can promise that `b` is safe to use with all operations</span>
+    <span class="doccomment">///     unsafe {</span>
+    <span class="doccomment">///         b.assume_init()</span>
+    <span class="doccomment">///     }</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// use ndarray::{IntoNdProducer, AssignElem};</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// // This function clones elements from the first input to the second;</span>
+    <span class=
+"doccomment">/// // the two producers must have the same shape</span>
+    <span class=
+"doccomment">/// fn assign_to&lt;'a, P1, P2, A&gt;(from: P1, to: P2)</span>
+    <span class=
+"doccomment">///     where P1: IntoNdProducer&lt;Item = &amp;'a A&gt;,</span>
+    <span class=
+"doccomment">///           P2: IntoNdProducer&lt;Dim = P1::Dim&gt;,</span>
+    <span class=
+"doccomment">///           P2::Item: AssignElem&lt;A&gt;,</span>
+    <span class="doccomment">///           A: Clone + 'a</span>
+    <span class="doccomment">/// {</span>
+    <span class="doccomment">///     Zip::from(from)</span>
+    <span class=
+"doccomment">///         .apply_assign_into(to, A::clone);</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// # shift_by_two(&amp;Array2::zeros((8, 8)));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">maybe_uninit</span><span class=
+"op">&lt;</span><span class="ident">Sh</span><span class=
+"op">&gt;</span>(<span class="ident">shape</span>: <span class=
+"ident">Sh</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">Sh</span>: <span class=
+"ident">ShapeBuilder</span><span class="op">&lt;</span><span class=
+"ident">Dim</span> <span class="op">=</span> <span class=
+"ident">D</span><span class="op">&gt;</span>,
+    {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class=
+"ident">shape</span> <span class="op">=</span> <span class=
+"ident">shape</span>.<span class="ident">into_shape</span>();
+            <span class="kw">let</span> <span class=
+"ident">size</span> <span class="op">=</span> <span class=
+"macro">size_of_shape_checked_unwrap</span><span class=
+"macro">!</span>(<span class="kw-2">&</span><span class=
+"ident">shape</span>.<span class="ident">dim</span>);
+            <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">v</span> <span class=
+"op">=</span> <span class="ident">Vec</span>::<span class=
+"ident">with_capacity</span>(<span class="ident">size</span>);
+            <span class="ident">v</span>.<span class=
+"ident">set_len</span>(<span class="ident">size</span>);
+            <span class="self">Self</span>::<span class=
+"ident">from_shape_vec_unchecked</span>(<span class=
+"ident">shape</span>, <span class="ident">v</span>)
+        }
+    }
+}
 </pre></div>
 </section>
 <section id="search" class="content hidden"></section>
@@ -1603,7 +1866,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "ndarray";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

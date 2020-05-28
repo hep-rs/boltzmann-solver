@@ -96,7 +96,7 @@ autocomplete="off" spellcheck="false" placeholder=
 'render-detail'><a id="toggle-all-docs" href="javascript:void(0)"
 title="collapse all docs">[<span class=
 'inner'>−</span>]</a></span><a class='srclink' href=
-'../src/ndarray/impl_views/indexing.rs.html#49-94' title=
+'../src/ndarray/impl_views/indexing.rs.html#49-98' title=
 'goto source code'>[src]</a></span><span class='in-band'>Trait
 <a href='index.html'>ndarray</a>::<wbr><a class="trait" href=
 ''>IndexLonger</a></span></h1>
@@ -247,6 +247,9 @@ arrays.</p>
 views.</p>
 <p><strong>Note:</strong> only unchecked for non-debug builds of
 ndarray.</p>
+<h1 id="safety" class="section-header"><a href=
+"#safety">Safety</a></h1>
+<p>The caller must ensure that the index is in-bounds.</p>
 </div>
 </div>
 <span class='loading-content'>Loading content...</span>
@@ -265,7 +268,7 @@ title="type ndarray::ArrayView">ArrayView</a>&lt;'a, A, D&gt;
 "../ndarray/trait.Dimension.html" title=
 "trait ndarray::Dimension">Dimension</a>,&nbsp;</span></code><a href='#impl-IndexLonger%3CI%3E'
 class='anchor'></a><a class='srclink' href=
-'../src/ndarray/impl_views/indexing.rs.html#96-139' title=
+'../src/ndarray/impl_views/indexing.rs.html#100-143' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='associatedtype.Output-1' class="type"><code id=
@@ -278,7 +281,7 @@ A</code></h4>
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;'a</a>
 A</code><a class='srclink' href=
-'../src/ndarray/impl_views/indexing.rs.html#115-118' title=
+'../src/ndarray/impl_views/indexing.rs.html#119-122' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Get a reference of a element through the view.</p>
@@ -298,14 +301,14 @@ title="enum core::option::Option">Option</a>&lt;<a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;'a</a>
 A&gt;</code><a class='srclink' href=
-'../src/ndarray/impl_views/indexing.rs.html#120-122' title=
+'../src/ndarray/impl_views/indexing.rs.html#124-126' title=
 'goto source code'>[src]</a></h4>
 <h4 id='method.uget' class="method"><code id='uget.v-1'>unsafe fn
 <a href='#method.uget' class='fnname'>uget</a>(self, index: I)
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;'a</a>
 A</code><a class='srclink' href=
-'../src/ndarray/impl_views/indexing.rs.html#135-138' title=
+'../src/ndarray/impl_views/indexing.rs.html#139-142' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Get a reference of a element through the view without boundary
@@ -332,7 +335,7 @@ ndarray.</p>
 "../ndarray/trait.Dimension.html" title=
 "trait ndarray::Dimension">Dimension</a>,&nbsp;</span></code><a href='#impl-IndexLonger%3CI%3E-1'
 class='anchor'></a><a class='srclink' href=
-'../src/ndarray/impl_views/indexing.rs.html#141-203' title=
+'../src/ndarray/impl_views/indexing.rs.html#145-207' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='associatedtype.Output-2' class="type"><code id=
@@ -345,7 +348,7 @@ mut</a> A</code></h4>
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;'a
 mut</a> A</code><a class='srclink' href=
-'../src/ndarray/impl_views/indexing.rs.html#160-168' title=
+'../src/ndarray/impl_views/indexing.rs.html#164-172' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Convert a mutable array view to a mutable reference of a
@@ -366,7 +369,7 @@ title="enum core::option::Option">Option</a>&lt;<a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;'a
 mut</a> A&gt;</code><a class='srclink' href=
-'../src/ndarray/impl_views/indexing.rs.html#178-186' title=
+'../src/ndarray/impl_views/indexing.rs.html#182-190' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Convert a mutable array view to a mutable reference of a
@@ -380,7 +383,7 @@ array views.</p>
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;'a
 mut</a> A</code><a class='srclink' href=
-'../src/ndarray/impl_views/indexing.rs.html#197-202' title=
+'../src/ndarray/impl_views/indexing.rs.html#201-206' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Convert a mutable array view to a mutable reference of a element
@@ -402,7 +405,6 @@ ndarray.</p>
 <script>
 window.rootPath = "../";window.currentCrate = "ndarray";
 </script>
-<script src="../aliases.js"></script>
 <script src="../main.js"></script>
 <script defer src="../search-index.js"></script>
 </body>

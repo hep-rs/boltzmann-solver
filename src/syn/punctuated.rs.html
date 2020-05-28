@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.16/src/punctuated.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.27/src/punctuated.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>punctuated.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -988,6 +988,12 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="913">913</span>
 <span id="914">914</span>
 <span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -1523,6 +1529,19 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
+"doccomment">/// Clears the sequence of all values and punctuation, making it empty.</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">clear</span>(<span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"self">self</span>) {
+        <span class="self">self</span>.<span class=
+"ident">inner</span>.<span class="ident">clear</span>();
+        <span class="self">self</span>.<span class=
+"ident">last</span> <span class="op">=</span> <span class=
+"prelude-val">None</span>;
+    }
+
+    <span class=
 "doccomment">/// Parses zero or more occurrences of `T` separated by punctuation of type</span>
     <span class=
 "doccomment">/// `P`, with optional trailing punctuation.</span>
@@ -1533,7 +1552,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// of this parse stream must consist of `T` and `P`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This function is available if Syn is built with the `"parsing"`</span>
+"doccomment">/// *This function is available only if Syn is built with the `"parsing"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class="ident">feature</span> <span class=
@@ -1572,7 +1591,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// [`parse_terminated`]: Punctuated::parse_terminated</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This function is available if Syn is built with the `"parsing"`</span>
+"doccomment">/// *This function is available only if Syn is built with the `"parsing"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class="ident">feature</span> <span class=
@@ -1640,7 +1659,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// stream.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This function is available if Syn is built with the `"parsing"`</span>
+"doccomment">/// *This function is available only if Syn is built with the `"parsing"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class="ident">feature</span> <span class=
@@ -1681,7 +1700,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// [`parse_separated_nonempty`]: Punctuated::parse_separated_nonempty</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This function is available if Syn is built with the `"parsing"`</span>
+"doccomment">/// *This function is available only if Syn is built with the `"parsing"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class="ident">feature</span> <span class=
@@ -3481,7 +3500,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "syn";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

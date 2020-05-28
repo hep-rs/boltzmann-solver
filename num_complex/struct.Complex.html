@@ -59,7 +59,7 @@
 "#fields">Fields</a>
 <div class="sidebar-links"><a href="#structfield.re">re</a><a href=
 "#structfield.im">im</a></div>
-<a class="sidebar-title" href="#methods">Methods</a>
+<a class="sidebar-title" href="#implementations">Methods</a>
 <div class="sidebar-links"><a href="#method.acos">acos</a><a href=
 "#method.acosh">acosh</a><a href="#method.arg">arg</a><a href=
 "#method.asin">asin</a><a href="#method.asinh">asinh</a><a href=
@@ -85,7 +85,7 @@
 "#method.tan">tan</a><a href="#method.tanh">tanh</a><a href=
 "#method.to_polar">to_polar</a><a href=
 "#method.unscale">unscale</a></div>
-<a class="sidebar-title" href="#implementations">Trait
+<a class="sidebar-title" href="#trait-implementations">Trait
 Implementations</a>
 <div class="sidebar-links"><a href=
 "#impl-Add%3C%26%27a%20Complex%3CT%3E%3E">Add&lt;&amp;'a
@@ -125,7 +125,7 @@ Complex&lt;T&gt;&gt;</a><a href=
 Complex&lt;T&gt;&gt;</a><a href=
 "#impl-AddAssign%3C%26%27a%20T%3E">AddAssign&lt;&amp;'a
 T&gt;</a><a href=
-"#impl-AddAssign%3CComplex%3CT%3E%3E">AddAssign&lt;Complex&lt;T&gt;&gt;</a><a href="#impl-AddAssign%3CT%3E">AddAssign&lt;T&gt;</a><a href="#impl-AsPrimitive%3CU%3E">AsPrimitive&lt;U&gt;</a><a href="#impl-Binary">Binary</a><a href="#impl-Clone">Clone</a><a href="#impl-Copy">Copy</a><a href="#impl-Debug">Debug</a><a href="#impl-Default">Default</a><a href="#impl-Display">Display</a><a href="#impl-Div%3C%26%27a%20Complex%3CT%3E%3E">Div&lt;&amp;'a
+"#impl-AddAssign%3CComplex%3CT%3E%3E">AddAssign&lt;Complex&lt;T&gt;&gt;</a><a href="#impl-AddAssign%3CT%3E">AddAssign&lt;T&gt;</a><a href="#impl-AsPrimitive%3CU%3E">AsPrimitive&lt;U&gt;</a><a href="#impl-Binary">Binary</a><a href="#impl-Clone">Clone</a><a href="#impl-Copy">Copy</a><a href="#impl-Debug">Debug</a><a href="#impl-Default">Default</a><a href="#impl-Deserialize%3C%27de%3E">Deserialize&lt;'de&gt;</a><a href="#impl-Display">Display</a><a href="#impl-Div%3C%26%27a%20Complex%3CT%3E%3E">Div&lt;&amp;'a
 Complex&lt;T&gt;&gt;</a><a href=
 "#impl-Div%3C%26%27a%20Complex%3Cf32%3E%3E">Div&lt;&amp;'a
 Complex&lt;f32&gt;&gt;</a><a href=
@@ -269,7 +269,7 @@ Complex&lt;T&gt;&gt;</a><a href=
 Complex&lt;T&gt;&gt;</a><a href=
 "#impl-RemAssign%3C%26%27a%20T%3E">RemAssign&lt;&amp;'a
 T&gt;</a><a href=
-"#impl-RemAssign%3CComplex%3CT%3E%3E">RemAssign&lt;Complex&lt;T&gt;&gt;</a><a href="#impl-RemAssign%3CT%3E">RemAssign&lt;T&gt;</a><a href="#impl-StructuralEq">StructuralEq</a><a href="#impl-StructuralPartialEq">StructuralPartialEq</a><a href="#impl-Sub%3C%26%27a%20Complex%3CT%3E%3E">Sub&lt;&amp;'a
+"#impl-RemAssign%3CComplex%3CT%3E%3E">RemAssign&lt;Complex&lt;T&gt;&gt;</a><a href="#impl-RemAssign%3CT%3E">RemAssign&lt;T&gt;</a><a href="#impl-Serialize">Serialize</a><a href="#impl-StructuralEq">StructuralEq</a><a href="#impl-StructuralPartialEq">StructuralPartialEq</a><a href="#impl-Sub%3C%26%27a%20Complex%3CT%3E%3E">Sub&lt;&amp;'a
 Complex&lt;T&gt;&gt;</a><a href=
 "#impl-Sub%3C%26%27a%20Complex%3Cf32%3E%3E">Sub&lt;&amp;'a
 Complex&lt;f32&gt;&gt;</a><a href=
@@ -321,6 +321,7 @@ Implementations</a>
 <div class="sidebar-links"><a href="#impl-Any">Any</a><a href=
 "#impl-Borrow%3CT%3E">Borrow&lt;T&gt;</a><a href=
 "#impl-BorrowMut%3CT%3E">BorrowMut&lt;T&gt;</a><a href=
+"#impl-DeserializeOwned">DeserializeOwned</a><a href=
 "#impl-From%3CT%3E">From&lt;T&gt;</a><a href=
 "#impl-Into%3CU%3E">Into&lt;U&gt;</a><a href=
 "#impl-NumAssign">NumAssign</a><a href=
@@ -370,8 +371,7 @@ title="collapse all docs">[<span class=
 ''>Complex</a></span></h1>
 <div class="docblock type-decl hidden-by-usual-hider">
 <pre class='rust struct'><span class=
-"docblock attributes top-attr">#[repr(C)]
-</span>pub struct Complex&lt;T&gt; {
+"docblock attributes top-attr">#[repr(C)]</span>pub struct Complex&lt;T&gt; {
     pub re: T,
     pub im: T,
 }</pre></div>
@@ -437,8 +437,8 @@ convention compatible. This means that for FFI you can only pass
 <div class='docblock'>
 <p>Imaginary portion of the complex number</p>
 </div>
-<h2 id='methods' class='small-section-header'>Methods<a href=
-'#methods' class='anchor'></a></h2>
+<h2 id='implementations' class='small-section-header'>
+Implementations<a href='#implementations' class='anchor'></a></h2>
 <h3 id='impl' class='impl'><code class='in-band'>impl&lt;T&gt;
 <a class="struct" href="../num_complex/struct.Complex.html" title=
 "struct num_complex::Complex">Complex</a>&lt;T&gt;</code><a href=
@@ -1017,9 +1017,10 @@ href='../src/num_complex/lib.rs.html#606-608' title=
 <p>Checks if the given complex number is normal</p>
 </div>
 </div>
-<h2 id='implementations' class='small-section-header'>Trait
-Implementations<a href='#implementations' class='anchor'></a></h2>
-<div id='implementations-list'>
+<h2 id='trait-implementations' class='small-section-header'>Trait
+Implementations<a href='#trait-implementations' class=
+'anchor'></a></h2>
+<div id='trait-implementations-list'>
 <h3 id='impl-Add%3C%26%27a%20Complex%3CT%3E%3E' class='impl'>
 <code class='in-band'>impl&lt;'a, T:&nbsp;<a class="trait" href=
 "https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html"
@@ -4102,6 +4103,48 @@ class='fnname'>default</a>() -&gt; <a class="struct" href=
 <p>Returns the "default value" for a type. <a href=
 "https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default">
 Read more</a></p>
+</div>
+</div>
+<h3 id='impl-Deserialize%3C%27de%3E' class='impl'><code class=
+'in-band'>impl&lt;'de, T&gt; <a class="trait" href=
+"../serde/de/trait.Deserialize.html" title=
+"trait serde::de::Deserialize">Deserialize</a>&lt;'de&gt; for
+<a class="struct" href="../num_complex/struct.Complex.html" title=
+"struct num_complex::Complex">Complex</a>&lt;T&gt; <span class=
+"where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href=
+"../serde/de/trait.Deserialize.html" title=
+"trait serde::de::Deserialize">Deserialize</a>&lt;'de&gt; +
+<a class="trait" href="../num_traits/trait.Num.html" title=
+"trait num_traits::Num">Num</a> + <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html"
+title=
+"trait core::clone::Clone">Clone</a>,&nbsp;</span></code><a href=
+'#impl-Deserialize%3C%27de%3E' class='anchor'></a><a class=
+'srclink' href='../src/num_complex/lib.rs.html#1457-1468' title=
+'goto source code'>[src]</a></h3>
+<div class='impl-items'>
+<h4 id='method.deserialize' class="method hidden"><code id=
+'deserialize.v'>fn <a href=
+'../serde/de/trait.Deserialize.html#tymethod.deserialize' class=
+'fnname'>deserialize</a>&lt;D&gt;(deserializer: D) -&gt; <a class=
+"enum" href=
+"https://doc.rust-lang.org/nightly/core/result/enum.Result.html"
+title="enum core::result::Result">Result</a>&lt;Self, D::<a class=
+"type" href=
+"../serde/de/trait.Deserializer.html#associatedtype.Error" title=
+"type serde::de::Deserializer::Error">Error</a>&gt; <span class=
+"where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;D: <a class="trait" href=
+"../serde/de/trait.Deserializer.html" title=
+"trait serde::de::Deserializer">Deserializer</a>&lt;'de&gt;,&nbsp;</span></code><a class='srclink'
+href='../src/num_complex/lib.rs.html#1461-1467' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock hidden'>
+<p>Deserialize this value from the given Serde deserializer.
+<a href=
+"../serde/de/trait.Deserialize.html#tymethod.deserialize">Read
+more</a></p>
 </div>
 </div>
 <h3 id='impl-Display' class='impl'><code class=
@@ -7474,7 +7517,7 @@ title=
 "trait core::hash::Hasher">Hasher</a>,&nbsp;</span></code><span class='since'
 title='Stable since Rust version 1.3.0'>1.3.0</span><a class=
 'srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/hash/mod.rs.html#194-201'
+'https://doc.rust-lang.org/nightly/src/core/hash/mod.rs.html#192-199'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Feeds a slice of this type into the given [<code>Hasher</code>].
@@ -15495,6 +15538,43 @@ T)</code><a class='srclink' href=
 <p>Performs the <code>%=</code> operation.</p>
 </div>
 </div>
+<h3 id='impl-Serialize' class='impl'><code class=
+'in-band'>impl&lt;T&gt; <a class="trait" href=
+"../serde/ser/trait.Serialize.html" title=
+"trait serde::ser::Serialize">Serialize</a> for <a class="struct"
+href="../num_complex/struct.Complex.html" title=
+"struct num_complex::Complex">Complex</a>&lt;T&gt; <span class=
+"where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href=
+"../serde/ser/trait.Serialize.html" title=
+"trait serde::ser::Serialize">Serialize</a>,&nbsp;</span></code><a href='#impl-Serialize'
+class='anchor'></a><a class='srclink' href=
+'../src/num_complex/lib.rs.html#1444-1454' title=
+'goto source code'>[src]</a></h3>
+<div class='impl-items'>
+<h4 id='method.serialize' class="method hidden"><code id=
+'serialize.v'>fn <a href=
+'../serde/ser/trait.Serialize.html#tymethod.serialize' class=
+'fnname'>serialize</a>&lt;S&gt;(&amp;self, serializer: S) -&gt;
+<a class="enum" href=
+"https://doc.rust-lang.org/nightly/core/result/enum.Result.html"
+title="enum core::result::Result">Result</a>&lt;S::<a class="type"
+href="../serde/ser/trait.Serializer.html#associatedtype.Ok" title=
+"type serde::ser::Serializer::Ok">Ok</a>, S::<a class="type" href=
+"../serde/ser/trait.Serializer.html#associatedtype.Error" title=
+"type serde::ser::Serializer::Error">Error</a>&gt; <span class=
+"where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;S: <a class="trait" href=
+"../serde/ser/trait.Serializer.html" title=
+"trait serde::ser::Serializer">Serializer</a>,&nbsp;</span></code><a class='srclink'
+href='../src/num_complex/lib.rs.html#1448-1453' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock hidden'>
+<p>Serialize this value into the given Serde serializer. <a href=
+"../serde/ser/trait.Serialize.html#tymethod.serialize">Read
+more</a></p>
+</div>
+</div>
 <h3 id='impl-StructuralEq' class='impl'><code class=
 'in-band'>impl&lt;T&gt; <a class="trait" href=
 "https://doc.rust-lang.org/nightly/core/marker/trait.StructuralEq.html"
@@ -19026,20 +19106,32 @@ title='goto source code'>[src]</a></h4>
 Read more</a></p>
 </div>
 </div>
+<h3 id='impl-DeserializeOwned' class='impl'><code class=
+'in-band'>impl&lt;T&gt; <a class="trait" href=
+"../serde/de/trait.DeserializeOwned.html" title=
+"trait serde::de::DeserializeOwned">DeserializeOwned</a> for T
+<span class="where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;T: for&lt;'de&gt; <a class="trait" href=
+"../serde/de/trait.Deserialize.html" title=
+"trait serde::de::Deserialize">Deserialize</a>&lt;'de&gt;,&nbsp;</span></code><a href='#impl-DeserializeOwned'
+class='anchor'></a><a class='srclink' href=
+'../src/serde/de/mod.rs.html#604' title=
+'goto source code'>[src]</a></h3>
+<div class='impl-items'></div>
 <h3 id='impl-From%3CT%3E-1' class='impl'><code class=
 'in-band'>impl&lt;T&gt; <a class="trait" href=
 "https://doc.rust-lang.org/nightly/core/convert/trait.From.html"
 title="trait core::convert::From">From</a>&lt;T&gt; for
 T</code><a href='#impl-From%3CT%3E-1' class='anchor'></a><a class=
 'srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#564-568'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#565-569'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.from-3' class="method hidden"><code id='from.v-3'>fn
 <a href=
 'https://doc.rust-lang.org/nightly/core/convert/trait.From.html#tymethod.from'
 class='fnname'>from</a>(t: T) -&gt; T</code><a class='srclink'
-href='https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#565-567'
+href='https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#566-568'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the conversion.</p>
@@ -19055,14 +19147,14 @@ title="trait core::convert::Into">Into</a>&lt;U&gt; for T
 title=
 "trait core::convert::From">From</a>&lt;T&gt;,&nbsp;</span></code><a href='#impl-Into%3CU%3E'
 class='anchor'></a><a class='srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#553-560'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#554-561'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.into' class="method hidden"><code id='into.v'>fn
 <a href=
 'https://doc.rust-lang.org/nightly/core/convert/trait.Into.html#tymethod.into'
 class='fnname'>into</a>(self) -&gt; U</code><a class='srclink'
-href='https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#557-559'
+href='https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#558-560'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the conversion.</p>
@@ -19114,10 +19206,10 @@ class='anchor'></a><a class='srclink' href=
 <span class="where fmt-newline">where<br>
 &nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href=
 "../num_traits/trait.NumAssign.html" title=
-"trait num_traits::NumAssign">NumAssign</a> + <a class="trait"
-href="../num_traits/trait.NumAssignOps.html" title=
-"trait num_traits::NumAssignOps">NumAssignOps</a>&lt;<a class=
-"primitive" href=
+"trait num_traits::NumAssign">NumAssign</a> + for&lt;'r&gt;
+<a class="trait" href="../num_traits/trait.NumAssignOps.html"
+title="trait num_traits::NumAssignOps">NumAssignOps</a>&lt;<a class="primitive"
+href=
 "https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;'r</a>
 T&gt;,&nbsp;</span></code><a href='#impl-NumAssignRef' class=
 'anchor'></a><a class='srclink' href=
@@ -19156,8 +19248,8 @@ Output&gt;,&nbsp;</span></code><a href=
 "where fmt-newline">where<br>
 &nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href=
 "../num_traits/trait.Num.html" title=
-"trait num_traits::Num">Num</a> + <a class="trait" href=
-"../num_traits/trait.NumOps.html" title=
+"trait num_traits::Num">Num</a> + for&lt;'r&gt; <a class="trait"
+href="../num_traits/trait.NumOps.html" title=
 "trait num_traits::NumOps">NumOps</a>&lt;<a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;'r</a>
 T, T&gt;,&nbsp;</span></code><a href='#impl-NumRef' class=
@@ -19172,8 +19264,9 @@ T, T&gt;,&nbsp;</span></code><a href='#impl-NumRef' class=
 <span class="where fmt-newline">where<br>
 &nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href=
 "../num_traits/trait.NumOps.html" title=
-"trait num_traits::NumOps">NumOps</a>&lt;Base, Base&gt; + <a class=
-"trait" href="../num_traits/trait.NumOps.html" title=
+"trait num_traits::NumOps">NumOps</a>&lt;Base, Base&gt; +
+for&lt;'r&gt; <a class="trait" href=
+"../num_traits/trait.NumOps.html" title=
 "trait num_traits::NumOps">NumOps</a>&lt;<a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;'r</a>
 Base, Base&gt;,&nbsp;</span></code><a href='#impl-RefNum%3CBase%3E'
@@ -19252,7 +19345,7 @@ href=
 title=
 "trait core::marker::Sized">Sized</a>,&nbsp;</span></code><a href=
 '#impl-ToString' class='anchor'></a><a class='srclink' href=
-'https://doc.rust-lang.org/nightly/src/alloc/string.rs.html#2160-2170'
+'https://doc.rust-lang.org/nightly/src/alloc/string.rs.html#2184-2194'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.to_string' class="method hidden"><code id=
@@ -19263,7 +19356,7 @@ href=
 "https://doc.rust-lang.org/nightly/alloc/string/struct.String.html"
 title="struct alloc::string::String">String</a></code><a class=
 'srclink' href=
-'https://doc.rust-lang.org/nightly/src/alloc/string.rs.html#2162-2169'
+'https://doc.rust-lang.org/nightly/src/alloc/string.rs.html#2186-2193'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Converts the given value to a <code>String</code>. <a href=
@@ -19281,7 +19374,7 @@ title="trait core::convert::TryFrom">TryFrom</a>&lt;U&gt; for T
 title=
 "trait core::convert::Into">Into</a>&lt;T&gt;,&nbsp;</span></code><a href='#impl-TryFrom%3CU%3E'
 class='anchor'></a><a class='srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#601-610'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#602-611'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='associatedtype.Error' class="type"><code id='Error.t'>type
@@ -19308,7 +19401,7 @@ title=
 title=
 "type core::convert::TryFrom::Error">Error</a>&gt;</code><a class=
 'srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#607-609'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#608-610'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the conversion.</p>
@@ -19324,7 +19417,7 @@ title="trait core::convert::TryInto">TryInto</a>&lt;U&gt; for T
 title=
 "trait core::convert::TryFrom">TryFrom</a>&lt;T&gt;,&nbsp;</span></code><a href='#impl-TryInto%3CU%3E'
 class='anchor'></a><a class='srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#587-596'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#588-597'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='associatedtype.Error-1' class="type"><code id=
@@ -19355,7 +19448,7 @@ title=
 title=
 "type core::convert::TryFrom::Error">Error</a>&gt;</code><a class=
 'srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#593-595'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#594-596'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the conversion.</p>
@@ -19368,7 +19461,6 @@ title='goto source code'>[src]</a></h4>
 <script>
 window.rootPath = "../";window.currentCrate = "num_complex";
 </script>
-<script src="../aliases.js"></script>
 <script src="../main.js"></script>
 <script defer src="../search-index.js"></script>
 </body>

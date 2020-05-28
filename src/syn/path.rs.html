@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.16/src/path.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.27/src/path.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>path.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -812,11 +812,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="737">737</span>
 <span id="738">738</span>
 <span id="739">739</span>
-<span id="740">740</span>
-<span id="741">741</span>
-<span id="742">742</span>
-<span id="743">743</span>
-<span id="744">744</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -828,10 +823,10 @@ autocomplete="off" spellcheck="false" placeholder=
 
 <span class="macro">ast_struct</span><span class="macro">!</span> {
     <span class=
-"doccomment">/// A path at which a named item is exported: `std::collections::HashMap`.</span>
+"doccomment">/// A path at which a named item is exported (e.g. `std::collections::HashMap`).</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">Path</span> {
@@ -886,7 +881,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A segment of a path together with any path arguments on that segment.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">PathSegment</span> {
@@ -927,7 +922,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Angle bracketed or parenthesized arguments of a path segment.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ## Angle bracketed</span>
@@ -1016,7 +1011,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// An individual generic argument, like `'a`, `T`, or `Item = T`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">enum</span> <span class="ident">GenericArgument</span> {
@@ -1054,7 +1049,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// V&gt;`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
@@ -1086,7 +1081,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A binding (equality constraint) on an associated type: `Item = u8`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">Binding</span> {
@@ -1106,7 +1101,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// An associated type bound: `Iterator&lt;Item: Display&gt;`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">Constraint</span> {
@@ -1130,7 +1125,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// C`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
@@ -1175,7 +1170,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">QSelf</span> {
@@ -1449,20 +1444,14 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="kw">if</span> <span class=
 "ident">input</span>.<span class="ident">peek</span>(<span class=
 "macro">Token</span><span class="macro">!</span>[<span class=
-"kw">super</span>])
-                <span class="op">|</span><span class=
+"kw">super</span>]) <span class="op">|</span><span class=
 "op">|</span> <span class="ident">input</span>.<span class=
 "ident">peek</span>(<span class="macro">Token</span><span class=
-"macro">!</span>[<span class="self">self</span>])
-                <span class="op">|</span><span class=
-"op">|</span> <span class="ident">input</span>.<span class=
-"ident">peek</span>(<span class="macro">Token</span><span class=
-"macro">!</span>[<span class="kw">crate</span>])
-                <span class="op">|</span><span class=
-"op">|</span> <span class="ident">input</span>.<span class=
-"ident">peek</span>(<span class="macro">Token</span><span class=
-"macro">!</span>[<span class="kw">extern</span>])
-            {
+"macro">!</span>[<span class="self">self</span>]) <span class=
+"op">|</span><span class="op">|</span> <span class=
+"ident">input</span>.<span class="ident">peek</span>(<span class=
+"macro">Token</span><span class="macro">!</span>[<span class=
+"kw">crate</span>]) {
                 <span class="kw">let</span> <span class=
 "ident">ident</span> <span class="op">=</span> <span class=
 "ident">input</span>.<span class="ident">call</span>(<span class=
@@ -1613,7 +1602,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Parse a `Path` containing no path arguments on any of its segments.</span>
         <span class="doccomment">///</span>
         <span class=
-"doccomment">/// *This function is available if Syn is built with the `"parsing"`</span>
+"doccomment">/// *This function is available only if Syn is built with the `"parsing"`</span>
         <span class="doccomment">/// feature.*</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Example</span>
@@ -1699,11 +1688,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">input</span>.<span class="ident">peek</span>(<span class=
 "macro">Token</span><span class="macro">!</span>[<span class=
 "kw">crate</span>])
-                            <span class="kw-2">&</span><span class=
-"op">&</span> <span class="op">!</span><span class=
-"ident">input</span>.<span class="ident">peek</span>(<span class=
-"macro">Token</span><span class="macro">!</span>[<span class=
-"kw">extern</span>])
                         {
                             <span class="kw">break</span>;
                         }
@@ -1768,7 +1752,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// - the ident of the first path segment is equal to the given one.</span>
         <span class="doccomment">///</span>
         <span class=
-"doccomment">/// *This function is available if Syn is built with the `"parsing"`</span>
+"doccomment">/// *This function is available only if Syn is built with the `"parsing"`</span>
         <span class="doccomment">/// feature.*</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Example</span>
@@ -1837,7 +1821,7 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="doccomment">///   path arguments.</span>
         <span class="doccomment">///</span>
         <span class=
-"doccomment">/// *This function is available if Syn is built with the `"parsing"`</span>
+"doccomment">/// *This function is available only if Syn is built with the `"parsing"`</span>
         <span class="doccomment">/// feature.*</span>
         <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">get_ident</span>(<span class=
@@ -2568,7 +2552,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "syn";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

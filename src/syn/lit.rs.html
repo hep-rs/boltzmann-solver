@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.16/src/lit.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.27/src/lit.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>lit.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -1537,6 +1537,39 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="1462">1462</span>
 <span id="1463">1463</span>
 <span id="1464">1464</span>
+<span id="1465">1465</span>
+<span id="1466">1466</span>
+<span id="1467">1467</span>
+<span id="1468">1468</span>
+<span id="1469">1469</span>
+<span id="1470">1470</span>
+<span id="1471">1471</span>
+<span id="1472">1472</span>
+<span id="1473">1473</span>
+<span id="1474">1474</span>
+<span id="1475">1475</span>
+<span id="1476">1476</span>
+<span id="1477">1477</span>
+<span id="1478">1478</span>
+<span id="1479">1479</span>
+<span id="1480">1480</span>
+<span id="1481">1481</span>
+<span id="1482">1482</span>
+<span id="1483">1483</span>
+<span id="1484">1484</span>
+<span id="1485">1485</span>
+<span id="1486">1486</span>
+<span id="1487">1487</span>
+<span id="1488">1488</span>
+<span id="1489">1489</span>
+<span id="1490">1490</span>
+<span id="1491">1491</span>
+<span id="1492">1492</span>
+<span id="1493">1493</span>
+<span id="1494">1494</span>
+<span id="1495">1495</span>
+<span id="1496">1496</span>
+<span id="1497">1497</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -1591,10 +1624,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro">!</span> {
     <span class=
 "doccomment">/// A Rust literal such as a string or integer or boolean.</span>
-    <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
-    <span class="doccomment">/// feature.*</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Syntax tree enum</span>
     <span class="doccomment">///</span>
@@ -1658,16 +1687,47 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="macro">ast_struct</span><span class="macro">!</span> {
     <span class=
 "doccomment">/// A UTF-8 string literal: `"foo"`.</span>
-    <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or</span>
-    <span class="doccomment">/// `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">LitStr</span> #<span class=
 "ident">manual_extra_traits_debug</span> {
         <span class="ident">repr</span>: <span class=
 "ident">Box</span><span class="op">&lt;</span><span class=
-"ident">LitStrRepr</span><span class="op">&gt;</span>,
+"ident">LitRepr</span><span class="op">&gt;</span>,
+    }
+}
+
+<span class="macro">ast_struct</span><span class="macro">!</span> {
+    <span class=
+"doccomment">/// A byte string literal: `b"foo"`.</span>
+    <span class="kw">pub</span> <span class=
+"kw">struct</span> <span class=
+"ident">LitByteStr</span> #<span class=
+"ident">manual_extra_traits_debug</span> {
+        <span class="ident">repr</span>: <span class=
+"ident">Box</span><span class="op">&lt;</span><span class=
+"ident">LitRepr</span><span class="op">&gt;</span>,
+    }
+}
+
+<span class="macro">ast_struct</span><span class="macro">!</span> {
+    <span class="doccomment">/// A byte literal: `b'f'`.</span>
+    <span class="kw">pub</span> <span class=
+"kw">struct</span> <span class="ident">LitByte</span> #<span class=
+"ident">manual_extra_traits_debug</span> {
+        <span class="ident">repr</span>: <span class=
+"ident">Box</span><span class="op">&lt;</span><span class=
+"ident">LitRepr</span><span class="op">&gt;</span>,
+    }
+}
+
+<span class="macro">ast_struct</span><span class="macro">!</span> {
+    <span class="doccomment">/// A character literal: `'a'`.</span>
+    <span class="kw">pub</span> <span class=
+"kw">struct</span> <span class="ident">LitChar</span> #<span class=
+"ident">manual_extra_traits_debug</span> {
+        <span class="ident">repr</span>: <span class=
+"ident">Box</span><span class="op">&lt;</span><span class=
+"ident">LitRepr</span><span class="op">&gt;</span>,
     }
 }
 
@@ -1676,8 +1736,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">feature</span> <span class="op">=</span> <span class=
 "string">"clone-impls"</span>, <span class=
 "ident">derive</span>(<span class="ident">Clone</span>))]</span>
-<span class="kw">struct</span> <span class=
-"ident">LitStrRepr</span> {
+<span class="kw">struct</span> <span class="ident">LitRepr</span> {
     <span class="ident">token</span>: <span class=
 "ident">Literal</span>,
     <span class="ident">suffix</span>: <span class=
@@ -1687,55 +1746,7 @@ autocomplete="off" spellcheck="false" placeholder=
 
 <span class="macro">ast_struct</span><span class="macro">!</span> {
     <span class=
-"doccomment">/// A byte string literal: `b"foo"`.</span>
-    <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or</span>
-    <span class="doccomment">/// `"full"` feature.*</span>
-    <span class="kw">pub</span> <span class=
-"kw">struct</span> <span class=
-"ident">LitByteStr</span> #<span class=
-"ident">manual_extra_traits_debug</span> {
-        <span class="ident">token</span>: <span class=
-"ident">Literal</span>,
-    }
-}
-
-<span class="macro">ast_struct</span><span class="macro">!</span> {
-    <span class="doccomment">/// A byte literal: `b'f'`.</span>
-    <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or</span>
-    <span class="doccomment">/// `"full"` feature.*</span>
-    <span class="kw">pub</span> <span class=
-"kw">struct</span> <span class="ident">LitByte</span> #<span class=
-"ident">manual_extra_traits_debug</span> {
-        <span class="ident">token</span>: <span class=
-"ident">Literal</span>,
-    }
-}
-
-<span class="macro">ast_struct</span><span class="macro">!</span> {
-    <span class="doccomment">/// A character literal: `'a'`.</span>
-    <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or</span>
-    <span class="doccomment">/// `"full"` feature.*</span>
-    <span class="kw">pub</span> <span class=
-"kw">struct</span> <span class="ident">LitChar</span> #<span class=
-"ident">manual_extra_traits_debug</span> {
-        <span class="ident">token</span>: <span class=
-"ident">Literal</span>,
-    }
-}
-
-<span class="macro">ast_struct</span><span class="macro">!</span> {
-    <span class=
 "doccomment">/// An integer literal: `1` or `1u16`.</span>
-    <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or</span>
-    <span class="doccomment">/// `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">LitInt</span> #<span class=
 "ident">manual_extra_traits_debug</span> {
@@ -1768,10 +1779,6 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// Must be finite. May not be infinte or NaN.</span>
-    <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or</span>
-    <span class="doccomment">/// `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">LitFloat</span> #<span class="ident">manual_extra_traits_debug</span> {
@@ -1801,10 +1808,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="macro">ast_struct</span><span class="macro">!</span> {
     <span class=
 "doccomment">/// A boolean literal: `true` or `false`.</span>
-    <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or</span>
-    <span class="doccomment">/// `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">LitBool</span> #<span class=
 "ident">manual_extra_traits_debug</span> {
@@ -1998,17 +2001,16 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Span</span>) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class=
-"kw-2">mut</span> <span class="ident">lit</span> <span class=
+"kw-2">mut</span> <span class="ident">token</span> <span class=
 "op">=</span> <span class="ident">Literal</span>::<span class=
 "ident">string</span>(<span class="ident">value</span>);
-        <span class="ident">lit</span>.<span class=
+        <span class="ident">token</span>.<span class=
 "ident">set_span</span>(<span class="ident">span</span>);
         <span class="ident">LitStr</span> {
             <span class="ident">repr</span>: <span class=
 "ident">Box</span>::<span class="ident">new</span>(<span class=
-"ident">LitStrRepr</span> {
-                <span class="ident">token</span>: <span class=
-"ident">lit</span>,
+"ident">LitRepr</span> {
+                <span class="ident">token</span>,
                 <span class="ident">suffix</span>: <span class=
 "ident">Box</span>::<span class="op">&lt;</span><span class=
 "ident">str</span><span class="op">&gt;</span>::<span class=
@@ -2022,13 +2024,16 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">&</span><span class="self">self</span>) <span class=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">String</span> {
+        <span class="kw">let</span> <span class=
+"ident">repr</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class="ident">repr</span>.<span class=
+"ident">token</span>.<span class="ident">to_string</span>();
         <span class="kw">let</span> (<span class=
-"ident">value</span>, <span class="kw">_</span>) <span class=
-"op">=</span> <span class="ident">value</span>::<span class=
+"ident">value</span>, <span class=
+"ident">_suffix</span>) <span class="op">=</span> <span class=
+"ident">value</span>::<span class=
 "ident">parse_lit_str</span>(<span class=
-"kw-2">&</span><span class="self">self</span>.<span class=
-"ident">repr</span>.<span class="ident">token</span>.<span class=
-"ident">to_string</span>());
+"kw-2">&</span><span class="ident">repr</span>);
         <span class="ident">String</span>::<span class=
 "ident">from</span>(<span class="ident">value</span>)
     }
@@ -2261,8 +2266,17 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">byte_string</span>(<span class="ident">value</span>);
         <span class="ident">token</span>.<span class=
 "ident">set_span</span>(<span class="ident">span</span>);
-        <span class="ident">LitByteStr</span> { <span class=
-"ident">token</span> }
+        <span class="ident">LitByteStr</span> {
+            <span class="ident">repr</span>: <span class=
+"ident">Box</span>::<span class="ident">new</span>(<span class=
+"ident">LitRepr</span> {
+                <span class="ident">token</span>,
+                <span class="ident">suffix</span>: <span class=
+"ident">Box</span>::<span class="op">&lt;</span><span class=
+"ident">str</span><span class="op">&gt;</span>::<span class=
+"ident">default</span>(),
+            }),
+        }
     }
 
     <span class="kw">pub</span> <span class=
@@ -2271,10 +2285,17 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">Vec</span><span class="op">&lt;</span><span class=
 "ident">u8</span><span class="op">&gt;</span> {
-        <span class="ident">value</span>::<span class=
+        <span class="kw">let</span> <span class=
+"ident">repr</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class="ident">repr</span>.<span class=
+"ident">token</span>.<span class="ident">to_string</span>();
+        <span class="kw">let</span> (<span class=
+"ident">value</span>, <span class=
+"ident">_suffix</span>) <span class="op">=</span> <span class=
+"ident">value</span>::<span class=
 "ident">parse_lit_byte_str</span>(<span class=
-"kw-2">&</span><span class="self">self</span>.<span class=
-"ident">token</span>.<span class="ident">to_string</span>())
+"kw-2">&</span><span class="ident">repr</span>);
+        <span class="ident">value</span>
     }
 
     <span class="kw">pub</span> <span class=
@@ -2283,7 +2304,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">Span</span> {
         <span class="self">self</span>.<span class=
-"ident">token</span>.<span class="ident">span</span>()
+"ident">repr</span>.<span class="ident">token</span>.<span class=
+"ident">span</span>()
     }
 
     <span class="kw">pub</span> <span class=
@@ -2292,8 +2314,18 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>, <span class="ident">span</span>: <span class=
 "ident">Span</span>) {
         <span class="self">self</span>.<span class=
-"ident">token</span>.<span class=
+"ident">repr</span>.<span class="ident">token</span>.<span class=
 "ident">set_span</span>(<span class="ident">span</span>)
+    }
+
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">suffix</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"kw-2">&</span><span class="ident">str</span> {
+        <span class="kw-2">&</span><span class=
+"self">self</span>.<span class="ident">repr</span>.<span class=
+"ident">suffix</span>
     }
 }
 
@@ -2310,8 +2342,17 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">u8_suffixed</span>(<span class="ident">value</span>);
         <span class="ident">token</span>.<span class=
 "ident">set_span</span>(<span class="ident">span</span>);
-        <span class="ident">LitByte</span> { <span class=
-"ident">token</span> }
+        <span class="ident">LitByte</span> {
+            <span class="ident">repr</span>: <span class=
+"ident">Box</span>::<span class="ident">new</span>(<span class=
+"ident">LitRepr</span> {
+                <span class="ident">token</span>,
+                <span class="ident">suffix</span>: <span class=
+"ident">Box</span>::<span class="op">&lt;</span><span class=
+"ident">str</span><span class="op">&gt;</span>::<span class=
+"ident">default</span>(),
+            }),
+        }
     }
 
     <span class="kw">pub</span> <span class=
@@ -2319,10 +2360,17 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">&</span><span class="self">self</span>) <span class=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">u8</span> {
-        <span class="ident">value</span>::<span class=
+        <span class="kw">let</span> <span class=
+"ident">repr</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class="ident">repr</span>.<span class=
+"ident">token</span>.<span class="ident">to_string</span>();
+        <span class="kw">let</span> (<span class=
+"ident">value</span>, <span class=
+"ident">_suffix</span>) <span class="op">=</span> <span class=
+"ident">value</span>::<span class=
 "ident">parse_lit_byte</span>(<span class=
-"kw-2">&</span><span class="self">self</span>.<span class=
-"ident">token</span>.<span class="ident">to_string</span>())
+"kw-2">&</span><span class="ident">repr</span>);
+        <span class="ident">value</span>
     }
 
     <span class="kw">pub</span> <span class=
@@ -2331,7 +2379,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">Span</span> {
         <span class="self">self</span>.<span class=
-"ident">token</span>.<span class="ident">span</span>()
+"ident">repr</span>.<span class="ident">token</span>.<span class=
+"ident">span</span>()
     }
 
     <span class="kw">pub</span> <span class=
@@ -2340,8 +2389,18 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>, <span class="ident">span</span>: <span class=
 "ident">Span</span>) {
         <span class="self">self</span>.<span class=
-"ident">token</span>.<span class=
+"ident">repr</span>.<span class="ident">token</span>.<span class=
 "ident">set_span</span>(<span class="ident">span</span>)
+    }
+
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">suffix</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"kw-2">&</span><span class="ident">str</span> {
+        <span class="kw-2">&</span><span class=
+"self">self</span>.<span class="ident">repr</span>.<span class=
+"ident">suffix</span>
     }
 }
 
@@ -2358,8 +2417,17 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">character</span>(<span class="ident">value</span>);
         <span class="ident">token</span>.<span class=
 "ident">set_span</span>(<span class="ident">span</span>);
-        <span class="ident">LitChar</span> { <span class=
-"ident">token</span> }
+        <span class="ident">LitChar</span> {
+            <span class="ident">repr</span>: <span class=
+"ident">Box</span>::<span class="ident">new</span>(<span class=
+"ident">LitRepr</span> {
+                <span class="ident">token</span>,
+                <span class="ident">suffix</span>: <span class=
+"ident">Box</span>::<span class="op">&lt;</span><span class=
+"ident">str</span><span class="op">&gt;</span>::<span class=
+"ident">default</span>(),
+            }),
+        }
     }
 
     <span class="kw">pub</span> <span class=
@@ -2367,10 +2435,17 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">&</span><span class="self">self</span>) <span class=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">char</span> {
-        <span class="ident">value</span>::<span class=
+        <span class="kw">let</span> <span class=
+"ident">repr</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class="ident">repr</span>.<span class=
+"ident">token</span>.<span class="ident">to_string</span>();
+        <span class="kw">let</span> (<span class=
+"ident">value</span>, <span class=
+"ident">_suffix</span>) <span class="op">=</span> <span class=
+"ident">value</span>::<span class=
 "ident">parse_lit_char</span>(<span class=
-"kw-2">&</span><span class="self">self</span>.<span class=
-"ident">token</span>.<span class="ident">to_string</span>())
+"kw-2">&</span><span class="ident">repr</span>);
+        <span class="ident">value</span>
     }
 
     <span class="kw">pub</span> <span class=
@@ -2379,7 +2454,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">Span</span> {
         <span class="self">self</span>.<span class=
-"ident">token</span>.<span class="ident">span</span>()
+"ident">repr</span>.<span class="ident">token</span>.<span class=
+"ident">span</span>()
     }
 
     <span class="kw">pub</span> <span class=
@@ -2388,8 +2464,18 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>, <span class="ident">span</span>: <span class=
 "ident">Span</span>) {
         <span class="self">self</span>.<span class=
-"ident">token</span>.<span class=
+"ident">repr</span>.<span class="ident">token</span>.<span class=
 "ident">set_span</span>(<span class="ident">span</span>)
+    }
+
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">suffix</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"kw-2">&</span><span class="ident">str</span> {
+        <span class="kw-2">&</span><span class=
+"self">self</span>.<span class="ident">repr</span>.<span class=
+"ident">suffix</span>
     }
 }
 
@@ -2813,7 +2899,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "string">"token"</span>, <span class="kw-2">&</span><span class=
 "macro">format_args</span><span class="macro">!</span>(<span class=
 "string">"{}"</span>, <span class="self">self</span>.<span class=
-"ident">token</span>))
+"ident">repr</span>.<span class="ident">token</span>))
                 .<span class="ident">finish</span>()
         }
     }
@@ -2836,7 +2922,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "string">"token"</span>, <span class="kw-2">&</span><span class=
 "macro">format_args</span><span class="macro">!</span>(<span class=
 "string">"{}"</span>, <span class="self">self</span>.<span class=
-"ident">token</span>))
+"ident">repr</span>.<span class="ident">token</span>))
                 .<span class="ident">finish</span>()
         }
     }
@@ -2859,7 +2945,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "string">"token"</span>, <span class="kw-2">&</span><span class=
 "macro">format_args</span><span class="macro">!</span>(<span class=
 "string">"{}"</span>, <span class="self">self</span>.<span class=
-"ident">token</span>))
+"ident">repr</span>.<span class="ident">token</span>))
                 .<span class="ident">finish</span>()
         }
     }
@@ -3027,13 +3113,13 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">repr</span>.<span class="ident">token</span>);
 <span class="macro">lit_extra_traits</span><span class=
 "macro">!</span>(<span class=
-"ident">LitByteStr</span>, <span class="ident">token</span>);
+"ident">LitByteStr</span>, <span class="ident">repr</span>.<span class="ident">token</span>);
 <span class="macro">lit_extra_traits</span><span class=
 "macro">!</span>(<span class="ident">LitByte</span>, <span class=
-"ident">token</span>);
+"ident">repr</span>.<span class="ident">token</span>);
 <span class="macro">lit_extra_traits</span><span class=
 "macro">!</span>(<span class="ident">LitChar</span>, <span class=
-"ident">token</span>);
+"ident">repr</span>.<span class="ident">token</span>);
 <span class="macro">lit_extra_traits</span><span class=
 "macro">!</span>(<span class="ident">LitInt</span>, <span class=
 "ident">repr</span>.<span class="ident">token</span>);
@@ -3048,10 +3134,6 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class=
 "doccomment">/// The style of a string literal, either plain quoted or a raw string like</span>
     <span class="doccomment">/// `r##"data"##`.</span>
-    <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
-    <span class="doccomment">/// feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">enum</span> <span class="ident">StrStyle</span> #<span class=
 "ident">no_visit</span> {
@@ -3521,7 +3603,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
 "ident">TokenStream</span>) {
             <span class="self">self</span>.<span class=
-"ident">token</span>.<span class=
+"ident">repr</span>.<span class="ident">token</span>.<span class=
 "ident">to_tokens</span>(<span class="ident">tokens</span>);
         }
     }
@@ -3535,7 +3617,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
 "ident">TokenStream</span>) {
             <span class="self">self</span>.<span class=
-"ident">token</span>.<span class=
+"ident">repr</span>.<span class="ident">token</span>.<span class=
 "ident">to_tokens</span>(<span class="ident">tokens</span>);
         }
     }
@@ -3549,7 +3631,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
 "ident">TokenStream</span>) {
             <span class="self">self</span>.<span class=
-"ident">token</span>.<span class=
+"ident">repr</span>.<span class="ident">token</span>.<span class=
 "ident">to_tokens</span>(<span class="ident">tokens</span>);
         }
     }
@@ -3647,8 +3729,7 @@ autocomplete="off" spellcheck="false" placeholder=
                         <span class=
 "ident">repr</span>: <span class="ident">Box</span>::<span class=
 "ident">new</span>(<span class=
-"ident">LitStrRepr</span> { <span class=
-"ident">token</span>, <span class="ident">suffix</span> }),
+"ident">LitRepr</span> { <span class="ident">token</span>, <span class="ident">suffix</span> }),
                     });
                 }
                 <span class="string">b'b'</span> <span class=
@@ -3659,24 +3740,52 @@ autocomplete="off" spellcheck="false" placeholder=
                     <span class="string">b'"'</span> <span class=
 "op">|</span> <span class="string">b'r'</span> <span class=
 "op">=</span><span class="op">&gt;</span> {
+                        <span class="kw">let</span> (<span class=
+"kw">_</span>, <span class="ident">suffix</span>) <span class=
+"op">=</span> <span class=
+"ident">parse_lit_byte_str</span>(<span class=
+"kw-2">&</span><span class="ident">repr</span>);
                         <span class="kw">return</span> <span class=
 "ident">Lit</span>::<span class="ident">ByteStr</span>(<span class=
-"ident">LitByteStr</span> { <span class="ident">token</span> });
+"ident">LitByteStr</span> {
+                            <span class=
+"ident">repr</span>: <span class="ident">Box</span>::<span class=
+"ident">new</span>(<span class=
+"ident">LitRepr</span> { <span class="ident">token</span>, <span class="ident">suffix</span> }),
+                        });
                     }
                     <span class="string">b'\''</span> <span class=
 "op">=</span><span class="op">&gt;</span> {
+                        <span class="kw">let</span> (<span class=
+"kw">_</span>, <span class="ident">suffix</span>) <span class=
+"op">=</span> <span class=
+"ident">parse_lit_byte</span>(<span class="kw-2">&</span><span class="ident">repr</span>);
                         <span class="kw">return</span> <span class=
 "ident">Lit</span>::<span class="ident">Byte</span>(<span class=
-"ident">LitByte</span> { <span class="ident">token</span> });
+"ident">LitByte</span> {
+                            <span class=
+"ident">repr</span>: <span class="ident">Box</span>::<span class=
+"ident">new</span>(<span class=
+"ident">LitRepr</span> { <span class="ident">token</span>, <span class="ident">suffix</span> }),
+                        });
                     }
                     <span class="kw">_</span> <span class=
 "op">=</span><span class="op">&gt;</span> {}
                 },
                 <span class="string">b'\''</span> <span class=
 "op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">let</span> (<span class=
+"kw">_</span>, <span class="ident">suffix</span>) <span class=
+"op">=</span> <span class=
+"ident">parse_lit_char</span>(<span class="kw-2">&</span><span class="ident">repr</span>);
                     <span class="kw">return</span> <span class=
 "ident">Lit</span>::<span class="ident">Char</span>(<span class=
-"ident">LitChar</span> { <span class="ident">token</span> });
+"ident">LitChar</span> {
+                        <span class=
+"ident">repr</span>: <span class="ident">Box</span>::<span class=
+"ident">new</span>(<span class=
+"ident">LitRepr</span> { <span class="ident">token</span>, <span class="ident">suffix</span> }),
+                    });
                 }
                 <span class="string">b'0'</span>..<span class=
 "op">=</span><span class="string">b'9'</span> <span class=
@@ -3759,6 +3868,46 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro">!</span>(<span class=
 "string">"Unrecognized literal: `{}`"</span>, <span class=
 "ident">repr</span>);
+        }
+
+        <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">suffix</span>(<span class=
+"kw-2">&</span><span class="self">self</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"kw-2">&</span><span class="ident">str</span> {
+            <span class="kw">match</span> <span class=
+"self">self</span> {
+                <span class="ident">Lit</span>::<span class=
+"ident">Str</span>(<span class="ident">lit</span>) <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"ident">lit</span>.<span class="ident">suffix</span>(),
+                <span class="ident">Lit</span>::<span class=
+"ident">ByteStr</span>(<span class="ident">lit</span>) <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"ident">lit</span>.<span class="ident">suffix</span>(),
+                <span class="ident">Lit</span>::<span class=
+"ident">Byte</span>(<span class="ident">lit</span>) <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"ident">lit</span>.<span class="ident">suffix</span>(),
+                <span class="ident">Lit</span>::<span class=
+"ident">Char</span>(<span class="ident">lit</span>) <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"ident">lit</span>.<span class="ident">suffix</span>(),
+                <span class="ident">Lit</span>::<span class=
+"ident">Int</span>(<span class="ident">lit</span>) <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"ident">lit</span>.<span class="ident">suffix</span>(),
+                <span class="ident">Lit</span>::<span class=
+"ident">Float</span>(<span class="ident">lit</span>) <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"ident">lit</span>.<span class="ident">suffix</span>(),
+                <span class="ident">Lit</span>::<span class=
+"ident">Bool</span>(<span class="kw">_</span>) <span class=
+"op">|</span> <span class="ident">Lit</span>::<span class=
+"ident">Verbatim</span>(<span class="kw">_</span>) <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"string">""</span>,
+            }
         }
     }
 
@@ -4021,17 +4170,17 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro">!</span>(<span class="ident">byte</span>(<span class=
 "ident">s</span>, <span class="ident">pounds</span>), <span class=
 "string">b'"'</span>);
-        <span class="macro">assert_eq</span><span class=
-"macro">!</span>(<span class="ident">byte</span>(<span class=
-"ident">s</span>, <span class="ident">s</span>.<span class=
-"ident">len</span>() <span class="op">-</span> <span class=
-"ident">pounds</span> <span class="op">-</span> <span class=
-"number">1</span>), <span class="string">b'"'</span>);
+        <span class="kw">let</span> <span class=
+"ident">close</span> <span class="op">=</span> <span class=
+"ident">s</span>.<span class="ident">rfind</span>(<span class=
+"string">'"'</span>).<span class="ident">unwrap</span>();
         <span class="kw">for</span> <span class=
 "ident">end</span> <span class="kw">in</span> <span class=
-"ident">s</span>[<span class="ident">s</span>.<span class=
-"ident">len</span>() <span class="op">-</span> <span class=
-"ident">pounds</span>..].<span class="ident">bytes</span>() {
+"ident">s</span>[<span class="ident">close</span> <span class=
+"op">+</span> <span class="number">1</span>..<span class=
+"ident">close</span> <span class="op">+</span> <span class=
+"number">1</span> <span class="op">+</span> <span class=
+"ident">pounds</span>].<span class="ident">bytes</span>() {
             <span class="macro">assert_eq</span><span class=
 "macro">!</span>(<span class="ident">end</span>, <span class=
 "string">b'#'</span>);
@@ -4041,28 +4190,31 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">content</span> <span class="op">=</span> <span class=
 "ident">s</span>[<span class="ident">pounds</span> <span class=
 "op">+</span> <span class="number">1</span>..<span class=
-"ident">s</span>.<span class="ident">len</span>() <span class=
-"op">-</span> <span class="ident">pounds</span> <span class=
-"op">-</span> <span class="number">1</span>]
-            .<span class="ident">to_owned</span>()
-            .<span class="ident">into_boxed_str</span>();
+"ident">close</span>].<span class=
+"ident">to_owned</span>().<span class=
+"ident">into_boxed_str</span>();
         <span class="kw">let</span> <span class=
 "ident">suffix</span> <span class="op">=</span> <span class=
-"ident">Box</span>::<span class="op">&lt;</span><span class=
-"ident">str</span><span class="op">&gt;</span>::<span class=
-"ident">default</span>(); <span class="comment">// todo</span>
+"ident">s</span>[<span class="ident">close</span> <span class=
+"op">+</span> <span class="number">1</span> <span class=
+"op">+</span> <span class="ident">pounds</span>..].<span class=
+"ident">to_owned</span>().<span class=
+"ident">into_boxed_str</span>();
         (<span class="ident">content</span>, <span class=
 "ident">suffix</span>)
     }
 
+    <span class="comment">// Returns (content, suffix).</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class=
 "ident">parse_lit_byte_str</span>(<span class=
 "ident">s</span>: <span class="kw-2">&</span><span class=
 "ident">str</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">Vec</span><span class=
+"op">&gt;</span> (<span class="ident">Vec</span><span class=
 "op">&lt;</span><span class="ident">u8</span><span class=
-"op">&gt;</span> {
+"op">&gt;</span>, <span class="ident">Box</span><span class=
+"op">&lt;</span><span class="ident">str</span><span class=
+"op">&gt;</span>) {
         <span class="macro">assert_eq</span><span class=
 "macro">!</span>(<span class="ident">byte</span>(<span class=
 "ident">s</span>, <span class="number">0</span>), <span class=
@@ -4094,9 +4246,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">parse_lit_byte_str_cooked</span>(<span class=
 "kw-2">mut</span> <span class="ident">s</span>: <span class=
 "kw-2">&</span><span class="ident">str</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
+"op">-</span><span class="op">&gt;</span> (<span class=
 "ident">Vec</span><span class="op">&lt;</span><span class=
-"ident">u8</span><span class="op">&gt;</span> {
+"ident">u8</span><span class="op">&gt;</span>, <span class=
+"ident">Box</span><span class="op">&lt;</span><span class=
+"ident">str</span><span class="op">&gt;</span>) {
         <span class="macro">assert_eq</span><span class=
 "macro">!</span>(<span class="ident">byte</span>(<span class=
 "ident">s</span>, <span class="number">0</span>), <span class=
@@ -4112,7 +4266,7 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class=
 "comment">// We're going to want to have slices which don't respect codepoint boundaries.</span>
         <span class="kw">let</span> <span class=
-"kw-2">mut</span> <span class="ident">s</span> <span class=
+"kw-2">mut</span> <span class="ident">v</span> <span class=
 "op">=</span> <span class="ident">s</span>.<span class=
 "ident">as_bytes</span>();
 
@@ -4125,7 +4279,7 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="kw">let</span> <span class=
 "ident">byte</span> <span class="op">=</span> <span class=
 "kw">match</span> <span class="ident">byte</span>(<span class=
-"ident">s</span>, <span class="number">0</span>) {
+"ident">v</span>, <span class="number">0</span>) {
                 <span class="string">b'"'</span> <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
 "kw">break</span>,
@@ -4133,11 +4287,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class=
 "ident">b</span> <span class="op">=</span> <span class=
-"ident">byte</span>(<span class="ident">s</span>, <span class=
+"ident">byte</span>(<span class="ident">v</span>, <span class=
 "number">1</span>);
-                    <span class="ident">s</span> <span class=
+                    <span class="ident">v</span> <span class=
 "op">=</span> <span class="kw-2">&</span><span class=
-"ident">s</span>[<span class="number">2</span>..];
+"ident">v</span>[<span class="number">2</span>..];
                     <span class="kw">match</span> <span class=
 "ident">b</span> {
                         <span class=
@@ -4146,9 +4300,9 @@ autocomplete="off" spellcheck="false" placeholder=
                             <span class=
 "kw">let</span> (<span class="ident">b</span>, <span class=
 "ident">rest</span>) <span class="op">=</span> <span class=
-"ident">backslash_x</span>(<span class="ident">s</span>);
+"ident">backslash_x</span>(<span class="ident">v</span>);
                             <span class=
-"ident">s</span> <span class="op">=</span> <span class=
+"ident">v</span> <span class="op">=</span> <span class=
 "ident">rest</span>;
                             <span class="ident">b</span>
                         }
@@ -4180,7 +4334,7 @@ autocomplete="off" spellcheck="false" placeholder=
                             <span class=
 "kw">let</span> <span class="ident">byte</span> <span class=
 "op">=</span> <span class="ident">byte</span>(<span class=
-"ident">s</span>, <span class="number">0</span>);
+"ident">v</span>, <span class="number">0</span>);
                             <span class=
 "kw">let</span> <span class="ident">ch</span> <span class=
 "op">=</span> <span class="ident">char</span>::<span class=
@@ -4190,8 +4344,8 @@ autocomplete="off" spellcheck="false" placeholder=
                             <span class="kw">if</span> <span class=
 "ident">ch</span>.<span class="ident">is_whitespace</span>() {
                                 <span class=
-"ident">s</span> <span class="op">=</span> <span class=
-"kw-2">&</span><span class="ident">s</span>[<span class=
+"ident">v</span> <span class="op">=</span> <span class=
+"kw-2">&</span><span class="ident">v</span>[<span class=
 "number">1</span>..];
                             } <span class="kw">else</span> {
                                 <span class=
@@ -4208,19 +4362,19 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span><span class="op">&gt;</span> {
                     <span class=
 "macro">assert_eq</span><span class="macro">!</span>(<span class=
-"ident">byte</span>(<span class="ident">s</span>, <span class=
+"ident">byte</span>(<span class="ident">v</span>, <span class=
 "number">1</span>), <span class="string">b'\n'</span>, <span class=
 "string">"Bare CR not allowed in string"</span>);
-                    <span class="ident">s</span> <span class=
+                    <span class="ident">v</span> <span class=
 "op">=</span> <span class="kw-2">&</span><span class=
-"ident">s</span>[<span class="number">2</span>..];
+"ident">v</span>[<span class="number">2</span>..];
                     <span class="string">b'\n'</span>
                 }
                 <span class="ident">b</span> <span class=
 "op">=</span><span class="op">&gt;</span> {
-                    <span class="ident">s</span> <span class=
+                    <span class="ident">v</span> <span class=
 "op">=</span> <span class="kw-2">&</span><span class=
-"ident">s</span>[<span class="number">1</span>..];
+"ident">v</span>[<span class="number">1</span>..];
                     <span class="ident">b</span>
                 }
             };
@@ -4229,36 +4383,54 @@ autocomplete="off" spellcheck="false" placeholder=
         }
 
         <span class="macro">assert_eq</span><span class=
-"macro">!</span>(<span class="ident">s</span>, <span class=
-"string">b"\""</span>);
-        <span class="ident">out</span>
+"macro">!</span>(<span class="ident">byte</span>(<span class=
+"ident">v</span>, <span class="number">0</span>), <span class=
+"string">b'"'</span>);
+        <span class="kw">let</span> <span class=
+"ident">suffix</span> <span class="op">=</span> <span class=
+"ident">s</span>[<span class="ident">s</span>.<span class=
+"ident">len</span>() <span class="op">-</span> <span class=
+"ident">v</span>.<span class="ident">len</span>() <span class=
+"op">+</span> <span class="number">1</span>..].<span class=
+"ident">to_owned</span>().<span class=
+"ident">into_boxed_str</span>();
+        (<span class="ident">out</span>, <span class=
+"ident">suffix</span>)
     }
 
     <span class="kw">fn</span> <span class=
 "ident">parse_lit_byte_str_raw</span>(<span class=
 "ident">s</span>: <span class="kw-2">&</span><span class=
 "ident">str</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">Vec</span><span class=
+"op">&gt;</span> (<span class="ident">Vec</span><span class=
 "op">&lt;</span><span class="ident">u8</span><span class=
-"op">&gt;</span> {
+"op">&gt;</span>, <span class="ident">Box</span><span class=
+"op">&lt;</span><span class="ident">str</span><span class=
+"op">&gt;</span>) {
         <span class="macro">assert_eq</span><span class=
 "macro">!</span>(<span class="ident">byte</span>(<span class=
 "ident">s</span>, <span class="number">0</span>), <span class=
 "string">b'b'</span>);
-        <span class="ident">String</span>::<span class=
-"ident">from</span>(<span class=
+        <span class="kw">let</span> (<span class=
+"ident">value</span>, <span class=
+"ident">suffix</span>) <span class="op">=</span> <span class=
 "ident">parse_lit_str_raw</span>(<span class=
 "kw-2">&</span><span class="ident">s</span>[<span class=
-"number">1</span>..]).<span class="number">0</span>).<span class=
-"ident">into_bytes</span>()
+"number">1</span>..]);
+        (<span class="ident">String</span>::<span class=
+"ident">from</span>(<span class="ident">value</span>).<span class=
+"ident">into_bytes</span>(), <span class="ident">suffix</span>)
     }
 
+    <span class="comment">// Returns (value, suffix).</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class=
 "ident">parse_lit_byte</span>(<span class=
 "ident">s</span>: <span class="kw-2">&</span><span class=
 "ident">str</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">u8</span> {
+"op">&gt;</span> (<span class="ident">u8</span>, <span class=
+"ident">Box</span><span class="op">&lt;</span><span class=
+"ident">str</span><span class="op">&gt;</span>) {
         <span class="macro">assert_eq</span><span class=
 "macro">!</span>(<span class="ident">byte</span>(<span class=
 "ident">s</span>, <span class="number">0</span>), <span class=
@@ -4271,23 +4443,23 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class=
 "comment">// We're going to want to have slices which don't respect codepoint boundaries.</span>
         <span class="kw">let</span> <span class=
-"kw-2">mut</span> <span class="ident">s</span> <span class=
+"kw-2">mut</span> <span class="ident">v</span> <span class=
 "op">=</span> <span class="ident">s</span>[<span class=
 "number">2</span>..].<span class="ident">as_bytes</span>();
 
         <span class="kw">let</span> <span class=
 "ident">b</span> <span class="op">=</span> <span class=
 "kw">match</span> <span class="ident">byte</span>(<span class=
-"ident">s</span>, <span class="number">0</span>) {
+"ident">v</span>, <span class="number">0</span>) {
             <span class="string">b'\\'</span> <span class=
 "op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class=
 "ident">b</span> <span class="op">=</span> <span class=
-"ident">byte</span>(<span class="ident">s</span>, <span class=
+"ident">byte</span>(<span class="ident">v</span>, <span class=
 "number">1</span>);
-                <span class="ident">s</span> <span class=
+                <span class="ident">v</span> <span class=
 "op">=</span> <span class="kw-2">&</span><span class=
-"ident">s</span>[<span class="number">2</span>..];
+"ident">v</span>[<span class="number">2</span>..];
                 <span class="kw">match</span> <span class=
 "ident">b</span> {
                     <span class="string">b'x'</span> <span class=
@@ -4295,8 +4467,8 @@ autocomplete="off" spellcheck="false" placeholder=
                         <span class="kw">let</span> (<span class=
 "ident">b</span>, <span class="ident">rest</span>) <span class=
 "op">=</span> <span class="ident">backslash_x</span>(<span class=
-"ident">s</span>);
-                        <span class="ident">s</span> <span class=
+"ident">v</span>);
+                        <span class="ident">v</span> <span class=
 "op">=</span> <span class="ident">rest</span>;
                         <span class="ident">b</span>
                     }
@@ -4329,27 +4501,39 @@ autocomplete="off" spellcheck="false" placeholder=
             }
             <span class="ident">b</span> <span class=
 "op">=</span><span class="op">&gt;</span> {
-                <span class="ident">s</span> <span class=
+                <span class="ident">v</span> <span class=
 "op">=</span> <span class="kw-2">&</span><span class=
-"ident">s</span>[<span class="number">1</span>..];
+"ident">v</span>[<span class="number">1</span>..];
                 <span class="ident">b</span>
             }
         };
 
         <span class="macro">assert_eq</span><span class=
 "macro">!</span>(<span class="ident">byte</span>(<span class=
-"ident">s</span>, <span class="number">0</span>), <span class=
+"ident">v</span>, <span class="number">0</span>), <span class=
 "string">b'\''</span>);
-        <span class="ident">b</span>
+        <span class="kw">let</span> <span class=
+"ident">suffix</span> <span class="op">=</span> <span class=
+"ident">s</span>[<span class="ident">s</span>.<span class=
+"ident">len</span>() <span class="op">-</span> <span class=
+"ident">v</span>.<span class="ident">len</span>() <span class=
+"op">+</span> <span class="number">1</span>..].<span class=
+"ident">to_owned</span>().<span class=
+"ident">into_boxed_str</span>();
+        (<span class="ident">b</span>, <span class=
+"ident">suffix</span>)
     }
 
+    <span class="comment">// Returns (value, suffix).</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class=
 "ident">parse_lit_char</span>(<span class=
 "kw-2">mut</span> <span class="ident">s</span>: <span class=
 "kw-2">&</span><span class="ident">str</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"ident">char</span> {
+"op">-</span><span class="op">&gt;</span> (<span class=
+"ident">char</span>, <span class="ident">Box</span><span class=
+"op">&lt;</span><span class="ident">str</span><span class=
+"op">&gt;</span>) {
         <span class="macro">assert_eq</span><span class=
 "macro">!</span>(<span class="ident">byte</span>(<span class=
 "ident">s</span>, <span class="number">0</span>), <span class=
@@ -4442,10 +4626,16 @@ autocomplete="off" spellcheck="false" placeholder=
             }
         };
         <span class="macro">assert_eq</span><span class=
-"macro">!</span>(<span class="ident">s</span>, <span class=
-"string">"\'"</span>, <span class=
-"string">"Expected end of char literal"</span>);
-        <span class="ident">ch</span>
+"macro">!</span>(<span class="ident">byte</span>(<span class=
+"ident">s</span>, <span class="number">0</span>), <span class=
+"string">b'\''</span>);
+        <span class="kw">let</span> <span class=
+"ident">suffix</span> <span class="op">=</span> <span class=
+"ident">s</span>[<span class="number">1</span>..].<span class=
+"ident">to_owned</span>().<span class=
+"ident">into_boxed_str</span>();
+        (<span class="ident">ch</span>, <span class=
+"ident">suffix</span>)
     }
 
     <span class="kw">fn</span> <span class=
@@ -5111,7 +5301,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "syn";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

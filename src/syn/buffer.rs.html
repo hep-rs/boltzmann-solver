@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.16/src/buffer.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.27/src/buffer.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>buffer.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -463,7 +463,7 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="doccomment">//! cheaply copyable cursor.</span>
 <span class="doccomment">//!</span>
 <span class=
-"doccomment">//! *This module is available if Syn is built with the `"parsing"` feature.*</span>
+"doccomment">//! *This module is available only if Syn is built with the `"parsing"` feature.*</span>
 
 <span class=
 "comment">// This module is heavily commented as it contains most of the unsafe code in</span>
@@ -535,7 +535,7 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="doccomment">/// once.</span>
 <span class="doccomment">///</span>
 <span class=
-"doccomment">/// *This type is available if Syn is built with the `"parsing"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"parsing"` feature.*</span>
 <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">TokenBuffer</span> {
     <span class=
@@ -677,7 +677,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// `TokenStream`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This method is available if Syn is built with both the `"parsing"` and</span>
+"doccomment">/// *This method is available only if Syn is built with both the `"parsing"` and</span>
     <span class="doccomment">/// `"proc-macro"` features.*</span>
     <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class="ident">all</span>(
@@ -758,7 +758,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// stream, and have the same scope.</span>
 <span class="doccomment">///</span>
 <span class=
-"doccomment">/// *This type is available if Syn is built with the `"parsing"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"parsing"` feature.*</span>
 <span class="attribute">#[<span class=
 "ident">derive</span>(<span class="ident">Copy</span>, <span class=
 "ident">Clone</span>, <span class="ident">Eq</span>, <span class=
@@ -1406,7 +1406,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "syn";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

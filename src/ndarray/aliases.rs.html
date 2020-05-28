@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.0/src/aliases.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.1/src/aliases.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>aliases.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -233,6 +233,11 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="158">158</span>
 <span id="159">159</span>
 <span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -246,7 +251,9 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="attribute">#[<span class=
 "ident">allow</span>(<span class="ident">deprecated</span>)]</span>
 <span class="kw">use</span> <span class=
-"kw">crate</span>::{<span class="ident">Array</span>, <span class=
+"kw">crate</span>::{<span class=
+"ident">ArcArray</span>, <span class=
+"ident">Array</span>, <span class=
 "ident">ArrayView</span>, <span class=
 "ident">ArrayViewMut</span>, <span class=
 "ident">Ix</span>, <span class=
@@ -728,6 +735,25 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">RcArray</span><span class="op">&lt;</span><span class=
 "ident">A</span>, <span class="ident">Ix2</span><span class=
 "op">&gt;</span>;
+
+<span class=
+"doccomment">/// one-dimensional shared ownership array</span>
+<span class="kw">pub</span> <span class=
+"kw">type</span> <span class="ident">ArcArray1</span><span class=
+"op">&lt;</span><span class="ident">A</span><span class=
+"op">&gt;</span> <span class="op">=</span> <span class=
+"ident">ArcArray</span><span class="op">&lt;</span><span class=
+"ident">A</span>, <span class="ident">Ix1</span><span class=
+"op">&gt;</span>;
+<span class=
+"doccomment">/// two-dimensional shared ownership array</span>
+<span class="kw">pub</span> <span class=
+"kw">type</span> <span class="ident">ArcArray2</span><span class=
+"op">&lt;</span><span class="ident">A</span><span class=
+"op">&gt;</span> <span class="op">=</span> <span class=
+"ident">ArcArray</span><span class="op">&lt;</span><span class=
+"ident">A</span>, <span class="ident">Ix2</span><span class=
+"op">&gt;</span>;
 </pre></div>
 </section>
 <section id="search" class="content hidden"></section>
@@ -735,7 +761,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "ndarray";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

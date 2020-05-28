@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.9/src/wrapper.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.17/src/wrapper.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>wrapper.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -971,44 +971,19 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="896">896</span>
 <span id="897">897</span>
 <span id="898">898</span>
-<span id="899">899</span>
-<span id="900">900</span>
-<span id="901">901</span>
-<span id="902">902</span>
-<span id="903">903</span>
-<span id="904">904</span>
-<span id="905">905</span>
-<span id="906">906</span>
-<span id="907">907</span>
-<span id="908">908</span>
-<span id="909">909</span>
-<span id="910">910</span>
-<span id="911">911</span>
-<span id="912">912</span>
-<span id="913">913</span>
-<span id="914">914</span>
-<span id="915">915</span>
-<span id="916">916</span>
-<span id="917">917</span>
-<span id="918">918</span>
-<span id="919">919</span>
-<span id="920">920</span>
-<span id="921">921</span>
-<span id="922">922</span>
-<span id="923">923</span>
-<span id="924">924</span>
-<span id="925">925</span>
-<span id="926">926</span>
-<span id="927">927</span>
-<span id="928">928</span>
-<span id="929">929</span>
-<span id="930">930</span>
-<span id="931">931</span>
-<span id="932">932</span>
-<span id="933">933</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
+<span class="kw">use</span> <span class=
+"kw">crate</span>::<span class=
+"ident">detection</span>::<span class=
+"ident">inside_proc_macro</span>;
+<span class="kw">use</span> <span class=
+"kw">crate</span>::{<span class=
+"ident">fallback</span>, <span class=
+"ident">Delimiter</span>, <span class=
+"ident">Punct</span>, <span class=
+"ident">Spacing</span>, <span class="ident">TokenTree</span>};
 <span class="kw">use</span> <span class=
 "ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class=
@@ -1017,8 +992,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">std</span>::<span class="ident">ops</span>::<span class=
 "ident">RangeBounds</span>;
 <span class="kw">use</span> <span class=
-"ident">std</span>::<span class="ident">panic</span>::{<span class=
-"self">self</span>, <span class="ident">PanicInfo</span>};
+"ident">std</span>::<span class="ident">panic</span>;
 <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class=
 "ident">super_unstable</span>)]</span>
@@ -1029,17 +1003,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">std</span>::<span class="ident">str</span>::<span class=
 "ident">FromStr</span>;
 
-<span class="kw">use</span> <span class=
-"kw">crate</span>::{<span class=
-"ident">fallback</span>, <span class=
-"ident">Delimiter</span>, <span class=
-"ident">Punct</span>, <span class=
-"ident">Spacing</span>, <span class="ident">TokenTree</span>};
-
 <span class="attribute">#[<span class=
 "ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class=
-"kw">enum</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">enum</span> <span class=
+"ident">TokenStream</span> {
     <span class="ident">Compiler</span>(<span class=
 "ident">DeferredTokenStream</span>),
     <span class="ident">Fallback</span>(<span class=
@@ -1056,8 +1024,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "comment">// late as possible to batch together consecutive uses of the Extend impl.</span>
 <span class="attribute">#[<span class=
 "ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class=
-"kw">struct</span> <span class="ident">DeferredTokenStream</span> {
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">struct</span> <span class=
+"ident">DeferredTokenStream</span> {
     <span class="ident">stream</span>: <span class=
 "ident">proc_macro</span>::<span class="ident">TokenStream</span>,
     <span class="ident">extra</span>: <span class=
@@ -1066,152 +1035,13 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">TokenTree</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">pub</span> <span class=
-"kw">enum</span> <span class="ident">LexError</span> {
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">enum</span> <span class=
+"ident">LexError</span> {
     <span class="ident">Compiler</span>(<span class=
 "ident">proc_macro</span>::<span class="ident">LexError</span>),
     <span class="ident">Fallback</span>(<span class=
 "ident">fallback</span>::<span class="ident">LexError</span>),
-}
-
-<span class="kw">fn</span> <span class=
-"ident">nightly_works</span>() <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"ident">bool</span> {
-    <span class="kw">use</span> <span class=
-"ident">std</span>::<span class="ident">sync</span>::<span class=
-"ident">atomic</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class=
-"ident">std</span>::<span class="ident">sync</span>::<span class=
-"ident">Once</span>;
-
-    <span class="kw">static</span> <span class=
-"ident">WORKS</span>: <span class=
-"ident">AtomicUsize</span> <span class="op">=</span> <span class=
-"ident">AtomicUsize</span>::<span class=
-"ident">new</span>(<span class="number">0</span>);
-    <span class="kw">static</span> <span class=
-"ident">INIT</span>: <span class="ident">Once</span> <span class=
-"op">=</span> <span class="ident">Once</span>::<span class=
-"ident">new</span>();
-
-    <span class="kw">match</span> <span class=
-"ident">WORKS</span>.<span class="ident">load</span>(<span class=
-"ident">Ordering</span>::<span class="ident">SeqCst</span>) {
-        <span class="number">1</span> <span class=
-"op">=</span><span class="op">&gt;</span> <span class=
-"kw">return</span> <span class="bool-val">false</span>,
-        <span class="number">2</span> <span class=
-"op">=</span><span class="op">&gt;</span> <span class=
-"kw">return</span> <span class="bool-val">true</span>,
-        <span class="kw">_</span> <span class=
-"op">=</span><span class="op">&gt;</span> {}
-    }
-
-    <span class=
-"comment">// Swap in a null panic hook to avoid printing "thread panicked" to stderr,</span>
-    <span class=
-"comment">// then use catch_unwind to determine whether the compiler's proc_macro is</span>
-    <span class=
-"comment">// working. When proc-macro2 is used from outside of a procedural macro all</span>
-    <span class=
-"comment">// of the proc_macro crate's APIs currently panic.</span>
-    <span class="comment">//</span>
-    <span class=
-"comment">// The Once is to prevent the possibility of this ordering:</span>
-    <span class="comment">//</span>
-    <span class=
-"comment">//     thread 1 calls take_hook, gets the user's original hook</span>
-    <span class=
-"comment">//     thread 1 calls set_hook with the null hook</span>
-    <span class=
-"comment">//     thread 2 calls take_hook, thinks null hook is the original hook</span>
-    <span class=
-"comment">//     thread 2 calls set_hook with the null hook</span>
-    <span class=
-"comment">//     thread 1 calls set_hook with the actual original hook</span>
-    <span class=
-"comment">//     thread 2 calls set_hook with what it thinks is the original hook</span>
-    <span class="comment">//</span>
-    <span class=
-"comment">// in which the user's hook has been lost.</span>
-    <span class="comment">//</span>
-    <span class=
-"comment">// There is still a race condition where a panic in a different thread can</span>
-    <span class=
-"comment">// happen during the interval that the user's original panic hook is</span>
-    <span class=
-"comment">// unregistered such that their hook is incorrectly not called. This is</span>
-    <span class=
-"comment">// sufficiently unlikely and less bad than printing panic messages to stderr</span>
-    <span class=
-"comment">// on correct use of this crate. Maybe there is a libstd feature request</span>
-    <span class=
-"comment">// here. For now, if a user needs to guarantee that this failure mode does</span>
-    <span class=
-"comment">// not occur, they need to call e.g. `proc_macro2::Span::call_site()` from</span>
-    <span class=
-"comment">// the main thread before launching any other threads.</span>
-    <span class="ident">INIT</span>.<span class=
-"ident">call_once</span>(<span class="op">|</span><span class=
-"op">|</span> {
-        <span class="kw">type</span> <span class=
-"ident">PanicHook</span> <span class="op">=</span> <span class=
-"kw">dyn</span> <span class="ident">Fn</span>(<span class=
-"kw-2">&</span><span class="ident">PanicInfo</span>) <span class=
-"op">+</span> <span class="ident">Sync</span> <span class=
-"op">+</span> <span class="ident">Send</span> <span class=
-"op">+</span> <span class="lifetime">'static</span>;
-
-        <span class="kw">let</span> <span class=
-"ident">null_hook</span>: <span class=
-"ident">Box</span><span class="op">&lt;</span><span class=
-"ident">PanicHook</span><span class="op">&gt;</span> <span class=
-"op">=</span> <span class="ident">Box</span>::<span class=
-"ident">new</span>(<span class="op">|</span><span class=
-"ident">_panic_info</span><span class="op">|</span> { <span class=
-"comment">/* ignore */</span> });
-        <span class="kw">let</span> <span class=
-"ident">sanity_check</span> <span class="op">=</span> <span class=
-"kw-2">&</span><span class="kw-2">*</span><span class=
-"ident">null_hook</span> <span class="kw">as</span> <span class=
-"kw-2">*</span><span class="kw">const</span> <span class=
-"ident">PanicHook</span>;
-        <span class="kw">let</span> <span class=
-"ident">original_hook</span> <span class="op">=</span> <span class=
-"ident">panic</span>::<span class="ident">take_hook</span>();
-        <span class="ident">panic</span>::<span class=
-"ident">set_hook</span>(<span class="ident">null_hook</span>);
-
-        <span class="kw">let</span> <span class=
-"ident">works</span> <span class="op">=</span> <span class=
-"ident">panic</span>::<span class=
-"ident">catch_unwind</span>(<span class="op">|</span><span class=
-"op">|</span> <span class="ident">proc_macro</span>::<span class=
-"ident">Span</span>::<span class=
-"ident">call_site</span>()).<span class="ident">is_ok</span>();
-        <span class="ident">WORKS</span>.<span class=
-"ident">store</span>(<span class="ident">works</span> <span class=
-"kw">as</span> <span class="ident">usize</span> <span class=
-"op">+</span> <span class="number">1</span>, <span class=
-"ident">Ordering</span>::<span class="ident">SeqCst</span>);
-
-        <span class="kw">let</span> <span class=
-"ident">hopefully_null_hook</span> <span class=
-"op">=</span> <span class="ident">panic</span>::<span class=
-"ident">take_hook</span>();
-        <span class="ident">panic</span>::<span class=
-"ident">set_hook</span>(<span class="ident">original_hook</span>);
-        <span class="kw">if</span> <span class=
-"ident">sanity_check</span> <span class="op">!</span><span class=
-"op">=</span> <span class="kw-2">&</span><span class=
-"kw-2">*</span><span class="ident">hopefully_null_hook</span> {
-            <span class="macro">panic</span><span class=
-"macro">!</span>(<span class=
-"string">"observed race condition in proc_macro2::nightly_works"</span>);
-        }
-    });
-    <span class="ident">nightly_works</span>()
 }
 
 <span class="kw">fn</span> <span class=
@@ -1275,7 +1105,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">TokenStream</span> {
         <span class="kw">if</span> <span class=
-"ident">nightly_works</span>() {
+"ident">inside_proc_macro</span>() {
             <span class="ident">TokenStream</span>::<span class=
 "ident">Compiler</span>(<span class=
 "ident">DeferredTokenStream</span>::<span class=
@@ -1362,7 +1192,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&lt;</span><span class=
 "ident">TokenStream</span>, <span class="ident">LexError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class=
-"ident">nightly_works</span>() {
+"ident">inside_proc_macro</span>() {
             <span class="prelude-val">Ok</span>(<span class=
 "ident">TokenStream</span>::<span class=
 "ident">Compiler</span>(<span class=
@@ -1491,7 +1321,7 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 }
 
-<span class="comment">// Assumes nightly_works().</span>
+<span class="comment">// Assumes inside_proc_macro().</span>
 <span class="kw">fn</span> <span class=
 "ident">into_compiler_token</span>(<span class=
 "ident">token</span>: <span class=
@@ -1556,7 +1386,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">TokenTree</span>) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="ident">TokenStream</span> {
         <span class="kw">if</span> <span class=
-"ident">nightly_works</span>() {
+"ident">inside_proc_macro</span>() {
             <span class="ident">TokenStream</span>::<span class=
 "ident">Compiler</span>(<span class=
 "ident">DeferredTokenStream</span>::<span class=
@@ -1586,7 +1416,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">I</span>) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">if</span> <span class=
-"ident">nightly_works</span>() {
+"ident">inside_proc_macro</span>() {
             <span class="ident">TokenStream</span>::<span class=
 "ident">Compiler</span>(<span class=
 "ident">DeferredTokenStream</span>::<span class="ident">new</span>(
@@ -1854,8 +1684,9 @@ autocomplete="off" spellcheck="false" placeholder=
 
 <span class="attribute">#[<span class=
 "ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class=
-"kw">enum</span> <span class="ident">TokenTreeIter</span> {
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">enum</span> <span class=
+"ident">TokenTreeIter</span> {
     <span class="ident">Compiler</span>(<span class=
 "ident">proc_macro</span>::<span class=
 "ident">token_stream</span>::<span class="ident">IntoIter</span>),
@@ -2036,8 +1867,9 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class=
 "ident">super_unstable</span>)]</span>
-<span class="kw">pub</span> <span class=
-"kw">enum</span> <span class="ident">SourceFile</span> {
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">enum</span> <span class=
+"ident">SourceFile</span> {
     <span class="ident">Compiler</span>(<span class=
 "ident">proc_macro</span>::<span class="ident">SourceFile</span>),
     <span class="ident">Fallback</span>(<span class=
@@ -2132,8 +1964,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">super_unstable</span>, <span class=
 "ident">feature</span> <span class="op">=</span> <span class=
 "string">"span-locations"</span>))]</span>
-<span class="kw">pub</span> <span class=
-"kw">struct</span> <span class="ident">LineColumn</span> {
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">struct</span> <span class=
+"ident">LineColumn</span> {
     <span class="kw">pub</span> <span class=
 "ident">line</span>: <span class="ident">usize</span>,
     <span class="kw">pub</span> <span class=
@@ -2143,8 +1976,9 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="attribute">#[<span class=
 "ident">derive</span>(<span class="ident">Copy</span>, <span class=
 "ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class=
-"kw">enum</span> <span class="ident">Span</span> {
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">enum</span> <span class=
+"ident">Span</span> {
     <span class="ident">Compiler</span>(<span class=
 "ident">proc_macro</span>::<span class="ident">Span</span>),
     <span class="ident">Fallback</span>(<span class=
@@ -2157,7 +1991,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">Span</span> {
         <span class="kw">if</span> <span class=
-"ident">nightly_works</span>() {
+"ident">inside_proc_macro</span>() {
             <span class="ident">Span</span>::<span class=
 "ident">Compiler</span>(<span class=
 "ident">proc_macro</span>::<span class=
@@ -2167,6 +2001,29 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Fallback</span>(<span class=
 "ident">fallback</span>::<span class=
 "ident">Span</span>::<span class="ident">call_site</span>())
+        }
+    }
+
+    <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">procmacro2_semver_exempt</span>)]</span>
+    <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">hygiene</span>)]</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">mixed_site</span>() <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">Span</span> {
+        <span class="kw">if</span> <span class=
+"ident">inside_proc_macro</span>() {
+            <span class="ident">Span</span>::<span class=
+"ident">Compiler</span>(<span class=
+"ident">proc_macro</span>::<span class=
+"ident">Span</span>::<span class="ident">mixed_site</span>())
+        } <span class="kw">else</span> {
+            <span class="ident">Span</span>::<span class=
+"ident">Fallback</span>(<span class=
+"ident">fallback</span>::<span class=
+"ident">Span</span>::<span class="ident">mixed_site</span>())
         }
     }
 
@@ -2178,7 +2035,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">Span</span> {
         <span class="kw">if</span> <span class=
-"ident">nightly_works</span>() {
+"ident">inside_proc_macro</span>() {
             <span class="ident">Span</span>::<span class=
 "ident">Compiler</span>(<span class=
 "ident">proc_macro</span>::<span class=
@@ -2193,7 +2050,7 @@ autocomplete="off" spellcheck="false" placeholder=
 
     <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class=
-"ident">super_unstable</span>)]</span>
+"ident">procmacro2_semver_exempt</span>)]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">resolved_at</span>(<span class=
 "kw-2">&</span><span class="self">self</span>, <span class=
@@ -2202,6 +2059,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Span</span> {
         <span class="kw">match</span> (<span class=
 "self">self</span>, <span class="ident">other</span>) {
+            <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">hygiene</span>)]</span>
             (<span class="ident">Span</span>::<span class=
 "ident">Compiler</span>(<span class="ident">a</span>), <span class=
 "ident">Span</span>::<span class=
@@ -2210,6 +2069,19 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Span</span>::<span class=
 "ident">Compiler</span>(<span class="ident">a</span>.<span class=
 "ident">resolved_at</span>(<span class="ident">b</span>)),
+
+            <span class=
+"comment">// Name resolution affects semantics, but location is only cosmetic</span>
+            <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">not</span>(<span class=
+"ident">hygiene</span>))]</span>
+            (<span class="ident">Span</span>::<span class=
+"ident">Compiler</span>(<span class="kw">_</span>), <span class=
+"ident">Span</span>::<span class=
+"ident">Compiler</span>(<span class="kw">_</span>)) <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"ident">other</span>,
+
             (<span class="ident">Span</span>::<span class=
 "ident">Fallback</span>(<span class="ident">a</span>), <span class=
 "ident">Span</span>::<span class=
@@ -2226,7 +2098,7 @@ autocomplete="off" spellcheck="false" placeholder=
 
     <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class=
-"ident">super_unstable</span>)]</span>
+"ident">procmacro2_semver_exempt</span>)]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">located_at</span>(<span class=
 "kw-2">&</span><span class="self">self</span>, <span class=
@@ -2235,6 +2107,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Span</span> {
         <span class="kw">match</span> (<span class=
 "self">self</span>, <span class="ident">other</span>) {
+            <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">hygiene</span>)]</span>
             (<span class="ident">Span</span>::<span class=
 "ident">Compiler</span>(<span class="ident">a</span>), <span class=
 "ident">Span</span>::<span class=
@@ -2243,6 +2117,19 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Span</span>::<span class=
 "ident">Compiler</span>(<span class="ident">a</span>.<span class=
 "ident">located_at</span>(<span class="ident">b</span>)),
+
+            <span class=
+"comment">// Name resolution affects semantics, but location is only cosmetic</span>
+            <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">not</span>(<span class=
+"ident">hygiene</span>))]</span>
+            (<span class="ident">Span</span>::<span class=
+"ident">Compiler</span>(<span class="kw">_</span>), <span class=
+"ident">Span</span>::<span class=
+"ident">Compiler</span>(<span class="kw">_</span>)) <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"kw-2">*</span><span class="self">self</span>,
+
             (<span class="ident">Span</span>::<span class=
 "ident">Fallback</span>(<span class="ident">a</span>), <span class=
 "ident">Span</span>::<span class=
@@ -2555,7 +2442,8 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class=
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">fn</span> <span class=
 "ident">debug_span_field_if_nontrivial</span>(<span class=
 "ident">debug</span>: <span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class="ident">fmt</span>::<span class=
@@ -2581,8 +2469,9 @@ autocomplete="off" spellcheck="false" placeholder=
 
 <span class="attribute">#[<span class=
 "ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class=
-"kw">enum</span> <span class="ident">Group</span> {
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">enum</span> <span class=
+"ident">Group</span> {
     <span class="ident">Compiler</span>(<span class=
 "ident">proc_macro</span>::<span class="ident">Group</span>),
     <span class="ident">Fallback</span>(<span class=
@@ -2918,8 +2807,9 @@ autocomplete="off" spellcheck="false" placeholder=
 
 <span class="attribute">#[<span class=
 "ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class=
-"kw">enum</span> <span class="ident">Ident</span> {
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">enum</span> <span class=
+"ident">Ident</span> {
     <span class="ident">Compiler</span>(<span class=
 "ident">proc_macro</span>::<span class="ident">Ident</span>),
     <span class="ident">Fallback</span>(<span class=
@@ -3202,8 +3092,9 @@ autocomplete="off" spellcheck="false" placeholder=
 
 <span class="attribute">#[<span class=
 "ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class=
-"kw">enum</span> <span class="ident">Literal</span> {
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">enum</span> <span class=
+"ident">Literal</span> {
     <span class="ident">Compiler</span>(<span class=
 "ident">proc_macro</span>::<span class="ident">Literal</span>),
     <span class="ident">Fallback</span>(<span class=
@@ -3229,7 +3120,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">Literal</span> {
             <span class="kw">if</span> <span class=
-"ident">nightly_works</span>() {
+"ident">inside_proc_macro</span>() {
                 <span class="ident">Literal</span>::<span class=
 "ident">Compiler</span>(<span class=
 "ident">proc_macro</span>::<span class=
@@ -3267,7 +3158,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">Literal</span> {
             <span class="kw">if</span> <span class=
-"ident">nightly_works</span>() {
+"ident">inside_proc_macro</span>() {
                 <span class="ident">Literal</span>::<span class=
 "ident">Compiler</span>(<span class=
 "ident">proc_macro</span>::<span class=
@@ -3381,7 +3272,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">Literal</span> {
         <span class="kw">if</span> <span class=
-"ident">nightly_works</span>() {
+"ident">inside_proc_macro</span>() {
             <span class="ident">Literal</span>::<span class=
 "ident">Compiler</span>(<span class=
 "ident">proc_macro</span>::<span class=
@@ -3403,7 +3294,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">Literal</span> {
         <span class="kw">if</span> <span class=
-"ident">nightly_works</span>() {
+"ident">inside_proc_macro</span>() {
             <span class="ident">Literal</span>::<span class=
 "ident">Compiler</span>(<span class=
 "ident">proc_macro</span>::<span class=
@@ -3424,7 +3315,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">str</span>) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="ident">Literal</span> {
         <span class="kw">if</span> <span class=
-"ident">nightly_works</span>() {
+"ident">inside_proc_macro</span>() {
             <span class="ident">Literal</span>::<span class=
 "ident">Compiler</span>(<span class=
 "ident">proc_macro</span>::<span class=
@@ -3445,7 +3336,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">Literal</span> {
         <span class="kw">if</span> <span class=
-"ident">nightly_works</span>() {
+"ident">inside_proc_macro</span>() {
             <span class="ident">Literal</span>::<span class=
 "ident">Compiler</span>(<span class=
 "ident">proc_macro</span>::<span class=
@@ -3466,7 +3357,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">u8</span>]) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="ident">Literal</span> {
         <span class="kw">if</span> <span class=
-"ident">nightly_works</span>() {
+"ident">inside_proc_macro</span>() {
             <span class="ident">Literal</span>::<span class=
 "ident">Compiler</span>(<span class=
 "ident">proc_macro</span>::<span class=
@@ -3664,7 +3555,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "proc_macro2";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.0/src/data_traits.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.1/src/data_traits.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>data_traits.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -604,6 +604,40 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="529">529</span>
 <span id="530">530</span>
 <span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -623,11 +657,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class=
 "doccomment">//! The data (inner representation) traits for ndarray</span>
 
-<span class="kw">use</span> <span class=
-"kw">crate</span>::<span class=
-"ident">extension</span>::<span class=
-"ident">nonnull</span>::<span class=
-"ident">nonnull_from_vec_data</span>;
 <span class="kw">use</span> <span class=
 "ident">rawpointer</span>::<span class="ident">PointerExt</span>;
 <span class="kw">use</span> <span class=
@@ -1058,8 +1087,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&lt;</span><span class="kw-2">&</span>[<span class=
 "ident">A</span>]<span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class=
-"kw-2">&</span><span class="self">self</span>.<span class=
-"number">0</span>)
+"self">self</span>.<span class="number">0</span>.<span class=
+"ident">as_slice</span>())
     }
     <span class="macro">private_impl</span><span class=
 "macro">!</span> {}
@@ -1153,9 +1182,9 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="kw">unsafe</span> {
             <span class="ident">self_</span>.<span class=
 "ident">ptr</span> <span class="op">=</span> <span class=
-"ident">nonnull_from_vec_data</span>(<span class=
-"ident">rvec</span>).<span class="ident">offset</span>(<span class=
-"ident">our_off</span>);
+"ident">rvec</span>.<span class=
+"ident">as_nonnull_mut</span>().<span class=
+"ident">offset</span>(<span class="ident">our_off</span>);
         }
     }
 
@@ -1204,12 +1233,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">self_</span>);
         <span class="kw">let</span> <span class=
 "ident">data</span> <span class="op">=</span> <span class=
-"ident">OwnedRepr</span>(<span class=
 "ident">Arc</span>::<span class=
 "ident">try_unwrap</span>(<span class=
 "ident">self_</span>.<span class="ident">data</span>.<span class=
 "number">0</span>).<span class="ident">ok</span>().<span class=
-"ident">unwrap</span>());
+"ident">unwrap</span>();
         <span class="ident">ArrayBase</span> {
             <span class="ident">data</span>,
             <span class="ident">ptr</span>: <span class=
@@ -1271,8 +1299,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&lt;</span><span class="kw-2">&</span>[<span class=
 "ident">A</span>]<span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class=
-"kw-2">&</span><span class="self">self</span>.<span class=
-"number">0</span>)
+"self">self</span>.<span class="ident">as_slice</span>())
     }
     <span class="macro">private_impl</span><span class=
 "macro">!</span> {}
@@ -1380,10 +1407,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">clone</span>();
         <span class="kw">let</span> <span class=
 "kw-2">mut</span> <span class="ident">new_ptr</span> <span class=
-"op">=</span> <span class=
-"ident">nonnull_from_vec_data</span>(<span class=
-"kw-2">&</span><span class="kw-2">mut</span> <span class=
-"ident">u</span>.<span class="number">0</span>);
+"op">=</span> <span class="ident">u</span>.<span class=
+"ident">as_nonnull_mut</span>();
         <span class="kw">if</span> <span class=
 "ident">size_of</span>::<span class="op">&lt;</span><span class=
 "ident">A</span><span class="op">&gt;</span>() <span class=
@@ -1394,10 +1419,9 @@ autocomplete="off" spellcheck="false" placeholder=
                 (<span class="ident">ptr</span>.<span class=
 "ident">as_ptr</span>() <span class="kw">as</span> <span class=
 "ident">isize</span> <span class="op">-</span> <span class=
-"self">self</span>.<span class="number">0</span>.<span class=
-"ident">as_ptr</span>() <span class="kw">as</span> <span class=
-"ident">isize</span>) <span class="op">/</span> <span class=
-"ident">mem</span>::<span class=
+"self">self</span>.<span class="ident">as_ptr</span>() <span class=
+"kw">as</span> <span class="ident">isize</span>) <span class=
+"op">/</span> <span class="ident">mem</span>::<span class=
 "ident">size_of</span>::<span class="op">&lt;</span><span class=
 "ident">A</span><span class="op">&gt;</span>() <span class=
 "kw">as</span> <span class="ident">isize</span>;
@@ -1432,7 +1456,7 @@ autocomplete="off" spellcheck="false" placeholder=
             (<span class="ident">ptr</span>.<span class=
 "ident">as_ptr</span>() <span class="kw">as</span> <span class=
 "ident">isize</span> <span class="op">-</span> <span class=
-"ident">other</span>.<span class="number">0</span>.<span class=
+"ident">other</span>.<span class=
 "ident">as_ptr</span>() <span class="kw">as</span> <span class=
 "ident">isize</span>) <span class="op">/</span> <span class=
 "ident">mem</span>::<span class=
@@ -1443,13 +1467,10 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="number">0</span>
         };
         <span class="self">self</span>.<span class=
-"number">0</span>.<span class=
 "ident">clone_from</span>(<span class="kw-2">&</span><span class=
-"ident">other</span>.<span class="number">0</span>);
-        <span class=
-"ident">nonnull_from_vec_data</span>(<span class=
-"kw-2">&</span><span class="kw-2">mut</span> <span class=
-"self">self</span>.<span class="number">0</span>).<span class=
+"ident">other</span>);
+        <span class="self">self</span>.<span class=
+"ident">as_nonnull_mut</span>().<span class=
 "ident">offset</span>(<span class="ident">our_off</span>)
     }
 }
@@ -1711,8 +1732,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&lt;</span><span class="ident">A</span><span class=
 "op">&gt;</span>) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">OwnedRepr</span>(<span class=
-"ident">elements</span>)
+        <span class="ident">OwnedRepr</span>::<span class=
+"ident">from</span>(<span class="ident">elements</span>)
     }
     <span class="kw">fn</span> <span class=
 "ident">into_shared</span>(<span class=
@@ -1722,7 +1743,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="ident">OwnedArcRepr</span>(<span class=
 "ident">Arc</span>::<span class="ident">new</span>(<span class=
-"self">self</span>.<span class="number">0</span>))
+"self">self</span>))
     }
 }
 
@@ -1740,7 +1761,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">OwnedArcRepr</span>(<span class=
 "ident">Arc</span>::<span class="ident">new</span>(<span class=
-"ident">elements</span>))
+"ident">OwnedRepr</span>::<span class=
+"ident">from</span>(<span class="ident">elements</span>)))
     }
 
     <span class="kw">fn</span> <span class=
@@ -2029,6 +2051,126 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">A</span><span class="op">&gt;</span> <span class=
 "kw">where</span> <span class="ident">A</span>: <span class=
 "ident">Clone</span> {}
+
+<span class="doccomment">/// Array representation trait.</span>
+<span class="doccomment">///</span>
+<span class=
+"doccomment">/// The RawDataSubst trait maps the element type of array storage, while</span>
+<span class=
+"doccomment">/// keeping the same kind of storage.</span>
+<span class="doccomment">///</span>
+<span class=
+"doccomment">/// For example, `RawDataSubst&lt;B&gt;` can map the type `OwnedRepr&lt;A&gt;` to `OwnedRepr&lt;B&gt;`.</span>
+<span class="kw">pub</span> <span class=
+"kw">trait</span> <span class=
+"ident">RawDataSubst</span><span class="op">&lt;</span><span class=
+"ident">A</span><span class="op">&gt;</span>: <span class=
+"ident">RawData</span> {
+    <span class=
+"doccomment">/// The resulting array storage of the same kind but substituted element type</span>
+    <span class="kw">type</span> <span class=
+"ident">Output</span>: <span class=
+"ident">RawData</span><span class="op">&lt;</span><span class=
+"ident">Elem</span> <span class="op">=</span> <span class=
+"ident">A</span><span class="op">&gt;</span>;
+}
+
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="ident">A</span>, <span class=
+"ident">B</span><span class="op">&gt;</span> <span class=
+"ident">RawDataSubst</span><span class="op">&lt;</span><span class=
+"ident">B</span><span class="op">&gt;</span> <span class=
+"kw">for</span> <span class="ident">OwnedRepr</span><span class=
+"op">&lt;</span><span class="ident">A</span><span class=
+"op">&gt;</span> {
+    <span class="kw">type</span> <span class=
+"ident">Output</span> <span class="op">=</span> <span class=
+"ident">OwnedRepr</span><span class="op">&lt;</span><span class=
+"ident">B</span><span class="op">&gt;</span>;
+}
+
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="ident">A</span>, <span class=
+"ident">B</span><span class="op">&gt;</span> <span class=
+"ident">RawDataSubst</span><span class="op">&lt;</span><span class=
+"ident">B</span><span class="op">&gt;</span> <span class=
+"kw">for</span> <span class="ident">OwnedArcRepr</span><span class=
+"op">&lt;</span><span class="ident">A</span><span class=
+"op">&gt;</span> {
+    <span class="kw">type</span> <span class=
+"ident">Output</span> <span class="op">=</span> <span class=
+"ident">OwnedArcRepr</span><span class="op">&lt;</span><span class=
+"ident">B</span><span class="op">&gt;</span>;
+}
+
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="ident">A</span>, <span class=
+"ident">B</span><span class="op">&gt;</span> <span class=
+"ident">RawDataSubst</span><span class="op">&lt;</span><span class=
+"ident">B</span><span class="op">&gt;</span> <span class=
+"kw">for</span> <span class="ident">RawViewRepr</span><span class=
+"op">&lt;</span><span class="kw-2">*</span><span class=
+"kw">const</span> <span class="ident">A</span><span class=
+"op">&gt;</span> {
+    <span class="kw">type</span> <span class=
+"ident">Output</span> <span class="op">=</span> <span class=
+"ident">RawViewRepr</span><span class="op">&lt;</span><span class=
+"kw-2">*</span><span class="kw">const</span> <span class=
+"ident">B</span><span class="op">&gt;</span>;
+}
+
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="ident">A</span>, <span class=
+"ident">B</span><span class="op">&gt;</span> <span class=
+"ident">RawDataSubst</span><span class="op">&lt;</span><span class=
+"ident">B</span><span class="op">&gt;</span> <span class=
+"kw">for</span> <span class="ident">RawViewRepr</span><span class=
+"op">&lt;</span><span class="kw-2">*</span><span class=
+"kw-2">mut</span> <span class="ident">A</span><span class=
+"op">&gt;</span> {
+    <span class="kw">type</span> <span class=
+"ident">Output</span> <span class="op">=</span> <span class=
+"ident">RawViewRepr</span><span class="op">&lt;</span><span class=
+"kw-2">*</span><span class="kw-2">mut</span> <span class=
+"ident">B</span><span class="op">&gt;</span>;
+}
+
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="lifetime">'a</span>, <span class=
+"ident">A</span>: <span class="lifetime">'a</span>, <span class=
+"ident">B</span>: <span class="lifetime">'a</span><span class=
+"op">&gt;</span> <span class=
+"ident">RawDataSubst</span><span class="op">&lt;</span><span class=
+"ident">B</span><span class="op">&gt;</span> <span class=
+"kw">for</span> <span class="ident">ViewRepr</span><span class=
+"op">&lt;</span><span class="kw-2">&</span><span class=
+"lifetime">'a</span> <span class="ident">A</span><span class=
+"op">&gt;</span> {
+    <span class="kw">type</span> <span class=
+"ident">Output</span> <span class="op">=</span> <span class=
+"ident">ViewRepr</span><span class="op">&lt;</span><span class=
+"kw-2">&</span><span class="lifetime">'a</span> <span class=
+"ident">B</span><span class="op">&gt;</span>;
+}
+
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="lifetime">'a</span>, <span class=
+"ident">A</span>: <span class="lifetime">'a</span>, <span class=
+"ident">B</span>: <span class="lifetime">'a</span><span class=
+"op">&gt;</span> <span class=
+"ident">RawDataSubst</span><span class="op">&lt;</span><span class=
+"ident">B</span><span class="op">&gt;</span> <span class=
+"kw">for</span> <span class="ident">ViewRepr</span><span class=
+"op">&lt;</span><span class="kw-2">&</span><span class=
+"lifetime">'a</span> <span class="kw-2">mut</span> <span class=
+"ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">type</span> <span class=
+"ident">Output</span> <span class="op">=</span> <span class=
+"ident">ViewRepr</span><span class="op">&lt;</span><span class=
+"kw-2">&</span><span class="lifetime">'a</span> <span class=
+"kw-2">mut</span> <span class="ident">B</span><span class=
+"op">&gt;</span>;
+}
 </pre></div>
 </section>
 <section id="search" class="content hidden"></section>
@@ -2036,7 +2178,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "ndarray";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

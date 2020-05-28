@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive-1.0.104/src/de.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive-1.0.110/src/de.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>de.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -3119,6 +3119,9 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="3044">3044</span>
 <span id="3045">3045</span>
 <span id="3046">3046</span>
+<span id="3047">3047</span>
+<span id="3048">3048</span>
+<span id="3049">3049</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -3477,16 +3480,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">has_getter</span>();
 
         <span class="ident">Parameters</span> {
-            <span class="ident">local</span>: <span class=
-"ident">local</span>,
-            <span class="ident">this</span>: <span class=
-"ident">this</span>,
-            <span class="ident">generics</span>: <span class=
-"ident">generics</span>,
-            <span class="ident">borrowed</span>: <span class=
-"ident">borrowed</span>,
-            <span class="ident">has_getter</span>: <span class=
-"ident">has_getter</span>,
+            <span class="ident">local</span>,
+            <span class="ident">this</span>,
+            <span class="ident">generics</span>,
+            <span class="ident">borrowed</span>,
+            <span class="ident">has_getter</span>,
         }
     }
 
@@ -3971,21 +3969,13 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="ident">Data</span>::<span class=
 "ident">Struct</span>(<span class=
 "ident">Style</span>::<span class="ident">Struct</span>, <span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">if</span> <span class=
-"kw">let</span> <span class="prelude-val">Some</span>(<span class=
-"ident">code</span>) <span class="op">=</span> <span class=
+            <span class=
 "ident">deserialize_struct_in_place</span>(<span class=
 "prelude-val">None</span>, <span class=
 "ident">params</span>, <span class=
 "ident">fields</span>, <span class="kw-2">&</span><span class=
 "ident">cont</span>.<span class="ident">attrs</span>, <span class=
-"prelude-val">None</span>)
-            {
-                <span class="ident">code</span>
-            } <span class="kw">else</span> {
-                <span class="kw">return</span> <span class=
-"prelude-val">None</span>;
-            }
+"prelude-val">None</span>)<span class="question-mark">?</span>
         }
         <span class="ident">Data</span>::<span class=
 "ident">Struct</span>(<span class=
@@ -6368,9 +6358,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> (<span class=
 "ident">TokenStream</span>, <span class="ident">Stmts</span>) {
     <span class="kw">let</span> <span class=
-"ident">variant_names_idents</span>: <span class=
-"ident">Vec</span><span class="op">&lt;</span><span class=
-"kw">_</span><span class="op">&gt;</span> <span class=
+"kw-2">mut</span> <span class=
+"ident">deserialized_variants</span> <span class=
 "op">=</span> <span class="ident">variants</span>
         .<span class="ident">iter</span>()
         .<span class="ident">enumerate</span>()
@@ -6379,7 +6368,14 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw">_</span>, <span class="ident">variant</span>)<span class=
 "op">|</span> <span class="op">!</span><span class=
 "ident">variant</span>.<span class=
-"ident">attrs</span>.<span class="ident">skip_deserializing</span>())
+"ident">attrs</span>.<span class="ident">skip_deserializing</span>());
+
+    <span class="kw">let</span> <span class=
+"ident">variant_names_idents</span>: <span class=
+"ident">Vec</span><span class="op">&lt;</span><span class=
+"kw">_</span><span class="op">&gt;</span> <span class=
+"op">=</span> <span class="ident">deserialized_variants</span>
+        .<span class="ident">clone</span>()
         .<span class="ident">map</span>(<span class=
 "op">|</span>(<span class="ident">i</span>, <span class=
 "ident">variant</span>)<span class="op">|</span> {
@@ -6397,11 +6393,10 @@ autocomplete="off" spellcheck="false" placeholder=
 
     <span class="kw">let</span> <span class=
 "ident">other_idx</span> <span class="op">=</span> <span class=
-"ident">variants</span>.<span class=
-"ident">iter</span>().<span class=
-"ident">position</span>(<span class="op">|</span><span class=
-"ident">variant</span><span class="op">|</span> <span class=
-"ident">variant</span>.<span class=
+"ident">deserialized_variants</span>.<span class=
+"ident">position</span>(<span class="op">|</span>(<span class=
+"kw">_</span>, <span class="ident">variant</span>)<span class=
+"op">|</span> <span class="ident">variant</span>.<span class=
 "ident">attrs</span>.<span class="ident">other</span>());
 
     <span class="kw">let</span> <span class=
@@ -6889,25 +6884,6 @@ autocomplete="off" spellcheck="false" placeholder=
         }
     };
 
-    <span class="kw">fn</span> <span class=
-"ident">is_unit</span>(<span class=
-"ident">variant</span>: <span class="kw-2">&</span><span class=
-"ident">Variant</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class=
-"ident">variant</span>.<span class="ident">style</span> {
-            <span class="ident">Style</span>::<span class=
-"ident">Unit</span> <span class="op">=</span><span class=
-"op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">Style</span>::<span class=
-"ident">Struct</span> <span class="op">|</span> <span class=
-"ident">Style</span>::<span class="ident">Tuple</span> <span class=
-"op">|</span> <span class="ident">Style</span>::<span class=
-"ident">Newtype</span> <span class="op">=</span><span class=
-"op">&gt;</span> <span class="bool-val">false</span>,
-        }
-    }
-
     <span class="kw">let</span> <span class=
 "kw-2">mut</span> <span class=
 "ident">missing_content</span> <span class=
@@ -6922,64 +6898,105 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span>::<span class=
 "ident">missing_field</span>(#<span class="ident">content</span>))
     };
-    <span class="kw">if</span> <span class=
-"ident">variants</span>.<span class=
-"ident">iter</span>().<span class="ident">any</span>(<span class=
-"ident">is_unit</span>) {
-        <span class="kw">let</span> <span class=
-"ident">fallthrough</span> <span class="op">=</span> <span class=
-"kw">if</span> <span class="ident">variants</span>.<span class=
-"ident">iter</span>().<span class="ident">all</span>(<span class=
-"ident">is_unit</span>) {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class=
-"macro">quote</span><span class="macro">!</span> {
-                <span class="kw">_</span> <span class=
-"op">=</span><span class="op">&gt;</span> #<span class=
-"ident">missing_content</span>
-            })
-        };
-        <span class="kw">let</span> <span class=
-"ident">arms</span> <span class="op">=</span> <span class=
-"ident">variants</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">filter</span>(<span class=
+    <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class=
+"ident">missing_content_fallthrough</span> <span class=
+"op">=</span> <span class="macro">quote</span><span class=
+"macro">!</span>();
+    <span class="kw">let</span> <span class=
+"ident">missing_content_arms</span> <span class=
+"op">=</span> <span class="ident">variants</span>
+        .<span class="ident">iter</span>()
+        .<span class="ident">enumerate</span>()
+        .<span class="ident">filter</span>(<span class=
 "op">|</span><span class="kw-2">&</span>(<span class=
 "kw">_</span>, <span class="ident">variant</span>)<span class=
 "op">|</span> <span class="op">!</span><span class=
 "ident">variant</span>.<span class=
-"ident">attrs</span>.<span class="ident">skip_deserializing</span>() <span class="kw-2">&</span><span class="op">&</span> <span class="ident">is_unit</span>(<span class="ident">variant</span>))
-            .<span class="ident">map</span>(<span class=
+"ident">attrs</span>.<span class="ident">skip_deserializing</span>())
+        .<span class="ident">filter_map</span>(<span class=
 "op">|</span>(<span class="ident">i</span>, <span class=
 "ident">variant</span>)<span class="op">|</span> {
-                <span class="kw">let</span> <span class=
+            <span class="kw">let</span> <span class=
 "ident">variant_index</span> <span class="op">=</span> <span class=
 "ident">field_i</span>(<span class="ident">i</span>);
-                <span class="kw">let</span> <span class=
+            <span class="kw">let</span> <span class=
 "ident">variant_ident</span> <span class="op">=</span> <span class=
 "kw-2">&</span><span class="ident">variant</span>.<span class=
 "ident">ident</span>;
-                <span class="macro">quote</span><span class=
+
+            <span class="kw">let</span> <span class=
+"ident">arm</span> <span class="op">=</span> <span class=
+"kw">match</span> <span class="ident">variant</span>.<span class=
+"ident">style</span> {
+                <span class="ident">Style</span>::<span class=
+"ident">Unit</span> <span class="op">=</span><span class=
+"op">&gt;</span> <span class="macro">quote</span><span class=
 "macro">!</span> {
-                    <span class=
-"ident">__Field</span>::#<span class=
-"ident">variant_index</span> <span class="op">=</span><span class=
-"op">&gt;</span> <span class="ident">_serde</span>::<span class=
+                    <span class="ident">_serde</span>::<span class=
 "ident">export</span>::<span class=
 "prelude-val">Ok</span>(#<span class=
-"ident">this</span>::#<span class="ident">variant_ident</span>),
+"ident">this</span>::#<span class="ident">variant_ident</span>)
+                },
+                <span class="ident">Style</span>::<span class=
+"ident">Newtype</span> <span class="kw">if</span> <span class=
+"ident">variant</span>.<span class=
+"ident">attrs</span>.<span class="ident">deserialize_with</span>().<span class="ident">is_none</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">let</span> <span class=
+"ident">span</span> <span class="op">=</span> <span class=
+"ident">variant</span>.<span class=
+"ident">original</span>.<span class="ident">span</span>();
+                    <span class="kw">let</span> <span class=
+"ident">func</span> <span class="op">=</span> <span class=
+"macro">quote_spanned</span><span class=
+"macro">!</span>(<span class="ident">span</span><span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"ident">_serde</span>::<span class=
+"ident">private</span>::<span class="ident">de</span>::<span class=
+"ident">missing_field</span>);
+                    <span class="macro">quote</span><span class=
+"macro">!</span> {
+                        #<span class=
+"ident">func</span>(#<span class=
+"ident">content</span>).<span class=
+"ident">map</span>(#<span class="ident">this</span>::#<span class=
+"ident">variant_ident</span>)
+                    }
                 }
-            });
+                <span class="kw">_</span> <span class=
+"op">=</span><span class="op">&gt;</span> {
+                    <span class=
+"ident">missing_content_fallthrough</span> <span class=
+"op">=</span> <span class="macro">quote</span><span class=
+"macro">!</span>(<span class="kw">_</span> <span class=
+"op">=</span><span class="op">&gt;</span> #<span class=
+"ident">missing_content</span>);
+                    <span class="kw">return</span> <span class=
+"prelude-val">None</span>;
+                }
+            };
+            <span class="prelude-val">Some</span>(<span class=
+"macro">quote</span><span class="macro">!</span> {
+                <span class="ident">__Field</span>::#<span class=
+"ident">variant_index</span> <span class="op">=</span><span class=
+"op">&gt;</span> #<span class="ident">arm</span>,
+            })
+        })
+        .<span class="ident">collect</span>::<span class=
+"op">&lt;</span><span class="ident">Vec</span><span class=
+"op">&lt;</span><span class="kw">_</span><span class=
+"op">&gt;</span><span class="op">&gt;</span>();
+    <span class="kw">if</span> <span class=
+"op">!</span><span class="ident">missing_content_arms</span>.<span class="ident">is_empty</span>() {
         <span class="ident">missing_content</span> <span class=
 "op">=</span> <span class="macro">quote</span><span class=
 "macro">!</span> {
             <span class="kw">match</span> <span class=
 "ident">__field</span> {
-                #(#<span class="ident">arms</span>)<span class=
-"op">*</span>
-                #<span class="ident">fallthrough</span>
+                #(#<span class=
+"ident">missing_content_arms</span>)<span class="op">*</span>
+                #<span class=
+"ident">missing_content_fallthrough</span>
             }
         };
     }
@@ -11536,7 +11553,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "serde_derive";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

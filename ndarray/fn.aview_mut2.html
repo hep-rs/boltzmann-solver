@@ -85,7 +85,7 @@ autocomplete="off" spellcheck="false" placeholder=
 'render-detail'><a id="toggle-all-docs" href="javascript:void(0)"
 title="collapse all docs">[<span class=
 'inner'>−</span>]</a></span><a class='srclink' href=
-'../src/ndarray/free_functions.rs.html#161-179' title=
+'../src/ndarray/free_functions.rs.html#149-167' title=
 'goto source code'>[src]</a></span><span class='in-band'>Function
 <a href='index.html'>ndarray</a>::<wbr><a class="fn" href=
 ''>aview_mut2</a></span></h1>
@@ -109,42 +109,40 @@ overflows <code>isize</code>. (This can only occur when
 <span class="kw">use</span> <span class=
 "ident">ndarray</span>::<span class="ident">aview_mut2</span>;
 
-<span class="kw">fn</span> <span class="ident">main</span>() {
-    <span class=
+<span class=
 "comment">// The inner (nested) array must be of length 1 to 16, but the outer</span>
-    <span class="comment">// can be of any length.</span>
-    <span class="kw">let</span> <span class=
+<span class="comment">// can be of any length.</span>
+<span class="kw">let</span> <span class=
 "kw-2">mut</span> <span class="ident">data</span> <span class=
 "op">=</span> [[<span class="number">0.</span>; <span class=
 "number">2</span>]; <span class="number">128</span>];
-    {
-        <span class=
+{
+    <span class=
 "comment">// Make a 128 x 2 mut array view then turn it into 2 x 128</span>
-        <span class="kw">let</span> <span class=
+    <span class="kw">let</span> <span class=
 "kw-2">mut</span> <span class="ident">a</span> <span class=
 "op">=</span> <span class="ident">aview_mut2</span>(<span class=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
 "ident">data</span>).<span class="ident">reversed_axes</span>();
-        <span class=
+    <span class=
 "comment">// Make the first row ones and second row minus ones.</span>
-        <span class="ident">a</span>.<span class=
+    <span class="ident">a</span>.<span class=
 "ident">row_mut</span>(<span class="number">0</span>).<span class=
 "ident">fill</span>(<span class="number">1.</span>);
-        <span class="ident">a</span>.<span class=
+    <span class="ident">a</span>.<span class=
 "ident">row_mut</span>(<span class="number">1</span>).<span class=
 "ident">fill</span>(<span class="op">-</span><span class=
 "number">1.</span>);
-    }
-    <span class="comment">// look at the start of the result</span>
-    <span class="macro">assert_eq</span><span class=
+}
+<span class="comment">// look at the start of the result</span>
+<span class="macro">assert_eq</span><span class=
 "macro">!</span>(<span class="kw-2">&</span><span class=
 "ident">data</span>[..<span class=
 "number">3</span>], [[<span class="number">1.</span>, <span class=
 "op">-</span><span class="number">1.</span>], [<span class=
 "number">1.</span>, <span class="op">-</span><span class=
 "number">1.</span>], [<span class="number">1.</span>, <span class=
-"op">-</span><span class="number">1.</span>]]);
-}</pre></div>
+"op">-</span><span class="number">1.</span>]]);</pre></div>
 </div>
 </section>
 <section id="search" class="content hidden"></section>
@@ -152,7 +150,6 @@ overflows <code>isize</code>. (This can only occur when
 <script>
 window.rootPath = "../";window.currentCrate = "ndarray";
 </script>
-<script src="../aliases.js"></script>
 <script src="../main.js"></script>
 <script defer src="../search-index.js"></script>
 </body>

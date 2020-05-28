@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.16/src/custom_punctuation.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.27/src/custom_punctuation.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>custom_punctuation.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -372,16 +372,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="297">297</span>
 <span id="298">298</span>
 <span id="299">299</span>
-<span id="300">300</span>
-<span id="301">301</span>
-<span id="302">302</span>
-<span id="303">303</span>
-<span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
-<span id="308">308</span>
-<span id="309">309</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -496,8 +486,7 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class=
-"ident">macro_export</span>(<span class=
-"ident">local_inner_macros</span>)]</span>
+"ident">macro_export</span>]</span>
 <span class="macro">macro_rules</span><span class=
 "macro">!</span> <span class="ident">custom_punctuation</span> {
     (<span class="macro-nonterminal">$</span><span class=
@@ -513,10 +502,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">ident</span> {
             <span class="kw">pub</span> <span class=
 "ident">spans</span>: <span class=
-"macro">custom_punctuation_repr</span><span class=
-"macro">!</span>($(<span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">tt</span>)<span class="op">+</span>),
+"kw">crate</span>::<span class=
+"macro-nonterminal">custom_punctuation_repr</span><span class=
+"op">!</span>($(<span class=
+"macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">+</span>),
         }
 
         <span class="attribute">#[<span class=
@@ -533,12 +523,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw">crate</span>::<span class=
 "macro-nonterminal">export</span>::<span class=
 "ident">IntoSpans</span><span class="op">&lt;</span><span class=
-"macro">custom_punctuation_repr</span><span class=
-"macro">!</span>($(<span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">tt</span>)<span class=
-"op">+</span>)<span class="op">&gt;</span><span class=
-"op">&gt;</span>(
+"kw">crate</span>::<span class=
+"macro-nonterminal">custom_punctuation_repr</span><span class=
+"op">!</span>($(<span class=
+"macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">+</span>)<span class="op">&gt;</span><span class="op">&gt;</span>(
             <span class="ident">spans</span>: <span class=
 "ident">__S</span>,
         ) <span class="op">-</span><span class=
@@ -548,8 +537,10 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="kw">let</span> <span class=
 "ident">_validate_len</span> <span class="op">=</span> <span class=
 "number">0</span> $(<span class="op">+</span> <span class=
-"macro">custom_punctuation_len</span><span class=
-"macro">!</span>(<span class="ident">strict</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">custom_punctuation_len</span><span class=
+"op">!</span>(<span class="ident">strict</span>, <span class=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">tt</span>))<span class="kw-2">*</span>;
             <span class="macro-nonterminal">$</span><span class=
@@ -578,34 +569,18 @@ autocomplete="off" spellcheck="false" placeholder=
             }
         }
 
-        <span class=
-"macro">impl_parse_for_custom_punctuation</span><span class=
-"macro">!</span>(<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">ident</span>, $(<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">tt</span>)<span class="op">+</span>);
-        <span class=
-"macro">impl_to_tokens_for_custom_punctuation</span><span class=
-"macro">!</span>(<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">ident</span>, $(<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">tt</span>)<span class="op">+</span>);
-        <span class=
-"macro">impl_clone_for_custom_punctuation</span><span class=
-"macro">!</span>(<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">ident</span>, $(<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">tt</span>)<span class="op">+</span>);
-        <span class=
-"macro">impl_extra_traits_for_custom_punctuation</span><span class=
-"macro">!</span>(<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">ident</span>, $(<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">tt</span>)<span class="op">+</span>);
+        <span class="macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">impl_parse_for_custom_punctuation</span><span class="op">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">+</span>);
+        <span class="macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">impl_to_tokens_for_custom_punctuation</span><span class="op">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">+</span>);
+        <span class="macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">impl_clone_for_custom_punctuation</span><span class="op">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">+</span>);
+        <span class="macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">impl_extra_traits_for_custom_punctuation</span><span class="op">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">+</span>);
     };
 }
 
@@ -616,8 +591,7 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="attribute">#[<span class=
 "ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="attribute">#[<span class=
-"ident">macro_export</span>(<span class=
-"ident">local_inner_macros</span>)]</span>
+"ident">macro_export</span>]</span>
 <span class="macro">macro_rules</span><span class=
 "macro">!</span> <span class=
 "ident">impl_parse_for_custom_punctuation</span> {
@@ -643,7 +617,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Cursor</span>) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="ident">bool</span> {
                 <span class=
-"macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">token</span>::<span class="ident">parsing</span>::<span class="ident">peek_punct</span>(<span class="ident">cursor</span>, <span class="macro">stringify_punct</span><span class="macro">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">+</span>))
+"macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">token</span>::<span class="ident">parsing</span>::<span class="ident">peek_punct</span>(<span class="ident">cursor</span>, <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">stringify_punct</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">+</span>))
             }
 
             <span class="kw">fn</span> <span class=
@@ -653,14 +627,13 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
 "macro-nonterminal">export</span>::<span class="ident">str</span> {
-                <span class=
-"macro">custom_punctuation_concat</span><span class=
+                <span class="macro">concat</span><span class=
 "macro">!</span>(<span class="string">"`"</span>, <span class=
-"macro">stringify_punct</span><span class=
-"macro">!</span>($(<span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">tt</span>)<span class=
-"op">+</span>), <span class="string">"`"</span>)
+"kw">crate</span>::<span class=
+"macro-nonterminal">stringify_punct</span><span class=
+"op">!</span>($(<span class=
+"macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">+</span>), <span class="string">"`"</span>)
             }
         }
 
@@ -686,22 +659,22 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">ident</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class=
 "ident">spans</span>: <span class=
-"macro">custom_punctuation_repr</span><span class=
-"macro">!</span>($(<span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">tt</span>)<span class=
-"op">+</span>) <span class="op">=</span>
+"kw">crate</span>::<span class=
+"macro-nonterminal">custom_punctuation_repr</span><span class=
+"op">!</span>($(<span class=
+"macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">+</span>) <span class="op">=</span>
                     <span class=
 "macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
 "macro-nonterminal">token</span>::<span class=
 "ident">parsing</span>::<span class=
 "ident">punct</span>(<span class="ident">input</span>, <span class=
-"macro">stringify_punct</span><span class=
-"macro">!</span>($(<span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">tt</span>)<span class=
-"op">+</span>))<span class="question-mark">?</span>;
+"kw">crate</span>::<span class=
+"macro-nonterminal">stringify_punct</span><span class=
+"op">!</span>($(<span class=
+"macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">+</span>))<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">ident</span>(<span class="ident">spans</span>))
@@ -738,8 +711,7 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="attribute">#[<span class=
 "ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="attribute">#[<span class=
-"ident">macro_export</span>(<span class=
-"ident">local_inner_macros</span>)]</span>
+"ident">macro_export</span>]</span>
 <span class="macro">macro_rules</span><span class=
 "macro">!</span> <span class=
 "ident">impl_to_tokens_for_custom_punctuation</span> {
@@ -766,7 +738,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">export</span>::<span class=
 "ident">TokenStream2</span>) {
                 <span class=
-"macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">token</span>::<span class="ident">printing</span>::<span class="ident">punct</span>(<span class="macro">stringify_punct</span><span class="macro">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">+</span>), <span class="kw-2">&</span><span class="self">self</span>.<span class="ident">spans</span>, <span class="ident">tokens</span>)
+"macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">token</span>::<span class="ident">printing</span>::<span class="ident">punct</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">stringify_punct</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">+</span>), <span class="kw-2">&</span><span class="self">self</span>.<span class="ident">spans</span>, <span class="ident">tokens</span>)
             }
         }
     };
@@ -975,8 +947,7 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="attribute">#[<span class=
 "ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="attribute">#[<span class=
-"ident">macro_export</span>(<span class=
-"ident">local_inner_macros</span>)]</span>
+"ident">macro_export</span>]</span>
 <span class="macro">macro_rules</span><span class=
 "macro">!</span> <span class=
 "ident">custom_punctuation_repr</span> {
@@ -988,9 +959,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw">crate</span>::<span class=
 "macro-nonterminal">export</span>::<span class=
 "ident">Span</span>; <span class="number">0</span> $(<span class=
-"op">+</span> <span class=
-"macro">custom_punctuation_len</span><span class=
-"macro">!</span>(<span class="ident">lenient</span>, <span class=
+"op">+</span> <span class="macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">custom_punctuation_len</span><span class=
+"op">!</span>(<span class="ident">lenient</span>, <span class=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">tt</span>))<span class="op">+</span>]
     };
@@ -1000,8 +972,7 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="attribute">#[<span class=
 "ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="attribute">#[<span class=
-"ident">macro_export</span>(<span class=
-"ident">local_inner_macros</span>)]</span>
+"ident">macro_export</span>]</span>
 <span class="attribute">#[<span class=
 "ident">rustfmt</span>::<span class="ident">skip</span>]</span>
 <span class="macro">macro_rules</span><span class=
@@ -1234,10 +1205,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">tt</span>:<span class=
 "ident">tt</span>)     <span class="op">=</span><span class=
 "op">&gt;</span> {{ <span class=
-"macro">custom_punctuation_unexpected</span><span class=
-"macro">!</span>(<span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">tt</span>); <span class="number">0</span> }};
+"kw">crate</span>::<span class=
+"macro-nonterminal">custom_punctuation_unexpected</span><span class="op">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>); <span class="number">0</span> }};
 }
 
 <span class="comment">// Not public API.</span>
@@ -1269,27 +1239,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">tt</span>)),<span class="op">+</span>)
     };
 }
-
-<span class="comment">// Not public API.</span>
-<span class=
-"comment">// Without this, local_inner_macros breaks when looking for concat!</span>
-<span class="attribute">#[<span class=
-"ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class=
-"ident">macro_export</span>]</span>
-<span class="macro">macro_rules</span><span class=
-"macro">!</span> <span class=
-"ident">custom_punctuation_concat</span> {
-    ($(<span class="macro-nonterminal">$</span><span class=
-"macro-nonterminal">tt</span>:<span class=
-"ident">tt</span>)<span class="kw-2">*</span>) <span class=
-"op">=</span><span class="op">&gt;</span> {
-        <span class="macro">concat</span><span class=
-"macro">!</span>($(<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">tt</span>)<span class="kw-2">*</span>)
-    };
-}
 </pre></div>
 </section>
 <section id="search" class="content hidden"></section>
@@ -1297,7 +1246,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "syn";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

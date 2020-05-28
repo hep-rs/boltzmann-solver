@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libc-0.2.67/src/unix/linux_like/linux/gnu/b64/x86_64/mod.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libc-0.2.71/src/unix/linux_like/linux/gnu/b64/x86_64/mod.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>mod.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href=
@@ -1009,6 +1009,14 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="927">927</span>
 <span id="928">928</span>
 <span id="929">929</span>
+<span id="930">930</span>
+<span id="931">931</span>
+<span id="932">932</span>
+<span id="933">933</span>
+<span id="934">934</span>
+<span id="935">935</span>
+<span id="936">936</span>
+<span id="937">937</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -2816,6 +2824,21 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">F_SETLKW</span>: ::<span class=
 "ident">c_int</span> <span class="op">=</span> <span class=
 "number">7</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">F_OFD_GETLK</span>: ::<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
+"number">36</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">F_OFD_SETLK</span>: ::<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
+"number">37</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">F_OFD_SETLKW</span>: ::<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
+"number">38</span>;
 
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
@@ -3121,6 +3144,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">MAP_STACK</span>: ::<span class=
 "ident">c_int</span> <span class="op">=</span> <span class=
 "number">0x020000</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">MAP_SYNC</span> : ::<span class=
+"ident">c_int</span> <span class="op">=</span> <span class=
+"number">0x080000</span>;
 
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
@@ -3193,6 +3221,16 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">PTRACE_PEEKSIGINFO_SHARED</span>: ::<span class=
 "ident">c_uint</span> <span class="op">=</span> <span class=
 "number">1</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">PTRACE_SYSEMU</span>: ::<span class=
+"ident">c_uint</span> <span class="op">=</span> <span class=
+"number">31</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">PTRACE_SYSEMU_SINGLESTEP</span>: ::<span class=
+"ident">c_uint</span> <span class="op">=</span> <span class=
+"number">32</span>;
 
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
@@ -3656,6 +3694,16 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">FIONREAD</span>: ::<span class=
 "ident">c_ulong</span> <span class="op">=</span> <span class=
 "number">0x541B</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">TIOCSBRK</span>: ::<span class=
+"ident">c_ulong</span> <span class="op">=</span> <span class=
+"number">0x5427</span>;
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class=
+"ident">TIOCCBRK</span>: ::<span class=
+"ident">c_ulong</span> <span class="op">=</span> <span class=
+"number">0x5428</span>;
 
 <span class=
 "comment">// offsets in user_regs_structs, from sys/reg.h</span>
@@ -3935,7 +3983,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../../../../../../../";window.currentCrate = "libc";
 </script>
-<script src="../../../../../../../../aliases.js"></script>
 <script src="../../../../../../../../main.js"></script>
 <script src="../../../../../../../../source-script.js"></script>
 <script src="../../../../../../../../source-files.js"></script>

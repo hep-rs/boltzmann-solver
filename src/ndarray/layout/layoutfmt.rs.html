@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.0/src/layout/layoutfmt.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.1/src/layout/layoutfmt.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>layoutfmt.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href=
@@ -104,12 +104,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="28">28</span>
 <span id="29">29</span>
 <span id="30">30</span>
-<span id="31">31</span>
-<span id="32">32</span>
-<span id="33">33</span>
-<span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -128,10 +122,6 @@ autocomplete="off" spellcheck="false" placeholder=
 
 <span class="kw">use</span> <span class=
 "kw">super</span>::<span class="ident">Layout</span>;
-<span class="kw">use</span> <span class=
-"kw">super</span>::<span class="ident">LayoutPriv</span>;
-<span class="kw">use</span> <span class=
-"ident">itertools</span>::<span class="ident">Itertools</span>;
 
 <span class="kw">const</span> <span class=
 "ident">LAYOUT_NAMES</span>: <span class=
@@ -161,39 +151,33 @@ autocomplete="off" spellcheck="false" placeholder=
 "number">0</span> {
             <span class="macro">write</span><span class=
 "macro">!</span>(<span class="ident">f</span>, <span class=
-"string">"Custom"</span>)
+"string">"Custom"</span>)<span class="question-mark">?</span>
         } <span class="kw">else</span> {
-            <span class="macro">write</span><span class=
-"macro">!</span>(
-                <span class="ident">f</span>,
-                <span class="string">"{}"</span>,
-                (<span class="number">0</span>..<span class=
-"number">32</span>)
-                    .<span class="ident">filter</span>(<span class=
+            (<span class="number">0</span>..<span class=
+"number">32</span>).<span class="ident">filter</span>(<span class=
 "op">|</span><span class="kw-2">&</span><span class=
 "ident">i</span><span class="op">|</span> <span class=
 "self">self</span>.<span class="ident">is</span>(<span class=
 "number">1</span> <span class="op">&lt;</span><span class=
-"op">&lt;</span> <span class="ident">i</span>))
-                    .<span class=
-"ident">format_with</span>(<span class=
-"string">" | "</span>, <span class="op">|</span><span class=
-"ident">i</span>, <span class="ident">f</span><span class=
-"op">|</span> <span class="kw">if</span> <span class=
+"op">&lt;</span> <span class="ident">i</span>)).<span class=
+"ident">try_fold</span>((), <span class="op">|</span><span class=
+"kw">_</span>, <span class="ident">i</span><span class=
+"op">|</span> {
+                <span class="kw">if</span> <span class=
 "kw">let</span> <span class="prelude-val">Some</span>(<span class=
 "ident">name</span>) <span class="op">=</span> <span class=
 "ident">LAYOUT_NAMES</span>.<span class=
 "ident">get</span>(<span class="ident">i</span>) {
-                        <span class="ident">f</span>(<span class=
-"ident">name</span>)
-                    } <span class="kw">else</span> {
-                        <span class="ident">f</span>(<span class=
-"kw-2">&</span><span class="macro">format_args</span><span class=
-"macro">!</span>(<span class="string">"0x{:x}"</span>, <span class=
-"ident">i</span>))
-                    })
-            )
-        }<span class="question-mark">?</span>;
+                    <span class="macro">write</span><span class=
+"macro">!</span>(<span class="ident">f</span>, <span class=
+"string">"{}"</span>, <span class="ident">name</span>)
+                } <span class="kw">else</span> {
+                    <span class="macro">write</span><span class=
+"macro">!</span>(<span class="ident">f</span>, <span class=
+"string">"{:#x}"</span>, <span class="ident">i</span>)
+                }
+            })<span class="question-mark">?</span>;
+        };
         <span class="macro">write</span><span class=
 "macro">!</span>(<span class="ident">f</span>, <span class=
 "string">" ({:#x})"</span>, <span class=
@@ -207,7 +191,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../../";window.currentCrate = "ndarray";
 </script>
-<script src="../../../aliases.js"></script>
 <script src="../../../main.js"></script>
 <script src="../../../source-script.js"></script>
 <script src="../../../source-files.js"></script>

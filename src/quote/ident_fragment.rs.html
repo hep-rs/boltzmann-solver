@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.3/src/ident_fragment.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/quote-1.0.6/src/ident_fragment.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>ident_fragment.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -145,12 +145,29 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="70">70</span>
 <span id="71">71</span>
 <span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
 <span class="kw">use</span> <span class=
 "ident">proc_macro2</span>::{<span class=
 "ident">Ident</span>, <span class="ident">Span</span>};
+<span class="kw">use</span> <span class=
+"ident">std</span>::<span class="ident">borrow</span>::<span class=
+"ident">Cow</span>;
 <span class="kw">use</span> <span class=
 "ident">std</span>::<span class="ident">fmt</span>;
 
@@ -301,6 +318,43 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 }
 
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="ident">T</span><span class=
+"op">&gt;</span> <span class=
+"ident">IdentFragment</span> <span class=
+"kw">for</span> <span class="ident">Cow</span><span class=
+"op">&lt;</span><span class="lifetime">'_</span>, <span class=
+"ident">T</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class=
+"ident">IdentFragment</span> <span class="op">+</span> <span class=
+"ident">ToOwned</span> <span class="op">+</span> <span class=
+"question-mark">?</span><span class="ident">Sized</span>,
+{
+    <span class="kw">fn</span> <span class=
+"ident">span</span>(<span class="kw-2">&</span><span class=
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Option</span><span class=
+"op">&lt;</span><span class="ident">Span</span><span class=
+"op">&gt;</span> {
+        <span class="ident">T</span>::<span class=
+"ident">span</span>(<span class="self">self</span>)
+    }
+
+    <span class="kw">fn</span> <span class=
+"ident">fmt</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">f</span>: <span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">fmt</span>::<span class=
+"ident">Formatter</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">fmt</span>::<span class=
+"prelude-ty">Result</span> {
+        <span class="ident">T</span>::<span class=
+"ident">fmt</span>(<span class="self">self</span>, <span class=
+"ident">f</span>)
+    }
+}
+
 <span class=
 "comment">// Limited set of types which this is implemented for, as we want to avoid types</span>
 <span class=
@@ -336,7 +390,8 @@ autocomplete="off" spellcheck="false" placeholder=
 
 <span class="macro">ident_fragment_display</span><span class=
 "macro">!</span>(<span class="ident">bool</span>, <span class=
-"ident">str</span>, <span class="ident">String</span>);
+"ident">str</span>, <span class="ident">String</span>, <span class=
+"ident">char</span>);
 <span class="macro">ident_fragment_display</span><span class=
 "macro">!</span>(<span class="ident">u8</span>, <span class=
 "ident">u16</span>, <span class="ident">u32</span>, <span class=
@@ -349,7 +404,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "quote";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

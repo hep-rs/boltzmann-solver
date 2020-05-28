@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.0/src/zip/zipmacro.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.1/src/zip/zipmacro.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>zipmacro.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href=
@@ -204,6 +204,12 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="128">128</span>
 <span id="129">129</span>
 <span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -512,6 +518,31 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">body</span>)
     };
+
+    <span class=
+"comment">// Unindexed with one or more producer, no loop body</span>
+    (@<span class="ident">build</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">apply</span>:<span class=
+"ident">ident</span> <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">first_prod</span>:<span class=
+"ident">expr</span> $(, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">prod</span>:<span class=
+"ident">expr</span>)<span class="op">*</span> $(,)<span class=
+"question-mark">?</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+        <span class="macro-nonterminal">$</span><span class=
+"kw">crate</span>::<span class=
+"macro-nonterminal">Zip</span>::<span class=
+"ident">from</span>(<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">first_prod</span>)
+            $(.<span class="ident">and</span>(<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">prod</span>))<span class="op">*</span>
+    };
     <span class="comment">// catch-all rule</span>
     (@<span class="ident">build</span> $(<span class=
 "macro-nonterminal">$</span><span class=
@@ -541,7 +572,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../../";window.currentCrate = "ndarray";
 </script>
-<script src="../../../aliases.js"></script>
 <script src="../../../main.js"></script>
 <script src="../../../source-script.js"></script>
 <script src="../../../source-files.js"></script>

@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.0/src/impl_views/indexing.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.1/src/impl_views/indexing.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>indexing.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href=
@@ -277,6 +277,10 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="201">201</span>
 <span id="202">202</span>
 <span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -434,6 +438,11 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// **Note:** only unchecked for non-debug builds of ndarray.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// The caller must ensure that the index is in-bounds.</span>
     <span class="kw">unsafe</span> <span class=
 "kw">fn</span> <span class="ident">uget</span>(<span class=
 "self">self</span>, <span class="ident">index</span>: <span class=
@@ -696,7 +705,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../../";window.currentCrate = "ndarray";
 </script>
-<script src="../../../aliases.js"></script>
 <script src="../../../main.js"></script>
 <script src="../../../source-script.js"></script>
 <script src="../../../source-files.js"></script>

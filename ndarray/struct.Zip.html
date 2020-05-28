@@ -56,7 +56,7 @@
 <p class='location'>Struct Zip</p>
 <div class="sidebar-elems">
 <div class="block items"><a class="sidebar-title" href=
-"#methods">Methods</a>
+"#implementations">Methods</a>
 <div class="sidebar-links"><a href="#method.all">all</a><a href=
 "#method.all-1">all</a><a href="#method.all-2">all</a><a href=
 "#method.all-3">all</a><a href="#method.all-4">all</a><a href=
@@ -69,8 +69,8 @@
 "#method.and_broadcast-3">and_broadcast</a><a href=
 "#method.and_broadcast-4">and_broadcast</a><a href=
 "#method.apply">apply</a><a href=
-"#method.apply-1">apply</a><a href="#method.apply-2">apply</a><a href="#method.apply-3">apply</a><a href="#method.apply-4">apply</a><a href="#method.apply-5">apply</a><a href="#method.fold">fold</a><a href="#method.fold-1">fold</a><a href="#method.fold-2">fold</a><a href="#method.fold-3">fold</a><a href="#method.fold-4">fold</a><a href="#method.fold-5">fold</a><a href="#method.fold_while">fold_while</a><a href="#method.fold_while-1">fold_while</a><a href="#method.fold_while-2">fold_while</a><a href="#method.fold_while-3">fold_while</a><a href="#method.fold_while-4">fold_while</a><a href="#method.fold_while-5">fold_while</a><a href="#method.from">from</a><a href="#method.indexed">indexed</a><a href="#method.par_apply">par_apply</a><a href="#method.par_apply-1">par_apply</a><a href="#method.par_apply-2">par_apply</a><a href="#method.par_apply-3">par_apply</a><a href="#method.par_apply-4">par_apply</a><a href="#method.par_apply-5">par_apply</a><a href="#method.size">size</a><a href="#method.split">split</a><a href="#method.split-1">split</a><a href="#method.split-2">split</a><a href="#method.split-3">split</a><a href="#method.split-4">split</a><a href="#method.split-5">split</a></div>
-<a class="sidebar-title" href="#implementations">Trait
+"#method.apply-1">apply</a><a href="#method.apply-2">apply</a><a href="#method.apply-3">apply</a><a href="#method.apply-4">apply</a><a href="#method.apply-5">apply</a><a href="#method.apply_assign_into">apply_assign_into</a><a href="#method.apply_assign_into-1">apply_assign_into</a><a href="#method.apply_assign_into-2">apply_assign_into</a><a href="#method.apply_assign_into-3">apply_assign_into</a><a href="#method.apply_assign_into-4">apply_assign_into</a><a href="#method.apply_collect">apply_collect</a><a href="#method.apply_collect-1">apply_collect</a><a href="#method.apply_collect-2">apply_collect</a><a href="#method.apply_collect-3">apply_collect</a><a href="#method.apply_collect-4">apply_collect</a><a href="#method.fold">fold</a><a href="#method.fold-1">fold</a><a href="#method.fold-2">fold</a><a href="#method.fold-3">fold</a><a href="#method.fold-4">fold</a><a href="#method.fold-5">fold</a><a href="#method.fold_while">fold_while</a><a href="#method.fold_while-1">fold_while</a><a href="#method.fold_while-2">fold_while</a><a href="#method.fold_while-3">fold_while</a><a href="#method.fold_while-4">fold_while</a><a href="#method.fold_while-5">fold_while</a><a href="#method.from">from</a><a href="#method.indexed">indexed</a><a href="#method.par_apply">par_apply</a><a href="#method.par_apply-1">par_apply</a><a href="#method.par_apply-2">par_apply</a><a href="#method.par_apply-3">par_apply</a><a href="#method.par_apply-4">par_apply</a><a href="#method.par_apply-5">par_apply</a><a href="#method.par_apply_assign_into">par_apply_assign_into</a><a href="#method.par_apply_assign_into-1">par_apply_assign_into</a><a href="#method.par_apply_assign_into-2">par_apply_assign_into</a><a href="#method.par_apply_assign_into-3">par_apply_assign_into</a><a href="#method.par_apply_assign_into-4">par_apply_assign_into</a><a href="#method.par_apply_collect">par_apply_collect</a><a href="#method.par_apply_collect-1">par_apply_collect</a><a href="#method.par_apply_collect-2">par_apply_collect</a><a href="#method.par_apply_collect-3">par_apply_collect</a><a href="#method.par_apply_collect-4">par_apply_collect</a><a href="#method.size">size</a><a href="#method.split">split</a><a href="#method.split-1">split</a><a href="#method.split-2">split</a><a href="#method.split-3">split</a><a href="#method.split-4">split</a><a href="#method.split-5">split</a></div>
+<a class="sidebar-title" href="#trait-implementations">Trait
 Implementations</a>
 <div class="sidebar-links"><a href="#impl-Clone">Clone</a><a href=
 "#impl-Debug">Debug</a><a href=
@@ -124,7 +124,7 @@ autocomplete="off" spellcheck="false" placeholder=
 'render-detail'><a id="toggle-all-docs" href="javascript:void(0)"
 title="collapse all docs">[<span class=
 'inner'>−</span>]</a></span><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#576-580' title=
+'../src/ndarray/zip/mod.rs.html#586-590' title=
 'goto source code'>[src]</a></span><span class='in-band'>Struct
 <a href='index.html'>ndarray</a>::<wbr><a class="struct" href=
 ''>Zip</a></span></h1>
@@ -255,10 +255,29 @@ macro</a> which offers a convenient shorthand to common ways to use
 <span class="macro">assert_eq</span><span class=
 "macro">!</span>(<span class="ident">totals</span>, <span class=
 "ident">a</span>.<span class="ident">sum_axis</span>(<span class=
-"ident">Axis</span>(<span class="number">1</span>)));</pre></div>
+"ident">Axis</span>(<span class="number">1</span>)));
+
+
+<span class=
+"comment">// Example 3: Recreate Example 2 using apply_collect to make a new array</span>
+
+<span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">totals2</span> <span class=
+"op">=</span> <span class="ident">Zip</span>::<span class=
+"ident">from</span>(<span class="ident">a</span>.<span class=
+"ident">genrows</span>()).<span class=
+"ident">apply_collect</span>(<span class="op">|</span><span class=
+"ident">row</span><span class="op">|</span> <span class=
+"ident">row</span>.<span class="ident">sum</span>());
+
+<span class=
+"comment">// Check the result against the previous example.</span>
+<span class="macro">assert_eq</span><span class=
+"macro">!</span>(<span class="ident">totals</span>, <span class=
+"ident">totals2</span>);</pre></div>
 </div>
-<h2 id='methods' class='small-section-header'>Methods<a href=
-'#methods' class='anchor'></a></h2>
+<h2 id='implementations' class='small-section-header'>
+Implementations<a href='#implementations' class='anchor'></a></h2>
 <h3 id='impl' class='impl'><code class='in-band'>impl&lt;P, D&gt;
 <a class="struct" href="../ndarray/struct.Zip.html" title=
 "struct ndarray::Zip">Zip</a>&lt;<a class="primitive" href=
@@ -274,7 +293,7 @@ D&gt; <span class="where fmt-newline">where<br>
 "trait ndarray::NdProducer">NdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a href='#impl' class=
 'anchor'></a><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#582-603' title=
+'../src/ndarray/zip/mod.rs.html#593-614' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.from' class="method"><code id='from.v'>pub fn
@@ -286,7 +305,7 @@ D&gt;,&nbsp;</span></code><a href='#impl' class=
 Output = P, Item = P::<a class="type" href=
 "../ndarray/trait.NdProducer.html#associatedtype.Item" title=
 "type ndarray::NdProducer::Item">Item</a>&gt;,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#591-602' title=
+href='../src/ndarray/zip/mod.rs.html#602-613' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Create a new <code>Zip</code> from the input array or other
@@ -314,7 +333,7 @@ title="trait core::marker::Copy">Copy</a>,<br>
 "trait ndarray::NdProducer">NdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a href='#impl-1' class=
 'anchor'></a><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#604-623' title=
+'../src/ndarray/zip/mod.rs.html#615-634' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.indexed' class="method"><code id='indexed.v'>pub fn
@@ -326,7 +345,7 @@ IP) -&gt; Self <span class="where fmt-newline">where<br>
 Output = P, Item = P::<a class="type" href=
 "../ndarray/trait.NdProducer.html#associatedtype.Item" title=
 "type ndarray::NdProducer::Item">Item</a>&gt;,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#615-622' title=
+href='../src/ndarray/zip/mod.rs.html#626-633' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Create a new <code>Zip</code> with an index producer and the
@@ -344,14 +363,14 @@ D&gt; <a class="struct" href="../ndarray/struct.Zip.html" title=
 "../ndarray/trait.Dimension.html" title=
 "trait ndarray::Dimension">Dimension</a>,&nbsp;</span></code><a href='#impl-2'
 class='anchor'></a><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#625-674' title=
+'../src/ndarray/zip/mod.rs.html#636-685' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.size' class="method"><code id='size.v'>pub fn
 <a href='#method.size' class='fnname'>size</a>(&amp;self) -&gt;
 <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#642-644' title=
+href='../src/ndarray/zip/mod.rs.html#653-655' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Return a the number of element tuples in the Zip</p>
@@ -372,7 +391,7 @@ D&gt; <span class="where fmt-newline">where<br>
 "trait ndarray::NdProducer">NdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a href='#impl-3' class=
 'anchor'></a><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#855-1009' title=
+'../src/ndarray/zip/mod.rs.html#872-1062' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.apply' class="method"><code id='apply.v'>pub fn
@@ -384,7 +403,7 @@ title="trait core::ops::function::FnMut">FnMut</a>(P1::<a class=
 "type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
 title=
 "type ndarray::NdProducer::Item">Item</a>),&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#861-868' title=
+href='../src/ndarray/zip/mod.rs.html#878-885' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a function to all elements of the input arrays, visiting
@@ -401,7 +420,7 @@ P1::<a class="type" href=
 "../ndarray/trait.NdProducer.html#associatedtype.Item" title=
 "type ndarray::NdProducer::Item">Item</a>) -&gt;
 Acc,&nbsp;</span></code><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#898-906' title=
+'../src/ndarray/zip/mod.rs.html#915-923' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a fold function to all elements of the input arrays,
@@ -478,7 +497,7 @@ P1::<a class="type" href=
 "type ndarray::NdProducer::Item">Item</a>) -&gt; <a class="enum"
 href="../ndarray/enum.FoldWhile.html" title=
 "enum ndarray::FoldWhile">FoldWhile</a>&lt;Acc&gt;,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#911-919' title=
+href='../src/ndarray/zip/mod.rs.html#928-936' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a fold function to the input arrays while the return value
@@ -497,7 +516,7 @@ title="trait core::ops::function::FnMut">FnMut</a>(P1::<a class=
 title="type ndarray::NdProducer::Item">Item</a>) -&gt; <a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#934-945' title=
+href='../src/ndarray/zip/mod.rs.html#951-962' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Tests if every element of the iterator matches a predicate.</p>
@@ -548,7 +567,7 @@ D&gt; <span class="where fmt-newline">where<br>
 "../ndarray/trait.IntoNdProducer.html" title=
 "trait ndarray::IntoNdProducer">IntoNdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#952-964' title=
+'../src/ndarray/zip/mod.rs.html#969-981' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Include the producer <code>p</code> in the Zip.</p>
@@ -579,7 +598,7 @@ Elem&gt;,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;D2: <a class="trait" href=
 "../ndarray/trait.Dimension.html" title=
 "trait ndarray::Dimension">Dimension</a>,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#971-984' title=
+href='../src/ndarray/zip/mod.rs.html#988-1001' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Include the producer <code>p</code> in the Zip, broadcasting if
@@ -589,13 +608,66 @@ shape of <code>self</code>.</p>
 <p><em><strong>Panics</strong></em> if broadcasting isn’t
 possible.</p>
 </div>
+<h4 id='method.apply_collect' class="method"><code id=
+'apply_collect.v'>pub fn <a href='#method.apply_collect' class=
+'fnname'>apply_collect</a>&lt;R&gt;(self, f: impl <a class="trait"
+href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.FnMut.html"
+title="trait core::ops::function::FnMut">FnMut</a>(P1::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>) -&gt; R) -&gt;
+<a class="type" href="../ndarray/type.Array.html" title=
+"type ndarray::Array">Array</a>&lt;R, D&gt; <span class=
+"where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html"
+title=
+"trait core::marker::Copy">Copy</a>,&nbsp;</span></code><a class=
+'srclink' href='../src/ndarray/zip/mod.rs.html#1010-1020' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and collect the results into a new array, which has the
+same size as the inputs.</p>
+<p>If all inputs are c- or f-order respectively, that is preserved
+in the output.</p>
+<p>Restricted to functions that produce copyable results for
+technical reasons; other cases are not yet implemented.</p>
+</div>
+<h4 id='method.apply_assign_into' class="method"><code id=
+'apply_assign_into.v'>pub fn <a href='#method.apply_assign_into'
+class='fnname'>apply_assign_into</a>&lt;R, Q&gt;(self, into: Q, f:
+impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.FnMut.html"
+title="trait core::ops::function::FnMut">FnMut</a>(P1::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>) -&gt; R)
+<span class="where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q: <a class="trait" href=
+"../ndarray/trait.IntoNdProducer.html" title=
+"trait ndarray::IntoNdProducer">IntoNdProducer</a>&lt;Dim =
+D&gt;,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q::<a class="type" href=
+"../ndarray/trait.IntoNdProducer.html#associatedtype.Item" title=
+"type ndarray::IntoNdProducer::Item">Item</a>: <a class="trait"
+href="../ndarray/trait.AssignElem.html" title=
+"trait ndarray::AssignElem">AssignElem</a>&lt;R&gt;,&nbsp;</span></code><a class='srclink'
+href='../src/ndarray/zip/mod.rs.html#1027-1035' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and assign the results into the producer
+<code>into</code>, which should have the same size as the other
+inputs.</p>
+<p>The producer should have assignable items as dictated by the
+<code>AssignElem</code> trait, for example <code>&amp;mut
+R</code>.</p>
+</div>
 <h4 id='method.split' class="method"><code id='split.v'>pub fn
 <a href='#method.split' class='fnname'>split</a>(self) -&gt;
 <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a>Self,
 Self<a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#990-1008' title=
+href='../src/ndarray/zip/mod.rs.html#1043-1061' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Split the <code>Zip</code> evenly in two.</p>
@@ -621,7 +693,7 @@ D&gt; <span class="where fmt-newline">where<br>
 "trait ndarray::NdProducer">NdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a href='#impl-4' class=
 'anchor'></a><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#855-1009' title=
+'../src/ndarray/zip/mod.rs.html#872-1062' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.apply-1' class="method"><code id='apply.v-1'>pub fn
@@ -635,7 +707,7 @@ title="type ndarray::NdProducer::Item">Item</a>, P2::<a class=
 "type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
 title=
 "type ndarray::NdProducer::Item">Item</a>),&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#861-868' title=
+href='../src/ndarray/zip/mod.rs.html#878-885' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a function to all elements of the input arrays, visiting
@@ -654,7 +726,7 @@ P1::<a class="type" href=
 href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
 "type ndarray::NdProducer::Item">Item</a>) -&gt;
 Acc,&nbsp;</span></code><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#898-906' title=
+'../src/ndarray/zip/mod.rs.html#915-923' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a fold function to all elements of the input arrays,
@@ -733,7 +805,7 @@ href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
 "type ndarray::NdProducer::Item">Item</a>) -&gt; <a class="enum"
 href="../ndarray/enum.FoldWhile.html" title=
 "enum ndarray::FoldWhile">FoldWhile</a>&lt;Acc&gt;,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#911-919' title=
+href='../src/ndarray/zip/mod.rs.html#928-936' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a fold function to the input arrays while the return value
@@ -754,7 +826,7 @@ title="type ndarray::NdProducer::Item">Item</a>, P2::<a class=
 title="type ndarray::NdProducer::Item">Item</a>) -&gt; <a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#934-945' title=
+href='../src/ndarray/zip/mod.rs.html#951-962' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Tests if every element of the iterator matches a predicate.</p>
@@ -805,7 +877,7 @@ D&gt; <span class="where fmt-newline">where<br>
 "../ndarray/trait.IntoNdProducer.html" title=
 "trait ndarray::IntoNdProducer">IntoNdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#952-964' title=
+'../src/ndarray/zip/mod.rs.html#969-981' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Include the producer <code>p</code> in the Zip.</p>
@@ -836,7 +908,7 @@ Elem&gt;,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;D2: <a class="trait" href=
 "../ndarray/trait.Dimension.html" title=
 "trait ndarray::Dimension">Dimension</a>,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#971-984' title=
+href='../src/ndarray/zip/mod.rs.html#988-1001' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Include the producer <code>p</code> in the Zip, broadcasting if
@@ -846,13 +918,74 @@ shape of <code>self</code>.</p>
 <p><em><strong>Panics</strong></em> if broadcasting isn’t
 possible.</p>
 </div>
+<h4 id='method.apply_collect-1' class="method"><code id=
+'apply_collect.v-1'>pub fn <a href='#method.apply_collect-1' class=
+'fnname'>apply_collect</a>&lt;R&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.FnMut.html"
+title="trait core::ops::function::FnMut">FnMut</a>(P1::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P2::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>) -&gt; R<br>
+) -&gt; <a class="type" href="../ndarray/type.Array.html" title=
+"type ndarray::Array">Array</a>&lt;R, D&gt; <span class=
+"where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html"
+title=
+"trait core::marker::Copy">Copy</a>,&nbsp;</span></code><a class=
+'srclink' href='../src/ndarray/zip/mod.rs.html#1010-1020' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and collect the results into a new array, which has the
+same size as the inputs.</p>
+<p>If all inputs are c- or f-order respectively, that is preserved
+in the output.</p>
+<p>Restricted to functions that produce copyable results for
+technical reasons; other cases are not yet implemented.</p>
+</div>
+<h4 id='method.apply_assign_into-1' class="method"><code id=
+'apply_assign_into.v-1'>pub fn <a href=
+'#method.apply_assign_into-1' class=
+'fnname'>apply_assign_into</a>&lt;R, Q&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;into: Q,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.FnMut.html"
+title="trait core::ops::function::FnMut">FnMut</a>(P1::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P2::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>) -&gt; R<br>
+) <span class="where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q: <a class="trait" href=
+"../ndarray/trait.IntoNdProducer.html" title=
+"trait ndarray::IntoNdProducer">IntoNdProducer</a>&lt;Dim =
+D&gt;,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q::<a class="type" href=
+"../ndarray/trait.IntoNdProducer.html#associatedtype.Item" title=
+"type ndarray::IntoNdProducer::Item">Item</a>: <a class="trait"
+href="../ndarray/trait.AssignElem.html" title=
+"trait ndarray::AssignElem">AssignElem</a>&lt;R&gt;,&nbsp;</span></code><a class='srclink'
+href='../src/ndarray/zip/mod.rs.html#1027-1035' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and assign the results into the producer
+<code>into</code>, which should have the same size as the other
+inputs.</p>
+<p>The producer should have assignable items as dictated by the
+<code>AssignElem</code> trait, for example <code>&amp;mut
+R</code>.</p>
+</div>
 <h4 id='method.split-1' class="method"><code id='split.v-1'>pub fn
 <a href='#method.split-1' class='fnname'>split</a>(self) -&gt;
 <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a>Self,
 Self<a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#990-1008' title=
+href='../src/ndarray/zip/mod.rs.html#1043-1061' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Split the <code>Zip</code> evenly in two.</p>
@@ -881,7 +1014,7 @@ D&gt; <span class="where fmt-newline">where<br>
 "trait ndarray::NdProducer">NdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a href='#impl-5' class=
 'anchor'></a><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#855-1009' title=
+'../src/ndarray/zip/mod.rs.html#872-1062' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.apply-2' class="method"><code id='apply.v-2'>pub fn
@@ -897,7 +1030,7 @@ title="type ndarray::NdProducer::Item">Item</a>, P3::<a class=
 "type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
 title=
 "type ndarray::NdProducer::Item">Item</a>),&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#861-868' title=
+href='../src/ndarray/zip/mod.rs.html#878-885' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a function to all elements of the input arrays, visiting
@@ -918,7 +1051,7 @@ href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
 href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
 "type ndarray::NdProducer::Item">Item</a>) -&gt;
 Acc,&nbsp;</span></code><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#898-906' title=
+'../src/ndarray/zip/mod.rs.html#915-923' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a fold function to all elements of the input arrays,
@@ -999,7 +1132,7 @@ href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
 "type ndarray::NdProducer::Item">Item</a>) -&gt; <a class="enum"
 href="../ndarray/enum.FoldWhile.html" title=
 "enum ndarray::FoldWhile">FoldWhile</a>&lt;Acc&gt;,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#911-919' title=
+href='../src/ndarray/zip/mod.rs.html#928-936' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a fold function to the input arrays while the return value
@@ -1022,7 +1155,7 @@ title="type ndarray::NdProducer::Item">Item</a>, P3::<a class=
 title="type ndarray::NdProducer::Item">Item</a>) -&gt; <a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#934-945' title=
+href='../src/ndarray/zip/mod.rs.html#951-962' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Tests if every element of the iterator matches a predicate.</p>
@@ -1073,7 +1206,7 @@ D&gt; <span class="where fmt-newline">where<br>
 "../ndarray/trait.IntoNdProducer.html" title=
 "trait ndarray::IntoNdProducer">IntoNdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#952-964' title=
+'../src/ndarray/zip/mod.rs.html#969-981' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Include the producer <code>p</code> in the Zip.</p>
@@ -1104,7 +1237,7 @@ Elem&gt;,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;D2: <a class="trait" href=
 "../ndarray/trait.Dimension.html" title=
 "trait ndarray::Dimension">Dimension</a>,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#971-984' title=
+href='../src/ndarray/zip/mod.rs.html#988-1001' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Include the producer <code>p</code> in the Zip, broadcasting if
@@ -1114,13 +1247,78 @@ shape of <code>self</code>.</p>
 <p><em><strong>Panics</strong></em> if broadcasting isn’t
 possible.</p>
 </div>
+<h4 id='method.apply_collect-2' class="method"><code id=
+'apply_collect.v-2'>pub fn <a href='#method.apply_collect-2' class=
+'fnname'>apply_collect</a>&lt;R&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.FnMut.html"
+title="trait core::ops::function::FnMut">FnMut</a>(P1::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P2::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P3::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>) -&gt; R<br>
+) -&gt; <a class="type" href="../ndarray/type.Array.html" title=
+"type ndarray::Array">Array</a>&lt;R, D&gt; <span class=
+"where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html"
+title=
+"trait core::marker::Copy">Copy</a>,&nbsp;</span></code><a class=
+'srclink' href='../src/ndarray/zip/mod.rs.html#1010-1020' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and collect the results into a new array, which has the
+same size as the inputs.</p>
+<p>If all inputs are c- or f-order respectively, that is preserved
+in the output.</p>
+<p>Restricted to functions that produce copyable results for
+technical reasons; other cases are not yet implemented.</p>
+</div>
+<h4 id='method.apply_assign_into-2' class="method"><code id=
+'apply_assign_into.v-2'>pub fn <a href=
+'#method.apply_assign_into-2' class=
+'fnname'>apply_assign_into</a>&lt;R, Q&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;into: Q,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.FnMut.html"
+title="trait core::ops::function::FnMut">FnMut</a>(P1::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P2::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P3::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>) -&gt; R<br>
+) <span class="where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q: <a class="trait" href=
+"../ndarray/trait.IntoNdProducer.html" title=
+"trait ndarray::IntoNdProducer">IntoNdProducer</a>&lt;Dim =
+D&gt;,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q::<a class="type" href=
+"../ndarray/trait.IntoNdProducer.html#associatedtype.Item" title=
+"type ndarray::IntoNdProducer::Item">Item</a>: <a class="trait"
+href="../ndarray/trait.AssignElem.html" title=
+"trait ndarray::AssignElem">AssignElem</a>&lt;R&gt;,&nbsp;</span></code><a class='srclink'
+href='../src/ndarray/zip/mod.rs.html#1027-1035' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and assign the results into the producer
+<code>into</code>, which should have the same size as the other
+inputs.</p>
+<p>The producer should have assignable items as dictated by the
+<code>AssignElem</code> trait, for example <code>&amp;mut
+R</code>.</p>
+</div>
 <h4 id='method.split-2' class="method"><code id='split.v-2'>pub fn
 <a href='#method.split-2' class='fnname'>split</a>(self) -&gt;
 <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a>Self,
 Self<a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#990-1008' title=
+href='../src/ndarray/zip/mod.rs.html#1043-1061' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Split the <code>Zip</code> evenly in two.</p>
@@ -1152,7 +1350,7 @@ D&gt; <span class="where fmt-newline">where<br>
 "trait ndarray::NdProducer">NdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a href='#impl-6' class=
 'anchor'></a><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#855-1009' title=
+'../src/ndarray/zip/mod.rs.html#872-1062' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.apply-3' class="method"><code id='apply.v-3'>pub fn
@@ -1170,7 +1368,7 @@ title="type ndarray::NdProducer::Item">Item</a>, P4::<a class=
 "type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
 title=
 "type ndarray::NdProducer::Item">Item</a>),&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#861-868' title=
+href='../src/ndarray/zip/mod.rs.html#878-885' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a function to all elements of the input arrays, visiting
@@ -1193,7 +1391,7 @@ href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
 href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
 "type ndarray::NdProducer::Item">Item</a>) -&gt;
 Acc,&nbsp;</span></code><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#898-906' title=
+'../src/ndarray/zip/mod.rs.html#915-923' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a fold function to all elements of the input arrays,
@@ -1276,7 +1474,7 @@ href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
 "type ndarray::NdProducer::Item">Item</a>) -&gt; <a class="enum"
 href="../ndarray/enum.FoldWhile.html" title=
 "enum ndarray::FoldWhile">FoldWhile</a>&lt;Acc&gt;,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#911-919' title=
+href='../src/ndarray/zip/mod.rs.html#928-936' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a fold function to the input arrays while the return value
@@ -1301,7 +1499,7 @@ title="type ndarray::NdProducer::Item">Item</a>, P4::<a class=
 title="type ndarray::NdProducer::Item">Item</a>) -&gt; <a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#934-945' title=
+href='../src/ndarray/zip/mod.rs.html#951-962' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Tests if every element of the iterator matches a predicate.</p>
@@ -1352,7 +1550,7 @@ D&gt; <span class="where fmt-newline">where<br>
 "../ndarray/trait.IntoNdProducer.html" title=
 "trait ndarray::IntoNdProducer">IntoNdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#952-964' title=
+'../src/ndarray/zip/mod.rs.html#969-981' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Include the producer <code>p</code> in the Zip.</p>
@@ -1383,7 +1581,7 @@ Elem&gt;,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;D2: <a class="trait" href=
 "../ndarray/trait.Dimension.html" title=
 "trait ndarray::Dimension">Dimension</a>,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#971-984' title=
+href='../src/ndarray/zip/mod.rs.html#988-1001' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Include the producer <code>p</code> in the Zip, broadcasting if
@@ -1393,13 +1591,82 @@ shape of <code>self</code>.</p>
 <p><em><strong>Panics</strong></em> if broadcasting isn’t
 possible.</p>
 </div>
+<h4 id='method.apply_collect-3' class="method"><code id=
+'apply_collect.v-3'>pub fn <a href='#method.apply_collect-3' class=
+'fnname'>apply_collect</a>&lt;R&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.FnMut.html"
+title="trait core::ops::function::FnMut">FnMut</a>(P1::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P2::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P3::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P4::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>) -&gt; R<br>
+) -&gt; <a class="type" href="../ndarray/type.Array.html" title=
+"type ndarray::Array">Array</a>&lt;R, D&gt; <span class=
+"where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html"
+title=
+"trait core::marker::Copy">Copy</a>,&nbsp;</span></code><a class=
+'srclink' href='../src/ndarray/zip/mod.rs.html#1010-1020' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and collect the results into a new array, which has the
+same size as the inputs.</p>
+<p>If all inputs are c- or f-order respectively, that is preserved
+in the output.</p>
+<p>Restricted to functions that produce copyable results for
+technical reasons; other cases are not yet implemented.</p>
+</div>
+<h4 id='method.apply_assign_into-3' class="method"><code id=
+'apply_assign_into.v-3'>pub fn <a href=
+'#method.apply_assign_into-3' class=
+'fnname'>apply_assign_into</a>&lt;R, Q&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;into: Q,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.FnMut.html"
+title="trait core::ops::function::FnMut">FnMut</a>(P1::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P2::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P3::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P4::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>) -&gt; R<br>
+) <span class="where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q: <a class="trait" href=
+"../ndarray/trait.IntoNdProducer.html" title=
+"trait ndarray::IntoNdProducer">IntoNdProducer</a>&lt;Dim =
+D&gt;,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q::<a class="type" href=
+"../ndarray/trait.IntoNdProducer.html#associatedtype.Item" title=
+"type ndarray::IntoNdProducer::Item">Item</a>: <a class="trait"
+href="../ndarray/trait.AssignElem.html" title=
+"trait ndarray::AssignElem">AssignElem</a>&lt;R&gt;,&nbsp;</span></code><a class='srclink'
+href='../src/ndarray/zip/mod.rs.html#1027-1035' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and assign the results into the producer
+<code>into</code>, which should have the same size as the other
+inputs.</p>
+<p>The producer should have assignable items as dictated by the
+<code>AssignElem</code> trait, for example <code>&amp;mut
+R</code>.</p>
+</div>
 <h4 id='method.split-3' class="method"><code id='split.v-3'>pub fn
 <a href='#method.split-3' class='fnname'>split</a>(self) -&gt;
 <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a>Self,
 Self<a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#990-1008' title=
+href='../src/ndarray/zip/mod.rs.html#1043-1061' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Split the <code>Zip</code> evenly in two.</p>
@@ -1435,7 +1702,7 @@ D&gt; <span class="where fmt-newline">where<br>
 "trait ndarray::NdProducer">NdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a href='#impl-7' class=
 'anchor'></a><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#855-1009' title=
+'../src/ndarray/zip/mod.rs.html#872-1062' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.apply-4' class="method"><code id='apply.v-4'>pub fn
@@ -1455,7 +1722,7 @@ title="type ndarray::NdProducer::Item">Item</a>, P5::<a class=
 "type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
 title=
 "type ndarray::NdProducer::Item">Item</a>),&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#861-868' title=
+href='../src/ndarray/zip/mod.rs.html#878-885' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a function to all elements of the input arrays, visiting
@@ -1480,7 +1747,7 @@ href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
 href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
 "type ndarray::NdProducer::Item">Item</a>) -&gt;
 Acc,&nbsp;</span></code><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#898-906' title=
+'../src/ndarray/zip/mod.rs.html#915-923' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a fold function to all elements of the input arrays,
@@ -1565,7 +1832,7 @@ href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
 "type ndarray::NdProducer::Item">Item</a>) -&gt; <a class="enum"
 href="../ndarray/enum.FoldWhile.html" title=
 "enum ndarray::FoldWhile">FoldWhile</a>&lt;Acc&gt;,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#911-919' title=
+href='../src/ndarray/zip/mod.rs.html#928-936' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a fold function to the input arrays while the return value
@@ -1592,7 +1859,7 @@ title="type ndarray::NdProducer::Item">Item</a>, P5::<a class=
 title="type ndarray::NdProducer::Item">Item</a>) -&gt; <a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#934-945' title=
+href='../src/ndarray/zip/mod.rs.html#951-962' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Tests if every element of the iterator matches a predicate.</p>
@@ -1643,7 +1910,7 @@ D&gt; <span class="where fmt-newline">where<br>
 "../ndarray/trait.IntoNdProducer.html" title=
 "trait ndarray::IntoNdProducer">IntoNdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#952-964' title=
+'../src/ndarray/zip/mod.rs.html#969-981' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Include the producer <code>p</code> in the Zip.</p>
@@ -1675,7 +1942,7 @@ Elem&gt;,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;D2: <a class="trait" href=
 "../ndarray/trait.Dimension.html" title=
 "trait ndarray::Dimension">Dimension</a>,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#971-984' title=
+href='../src/ndarray/zip/mod.rs.html#988-1001' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Include the producer <code>p</code> in the Zip, broadcasting if
@@ -1685,13 +1952,86 @@ shape of <code>self</code>.</p>
 <p><em><strong>Panics</strong></em> if broadcasting isn’t
 possible.</p>
 </div>
+<h4 id='method.apply_collect-4' class="method"><code id=
+'apply_collect.v-4'>pub fn <a href='#method.apply_collect-4' class=
+'fnname'>apply_collect</a>&lt;R&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.FnMut.html"
+title="trait core::ops::function::FnMut">FnMut</a>(P1::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P2::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P3::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P4::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P5::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>) -&gt; R<br>
+) -&gt; <a class="type" href="../ndarray/type.Array.html" title=
+"type ndarray::Array">Array</a>&lt;R, D&gt; <span class=
+"where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html"
+title=
+"trait core::marker::Copy">Copy</a>,&nbsp;</span></code><a class=
+'srclink' href='../src/ndarray/zip/mod.rs.html#1010-1020' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and collect the results into a new array, which has the
+same size as the inputs.</p>
+<p>If all inputs are c- or f-order respectively, that is preserved
+in the output.</p>
+<p>Restricted to functions that produce copyable results for
+technical reasons; other cases are not yet implemented.</p>
+</div>
+<h4 id='method.apply_assign_into-4' class="method"><code id=
+'apply_assign_into.v-4'>pub fn <a href=
+'#method.apply_assign_into-4' class=
+'fnname'>apply_assign_into</a>&lt;R, Q&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;into: Q,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.FnMut.html"
+title="trait core::ops::function::FnMut">FnMut</a>(P1::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P2::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P3::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P4::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>, P5::<a class=
+"type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
+title="type ndarray::NdProducer::Item">Item</a>) -&gt; R<br>
+) <span class="where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q: <a class="trait" href=
+"../ndarray/trait.IntoNdProducer.html" title=
+"trait ndarray::IntoNdProducer">IntoNdProducer</a>&lt;Dim =
+D&gt;,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q::<a class="type" href=
+"../ndarray/trait.IntoNdProducer.html#associatedtype.Item" title=
+"type ndarray::IntoNdProducer::Item">Item</a>: <a class="trait"
+href="../ndarray/trait.AssignElem.html" title=
+"trait ndarray::AssignElem">AssignElem</a>&lt;R&gt;,&nbsp;</span></code><a class='srclink'
+href='../src/ndarray/zip/mod.rs.html#1027-1035' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and assign the results into the producer
+<code>into</code>, which should have the same size as the other
+inputs.</p>
+<p>The producer should have assignable items as dictated by the
+<code>AssignElem</code> trait, for example <code>&amp;mut
+R</code>.</p>
+</div>
 <h4 id='method.split-4' class="method"><code id='split.v-4'>pub fn
 <a href='#method.split-4' class='fnname'>split</a>(self) -&gt;
 <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a>Self,
 Self<a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#990-1008' title=
+href='../src/ndarray/zip/mod.rs.html#1043-1061' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Split the <code>Zip</code> evenly in two.</p>
@@ -1730,7 +2070,7 @@ D&gt; <span class="where fmt-newline">where<br>
 "trait ndarray::NdProducer">NdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a href='#impl-8' class=
 'anchor'></a><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#855-1009' title=
+'../src/ndarray/zip/mod.rs.html#872-1062' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.apply-5' class="method"><code id='apply.v-5'>pub fn
@@ -1752,7 +2092,7 @@ title="type ndarray::NdProducer::Item">Item</a>, P6::<a class=
 "type" href="../ndarray/trait.NdProducer.html#associatedtype.Item"
 title=
 "type ndarray::NdProducer::Item">Item</a>),&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#861-868' title=
+href='../src/ndarray/zip/mod.rs.html#878-885' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a function to all elements of the input arrays, visiting
@@ -1779,7 +2119,7 @@ href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
 href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
 "type ndarray::NdProducer::Item">Item</a>) -&gt;
 Acc,&nbsp;</span></code><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#898-906' title=
+'../src/ndarray/zip/mod.rs.html#915-923' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a fold function to all elements of the input arrays,
@@ -1866,7 +2206,7 @@ href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
 "type ndarray::NdProducer::Item">Item</a>) -&gt; <a class="enum"
 href="../ndarray/enum.FoldWhile.html" title=
 "enum ndarray::FoldWhile">FoldWhile</a>&lt;Acc&gt;,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#911-919' title=
+href='../src/ndarray/zip/mod.rs.html#928-936' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Apply a fold function to the input arrays while the return value
@@ -1895,7 +2235,7 @@ title="type ndarray::NdProducer::Item">Item</a>, P6::<a class=
 title="type ndarray::NdProducer::Item">Item</a>) -&gt; <a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>,&nbsp;</span></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#934-945' title=
+href='../src/ndarray/zip/mod.rs.html#951-962' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Tests if every element of the iterator matches a predicate.</p>
@@ -1937,7 +2277,7 @@ the input arrays are empty.</p>
 "https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a>Self,
 Self<a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#990-1008' title=
+href='../src/ndarray/zip/mod.rs.html#1043-1061' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Split the <code>Zip</code> evenly in two.</p>
@@ -1968,7 +2308,7 @@ title="trait core::marker::Send">Send</a>,<br>
 "trait ndarray::NdProducer">NdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a href='#impl-9' class=
 'anchor'></a><a class='srclink' href=
-'../src/ndarray/parallel/impl_par_methods.rs.html#49-66' title=
+'../src/ndarray/parallel/impl_par_methods.rs.html#50-103' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.par_apply' class="method"><code id='par_apply.v'>pub
@@ -1986,13 +2326,94 @@ title="trait core::marker::Sync">Sync</a> + <a class="trait" href=
 title=
 "trait core::marker::Send">Send</a>,&nbsp;</span></code><a class=
 'srclink' href=
-'../src/ndarray/parallel/impl_par_methods.rs.html#61-65' title=
+'../src/ndarray/parallel/impl_par_methods.rs.html#62-66' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>The <code>par_apply</code> method for <code>Zip</code>.</p>
 <p>This is a shorthand for using
 <code>.into_par_iter().for_each()</code> on <code>Zip</code>.</p>
 <p>Requires crate feature <code>rayon</code>.</p>
+</div>
+<h4 id='method.par_apply_collect' class="method"><code id=
+'par_apply_collect.v'>pub fn <a href='#method.par_apply_collect'
+class='fnname'>par_apply_collect</a>&lt;R&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.Fn.html"
+title="trait core::ops::function::Fn">Fn</a>(P1::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>) -&gt; R + <a class=
+"trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html"
+title="trait core::marker::Sync">Sync</a> + <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title="trait core::marker::Send">Send</a><br>
+) -&gt; <a class="type" href="../ndarray/type.Array.html" title=
+"type ndarray::Array">Array</a>&lt;R, D&gt; <span class=
+"where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html"
+title="trait core::marker::Copy">Copy</a> + <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title=
+"trait core::marker::Send">Send</a>,&nbsp;</span></code><a class=
+'srclink' href=
+'../src/ndarray/parallel/impl_par_methods.rs.html#77-85' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and collect the results into a new array, which has the
+same size as the inputs.</p>
+<p>If all inputs are c- or f-order respectively, that is preserved
+in the output.</p>
+<p>Restricted to functions that produce copyable results for
+technical reasons; other cases are not yet implemented.</p>
+</div>
+<h4 id='method.par_apply_assign_into' class="method"><code id=
+'par_apply_assign_into.v'>pub fn <a href=
+'#method.par_apply_assign_into' class=
+'fnname'>par_apply_assign_into</a>&lt;R, Q&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;into: Q,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.Fn.html"
+title="trait core::ops::function::Fn">Fn</a>(P1::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>) -&gt; R + <a class=
+"trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html"
+title="trait core::marker::Sync">Sync</a> + <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title="trait core::marker::Send">Send</a><br>
+) <span class="where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q: <a class="trait" href=
+"../ndarray/trait.IntoNdProducer.html" title=
+"trait ndarray::IntoNdProducer">IntoNdProducer</a>&lt;Dim =
+D&gt;,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q::<a class="type" href=
+"../ndarray/trait.IntoNdProducer.html#associatedtype.Item" title=
+"type ndarray::IntoNdProducer::Item">Item</a>: <a class="trait"
+href="../ndarray/trait.AssignElem.html" title=
+"trait ndarray::AssignElem">AssignElem</a>&lt;R&gt; + <a class=
+"trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title="trait core::marker::Send">Send</a>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q::<a class="type" href=
+"../ndarray/trait.IntoNdProducer.html#associatedtype.Output" title=
+"type ndarray::IntoNdProducer::Output">Output</a>: <a class="trait"
+href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title=
+"trait core::marker::Send">Send</a>,&nbsp;</span></code><a class=
+'srclink' href=
+'../src/ndarray/parallel/impl_par_methods.rs.html#92-101' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and assign the results into the producer
+<code>into</code>, which should have the same size as the other
+inputs.</p>
+<p>The producer should have assignable items as dictated by the
+<code>AssignElem</code> trait, for example <code>&amp;mut
+R</code>.</p>
 </div>
 </div>
 <h3 id='impl-10' class='impl'><code class='in-band'>impl&lt;D, P1,
@@ -2029,7 +2450,7 @@ title="trait core::marker::Send">Send</a>,<br>
 "trait ndarray::NdProducer">NdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a href='#impl-10' class=
 'anchor'></a><a class='srclink' href=
-'../src/ndarray/parallel/impl_par_methods.rs.html#49-66' title=
+'../src/ndarray/parallel/impl_par_methods.rs.html#50-103' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.par_apply-1' class="method"><code id=
@@ -2049,13 +2470,99 @@ title="trait core::marker::Sync">Sync</a> + <a class="trait" href=
 title=
 "trait core::marker::Send">Send</a>,&nbsp;</span></code><a class=
 'srclink' href=
-'../src/ndarray/parallel/impl_par_methods.rs.html#61-65' title=
+'../src/ndarray/parallel/impl_par_methods.rs.html#62-66' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>The <code>par_apply</code> method for <code>Zip</code>.</p>
 <p>This is a shorthand for using
 <code>.into_par_iter().for_each()</code> on <code>Zip</code>.</p>
 <p>Requires crate feature <code>rayon</code>.</p>
+</div>
+<h4 id='method.par_apply_collect-1' class="method"><code id=
+'par_apply_collect.v-1'>pub fn <a href=
+'#method.par_apply_collect-1' class=
+'fnname'>par_apply_collect</a>&lt;R&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.Fn.html"
+title="trait core::ops::function::Fn">Fn</a>(P1::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P2::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>) -&gt; R + <a class=
+"trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html"
+title="trait core::marker::Sync">Sync</a> + <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title="trait core::marker::Send">Send</a><br>
+) -&gt; <a class="type" href="../ndarray/type.Array.html" title=
+"type ndarray::Array">Array</a>&lt;R, D&gt; <span class=
+"where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html"
+title="trait core::marker::Copy">Copy</a> + <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title=
+"trait core::marker::Send">Send</a>,&nbsp;</span></code><a class=
+'srclink' href=
+'../src/ndarray/parallel/impl_par_methods.rs.html#77-85' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and collect the results into a new array, which has the
+same size as the inputs.</p>
+<p>If all inputs are c- or f-order respectively, that is preserved
+in the output.</p>
+<p>Restricted to functions that produce copyable results for
+technical reasons; other cases are not yet implemented.</p>
+</div>
+<h4 id='method.par_apply_assign_into-1' class="method"><code id=
+'par_apply_assign_into.v-1'>pub fn <a href=
+'#method.par_apply_assign_into-1' class=
+'fnname'>par_apply_assign_into</a>&lt;R, Q&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;into: Q,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.Fn.html"
+title="trait core::ops::function::Fn">Fn</a>(P1::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P2::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>) -&gt; R + <a class=
+"trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html"
+title="trait core::marker::Sync">Sync</a> + <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title="trait core::marker::Send">Send</a><br>
+) <span class="where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q: <a class="trait" href=
+"../ndarray/trait.IntoNdProducer.html" title=
+"trait ndarray::IntoNdProducer">IntoNdProducer</a>&lt;Dim =
+D&gt;,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q::<a class="type" href=
+"../ndarray/trait.IntoNdProducer.html#associatedtype.Item" title=
+"type ndarray::IntoNdProducer::Item">Item</a>: <a class="trait"
+href="../ndarray/trait.AssignElem.html" title=
+"trait ndarray::AssignElem">AssignElem</a>&lt;R&gt; + <a class=
+"trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title="trait core::marker::Send">Send</a>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q::<a class="type" href=
+"../ndarray/trait.IntoNdProducer.html#associatedtype.Output" title=
+"type ndarray::IntoNdProducer::Output">Output</a>: <a class="trait"
+href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title=
+"trait core::marker::Send">Send</a>,&nbsp;</span></code><a class=
+'srclink' href=
+'../src/ndarray/parallel/impl_par_methods.rs.html#92-101' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and assign the results into the producer
+<code>into</code>, which should have the same size as the other
+inputs.</p>
+<p>The producer should have assignable items as dictated by the
+<code>AssignElem</code> trait, for example <code>&amp;mut
+R</code>.</p>
 </div>
 </div>
 <h3 id='impl-11' class='impl'><code class='in-band'>impl&lt;D, P1,
@@ -2103,7 +2610,7 @@ title="trait core::marker::Send">Send</a>,<br>
 "trait ndarray::NdProducer">NdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a href='#impl-11' class=
 'anchor'></a><a class='srclink' href=
-'../src/ndarray/parallel/impl_par_methods.rs.html#49-66' title=
+'../src/ndarray/parallel/impl_par_methods.rs.html#50-103' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.par_apply-2' class="method"><code id=
@@ -2125,13 +2632,103 @@ title="trait core::marker::Sync">Sync</a> + <a class="trait" href=
 title=
 "trait core::marker::Send">Send</a>,&nbsp;</span></code><a class=
 'srclink' href=
-'../src/ndarray/parallel/impl_par_methods.rs.html#61-65' title=
+'../src/ndarray/parallel/impl_par_methods.rs.html#62-66' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>The <code>par_apply</code> method for <code>Zip</code>.</p>
 <p>This is a shorthand for using
 <code>.into_par_iter().for_each()</code> on <code>Zip</code>.</p>
 <p>Requires crate feature <code>rayon</code>.</p>
+</div>
+<h4 id='method.par_apply_collect-2' class="method"><code id=
+'par_apply_collect.v-2'>pub fn <a href=
+'#method.par_apply_collect-2' class=
+'fnname'>par_apply_collect</a>&lt;R&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.Fn.html"
+title="trait core::ops::function::Fn">Fn</a>(P1::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P2::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P3::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>) -&gt; R + <a class=
+"trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html"
+title="trait core::marker::Sync">Sync</a> + <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title="trait core::marker::Send">Send</a><br>
+) -&gt; <a class="type" href="../ndarray/type.Array.html" title=
+"type ndarray::Array">Array</a>&lt;R, D&gt; <span class=
+"where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html"
+title="trait core::marker::Copy">Copy</a> + <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title=
+"trait core::marker::Send">Send</a>,&nbsp;</span></code><a class=
+'srclink' href=
+'../src/ndarray/parallel/impl_par_methods.rs.html#77-85' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and collect the results into a new array, which has the
+same size as the inputs.</p>
+<p>If all inputs are c- or f-order respectively, that is preserved
+in the output.</p>
+<p>Restricted to functions that produce copyable results for
+technical reasons; other cases are not yet implemented.</p>
+</div>
+<h4 id='method.par_apply_assign_into-2' class="method"><code id=
+'par_apply_assign_into.v-2'>pub fn <a href=
+'#method.par_apply_assign_into-2' class=
+'fnname'>par_apply_assign_into</a>&lt;R, Q&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;into: Q,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.Fn.html"
+title="trait core::ops::function::Fn">Fn</a>(P1::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P2::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P3::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>) -&gt; R + <a class=
+"trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html"
+title="trait core::marker::Sync">Sync</a> + <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title="trait core::marker::Send">Send</a><br>
+) <span class="where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q: <a class="trait" href=
+"../ndarray/trait.IntoNdProducer.html" title=
+"trait ndarray::IntoNdProducer">IntoNdProducer</a>&lt;Dim =
+D&gt;,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q::<a class="type" href=
+"../ndarray/trait.IntoNdProducer.html#associatedtype.Item" title=
+"type ndarray::IntoNdProducer::Item">Item</a>: <a class="trait"
+href="../ndarray/trait.AssignElem.html" title=
+"trait ndarray::AssignElem">AssignElem</a>&lt;R&gt; + <a class=
+"trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title="trait core::marker::Send">Send</a>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q::<a class="type" href=
+"../ndarray/trait.IntoNdProducer.html#associatedtype.Output" title=
+"type ndarray::IntoNdProducer::Output">Output</a>: <a class="trait"
+href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title=
+"trait core::marker::Send">Send</a>,&nbsp;</span></code><a class=
+'srclink' href=
+'../src/ndarray/parallel/impl_par_methods.rs.html#92-101' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and assign the results into the producer
+<code>into</code>, which should have the same size as the other
+inputs.</p>
+<p>The producer should have assignable items as dictated by the
+<code>AssignElem</code> trait, for example <code>&amp;mut
+R</code>.</p>
 </div>
 </div>
 <h3 id='impl-12' class='impl'><code class='in-band'>impl&lt;D, P1,
@@ -2190,7 +2787,7 @@ title="trait core::marker::Send">Send</a>,<br>
 "trait ndarray::NdProducer">NdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a href='#impl-12' class=
 'anchor'></a><a class='srclink' href=
-'../src/ndarray/parallel/impl_par_methods.rs.html#49-66' title=
+'../src/ndarray/parallel/impl_par_methods.rs.html#50-103' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.par_apply-3' class="method"><code id=
@@ -2214,13 +2811,107 @@ title="trait core::marker::Sync">Sync</a> + <a class="trait" href=
 title=
 "trait core::marker::Send">Send</a>,&nbsp;</span></code><a class=
 'srclink' href=
-'../src/ndarray/parallel/impl_par_methods.rs.html#61-65' title=
+'../src/ndarray/parallel/impl_par_methods.rs.html#62-66' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>The <code>par_apply</code> method for <code>Zip</code>.</p>
 <p>This is a shorthand for using
 <code>.into_par_iter().for_each()</code> on <code>Zip</code>.</p>
 <p>Requires crate feature <code>rayon</code>.</p>
+</div>
+<h4 id='method.par_apply_collect-3' class="method"><code id=
+'par_apply_collect.v-3'>pub fn <a href=
+'#method.par_apply_collect-3' class=
+'fnname'>par_apply_collect</a>&lt;R&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.Fn.html"
+title="trait core::ops::function::Fn">Fn</a>(P1::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P2::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P3::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P4::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>) -&gt; R + <a class=
+"trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html"
+title="trait core::marker::Sync">Sync</a> + <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title="trait core::marker::Send">Send</a><br>
+) -&gt; <a class="type" href="../ndarray/type.Array.html" title=
+"type ndarray::Array">Array</a>&lt;R, D&gt; <span class=
+"where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html"
+title="trait core::marker::Copy">Copy</a> + <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title=
+"trait core::marker::Send">Send</a>,&nbsp;</span></code><a class=
+'srclink' href=
+'../src/ndarray/parallel/impl_par_methods.rs.html#77-85' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and collect the results into a new array, which has the
+same size as the inputs.</p>
+<p>If all inputs are c- or f-order respectively, that is preserved
+in the output.</p>
+<p>Restricted to functions that produce copyable results for
+technical reasons; other cases are not yet implemented.</p>
+</div>
+<h4 id='method.par_apply_assign_into-3' class="method"><code id=
+'par_apply_assign_into.v-3'>pub fn <a href=
+'#method.par_apply_assign_into-3' class=
+'fnname'>par_apply_assign_into</a>&lt;R, Q&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;into: Q,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.Fn.html"
+title="trait core::ops::function::Fn">Fn</a>(P1::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P2::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P3::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P4::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>) -&gt; R + <a class=
+"trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html"
+title="trait core::marker::Sync">Sync</a> + <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title="trait core::marker::Send">Send</a><br>
+) <span class="where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q: <a class="trait" href=
+"../ndarray/trait.IntoNdProducer.html" title=
+"trait ndarray::IntoNdProducer">IntoNdProducer</a>&lt;Dim =
+D&gt;,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q::<a class="type" href=
+"../ndarray/trait.IntoNdProducer.html#associatedtype.Item" title=
+"type ndarray::IntoNdProducer::Item">Item</a>: <a class="trait"
+href="../ndarray/trait.AssignElem.html" title=
+"trait ndarray::AssignElem">AssignElem</a>&lt;R&gt; + <a class=
+"trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title="trait core::marker::Send">Send</a>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q::<a class="type" href=
+"../ndarray/trait.IntoNdProducer.html#associatedtype.Output" title=
+"type ndarray::IntoNdProducer::Output">Output</a>: <a class="trait"
+href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title=
+"trait core::marker::Send">Send</a>,&nbsp;</span></code><a class=
+'srclink' href=
+'../src/ndarray/parallel/impl_par_methods.rs.html#92-101' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and assign the results into the producer
+<code>into</code>, which should have the same size as the other
+inputs.</p>
+<p>The producer should have assignable items as dictated by the
+<code>AssignElem</code> trait, for example <code>&amp;mut
+R</code>.</p>
 </div>
 </div>
 <h3 id='impl-13' class='impl'><code class='in-band'>impl&lt;D, P1,
@@ -2291,7 +2982,7 @@ title="trait core::marker::Send">Send</a>,<br>
 "trait ndarray::NdProducer">NdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a href='#impl-13' class=
 'anchor'></a><a class='srclink' href=
-'../src/ndarray/parallel/impl_par_methods.rs.html#49-66' title=
+'../src/ndarray/parallel/impl_par_methods.rs.html#50-103' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.par_apply-4' class="method"><code id=
@@ -2317,13 +3008,111 @@ title="trait core::marker::Sync">Sync</a> + <a class="trait" href=
 title=
 "trait core::marker::Send">Send</a>,&nbsp;</span></code><a class=
 'srclink' href=
-'../src/ndarray/parallel/impl_par_methods.rs.html#61-65' title=
+'../src/ndarray/parallel/impl_par_methods.rs.html#62-66' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>The <code>par_apply</code> method for <code>Zip</code>.</p>
 <p>This is a shorthand for using
 <code>.into_par_iter().for_each()</code> on <code>Zip</code>.</p>
 <p>Requires crate feature <code>rayon</code>.</p>
+</div>
+<h4 id='method.par_apply_collect-4' class="method"><code id=
+'par_apply_collect.v-4'>pub fn <a href=
+'#method.par_apply_collect-4' class=
+'fnname'>par_apply_collect</a>&lt;R&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.Fn.html"
+title="trait core::ops::function::Fn">Fn</a>(P1::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P2::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P3::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P4::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P5::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>) -&gt; R + <a class=
+"trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html"
+title="trait core::marker::Sync">Sync</a> + <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title="trait core::marker::Send">Send</a><br>
+) -&gt; <a class="type" href="../ndarray/type.Array.html" title=
+"type ndarray::Array">Array</a>&lt;R, D&gt; <span class=
+"where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html"
+title="trait core::marker::Copy">Copy</a> + <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title=
+"trait core::marker::Send">Send</a>,&nbsp;</span></code><a class=
+'srclink' href=
+'../src/ndarray/parallel/impl_par_methods.rs.html#77-85' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and collect the results into a new array, which has the
+same size as the inputs.</p>
+<p>If all inputs are c- or f-order respectively, that is preserved
+in the output.</p>
+<p>Restricted to functions that produce copyable results for
+technical reasons; other cases are not yet implemented.</p>
+</div>
+<h4 id='method.par_apply_assign_into-4' class="method"><code id=
+'par_apply_assign_into.v-4'>pub fn <a href=
+'#method.par_apply_assign_into-4' class=
+'fnname'>par_apply_assign_into</a>&lt;R, Q&gt;(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;into: Q,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;f: impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.Fn.html"
+title="trait core::ops::function::Fn">Fn</a>(P1::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P2::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P3::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P4::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>, P5::<a class="type"
+href="../ndarray/trait.NdProducer.html#associatedtype.Item" title=
+"type ndarray::NdProducer::Item">Item</a>) -&gt; R + <a class=
+"trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html"
+title="trait core::marker::Sync">Sync</a> + <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title="trait core::marker::Send">Send</a><br>
+) <span class="where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q: <a class="trait" href=
+"../ndarray/trait.IntoNdProducer.html" title=
+"trait ndarray::IntoNdProducer">IntoNdProducer</a>&lt;Dim =
+D&gt;,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q::<a class="type" href=
+"../ndarray/trait.IntoNdProducer.html#associatedtype.Item" title=
+"type ndarray::IntoNdProducer::Item">Item</a>: <a class="trait"
+href="../ndarray/trait.AssignElem.html" title=
+"trait ndarray::AssignElem">AssignElem</a>&lt;R&gt; + <a class=
+"trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title="trait core::marker::Send">Send</a>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Q::<a class="type" href=
+"../ndarray/trait.IntoNdProducer.html#associatedtype.Output" title=
+"type ndarray::IntoNdProducer::Output">Output</a>: <a class="trait"
+href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Send.html"
+title=
+"trait core::marker::Send">Send</a>,&nbsp;</span></code><a class=
+'srclink' href=
+'../src/ndarray/parallel/impl_par_methods.rs.html#92-101' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Apply and assign the results into the producer
+<code>into</code>, which should have the same size as the other
+inputs.</p>
+<p>The producer should have assignable items as dictated by the
+<code>AssignElem</code> trait, for example <code>&amp;mut
+R</code>.</p>
 </div>
 </div>
 <h3 id='impl-14' class='impl'><code class='in-band'>impl&lt;D, P1,
@@ -2405,7 +3194,7 @@ title="trait core::marker::Send">Send</a>,<br>
 "trait ndarray::NdProducer">NdProducer</a>&lt;Dim =
 D&gt;,&nbsp;</span></code><a href='#impl-14' class=
 'anchor'></a><a class='srclink' href=
-'../src/ndarray/parallel/impl_par_methods.rs.html#49-66' title=
+'../src/ndarray/parallel/impl_par_methods.rs.html#50-103' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.par_apply-5' class="method"><code id=
@@ -2433,7 +3222,7 @@ title="trait core::marker::Sync">Sync</a> + <a class="trait" href=
 title=
 "trait core::marker::Send">Send</a>,&nbsp;</span></code><a class=
 'srclink' href=
-'../src/ndarray/parallel/impl_par_methods.rs.html#61-65' title=
+'../src/ndarray/parallel/impl_par_methods.rs.html#62-66' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>The <code>par_apply</code> method for <code>Zip</code>.</p>
@@ -2442,9 +3231,10 @@ title=
 <p>Requires crate feature <code>rayon</code>.</p>
 </div>
 </div>
-<h2 id='implementations' class='small-section-header'>Trait
-Implementations<a href='#implementations' class='anchor'></a></h2>
-<div id='implementations-list'>
+<h2 id='trait-implementations' class='small-section-header'>Trait
+Implementations<a href='#trait-implementations' class=
+'anchor'></a></h2>
+<div id='trait-implementations-list'>
 <h3 id='impl-Clone' class='impl'><code class=
 'in-band'>impl&lt;Parts:&nbsp;<a class="trait" href=
 "https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html"
@@ -2458,7 +3248,7 @@ title="trait core::clone::Clone">Clone</a> for <a class="struct"
 href="../ndarray/struct.Zip.html" title=
 "struct ndarray::Zip">Zip</a>&lt;Parts, D&gt;</code><a href=
 '#impl-Clone' class='anchor'></a><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#575' title=
+'../src/ndarray/zip/mod.rs.html#585' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.clone' class="method hidden"><code id='clone.v'>fn
@@ -2467,7 +3257,7 @@ href="../ndarray/struct.Zip.html" title=
 class='fnname'>clone</a>(&amp;self) -&gt; <a class="struct" href=
 "../ndarray/struct.Zip.html" title=
 "struct ndarray::Zip">Zip</a>&lt;Parts, D&gt;</code><a class=
-'srclink' href='../src/ndarray/zip/mod.rs.html#575' title=
+'srclink' href='../src/ndarray/zip/mod.rs.html#585' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Returns a copy of the value. <a href=
@@ -2501,7 +3291,7 @@ title="trait core::fmt::Debug">Debug</a> for <a class="struct"
 href="../ndarray/struct.Zip.html" title=
 "struct ndarray::Zip">Zip</a>&lt;Parts, D&gt;</code><a href=
 '#impl-Debug' class='anchor'></a><a class='srclink' href=
-'../src/ndarray/zip/mod.rs.html#575' title=
+'../src/ndarray/zip/mod.rs.html#585' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.fmt' class="method hidden"><code id='fmt.v'>fn
@@ -2514,7 +3304,7 @@ title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class=
 "type" href=
 "https://doc.rust-lang.org/nightly/core/fmt/type.Result.html"
 title="type core::fmt::Result">Result</a></code><a class='srclink'
-href='../src/ndarray/zip/mod.rs.html#575' title=
+href='../src/ndarray/zip/mod.rs.html#585' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Formats the value using the given formatter. <a href=
@@ -3305,14 +4095,14 @@ Read more</a></p>
 title="trait core::convert::From">From</a>&lt;T&gt; for
 T</code><a href='#impl-From%3CT%3E' class='anchor'></a><a class=
 'srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#564-568'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#565-569'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.from-1' class="method hidden"><code id='from.v-1'>fn
 <a href=
 'https://doc.rust-lang.org/nightly/core/convert/trait.From.html#tymethod.from'
 class='fnname'>from</a>(t: T) -&gt; T</code><a class='srclink'
-href='https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#565-567'
+href='https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#566-568'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the conversion.</p>
@@ -3328,14 +4118,14 @@ title="trait core::convert::Into">Into</a>&lt;U&gt; for T
 title=
 "trait core::convert::From">From</a>&lt;T&gt;,&nbsp;</span></code><a href='#impl-Into%3CU%3E'
 class='anchor'></a><a class='srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#553-560'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#554-561'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.into' class="method hidden"><code id='into.v'>fn
 <a href=
 'https://doc.rust-lang.org/nightly/core/convert/trait.Into.html#tymethod.into'
 class='fnname'>into</a>(self) -&gt; U</code><a class='srclink'
-href='https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#557-559'
+href='https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#558-560'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the conversion.</p>
@@ -3453,7 +4243,7 @@ title="trait core::convert::TryFrom">TryFrom</a>&lt;U&gt; for T
 title=
 "trait core::convert::Into">Into</a>&lt;T&gt;,&nbsp;</span></code><a href='#impl-TryFrom%3CU%3E'
 class='anchor'></a><a class='srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#601-610'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#602-611'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='associatedtype.Error' class="type"><code id='Error.t'>type
@@ -3480,7 +4270,7 @@ title=
 title=
 "type core::convert::TryFrom::Error">Error</a>&gt;</code><a class=
 'srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#607-609'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#608-610'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the conversion.</p>
@@ -3496,7 +4286,7 @@ title="trait core::convert::TryInto">TryInto</a>&lt;U&gt; for T
 title=
 "trait core::convert::TryFrom">TryFrom</a>&lt;T&gt;,&nbsp;</span></code><a href='#impl-TryInto%3CU%3E'
 class='anchor'></a><a class='srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#587-596'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#588-597'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='associatedtype.Error-1' class="type"><code id=
@@ -3527,7 +4317,7 @@ title=
 title=
 "type core::convert::TryFrom::Error">Error</a>&gt;</code><a class=
 'srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#593-595'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#594-596'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the conversion.</p>
@@ -3540,7 +4330,6 @@ title='goto source code'>[src]</a></h4>
 <script>
 window.rootPath = "../";window.currentCrate = "ndarray";
 </script>
-<script src="../aliases.js"></script>
 <script src="../main.js"></script>
 <script defer src="../search-index.js"></script>
 </body>

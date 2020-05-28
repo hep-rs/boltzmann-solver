@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.16/src/parse.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.27/src/parse.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>parse.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -1295,6 +1295,29 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="1220">1220</span>
 <span id="1221">1221</span>
 <span id="1222">1222</span>
+<span id="1223">1223</span>
+<span id="1224">1224</span>
+<span id="1225">1225</span>
+<span id="1226">1226</span>
+<span id="1227">1227</span>
+<span id="1228">1228</span>
+<span id="1229">1229</span>
+<span id="1230">1230</span>
+<span id="1231">1231</span>
+<span id="1232">1232</span>
+<span id="1233">1233</span>
+<span id="1234">1234</span>
+<span id="1235">1235</span>
+<span id="1236">1236</span>
+<span id="1237">1237</span>
+<span id="1238">1238</span>
+<span id="1239">1239</span>
+<span id="1240">1240</span>
+<span id="1241">1241</span>
+<span id="1242">1242</span>
+<span id="1243">1243</span>
+<span id="1244">1244</span>
+<span id="1245">1245</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -1566,7 +1589,7 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="doccomment">//! ---</span>
 <span class="doccomment">//!</span>
 <span class=
-"doccomment">//! *This module is available if Syn is built with the `"parsing"` feature.*</span>
+"doccomment">//! *This module is available only if Syn is built with the `"parsing"` feature.*</span>
 
 <span class="attribute">#[<span class=
 "ident">path</span> <span class="op">=</span> <span class=
@@ -1760,8 +1783,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">drop</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class=
-"op">!</span><span class="self">self</span>.<span class=
-"ident">is_empty</span>() {
+"kw">let</span> <span class="prelude-val">Some</span>(<span class=
+"ident">unexpected_span</span>) <span class=
+"op">=</span> <span class=
+"ident">span_of_unexpected_ignoring_nones</span>(<span class=
+"self">self</span>.<span class="ident">cursor</span>()) {
             <span class="kw">let</span> (<span class=
 "ident">inner</span>, <span class=
 "ident">old_span</span>) <span class="op">=</span> <span class=
@@ -1772,8 +1798,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">set</span>(<span class=
 "ident">Unexpected</span>::<span class=
 "prelude-val">Some</span>(<span class=
-"self">self</span>.<span class="ident">cursor</span>().<span class=
-"ident">span</span>()));
+"ident">unexpected_span</span>));
             }
         }
     }
@@ -2134,6 +2159,42 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="ident">cell_clone</span>(<span class=
 "kw-2">&</span><span class="ident">buffer</span>.<span class=
 "ident">unexpected</span>).<span class="ident">unwrap</span>()
+}
+
+<span class="kw">fn</span> <span class=
+"ident">span_of_unexpected_ignoring_nones</span>(<span class=
+"kw-2">mut</span> <span class="ident">cursor</span>: <span class=
+"ident">Cursor</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Option</span><span class=
+"op">&lt;</span><span class="ident">Span</span><span class=
+"op">&gt;</span> {
+    <span class="kw">if</span> <span class=
+"ident">cursor</span>.<span class="ident">eof</span>() {
+        <span class="kw">return</span> <span class=
+"prelude-val">None</span>;
+    }
+    <span class="kw">while</span> <span class=
+"kw">let</span> <span class="prelude-val">Some</span>((<span class=
+"ident">inner</span>, <span class=
+"ident">_span</span>, <span class="ident">rest</span>)) <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">group</span>(<span class="ident">Delimiter</span>::<span class="prelude-val">None</span>) {
+        <span class="kw">if</span> <span class=
+"kw">let</span> <span class="prelude-val">Some</span>(<span class=
+"ident">unexpected</span>) <span class="op">=</span> <span class=
+"ident">span_of_unexpected_ignoring_nones</span>(<span class=
+"ident">inner</span>) {
+            <span class="kw">return</span> <span class=
+"prelude-val">Some</span>(<span class="ident">unexpected</span>);
+        }
+        <span class="ident">cursor</span> <span class=
+"op">=</span> <span class="ident">rest</span>;
+    }
+    <span class="kw">if</span> <span class=
+"ident">cursor</span>.<span class="ident">eof</span>() {
+        <span class="prelude-val">None</span>
+    } <span class="kw">else</span> {
+        <span class="prelude-val">Some</span>(<span class=
+"ident">cursor</span>.<span class="ident">span</span>())
+    }
 }
 
 <span class="kw">impl</span><span class=
@@ -3324,7 +3385,7 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="doccomment">/// [module documentation]: self</span>
 <span class="doccomment">///</span>
 <span class=
-"doccomment">/// *This trait is available if Syn is built with the `"parsing"` feature.*</span>
+"doccomment">/// *This trait is available only if Syn is built with the `"parsing"` feature.*</span>
 <span class="kw">pub</span> <span class=
 "kw">trait</span> <span class="ident">Parser</span>: <span class=
 "ident">Sized</span> {
@@ -3354,7 +3415,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// any unparsed tokens at the end of the stream, an error is returned.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This method is available if Syn is built with both the `"parsing"` and</span>
+"doccomment">/// *This method is available only if Syn is built with both the `"parsing"` and</span>
     <span class="doccomment">/// `"proc-macro"` features.*</span>
     <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class="ident">all</span>(
@@ -3417,6 +3478,12 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="comment">// Not public API.</span>
     <span class="attribute">#[<span class=
 "ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"full"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"derive"</span>))]</span>
     <span class="kw">fn</span> <span class=
 "ident">__parse_scoped</span>(<span class=
 "self">self</span>, <span class="ident">scope</span>: <span class=
@@ -3432,6 +3499,12 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="comment">// Not public API.</span>
     <span class="attribute">#[<span class=
 "ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"full"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"derive"</span>))]</span>
     <span class="kw">fn</span> <span class=
 "ident">__parse_stream</span>(<span class=
 "self">self</span>, <span class="ident">input</span>: <span class=
@@ -3509,18 +3582,29 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">check_unexpected</span>()<span class=
 "question-mark">?</span>;
         <span class="kw">if</span> <span class=
-"ident">state</span>.<span class="ident">is_empty</span>() {
+"kw">let</span> <span class="prelude-val">Some</span>(<span class=
+"ident">unexpected_span</span>) <span class=
+"op">=</span> <span class=
+"ident">span_of_unexpected_ignoring_nones</span>(<span class=
+"ident">state</span>.<span class="ident">cursor</span>()) {
+            <span class="prelude-val">Err</span>(<span class=
+"ident">Error</span>::<span class="ident">new</span>(<span class=
+"ident">unexpected_span</span>, <span class=
+"string">"unexpected token"</span>))
+        } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(<span class=
 "ident">node</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class=
-"ident">state</span>.<span class="ident">error</span>(<span class=
-"string">"unexpected token"</span>))
         }
     }
 
     <span class="attribute">#[<span class=
 "ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"full"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"derive"</span>))]</span>
     <span class="kw">fn</span> <span class=
 "ident">__parse_scoped</span>(<span class=
 "self">self</span>, <span class="ident">scope</span>: <span class=
@@ -3551,18 +3635,29 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">check_unexpected</span>()<span class=
 "question-mark">?</span>;
         <span class="kw">if</span> <span class=
-"ident">state</span>.<span class="ident">is_empty</span>() {
+"kw">let</span> <span class="prelude-val">Some</span>(<span class=
+"ident">unexpected_span</span>) <span class=
+"op">=</span> <span class=
+"ident">span_of_unexpected_ignoring_nones</span>(<span class=
+"ident">state</span>.<span class="ident">cursor</span>()) {
+            <span class="prelude-val">Err</span>(<span class=
+"ident">Error</span>::<span class="ident">new</span>(<span class=
+"ident">unexpected_span</span>, <span class=
+"string">"unexpected token"</span>))
+        } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(<span class=
 "ident">node</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class=
-"ident">state</span>.<span class="ident">error</span>(<span class=
-"string">"unexpected token"</span>))
         }
     }
 
     <span class="attribute">#[<span class=
 "ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"full"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"derive"</span>))]</span>
     <span class="kw">fn</span> <span class=
 "ident">__parse_stream</span>(<span class=
 "self">self</span>, <span class="ident">input</span>: <span class=
@@ -3575,6 +3670,12 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 }
 
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"full"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"derive"</span>))]</span>
 <span class="kw">pub</span>(<span class=
 "kw">crate</span>) <span class="kw">fn</span> <span class=
 "ident">parse_scoped</span><span class="op">&lt;</span><span class=
@@ -3588,6 +3689,12 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">scope</span>, <span class="ident">tokens</span>)
 }
 
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"full"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"derive"</span>))]</span>
 <span class="kw">pub</span>(<span class=
 "kw">crate</span>) <span class="kw">fn</span> <span class=
 "ident">parse_stream</span><span class="op">&lt;</span><span class=
@@ -3657,7 +3764,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "syn";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.0/src/impl_owned_array.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.1/src/impl_owned_array.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>impl_owned_array.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -132,9 +132,11 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="57">57</span>
 <span id="58">58</span>
 <span id="59">59</span>
+<span id="60">60</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
+
 <span class="kw">use</span> <span class=
 "kw">crate</span>::<span class=
 "ident">imp_prelude</span>::<span class="kw-2">*</span>;
@@ -172,9 +174,8 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">into_scalar</span>(<span class=
-"kw-2">mut</span> <span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"ident">A</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">A</span> {
         <span class="kw">let</span> <span class=
 "ident">size</span> <span class="op">=</span> ::<span class=
 "ident">std</span>::<span class="ident">mem</span>::<span class=
@@ -186,7 +187,8 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class=
 "comment">// Any index in the `Vec` is fine since all elements are identical.</span>
             <span class="self">self</span>.<span class=
-"ident">data</span>.<span class="number">0</span>.<span class=
+"ident">data</span>.<span class=
+"ident">into_vec</span>().<span class=
 "ident">remove</span>(<span class="number">0</span>)
         } <span class="kw">else</span> {
             <span class=
@@ -205,8 +207,8 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="kw">let</span> <span class=
 "ident">base</span> <span class="op">=</span> <span class=
 "self">self</span>.<span class="ident">data</span>.<span class=
-"number">0</span>.<span class="ident">as_ptr</span>() <span class=
-"kw">as</span> <span class="ident">usize</span>;
+"ident">as_ptr</span>() <span class="kw">as</span> <span class=
+"ident">usize</span>;
             <span class="kw">let</span> <span class=
 "ident">index</span> <span class="op">=</span> (<span class=
 "ident">first</span> <span class="op">-</span> <span class=
@@ -220,7 +222,8 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class=
 "comment">// Remove the element at the index and return it.</span>
             <span class="self">self</span>.<span class=
-"ident">data</span>.<span class="number">0</span>.<span class=
+"ident">data</span>.<span class=
+"ident">into_vec</span>().<span class=
 "ident">remove</span>(<span class="ident">index</span>)
         }
     }
@@ -258,7 +261,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&lt;</span><span class="ident">A</span><span class=
 "op">&gt;</span> {
         <span class="self">self</span>.<span class=
-"ident">data</span>.<span class="number">0</span>
+"ident">data</span>.<span class="ident">into_vec</span>()
     }
 }
 </pre></div>
@@ -268,7 +271,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "ndarray";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

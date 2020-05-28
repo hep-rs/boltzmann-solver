@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.16/src/error.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.27/src/error.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>error.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -440,6 +440,14 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="365">365</span>
 <span id="366">366</span>
 <span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -1235,6 +1243,28 @@ autocomplete="off" spellcheck="false" placeholder=
         })
     }
 }
+
+<span class="kw">impl</span> <span class=
+"ident">Extend</span><span class="op">&lt;</span><span class=
+"ident">Error</span><span class="op">&gt;</span> <span class=
+"kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class=
+"ident">extend</span><span class="op">&lt;</span><span class=
+"ident">T</span>: <span class=
+"ident">IntoIterator</span><span class="op">&lt;</span><span class=
+"ident">Item</span> <span class="op">=</span> <span class=
+"ident">Error</span><span class="op">&gt;</span><span class=
+"op">&gt;</span>(<span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="self">self</span>, <span class=
+"ident">iter</span>: <span class="ident">T</span>) {
+        <span class="kw">for</span> <span class=
+"ident">err</span> <span class="kw">in</span> <span class=
+"ident">iter</span> {
+            <span class="self">self</span>.<span class=
+"ident">combine</span>(<span class="ident">err</span>);
+        }
+    }
+}
 </pre></div>
 </section>
 <section id="search" class="content hidden"></section>
@@ -1242,7 +1272,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "syn";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

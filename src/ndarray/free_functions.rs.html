@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.0/src/free_functions.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.1/src/free_functions.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>free_functions.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -393,18 +393,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="318">318</span>
 <span id="319">319</span>
 <span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -428,39 +416,35 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">std</span>::<span class="ident">slice</span>;
 
 <span class="kw">use</span> <span class=
-"kw">crate</span>::<span class="ident">dimension</span>;
-<span class="kw">use</span> <span class=
 "kw">crate</span>::<span class=
 "ident">imp_prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class=
+"kw">crate</span>::{<span class=
+"ident">dimension</span>, <span class=
+"ident">ArcArray1</span>, <span class="ident">ArcArray2</span>};
 
 <span class=
 "doccomment">/// Create an [**`Array`**](type.Array.html) with one, two or</span>
 <span class="doccomment">/// three dimensions.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// extern crate ndarray;</span>
-<span class="doccomment">///</span>
 <span class="doccomment">/// use ndarray::array;</span>
+<span class="doccomment">/// let a1 = array![1, 2, 3, 4];</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// fn main() {</span>
-<span class=
-"doccomment">///     let a1 = array![1, 2, 3, 4];</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     let a2 = array![[1, 2],</span>
-<span class="doccomment">///                     [3, 4]];</span>
+<span class="doccomment">/// let a2 = array![[1, 2],</span>
+<span class="doccomment">///                 [3, 4]];</span>
 <span class="doccomment">///</span>
 <span class=
-"doccomment">///     let a3 = array![[[1, 2], [3, 4]],</span>
+"doccomment">/// let a3 = array![[[1, 2], [3, 4]],</span>
 <span class=
-"doccomment">///                     [[5, 6], [7, 8]]];</span>
+"doccomment">///                 [[5, 6], [7, 8]]];</span>
 <span class="doccomment">///</span>
 <span class=
-"doccomment">///     assert_eq!(a1.shape(), &amp;[4]);</span>
+"doccomment">/// assert_eq!(a1.shape(), &amp;[4]);</span>
 <span class=
-"doccomment">///     assert_eq!(a2.shape(), &amp;[2, 2]);</span>
+"doccomment">/// assert_eq!(a2.shape(), &amp;[2, 2]);</span>
 <span class=
-"doccomment">///     assert_eq!(a3.shape(), &amp;[2, 2, 2]);</span>
-<span class="doccomment">/// }</span>
+"doccomment">/// assert_eq!(a3.shape(), &amp;[2, 2, 2]);</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class=
@@ -560,9 +544,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span>(<span class="ident">xs</span>: <span class=
 "kw-2">&</span>[<span class="ident">A</span>]) <span class=
 "op">-</span><span class="op">&gt;</span> <span class=
-"ident">ArcArray</span><span class="op">&lt;</span><span class=
-"ident">A</span>, <span class="ident">Ix1</span><span class=
-"op">&gt;</span> {
+"ident">ArcArray1</span><span class="op">&lt;</span><span class=
+"ident">A</span><span class="op">&gt;</span> {
     <span class="ident">arr1</span>(<span class=
 "ident">xs</span>).<span class="ident">into_shared</span>()
 }
@@ -682,23 +665,18 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Create a one-dimensional read-write array view with elements borrowing `xs`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// extern crate ndarray;</span>
-<span class="doccomment">///</span>
 <span class="doccomment">/// use ndarray::{aview_mut1, s};</span>
-<span class="doccomment">///</span>
 <span class=
 "doccomment">/// // Create an array view over some data, then slice it and modify it.</span>
-<span class="doccomment">/// fn main() {</span>
-<span class="doccomment">///     let mut data = [0; 1024];</span>
-<span class="doccomment">///     {</span>
+<span class="doccomment">/// let mut data = [0; 1024];</span>
+<span class="doccomment">/// {</span>
 <span class=
-"doccomment">///         let mut a = aview_mut1(&amp;mut data).into_shape((32, 32)).unwrap();</span>
+"doccomment">///     let mut a = aview_mut1(&amp;mut data).into_shape((32, 32)).unwrap();</span>
 <span class=
-"doccomment">///         a.slice_mut(s![.., ..;3]).fill(5);</span>
-<span class="doccomment">///     }</span>
-<span class=
-"doccomment">///     assert_eq!(&amp;data[..10], [5, 0, 0, 5, 0, 0, 5, 0, 0, 5]);</span>
+"doccomment">///     a.slice_mut(s![.., ..;3]).fill(5);</span>
 <span class="doccomment">/// }</span>
+<span class=
+"doccomment">/// assert_eq!(&amp;data[..10], [5, 0, 0, 5, 0, 0, 5, 0, 0, 5]);</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class=
 "ident">aview_mut1</span><span class="op">&lt;</span><span class=
@@ -726,27 +704,24 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use ndarray::aview_mut2;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// fn main() {</span>
 <span class=
-"doccomment">///     // The inner (nested) array must be of length 1 to 16, but the outer</span>
-<span class="doccomment">///     // can be of any length.</span>
+"doccomment">/// // The inner (nested) array must be of length 1 to 16, but the outer</span>
+<span class="doccomment">/// // can be of any length.</span>
+<span class="doccomment">/// let mut data = [[0.; 2]; 128];</span>
+<span class="doccomment">/// {</span>
 <span class=
-"doccomment">///     let mut data = [[0.; 2]; 128];</span>
-<span class="doccomment">///     {</span>
+"doccomment">///     // Make a 128 x 2 mut array view then turn it into 2 x 128</span>
 <span class=
-"doccomment">///         // Make a 128 x 2 mut array view then turn it into 2 x 128</span>
+"doccomment">///     let mut a = aview_mut2(&amp;mut data).reversed_axes();</span>
 <span class=
-"doccomment">///         let mut a = aview_mut2(&amp;mut data).reversed_axes();</span>
-<span class=
-"doccomment">///         // Make the first row ones and second row minus ones.</span>
-<span class="doccomment">///         a.row_mut(0).fill(1.);</span>
-<span class="doccomment">///         a.row_mut(1).fill(-1.);</span>
-<span class="doccomment">///     }</span>
-<span class=
-"doccomment">///     // look at the start of the result</span>
-<span class=
-"doccomment">///     assert_eq!(&amp;data[..3], [[1., -1.], [1., -1.], [1., -1.]]);</span>
+"doccomment">///     // Make the first row ones and second row minus ones.</span>
+<span class="doccomment">///     a.row_mut(0).fill(1.);</span>
+<span class="doccomment">///     a.row_mut(1).fill(-1.);</span>
 <span class="doccomment">/// }</span>
+<span class=
+"doccomment">/// // look at the start of the result</span>
+<span class=
+"doccomment">/// assert_eq!(&amp;data[..3], [[1., -1.], [1., -1.], [1., -1.]]);</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class=
 "ident">aview_mut2</span><span class="op">&lt;</span><span class=
@@ -1136,9 +1111,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span><span class="op">&gt;</span>(<span class=
 "ident">xs</span>: <span class="kw-2">&</span>[<span class=
 "ident">V</span>]) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">ArcArray</span><span class=
-"op">&lt;</span><span class="ident">A</span>, <span class=
-"ident">Ix2</span><span class="op">&gt;</span> {
+"op">&gt;</span> <span class="ident">ArcArray2</span><span class=
+"op">&lt;</span><span class="ident">A</span><span class=
+"op">&gt;</span> {
     <span class="ident">arr2</span>(<span class=
 "ident">xs</span>).<span class="ident">into_shared</span>()
 }
@@ -1223,7 +1198,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "ndarray";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

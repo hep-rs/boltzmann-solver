@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.0/src/impl_methods.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.1/src/impl_methods.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>impl_methods.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -2363,6 +2363,60 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="2288">2288</span>
 <span id="2289">2289</span>
 <span id="2290">2290</span>
+<span id="2291">2291</span>
+<span id="2292">2292</span>
+<span id="2293">2293</span>
+<span id="2294">2294</span>
+<span id="2295">2295</span>
+<span id="2296">2296</span>
+<span id="2297">2297</span>
+<span id="2298">2298</span>
+<span id="2299">2299</span>
+<span id="2300">2300</span>
+<span id="2301">2301</span>
+<span id="2302">2302</span>
+<span id="2303">2303</span>
+<span id="2304">2304</span>
+<span id="2305">2305</span>
+<span id="2306">2306</span>
+<span id="2307">2307</span>
+<span id="2308">2308</span>
+<span id="2309">2309</span>
+<span id="2310">2310</span>
+<span id="2311">2311</span>
+<span id="2312">2312</span>
+<span id="2313">2313</span>
+<span id="2314">2314</span>
+<span id="2315">2315</span>
+<span id="2316">2316</span>
+<span id="2317">2317</span>
+<span id="2318">2318</span>
+<span id="2319">2319</span>
+<span id="2320">2320</span>
+<span id="2321">2321</span>
+<span id="2322">2322</span>
+<span id="2323">2323</span>
+<span id="2324">2324</span>
+<span id="2325">2325</span>
+<span id="2326">2326</span>
+<span id="2327">2327</span>
+<span id="2328">2328</span>
+<span id="2329">2329</span>
+<span id="2330">2330</span>
+<span id="2331">2331</span>
+<span id="2332">2332</span>
+<span id="2333">2333</span>
+<span id="2334">2334</span>
+<span id="2335">2335</span>
+<span id="2336">2336</span>
+<span id="2337">2337</span>
+<span id="2338">2338</span>
+<span id="2339">2339</span>
+<span id="2340">2340</span>
+<span id="2341">2341</span>
+<span id="2342">2342</span>
+<span id="2343">2343</span>
+<span id="2344">2344</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -2380,16 +2434,11 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="comment">// except according to those terms.</span>
 
 <span class="kw">use</span> <span class=
-"ident">std</span>::<span class="ident">cmp</span>;
-<span class="kw">use</span> <span class=
 "ident">std</span>::<span class="ident">ptr</span> <span class=
 "kw">as</span> <span class="ident">std_ptr</span>;
 <span class="kw">use</span> <span class=
 "ident">std</span>::<span class="ident">slice</span>;
 
-<span class="kw">use</span> <span class=
-"ident">itertools</span>::{<span class=
-"ident">izip</span>, <span class="ident">zip</span>};
 <span class="kw">use</span> <span class=
 "ident">rawpointer</span>::<span class="ident">PointerExt</span>;
 
@@ -2418,6 +2467,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>, <span class=
 "ident">ErrorKind</span>, <span class="ident">ShapeError</span>};
 <span class="kw">use</span> <span class=
+"kw">crate</span>::<span class=
+"ident">itertools</span>::<span class="ident">zip</span>;
+<span class="kw">use</span> <span class=
 "kw">crate</span>::<span class="ident">zip</span>::<span class=
 "ident">Zip</span>;
 
@@ -2436,6 +2488,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Lanes</span>, <span class=
 "ident">LanesMut</span>, <span class="ident">Windows</span>,
 };
+<span class="kw">use</span> <span class=
+"kw">crate</span>::<span class="ident">slice</span>::<span class=
+"ident">MultiSlice</span>;
 <span class="kw">use</span> <span class=
 "kw">crate</span>::<span class=
 "ident">stacking</span>::<span class="ident">stack</span>;
@@ -2669,9 +2724,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">pointer_is_inbounds</span>());
         <span class="kw">unsafe</span> { <span class=
 "ident">ArrayView</span>::<span class=
-"ident">new_</span>(<span class="self">self</span>.<span class=
-"ident">ptr</span>.<span class=
-"ident">as_ptr</span>(), <span class="self">self</span>.<span class="ident">dim</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">strides</span>.<span class="ident">clone</span>()) }
+"ident">new</span>(<span class="self">self</span>.<span class=
+"ident">ptr</span>, <span class="self">self</span>.<span class=
+"ident">dim</span>.<span class="ident">clone</span>(), <span class=
+"self">self</span>.<span class="ident">strides</span>.<span class=
+"ident">clone</span>()) }
     }
 
     <span class=
@@ -2692,9 +2749,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">ensure_unique</span>();
         <span class="kw">unsafe</span> { <span class=
 "ident">ArrayViewMut</span>::<span class=
-"ident">new_</span>(<span class="self">self</span>.<span class=
-"ident">ptr</span>.<span class=
-"ident">as_ptr</span>(), <span class="self">self</span>.<span class="ident">dim</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">strides</span>.<span class="ident">clone</span>()) }
+"ident">new</span>(<span class="self">self</span>.<span class=
+"ident">ptr</span>, <span class="self">self</span>.<span class=
+"ident">dim</span>.<span class="ident">clone</span>(), <span class=
+"self">self</span>.<span class="ident">strides</span>.<span class=
+"ident">clone</span>()) }
     }
 
     <span class=
@@ -3091,6 +3150,66 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="self">self</span>.<span class=
 "ident">view_mut</span>().<span class=
 "ident">slice_move</span>(<span class="ident">info</span>)
+    }
+
+    <span class=
+"doccomment">/// Return multiple disjoint, sliced, mutable views of the array.</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// See [*Slicing*](#slicing) for full documentation.</span>
+    <span class=
+"doccomment">/// See also [`SliceInfo`] and [`D::SliceArg`].</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// [`SliceInfo`]: struct.SliceInfo.html</span>
+    <span class=
+"doccomment">/// [`D::SliceArg`]: trait.Dimension.html#associatedtype.SliceArg</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// **Panics** if any of the following occur:</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// * if any of the views would intersect (i.e. if any element would appear in multiple slices)</span>
+    <span class=
+"doccomment">/// * if an index is out of bounds or step size is zero</span>
+    <span class=
+"doccomment">/// * if `D` is `IxDyn` and `info` does not match the number of array axes</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use ndarray::{arr2, s};</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// let mut a = arr2(&amp;[[1, 2, 3], [4, 5, 6]]);</span>
+    <span class=
+"doccomment">/// let (mut edges, mut middle) = a.multi_slice_mut((s![.., ..;2], s![.., 1]));</span>
+    <span class="doccomment">/// edges.fill(1);</span>
+    <span class="doccomment">/// middle.fill(0);</span>
+    <span class=
+"doccomment">/// assert_eq!(a, arr2(&amp;[[1, 0, 1], [1, 0, 1]]));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class=
+"ident">multi_slice_mut</span><span class=
+"op">&lt;</span><span class="lifetime">'a</span>, <span class=
+"ident">M</span><span class="op">&gt;</span>(<span class=
+"kw-2">&</span><span class="lifetime">'a</span> <span class=
+"kw-2">mut</span> <span class="self">self</span>, <span class=
+"ident">info</span>: <span class="ident">M</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">M</span>::<span class="ident">Output</span>
+    <span class="kw">where</span>
+        <span class="ident">M</span>: <span class=
+"ident">MultiSlice</span><span class="op">&lt;</span><span class=
+"lifetime">'a</span>, <span class="ident">A</span>, <span class=
+"ident">D</span><span class="op">&gt;</span>,
+        <span class="ident">S</span>: <span class=
+"ident">DataMut</span>,
+    {
+        <span class="ident">info</span>.<span class=
+"ident">multi_slice_move</span>(<span class=
+"self">self</span>.<span class="ident">view_mut</span>())
     }
 
     <span class=
@@ -3563,6 +3682,11 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// **Note:** only unchecked for non-debug builds of ndarray.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// The caller must ensure that the index is in-bounds.</span>
     <span class="attribute">#[<span class=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
@@ -3603,9 +3727,20 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Return a mutable reference to the element at `index`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// **Note:** Only unchecked for non-debug builds of ndarray.&lt;br&gt;</span>
+"doccomment">/// **Note:** Only unchecked for non-debug builds of ndarray.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
     <span class=
-"doccomment">/// **Note:** (For `ArcArray`) The array must be uniquely held when mutating it.</span>
+"doccomment">/// The caller must ensure that:</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// 1. the index is in-bounds and</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// 2. the data is uniquely held by the array. (This property is guaranteed</span>
+    <span class=
+"doccomment">///    for `Array` and `ArrayViewMut`, but not for `ArcArray` or `CowArray`.)</span>
     <span class="attribute">#[<span class=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
@@ -3690,9 +3825,20 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// Indices may be equal.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// **Note:** only unchecked for non-debug builds of ndarray.&lt;br&gt;</span>
+"doccomment">/// **Note:** only unchecked for non-debug builds of ndarray.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
     <span class=
-"doccomment">/// **Note:** (For `ArcArray`) The array must be uniquely held.</span>
+"doccomment">/// The caller must ensure that:</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// 1. both `index1 and `index2` are in-bounds and</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// 2. the data is uniquely held by the array. (This property is guaranteed</span>
+    <span class=
+"doccomment">///    for `Array` and `ArrayViewMut`, but not for `ArcArray` or `CowArray`.)</span>
     <span class="kw">pub</span> <span class=
 "kw">unsafe</span> <span class="kw">fn</span> <span class=
 "ident">uswap</span><span class="op">&lt;</span><span class=
@@ -5235,9 +5381,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class=
 "ident">RawArrayView</span>::<span class=
-"ident">new_</span>(<span class="self">self</span>.<span class=
-"ident">ptr</span>.<span class=
-"ident">as_ptr</span>(), <span class="self">self</span>.<span class="ident">dim</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">strides</span>.<span class="ident">clone</span>()) }
+"ident">new</span>(<span class="self">self</span>.<span class=
+"ident">ptr</span>, <span class="self">self</span>.<span class=
+"ident">dim</span>.<span class="ident">clone</span>(), <span class=
+"self">self</span>.<span class="ident">strides</span>.<span class=
+"ident">clone</span>()) }
     }
 
     <span class=
@@ -5261,9 +5409,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "comment">// for RcArray</span>
         <span class="kw">unsafe</span> { <span class=
 "ident">RawArrayViewMut</span>::<span class=
-"ident">new_</span>(<span class="self">self</span>.<span class=
-"ident">ptr</span>.<span class=
-"ident">as_ptr</span>(), <span class="self">self</span>.<span class="ident">dim</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">strides</span>.<span class="ident">clone</span>()) }
+"ident">new</span>(<span class="self">self</span>.<span class=
+"ident">ptr</span>, <span class="self">self</span>.<span class=
+"ident">dim</span>.<span class="ident">clone</span>(), <span class=
+"self">self</span>.<span class="ident">strides</span>.<span class=
+"ident">clone</span>()) }
     }
 
     <span class=
@@ -5404,9 +5554,9 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class=
 "doccomment">/// Transform the array into `shape`; any shape with the same number of</span>
     <span class=
-"doccomment">/// elements is accepted, but the source array or view must be</span>
+"doccomment">/// elements is accepted, but the source array or view must be in standard</span>
     <span class=
-"doccomment">/// contiguous, otherwise we cannot rearrange the dimension.</span>
+"doccomment">/// or column-major (Fortran) layout.</span>
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// **Errors** if the shapes don't have the same number of elements.&lt;br&gt;</span>
@@ -5894,9 +6044,9 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="kw">unsafe</span> { <span class=
 "prelude-val">Some</span>(<span class=
 "ident">ArrayView</span>::<span class=
-"ident">new_</span>(<span class="self">self</span>.<span class=
-"ident">ptr</span>.<span class=
-"ident">as_ptr</span>(), <span class="ident">dim</span>, <span class="ident">broadcast_strides</span>)) }
+"ident">new</span>(<span class="self">self</span>.<span class=
+"ident">ptr</span>, <span class="ident">dim</span>, <span class=
+"ident">broadcast_strides</span>)) }
     }
 
     <span class="doccomment">/// Swap axes `ax` and `bx`.</span>
@@ -6465,42 +6615,39 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro">!</span>(<span class="self">self</span>.<span class=
 "ident">shape</span>(), <span class="ident">rhs</span>.<span class=
 "ident">shape</span>());
+
         <span class="kw">if</span> <span class=
-"kw">let</span> <span class="prelude-val">Some</span>(<span class=
-"ident">self_s</span>) <span class="op">=</span> <span class=
-"self">self</span>.<span class="ident">as_slice_mut</span>() {
+"self">self</span>.<span class="ident">dim</span>.<span class=
+"ident">strides_equivalent</span>(<span class=
+"kw-2">&</span><span class="self">self</span>.<span class=
+"ident">strides</span>, <span class="kw-2">&</span><span class=
+"ident">rhs</span>.<span class="ident">strides</span>) {
             <span class="kw">if</span> <span class=
 "kw">let</span> <span class="prelude-val">Some</span>(<span class=
+"ident">self_s</span>) <span class="op">=</span> <span class=
+"self">self</span>.<span class=
+"ident">as_slice_memory_order_mut</span>() {
+                <span class="kw">if</span> <span class=
+"kw">let</span> <span class="prelude-val">Some</span>(<span class=
 "ident">rhs_s</span>) <span class="op">=</span> <span class=
-"ident">rhs</span>.<span class="ident">as_slice</span>() {
-                <span class="kw">let</span> <span class=
-"ident">len</span> <span class="op">=</span> <span class=
-"ident">cmp</span>::<span class="ident">min</span>(<span class=
-"ident">self_s</span>.<span class=
-"ident">len</span>(), <span class="ident">rhs_s</span>.<span class=
-"ident">len</span>());
-                <span class="kw">let</span> <span class=
-"ident">s</span> <span class="op">=</span> <span class=
-"kw-2">&</span><span class="kw-2">mut</span> <span class=
-"ident">self_s</span>[..<span class="ident">len</span>];
-                <span class="kw">let</span> <span class=
-"ident">r</span> <span class="op">=</span> <span class=
-"kw-2">&</span><span class="ident">rhs_s</span>[..<span class=
-"ident">len</span>];
-                <span class="kw">for</span> <span class=
-"ident">i</span> <span class="kw">in</span> <span class=
-"number">0</span>..<span class="ident">len</span> {
-                    <span class="ident">f</span>(<span class=
-"kw-2">&</span><span class="kw-2">mut</span> <span class=
-"ident">s</span>[<span class="ident">i</span>], <span class=
-"kw-2">&</span><span class="ident">r</span>[<span class=
-"ident">i</span>]);
+"ident">rhs</span>.<span class=
+"ident">as_slice_memory_order</span>() {
+                    <span class="kw">for</span> (<span class=
+"ident">s</span>, <span class="ident">r</span>) <span class=
+"kw">in</span> <span class="ident">self_s</span>.<span class=
+"ident">iter_mut</span>().<span class=
+"ident">zip</span>(<span class="ident">rhs_s</span>) {
+                        <span class="ident">f</span>(<span class=
+"ident">s</span>, <span class="kw-2">&</span><span class=
+"ident">r</span>);
+                    }
+                    <span class="kw">return</span>;
                 }
-                <span class="kw">return</span>;
             }
         }
+
         <span class=
-"comment">// otherwise, fall back to the outer iter</span>
+"comment">// Otherwise, fall back to the outer iter</span>
         <span class="self">self</span>.<span class=
 "ident">zip_mut_with_by_rows</span>(<span class=
 "ident">rhs</span>, <span class="ident">f</span>);
@@ -7243,10 +7390,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>.<span class="ident">dim</span>.<span class=
 "ident">remove_axis</span>(<span class="ident">axis</span>);
             <span class="ident">Array</span>::<span class=
-"ident">from_shape_fn</span>(<span class=
+"ident">from_shape_simple_fn</span>(<span class=
 "ident">new_dim</span>, <span class="kw">move</span> <span class=
-"op">|</span><span class="kw">_</span><span class=
-"op">|</span> <span class="ident">mapping</span>(<span class=
+"op">|</span><span class="op">|</span> <span class=
+"ident">mapping</span>(<span class=
 "ident">ArrayView</span>::<span class=
 "ident">from</span>(<span class="kw-2">&</span>[])))
         } <span class="kw">else</span> {
@@ -7330,10 +7477,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>.<span class="ident">dim</span>.<span class=
 "ident">remove_axis</span>(<span class="ident">axis</span>);
             <span class="ident">Array</span>::<span class=
-"ident">from_shape_fn</span>(<span class=
+"ident">from_shape_simple_fn</span>(<span class=
 "ident">new_dim</span>, <span class="kw">move</span> <span class=
-"op">|</span><span class="kw">_</span><span class=
-"op">|</span> <span class="ident">mapping</span>(<span class=
+"op">|</span><span class="op">|</span> <span class=
+"ident">mapping</span>(<span class=
 "ident">ArrayViewMut</span>::<span class=
 "ident">from</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> [])))
@@ -7479,7 +7626,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "ndarray";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

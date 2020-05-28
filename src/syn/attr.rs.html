@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.16/src/attr.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.27/src/attr.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>attr.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -807,7 +807,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// An attribute like `#[repr(transparent)]`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// &lt;br&gt;</span>
@@ -1114,7 +1114,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// as a [`Meta`] if possible.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This function is available if Syn is built with the `"parsing"`</span>
+"doccomment">/// *This function is available only if Syn is built with the `"parsing"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class="ident">feature</span> <span class=
@@ -1217,7 +1217,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This function is available if Syn is built with the `"parsing"`</span>
+"doccomment">/// *This function is available only if Syn is built with the `"parsing"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class="ident">feature</span> <span class=
@@ -1239,7 +1239,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Parse the arguments to the attribute using the given parser.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This function is available if Syn is built with the `"parsing"`</span>
+"doccomment">/// *This function is available only if Syn is built with the `"parsing"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class="ident">feature</span> <span class=
@@ -1278,7 +1278,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Parses zero or more outer attributes from the stream.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This function is available if Syn is built with the `"parsing"`</span>
+"doccomment">/// *This function is available only if Syn is built with the `"parsing"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class="ident">feature</span> <span class=
@@ -1297,7 +1297,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">new</span>();
         <span class="kw">while</span> <span class=
 "ident">input</span>.<span class="ident">peek</span>(<span class=
-"macro">Token</span><span class="macro">!</span>[#]) {
+"macro">Token</span><span class="macro">!</span>[#]) <span class=
+"kw-2">&</span><span class="op">&</span> <span class=
+"op">!</span><span class="ident">input</span>.<span class=
+"ident">peek</span>(<span class="ident">token</span>::<span class=
+"ident">Group</span>) {
             <span class="ident">attrs</span>.<span class=
 "ident">push</span>(<span class="ident">input</span>.<span class=
 "ident">call</span>(<span class=
@@ -1311,7 +1315,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Parses zero or more inner attributes from the stream.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This function is available if Syn is built with the `"parsing"`</span>
+"doccomment">/// *This function is available only if Syn is built with the `"parsing"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class="ident">feature</span> <span class=
@@ -1334,7 +1338,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">&</span><span class="op">&</span> <span class=
 "ident">input</span>.<span class="ident">peek2</span>(<span class=
 "macro">Token</span><span class="macro">!</span>[<span class=
-"op">!</span>]) {
+"op">!</span>]) <span class="kw-2">&</span><span class=
+"op">&</span> <span class="op">!</span><span class=
+"ident">input</span>.<span class="ident">peek</span>(<span class=
+"ident">token</span>::<span class="ident">Group</span>) {
             <span class="ident">attrs</span>.<span class=
 "ident">push</span>(<span class="ident">input</span>.<span class=
 "ident">call</span>(<span class=
@@ -1497,7 +1504,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// that are contained within an item.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Outer attributes</span>
@@ -1533,7 +1540,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Content of a compile-time structured attribute.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ## Path</span>
@@ -1586,7 +1593,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A structured list within an attribute, like `derive(Copy, Clone)`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or</span>
     <span class="doccomment">/// `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">MetaList</span> {
@@ -1609,7 +1616,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A name-value pair within an attribute, like `feature = "nightly"`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or</span>
     <span class="doccomment">/// `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">MetaNameValue</span> {
@@ -1663,7 +1670,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Element of a compile-time attribute list.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">enum</span> <span class="ident">NestedMeta</span> {
@@ -2272,7 +2279,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "syn";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

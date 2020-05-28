@@ -59,12 +59,13 @@ id="themeStyle">
 <p class='location'>Struct FourParticle</p>
 <div class="sidebar-elems">
 <div class="block items"><a class="sidebar-title" href=
-"#methods">Methods</a>
+"#implementations">Methods</a>
 <div class="sidebar-links"><a href=
 "#method.enable_gamma">enable_gamma</a><a href=
 "#method.enable_width">enable_width</a><a href=
-"#method.new">new</a><a href="#method.new_all">new_all</a></div>
-<a class="sidebar-title" href="#implementations">Trait
+"#method.new">new</a><a href="#method.new_all">new_all</a><a href=
+"#method.set_asymmetry">set_asymmetry</a></div>
+<a class="sidebar-title" href="#trait-implementations">Trait
 Implementations</a>
 <div class="sidebar-links"><a href="#impl-Debug">Debug</a><a href=
 "#impl-Interaction%3CM%3E">Interaction&lt;M&gt;</a></div>
@@ -118,7 +119,7 @@ autocomplete="off" spellcheck="false" placeholder=
 'render-detail'><a id="toggle-all-docs" href="javascript:void(0)"
 title="collapse all docs">[<span class=
 'inner'>−</span>]</a></span><a class='srclink' href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#14-23'
+'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#18-30'
 title='goto source code'>[src]</a></span><span class=
 'in-band'>Struct <a href=
 '../../index.html'>boltzmann_solver</a>::<wbr><a href=
@@ -132,15 +133,15 @@ pub struct FourParticle&lt;M&gt; { /* fields omitted */ }</pre></div>
 <p>Three particle interaction, all determined from the underlying
 squared amplitude.</p>
 </div>
-<h2 id='methods' class='small-section-header'>Methods<a href=
-'#methods' class='anchor'></a></h2>
+<h2 id='implementations' class='small-section-header'>
+Implementations<a href='#implementations' class='anchor'></a></h2>
 <h3 id='impl' class='impl'><code class='in-band'>impl&lt;M&gt;
 <a class="struct" href=
 "../../../boltzmann_solver/model/interaction/struct.FourParticle.html"
 title=
 "struct boltzmann_solver::model::interaction::FourParticle">FourParticle</a>&lt;M&gt;</code><a href='#impl'
 class='anchor'></a><a class='srclink' href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#25-123'
+'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#32-154'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.new' class="method"><code id='new.v'>pub fn <a href=
@@ -176,7 +177,7 @@ href=
 "https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html"
 title="trait core::marker::Sync">Sync</a> +
 'static,&nbsp;</span></code><a class='srclink' href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#43-63'
+'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#50-72'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Create a new four-particle interaction.</p>
@@ -187,7 +188,7 @@ positive integers and the corresponding antiparticles are indicates
 by negative integers.</p>
 <p>The squared amplitude is defined of the form</p>
 <p>\begin{equation} \abs{\mathcal{M}(p_1 p_2 \leftrightarrow p_3
-p_4)}(s, t, u) \end{equation}</p>
+p_4)}^2(s, t, u) \end{equation}</p>
 <p>where \(s\), \(t\) and \(u\) are the usual Mandelstam variables.
 Crossing symmetry is then used in order to compute the other
 processes.</p>
@@ -231,7 +232,7 @@ title="trait core::marker::Sync">Sync</a> + <a class="trait" href=
 "https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html"
 title="trait core::marker::Copy">Copy</a> +
 'static,&nbsp;</span></code><a class='srclink' href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#83-110'
+'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#92-120'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Create a set of related four-particle interactions.</p>
@@ -244,17 +245,56 @@ p_1 \overline{p_4} \leftrightarrow \overline{p_2} p_3. \\
 \end{aligned} \end{equation}</p>
 <p>The squared amplitude is defined of the form:</p>
 <p>\begin{equation} \abs{\mathcal{M}(p_1 p_2 \leftrightarrow p_3
-p_4)}(s, t, u) \end{equation}</p>
+p_4)}^2(s, t, u) \end{equation}</p>
 <p>where \(s\), \(t\) and \(u\) are the usual Mandelstam variables.
 Crossing symmetry is then used in order to compute the other
 processes.</p>
+</div>
+<h4 id='method.set_asymmetry' class="method"><code id=
+'set_asymmetry.v'>pub fn <a href='#method.set_asymmetry' class=
+'fnname'>set_asymmetry</a>&lt;F&gt;(self, asymmetry: F) -&gt; Self
+<span class="where fmt-newline">where<br>
+&nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/ops/function/trait.Fn.html"
+title="trait core::ops::function::Fn">Fn</a>(<a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.reference.html">&</a>M,
+<a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+<a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
+<a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
+-&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>
++ <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html"
+title="trait core::marker::Sync">Sync</a> +
+'static,&nbsp;</span></code><a class='srclink' href=
+'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#135-141'
+title='goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Specify the asymmetry between this process and its
+CP-conjugate.</p>
+<p>This asymmetry is specified in terms of the asymmetry in the
+squared amplitudes:</p>
+<p>\begin{equation} \delta \abs{\mathcal{M}}^2 \defeq
+\abs{\mathcal{M}(p_1 p_2 \to p_3 p_4)}^2 -
+\abs{\mathcal{M}(\overline{p_1} \overline{p_2} \to \overline{p_3}
+\overline{p_4})}^2 = \abs{\mathcal{M}(p_1 p_2 \to p_3 p_4)}^2 -
+\abs{\mathcal{M}(p_3 p_4 \to p_1 p_2)}^2 \end{equation}</p>
+<p>This asymmetry is subsequently used to compute the asymmetry in
+the interaction rate given by <a href=
+"../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.asymmetry"
+title=
+"`Interaction::asymmetry`"><code>Interaction::asymmetry</code></a>.</p>
 </div>
 <h4 id='method.enable_width' class="method"><code id=
 'enable_width.v'>pub fn <a href='#method.enable_width' class=
 'fnname'>enable_width</a>(self, v: <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>)
 -&gt; Self</code><a class='srclink' href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#113-116'
+'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#144-147'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Adjust whether this interaction will calculate decay widths.</p>
@@ -264,15 +304,16 @@ title='goto source code'>[src]</a></h4>
 'fnname'>enable_gamma</a>(self, v: <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>)
 -&gt; Self</code><a class='srclink' href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#119-122'
+'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#150-153'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Adjust whether this interaction will calculate decay widths.</p>
 </div>
 </div>
-<h2 id='implementations' class='small-section-header'>Trait
-Implementations<a href='#implementations' class='anchor'></a></h2>
-<div id='implementations-list'>
+<h2 id='trait-implementations' class='small-section-header'>Trait
+Implementations<a href='#trait-implementations' class=
+'anchor'></a></h2>
+<div id='trait-implementations-list'>
 <h3 id='impl-Debug' class='impl'><code class=
 'in-band'>impl&lt;M&gt; <a class="trait" href=
 "https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html"
@@ -281,7 +322,7 @@ href="../../../boltzmann_solver/model/interaction/struct.FourParticle.html"
 title=
 "struct boltzmann_solver::model::interaction::FourParticle">FourParticle</a>&lt;M&gt;</code><a href='#impl-Debug'
 class='anchor'></a><a class='srclink' href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#125-138'
+'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#156-169'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.fmt' class="method hidden"><code id='fmt.v'>fn
@@ -295,7 +336,7 @@ title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class=
 "https://doc.rust-lang.org/nightly/core/fmt/type.Result.html"
 title="type core::fmt::Result">Result</a></code><a class='srclink'
 href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#126-137'
+'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#157-168'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Formats the value using the given formatter. <a href=
@@ -317,7 +358,7 @@ title=
 "../../../boltzmann_solver/model/trait.Model.html" title=
 "trait boltzmann_solver::model::Model">Model</a>,&nbsp;</span></code><a href='#impl-Interaction%3CM%3E'
 class='anchor'></a><a class='srclink' href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#140-208'
+'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#171-277'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.particles' class="method hidden"><code id=
@@ -329,7 +370,7 @@ href=
 title=
 "struct boltzmann_solver::model::interaction::InteractionParticles">InteractionParticles</a></code><a class='srclink'
 href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#144-146'
+'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#175-177'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Return the particles involved in this interaction</p>
@@ -343,7 +384,7 @@ class='fnname'>particles_idx</a>(&amp;self) -&gt; &<a class=
 title=
 "struct boltzmann_solver::model::interaction::InteractionParticleIndices">InteractionParticleIndices</a></code><a class='srclink'
 href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#148-150'
+'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#179-181'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Return the particles involved in this interaction, not
@@ -360,7 +401,7 @@ class='fnname'>particles_sign</a>(&amp;self) -&gt; &<a class=
 title=
 "struct boltzmann_solver::model::interaction::InteractionParticleSigns">InteractionParticleSigns</a></code><a class='srclink'
 href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#152-154'
+'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#183-185'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Return the sign of the particles, with +1 for a particle and -1
@@ -375,7 +416,7 @@ class='fnname'>width_enabled</a>(&amp;self) -&gt; <a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
 href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#156-158'
+'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#187-189'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Whether this interaction is to be used to determine decays.
@@ -390,7 +431,7 @@ class='fnname'>gamma_enabled</a>(&amp;self) -&gt; <a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
 href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#163-165'
+'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#194-196'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Whether this interaction is to be used within the Boltzmann
@@ -410,17 +451,37 @@ title="enum core::option::Option">Option</a>&lt;<a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink'
 href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#167-207'
+'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#198-237'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Calculate the reaction rate density of this interaction.
 <a href="../../../boltzmann_solver/model/interaction/trait.Interaction.html#tymethod.gamma">
 Read more</a></p>
 </div>
+<h4 id='method.asymmetry' class="method hidden"><code id=
+'asymmetry.v'>fn <a href=
+'../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.asymmetry'
+class='fnname'>asymmetry</a>(&amp;self, c: &<a class="struct" href=
+"../../../boltzmann_solver/prelude/struct.Context.html" title=
+"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
+-&gt; <a class="enum" href=
+"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
+title="enum core::option::Option">Option</a>&lt;<a class=
+"primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink'
+href=
+'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#239-276'
+title='goto source code'>[src]</a></h4>
+<div class='docblock hidden'>
+<p>Asymmetry between the interaction and its (\mathcal{CP})
+conjugate: <a href=
+"../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.asymmetry">
+Read more</a></p>
+</div>
 <h4 id='method.width' class="method hidden"><code id='width.v'>fn
 <a href=
 '../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.width'
-class='fnname'>width</a>(&amp;self, _: &<a class="struct" href=
+class='fnname'>width</a>(&amp;self, _c: &<a class="struct" href=
 "../../../boltzmann_solver/prelude/struct.Context.html" title=
 "struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
 -&gt; <a class="enum" href=
@@ -431,7 +492,7 @@ href=
 title=
 "struct boltzmann_solver::model::interaction::PartialWidth">PartialWidth</a>&gt;</code><a class='srclink'
 href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#153-155'
+'../../../src/boltzmann_solver/model/interaction.rs.html#182-184'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Calculate the decay width associated with a particular
@@ -439,34 +500,10 @@ interaction. <a href=
 "../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.width">
 Read more</a></p>
 </div>
-<h4 id='method.asymmetry' class="method hidden"><code id=
-'asymmetry.v'>fn <a href=
-'../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.asymmetry'
-class='fnname'>asymmetry</a>(&amp;self, _c: &<a class="struct"
-href="../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class=
-"primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#177-179'
-title='goto source code'>[src]</a></h4>
-<div class='docblock hidden'>
-<p>Asymmetry <a href=
-"../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.asymmetry">
-Read more</a></p>
-</div>
 <h4 id='method.rate' class="method hidden"><code id='rate.v'>fn
 <a href=
 '../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.rate'
-class='fnname'>rate</a>(&amp;self, gamma: <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class=
-"primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;,
-c: &<a class="struct" href=
+class='fnname'>rate</a>(&amp;self, c: &<a class="struct" href=
 "../../../boltzmann_solver/prelude/struct.Context.html" title=
 "struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
 -&gt; <a class="enum" href=
@@ -477,7 +514,7 @@ href=
 title=
 "struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;</code><a class='srclink'
 href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#186-240'
+'../../../src/boltzmann_solver/model/interaction.rs.html#229-305'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Calculate the actual interaction rates density taking into
@@ -486,24 +523,13 @@ involved. <a href=
 "../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.rate">
 Read more</a></p>
 </div>
-<h4 id='method.adjust_rate_overshoot' class="method hidden">
-<code id='adjust_rate_overshoot.v'>fn <a href=
-'../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.adjust_rate_overshoot'
-class='fnname'>adjust_rate_overshoot</a>(<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&amp;self,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;rate: <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.RateDensity.html"
-title=
-"struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;,<br>
-
-&nbsp;&nbsp;&nbsp;&nbsp;c: &<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;<br>
-
-) -&gt; <a class="enum" href=
+<h4 id='method.adjusted_rate' class="method hidden"><code id=
+'adjusted_rate.v'>fn <a href=
+'../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.adjusted_rate'
+class='fnname'>adjusted_rate</a>(&amp;self, c: &<a class="struct"
+href="../../../boltzmann_solver/prelude/struct.Context.html" title=
+"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
+-&gt; <a class="enum" href=
 "https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
 title="enum core::option::Option">Option</a>&lt;<a class="struct"
 href=
@@ -511,12 +537,12 @@ href=
 title=
 "struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;</code><a class='srclink'
 href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#251-324'
+'../../../src/boltzmann_solver/model/interaction.rs.html#316-392'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Adjust the backward and forward rates such that they do not
 overshoot the equilibrium number densities. <a href=
-"../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.adjust_rate_overshoot">
+"../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.adjusted_rate">
 Read more</a></p>
 </div>
 <h4 id='method.change' class="method hidden"><code id='change.v'>fn
@@ -536,7 +562,7 @@ c: &<a class="struct" href=
 "../../../boltzmann_solver/prelude/struct.Context.html" title=
 "struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)</code><a class='srclink'
 href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#335-384'
+'../../../src/boltzmann_solver/model/interaction.rs.html#403-417'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Add this interaction to the <code>dn</code> and <code>dna</code>
@@ -695,14 +721,14 @@ Read more</a></p>
 title="trait core::convert::From">From</a>&lt;T&gt; for
 T</code><a href='#impl-From%3CT%3E' class='anchor'></a><a class=
 'srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#564-568'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#565-569'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.from' class="method hidden"><code id='from.v'>fn
 <a href=
 'https://doc.rust-lang.org/nightly/core/convert/trait.From.html#tymethod.from'
 class='fnname'>from</a>(t: T) -&gt; T</code><a class='srclink'
-href='https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#565-567'
+href='https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#566-568'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the conversion.</p>
@@ -718,14 +744,14 @@ title="trait core::convert::Into">Into</a>&lt;U&gt; for T
 title=
 "trait core::convert::From">From</a>&lt;T&gt;,&nbsp;</span></code><a href='#impl-Into%3CU%3E'
 class='anchor'></a><a class='srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#553-560'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#554-561'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.into' class="method hidden"><code id='into.v'>fn
 <a href=
 'https://doc.rust-lang.org/nightly/core/convert/trait.Into.html#tymethod.into'
 class='fnname'>into</a>(self) -&gt; U</code><a class='srclink'
-href='https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#557-559'
+href='https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#558-560'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the conversion.</p>
@@ -741,7 +767,7 @@ title="trait core::convert::TryFrom">TryFrom</a>&lt;U&gt; for T
 title=
 "trait core::convert::Into">Into</a>&lt;T&gt;,&nbsp;</span></code><a href='#impl-TryFrom%3CU%3E'
 class='anchor'></a><a class='srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#601-610'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#602-611'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='associatedtype.Error' class="type"><code id='Error.t'>type
@@ -768,7 +794,7 @@ title=
 title=
 "type core::convert::TryFrom::Error">Error</a>&gt;</code><a class=
 'srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#607-609'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#608-610'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the conversion.</p>
@@ -784,7 +810,7 @@ title="trait core::convert::TryInto">TryInto</a>&lt;U&gt; for T
 title=
 "trait core::convert::TryFrom">TryFrom</a>&lt;T&gt;,&nbsp;</span></code><a href='#impl-TryInto%3CU%3E'
 class='anchor'></a><a class='srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#587-596'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#588-597'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='associatedtype.Error-1' class="type"><code id=
@@ -815,7 +841,7 @@ title=
 title=
 "type core::convert::TryFrom::Error">Error</a>&gt;</code><a class=
 'srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#593-595'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#594-596'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the conversion.</p>
@@ -828,7 +854,6 @@ title='goto source code'>[src]</a></h4>
 <script>
 window.rootPath = "../../../";window.currentCrate = "boltzmann_solver";
 </script>
-<script src="../../../aliases.js"></script>
 <script src="../../../main.js"></script>
 <script defer src="../../../search-index.js"></script>
 </body>

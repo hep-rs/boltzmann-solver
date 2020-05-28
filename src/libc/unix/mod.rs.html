@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libc-0.2.67/src/unix/mod.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libc-0.2.71/src/unix/mod.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>mod.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href=
@@ -1643,6 +1643,17 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="1567">1567</span>
 <span id="1568">1568</span>
 <span id="1569">1569</span>
+<span id="1570">1570</span>
+<span id="1571">1571</span>
+<span id="1572">1572</span>
+<span id="1573">1573</span>
+<span id="1574">1574</span>
+<span id="1575">1575</span>
+<span id="1576">1576</span>
+<span id="1577">1577</span>
+<span id="1578">1578</span>
+<span id="1579">1579</span>
+<span id="1580">1580</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -2219,16 +2230,26 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw">const</span> <span class=
 "ident">S_ISVTX</span>: ::<span class="ident">mode_t</span> <span class="op">=</span> <span class="number">0x200</span>;
 
-<span class="kw">pub</span> <span class=
+<span class="macro">cfg_if</span><span class="macro">!</span> {
+    <span class="kw">if</span> <span class=
+"attribute">#[<span class="ident">cfg</span>(<span class=
+"ident">not</span>(<span class="ident">any</span>(<span class=
+"ident">target_os</span> <span class="op">=</span> <span class=
+"string">"illumos"</span>, <span class=
+"ident">target_os</span> <span class="op">=</span> <span class=
+"string">"solaris"</span>)))]</span> {
+        <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">IF_NAMESIZE</span>: ::<span class=
 "ident">size_t</span> <span class="op">=</span> <span class=
 "number">16</span>;
-<span class="kw">pub</span> <span class=
+        <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
 "ident">IFNAMSIZ</span>: ::<span class=
 "ident">size_t</span> <span class="op">=</span> <span class=
 "ident">IF_NAMESIZE</span>;
+    }
+}
 
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
@@ -2402,22 +2423,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">LOG_FACMASK</span>: ::<span class=
 "ident">c_int</span> <span class="op">=</span> <span class=
 "number">0x3f8</span>;
-
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class=
-"ident">PRIO_PROCESS</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> <span class=
-"number">0</span>;
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class=
-"ident">PRIO_PGRP</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> <span class=
-"number">1</span>;
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class=
-"ident">PRIO_USER</span>: ::<span class=
-"ident">c_int</span> <span class="op">=</span> <span class=
-"number">2</span>;
 
 <span class="kw">pub</span> <span class=
 "kw">const</span> <span class=
@@ -2724,7 +2729,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">derive</span>(<span class="ident">Debug</span>))]</span>
 <span class="kw">pub</span> <span class=
 "kw">enum</span> <span class="ident">fpos_t</span> {} <span class=
-"comment">// TODO: fill this out with a struct</span>
+"comment">// FIXME: fill this out with a struct</span>
 <span class="kw">impl</span> ::<span class=
 "ident">Copy</span> <span class="kw">for</span> <span class=
 "ident">fpos_t</span> {}
@@ -3333,6 +3338,14 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">*</span><span class="kw-2">mut</span> <span class=
 "ident">c_char</span>;
     <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">strndup</span>(<span class=
+"ident">cs</span>: <span class="kw-2">*</span><span class=
+"kw">const</span> <span class="ident">c_char</span>, <span class=
+"ident">n</span>: <span class="ident">size_t</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"kw-2">*</span><span class="kw-2">mut</span> <span class=
+"ident">c_char</span>;
+    <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">strpbrk</span>(<span class=
 "ident">cs</span>: <span class="kw-2">*</span><span class=
 "kw">const</span> <span class="ident">c_char</span>, <span class=
@@ -3417,6 +3430,12 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">size_t</span>;
     <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">strsignal</span>(<span class=
+"ident">sig</span>: <span class="ident">c_int</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"kw-2">*</span><span class="kw-2">mut</span> <span class=
+"ident">c_char</span>;
+    <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">wcslen</span>(<span class=
 "ident">buf</span>: <span class="kw-2">*</span><span class=
 "kw">const</span> <span class="ident">wchar_t</span>) <span class=
@@ -3444,6 +3463,15 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "kw-2">*</span><span class="kw-2">mut</span> <span class=
 "ident">c_void</span>;
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">wmemchr</span>(<span class=
+"ident">cx</span>: <span class="kw-2">*</span><span class=
+"kw">const</span> <span class="ident">wchar_t</span>, <span class=
+"ident">c</span>: <span class="ident">wchar_t</span>, <span class=
+"ident">n</span>: <span class="ident">size_t</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"kw-2">*</span><span class="kw-2">mut</span> <span class=
+"ident">wchar_t</span>;
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">memcmp</span>(<span class=
 "ident">cx</span>: <span class="kw-2">*</span><span class=
@@ -3665,12 +3693,6 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="ident">link_name</span> <span class=
 "op">=</span> <span class="string">"listen$UNIX2003"</span>
     )]</span>
-    <span class="attribute">#[<span class=
-"ident">cfg_attr</span>(<span class=
-"ident">target_os</span> <span class="op">=</span> <span class=
-"string">"illumos"</span>, <span class=
-"ident">link_name</span> <span class="op">=</span> <span class=
-"string">"__xnet_listen"</span>)]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">listen</span>(<span class=
 "ident">socket</span>: ::<span class=
@@ -4401,6 +4423,12 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">mut</span> <span class="ident">gid_t</span>) <span class=
 "op">-</span><span class="op">&gt;</span> ::<span class=
 "ident">c_int</span>;
+    <span class="attribute">#[<span class=
+"ident">cfg_attr</span>(<span class=
+"ident">target_os</span> <span class="op">=</span> <span class=
+"string">"illumos"</span>, <span class=
+"ident">link_name</span> <span class="op">=</span> <span class=
+"string">"getloginx"</span>)]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">getlogin</span>() <span class=
 "op">-</span><span class="op">&gt;</span> <span class=
@@ -4611,6 +4639,12 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="ident">link_name</span> <span class=
 "op">=</span> <span class="string">"ttyname_r$UNIX2003"</span>
     )]</span>
+    <span class="attribute">#[<span class=
+"ident">cfg_attr</span>(<span class=
+"ident">target_os</span> <span class="op">=</span> <span class=
+"string">"illumos"</span>, <span class=
+"ident">link_name</span> <span class="op">=</span> <span class=
+"string">"__posix_ttyname_r"</span>)]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">ttyname_r</span>(
         <span class="ident">fd</span>: ::<span class=
@@ -5577,6 +5611,12 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> ::<span class=
 "ident">c_int</span>;
 
+    <span class="attribute">#[<span class=
+"ident">cfg_attr</span>(<span class=
+"ident">target_os</span> <span class="op">=</span> <span class=
+"string">"illumos"</span>, <span class=
+"ident">link_name</span> <span class="op">=</span> <span class=
+"string">"__xnet_getaddrinfo"</span>)]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">getaddrinfo</span>(
         <span class="ident">node</span>: <span class=
@@ -6385,6 +6425,17 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">FILE</span>,
     ) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="ident">ssize_t</span>;
+
+    <span class="kw">pub</span> <span class=
+"kw">fn</span> <span class="ident">lockf</span>(
+        <span class="ident">fd</span>: ::<span class=
+"ident">c_int</span>,
+        <span class="ident">cmd</span>: ::<span class=
+"ident">c_int</span>,
+        <span class="ident">len</span>: ::<span class=
+"ident">off_t</span>,
+    ) <span class="op">-</span><span class=
+"op">&gt;</span> ::<span class="ident">c_int</span>;
 }
 
 <span class="macro">cfg_if</span><span class="macro">!</span> {
@@ -6721,7 +6772,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../../";window.currentCrate = "libc";
 </script>
-<script src="../../../aliases.js"></script>
 <script src="../../../main.js"></script>
 <script src="../../../source-script.js"></script>
 <script src="../../../source-files.js"></script>

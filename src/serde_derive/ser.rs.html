@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive-1.0.104/src/ser.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive-1.0.110/src/ser.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>ser.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -1394,6 +1394,19 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="1319">1319</span>
 <span id="1320">1320</span>
 <span id="1321">1321</span>
+<span id="1322">1322</span>
+<span id="1323">1323</span>
+<span id="1324">1324</span>
+<span id="1325">1325</span>
+<span id="1326">1326</span>
+<span id="1327">1327</span>
+<span id="1328">1328</span>
+<span id="1329">1329</span>
+<span id="1330">1330</span>
+<span id="1331">1331</span>
+<span id="1332">1332</span>
+<span id="1333">1333</span>
+<span id="1334">1334</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -1636,6 +1649,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Type has a `serde(remote = "...")` attribute.</span>
     <span class="ident">is_remote</span>: <span class=
 "ident">bool</span>,
+
+    <span class=
+"doccomment">/// Type has a repr(packed) attribute.</span>
+    <span class="ident">is_packed</span>: <span class=
+"ident">bool</span>,
 }
 
 <span class="kw">impl</span> <span class=
@@ -1677,18 +1695,20 @@ autocomplete="off" spellcheck="false" placeholder=
         };
 
         <span class="kw">let</span> <span class=
+"ident">is_packed</span> <span class="op">=</span> <span class=
+"ident">cont</span>.<span class="ident">attrs</span>.<span class=
+"ident">is_packed</span>();
+
+        <span class="kw">let</span> <span class=
 "ident">generics</span> <span class="op">=</span> <span class=
 "ident">build_generics</span>(<span class="ident">cont</span>);
 
         <span class="ident">Parameters</span> {
-            <span class="ident">self_var</span>: <span class=
-"ident">self_var</span>,
-            <span class="ident">this</span>: <span class=
-"ident">this</span>,
-            <span class="ident">generics</span>: <span class=
-"ident">generics</span>,
-            <span class="ident">is_remote</span>: <span class=
-"ident">is_remote</span>,
+            <span class="ident">self_var</span>,
+            <span class="ident">this</span>,
+            <span class="ident">generics</span>,
+            <span class="ident">is_remote</span>,
+            <span class="ident">is_packed</span>,
         }
     }
 
@@ -2856,14 +2876,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">serialize_tuple_variant</span>(
             <span class="ident">TupleVariant</span>::<span class=
 "ident">ExternallyTagged</span> {
-                <span class="ident">type_name</span>: <span class=
-"ident">type_name</span>,
-                <span class=
-"ident">variant_index</span>: <span class=
-"ident">variant_index</span>,
-                <span class=
-"ident">variant_name</span>: <span class=
-"ident">variant_name</span>,
+                <span class="ident">type_name</span>,
+                <span class="ident">variant_index</span>,
+                <span class="ident">variant_name</span>,
             },
             <span class="ident">params</span>,
             <span class="kw-2">&</span><span class=
@@ -2875,12 +2890,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">serialize_struct_variant</span>(
             <span class="ident">StructVariant</span>::<span class=
 "ident">ExternallyTagged</span> {
-                <span class=
-"ident">variant_index</span>: <span class=
-"ident">variant_index</span>,
-                <span class=
-"ident">variant_name</span>: <span class=
-"ident">variant_name</span>,
+                <span class="ident">variant_index</span>,
+                <span class="ident">variant_name</span>,
             },
             <span class="ident">params</span>,
             <span class="kw-2">&</span><span class=
@@ -3034,13 +3045,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> <span class=
 "ident">serialize_struct_variant</span>(
             <span class="ident">StructVariant</span>::<span class=
-"ident">InternallyTagged</span> {
-                <span class="ident">tag</span>: <span class=
-"ident">tag</span>,
-                <span class=
-"ident">variant_name</span>: <span class=
-"ident">variant_name</span>,
-            },
+"ident">InternallyTagged</span> { <span class=
+"ident">tag</span>, <span class="ident">variant_name</span> },
             <span class="ident">params</span>,
             <span class="kw-2">&</span><span class=
 "ident">variant</span>.<span class="ident">fields</span>,
@@ -3738,15 +3744,15 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw">match</span> <span class="ident">context</span> {
         <span class="ident">StructVariant</span>::<span class=
 "ident">ExternallyTagged</span> { .. } <span class=
-"op">=</span><span class="op">&gt;</span> (<span class=
+"op">=</span><span class="op">&gt;</span> <span class=
 "ident">StructTrait</span>::<span class=
-"ident">SerializeStructVariant</span>),
+"ident">SerializeStructVariant</span>,
         <span class="ident">StructVariant</span>::<span class=
 "ident">InternallyTagged</span> { .. } <span class=
 "op">|</span> <span class=
 "ident">StructVariant</span>::<span class="ident">Untagged</span> <span class="op">=</span><span class="op">&gt;</span> {
-            (<span class="ident">StructTrait</span>::<span class=
-"ident">SerializeStruct</span>)
+            <span class="ident">StructTrait</span>::<span class=
+"ident">SerializeStruct</span>
         }
     };
 
@@ -4673,17 +4679,33 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">getter</span>()) {
         (<span class="bool-val">false</span>, <span class=
 "prelude-val">None</span>) <span class="op">=</span><span class=
-"op">&gt;</span> <span class="macro">quote</span><span class=
+"op">&gt;</span> {
+            <span class="kw">if</span> <span class=
+"ident">params</span>.<span class="ident">is_packed</span> {
+                <span class="macro">quote</span><span class=
+"macro">!</span>(<span class="kw-2">&</span>{#<span class=
+"ident">self_var</span>.#<span class="ident">member</span>})
+            } <span class="kw">else</span> {
+                <span class="macro">quote</span><span class=
 "macro">!</span>(<span class="kw-2">&</span>#<span class=
-"ident">self_var</span>.#<span class="ident">member</span>),
+"ident">self_var</span>.#<span class="ident">member</span>)
+            }
+        }
         (<span class="bool-val">true</span>, <span class=
 "prelude-val">None</span>) <span class="op">=</span><span class=
 "op">&gt;</span> {
             <span class="kw">let</span> <span class=
 "ident">inner</span> <span class="op">=</span> <span class=
-"macro">quote</span><span class="macro">!</span>(<span class=
-"kw-2">&</span>#<span class="ident">self_var</span>.#<span class=
-"ident">member</span>);
+"kw">if</span> <span class="ident">params</span>.<span class=
+"ident">is_packed</span> {
+                <span class="macro">quote</span><span class=
+"macro">!</span>(<span class="kw-2">&</span>{#<span class=
+"ident">self_var</span>.#<span class="ident">member</span>})
+            } <span class="kw">else</span> {
+                <span class="macro">quote</span><span class=
+"macro">!</span>(<span class="kw-2">&</span>#<span class=
+"ident">self_var</span>.#<span class="ident">member</span>)
+            };
             <span class="kw">let</span> <span class=
 "ident">ty</span> <span class="op">=</span> <span class=
 "ident">field</span>.<span class="ident">ty</span>;
@@ -4856,7 +4878,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "serde_derive";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

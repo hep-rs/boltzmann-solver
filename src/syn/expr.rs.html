@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.16/src/expr.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.27/src/expr.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>expr.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -3276,59 +3276,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="3201">3201</span>
 <span id="3202">3202</span>
 <span id="3203">3203</span>
-<span id="3204">3204</span>
-<span id="3205">3205</span>
-<span id="3206">3206</span>
-<span id="3207">3207</span>
-<span id="3208">3208</span>
-<span id="3209">3209</span>
-<span id="3210">3210</span>
-<span id="3211">3211</span>
-<span id="3212">3212</span>
-<span id="3213">3213</span>
-<span id="3214">3214</span>
-<span id="3215">3215</span>
-<span id="3216">3216</span>
-<span id="3217">3217</span>
-<span id="3218">3218</span>
-<span id="3219">3219</span>
-<span id="3220">3220</span>
-<span id="3221">3221</span>
-<span id="3222">3222</span>
-<span id="3223">3223</span>
-<span id="3224">3224</span>
-<span id="3225">3225</span>
-<span id="3226">3226</span>
-<span id="3227">3227</span>
-<span id="3228">3228</span>
-<span id="3229">3229</span>
-<span id="3230">3230</span>
-<span id="3231">3231</span>
-<span id="3232">3232</span>
-<span id="3233">3233</span>
-<span id="3234">3234</span>
-<span id="3235">3235</span>
-<span id="3236">3236</span>
-<span id="3237">3237</span>
-<span id="3238">3238</span>
-<span id="3239">3239</span>
-<span id="3240">3240</span>
-<span id="3241">3241</span>
-<span id="3242">3242</span>
-<span id="3243">3243</span>
-<span id="3244">3244</span>
-<span id="3245">3245</span>
-<span id="3246">3246</span>
-<span id="3247">3247</span>
-<span id="3248">3248</span>
-<span id="3249">3249</span>
-<span id="3250">3250</span>
-<span id="3251">3251</span>
-<span id="3252">3252</span>
-<span id="3253">3253</span>
-<span id="3254">3254</span>
-<span id="3255">3255</span>
-<span id="3256">3256</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -3374,8 +3321,9 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// A Rust expression.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
-    <span class="doccomment">/// feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
+    <span class=
+"doccomment">/// feature, but most of the variants are not available unless "full" is enabled.*</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Syntax tree enums</span>
     <span class="doccomment">///</span>
@@ -3709,7 +3657,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A slice literal expression: `[a, b, c, d]`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprArray</span> #<span class="ident">full</span> {
@@ -3733,7 +3681,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// An assignment expression: `a = compute()`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprAssign</span> #<span class="ident">full</span> {
@@ -3761,7 +3709,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A compound assignment expression: `counter += 1`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprAssignOp</span> #<span class="ident">full</span> {
@@ -3787,7 +3735,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// An async block: `async { ... }`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprAsync</span> #<span class="ident">full</span> {
@@ -3814,7 +3762,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// An await expression: `fut.await`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprAwait</span> #<span class="ident">full</span> {
@@ -3840,7 +3788,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A binary operation: `a + b`, `a * b`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or</span>
     <span class="doccomment">/// `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">ExprBinary</span> {
@@ -3865,7 +3813,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// A blocked scope: `{ ... }`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprBlock</span> #<span class="ident">full</span> {
@@ -3886,7 +3834,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// A box expression: `box f`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">ExprBox</span> #<span class=
 "ident">full</span> {
@@ -3911,7 +3859,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// expression.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprBreak</span> #<span class="ident">full</span> {
@@ -3941,7 +3889,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A function call expression: `invoke(a, b)`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or</span>
     <span class="doccomment">/// `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">ExprCall</span> {
@@ -3969,7 +3917,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A cast expression: `foo as f64`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or</span>
     <span class="doccomment">/// `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">ExprCast</span> {
@@ -3997,7 +3945,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A closure expression: `|a, b| a + b`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprClosure</span> #<span class="ident">full</span> {
@@ -4047,7 +3995,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A `continue`, with an optional label.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprContinue</span> #<span class="ident">full</span> {
@@ -4072,7 +4020,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// field (`obj.0`).</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">ExprField</span> {
         <span class="kw">pub</span> <span class=
@@ -4096,7 +4044,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A for loop: `for pat in expr { ... }`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprForLoop</span> #<span class="ident">full</span> {
@@ -4138,7 +4086,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// `TokenStream`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprGroup</span> #<span class="ident">full</span> {
@@ -4167,7 +4115,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// expression, not any of the other types of expression.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">ExprIf</span> #<span class=
 "ident">full</span> {
@@ -4200,7 +4148,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A square bracketed indexing expression: `vector[2]`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or</span>
     <span class="doccomment">/// `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">ExprIndex</span> {
@@ -4227,7 +4175,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A `let` guard: `let Some(x) = opt`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">ExprLet</span> #<span class=
 "ident">full</span> {
@@ -4257,7 +4205,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A literal in place of an expression: `1`, `"foo"`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or</span>
     <span class="doccomment">/// `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">ExprLit</span> {
@@ -4275,7 +4223,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Conditionless loop: `loop { ... }`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprLoop</span> #<span class="ident">full</span> {
@@ -4301,7 +4249,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A macro invocation expression: `format!("{}", q)`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprMacro</span> #<span class="ident">full</span> {
@@ -4319,7 +4267,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A `match` expression: `match n { Some(n) =&gt; {}, None =&gt; {} }`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprMatch</span> #<span class="ident">full</span> {
@@ -4350,7 +4298,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A method call expression: `x.foo::&lt;T&gt;(a, b)`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprMethodCall</span> #<span class="ident">full</span> {
@@ -4387,7 +4335,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A parenthesized expression: `(a + b)`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">ExprParen</span> {
         <span class="kw">pub</span> <span class=
@@ -4414,7 +4362,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A plain identifier like `x` is a path of length 1.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or</span>
     <span class="doccomment">/// `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">ExprPath</span> {
@@ -4436,7 +4384,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A range expression: `1..2`, `1..`, `..2`, `1..=2`, `..=2`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprRange</span> #<span class="ident">full</span> {
@@ -4466,7 +4414,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A referencing operation: `&amp;a` or `&amp;mut a`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprReference</span> #<span class="ident">full</span> {
@@ -4497,7 +4445,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// An array literal constructed from one repeated element: `[0u8; N]`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprRepeat</span> #<span class="ident">full</span> {
@@ -4527,7 +4475,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A `return`, with an optional value to be returned.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprReturn</span> #<span class="ident">full</span> {
@@ -4557,7 +4505,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// 1, b: 1, ..rest }`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprStruct</span> #<span class="ident">full</span> {
@@ -4594,7 +4542,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// A try-expression: `expr?`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">ExprTry</span> #<span class=
 "ident">full</span> {
@@ -4617,7 +4565,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// A try block: `try { ... }`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprTryBlock</span> #<span class="ident">full</span> {
@@ -4639,7 +4587,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A tuple expression: `(a, b, c, d)`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprTuple</span> #<span class="ident">full</span> {
@@ -4663,7 +4611,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A type ascription expression: `foo: f64`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprType</span> #<span class="ident">full</span> {
@@ -4690,7 +4638,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A unary operation: `!x`, `*x`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or</span>
     <span class="doccomment">/// `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">ExprUnary</span> {
@@ -4712,7 +4660,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// An unsafe block: `unsafe { ... }`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprUnsafe</span> #<span class="ident">full</span> {
@@ -4734,7 +4682,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A while loop: `while expr { ... }`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprWhile</span> #<span class="ident">full</span> {
@@ -4764,7 +4712,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A yield expression: `yield expr`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class=
 "ident">ExprYield</span> #<span class="ident">full</span> {
@@ -5635,7 +5583,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// expression.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="attribute">#[<span class=
 "ident">derive</span>(<span class="ident">Eq</span>, <span class=
@@ -5711,7 +5659,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// The index of an unnamed tuple struct field.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"derive"` or `"full"`</span>
+"doccomment">/// *This type is available only if Syn is built with the `"derive"` or `"full"`</span>
     <span class="doccomment">/// feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">Index</span> #<span class=
@@ -5834,7 +5782,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// `parse::&lt;u64&gt;()`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">MethodTurbofish</span> {
         <span class="kw">pub</span> <span class=
@@ -5865,7 +5813,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// An individual generic argument to a method, like `T`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">enum</span> <span class="ident">GenericMethodArgument</span> {
         <span class="doccomment">/// A type argument.</span>
@@ -5891,7 +5839,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A field-value pair in a struct literal.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">FieldValue</span> {
         <span class=
@@ -5930,7 +5878,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// A lifetime labeling a `for`, `while`, or `loop`.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">Label</span> {
         <span class="kw">pub</span> <span class=
@@ -5965,7 +5913,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="kw">pub</span> <span class=
 "kw">struct</span> <span class="ident">Arm</span> {
         <span class="kw">pub</span> <span class=
@@ -6005,7 +5953,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// Limit types of a range, inclusive or exclusive.</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// *This type is available if Syn is built with the `"full"` feature.*</span>
+"doccomment">/// *This type is available only if Syn is built with the `"full"` feature.*</span>
     <span class="attribute">#[<span class=
 "ident">cfg_attr</span>(<span class=
 "ident">feature</span> <span class="op">=</span> <span class=
@@ -6041,7 +5989,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Expr</span>) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="ident">bool</span> {
     <span class=
-"comment">// see https://github.com/rust-lang/rust/blob/eb8f2586e/src/libsyntax/parse/classify.rs#L17-L37</span>
+"comment">// see https://github.com/rust-lang/rust/blob/2679c38fc/src/librustc_ast/util/classify.rs#L7-L25</span>
     <span class="kw">match</span> <span class=
 "kw-2">*</span><span class="ident">expr</span> {
         <span class="ident">Expr</span>::<span class=
@@ -7005,16 +6953,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> <span class="prelude-ty">Result</span><span class=
 "op">&lt;</span><span class="ident">Expr</span><span class=
 "op">&gt;</span> {
-        <span class="kw">if</span> <span class=
-"ident">input</span>.<span class="ident">peek</span>(<span class=
-"ident">token</span>::<span class="ident">Group</span>) {
-            <span class="kw">return</span> <span class=
-"ident">input</span>.<span class="ident">call</span>(<span class=
-"ident">expr_group</span>).<span class=
-"ident">map</span>(<span class="ident">Expr</span>::<span class=
-"ident">Group</span>);
-        }
-
         <span class="kw">let</span> <span class=
 "ident">outer_attrs</span> <span class="op">=</span> <span class=
 "ident">input</span>.<span class="ident">call</span>(<span class=
@@ -7409,7 +7347,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="kw">if</span> <span class=
 "ident">input</span>.<span class="ident">peek</span>(<span class=
-"ident">token</span>::<span class="ident">Group</span>) {
+"ident">token</span>::<span class=
+"ident">Group</span>) <span class="kw-2">&</span><span class=
+"op">&</span> <span class="op">!</span><span class=
+"ident">input</span>.<span class="ident">peek2</span>(<span class=
+"macro">Token</span><span class="macro">!</span>[::]) {
             <span class="ident">input</span>.<span class=
 "ident">call</span>(<span class=
 "ident">expr_group</span>).<span class=
@@ -7505,10 +7447,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">|</span> <span class="ident">input</span>.<span class=
 "ident">peek</span>(<span class="macro">Token</span><span class=
 "macro">!</span>[<span class="kw">super</span>])
-            <span class="op">|</span><span class=
-"op">|</span> <span class="ident">input</span>.<span class=
-"ident">peek</span>(<span class="macro">Token</span><span class=
-"macro">!</span>[<span class="kw">extern</span>])
             <span class="op">|</span><span class=
 "op">|</span> <span class="ident">input</span>.<span class=
 "ident">peek</span>(<span class="macro">Token</span><span class=
@@ -7765,10 +7703,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">|</span> <span class="ident">input</span>.<span class=
 "ident">peek</span>(<span class="macro">Token</span><span class=
 "macro">!</span>[<span class="kw">super</span>])
-            <span class="op">|</span><span class=
-"op">|</span> <span class="ident">input</span>.<span class=
-"ident">peek</span>(<span class="macro">Token</span><span class=
-"macro">!</span>[<span class="kw">extern</span>])
             <span class="op">|</span><span class=
 "op">|</span> <span class="ident">input</span>.<span class=
 "ident">peek</span>(<span class="macro">Token</span><span class=
@@ -8339,8 +8273,36 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> <span class="prelude-ty">Result</span><span class=
 "op">&lt;</span><span class=
 "ident">GenericMethodArgument</span><span class="op">&gt;</span> {
-        <span class=
-"comment">// TODO parse const generics as well</span>
+        <span class="kw">if</span> <span class=
+"ident">input</span>.<span class="ident">peek</span>(<span class=
+"ident">Lit</span>) {
+            <span class="kw">let</span> <span class=
+"ident">lit</span> <span class="op">=</span> <span class=
+"ident">input</span>.<span class="ident">parse</span>()<span class=
+"question-mark">?</span>;
+            <span class="kw">return</span> <span class=
+"prelude-val">Ok</span>(<span class=
+"ident">GenericMethodArgument</span>::<span class=
+"ident">Const</span>(<span class="ident">Expr</span>::<span class=
+"ident">Lit</span>(<span class="ident">lit</span>)));
+        }
+
+        <span class="kw">if</span> <span class=
+"ident">input</span>.<span class="ident">peek</span>(<span class=
+"ident">token</span>::<span class="ident">Brace</span>) {
+            <span class="kw">let</span> <span class=
+"ident">block</span> <span class="op">=</span> <span class=
+"ident">input</span>.<span class="ident">call</span>(<span class=
+"ident">expr</span>::<span class=
+"ident">parsing</span>::<span class=
+"ident">expr_block</span>)<span class="question-mark">?</span>;
+            <span class="kw">return</span> <span class=
+"prelude-val">Ok</span>(<span class=
+"ident">GenericMethodArgument</span>::<span class=
+"ident">Const</span>(<span class="ident">Expr</span>::<span class=
+"ident">Block</span>(<span class="ident">block</span>)));
+        }
+
         <span class="ident">input</span>.<span class=
 "ident">parse</span>().<span class="ident">map</span>(<span class=
 "ident">GenericMethodArgument</span>::<span class=
@@ -8364,82 +8326,9 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="ident">let_token</span>: <span class=
 "ident">input</span>.<span class="ident">parse</span>()<span class=
 "question-mark">?</span>,
-            <span class="ident">pat</span>: {
-                <span class="kw">let</span> <span class=
-"ident">leading_vert</span>: <span class=
-"prelude-ty">Option</span><span class="op">&lt;</span><span class=
-"macro">Token</span><span class="macro">!</span>[<span class=
-"op">|</span>]<span class="op">&gt;</span> <span class=
-"op">=</span> <span class="ident">input</span>.<span class=
-"ident">parse</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class=
-"ident">pat</span>: <span class="ident">Pat</span> <span class=
-"op">=</span> <span class="ident">input</span>.<span class=
-"ident">parse</span>()<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class=
-"ident">leading_vert</span>.<span class="ident">is_some</span>()
-                    <span class="op">|</span><span class=
-"op">|</span> <span class="ident">input</span>.<span class=
-"ident">peek</span>(<span class="macro">Token</span><span class=
-"macro">!</span>[<span class="op">|</span>]) <span class=
-"kw-2">&</span><span class="op">&</span> <span class=
-"op">!</span><span class="ident">input</span>.<span class=
-"ident">peek</span>(<span class="macro">Token</span><span class=
-"macro">!</span>[<span class="op">|</span><span class=
-"op">|</span>]) <span class="kw-2">&</span><span class=
-"op">&</span> <span class="op">!</span><span class=
-"ident">input</span>.<span class="ident">peek</span>(<span class=
-"macro">Token</span><span class="macro">!</span>[<span class=
-"op">|</span><span class="op">=</span>])
-                {
-                    <span class="kw">let</span> <span class=
-"kw-2">mut</span> <span class="ident">cases</span> <span class=
-"op">=</span> <span class="ident">Punctuated</span>::<span class=
-"ident">new</span>();
-                    <span class="ident">cases</span>.<span class=
-"ident">push_value</span>(<span class="ident">pat</span>);
-                    <span class="kw">while</span> <span class=
-"ident">input</span>.<span class="ident">peek</span>(<span class=
-"macro">Token</span><span class="macro">!</span>[<span class=
-"op">|</span>])
-                        <span class="kw-2">&</span><span class=
-"op">&</span> <span class="op">!</span><span class=
-"ident">input</span>.<span class="ident">peek</span>(<span class=
-"macro">Token</span><span class="macro">!</span>[<span class=
-"op">|</span><span class="op">|</span>])
-                        <span class="kw-2">&</span><span class=
-"op">&</span> <span class="op">!</span><span class=
-"ident">input</span>.<span class="ident">peek</span>(<span class=
-"macro">Token</span><span class="macro">!</span>[<span class=
-"op">|</span><span class="op">=</span>])
-                    {
-                        <span class="kw">let</span> <span class=
-"ident">punct</span> <span class="op">=</span> <span class=
-"ident">input</span>.<span class="ident">parse</span>()<span class=
-"question-mark">?</span>;
-                        <span class=
-"ident">cases</span>.<span class=
-"ident">push_punct</span>(<span class="ident">punct</span>);
-                        <span class="kw">let</span> <span class=
-"ident">pat</span>: <span class="ident">Pat</span> <span class=
-"op">=</span> <span class="ident">input</span>.<span class=
-"ident">parse</span>()<span class="question-mark">?</span>;
-                        <span class=
-"ident">cases</span>.<span class=
-"ident">push_value</span>(<span class="ident">pat</span>);
-                    }
-                    <span class="ident">Pat</span>::<span class=
-"ident">Or</span>(<span class="ident">PatOr</span> {
-                        <span class=
-"ident">attrs</span>: <span class="ident">Vec</span>::<span class=
-"ident">new</span>(),
-                        <span class="ident">leading_vert</span>,
-                        <span class="ident">cases</span>,
-                    })
-                } <span class="kw">else</span> {
-                    <span class="ident">pat</span>
-                }
-            },
+            <span class="ident">pat</span>: <span class=
+"ident">pat</span>::<span class=
+"ident">parsing</span>::<span class="ident">multi_pat_with_leading_vert</span>(<span class="ident">input</span>)<span class="question-mark">?</span>,
             <span class="ident">eq_token</span>: <span class=
 "ident">input</span>.<span class="ident">parse</span>()<span class=
 "question-mark">?</span>,
@@ -8463,10 +8352,14 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> <span class="prelude-ty">Result</span><span class=
 "op">&lt;</span><span class="self">Self</span><span class=
 "op">&gt;</span> {
+            <span class="kw">let</span> <span class=
+"ident">attrs</span> <span class="op">=</span> <span class=
+"ident">input</span>.<span class="ident">call</span>(<span class=
+"ident">Attribute</span>::<span class=
+"ident">parse_outer</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class=
 "ident">ExprIf</span> {
-                <span class="ident">attrs</span>: <span class=
-"ident">Vec</span>::<span class="ident">new</span>(),
+                <span class="ident">attrs</span>,
                 <span class="ident">if_token</span>: <span class=
 "ident">input</span>.<span class="ident">parse</span>()<span class=
 "question-mark">?</span>,
@@ -8565,6 +8458,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&lt;</span><span class="self">Self</span><span class=
 "op">&gt;</span> {
             <span class="kw">let</span> <span class=
+"ident">outer_attrs</span> <span class="op">=</span> <span class=
+"ident">input</span>.<span class="ident">call</span>(<span class=
+"ident">Attribute</span>::<span class=
+"ident">parse_outer</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class=
 "ident">label</span>: <span class=
 "prelude-ty">Option</span><span class="op">&lt;</span><span class=
 "ident">Label</span><span class="op">&gt;</span> <span class=
@@ -8578,55 +8476,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "question-mark">?</span>;
 
             <span class="kw">let</span> <span class=
-"ident">leading_vert</span>: <span class=
-"prelude-ty">Option</span><span class="op">&lt;</span><span class=
-"macro">Token</span><span class="macro">!</span>[<span class=
-"op">|</span>]<span class="op">&gt;</span> <span class=
-"op">=</span> <span class="ident">input</span>.<span class=
-"ident">parse</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class=
-"kw-2">mut</span> <span class="ident">pat</span>: <span class=
-"ident">Pat</span> <span class="op">=</span> <span class=
-"ident">input</span>.<span class="ident">parse</span>()<span class=
-"question-mark">?</span>;
-            <span class="kw">if</span> <span class=
-"ident">leading_vert</span>.<span class=
-"ident">is_some</span>() <span class="op">|</span><span class=
-"op">|</span> <span class="ident">input</span>.<span class=
-"ident">peek</span>(<span class="macro">Token</span><span class=
-"macro">!</span>[<span class="op">|</span>]) {
-                <span class="kw">let</span> <span class=
-"kw-2">mut</span> <span class="ident">cases</span> <span class=
-"op">=</span> <span class="ident">Punctuated</span>::<span class=
-"ident">new</span>();
-                <span class="ident">cases</span>.<span class=
-"ident">push_value</span>(<span class="ident">pat</span>);
-                <span class="kw">while</span> <span class=
-"ident">input</span>.<span class="ident">peek</span>(<span class=
-"macro">Token</span><span class="macro">!</span>[<span class=
-"op">|</span>]) {
-                    <span class="kw">let</span> <span class=
-"ident">punct</span> <span class="op">=</span> <span class=
-"ident">input</span>.<span class="ident">parse</span>()<span class=
-"question-mark">?</span>;
-                    <span class="ident">cases</span>.<span class=
-"ident">push_punct</span>(<span class="ident">punct</span>);
-                    <span class="kw">let</span> <span class=
-"ident">pat</span>: <span class="ident">Pat</span> <span class=
-"op">=</span> <span class="ident">input</span>.<span class=
-"ident">parse</span>()<span class="question-mark">?</span>;
-                    <span class="ident">cases</span>.<span class=
-"ident">push_value</span>(<span class="ident">pat</span>);
-                }
-                <span class="ident">pat</span> <span class=
-"op">=</span> <span class="ident">Pat</span>::<span class=
-"ident">Or</span>(<span class="ident">PatOr</span> {
-                    <span class="ident">attrs</span>: <span class=
-"ident">Vec</span>::<span class="ident">new</span>(),
-                    <span class="ident">leading_vert</span>,
-                    <span class="ident">cases</span>,
-                });
-            }
+"ident">pat</span> <span class="op">=</span> <span class=
+"ident">pat</span>::<span class=
+"ident">parsing</span>::<span class="ident">multi_pat_with_leading_vert</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
 
             <span class="kw">let</span> <span class=
 "ident">in_token</span>: <span class=
@@ -8661,7 +8513,10 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="prelude-val">Ok</span>(<span class=
 "ident">ExprForLoop</span> {
                 <span class="ident">attrs</span>: <span class=
-"ident">inner_attrs</span>,
+"ident">private</span>::<span class=
+"ident">attrs</span>(<span class=
+"ident">outer_attrs</span>, <span class=
+"ident">inner_attrs</span>),
                 <span class="ident">label</span>,
                 <span class="ident">for_token</span>,
                 <span class="ident">pat</span>,
@@ -8688,6 +8543,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> <span class="prelude-ty">Result</span><span class=
 "op">&lt;</span><span class="self">Self</span><span class=
 "op">&gt;</span> {
+            <span class="kw">let</span> <span class=
+"ident">outer_attrs</span> <span class="op">=</span> <span class=
+"ident">input</span>.<span class="ident">call</span>(<span class=
+"ident">Attribute</span>::<span class=
+"ident">parse_outer</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class=
 "ident">label</span>: <span class=
 "prelude-ty">Option</span><span class="op">&lt;</span><span class=
@@ -8722,7 +8582,10 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="prelude-val">Ok</span>(<span class=
 "ident">ExprLoop</span> {
                 <span class="ident">attrs</span>: <span class=
-"ident">inner_attrs</span>,
+"ident">private</span>::<span class=
+"ident">attrs</span>(<span class=
+"ident">outer_attrs</span>, <span class=
+"ident">inner_attrs</span>),
                 <span class="ident">label</span>,
                 <span class="ident">loop_token</span>,
                 <span class="ident">body</span>: <span class=
@@ -8744,6 +8607,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> <span class="prelude-ty">Result</span><span class=
 "op">&lt;</span><span class="self">Self</span><span class=
 "op">&gt;</span> {
+            <span class="kw">let</span> <span class=
+"ident">outer_attrs</span> <span class="op">=</span> <span class=
+"ident">input</span>.<span class="ident">call</span>(<span class=
+"ident">Attribute</span>::<span class=
+"ident">parse_outer</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class=
 "ident">match_token</span>: <span class=
 "macro">Token</span><span class="macro">!</span>[<span class=
@@ -8784,7 +8652,10 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="prelude-val">Ok</span>(<span class=
 "ident">ExprMatch</span> {
                 <span class="ident">attrs</span>: <span class=
-"ident">inner_attrs</span>,
+"ident">private</span>::<span class=
+"ident">attrs</span>(<span class=
+"ident">outer_attrs</span>, <span class=
+"ident">inner_attrs</span>),
                 <span class="ident">match_token</span>,
                 <span class="ident">expr</span>: <span class=
 "ident">Box</span>::<span class="ident">new</span>(<span class=
@@ -9335,6 +9206,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&lt;</span><span class="self">Self</span><span class=
 "op">&gt;</span> {
             <span class="kw">let</span> <span class=
+"ident">outer_attrs</span> <span class="op">=</span> <span class=
+"ident">input</span>.<span class="ident">call</span>(<span class=
+"ident">Attribute</span>::<span class=
+"ident">parse_outer</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class=
 "ident">label</span>: <span class=
 "prelude-ty">Option</span><span class="op">&lt;</span><span class=
 "ident">Label</span><span class="op">&gt;</span> <span class=
@@ -9372,7 +9248,10 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="prelude-val">Ok</span>(<span class=
 "ident">ExprWhile</span> {
                 <span class="ident">attrs</span>: <span class=
-"ident">inner_attrs</span>,
+"ident">private</span>::<span class=
+"ident">attrs</span>(<span class=
+"ident">outer_attrs</span>, <span class=
+"ident">inner_attrs</span>),
                 <span class="ident">label</span>,
                 <span class="ident">while_token</span>,
                 <span class="ident">cond</span>: <span class=
@@ -9713,9 +9592,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">push</span>(<span class="ident">content</span>.<span class=
 "ident">parse</span>()<span class="question-mark">?</span>);
             <span class="kw">if</span> <span class=
-"op">!</span><span class="ident">content</span>.<span class=
-"ident">peek</span>(<span class="macro">Token</span><span class=
-"macro">!</span>[,]) {
+"ident">content</span>.<span class="ident">is_empty</span>() {
                 <span class="kw">break</span>;
             }
             <span class="kw">let</span> <span class=
@@ -10026,65 +9903,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">input</span>.<span class="ident">call</span>(<span class=
 "ident">Attribute</span>::<span class=
 "ident">parse_outer</span>)<span class="question-mark">?</span>,
-                <span class="ident">pat</span>: {
-                    <span class="kw">let</span> <span class=
-"ident">leading_vert</span>: <span class=
-"prelude-ty">Option</span><span class="op">&lt;</span><span class=
-"macro">Token</span><span class="macro">!</span>[<span class=
-"op">|</span>]<span class="op">&gt;</span> <span class=
-"op">=</span> <span class="ident">input</span>.<span class=
-"ident">parse</span>()<span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class=
-"ident">pat</span>: <span class="ident">Pat</span> <span class=
-"op">=</span> <span class="ident">input</span>.<span class=
-"ident">parse</span>()<span class="question-mark">?</span>;
-                    <span class="kw">if</span> <span class=
-"ident">leading_vert</span>.<span class=
-"ident">is_some</span>() <span class="op">|</span><span class=
-"op">|</span> <span class="ident">input</span>.<span class=
-"ident">peek</span>(<span class="macro">Token</span><span class=
-"macro">!</span>[<span class="op">|</span>]) {
-                        <span class="kw">let</span> <span class=
-"kw-2">mut</span> <span class="ident">cases</span> <span class=
-"op">=</span> <span class="ident">Punctuated</span>::<span class=
-"ident">new</span>();
-                        <span class=
-"ident">cases</span>.<span class=
-"ident">push_value</span>(<span class="ident">pat</span>);
-                        <span class="kw">while</span> <span class=
-"ident">input</span>.<span class="ident">peek</span>(<span class=
-"macro">Token</span><span class="macro">!</span>[<span class=
-"op">|</span>]) {
-                            <span class=
-"kw">let</span> <span class="ident">punct</span> <span class=
-"op">=</span> <span class="ident">input</span>.<span class=
-"ident">parse</span>()<span class="question-mark">?</span>;
-                            <span class=
-"ident">cases</span>.<span class=
-"ident">push_punct</span>(<span class="ident">punct</span>);
-                            <span class=
-"kw">let</span> <span class="ident">pat</span>: <span class=
-"ident">Pat</span> <span class="op">=</span> <span class=
-"ident">input</span>.<span class="ident">parse</span>()<span class=
-"question-mark">?</span>;
-                            <span class=
-"ident">cases</span>.<span class=
-"ident">push_value</span>(<span class="ident">pat</span>);
-                        }
-                        <span class=
-"ident">Pat</span>::<span class="ident">Or</span>(<span class=
-"ident">PatOr</span> {
-                            <span class=
-"ident">attrs</span>: <span class="ident">Vec</span>::<span class=
-"ident">new</span>(),
-                            <span class=
-"ident">leading_vert</span>,
-                            <span class="ident">cases</span>,
-                        })
-                    } <span class="kw">else</span> {
-                        <span class="ident">pat</span>
-                    }
-                },
+                <span class="ident">pat</span>: <span class=
+"ident">pat</span>::<span class=
+"ident">parsing</span>::<span class="ident">multi_pat_with_leading_vert</span>(<span class="ident">input</span>)<span class="question-mark">?</span>,
                 <span class="ident">guard</span>: {
                     <span class="kw">if</span> <span class=
 "ident">input</span>.<span class="ident">peek</span>(<span class=
@@ -11768,7 +11589,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "syn";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>

@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.0/src/error.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ndarray-0.13.1/src/error.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>error.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -175,9 +175,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -320,14 +317,24 @@ autocomplete="off" spellcheck="false" placeholder=
 
 <span class="kw">impl</span> <span class=
 "ident">Error</span> <span class="kw">for</span> <span class=
-"ident">ShapeError</span> {
+"ident">ShapeError</span> {}
+
+<span class="kw">impl</span> <span class=
+"ident">fmt</span>::<span class="ident">Display</span> <span class=
+"kw">for</span> <span class="ident">ShapeError</span> {
     <span class="kw">fn</span> <span class=
-"ident">description</span>(<span class="kw-2">&</span><span class=
-"self">self</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="kw-2">&</span><span class=
-"ident">str</span> {
-        <span class="kw">match</span> <span class=
-"self">self</span>.<span class="ident">kind</span>() {
+"ident">fmt</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class="ident">f</span>: <span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">fmt</span>::<span class=
+"ident">Formatter</span><span class="op">&lt;</span><span class=
+"lifetime">'_</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="kw">let</span> <span class=
+"ident">description</span> <span class="op">=</span> <span class=
+"kw">match</span> <span class="self">self</span>.<span class=
+"ident">kind</span>() {
             <span class="ident">ErrorKind</span>::<span class=
 "ident">IncompatibleShape</span> <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
@@ -355,27 +362,12 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">__Incomplete</span> <span class="op">=</span><span class=
 "op">&gt;</span> <span class=
 "string">"this error variant is not in use"</span>,
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Display</span> <span class=
-"kw">for</span> <span class="ident">ShapeError</span> {
-    <span class="kw">fn</span> <span class=
-"ident">fmt</span>(<span class="kw-2">&</span><span class=
-"self">self</span>, <span class="ident">f</span>: <span class=
-"kw-2">&</span><span class="kw-2">mut</span> <span class=
-"ident">fmt</span>::<span class=
-"ident">Formatter</span><span class="op">&lt;</span><span class=
-"lifetime">'_</span><span class="op">&gt;</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        };
         <span class="macro">write</span><span class=
 "macro">!</span>(<span class="ident">f</span>, <span class=
 "string">"ShapeError/{:?}: {}"</span>, <span class=
 "self">self</span>.<span class="ident">kind</span>(), <span class=
-"self">self</span>.<span class="ident">description</span>())
+"ident">description</span>)
     }
 }
 
@@ -393,9 +385,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="macro">write</span><span class=
 "macro">!</span>(<span class="ident">f</span>, <span class=
-"string">"ShapeError/{:?}: {}"</span>, <span class=
-"self">self</span>.<span class="ident">kind</span>(), <span class=
-"self">self</span>.<span class="ident">description</span>())
+"string">"{}"</span>, <span class="self">self</span>)
     }
 }
 
@@ -425,7 +415,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <script>
 window.rootPath = "../../";window.currentCrate = "ndarray";
 </script>
-<script src="../../aliases.js"></script>
 <script src="../../main.js"></script>
 <script src="../../source-script.js"></script>
 <script src="../../source-files.js"></script>
