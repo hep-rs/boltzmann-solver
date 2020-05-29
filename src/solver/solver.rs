@@ -615,7 +615,7 @@ where
     #[allow(clippy::similar_names)]
     #[allow(clippy::too_many_lines)]
     pub fn solve(&mut self) -> (Array1<f64>, Array1<f64>) {
-        use super::tableau::rk87::{RK_A, RK_B, RK_C, RK_E, RK_ORDER, RK_S};
+        use super::tableau::{RK_A, RK_B, RK_C, RK_E, RK_ORDER, RK_S};
 
         // Initialize all the variables that will be used in the integration
         let mut n = self.initial_densities.clone();

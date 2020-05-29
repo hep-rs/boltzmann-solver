@@ -24,11 +24,20 @@ num = "0.2"
 serde_json = "1.0"
 
 [features]
-default = ["parallel", "serialization"]
+default = ["rk87", "parallel", "serialization"]
 
 nightly = []
 serialization = ["serde", "ndarray/serde", "num/serde"]
 parallel = ["rayon", "ndarray/rayon"]
+
+rk21 = []
+rk32 = []
+rk43 = []
+rk54 = []
+rk65 = []
+rk76 = []
+rk87 = []
+rk98 = []
 
 [profile.dev]
 opt-level = 1
