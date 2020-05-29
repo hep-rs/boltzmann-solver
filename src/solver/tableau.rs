@@ -35,6 +35,36 @@ pub mod rk76;
 pub mod rk87;
 pub mod rk98;
 
+#[cfg(feature = "rk21")]
+pub use rk21::{RK_A, RK_B, RK_C, RK_E, RK_ORDER, RK_S};
+#[cfg(feature = "rk32")]
+pub use rk32::{RK_A, RK_B, RK_C, RK_E, RK_ORDER, RK_S};
+#[cfg(feature = "rk43")]
+pub use rk43::{RK_A, RK_B, RK_C, RK_E, RK_ORDER, RK_S};
+#[cfg(feature = "rk54")]
+pub use rk54::{RK_A, RK_B, RK_C, RK_E, RK_ORDER, RK_S};
+#[cfg(feature = "rk65")]
+pub use rk65::{RK_A, RK_B, RK_C, RK_E, RK_ORDER, RK_S};
+#[cfg(feature = "rk76")]
+pub use rk76::{RK_A, RK_B, RK_C, RK_E, RK_ORDER, RK_S};
+#[cfg(feature = "rk87")]
+pub use rk87::{RK_A, RK_B, RK_C, RK_E, RK_ORDER, RK_S};
+#[cfg(feature = "rk98")]
+pub use rk98::{RK_A, RK_B, RK_C, RK_E, RK_ORDER, RK_S};
+
+// Use Runge-Kutta 8(7) by default
+#[cfg(all(
+    not(feature = "rk21"),
+    not(feature = "rk32"),
+    not(feature = "rk43"),
+    not(feature = "rk54"),
+    not(feature = "rk65"),
+    not(feature = "rk76"),
+    not(feature = "rk87"),
+    not(feature = "rk98")
+))]
+pub use rk87::{RK_A, RK_B, RK_C, RK_E, RK_ORDER, RK_S};
+
 #[cfg(test)]
 mod tests {
     use crate::utilities::test::approx_eq;
