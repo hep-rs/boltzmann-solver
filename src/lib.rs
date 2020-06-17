@@ -158,3 +158,5 @@ pub mod prelude;
 pub mod solver;
 pub mod statistic;
 pub mod utilities;
+
+pub use special_functions::particle_physics::pave_absorptive as pave;

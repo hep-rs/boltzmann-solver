@@ -15,7 +15,7 @@ use crate::constants::PI_N2;
 use quadrature::integrate;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use special_functions::{bessel, particle_statistics};
+use special_functions::{bessel, particle_physics::statistics};
 use std::{f64, fmt};
 
 /// Equilibrium number density for massless bosons, normalized to the
@@ -183,7 +183,7 @@ impl Statistics for Statistic {
         match *self {
             Statistic::FermiDirac => {
                 if mu == 0.0 {
-                    particle_statistics::fermi_dirac_massive(mass, beta)
+                    statistics::fermi_dirac_massive(mass, beta)
                 } else {
                     let integral = integrate(
                         |t| {
@@ -218,7 +218,7 @@ impl Statistics for Statistic {
             }
             Statistic::BoseEinstein => {
                 if mu == 0.0 {
-                    particle_statistics::bose_einstein_massive(mass, beta)
+                    statistics::bose_einstein_massive(mass, beta)
                 } else {
                     let integral = integrate(
                         |t| {
@@ -279,10 +279,8 @@ impl Statistics for Statistic {
         debug_assert!(beta >= 0.0, "β must be positive.");
         if mu == 0.0 {
             match *self {
-                Statistic::BoseEinstein => {
-                    particle_statistics::bose_einstein_normalized(mass, beta)
-                }
-                Statistic::FermiDirac => particle_statistics::fermi_dirac_normalized(mass, beta),
+                Statistic::BoseEinstein => statistics::bose_einstein_normalized(mass, beta),
+                Statistic::FermiDirac => statistics::fermi_dirac_normalized(mass, beta),
                 Statistic::MaxwellBoltzmann | Statistic::MaxwellJuttner => {
                     self.number_density(mass, mu, beta)
                         / Statistic::BoseEinstein.massless_number_density(0.0, beta)
@@ -309,13 +307,13 @@ impl Statistics for Statistic {
         debug_assert!(beta >= 0.0, "β must be positive.");
 
         match *self {
-            Statistic::FermiDirac => particle_statistics::fermi_dirac_massless(mu, beta),
+            Statistic::FermiDirac => statistics::fermi_dirac_massless(mu, beta),
             Statistic::BoseEinstein => {
                 debug_assert!(
                     mu <= 0.0,
                     "Bose–Einstein condensates (μ > 0) are not supported."
                 );
-                particle_statistics::bose_einstein_massless(mu, beta)
+                statistics::bose_einstein_massless(mu, beta)
             }
             Statistic::MaxwellBoltzmann => PI_N2 * f64::exp(mu * beta) * beta.powi(-3),
             Statistic::MaxwellJuttner => 0.0,
