@@ -132,7 +132,7 @@ impl<M> FourParticle<M> {
     ///
     /// This asymmetry is subsequently used to compute the asymmetry in the
     /// interaction rate given by [`Interaction::asymmetry`].
-    pub fn set_asymmetry<F>(mut self, asymmetry: F) -> Self
+    pub fn set_asymmetry<F>(&mut self, asymmetry: F) -> &Self
     where
         F: Fn(&M, f64, f64, f64) -> f64 + Sync + 'static,
     {
