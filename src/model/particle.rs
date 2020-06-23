@@ -55,7 +55,7 @@ pub struct Particle {
     /// width and squared width are updated simultaneously.
     pub width2: f64,
     /// Decays
-    #[serde(skip)]
+    #[cfg_attr(feature = "serde", serde(skip))]
     pub decays: HashMap<Vec<isize>, f64>,
     // Whether the particle is complex or not
     complex: bool,
