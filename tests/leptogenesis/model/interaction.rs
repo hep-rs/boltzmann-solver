@@ -1,8 +1,11 @@
 //! Define the various interactions involved in leptogenesis.
 
 use crate::LeptogenesisModel;
-use boltzmann_solver::{model::interaction, prelude::*, utilities::propagator};
+use boltzmann_solver::{
+    constants::PI_2, model::interaction, pave, prelude::*, utilities::propagator,
+};
 use itertools::iproduct;
+use num::Complex;
 use std::convert::TryFrom;
 
 /// Interaction H ↔ L(i2), -e(i3)
@@ -91,7 +94,11 @@ pub fn hln() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
 
         let m2 = move |m: &LeptogenesisModel| {
             let ptcl = m.particles();
-            2.0 * m.yv[[i3, i2]].norm_sqr() * (ptcl[p1].mass2 - ptcl[p2].mass2 - ptcl[p3].mass2)
+            let p1 = &ptcl[p1];
+            let p2 = &ptcl[p2];
+            let p3 = &ptcl[p3];
+
+            2.0 * m.yv[[i3, i2]].norm_sqr() * (p1.mass2 - p2.mass2 - p3.mass2).abs()
         };
 
         interactions.extend(
@@ -101,11 +108,171 @@ pub fn hln() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
                 -isize::try_from(p2).unwrap(),
                 isize::try_from(p3).unwrap(),
             )
-            .drain(..)
-            .map(|interaction| {
-                interaction.set_asymmetry(move |m: &LeptogenesisModel| m.epsilon[[i3, i2]])
-            }),
+            .drain(..),
         );
+
+        let len = interactions.len();
+
+        interactions[len - 1].set_asymmetry(move |m: &LeptogenesisModel| {
+            let ptcl = m.particles();
+            let p1 = &ptcl[p1];
+            let p2 = &ptcl[p2];
+            let p3 = &ptcl[p3];
+
+            let mass_correction = iproduct!(0..3, 0..3)
+                .filter(|(i4, _)| i4 != &i3)
+                .map(|(i4, i5)| {
+                    let p4 = &ptcl[LeptogenesisModel::particle_idx("N", i4).unwrap()];
+                    let p5 = &ptcl[LeptogenesisModel::particle_idx("L", i5).unwrap()];
+
+                    let numerator = p3.mass
+                        * (m.yv[[i4, i5]] * m.yv[[i3, i5]].conj())
+                        * (p2.mass2 + p3.mass2 - p1.mass2)
+                        * (p3.mass * m.yv[[i3, i2]] * m.yv[[i4, i2]].conj()
+                            - p4.mass * m.yv[[i4, i2]] * m.yv[[i3, i2]].conj())
+                        * pave::b(0, 1, p3.mass2, p5.mass, p1.mass);
+                    let denominator = p3.mass2 - p4.mass2;
+
+                    2.0 * -2.0 * numerator.im / denominator
+                })
+                .sum::<f64>();
+
+            let vertex_correction = iproduct!(0..3, 0..3)
+                .map(|(i4, i5)| {
+                    let p4 = &ptcl[LeptogenesisModel::particle_idx("L", i4).unwrap()];
+                    let p5 = &ptcl[LeptogenesisModel::particle_idx("N", i5).unwrap()];
+
+                    (p3.mass * p5.mass)
+                        * 2.0
+                        * (m.yv[[i3, i2]]
+                            * m.yv[[i3, i4]]
+                            * m.yv[[i5, i2]].conj()
+                            * m.yv[[i5, i4]].conj())
+                        .im
+                        * (-pave::b(0, 0, p1.mass2, p5.mass, p4.mass)
+                            + pave::b(0, 0, p3.mass2, p1.mass, p4.mass)
+                            + (p3.mass2 + p5.mass2 - 2.0 * p1.mass2)
+                                * pave::c(
+                                    0, 0, 0, p2.mass2, p1.mass2, p3.mass2, p1.mass, p5.mass,
+                                    p4.mass,
+                                ))
+                })
+                .sum::<f64>();
+
+            (mass_correction + vertex_correction) / (16.0 * PI_2)
+        });
+
+        interactions[len - 3].set_asymmetry(move |m: &LeptogenesisModel| {
+            let ptcl = m.particles();
+            let p1 = &ptcl[p1];
+            let p2 = &ptcl[p2];
+            let p3 = &ptcl[p3];
+
+            let mass_correction = iproduct!(0..3, 0..3)
+                .filter(|(i4, _)| i4 != &i3)
+                .map(|(i4, i5)| {
+                    let p4 = &ptcl[LeptogenesisModel::particle_idx("N", i4).unwrap()];
+                    let p5 = &ptcl[LeptogenesisModel::particle_idx("L", i5).unwrap()];
+
+                    let numerator: Complex<f64> = (m.yv[[i4, i5]] * m.yv[[i3, i5]].conj())
+                        * (-p2.mass2 - p3.mass2 + p1.mass2)
+                        * ((m.yv[[i3, i2]] * (-m.yv[[i4, i2]].conj()))
+                            * ((p5.mass2 + p3.mass2 - p1.mass2)
+                                * pave::b(0, 0, p3.mass2, p5.mass, p1.mass)
+                                + p3.mass2 * pave::b(0, 1, p3.mass2, p5.mass, p1.mass)))
+                        - (p3.mass * p4.mass)
+                            * (m.yv[[i4, i2]] * m.yv[[i3, i2]].conj())
+                            * pave::b(0, 1, p3.mass2, p5.mass, p1.mass);
+                    let denominator = p3.mass2 - p4.mass2;
+
+                    2.0 * -2.0 * numerator.im / denominator
+                })
+                .sum::<f64>();
+
+            let vertex_correction = iproduct!(0..3, 0..3)
+                .map(|(i4, i5)| {
+                    let p4 = &ptcl[LeptogenesisModel::particle_idx("L", i4).unwrap()];
+                    let p5 = &ptcl[LeptogenesisModel::particle_idx("N", i5).unwrap()];
+
+                    (p3.mass * p4.mass)
+                        * 2.0
+                        * (m.yv[[i3, i2]]
+                            * m.yv[[i3, i4]]
+                            * m.yv[[i5, i2]].conj()
+                            * m.yv[[i5, i4]].conj())
+                        .im
+                        * (-pave::b(0, 0, p1.mass2, p5.mass, p4.mass)
+                            + pave::b(0, 0, p3.mass2, p1.mass, p4.mass)
+                            + (p3.mass2 + p5.mass2 - 2.0 * p1.mass2)
+                                * pave::c(
+                                    0, 0, 0, p2.mass2, p1.mass2, p3.mass2, p5.mass, p1.mass,
+                                    p4.mass,
+                                ))
+                })
+                .sum::<f64>();
+
+            (mass_correction + vertex_correction) / (16.0 * PI_2)
+        });
+
+        interactions[len - 2].set_asymmetry(move |m: &LeptogenesisModel| {
+            let ptcl = m.particles();
+            let p1 = &ptcl[p1];
+            let p2 = &ptcl[p2];
+            let p3 = &ptcl[p3];
+
+            let mass_correction = iproduct!(0..3, 0..3)
+                .filter(|(i4, _)| i4 != &i3)
+                .map(|(i4, i5)| {
+                    let p4 = &ptcl[LeptogenesisModel::particle_idx("N", i4).unwrap()];
+                    let p5 = &ptcl[LeptogenesisModel::particle_idx("L", i5).unwrap()];
+
+                    let numerator: Complex<f64> = (m.yv[[i4, i5]] * m.yv[[i3, i5]].conj())
+                        * (-p2.mass2 - p3.mass2 + p1.mass2)
+                        * ((m.yv[[i3, i2]] * (-m.yv[[i4, i2]].conj()))
+                            * ((p5.mass2 + p3.mass2 - p1.mass2)
+                                * pave::b(0, 0, p3.mass2, p5.mass, p1.mass)
+                                + p3.mass2 * pave::b(0, 1, p3.mass2, p5.mass, p1.mass)))
+                        - (p3.mass * p4.mass)
+                            * (m.yv[[i4, i2]] * m.yv[[i3, i2]].conj())
+                            * pave::b(0, 1, p3.mass2, p5.mass, p1.mass);
+                    let denominator = p3.mass2 - p4.mass2;
+
+                    2.0 * -2.0 * numerator.im / denominator
+                })
+                .sum::<f64>();
+
+            let vertex_correction = iproduct!(0..3, 0..3)
+                .map(|(i4, i5)| {
+                    let p4 = &ptcl[LeptogenesisModel::particle_idx("L", i4).unwrap()];
+                    let p5 = &ptcl[LeptogenesisModel::particle_idx("N", i5).unwrap()];
+
+                    (p3.mass * p4.mass)
+                        * 2.0
+                        * (m.yv[[i3, i2]]
+                            * m.yv[[i3, i4]]
+                            * m.yv[[i5, i2]].conj()
+                            * m.yv[[i5, i4]].conj())
+                        .im
+                        * (-2.0
+                            * p2.mass2
+                            * pave::c(
+                                0, 0, 1, p3.mass2, p1.mass2, p2.mass2, p1.mass, p4.mass, p5.mass,
+                            )
+                            + (-p2.mass2 - p3.mass2 + p1.mass2)
+                                * pave::c(
+                                    0, 0, 0, p3.mass2, p1.mass2, p2.mass2, p1.mass, p4.mass,
+                                    p5.mass,
+                                )
+                            - (p2.mass2 + p3.mass2 - p1.mass2)
+                                * pave::c(
+                                    0, 1, 0, p3.mass2, p1.mass2, p2.mass2, p1.mass, p4.mass,
+                                    p5.mass,
+                                ))
+                })
+                .sum::<f64>();
+
+            (mass_correction + vertex_correction) / (16.0 * PI_2)
+        });
     }
 
     interactions
