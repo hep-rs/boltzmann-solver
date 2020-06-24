@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-complex-0.2.4/src/pow.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-complex-0.3.0/src/pow.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>pow.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -259,7 +259,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
-<span id="187">187</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -270,12 +269,15 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">core</span>::<span class="ident">ops</span>::<span class=
 "ident">Neg</span>;
 <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"std"</span>)]</span>
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"libm"</span>))]</span>
 <span class="kw">use</span> <span class=
-"ident">traits</span>::<span class="ident">Float</span>;
+"ident">num_traits</span>::<span class="ident">Float</span>;
 <span class="kw">use</span> <span class=
-"ident">traits</span>::{<span class=
+"ident">num_traits</span>::{<span class=
 "ident">Num</span>, <span class="ident">One</span>, <span class=
 "ident">Pow</span>};
 
@@ -504,8 +506,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="macro">pow_impl</span><span class=
 "macro">!</span>(<span class="ident">usize</span>, <span class=
 "ident">isize</span>);
-<span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">has_i128</span>)]</span>
 <span class="macro">pow_impl</span><span class=
 "macro">!</span>(<span class="ident">u128</span>, <span class=
 "ident">i128</span>);
@@ -526,8 +526,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">ty</span>) <span class="op">=</span><span class=
 "op">&gt;</span> {
         <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"std"</span>)]</span>
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"libm"</span>))]</span>
         <span class="kw">impl</span><span class=
 "op">&lt;</span><span class="lifetime">'a</span>, <span class=
 "ident">T</span>: <span class="ident">Float</span><span class=
@@ -561,8 +564,11 @@ autocomplete="off" spellcheck="false" placeholder=
         }
 
         <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"std"</span>)]</span>
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"libm"</span>))]</span>
         <span class="kw">impl</span><span class=
 "op">&lt;</span><span class="lifetime">'a</span>, <span class=
 "lifetime">'b</span>, <span class="ident">T</span>: <span class=
@@ -602,8 +608,11 @@ autocomplete="off" spellcheck="false" placeholder=
         }
 
         <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"std"</span>)]</span>
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"libm"</span>))]</span>
         <span class="kw">impl</span><span class=
 "op">&lt;</span><span class="ident">T</span>: <span class=
 "ident">Float</span><span class="op">&gt;</span> <span class=
@@ -640,8 +649,11 @@ autocomplete="off" spellcheck="false" placeholder=
         }
 
         <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"std"</span>)]</span>
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"libm"</span>))]</span>
         <span class="kw">impl</span><span class=
 "op">&lt;</span><span class="lifetime">'b</span>, <span class=
 "ident">T</span>: <span class="ident">Float</span><span class=
@@ -692,8 +704,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "comment">// foreign to anyone else trying to implement something that would overlap, raising E0117.</span>
 
 <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"std"</span>)]</span>
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"libm"</span>))]</span>
 <span class="kw">impl</span><span class=
 "op">&lt;</span><span class="lifetime">'a</span>, <span class=
 "ident">T</span>: <span class="ident">Float</span><span class=
@@ -725,8 +740,11 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"std"</span>)]</span>
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"libm"</span>))]</span>
 <span class="kw">impl</span><span class=
 "op">&lt;</span><span class="lifetime">'a</span>, <span class=
 "lifetime">'b</span>, <span class="ident">T</span>: <span class=
@@ -760,8 +778,11 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"std"</span>)]</span>
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"libm"</span>))]</span>
 <span class="kw">impl</span><span class=
 "op">&lt;</span><span class="ident">T</span>: <span class=
 "ident">Float</span><span class="op">&gt;</span> <span class=
@@ -791,8 +812,11 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"std"</span>)]</span>
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"libm"</span>))]</span>
 <span class="kw">impl</span><span class=
 "op">&lt;</span><span class="lifetime">'b</span>, <span class=
 "ident">T</span>: <span class="ident">Float</span><span class=

@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["a","Absorptive part of the Passarin-Veltman coefficient function"],["b","Absorptive part of the Passarino-Veltman coefficient function:"],["c","Absrptive part of the Passarin-Veltman coefficient function"],["d","Evaluate the Passarin-Veltman coefficient function"]]});

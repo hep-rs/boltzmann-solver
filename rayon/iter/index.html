@@ -94,7 +94,7 @@ autocomplete="off" spellcheck="false" placeholder=
 'render-detail'><a id="toggle-all-docs" href="javascript:void(0)"
 title="collapse all docs">[<span class=
 'inner'>−</span>]</a></span><a class='srclink' href=
-'../../src/rayon/iter/mod.rs.html#1-2867' title=
+'../../src/rayon/iter/mod.rs.html#1-2892' title=
 'goto source code'>[src]</a></span><span class='in-band'>Module
 <a href='../index.html'>rayon</a>::<wbr><a class="mod" href=
 ''>iter</a></span></h1>
@@ -211,7 +211,7 @@ optimizations.)</p>
 are low-level details -- users of parallel iterators should not
 need to interact with them directly. See <a href=
 "https://github.com/rayon-rs/rayon/blob/master/src/iter/plumbing/README.md">
-the <code>plumbing</code> README</a> for a high-level overview.</p>
+the <code>plumbing</code> README</a> for a general overview.</p>
 </td>
 </tr>
 </table>
@@ -510,6 +510,18 @@ method on <a href=
 <p><code>Split</code> is a parallel iterator using arbitrary data
 and a splitting function. This struct is created by the <a href=
 "fn.split.html"><code>split()</code></a> function.</p>
+</td>
+</tr>
+<tr class='module-item'>
+<td><a class="struct" href="struct.StepBy.html" title=
+'rayon::iter::StepBy struct'>StepBy</a></td>
+<td class='docblock-short'>
+<p><code>StepBy</code> is an iterator that skips <code>n</code>
+elements between each yield, where <code>n</code> is the given
+step. This struct is created by the <a href=
+"trait.IndexedParallelIterator.html#method.step_by"><code>step_by()</code></a>
+method on <a href=
+"trait.IndexedParallelIterator.html"><code>IndexedParallelIterator</code></a></p>
 </td>
 </tr>
 <tr class='module-item'>

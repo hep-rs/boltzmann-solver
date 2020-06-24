@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive-1.0.110/src/de.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive-1.0.114/src/de.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>de.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -3157,8 +3157,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Style</span>, <span class="ident">Variant</span>};
 <span class="kw">use</span> <span class=
 "ident">internals</span>::{<span class=
-"ident">attr</span>, <span class="ident">Ctxt</span>, <span class=
-"ident">Derive</span>};
+"ident">attr</span>, <span class=
+"ident">ungroup</span>, <span class=
+"ident">Ctxt</span>, <span class="ident">Derive</span>};
 <span class="kw">use</span> <span class="ident">pretend</span>;
 
 <span class="kw">use</span> <span class=
@@ -3359,8 +3360,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw">let</span> <span class="ident">syn</span>::<span class=
 "ident">Type</span>::<span class="ident">Slice</span>(<span class=
 "kw">_</span>) <span class="op">=</span> <span class=
-"kw-2">*</span><span class="ident">last</span>.<span class=
-"ident">ty</span> {
+"ident">ungroup</span>(<span class="ident">last</span>.<span class=
+"ident">ty</span>) {
                 <span class="ident">cx</span>.<span class=
 "ident">error_spanned_by</span>(
                     <span class="ident">cont</span>.<span class=

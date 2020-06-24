@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/unicode-xid-0.2.0/src/lib.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/unicode-xid-0.2.1/src/lib.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>lib.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -158,9 +158,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="82">82</span>
 <span id="83">83</span>
 <span id="84">84</span>
-<span id="85">85</span>
-<span id="86">86</span>
-<span id="87">87</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -204,29 +201,21 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class=
 "doccomment">//! on std, and instead uses equivalent functions from core.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! # crates.io</span>
-<span class="doccomment">//!</span>
-<span class=
-"doccomment">//! You can use this package in your project by adding the following</span>
-<span class="doccomment">//! to your `Cargo.toml`:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! unicode-xid = "0.0.4"</span>
-<span class="doccomment">//! ```</span>
 
 <span class="attribute">#![<span class=
-"ident">deny</span>(<span class=
-"ident">missing_docs</span>, <span class=
+"ident">forbid</span>(<span class=
 "ident">unsafe_code</span>)]</span>
 <span class="attribute">#![<span class=
-"ident">doc</span>(<span class=
-"ident">html_logo_url</span> <span class="op">=</span> <span class=
-"string">"https://unicode-rs.github.io/unicode-rs_sm.png"</span>,
-       <span class="ident">html_favicon_url</span> <span class=
+"ident">deny</span>(<span class=
+"ident">missing_docs</span>)]</span>
+<span class="attribute">#![<span class="ident">doc</span>(
+    <span class="ident">html_logo_url</span> <span class=
 "op">=</span> <span class=
-"string">"https://unicode-rs.github.io/unicode-rs_sm.png"</span>)]</span>
-
+"string">"https://unicode-rs.github.io/unicode-rs_sm.png"</span>,
+    <span class="ident">html_favicon_url</span> <span class=
+"op">=</span> <span class=
+"string">"https://unicode-rs.github.io/unicode-rs_sm.png"</span>
+)]</span>
 <span class="attribute">#![<span class=
 "ident">no_std</span>]</span>
 <span class="attribute">#![<span class=
@@ -304,18 +293,20 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="kw">fn</span> <span class=
 "ident">is_xid_start</span>(<span class=
 "self">self</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">bool</span> { <span class=
-"ident">derived_property</span>::<span class=
-"ident">XID_Start</span>(<span class="self">self</span>) }
+"op">&gt;</span> <span class="ident">bool</span> {
+        <span class="ident">derived_property</span>::<span class=
+"ident">XID_Start</span>(<span class="self">self</span>)
+    }
 
     <span class="attribute">#[<span class=
 "ident">inline</span>]</span>
     <span class="kw">fn</span> <span class=
 "ident">is_xid_continue</span>(<span class=
 "self">self</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">bool</span> { <span class=
-"ident">derived_property</span>::<span class=
-"ident">XID_Continue</span>(<span class="self">self</span>) }
+"op">&gt;</span> <span class="ident">bool</span> {
+        <span class="ident">derived_property</span>::<span class=
+"ident">XID_Continue</span>(<span class="self">self</span>)
+    }
 }
 </pre></div>
 </section>

@@ -668,8 +668,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="593">593</span>
 <span id="594">594</span>
 <span id="595">595</span>
-<span id="596">596</span>
-<span id="597">597</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -708,7 +706,8 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="kw">use</span> <span class=
 "ident">special_functions</span>::{<span class=
 "ident">bessel</span>, <span class=
-"ident">particle_statistics</span>};
+"ident">particle_physics</span>::<span class=
+"ident">statistics</span>};
 <span class="kw">use</span> <span class=
 "ident">std</span>::{<span class="ident">f64</span>, <span class=
 "ident">fmt</span>};
@@ -1109,7 +1108,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">mu</span> <span class="op">=</span><span class=
 "op">=</span> <span class="number">0.0</span> {
                     <span class=
-"ident">particle_statistics</span>::<span class=
+"ident">statistics</span>::<span class=
 "ident">fermi_dirac_massive</span>(<span class=
 "ident">mass</span>, <span class="ident">beta</span>)
                 } <span class="kw">else</span> {
@@ -1200,7 +1199,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">mu</span> <span class="op">=</span><span class=
 "op">=</span> <span class="number">0.0</span> {
                     <span class=
-"ident">particle_statistics</span>::<span class=
+"ident">statistics</span>::<span class=
 "ident">bose_einstein_massive</span>(<span class=
 "ident">mass</span>, <span class="ident">beta</span>)
                 } <span class="kw">else</span> {
@@ -1366,18 +1365,12 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">*</span><span class="self">self</span> {
                 <span class="ident">Statistic</span>::<span class=
 "ident">BoseEinstein</span> <span class="op">=</span><span class=
-"op">&gt;</span> {
-                    <span class=
-"ident">particle_statistics</span>::<span class=
-"ident">bose_einstein_normalized</span>(<span class=
-"ident">mass</span>, <span class="ident">beta</span>)
-                }
+"op">&gt;</span> <span class=
+"ident">statistics</span>::<span class="ident">bose_einstein_normalized</span>(<span class="ident">mass</span>, <span class="ident">beta</span>),
                 <span class="ident">Statistic</span>::<span class=
 "ident">FermiDirac</span> <span class="op">=</span><span class=
 "op">&gt;</span> <span class=
-"ident">particle_statistics</span>::<span class=
-"ident">fermi_dirac_normalized</span>(<span class=
-"ident">mass</span>, <span class="ident">beta</span>),
+"ident">statistics</span>::<span class="ident">fermi_dirac_normalized</span>(<span class="ident">mass</span>, <span class="ident">beta</span>),
                 <span class="ident">Statistic</span>::<span class=
 "ident">MaxwellBoltzmann</span> <span class=
 "op">|</span> <span class="ident">Statistic</span>::<span class=
@@ -1439,9 +1432,7 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="ident">Statistic</span>::<span class=
 "ident">FermiDirac</span> <span class="op">=</span><span class=
 "op">&gt;</span> <span class=
-"ident">particle_statistics</span>::<span class=
-"ident">fermi_dirac_massless</span>(<span class=
-"ident">mu</span>, <span class="ident">beta</span>),
+"ident">statistics</span>::<span class="ident">fermi_dirac_massless</span>(<span class="ident">mu</span>, <span class="ident">beta</span>),
             <span class="ident">Statistic</span>::<span class=
 "ident">BoseEinstein</span> <span class="op">=</span><span class=
 "op">&gt;</span> {
@@ -1453,8 +1444,7 @@ autocomplete="off" spellcheck="false" placeholder=
                     <span class=
 "string">"Bose–Einstein condensates (μ &gt; 0) are not supported."</span>
                 );
-                <span class=
-"ident">particle_statistics</span>::<span class=
+                <span class="ident">statistics</span>::<span class=
 "ident">bose_einstein_massless</span>(<span class=
 "ident">mu</span>, <span class="ident">beta</span>)
             }

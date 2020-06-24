@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.27/src/parse.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.33/src/parse.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>parse.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -1318,6 +1318,11 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="1243">1243</span>
 <span id="1244">1244</span>
 <span id="1245">1245</span>
+<span id="1246">1246</span>
+<span id="1247">1247</span>
+<span id="1248">1248</span>
+<span id="1249">1249</span>
+<span id="1250">1250</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -1367,8 +1372,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">//! [`parse_macro_input!`]: ../macro.parse_macro_input.html</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```</span>
-<span class="doccomment">//! extern crate proc_macro;</span>
-<span class="doccomment">//!</span>
+<span class="doccomment">//! # extern crate proc_macro;</span>
+<span class="doccomment">//! #</span>
 <span class="doccomment">//! use proc_macro::TokenStream;</span>
 <span class=
 "doccomment">//! use syn::{braced, parse_macro_input, token, Field, Ident, Result, Token};</span>
@@ -1543,8 +1548,8 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="doccomment">//! [`Parser`]: trait.Parser.html</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```</span>
-<span class="doccomment">//! extern crate proc_macro;</span>
-<span class="doccomment">//!</span>
+<span class="doccomment">//! # extern crate proc_macro;</span>
+<span class="doccomment">//! #</span>
 <span class="doccomment">//! use proc_macro::TokenStream;</span>
 <span class="doccomment">//! use syn::parse::Parser;</span>
 <span class=
@@ -1670,6 +1675,12 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class=
 "doccomment">/// Parsing interface implemented by all types that can be parsed in a default</span>
 <span class="doccomment">/// way from a token stream.</span>
+<span class="doccomment">///</span>
+<span class=
+"doccomment">/// Refer to the [module documentation] for details about implementing and using</span>
+<span class="doccomment">/// the `Parse` trait.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [module documentation]: self</span>
 <span class="kw">pub</span> <span class=
 "kw">trait</span> <span class="ident">Parse</span>: <span class=
 "ident">Sized</span> {
@@ -3717,8 +3728,8 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="doccomment">/// provided any attribute args.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// extern crate proc_macro;</span>
-<span class="doccomment">///</span>
+<span class="doccomment">/// # extern crate proc_macro;</span>
+<span class="doccomment">/// #</span>
 <span class="doccomment">/// use proc_macro::TokenStream;</span>
 <span class="doccomment">/// use syn::parse_macro_input;</span>
 <span class="doccomment">/// use syn::parse::Nothing;</span>

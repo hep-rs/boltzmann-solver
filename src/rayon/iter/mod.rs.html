@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rayon-1.3.0/src/iter/mod.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rayon-1.3.1/src/iter/mod.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>mod.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href=
@@ -2941,6 +2941,31 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="2865">2865</span>
 <span id="2866">2866</span>
 <span id="2867">2867</span>
+<span id="2868">2868</span>
+<span id="2869">2869</span>
+<span id="2870">2870</span>
+<span id="2871">2871</span>
+<span id="2872">2872</span>
+<span id="2873">2873</span>
+<span id="2874">2874</span>
+<span id="2875">2875</span>
+<span id="2876">2876</span>
+<span id="2877">2877</span>
+<span id="2878">2878</span>
+<span id="2879">2879</span>
+<span id="2880">2880</span>
+<span id="2881">2881</span>
+<span id="2882">2882</span>
+<span id="2883">2883</span>
+<span id="2884">2884</span>
+<span id="2885">2885</span>
+<span id="2886">2886</span>
+<span id="2887">2887</span>
+<span id="2888">2888</span>
+<span id="2889">2889</span>
+<span id="2890">2890</span>
+<span id="2891">2891</span>
+<span id="2892">2892</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -3092,11 +3117,18 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">std</span>::<span class="ident">ops</span>::<span class=
 "ident">Fn</span>;
 
+<span class="kw">pub</span> <span class=
+"kw">mod</span> <span class="ident">plumbing</span>;
+
+<span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">test</span>;
+
 <span class=
 "comment">// There is a method to the madness here:</span>
 <span class="comment">//</span>
 <span class=
-"comment">// - Most of these modules are private but expose certain types to the end-user</span>
+"comment">// - These modules are private but expose certain types to the end-user</span>
 <span class=
 "comment">//   (e.g., `enumerate::Enumerate`) -- specifically, the types that appear in the</span>
 <span class=
@@ -3111,178 +3143,130 @@ autocomplete="off" spellcheck="false" placeholder=
 "comment">//   e.g. `find::find()`, are always used **prefixed**, so that they</span>
 <span class="comment">//   can be readily distinguished.</span>
 
-<span class="kw">mod</span> <span class="ident">par_bridge</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">par_bridge</span>::{<span class=
-"ident">IterBridge</span>, <span class=
-"ident">ParallelBridge</span>};
-
 <span class="kw">mod</span> <span class="ident">chain</span>;
+<span class="kw">mod</span> <span class="ident">chunks</span>;
+<span class="kw">mod</span> <span class="ident">cloned</span>;
+<span class="kw">mod</span> <span class="ident">collect</span>;
+<span class="kw">mod</span> <span class="ident">copied</span>;
+<span class="kw">mod</span> <span class="ident">empty</span>;
+<span class="kw">mod</span> <span class="ident">enumerate</span>;
+<span class="kw">mod</span> <span class="ident">extend</span>;
+<span class="kw">mod</span> <span class="ident">filter</span>;
+<span class="kw">mod</span> <span class="ident">filter_map</span>;
 <span class="kw">mod</span> <span class="ident">find</span>;
 <span class="kw">mod</span> <span class=
 "ident">find_first_last</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">chain</span>::<span class="ident">Chain</span>;
-<span class="kw">mod</span> <span class="ident">chunks</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">chunks</span>::<span class="ident">Chunks</span>;
-<span class="kw">mod</span> <span class="ident">collect</span>;
-<span class="kw">mod</span> <span class="ident">enumerate</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">enumerate</span>::<span class="ident">Enumerate</span>;
-<span class="kw">mod</span> <span class="ident">filter</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">filter</span>::<span class="ident">Filter</span>;
-<span class="kw">mod</span> <span class="ident">filter_map</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">filter_map</span>::<span class="ident">FilterMap</span>;
 <span class="kw">mod</span> <span class="ident">flat_map</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">flat_map</span>::<span class="ident">FlatMap</span>;
 <span class="kw">mod</span> <span class="ident">flatten</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">flatten</span>::<span class="ident">Flatten</span>;
 <span class="kw">mod</span> <span class="ident">fold</span>;
 <span class="kw">mod</span> <span class="ident">for_each</span>;
 <span class="kw">mod</span> <span class=
 "ident">from_par_iter</span>;
-<span class="kw">pub</span> <span class=
-"kw">mod</span> <span class="ident">plumbing</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">fold</span>::{<span class="ident">Fold</span>, <span class=
-"ident">FoldWith</span>};
-<span class="kw">mod</span> <span class="ident">try_fold</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">try_fold</span>::{<span class=
-"ident">TryFold</span>, <span class="ident">TryFoldWith</span>};
+<span class="kw">mod</span> <span class="ident">inspect</span>;
+<span class="kw">mod</span> <span class="ident">interleave</span>;
+<span class="kw">mod</span> <span class=
+"ident">interleave_shortest</span>;
+<span class="kw">mod</span> <span class="ident">intersperse</span>;
+<span class="kw">mod</span> <span class="ident">len</span>;
+<span class="kw">mod</span> <span class="ident">map</span>;
+<span class="kw">mod</span> <span class="ident">map_with</span>;
+<span class="kw">mod</span> <span class="ident">multizip</span>;
+<span class="kw">mod</span> <span class="ident">noop</span>;
+<span class="kw">mod</span> <span class="ident">once</span>;
+<span class="kw">mod</span> <span class="ident">panic_fuse</span>;
+<span class="kw">mod</span> <span class="ident">par_bridge</span>;
+<span class="kw">mod</span> <span class="ident">product</span>;
 <span class="kw">mod</span> <span class="ident">reduce</span>;
+<span class="kw">mod</span> <span class="ident">repeat</span>;
+<span class="kw">mod</span> <span class="ident">rev</span>;
 <span class="kw">mod</span> <span class="ident">skip</span>;
+<span class="kw">mod</span> <span class="ident">splitter</span>;
+<span class="kw">mod</span> <span class="ident">sum</span>;
+<span class="kw">mod</span> <span class="ident">take</span>;
+<span class="kw">mod</span> <span class="ident">try_fold</span>;
 <span class="kw">mod</span> <span class="ident">try_reduce</span>;
 <span class="kw">mod</span> <span class=
 "ident">try_reduce_with</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">skip</span>::<span class="ident">Skip</span>;
-<span class="kw">mod</span> <span class="ident">splitter</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">splitter</span>::{<span class=
-"ident">split</span>, <span class="ident">Split</span>};
-<span class="kw">mod</span> <span class="ident">take</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">take</span>::<span class="ident">Take</span>;
-<span class="kw">mod</span> <span class="ident">map</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">map</span>::<span class="ident">Map</span>;
-<span class="kw">mod</span> <span class="ident">map_with</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">map_with</span>::{<span class=
-"ident">MapInit</span>, <span class="ident">MapWith</span>};
-<span class="kw">mod</span> <span class="ident">zip</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">zip</span>::<span class="ident">Zip</span>;
-<span class="kw">mod</span> <span class="ident">zip_eq</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">zip_eq</span>::<span class="ident">ZipEq</span>;
-<span class="kw">mod</span> <span class="ident">multizip</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">multizip</span>::<span class="ident">MultiZip</span>;
-<span class="kw">mod</span> <span class="ident">interleave</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">interleave</span>::<span class="ident">Interleave</span>;
-<span class="kw">mod</span> <span class=
-"ident">interleave_shortest</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">interleave_shortest</span>::<span class=
-"ident">InterleaveShortest</span>;
-<span class="kw">mod</span> <span class="ident">intersperse</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">intersperse</span>::<span class="ident">Intersperse</span>;
-<span class="kw">mod</span> <span class="ident">update</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">update</span>::<span class="ident">Update</span>;
-
-<span class="kw">mod</span> <span class="ident">noop</span>;
-<span class="kw">mod</span> <span class="ident">rev</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">rev</span>::<span class="ident">Rev</span>;
-<span class="kw">mod</span> <span class="ident">len</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">len</span>::{<span class=
-"ident">MaxLen</span>, <span class="ident">MinLen</span>};
-
-<span class="kw">mod</span> <span class="ident">cloned</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">cloned</span>::<span class="ident">Cloned</span>;
-<span class="kw">mod</span> <span class="ident">copied</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">copied</span>::<span class="ident">Copied</span>;
-
-<span class="kw">mod</span> <span class="ident">product</span>;
-<span class="kw">mod</span> <span class="ident">sum</span>;
-
-<span class="kw">mod</span> <span class="ident">inspect</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">inspect</span>::<span class="ident">Inspect</span>;
-<span class="kw">mod</span> <span class="ident">panic_fuse</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">panic_fuse</span>::<span class="ident">PanicFuse</span>;
-<span class="kw">mod</span> <span class="ident">while_some</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">while_some</span>::<span class="ident">WhileSome</span>;
-<span class="kw">mod</span> <span class="ident">extend</span>;
-<span class="kw">mod</span> <span class="ident">repeat</span>;
 <span class="kw">mod</span> <span class="ident">unzip</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">repeat</span>::{<span class=
-"ident">repeat</span>, <span class="ident">Repeat</span>};
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">repeat</span>::{<span class=
-"ident">repeatn</span>, <span class="ident">RepeatN</span>};
+<span class="kw">mod</span> <span class="ident">update</span>;
+<span class="kw">mod</span> <span class="ident">while_some</span>;
+<span class="kw">mod</span> <span class="ident">zip</span>;
+<span class="kw">mod</span> <span class="ident">zip_eq</span>;
 
-<span class="kw">mod</span> <span class="ident">empty</span>;
 <span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">empty</span>::{<span class=
-"ident">empty</span>, <span class="ident">Empty</span>};
-<span class="kw">mod</span> <span class="ident">once</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="self">self</span>::<span class=
-"ident">once</span>::{<span class="ident">once</span>, <span class=
-"ident">Once</span>};
+"kw">use</span> <span class="self">self</span>::{
+    <span class="ident">chain</span>::<span class=
+"ident">Chain</span>,
+    <span class="ident">chunks</span>::<span class=
+"ident">Chunks</span>,
+    <span class="ident">cloned</span>::<span class=
+"ident">Cloned</span>,
+    <span class="ident">copied</span>::<span class=
+"ident">Copied</span>,
+    <span class="ident">empty</span>::{<span class=
+"ident">empty</span>, <span class="ident">Empty</span>},
+    <span class="ident">enumerate</span>::<span class=
+"ident">Enumerate</span>,
+    <span class="ident">filter</span>::<span class=
+"ident">Filter</span>,
+    <span class="ident">filter_map</span>::<span class=
+"ident">FilterMap</span>,
+    <span class="ident">flat_map</span>::<span class=
+"ident">FlatMap</span>,
+    <span class="ident">flatten</span>::<span class=
+"ident">Flatten</span>,
+    <span class="ident">fold</span>::{<span class=
+"ident">Fold</span>, <span class="ident">FoldWith</span>},
+    <span class="ident">inspect</span>::<span class=
+"ident">Inspect</span>,
+    <span class="ident">interleave</span>::<span class=
+"ident">Interleave</span>,
+    <span class="ident">interleave_shortest</span>::<span class=
+"ident">InterleaveShortest</span>,
+    <span class="ident">intersperse</span>::<span class=
+"ident">Intersperse</span>,
+    <span class="ident">len</span>::{<span class=
+"ident">MaxLen</span>, <span class="ident">MinLen</span>},
+    <span class="ident">map</span>::<span class="ident">Map</span>,
+    <span class="ident">map_with</span>::{<span class=
+"ident">MapInit</span>, <span class="ident">MapWith</span>},
+    <span class="ident">multizip</span>::<span class=
+"ident">MultiZip</span>,
+    <span class="ident">once</span>::{<span class=
+"ident">once</span>, <span class="ident">Once</span>},
+    <span class="ident">panic_fuse</span>::<span class=
+"ident">PanicFuse</span>,
+    <span class="ident">par_bridge</span>::{<span class=
+"ident">IterBridge</span>, <span class=
+"ident">ParallelBridge</span>},
+    <span class="ident">repeat</span>::{<span class=
+"ident">repeat</span>, <span class=
+"ident">repeatn</span>, <span class=
+"ident">Repeat</span>, <span class="ident">RepeatN</span>},
+    <span class="ident">rev</span>::<span class="ident">Rev</span>,
+    <span class="ident">skip</span>::<span class=
+"ident">Skip</span>,
+    <span class="ident">splitter</span>::{<span class=
+"ident">split</span>, <span class="ident">Split</span>},
+    <span class="ident">take</span>::<span class=
+"ident">Take</span>,
+    <span class="ident">try_fold</span>::{<span class=
+"ident">TryFold</span>, <span class="ident">TryFoldWith</span>},
+    <span class="ident">update</span>::<span class=
+"ident">Update</span>,
+    <span class="ident">while_some</span>::<span class=
+"ident">WhileSome</span>,
+    <span class="ident">zip</span>::<span class="ident">Zip</span>,
+    <span class="ident">zip_eq</span>::<span class=
+"ident">ZipEq</span>,
+};
 
+<span class="kw">mod</span> <span class="ident">step_by</span>;
 <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span>;
+"ident">cfg</span>(<span class="ident">step_by</span>)]</span>
+<span class="kw">pub</span> <span class=
+"kw">use</span> <span class="self">self</span>::<span class=
+"ident">step_by</span>::<span class="ident">StepBy</span>;
 
 <span class=
 "doccomment">/// `IntoParallelIterator` implements the conversion to a [`ParallelIterator`].</span>
@@ -5275,7 +5259,7 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Perform a fallible parallel fold.</span>
+"doccomment">/// Performs a fallible parallel fold.</span>
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// This is a variation of [`fold()`] for operations which can fail with</span>
@@ -5347,7 +5331,7 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Perform a fallible parallel fold with a cloneable `init` value.</span>
+"doccomment">/// Performs a fallible parallel fold with a cloneable `init` value.</span>
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// This combines the `init` semantics of [`fold_with()`] and the failure</span>
@@ -6191,10 +6175,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// let c = ["lol", "NaN", "5", "5"];</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// let first_number = c.par_iter().find_map_first(|s| s.parse().ok());</span>
+"doccomment">/// let found_number = c.par_iter().find_map_any(|s| s.parse().ok());</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// assert_eq!(first_number, Some(5));</span>
+"doccomment">/// assert_eq!(found_number, Some(5));</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class=
 "ident">find_map_any</span><span class="op">&lt;</span><span class=
@@ -6332,10 +6316,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "doccomment">/// let c = ["lol", "NaN", "2", "5"];</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// let first_number = c.par_iter().find_map_last(|s| s.parse().ok());</span>
+"doccomment">/// let last_number = c.par_iter().find_map_last(|s| s.parse().ok());</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// assert_eq!(first_number, Some(5));</span>
+"doccomment">/// assert_eq!(last_number, Some(5));</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class=
 "ident">find_map_last</span><span class=
@@ -6606,7 +6590,7 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Create a fresh collection containing all the element produced</span>
+"doccomment">/// Creates a fresh collection containing all the elements produced</span>
     <span class="doccomment">/// by this parallel iterator.</span>
     <span class="doccomment">///</span>
     <span class=
@@ -7123,7 +7107,7 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Iterate over tuples `(A, B)`, where the items `A` are from</span>
+"doccomment">/// Iterates over tuples `(A, B)`, where the items `A` are from</span>
     <span class=
 "doccomment">/// this iterator and `B` are from the iterator given as argument.</span>
     <span class=
@@ -7222,7 +7206,7 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Interleave elements of this iterator and the other given</span>
+"doccomment">/// Interleaves elements of this iterator and the other given</span>
     <span class=
 "doccomment">/// iterator. Alternately yields elements from this iterator and</span>
     <span class=
@@ -7270,7 +7254,7 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Interleave elements of this iterator and the other given</span>
+"doccomment">/// Interleaves elements of this iterator and the other given</span>
     <span class=
 "doccomment">/// iterator, until one is exhausted.</span>
     <span class="doccomment">///</span>
@@ -7314,7 +7298,7 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Split an iterator up into fixed-size chunks.</span>
+"doccomment">/// Splits an iterator up into fixed-size chunks.</span>
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// Returns an iterator that returns `Vec`s of the given number of elements.</span>
@@ -7773,6 +7757,42 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> {
         <span class="ident">Enumerate</span>::<span class=
 "ident">new</span>(<span class="self">self</span>)
+    }
+
+    <span class=
+"doccomment">/// Creates an iterator that steps by the given amount</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///use rayon::prelude::*;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let range = (3..10);</span>
+    <span class=
+"doccomment">/// let result: Vec&lt;i32&gt; = range</span>
+    <span class="doccomment">///    .into_par_iter()</span>
+    <span class="doccomment">///    .step_by(3)</span>
+    <span class="doccomment">///    .collect();</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// assert_eq!(result, [3, 6, 9])</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Compatibility</span>
+    <span class="doccomment">///</span>
+    <span class=
+"doccomment">/// This method is only available on Rust 1.38 or greater.</span>
+    <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">step_by</span>)]</span>
+    <span class="kw">fn</span> <span class=
+"ident">step_by</span>(<span class="self">self</span>, <span class=
+"ident">step</span>: <span class="ident">usize</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">StepBy</span><span class="op">&lt;</span><span class=
+"self">Self</span><span class="op">&gt;</span> {
+        <span class="ident">StepBy</span>::<span class=
+"ident">new</span>(<span class="self">self</span>, <span class=
+"ident">step</span>)
     }
 
     <span class=

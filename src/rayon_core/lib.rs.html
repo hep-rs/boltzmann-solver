@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rayon-core-1.7.0/src/lib.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rayon-core-1.7.1/src/lib.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>lib.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -821,6 +821,15 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="746">746</span>
 <span id="747">747</span>
 <span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -1216,7 +1225,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">ThreadSpawn</span>,
 {
     <span class=
-"doccomment">/// Create a new `ThreadPool` initialized using this configuration.</span>
+"doccomment">/// Creates a new `ThreadPool` initialized using this configuration.</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">build</span>(<span class=
 "self">self</span>) <span class="op">-</span><span class=
@@ -1277,7 +1286,7 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="kw">impl</span> <span class=
 "ident">ThreadPoolBuilder</span> {
     <span class=
-"doccomment">/// Create a scoped `ThreadPool` initialized using this configuration.</span>
+"doccomment">/// Creates a scoped `ThreadPool` initialized using this configuration.</span>
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// This is a convenience function for building a pool using [`crossbeam::scope`]</span>
@@ -1424,7 +1433,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&lt;</span><span class="ident">S</span><span class=
 "op">&gt;</span> {
     <span class=
-"doccomment">/// Set a custom function for spawning threads.</span>
+"doccomment">/// Sets a custom function for spawning threads.</span>
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// Note that the threads will not exit until after the pool is dropped. It</span>
@@ -1643,7 +1652,7 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Set a closure which takes a thread index and returns</span>
+"doccomment">/// Sets a closure which takes a thread index and returns</span>
     <span class="doccomment">/// the thread's name.</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">thread_name</span><span class=
@@ -1669,7 +1678,7 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Set the number of threads to be used in the rayon threadpool.</span>
+"doccomment">/// Sets the number of threads to be used in the rayon threadpool.</span>
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// If you specify a non-zero number of threads using this</span>
@@ -1804,7 +1813,7 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Set the stack size of the worker threads</span>
+"doccomment">/// Sets the stack size of the worker threads</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">stack_size</span>(<span class=
 "kw-2">mut</span> <span class="self">self</span>, <span class=
@@ -1903,7 +1912,7 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Set a callback to be invoked on thread start.</span>
+"doccomment">/// Sets a callback to be invoked on thread start.</span>
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// The closure is passed the index of the thread on which it is invoked.</span>
@@ -1951,7 +1960,7 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Set a callback to be invoked on thread exit.</span>
+"doccomment">/// Sets a callback to be invoked on thread exit.</span>
     <span class="doccomment">///</span>
     <span class=
 "doccomment">/// The closure is passed the index of the thread on which it is invoked.</span>
@@ -2186,9 +2195,18 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 }
 
+<span class="kw">const</span> <span class=
+"ident">GLOBAL_POOL_ALREADY_INITIALIZED</span>: <span class=
+"kw-2">&</span><span class="ident">str</span> <span class=
+"op">=</span>
+    <span class=
+"string">"The global thread pool has already been initialized."</span>;
+
 <span class="kw">impl</span> <span class=
 "ident">Error</span> <span class="kw">for</span> <span class=
 "ident">ThreadPoolBuildError</span> {
+    <span class="attribute">#[<span class=
+"ident">allow</span>(<span class="ident">deprecated</span>)]</span>
     <span class="kw">fn</span> <span class=
 "ident">description</span>(<span class="kw-2">&</span><span class=
 "self">self</span>) <span class="op">-</span><span class=
@@ -2198,15 +2216,35 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>.<span class="ident">kind</span> {
             <span class="ident">ErrorKind</span>::<span class=
 "ident">GlobalPoolAlreadyInitialized</span> <span class=
-"op">=</span><span class="op">&gt;</span> {
-                <span class=
-"string">"The global thread pool has already been initialized."</span>
-            }
+"op">=</span><span class="op">&gt;</span> <span class=
+"ident">GLOBAL_POOL_ALREADY_INITIALIZED</span>,
             <span class="ident">ErrorKind</span>::<span class=
 "ident">IOError</span>(<span class="kw-2">ref</span> <span class=
 "ident">e</span>) <span class="op">=</span><span class=
 "op">&gt;</span> <span class="ident">e</span>.<span class=
 "ident">description</span>(),
+        }
+    }
+
+    <span class="kw">fn</span> <span class=
+"ident">source</span>(<span class="kw-2">&</span><span class=
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Option</span><span class=
+"op">&lt;</span><span class="kw-2">&</span>(<span class=
+"kw">dyn</span> <span class="ident">Error</span> <span class=
+"op">+</span> <span class="lifetime">'static</span>)<span class=
+"op">&gt;</span> {
+        <span class="kw">match</span> <span class=
+"kw-2">&</span><span class="self">self</span>.<span class=
+"ident">kind</span> {
+            <span class="ident">ErrorKind</span>::<span class=
+"ident">GlobalPoolAlreadyInitialized</span> <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"prelude-val">None</span>,
+            <span class="ident">ErrorKind</span>::<span class=
+"ident">IOError</span>(<span class="ident">e</span>) <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"prelude-val">Some</span>(<span class="ident">e</span>),
         }
     }
 }
@@ -2224,17 +2262,18 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class=
-"self">self</span>.<span class="ident">kind</span> {
+"kw-2">&</span><span class="self">self</span>.<span class=
+"ident">kind</span> {
             <span class="ident">ErrorKind</span>::<span class=
-"ident">IOError</span>(<span class="kw-2">ref</span> <span class=
-"ident">e</span>) <span class="op">=</span><span class=
-"op">&gt;</span> <span class="ident">e</span>.<span class=
-"ident">fmt</span>(<span class="ident">f</span>),
-            <span class="kw">_</span> <span class=
+"ident">GlobalPoolAlreadyInitialized</span> <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
-"self">self</span>.<span class=
-"ident">description</span>().<span class=
+"ident">GLOBAL_POOL_ALREADY_INITIALIZED</span>.<span class=
 "ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">ErrorKind</span>::<span class=
+"ident">IOError</span>(<span class="ident">e</span>) <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"ident">e</span>.<span class="ident">fmt</span>(<span class=
+"ident">f</span>),
         }
     }
 }

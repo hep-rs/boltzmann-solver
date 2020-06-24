@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-complex-0.2.4/src/lib.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-complex-0.3.0/src/lib.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>lib.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -2709,33 +2709,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="2634">2634</span>
 <span id="2635">2635</span>
 <span id="2636">2636</span>
-<span id="2637">2637</span>
-<span id="2638">2638</span>
-<span id="2639">2639</span>
-<span id="2640">2640</span>
-<span id="2641">2641</span>
-<span id="2642">2642</span>
-<span id="2643">2643</span>
-<span id="2644">2644</span>
-<span id="2645">2645</span>
-<span id="2646">2646</span>
-<span id="2647">2647</span>
-<span id="2648">2648</span>
-<span id="2649">2649</span>
-<span id="2650">2650</span>
-<span id="2651">2651</span>
-<span id="2652">2652</span>
-<span id="2653">2653</span>
-<span id="2654">2654</span>
-<span id="2655">2655</span>
-<span id="2656">2656</span>
-<span id="2657">2657</span>
-<span id="2658">2658</span>
-<span id="2659">2659</span>
-<span id="2660">2660</span>
-<span id="2661">2661</span>
-<span id="2662">2662</span>
-<span id="2663">2663</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -2760,12 +2733,12 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="doccomment">//! ## Compatibility</span>
 <span class="doccomment">//!</span>
 <span class=
-"doccomment">//! The `num-complex` crate is tested for rustc 1.15 and greater.</span>
+"doccomment">//! The `num-complex` crate is tested for rustc 1.31 and greater.</span>
 
 <span class="attribute">#![<span class=
 "ident">doc</span>(<span class=
 "ident">html_root_url</span> <span class="op">=</span> <span class=
-"string">"https://docs.rs/num-complex/0.2"</span>)]</span>
+"string">"https://docs.rs/num-complex/0.3"</span>)]</span>
 <span class="attribute">#![<span class=
 "ident">no_std</span>]</span>
 
@@ -2779,23 +2752,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">test</span>, <span class="ident">macro_use</span>)]</span>
 <span class="kw">extern</span> <span class=
 "kw">crate</span> <span class="ident">std</span>;
-
-<span class="kw">extern</span> <span class=
-"kw">crate</span> <span class=
-"ident">num_traits</span> <span class="kw">as</span> <span class=
-"ident">traits</span>;
-
-<span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"serde"</span>)]</span>
-<span class="kw">extern</span> <span class=
-"kw">crate</span> <span class="ident">serde</span>;
-
-<span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"rand"</span>)]</span>
-<span class="kw">extern</span> <span class=
-"kw">crate</span> <span class="ident">rand</span>;
 
 <span class="kw">use</span> <span class=
 "ident">core</span>::<span class="ident">fmt</span>;
@@ -2822,20 +2778,23 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Error</span>;
 
 <span class="kw">use</span> <span class=
-"ident">traits</span>::{<span class=
+"ident">num_traits</span>::{<span class=
 "ident">Inv</span>, <span class="ident">MulAdd</span>, <span class=
 "ident">Num</span>, <span class="ident">One</span>, <span class=
 "ident">Pow</span>, <span class="ident">Signed</span>, <span class=
 "ident">Zero</span>};
 
 <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"std"</span>)]</span>
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"libm"</span>))]</span>
 <span class="kw">use</span> <span class=
-"ident">traits</span>::<span class=
+"ident">num_traits</span>::<span class=
 "ident">float</span>::<span class="ident">Float</span>;
 <span class="kw">use</span> <span class=
-"ident">traits</span>::<span class=
+"ident">num_traits</span>::<span class=
 "ident">float</span>::<span class="ident">FloatCore</span>;
 
 <span class="kw">mod</span> <span class="ident">cast</span>;
@@ -2849,7 +2808,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">cfg</span>(<span class="ident">feature</span> <span class=
 "op">=</span> <span class="string">"rand"</span>)]</span>
 <span class="kw">pub</span> <span class=
-"kw">use</span> <span class="ident">crand</span>::<span class=
+"kw">use</span> <span class="kw">crate</span>::<span class=
+"ident">crand</span>::<span class=
 "ident">ComplexDistribution</span>;
 
 <span class=
@@ -2931,8 +2891,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> <span class="ident">Complex</span><span class=
 "op">&lt;</span><span class="ident">T</span><span class=
 "op">&gt;</span> {
-    <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">has_const_fn</span>)]</span>
     <span class="doccomment">/// Create a new Complex</span>
     <span class="attribute">#[<span class=
 "ident">inline</span>]</span>
@@ -2943,25 +2901,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">T</span>) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">Complex</span> { <span class=
-"ident">re</span>: <span class="ident">re</span>, <span class=
-"ident">im</span>: <span class="ident">im</span> }
-    }
-
-    <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">not</span>(<span class=
-"ident">has_const_fn</span>))]</span>
-    <span class="doccomment">/// Create a new Complex</span>
-    <span class="attribute">#[<span class=
-"ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class=
-"kw">fn</span> <span class="ident">new</span>(<span class=
-"ident">re</span>: <span class="ident">T</span>, <span class=
-"ident">im</span>: <span class="ident">T</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
-        <span class="ident">Complex</span> { <span class=
-"ident">re</span>: <span class="ident">re</span>, <span class=
-"ident">im</span>: <span class="ident">im</span> }
+"ident">re</span>, <span class="ident">im</span> }
     }
 }
 
@@ -3151,11 +3091,13 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"std"</span>)]</span>
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"libm"</span>))]</span>
 <span class="kw">impl</span><span class=
 "op">&lt;</span><span class="ident">T</span>: <span class=
-"ident">Clone</span> <span class="op">+</span> <span class=
 "ident">Float</span><span class="op">&gt;</span> <span class=
 "ident">Complex</span><span class="op">&lt;</span><span class=
 "ident">T</span><span class="op">&gt;</span> {
@@ -3164,9 +3106,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">norm</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"ident">T</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">T</span> {
         <span class="self">self</span>.<span class=
 "ident">re</span>.<span class="ident">hypot</span>(<span class=
 "self">self</span>.<span class="ident">im</span>)
@@ -3177,9 +3118,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">arg</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"ident">T</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">T</span> {
         <span class="self">self</span>.<span class=
 "ident">im</span>.<span class="ident">atan2</span>(<span class=
 "self">self</span>.<span class="ident">re</span>)
@@ -3191,9 +3131,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">to_polar</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> (<span class=
-"ident">T</span>, <span class="ident">T</span>) {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> (<span class="ident">T</span>, <span class=
+"ident">T</span>) {
         (<span class="self">self</span>.<span class=
 "ident">norm</span>(), <span class="self">self</span>.<span class=
 "ident">arg</span>())
@@ -3204,16 +3144,14 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">from_polar</span>(<span class=
-"ident">r</span>: <span class="kw-2">&</span><span class=
-"ident">T</span>, <span class="ident">theta</span>: <span class=
-"kw-2">&</span><span class="ident">T</span>) <span class=
+"ident">r</span>: <span class="ident">T</span>, <span class=
+"ident">theta</span>: <span class="ident">T</span>) <span class=
 "op">-</span><span class="op">&gt;</span> <span class=
 "self">Self</span> {
         <span class="self">Self</span>::<span class=
-"ident">new</span>(<span class="kw-2">*</span><span class=
-"ident">r</span> <span class="op">*</span> <span class=
-"ident">theta</span>.<span class="ident">cos</span>(), <span class=
-"kw-2">*</span><span class="ident">r</span> <span class=
+"ident">new</span>(<span class="ident">r</span> <span class=
+"op">*</span> <span class="ident">theta</span>.<span class=
+"ident">cos</span>(), <span class="ident">r</span> <span class=
 "op">*</span> <span class="ident">theta</span>.<span class=
 "ident">sin</span>())
     }
@@ -3224,17 +3162,16 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">exp</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: e^(a + bi) = e^a (cos(b) + i*sin(b))</span>
         <span class="comment">// = from_polar(e^a, b)</span>
         <span class="self">Self</span>::<span class=
-"ident">from_polar</span>(<span class="kw-2">&</span><span class=
+"ident">from_polar</span>(<span class=
 "self">self</span>.<span class="ident">re</span>.<span class=
-"ident">exp</span>(), <span class="kw-2">&</span><span class=
-"self">self</span>.<span class="ident">im</span>)
+"ident">exp</span>(), <span class="self">self</span>.<span class=
+"ident">im</span>)
     }
 
     <span class=
@@ -3252,9 +3189,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">ln</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: ln(z) = ln|z| + i*arg(z)</span>
         <span class="kw">let</span> (<span class=
@@ -3281,9 +3217,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">sqrt</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">if</span> <span class=
 "self">self</span>.<span class="ident">im</span>.<span class=
 "ident">is_zero</span>() {
@@ -3365,10 +3300,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span> <span class="self">self</span>.<span class=
 "ident">to_polar</span>();
             <span class="self">Self</span>::<span class=
-"ident">from_polar</span>(<span class="kw-2">&</span>(<span class=
-"ident">r</span>.<span class="ident">sqrt</span>()), <span class=
-"kw-2">&</span>(<span class="ident">theta</span> <span class=
-"op">/</span> <span class="ident">two</span>))
+"ident">from_polar</span>(<span class="ident">r</span>.<span class=
+"ident">sqrt</span>(), <span class=
+"ident">theta</span> <span class="op">/</span> <span class=
+"ident">two</span>)
         }
     }
 
@@ -3394,9 +3329,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">cbrt</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">if</span> <span class=
 "self">self</span>.<span class="ident">im</span>.<span class=
 "ident">is_zero</span>() {
@@ -3500,10 +3434,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span> <span class="self">self</span>.<span class=
 "ident">to_polar</span>();
             <span class="self">Self</span>::<span class=
-"ident">from_polar</span>(<span class="kw-2">&</span>(<span class=
-"ident">r</span>.<span class="ident">cbrt</span>()), <span class=
-"kw-2">&</span>(<span class="ident">theta</span> <span class=
-"op">/</span> <span class="ident">three</span>))
+"ident">from_polar</span>(<span class="ident">r</span>.<span class=
+"ident">cbrt</span>(), <span class=
+"ident">theta</span> <span class="op">/</span> <span class=
+"ident">three</span>)
         }
     }
 
@@ -3513,10 +3447,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">powf</span>(<span class=
-"kw-2">&</span><span class="self">self</span>, <span class=
-"ident">exp</span>: <span class="ident">T</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>, <span class="ident">exp</span>: <span class=
+"ident">T</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: x^y = (ρ e^(i θ))^y = ρ^y e^(i θ y)</span>
         <span class="comment">// = from_polar(ρ^y, θ y)</span>
@@ -3525,11 +3458,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">=</span> <span class="self">self</span>.<span class=
 "ident">to_polar</span>();
         <span class="self">Self</span>::<span class=
-"ident">from_polar</span>(<span class="kw-2">&</span><span class=
-"ident">r</span>.<span class="ident">powf</span>(<span class=
-"ident">exp</span>), <span class="kw-2">&</span>(<span class=
+"ident">from_polar</span>(<span class="ident">r</span>.<span class=
+"ident">powf</span>(<span class="ident">exp</span>), <span class=
 "ident">theta</span> <span class="op">*</span> <span class=
-"ident">exp</span>))
+"ident">exp</span>)
     }
 
     <span class=
@@ -3538,10 +3470,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">log</span>(<span class=
-"kw-2">&</span><span class="self">self</span>, <span class=
-"ident">base</span>: <span class="ident">T</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>, <span class="ident">base</span>: <span class=
+"ident">T</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: log_y(x) = log_y(ρ e^(i θ))</span>
         <span class=
@@ -3564,10 +3495,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">powc</span>(<span class=
-"kw-2">&</span><span class="self">self</span>, <span class=
-"ident">exp</span>: <span class="self">Self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>, <span class="ident">exp</span>: <span class=
+"self">Self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: x^y = (a + i b)^(c + i d)</span>
         <span class=
@@ -3593,19 +3523,18 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">to_polar</span>();
         <span class="self">Self</span>::<span class=
 "ident">from_polar</span>(
-            <span class="kw-2">&</span>(<span class=
-"ident">r</span>.<span class="ident">powf</span>(<span class=
-"ident">exp</span>.<span class="ident">re</span>) <span class=
-"op">*</span> (<span class="op">-</span><span class=
-"ident">exp</span>.<span class="ident">im</span> <span class=
-"op">*</span> <span class="ident">theta</span>).<span class=
-"ident">exp</span>()),
-            <span class="kw-2">&</span>(<span class=
-"ident">exp</span>.<span class="ident">re</span> <span class=
-"op">*</span> <span class="ident">theta</span> <span class=
-"op">+</span> <span class="ident">exp</span>.<span class=
+            <span class="ident">r</span>.<span class=
+"ident">powf</span>(<span class="ident">exp</span>.<span class=
+"ident">re</span>) <span class="op">*</span> (<span class=
+"op">-</span><span class="ident">exp</span>.<span class=
 "ident">im</span> <span class="op">*</span> <span class=
-"ident">r</span>.<span class="ident">ln</span>()),
+"ident">theta</span>).<span class="ident">exp</span>(),
+            <span class="ident">exp</span>.<span class=
+"ident">re</span> <span class="op">*</span> <span class=
+"ident">theta</span> <span class="op">+</span> <span class=
+"ident">exp</span>.<span class="ident">im</span> <span class=
+"op">*</span> <span class="ident">r</span>.<span class=
+"ident">ln</span>(),
         )
     }
 
@@ -3615,20 +3544,19 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">expf</span>(<span class=
-"kw-2">&</span><span class="self">self</span>, <span class=
-"ident">base</span>: <span class="ident">T</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>, <span class="ident">base</span>: <span class=
+"ident">T</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: x^(a+bi) = x^a x^bi = x^a e^(b ln(x) i)</span>
         <span class="comment">// = from_polar(x^a, b ln(x))</span>
         <span class="self">Self</span>::<span class=
-"ident">from_polar</span>(<span class="kw-2">&</span><span class=
+"ident">from_polar</span>(<span class=
 "ident">base</span>.<span class="ident">powf</span>(<span class=
 "self">self</span>.<span class="ident">re</span>), <span class=
-"kw-2">&</span>(<span class="self">self</span>.<span class=
-"ident">im</span> <span class="op">*</span> <span class=
-"ident">base</span>.<span class="ident">ln</span>()))
+"self">self</span>.<span class="ident">im</span> <span class=
+"op">*</span> <span class="ident">base</span>.<span class=
+"ident">ln</span>())
     }
 
     <span class=
@@ -3637,9 +3565,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">sin</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: sin(a + bi) = sin(a)cosh(b) + i*cos(a)sinh(b)</span>
         <span class="self">Self</span>::<span class=
@@ -3661,9 +3588,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">cos</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: cos(a + bi) = cos(a)cosh(b) - i*sin(a)sinh(b)</span>
         <span class="self">Self</span>::<span class=
@@ -3686,9 +3612,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">tan</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: tan(a + bi) = (sin(2a) + i*sinh(2b))/(cos(2a) + cosh(2b))</span>
         <span class="kw">let</span> (<span class=
@@ -3722,9 +3647,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">asin</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: arcsin(z) = -i ln(sqrt(1-z^2) + iz)</span>
         <span class="kw">let</span> <span class=
@@ -3757,9 +3681,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">acos</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: arccos(z) = -i ln(i sqrt(1-z^2) + z)</span>
         <span class="kw">let</span> <span class=
@@ -3792,9 +3715,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">atan</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: arctan(z) = (ln(1+iz) - ln(1-iz))/(2i)</span>
         <span class="kw">let</span> <span class=
@@ -3808,18 +3730,16 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">one</span> <span class="op">+</span> <span class=
 "ident">one</span>;
         <span class="kw">if</span> <span class=
-"kw-2">*</span><span class="self">self</span> <span class=
-"op">=</span><span class="op">=</span> <span class=
-"ident">i</span> {
+"self">self</span> <span class="op">=</span><span class=
+"op">=</span> <span class="ident">i</span> {
             <span class="kw">return</span> <span class=
 "self">Self</span>::<span class="ident">new</span>(<span class=
 "ident">T</span>::<span class="ident">zero</span>(), <span class=
 "ident">T</span>::<span class="ident">infinity</span>());
         } <span class="kw">else</span> <span class=
-"kw">if</span> <span class="kw-2">*</span><span class=
-"self">self</span> <span class="op">=</span><span class=
-"op">=</span> <span class="op">-</span><span class=
-"ident">i</span> {
+"kw">if</span> <span class="self">self</span> <span class=
+"op">=</span><span class="op">=</span> <span class=
+"op">-</span><span class="ident">i</span> {
             <span class="kw">return</span> <span class=
 "self">Self</span>::<span class="ident">new</span>(<span class=
 "ident">T</span>::<span class="ident">zero</span>(), <span class=
@@ -3843,9 +3763,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">sinh</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: sinh(a + bi) = sinh(a)cos(b) + i*cosh(a)sin(b)</span>
         <span class="self">Self</span>::<span class=
@@ -3867,9 +3786,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">cosh</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: cosh(a + bi) = cosh(a)cos(b) + i*sinh(a)sin(b)</span>
         <span class="self">Self</span>::<span class=
@@ -3891,9 +3809,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">tanh</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: tanh(a + bi) = (sinh(2a) + i*sin(2b))/(cosh(2a) + cos(2b))</span>
         <span class="kw">let</span> (<span class=
@@ -3928,9 +3845,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">asinh</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: arcsinh(z) = ln(z + sqrt(1+z^2))</span>
         <span class="kw">let</span> <span class=
@@ -3958,9 +3874,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">acosh</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: arccosh(z) = 2 ln(sqrt((z+1)/2) + sqrt((z-1)/2))</span>
         <span class="kw">let</span> <span class=
@@ -3998,9 +3913,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">atanh</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
         <span class=
 "comment">// formula: arctanh(z) = (ln(1+z) - ln(1-z))/2</span>
         <span class="kw">let</span> <span class=
@@ -4011,19 +3925,17 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">one</span> <span class="op">+</span> <span class=
 "ident">one</span>;
         <span class="kw">if</span> <span class=
-"kw-2">*</span><span class="self">self</span> <span class=
-"op">=</span><span class="op">=</span> <span class=
-"ident">one</span> {
+"self">self</span> <span class="op">=</span><span class=
+"op">=</span> <span class="ident">one</span> {
             <span class="kw">return</span> <span class=
 "self">Self</span>::<span class="ident">new</span>(<span class=
 "ident">T</span>::<span class=
 "ident">infinity</span>(), <span class=
 "ident">T</span>::<span class="ident">zero</span>());
         } <span class="kw">else</span> <span class=
-"kw">if</span> <span class="kw-2">*</span><span class=
-"self">self</span> <span class="op">=</span><span class=
-"op">=</span> <span class="op">-</span><span class=
-"ident">one</span> {
+"kw">if</span> <span class="self">self</span> <span class=
+"op">=</span><span class="op">=</span> <span class=
+"op">-</span><span class="ident">one</span> {
             <span class="kw">return</span> <span class=
 "self">Self</span>::<span class="ident">new</span>(<span class=
 "op">-</span><span class="ident">T</span>::<span class=
@@ -4073,10 +3985,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">finv</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"ident">Complex</span><span class="op">&lt;</span><span class=
-"ident">T</span><span class="op">&gt;</span> {
+"self">self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="ident">Complex</span><span class=
+"op">&lt;</span><span class="ident">T</span><span class=
+"op">&gt;</span> {
         <span class="kw">let</span> <span class=
 "ident">norm</span> <span class="op">=</span> <span class=
 "self">self</span>.<span class="ident">norm</span>();
@@ -4124,8 +4036,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">inline</span>]</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">fdiv</span>(<span class=
-"kw-2">&</span><span class="self">self</span>, <span class=
-"ident">other</span>: <span class=
+"self">self</span>, <span class="ident">other</span>: <span class=
 "ident">Complex</span><span class="op">&lt;</span><span class=
 "ident">T</span><span class="op">&gt;</span>) <span class=
 "op">-</span><span class="op">&gt;</span> <span class=
@@ -4139,7 +4050,6 @@ autocomplete="off" spellcheck="false" placeholder=
 
 <span class="kw">impl</span><span class=
 "op">&lt;</span><span class="ident">T</span>: <span class=
-"ident">Clone</span> <span class="op">+</span> <span class=
 "ident">FloatCore</span><span class="op">&gt;</span> <span class=
 "ident">Complex</span><span class="op">&lt;</span><span class=
 "ident">T</span><span class="op">&gt;</span> {
@@ -4710,9 +4620,37 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro">!</span>(<span class="kw">impl</span> <span class=
 "ident">Rem</span>, <span class="ident">rem</span>);
 
-<span class=
-"comment">// Attempts to identify the gaussian integer whose product with `modulus`</span>
-<span class="comment">// is closest to `self`.</span>
+<span class="kw">impl</span><span class=
+"op">&lt;</span><span class="ident">T</span>: <span class=
+"ident">Clone</span> <span class="op">+</span> <span class=
+"ident">Num</span><span class="op">&gt;</span> <span class=
+"ident">Complex</span><span class="op">&lt;</span><span class=
+"ident">T</span><span class="op">&gt;</span> {
+    <span class=
+"doccomment">/// Find the gaussian integer corresponding to the true ratio rounded towards zero.</span>
+    <span class="kw">fn</span> <span class=
+"ident">div_trunc</span>(<span class="kw-2">&</span><span class=
+"self">self</span>, <span class=
+"ident">divisor</span>: <span class="kw-2">&</span><span class=
+"self">Self</span>) <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">let</span> <span class=
+"ident">Complex</span> { <span class=
+"ident">re</span>, <span class="ident">im</span> } <span class=
+"op">=</span> <span class="self">self</span> <span class=
+"op">/</span> <span class="ident">divisor</span>;
+        <span class="ident">Complex</span>::<span class=
+"ident">new</span>(<span class="ident">re</span>.<span class=
+"ident">clone</span>() <span class="op">-</span> <span class=
+"ident">re</span> <span class="op">%</span> <span class=
+"ident">T</span>::<span class="ident">one</span>(), <span class=
+"ident">im</span>.<span class="ident">clone</span>() <span class=
+"op">-</span> <span class="ident">im</span> <span class=
+"op">%</span> <span class="ident">T</span>::<span class=
+"ident">one</span>())
+    }
+}
+
 <span class="kw">impl</span><span class=
 "op">&lt;</span><span class="ident">T</span>: <span class=
 "ident">Clone</span> <span class="op">+</span> <span class=
@@ -4736,29 +4674,13 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> <span class="self">Self</span>::<span class=
 "ident">Output</span> {
         <span class="kw">let</span> <span class=
-"ident">Complex</span> { <span class=
-"ident">re</span>, <span class="ident">im</span> } <span class=
-"op">=</span> <span class="self">self</span>.<span class=
-"ident">clone</span>() <span class="op">/</span> <span class=
-"ident">modulus</span>.<span class="ident">clone</span>();
-        <span class=
-"comment">// This is the gaussian integer corresponding to the true ratio</span>
-        <span class="comment">// rounded towards zero.</span>
-        <span class="kw">let</span> (<span class=
-"ident">re0</span>, <span class="ident">im0</span>) <span class=
-"op">=</span> (<span class="ident">re</span>.<span class=
-"ident">clone</span>() <span class="op">-</span> <span class=
-"ident">re</span> <span class="op">%</span> <span class=
-"ident">T</span>::<span class="ident">one</span>(), <span class=
-"ident">im</span>.<span class="ident">clone</span>() <span class=
-"op">-</span> <span class="ident">im</span> <span class=
-"op">%</span> <span class="ident">T</span>::<span class=
-"ident">one</span>());
+"ident">gaussian</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class=
+"ident">div_trunc</span>(<span class="kw-2">&</span><span class=
+"ident">modulus</span>);
         <span class="self">self</span> <span class=
 "op">-</span> <span class="ident">modulus</span> <span class=
-"op">*</span> <span class="self">Self</span>::<span class=
-"ident">Output</span>::<span class="ident">new</span>(<span class=
-"ident">re0</span>, <span class="ident">im0</span>)
+"op">*</span> <span class="ident">gaussian</span>
     }
 }
 
@@ -4773,10 +4695,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">RemAssign</span>, <span class="ident">SubAssign</span>};
 
     <span class="kw">use</span> <span class=
-"ident">traits</span>::{<span class=
+"ident">num_traits</span>::{<span class=
 "ident">MulAddAssign</span>, <span class="ident">NumAssign</span>};
 
-    <span class="kw">use</span> <span class="ident">Complex</span>;
+    <span class="kw">use</span> <span class=
+"kw">crate</span>::<span class="ident">Complex</span>;
 
     <span class="kw">impl</span><span class=
 "op">&lt;</span><span class="ident">T</span>: <span class=
@@ -4822,6 +4745,8 @@ autocomplete="off" spellcheck="false" placeholder=
         }
     }
 
+    <span class=
+"comment">// (a + i b) * (c + i d) == (a*c - b*d) + i (a*d + b*c)</span>
     <span class="kw">impl</span><span class=
 "op">&lt;</span><span class="ident">T</span>: <span class=
 "ident">Clone</span> <span class="op">+</span> <span class=
@@ -4833,10 +4758,31 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">mul_assign</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class="self">self</span>, <span class=
 "ident">other</span>: <span class="self">Self</span>) {
-            <span class="kw-2">*</span><span class=
-"self">self</span> <span class="op">=</span> <span class=
-"self">self</span>.<span class="ident">clone</span>() <span class=
-"op">*</span> <span class="ident">other</span>;
+            <span class="kw">let</span> <span class=
+"ident">a</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class="ident">re</span>.<span class=
+"ident">clone</span>();
+
+            <span class="self">self</span>.<span class=
+"ident">re</span> <span class="kw-2">*</span><span class=
+"op">=</span> <span class="ident">other</span>.<span class=
+"ident">re</span>.<span class="ident">clone</span>();
+            <span class="self">self</span>.<span class=
+"ident">re</span> <span class="op">-</span><span class=
+"op">=</span> <span class="self">self</span>.<span class=
+"ident">im</span>.<span class="ident">clone</span>() <span class=
+"op">*</span> <span class="ident">other</span>.<span class=
+"ident">im</span>.<span class="ident">clone</span>();
+
+            <span class="self">self</span>.<span class=
+"ident">im</span> <span class="kw-2">*</span><span class=
+"op">=</span> <span class="ident">other</span>.<span class=
+"ident">re</span>;
+            <span class="self">self</span>.<span class=
+"ident">im</span> <span class="op">+</span><span class=
+"op">=</span> <span class="ident">a</span> <span class=
+"op">*</span> <span class="ident">other</span>.<span class=
+"ident">im</span>;
         }
     }
 
@@ -4922,6 +4868,10 @@ autocomplete="off" spellcheck="false" placeholder=
         }
     }
 
+    <span class=
+"comment">// (a + i b) / (c + i d) == [(a + i b) * (c - i d)] / (c*c + d*d)</span>
+    <span class=
+"comment">//   == [(a*c + b*d) / (c*c + d*d)] + i [(b*c - a*d) / (c*c + d*d)]</span>
     <span class="kw">impl</span><span class=
 "op">&lt;</span><span class="ident">T</span>: <span class=
 "ident">Clone</span> <span class="op">+</span> <span class=
@@ -4933,10 +4883,41 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">div_assign</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class="self">self</span>, <span class=
 "ident">other</span>: <span class="self">Self</span>) {
-            <span class="kw-2">*</span><span class=
-"self">self</span> <span class="op">=</span> <span class=
-"self">self</span>.<span class="ident">clone</span>() <span class=
-"op">/</span> <span class="ident">other</span>;
+            <span class="kw">let</span> <span class=
+"ident">a</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class="ident">re</span>.<span class=
+"ident">clone</span>();
+            <span class="kw">let</span> <span class=
+"ident">norm_sqr</span> <span class="op">=</span> <span class=
+"ident">other</span>.<span class="ident">norm_sqr</span>();
+
+            <span class="self">self</span>.<span class=
+"ident">re</span> <span class="kw-2">*</span><span class=
+"op">=</span> <span class="ident">other</span>.<span class=
+"ident">re</span>.<span class="ident">clone</span>();
+            <span class="self">self</span>.<span class=
+"ident">re</span> <span class="op">+</span><span class=
+"op">=</span> <span class="self">self</span>.<span class=
+"ident">im</span>.<span class="ident">clone</span>() <span class=
+"op">*</span> <span class="ident">other</span>.<span class=
+"ident">im</span>.<span class="ident">clone</span>();
+            <span class="self">self</span>.<span class=
+"ident">re</span> <span class="op">/</span><span class=
+"op">=</span> <span class="ident">norm_sqr</span>.<span class=
+"ident">clone</span>();
+
+            <span class="self">self</span>.<span class=
+"ident">im</span> <span class="kw-2">*</span><span class=
+"op">=</span> <span class="ident">other</span>.<span class=
+"ident">re</span>;
+            <span class="self">self</span>.<span class=
+"ident">im</span> <span class="op">-</span><span class=
+"op">=</span> <span class="ident">a</span> <span class=
+"op">*</span> <span class="ident">other</span>.<span class=
+"ident">im</span>;
+            <span class="self">self</span>.<span class=
+"ident">im</span> <span class="op">/</span><span class=
+"op">=</span> <span class="ident">norm_sqr</span>;
         }
     }
 
@@ -4950,11 +4931,16 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="kw">fn</span> <span class=
 "ident">rem_assign</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class="self">self</span>, <span class=
-"ident">other</span>: <span class="self">Self</span>) {
+"ident">modulus</span>: <span class="self">Self</span>) {
+            <span class="kw">let</span> <span class=
+"ident">gaussian</span> <span class="op">=</span> <span class=
+"self">self</span>.<span class=
+"ident">div_trunc</span>(<span class="kw-2">&</span><span class=
+"ident">modulus</span>);
             <span class="kw-2">*</span><span class=
-"self">self</span> <span class="op">=</span> <span class=
-"self">self</span>.<span class="ident">clone</span>() <span class=
-"op">%</span> <span class="ident">other</span>;
+"self">self</span> <span class="op">-</span><span class=
+"op">=</span> <span class="ident">modulus</span> <span class=
+"op">*</span> <span class="ident">gaussian</span>;
         }
     }
 
@@ -5055,10 +5041,13 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">rem_assign</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class="self">self</span>, <span class=
 "ident">other</span>: <span class="ident">T</span>) {
-            <span class="kw-2">*</span><span class=
-"self">self</span> <span class="op">=</span> <span class=
-"self">self</span>.<span class="ident">clone</span>() <span class=
-"op">%</span> <span class="ident">other</span>;
+            <span class="self">self</span>.<span class=
+"ident">re</span> <span class="op">%</span><span class=
+"op">=</span> <span class="ident">other</span>.<span class=
+"ident">clone</span>();
+            <span class="self">self</span>.<span class=
+"ident">im</span> <span class="op">%</span><span class=
+"op">=</span> <span class="ident">other</span>;
         }
     }
 
@@ -5141,53 +5130,9 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="macro">forward_op_assign</span><span class=
 "macro">!</span>(<span class="kw">impl</span> <span class=
 "ident">DivAssign</span>, <span class="ident">div_assign</span>);
-
-    <span class="kw">impl</span><span class=
-"op">&lt;</span><span class="lifetime">'a</span>, <span class=
-"ident">T</span>: <span class="ident">Clone</span> <span class=
-"op">+</span> <span class="ident">NumAssign</span><span class=
-"op">&gt;</span> <span class="ident">RemAssign</span><span class=
-"op">&lt;</span><span class="kw-2">&</span><span class=
-"lifetime">'a</span> <span class="ident">Complex</span><span class=
-"op">&lt;</span><span class="ident">T</span><span class=
-"op">&gt;</span><span class="op">&gt;</span> <span class=
-"kw">for</span> <span class="ident">Complex</span><span class=
-"op">&lt;</span><span class="ident">T</span><span class=
-"op">&gt;</span> {
-        <span class="attribute">#[<span class=
-"ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class=
-"ident">rem_assign</span>(<span class="kw-2">&</span><span class=
-"kw-2">mut</span> <span class="self">self</span>, <span class=
-"ident">other</span>: <span class="kw-2">&</span><span class=
-"self">Self</span>) {
-            <span class="self">self</span>.<span class=
-"ident">rem_assign</span>(<span class=
-"ident">other</span>.<span class="ident">clone</span>())
-        }
-    }
-    <span class="kw">impl</span><span class=
-"op">&lt;</span><span class="lifetime">'a</span>, <span class=
-"ident">T</span>: <span class="ident">Clone</span> <span class=
-"op">+</span> <span class="ident">NumAssign</span><span class=
-"op">&gt;</span> <span class="ident">RemAssign</span><span class=
-"op">&lt;</span><span class="kw-2">&</span><span class=
-"lifetime">'a</span> <span class="ident">T</span><span class=
-"op">&gt;</span> <span class="kw">for</span> <span class=
-"ident">Complex</span><span class="op">&lt;</span><span class=
-"ident">T</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class=
-"ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class=
-"ident">rem_assign</span>(<span class="kw-2">&</span><span class=
-"kw-2">mut</span> <span class="self">self</span>, <span class=
-"ident">other</span>: <span class="kw-2">&</span><span class=
-"ident">T</span>) {
-            <span class="self">self</span>.<span class=
-"ident">rem_assign</span>(<span class=
-"ident">other</span>.<span class="ident">clone</span>())
-        }
-    }
+    <span class="macro">forward_op_assign</span><span class=
+"macro">!</span>(<span class="kw">impl</span> <span class=
+"ident">RemAssign</span>, <span class="ident">rem_assign</span>);
 }
 
 <span class="kw">impl</span><span class=
@@ -5880,19 +5825,6 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 }
 
-<span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">not</span>(<span class=
-"ident">has_i128</span>))]</span>
-<span class="macro">real_arithmetic</span><span class=
-"macro">!</span>(<span class="ident">usize</span>, <span class=
-"ident">u8</span>, <span class="ident">u16</span>, <span class=
-"ident">u32</span>, <span class="ident">u64</span>, <span class=
-"ident">isize</span>, <span class="ident">i8</span>, <span class=
-"ident">i16</span>, <span class="ident">i32</span>, <span class=
-"ident">i64</span>, <span class="ident">f32</span>, <span class=
-"ident">f64</span>);
-<span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">has_i128</span>)]</span>
 <span class="macro">real_arithmetic</span><span class=
 "macro">!</span>(<span class="ident">usize</span>, <span class=
 "ident">u8</span>, <span class="ident">u16</span>, <span class=
@@ -6098,15 +6030,21 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">fmt_re_im</span>(
             <span class="ident">f</span>: <span class=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
-"ident">fmt</span>::<span class="ident">Formatter</span>,
+"ident">fmt</span>::<span class=
+"ident">Formatter</span><span class="op">&lt;</span><span class=
+"lifetime">'_</span><span class="op">&gt;</span>,
             <span class="ident">re_neg</span>: <span class=
 "ident">bool</span>,
             <span class="ident">im_neg</span>: <span class=
 "ident">bool</span>,
             <span class="ident">real</span>: <span class=
-"ident">fmt</span>::<span class="ident">Arguments</span>,
+"ident">fmt</span>::<span class=
+"ident">Arguments</span><span class="op">&lt;</span><span class=
+"lifetime">'_</span><span class="op">&gt;</span>,
             <span class="ident">imag</span>: <span class=
-"ident">fmt</span>::<span class="ident">Arguments</span>,
+"ident">fmt</span>::<span class=
+"ident">Arguments</span><span class="op">&lt;</span><span class=
+"lifetime">'_</span><span class="op">&gt;</span>,
         ) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="ident">fmt</span>::<span class=
 "prelude-ty">Result</span> {
@@ -6174,9 +6112,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">fmt_complex</span>(<span class=
 "ident">f</span>: <span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class="ident">fmt</span>::<span class=
-"ident">Formatter</span>, <span class=
+"ident">Formatter</span><span class="op">&lt;</span><span class=
+"lifetime">'_</span><span class="op">&gt;</span>, <span class=
 "ident">complex</span>: <span class=
-"ident">fmt</span>::<span class="ident">Arguments</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+"ident">fmt</span>::<span class="ident">Arguments</span><span class="op">&lt;</span><span class="lifetime">'_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
             <span class="kw">use</span> <span class=
 "ident">std</span>::<span class="ident">string</span>::<span class=
 "ident">ToString</span>;
@@ -6204,9 +6143,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">fmt_complex</span>(<span class=
 "ident">f</span>: <span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class="ident">fmt</span>::<span class=
-"ident">Formatter</span>, <span class=
+"ident">Formatter</span><span class="op">&lt;</span><span class=
+"lifetime">'_</span><span class="op">&gt;</span>, <span class=
 "ident">complex</span>: <span class=
-"ident">fmt</span>::<span class="ident">Arguments</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+"ident">fmt</span>::<span class="ident">Arguments</span><span class="op">&lt;</span><span class="lifetime">'_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
             <span class="macro">write</span><span class=
 "macro">!</span>(<span class="ident">f</span>, <span class=
 "string">"{}"</span>, <span class="ident">complex</span>)
@@ -6233,9 +6173,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>, <span class="ident">f</span>: <span class=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
 "ident">fmt</span>::<span class=
-"ident">Formatter</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">fmt</span>::<span class=
-"prelude-ty">Result</span> {
+"ident">Formatter</span><span class="op">&lt;</span><span class=
+"lifetime">'_</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="macro">write_complex</span><span class=
 "macro">!</span>(<span class="ident">f</span>, <span class=
 "string">""</span>, <span class="string">""</span>, <span class=
@@ -6264,9 +6205,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>, <span class="ident">f</span>: <span class=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
 "ident">fmt</span>::<span class=
-"ident">Formatter</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">fmt</span>::<span class=
-"prelude-ty">Result</span> {
+"ident">Formatter</span><span class="op">&lt;</span><span class=
+"lifetime">'_</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="macro">write_complex</span><span class=
 "macro">!</span>(<span class="ident">f</span>, <span class=
 "string">"e"</span>, <span class="string">""</span>, <span class=
@@ -6295,9 +6237,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>, <span class="ident">f</span>: <span class=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
 "ident">fmt</span>::<span class=
-"ident">Formatter</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">fmt</span>::<span class=
-"prelude-ty">Result</span> {
+"ident">Formatter</span><span class="op">&lt;</span><span class=
+"lifetime">'_</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="macro">write_complex</span><span class=
 "macro">!</span>(<span class="ident">f</span>, <span class=
 "string">"E"</span>, <span class="string">""</span>, <span class=
@@ -6326,9 +6269,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>, <span class="ident">f</span>: <span class=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
 "ident">fmt</span>::<span class=
-"ident">Formatter</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">fmt</span>::<span class=
-"prelude-ty">Result</span> {
+"ident">Formatter</span><span class="op">&lt;</span><span class=
+"lifetime">'_</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="macro">write_complex</span><span class=
 "macro">!</span>(<span class="ident">f</span>, <span class=
 "string">"x"</span>, <span class="string">"0x"</span>, <span class=
@@ -6357,9 +6301,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>, <span class="ident">f</span>: <span class=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
 "ident">fmt</span>::<span class=
-"ident">Formatter</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">fmt</span>::<span class=
-"prelude-ty">Result</span> {
+"ident">Formatter</span><span class="op">&lt;</span><span class=
+"lifetime">'_</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="macro">write_complex</span><span class=
 "macro">!</span>(<span class="ident">f</span>, <span class=
 "string">"X"</span>, <span class="string">"0x"</span>, <span class=
@@ -6387,9 +6332,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>, <span class="ident">f</span>: <span class=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
 "ident">fmt</span>::<span class=
-"ident">Formatter</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">fmt</span>::<span class=
-"prelude-ty">Result</span> {
+"ident">Formatter</span><span class="op">&lt;</span><span class=
+"lifetime">'_</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="macro">write_complex</span><span class=
 "macro">!</span>(<span class="ident">f</span>, <span class=
 "string">"o"</span>, <span class="string">"0o"</span>, <span class=
@@ -6417,9 +6363,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>, <span class="ident">f</span>: <span class=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
 "ident">fmt</span>::<span class=
-"ident">Formatter</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">fmt</span>::<span class=
-"prelude-ty">Result</span> {
+"ident">Formatter</span><span class="op">&lt;</span><span class=
+"lifetime">'_</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="macro">write_complex</span><span class=
 "macro">!</span>(<span class="ident">f</span>, <span class=
 "string">"b"</span>, <span class="string">"0b"</span>, <span class=
@@ -6458,63 +6405,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Clone</span> <span class="op">+</span> <span class=
 "ident">Num</span>,
 {
-    <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">not</span>(<span class=
-"ident">feature</span> <span class="op">=</span> <span class=
-"string">"std"</span>))]</span>
-    <span class="attribute">#[<span class=
-"ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class=
-"ident">is_whitespace</span>(<span class=
-"ident">c</span>: <span class="ident">char</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"ident">bool</span> {
-        <span class="kw">match</span> <span class=
-"ident">c</span> {
-            <span class="string">' '</span> <span class=
-"op">|</span> <span class="string">'\x09'</span>...<span class=
-"string">'\x0d'</span> <span class="op">=</span><span class=
-"op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class=
-"kw">if</span> <span class="ident">c</span> <span class=
-"op">&gt;</span> <span class="string">'\x7f'</span> <span class=
-"op">=</span><span class="op">&gt;</span> <span class=
-"kw">match</span> <span class="ident">c</span> {
-                <span class="string">'\u{0085}'</span> <span class=
-"op">|</span> <span class="string">'\u{00a0}'</span> <span class=
-"op">|</span> <span class="string">'\u{1680}'</span> <span class=
-"op">=</span><span class="op">&gt;</span> <span class=
-"bool-val">true</span>,
-                <span class=
-"string">'\u{2000}'</span>...<span class=
-"string">'\u{200a}'</span> <span class="op">=</span><span class=
-"op">&gt;</span> <span class="bool-val">true</span>,
-                <span class="string">'\u{2028}'</span> <span class=
-"op">|</span> <span class="string">'\u{2029}'</span> <span class=
-"op">|</span> <span class="string">'\u{202f}'</span> <span class=
-"op">|</span> <span class="string">'\u{205f}'</span> <span class=
-"op">=</span><span class="op">&gt;</span> <span class=
-"bool-val">true</span>,
-                <span class="string">'\u{3000}'</span> <span class=
-"op">=</span><span class="op">&gt;</span> <span class=
-"bool-val">true</span>,
-                <span class="kw">_</span> <span class=
-"op">=</span><span class="op">&gt;</span> <span class=
-"bool-val">false</span>,
-            },
-            <span class="kw">_</span> <span class=
-"op">=</span><span class="op">&gt;</span> <span class=
-"bool-val">false</span>,
-        }
-    }
-
-    <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"std"</span>)]</span>
-    <span class="kw">let</span> <span class=
-"ident">is_whitespace</span> <span class="op">=</span> <span class=
-"ident">char</span>::<span class="ident">is_whitespace</span>;
-
     <span class="kw">let</span> <span class=
 "ident">imag</span> <span class="op">=</span> <span class=
 "kw">match</span> <span class="ident">s</span>.<span class=
@@ -6569,16 +6459,16 @@ autocomplete="off" spellcheck="false" placeholder=
 "comment">// trim whitespace around the separator</span>
             <span class="ident">a</span> <span class=
 "op">=</span> <span class="kw-2">&</span><span class=
-"ident">s</span>[..<span class="ident">i</span> <span class=
-"op">+</span> <span class="number">1</span>].<span class=
+"ident">s</span>[..<span class="op">=</span><span class=
+"ident">i</span>].<span class=
 "ident">trim_right_matches</span>(<span class=
-"ident">is_whitespace</span>);
+"ident">char</span>::<span class="ident">is_whitespace</span>);
             <span class="ident">b</span> <span class=
 "op">=</span> <span class="kw-2">&</span><span class=
 "ident">s</span>[<span class="ident">i</span> <span class=
 "op">+</span> <span class="number">2</span>..].<span class=
 "ident">trim_left_matches</span>(<span class=
-"ident">is_whitespace</span>);
+"ident">char</span>::<span class="ident">is_whitespace</span>);
             <span class="ident">neg_b</span> <span class=
 "op">=</span> <span class="ident">c</span> <span class=
 "op">=</span><span class="op">=</span> <span class=
@@ -6606,16 +6496,11 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class=
 "comment">// input was either pure real or pure imaginary</span>
         <span class="ident">b</span> <span class=
-"op">=</span> <span class="kw">match</span> <span class=
+"op">=</span> <span class="kw">if</span> <span class=
 "ident">a</span>.<span class="ident">ends_with</span>(<span class=
-"ident">imag</span>) {
-            <span class="bool-val">false</span> <span class=
-"op">=</span><span class="op">&gt;</span> <span class=
-"string">"0i"</span>,
-            <span class="bool-val">true</span> <span class=
-"op">=</span><span class="op">&gt;</span> <span class=
-"string">"0"</span>,
-        };
+"ident">imag</span>) { <span class=
+"string">"0"</span> } <span class="kw">else</span> { <span class=
+"string">"0i"</span> };
     }
 
     <span class="kw">let</span> <span class="ident">re</span>;
@@ -6654,11 +6539,10 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="comment">// parse re</span>
     <span class="kw">let</span> <span class=
 "ident">re</span> <span class="op">=</span> <span class=
-"macro">try</span><span class="macro">!</span>(<span class=
 "ident">from</span>(<span class="ident">re</span>).<span class=
 "ident">map_err</span>(<span class=
 "ident">ParseComplexError</span>::<span class=
-"ident">from_error</span>));
+"ident">from_error</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class=
 "ident">re</span> <span class="op">=</span> <span class=
 "kw">if</span> <span class="ident">neg_re</span> { <span class=
@@ -6693,11 +6577,10 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="comment">// parse im</span>
     <span class="kw">let</span> <span class=
 "ident">im</span> <span class="op">=</span> <span class=
-"macro">try</span><span class="macro">!</span>(<span class=
 "ident">from</span>(<span class="ident">im</span>).<span class=
 "ident">map_err</span>(<span class=
 "ident">ParseComplexError</span>::<span class=
-"ident">from_error</span>));
+"ident">from_error</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class=
 "ident">im</span> <span class="op">=</span> <span class=
 "kw">if</span> <span class="ident">neg_im</span> { <span class=
@@ -6984,11 +6867,10 @@ autocomplete="off" spellcheck="false" placeholder=
     {
         <span class="kw">let</span> (<span class=
 "ident">re</span>, <span class="ident">im</span>) <span class=
-"op">=</span> <span class="macro">try</span><span class=
-"macro">!</span>(<span class="ident">serde</span>::<span class=
+"op">=</span> <span class="ident">serde</span>::<span class=
 "ident">Deserialize</span>::<span class=
 "ident">deserialize</span>(<span class=
-"ident">deserializer</span>));
+"ident">deserializer</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class=
 "self">Self</span>::<span class="ident">new</span>(<span class=
 "ident">re</span>, <span class="ident">im</span>))
@@ -7060,6 +6942,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">ParseComplexError</span><span class=
 "op">&lt;</span><span class="ident">E</span><span class=
 "op">&gt;</span> {
+    <span class="attribute">#[<span class=
+"ident">allow</span>(<span class="ident">deprecated</span>)]</span>
     <span class="kw">fn</span> <span class=
 "ident">description</span>(<span class="kw-2">&</span><span class=
 "self">self</span>) <span class="op">-</span><span class=
@@ -7095,9 +6979,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>, <span class="ident">f</span>: <span class=
 "kw-2">&</span><span class="kw-2">mut</span> <span class=
 "ident">fmt</span>::<span class=
-"ident">Formatter</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">fmt</span>::<span class=
-"prelude-ty">Result</span> {
+"ident">Formatter</span><span class="op">&lt;</span><span class=
+"lifetime">'_</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class=
 "self">self</span>.<span class="ident">kind</span> {
             <span class=
@@ -7167,7 +7052,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">string</span>::{<span class="ident">String</span>, <span class="ident">ToString</span>};
 
     <span class="kw">use</span> <span class=
-"ident">traits</span>::{<span class=
+"ident">num_traits</span>::{<span class=
 "ident">Num</span>, <span class="ident">One</span>, <span class=
 "ident">Zero</span>};
 
@@ -7355,6 +7240,9 @@ autocomplete="off" spellcheck="false" placeholder=
 
     <span class="attribute">#[<span class=
 "ident">test</span>]</span>
+    <span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">clippy</span>::<span class="ident">float_cmp</span>)]</span>
     <span class="kw">fn</span> <span class=
 "ident">test_l1_norm</span>() {
         <span class="macro">assert_eq</span><span class=
@@ -7428,13 +7316,16 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"std"</span>)]</span>
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"libm"</span>))]</span>
     <span class="kw">mod</span> <span class="ident">float</span> {
         <span class="kw">use</span> <span class=
 "kw">super</span>::<span class="kw-2">*</span>;
         <span class="kw">use</span> <span class=
-"ident">traits</span>::{<span class=
+"ident">num_traits</span>::{<span class=
 "ident">Float</span>, <span class="ident">Pow</span>};
 
         <span class="attribute">#[<span class=
@@ -7445,6 +7336,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "string">"x86"</span>, <span class="ident">ignore</span>)]</span>
         <span class=
 "comment">// FIXME #7158: (maybe?) currently failing on x86.</span>
+        <span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">clippy</span>::<span class="ident">float_cmp</span>)]</span>
         <span class="kw">fn</span> <span class=
 "ident">test_norm</span>() {
             <span class="kw">fn</span> <span class=
@@ -7517,9 +7411,8 @@ autocomplete="off" spellcheck="false" placeholder=
                 <span class="macro">assert</span><span class=
 "macro">!</span>((<span class="ident">c</span> <span class=
 "op">-</span> <span class="ident">Complex</span>::<span class=
-"ident">from_polar</span>(<span class="kw-2">&</span><span class=
-"ident">r</span>, <span class="kw-2">&</span><span class=
-"ident">theta</span>)).<span class=
+"ident">from_polar</span>(<span class=
+"ident">r</span>, <span class="ident">theta</span>)).<span class=
 "ident">norm</span>() <span class="op">&lt;</span> <span class=
 "number">1e-6</span>);
             }
@@ -7973,10 +7866,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">n2</span>).<span class="ident">sqrt</span>(),
                     <span class=
 "ident">Complex64</span>::<span class=
-"ident">from_polar</span>(<span class="kw-2">&</span><span class=
-"ident">n</span>, <span class="kw-2">&</span>(<span class=
-"ident">f64</span>::<span class="ident">consts</span>::<span class=
-"ident">FRAC_PI_4</span>))
+"ident">from_polar</span>(<span class=
+"ident">n</span>, <span class="ident">f64</span>::<span class=
+"ident">consts</span>::<span class="ident">FRAC_PI_4</span>)
                 ));
                 <span class=
 "comment">// √(0 - n²i) = n e^(-iπ/4)</span>
@@ -7989,10 +7881,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">sqrt</span>(),
                     <span class=
 "ident">Complex64</span>::<span class=
-"ident">from_polar</span>(<span class="kw-2">&</span><span class=
-"ident">n</span>, <span class="kw-2">&</span>(<span class=
-"op">-</span><span class="ident">f64</span>::<span class=
-"ident">consts</span>::<span class="ident">FRAC_PI_4</span>))
+"ident">from_polar</span>(<span class=
+"ident">n</span>, <span class="op">-</span><span class=
+"ident">f64</span>::<span class="ident">consts</span>::<span class=
+"ident">FRAC_PI_4</span>)
                 ));
             }
         }
@@ -8027,8 +7919,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "number">0.0</span>).<span class="ident">cbrt</span>(),
                 <span class="ident">Complex</span>::<span class=
 "ident">new</span>(<span class="number">0.5</span>, <span class=
-"op">-</span><span class="number">0.75</span>.<span class=
-"ident">sqrt</span>())
+"op">-</span>(<span class="number">0.75</span>.<span class=
+"ident">sqrt</span>()))
             ));
             <span class="macro">assert</span><span class=
 "macro">!</span>(<span class="ident">close</span>(<span class=
@@ -8118,10 +8010,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">cbrt</span>(),
                     <span class=
 "ident">Complex64</span>::<span class=
-"ident">from_polar</span>(<span class="kw-2">&</span><span class=
-"ident">n</span>, <span class="kw-2">&</span>(<span class=
-"ident">f64</span>::<span class="ident">consts</span>::<span class=
-"ident">FRAC_PI_3</span>))
+"ident">from_polar</span>(<span class=
+"ident">n</span>, <span class="ident">f64</span>::<span class=
+"ident">consts</span>::<span class="ident">FRAC_PI_3</span>)
                 ));
                 <span class=
 "comment">// ∛(-n³ - 0i) = n e^(-iπ/3)</span>
@@ -8134,10 +8025,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "number">0.0</span>).<span class="ident">cbrt</span>(),
                     <span class=
 "ident">Complex64</span>::<span class=
-"ident">from_polar</span>(<span class="kw-2">&</span><span class=
-"ident">n</span>, <span class="kw-2">&</span>(<span class=
-"op">-</span><span class="ident">f64</span>::<span class=
-"ident">consts</span>::<span class="ident">FRAC_PI_3</span>))
+"ident">from_polar</span>(<span class=
+"ident">n</span>, <span class="op">-</span><span class=
+"ident">f64</span>::<span class="ident">consts</span>::<span class=
+"ident">FRAC_PI_3</span>)
                 ));
             }
         }
@@ -8166,10 +8057,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">n3</span>).<span class="ident">cbrt</span>(),
                     <span class=
 "ident">Complex64</span>::<span class=
-"ident">from_polar</span>(<span class="kw-2">&</span><span class=
-"ident">n</span>, <span class="kw-2">&</span>(<span class=
-"ident">f64</span>::<span class="ident">consts</span>::<span class=
-"ident">FRAC_PI_6</span>))
+"ident">from_polar</span>(<span class=
+"ident">n</span>, <span class="ident">f64</span>::<span class=
+"ident">consts</span>::<span class="ident">FRAC_PI_6</span>)
                 ));
                 <span class=
 "comment">// ∛(0 - n³i) = n e^(-iπ/6)</span>
@@ -8182,10 +8072,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">cbrt</span>(),
                     <span class=
 "ident">Complex64</span>::<span class=
-"ident">from_polar</span>(<span class="kw-2">&</span><span class=
-"ident">n</span>, <span class="kw-2">&</span>(<span class=
-"op">-</span><span class="ident">f64</span>::<span class=
-"ident">consts</span>::<span class="ident">FRAC_PI_6</span>))
+"ident">from_polar</span>(<span class=
+"ident">n</span>, <span class="op">-</span><span class=
+"ident">f64</span>::<span class="ident">consts</span>::<span class=
+"ident">FRAC_PI_6</span>)
                 ));
             }
         }
@@ -9315,7 +9205,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw">super</span>::{<span class=
 "ident">_05_05i</span>, <span class="ident">_0_0i</span>, <span class="ident">_0_1i</span>, <span class="ident">_1_0i</span>, <span class="ident">_1_1i</span>, <span class="ident">_4_2i</span>, <span class="ident">_neg1_1i</span>, <span class="ident">all_consts</span>};
         <span class="kw">use</span> <span class=
-"ident">traits</span>::{<span class=
+"ident">num_traits</span>::{<span class=
 "ident">MulAdd</span>, <span class=
 "ident">MulAddAssign</span>, <span class="ident">Zero</span>};
 
@@ -9427,8 +9317,11 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="attribute">#[<span class=
 "ident">test</span>]</span>
         <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"std"</span>)]</span>
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"libm"</span>))]</span>
         <span class="kw">fn</span> <span class=
 "ident">test_mul_add_float</span>() {
             <span class="macro">assert_eq</span><span class=
@@ -9990,21 +9883,24 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Complex</span>::<span class="ident">new</span>(<span class=
 "number">0i32</span>, <span class="number">1i32</span>);
         <span class="macro">assert</span><span class=
-"macro">!</span>(::<span class="ident">hash</span>(<span class=
-"kw-2">&</span><span class="ident">a</span>) <span class=
-"op">!</span><span class="op">=</span> ::<span class=
+"macro">!</span>(<span class="kw">crate</span>::<span class=
+"ident">hash</span>(<span class="kw-2">&</span><span class=
+"ident">a</span>) <span class="op">!</span><span class=
+"op">=</span> <span class="kw">crate</span>::<span class=
 "ident">hash</span>(<span class="kw-2">&</span><span class=
 "ident">b</span>));
         <span class="macro">assert</span><span class=
-"macro">!</span>(::<span class="ident">hash</span>(<span class=
-"kw-2">&</span><span class="ident">b</span>) <span class=
-"op">!</span><span class="op">=</span> ::<span class=
+"macro">!</span>(<span class="kw">crate</span>::<span class=
+"ident">hash</span>(<span class="kw-2">&</span><span class=
+"ident">b</span>) <span class="op">!</span><span class=
+"op">=</span> <span class="kw">crate</span>::<span class=
 "ident">hash</span>(<span class="kw-2">&</span><span class=
 "ident">c</span>));
         <span class="macro">assert</span><span class=
-"macro">!</span>(::<span class="ident">hash</span>(<span class=
-"kw-2">&</span><span class="ident">c</span>) <span class=
-"op">!</span><span class="op">=</span> ::<span class=
+"macro">!</span>(<span class="kw">crate</span>::<span class=
+"ident">hash</span>(<span class="kw-2">&</span><span class=
+"ident">c</span>) <span class="op">!</span><span class=
+"op">=</span> <span class="kw">crate</span>::<span class=
 "ident">hash</span>(<span class="kw-2">&</span><span class=
 "ident">a</span>));
     }
@@ -10416,9 +10312,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro">!</span>(<span class="op">!</span><span class=
 "ident">c</span>.<span class="ident">is_zero</span>());
         <span class="macro">assert_eq</span><span class=
-"macro">!</span>(<span class="kw-2">&</span><span class=
-"ident">c</span> <span class="op">+</span> <span class=
-"kw-2">&</span><span class="ident">zero</span>, <span class=
+"macro">!</span>(<span class="ident">c</span> <span class=
+"op">+</span> <span class="ident">zero</span>, <span class=
 "ident">c</span>);
 
         <span class="ident">c</span>.<span class=
@@ -10448,9 +10343,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro">!</span>(<span class="op">!</span><span class=
 "ident">c</span>.<span class="ident">is_one</span>());
         <span class="macro">assert_eq</span><span class=
-"macro">!</span>(<span class="kw-2">&</span><span class=
-"ident">c</span> <span class="op">*</span> <span class=
-"kw-2">&</span><span class="ident">one</span>, <span class=
+"macro">!</span>(<span class="ident">c</span> <span class=
+"op">*</span> <span class="ident">one</span>, <span class=
 "ident">c</span>);
 
         <span class="ident">c</span>.<span class=
@@ -10461,9 +10355,10 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">has_const_fn</span>)]</span>
-    <span class="attribute">#[<span class=
 "ident">test</span>]</span>
+    <span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">clippy</span>::<span class="ident">float_cmp</span>)]</span>
     <span class="kw">fn</span> <span class=
 "ident">test_const</span>() {
         <span class="kw">const</span> <span class=

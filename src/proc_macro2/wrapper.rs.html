@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.17/src/wrapper.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.18/src/wrapper.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>wrapper.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -985,9 +985,12 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Punct</span>, <span class=
 "ident">Spacing</span>, <span class="ident">TokenTree</span>};
 <span class="kw">use</span> <span class=
-"ident">std</span>::<span class="ident">fmt</span>;
+"ident">std</span>::<span class="ident">fmt</span>::{<span class=
+"self">self</span>, <span class="ident">Debug</span>, <span class=
+"ident">Display</span>};
 <span class="kw">use</span> <span class=
-"ident">std</span>::<span class="ident">iter</span>;
+"ident">std</span>::<span class="ident">iter</span>::<span class=
+"ident">FromIterator</span>;
 <span class="kw">use</span> <span class=
 "ident">std</span>::<span class="ident">ops</span>::<span class=
 "ident">RangeBounds</span>;
@@ -1234,8 +1237,8 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Display</span> <span class=
-"kw">for</span> <span class="ident">TokenStream</span> {
+"ident">Display</span> <span class="kw">for</span> <span class=
+"ident">TokenStream</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -1249,15 +1252,16 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="ident">TokenStream</span>::<span class=
 "ident">Compiler</span>(<span class=
 "ident">tts</span>) <span class="op">=</span><span class=
-"op">&gt;</span> <span class="ident">tts</span>.<span class=
-"ident">clone</span>().<span class=
-"ident">into_token_stream</span>().<span class=
-"ident">fmt</span>(<span class="ident">f</span>),
+"op">&gt;</span> <span class="ident">Display</span>::<span class=
+"ident">fmt</span>(<span class="kw-2">&</span><span class=
+"ident">tts</span>.<span class="ident">clone</span>().<span class=
+"ident">into_token_stream</span>(), <span class="ident">f</span>),
             <span class="ident">TokenStream</span>::<span class=
 "ident">Fallback</span>(<span class=
 "ident">tts</span>) <span class="op">=</span><span class=
-"op">&gt;</span> <span class="ident">tts</span>.<span class=
-"ident">fmt</span>(<span class="ident">f</span>),
+"op">&gt;</span> <span class="ident">Display</span>::<span class=
+"ident">fmt</span>(<span class="ident">tts</span>, <span class=
+"ident">f</span>),
         }
     }
 }
@@ -1402,7 +1406,6 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">iter</span>::<span class=
 "ident">FromIterator</span><span class="op">&lt;</span><span class=
 "ident">TokenTree</span><span class="op">&gt;</span> <span class=
 "kw">for</span> <span class="ident">TokenStream</span> {
@@ -1436,7 +1439,6 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">iter</span>::<span class=
 "ident">FromIterator</span><span class="op">&lt;</span><span class=
 "ident">TokenStream</span><span class="op">&gt;</span> <span class=
 "kw">for</span> <span class="ident">TokenStream</span> {
@@ -1597,8 +1599,8 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Debug</span> <span class=
-"kw">for</span> <span class="ident">TokenStream</span> {
+"ident">Debug</span> <span class="kw">for</span> <span class=
+"ident">TokenStream</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -1612,15 +1614,16 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="ident">TokenStream</span>::<span class=
 "ident">Compiler</span>(<span class=
 "ident">tts</span>) <span class="op">=</span><span class=
-"op">&gt;</span> <span class="ident">tts</span>.<span class=
-"ident">clone</span>().<span class=
-"ident">into_token_stream</span>().<span class=
-"ident">fmt</span>(<span class="ident">f</span>),
+"op">&gt;</span> <span class="ident">Debug</span>::<span class=
+"ident">fmt</span>(<span class="kw-2">&</span><span class=
+"ident">tts</span>.<span class="ident">clone</span>().<span class=
+"ident">into_token_stream</span>(), <span class="ident">f</span>),
             <span class="ident">TokenStream</span>::<span class=
 "ident">Fallback</span>(<span class=
 "ident">tts</span>) <span class="op">=</span><span class=
-"op">&gt;</span> <span class="ident">tts</span>.<span class=
-"ident">fmt</span>(<span class="ident">f</span>),
+"op">&gt;</span> <span class="ident">Debug</span>::<span class=
+"ident">fmt</span>(<span class="ident">tts</span>, <span class=
+"ident">f</span>),
         }
     }
 }
@@ -1656,8 +1659,8 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Debug</span> <span class=
-"kw">for</span> <span class="ident">LexError</span> {
+"ident">Debug</span> <span class="kw">for</span> <span class=
+"ident">LexError</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -1671,13 +1674,13 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="ident">LexError</span>::<span class=
 "ident">Compiler</span>(<span class="ident">e</span>) <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
-"ident">e</span>.<span class="ident">fmt</span>(<span class=
-"ident">f</span>),
+"ident">Debug</span>::<span class="ident">fmt</span>(<span class=
+"ident">e</span>, <span class="ident">f</span>),
             <span class="ident">LexError</span>::<span class=
 "ident">Fallback</span>(<span class="ident">e</span>) <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
-"ident">e</span>.<span class="ident">fmt</span>(<span class=
-"ident">f</span>),
+"ident">Debug</span>::<span class="ident">fmt</span>(<span class=
+"ident">e</span>, <span class="ident">f</span>),
         }
     }
 }
@@ -1844,8 +1847,8 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Debug</span> <span class=
-"kw">for</span> <span class="ident">TokenTreeIter</span> {
+"ident">Debug</span> <span class="kw">for</span> <span class=
+"ident">TokenTreeIter</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -1933,8 +1936,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">cfg</span>(<span class=
 "ident">super_unstable</span>)]</span>
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Debug</span> <span class=
-"kw">for</span> <span class="ident">SourceFile</span> {
+"ident">Debug</span> <span class="kw">for</span> <span class=
+"ident">SourceFile</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -1948,13 +1951,13 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="ident">SourceFile</span>::<span class=
 "ident">Compiler</span>(<span class="ident">a</span>) <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
-"ident">a</span>.<span class="ident">fmt</span>(<span class=
-"ident">f</span>),
+"ident">Debug</span>::<span class="ident">fmt</span>(<span class=
+"ident">a</span>, <span class="ident">f</span>),
             <span class="ident">SourceFile</span>::<span class=
 "ident">Fallback</span>(<span class="ident">a</span>) <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
-"ident">a</span>.<span class="ident">fmt</span>(<span class=
-"ident">f</span>),
+"ident">Debug</span>::<span class="ident">fmt</span>(<span class=
+"ident">a</span>, <span class="ident">f</span>),
         }
     }
 }
@@ -2416,8 +2419,8 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Debug</span> <span class=
-"kw">for</span> <span class="ident">Span</span> {
+"ident">Debug</span> <span class="kw">for</span> <span class=
+"ident">Span</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -2431,13 +2434,13 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="ident">Span</span>::<span class=
 "ident">Compiler</span>(<span class="ident">s</span>) <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
-"ident">s</span>.<span class="ident">fmt</span>(<span class=
-"ident">f</span>),
+"ident">Debug</span>::<span class="ident">fmt</span>(<span class=
+"ident">s</span>, <span class="ident">f</span>),
             <span class="ident">Span</span>::<span class=
 "ident">Fallback</span>(<span class="ident">s</span>) <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
-"ident">s</span>.<span class="ident">fmt</span>(<span class=
-"ident">f</span>),
+"ident">Debug</span>::<span class="ident">fmt</span>(<span class=
+"ident">s</span>, <span class="ident">f</span>),
         }
     }
 }
@@ -2752,8 +2755,8 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Display</span> <span class=
-"kw">for</span> <span class="ident">Group</span> {
+"ident">Display</span> <span class="kw">for</span> <span class=
+"ident">Group</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class=
@@ -2767,20 +2770,22 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="ident">Group</span>::<span class=
 "ident">Compiler</span>(<span class=
 "ident">group</span>) <span class="op">=</span><span class=
-"op">&gt;</span> <span class="ident">group</span>.<span class=
-"ident">fmt</span>(<span class="ident">formatter</span>),
+"op">&gt;</span> <span class="ident">Display</span>::<span class=
+"ident">fmt</span>(<span class="ident">group</span>, <span class=
+"ident">formatter</span>),
             <span class="ident">Group</span>::<span class=
 "ident">Fallback</span>(<span class=
 "ident">group</span>) <span class="op">=</span><span class=
-"op">&gt;</span> <span class="ident">group</span>.<span class=
-"ident">fmt</span>(<span class="ident">formatter</span>),
+"op">&gt;</span> <span class="ident">Display</span>::<span class=
+"ident">fmt</span>(<span class="ident">group</span>, <span class=
+"ident">formatter</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Debug</span> <span class=
-"kw">for</span> <span class="ident">Group</span> {
+"ident">Debug</span> <span class="kw">for</span> <span class=
+"ident">Group</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class=
@@ -2794,13 +2799,15 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="ident">Group</span>::<span class=
 "ident">Compiler</span>(<span class=
 "ident">group</span>) <span class="op">=</span><span class=
-"op">&gt;</span> <span class="ident">group</span>.<span class=
-"ident">fmt</span>(<span class="ident">formatter</span>),
+"op">&gt;</span> <span class="ident">Debug</span>::<span class=
+"ident">fmt</span>(<span class="ident">group</span>, <span class=
+"ident">formatter</span>),
             <span class="ident">Group</span>::<span class=
 "ident">Fallback</span>(<span class=
 "ident">group</span>) <span class="op">=</span><span class=
-"op">&gt;</span> <span class="ident">group</span>.<span class=
-"ident">fmt</span>(<span class="ident">formatter</span>),
+"op">&gt;</span> <span class="ident">Debug</span>::<span class=
+"ident">fmt</span>(<span class="ident">group</span>, <span class=
+"ident">formatter</span>),
         }
     }
 }
@@ -3037,8 +3044,8 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Display</span> <span class=
-"kw">for</span> <span class="ident">Ident</span> {
+"ident">Display</span> <span class="kw">for</span> <span class=
+"ident">Ident</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -3052,20 +3059,20 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="ident">Ident</span>::<span class=
 "ident">Compiler</span>(<span class="ident">t</span>) <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
-"ident">t</span>.<span class="ident">fmt</span>(<span class=
-"ident">f</span>),
+"ident">Display</span>::<span class="ident">fmt</span>(<span class=
+"ident">t</span>, <span class="ident">f</span>),
             <span class="ident">Ident</span>::<span class=
 "ident">Fallback</span>(<span class="ident">t</span>) <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
-"ident">t</span>.<span class="ident">fmt</span>(<span class=
-"ident">f</span>),
+"ident">Display</span>::<span class="ident">fmt</span>(<span class=
+"ident">t</span>, <span class="ident">f</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Debug</span> <span class=
-"kw">for</span> <span class="ident">Ident</span> {
+"ident">Debug</span> <span class="kw">for</span> <span class=
+"ident">Ident</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -3079,13 +3086,13 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="ident">Ident</span>::<span class=
 "ident">Compiler</span>(<span class="ident">t</span>) <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
-"ident">t</span>.<span class="ident">fmt</span>(<span class=
-"ident">f</span>),
+"ident">Debug</span>::<span class="ident">fmt</span>(<span class=
+"ident">t</span>, <span class="ident">f</span>),
             <span class="ident">Ident</span>::<span class=
 "ident">Fallback</span>(<span class="ident">t</span>) <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
-"ident">t</span>.<span class="ident">fmt</span>(<span class=
-"ident">f</span>),
+"ident">Debug</span>::<span class="ident">fmt</span>(<span class=
+"ident">t</span>, <span class="ident">f</span>),
         }
     }
 }
@@ -3496,8 +3503,8 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Display</span> <span class=
-"kw">for</span> <span class="ident">Literal</span> {
+"ident">Display</span> <span class="kw">for</span> <span class=
+"ident">Literal</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -3511,20 +3518,20 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="ident">Literal</span>::<span class=
 "ident">Compiler</span>(<span class="ident">t</span>) <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
-"ident">t</span>.<span class="ident">fmt</span>(<span class=
-"ident">f</span>),
+"ident">Display</span>::<span class="ident">fmt</span>(<span class=
+"ident">t</span>, <span class="ident">f</span>),
             <span class="ident">Literal</span>::<span class=
 "ident">Fallback</span>(<span class="ident">t</span>) <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
-"ident">t</span>.<span class="ident">fmt</span>(<span class=
-"ident">f</span>),
+"ident">Display</span>::<span class="ident">fmt</span>(<span class=
+"ident">t</span>, <span class="ident">f</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Debug</span> <span class=
-"kw">for</span> <span class="ident">Literal</span> {
+"ident">Debug</span> <span class="kw">for</span> <span class=
+"ident">Literal</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -3538,13 +3545,13 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="ident">Literal</span>::<span class=
 "ident">Compiler</span>(<span class="ident">t</span>) <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
-"ident">t</span>.<span class="ident">fmt</span>(<span class=
-"ident">f</span>),
+"ident">Debug</span>::<span class="ident">fmt</span>(<span class=
+"ident">t</span>, <span class="ident">f</span>),
             <span class="ident">Literal</span>::<span class=
 "ident">Fallback</span>(<span class="ident">t</span>) <span class=
 "op">=</span><span class="op">&gt;</span> <span class=
-"ident">t</span>.<span class="ident">fmt</span>(<span class=
-"ident">f</span>),
+"ident">Debug</span>::<span class="ident">fmt</span>(<span class=
+"ident">t</span>, <span class="ident">f</span>),
         }
     }
 }

@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rayon-core-1.7.0/src/registry.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rayon-core-1.7.1/src/registry.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>registry.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -918,6 +918,10 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="843">843</span>
 <span id="844">844</span>
 <span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -1022,7 +1026,7 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="kw">impl</span> <span class=
 "ident">ThreadBuilder</span> {
     <span class=
-"doccomment">/// Get the index of this thread in the pool, within `0..num_threads`.</span>
+"doccomment">/// Gets the index of this thread in the pool, within `0..num_threads`.</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">index</span>(<span class=
 "kw-2">&</span><span class="self">self</span>) <span class=
@@ -1033,7 +1037,7 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Get the string that was specified by `ThreadPoolBuilder::name()`.</span>
+"doccomment">/// Gets the string that was specified by `ThreadPoolBuilder::name()`.</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">name</span>(<span class=
 "kw-2">&</span><span class="self">self</span>) <span class=
@@ -1048,7 +1052,7 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Get the value that was specified by `ThreadPoolBuilder::stack_size()`.</span>
+"doccomment">/// Gets the value that was specified by `ThreadPoolBuilder::stack_size()`.</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">stack_size</span>(<span class=
 "kw-2">&</span><span class="self">self</span>) <span class=
@@ -1060,7 +1064,7 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Execute the main loop for this thread. This will not return until the</span>
+"doccomment">/// Executes the main loop for this thread. This will not return until the</span>
     <span class="doccomment">/// thread pool is dropped.</span>
     <span class="kw">pub</span> <span class=
 "kw">fn</span> <span class="ident">run</span>(<span class=
@@ -2051,9 +2055,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">TickleLatch</span>::<span class=
 "ident">new</span>(<span class=
 "ident">SpinLatch</span>::<span class=
-"ident">new</span>(), <span class="kw-2">&</span><span class=
+"ident">new</span>(), <span class=
 "ident">current_thread</span>.<span class=
-"ident">registry</span>().<span class="ident">sleep</span>);
+"ident">registry</span>());
         <span class="kw">let</span> <span class=
 "ident">job</span> <span class="op">=</span> <span class=
 "ident">StackJob</span>::<span class="ident">new</span>(
@@ -2084,7 +2088,7 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// Increment the terminate counter. This increment should be</span>
+"doccomment">/// Increments the terminate counter. This increment should be</span>
     <span class=
 "doccomment">/// balanced by a call to `terminate`, which will decrement. This</span>
     <span class=
@@ -2139,6 +2143,15 @@ autocomplete="off" spellcheck="false" placeholder=
 "self">self</span>) {
         <span class="self">self</span>.<span class=
 "ident">terminate_latch</span>.<span class="ident">set</span>();
+        <span class="self">self</span>.<span class=
+"ident">sleep</span>.<span class="ident">tickle</span>(<span class=
+"ident">usize</span>::<span class="ident">MAX</span>);
+    }
+
+    <span class="kw">pub</span>(<span class=
+"kw">super</span>) <span class="kw">fn</span> <span class=
+"ident">tickle</span>(<span class="kw-2">&</span><span class=
+"self">self</span>) {
         <span class="self">self</span>.<span class=
 "ident">sleep</span>.<span class="ident">tickle</span>(<span class=
 "ident">usize</span>::<span class="ident">MAX</span>);

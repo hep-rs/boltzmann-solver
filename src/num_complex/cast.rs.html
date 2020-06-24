@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-complex-0.2.4/src/cast.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-complex-0.3.0/src/cast.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>cast.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -198,7 +198,7 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="kw">use</span> <span class=
 "kw">super</span>::<span class="ident">Complex</span>;
 <span class="kw">use</span> <span class=
-"ident">traits</span>::{<span class=
+"ident">num_traits</span>::{<span class=
 "ident">AsPrimitive</span>, <span class=
 "ident">FromPrimitive</span>, <span class=
 "ident">Num</span>, <span class=
@@ -225,13 +225,16 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">ty</span><span class="op">&gt;</span> {
             <span class="kw">if</span> <span class=
 "self">self</span>.<span class="ident">im</span>.<span class=
-"ident">is_zero</span>() { <span class=
-"self">self</span>.<span class="ident">re</span>.<span class=
+"ident">is_zero</span>() {
+                <span class="self">self</span>.<span class=
+"ident">re</span>.<span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">to</span>() } <span class=
-"kw">else</span> { <span class="prelude-val">None</span> }
+"macro-nonterminal">to</span>()
+            } <span class="kw">else</span> {
+                <span class="prelude-val">None</span>
+            }
         }
-    }
+    };
 } <span class="comment">// impl_to_primitive</span>
 
 <span class=
@@ -273,13 +276,9 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="macro">impl_to_primitive</span><span class=
 "macro">!</span>(<span class="ident">i64</span>, <span class=
 "ident">to_i64</span>);
-    <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">has_i128</span>)]</span>
     <span class="macro">impl_to_primitive</span><span class=
 "macro">!</span>(<span class="ident">u128</span>, <span class=
 "ident">to_u128</span>);
-    <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">has_i128</span>)]</span>
     <span class="macro">impl_to_primitive</span><span class=
 "macro">!</span>(<span class="ident">i128</span>, <span class=
 "ident">to_i128</span>);
@@ -311,14 +310,13 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "prelude-ty">Option</span><span class="op">&lt;</span><span class=
 "self">Self</span><span class="op">&gt;</span> {
-            <span class="ident">T</span>::<span class=
+            <span class="prelude-val">Some</span>(<span class=
+"ident">Complex</span> {
+                <span class="ident">re</span>: <span class=
+"ident">T</span>::<span class=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">from_xx</span>(<span class=
-"ident">n</span>).<span class="ident">map</span>(<span class=
-"op">|</span><span class="ident">re</span><span class=
-"op">|</span> <span class="ident">Complex</span> {
-                <span class="ident">re</span>: <span class=
-"ident">re</span>,
+"ident">n</span>)<span class="question-mark">?</span>,
                 <span class="ident">im</span>: <span class=
 "ident">T</span>::<span class="ident">zero</span>(),
             })
@@ -364,13 +362,9 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="macro">impl_from_primitive</span><span class=
 "macro">!</span>(<span class="ident">i64</span>, <span class=
 "ident">from_i64</span>);
-    <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">has_i128</span>)]</span>
     <span class="macro">impl_from_primitive</span><span class=
 "macro">!</span>(<span class="ident">u128</span>, <span class=
 "ident">from_u128</span>);
-    <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">has_i128</span>)]</span>
     <span class="macro">impl_from_primitive</span><span class=
 "macro">!</span>(<span class="ident">i128</span>, <span class=
 "ident">from_i128</span>);
@@ -397,13 +391,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">-</span><span class="op">&gt;</span> <span class=
 "prelude-ty">Option</span><span class="op">&lt;</span><span class=
 "self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">T</span>::<span class=
-"ident">from</span>(<span class="ident">n</span>).<span class=
-"ident">map</span>(<span class="op">|</span><span class=
-"ident">re</span><span class="op">|</span> <span class=
+        <span class="prelude-val">Some</span>(<span class=
 "ident">Complex</span> {
             <span class="ident">re</span>: <span class=
-"ident">re</span>,
+"ident">T</span>::<span class="ident">from</span>(<span class=
+"ident">n</span>)<span class="question-mark">?</span>,
             <span class="ident">im</span>: <span class=
 "ident">T</span>::<span class="ident">zero</span>(),
         })

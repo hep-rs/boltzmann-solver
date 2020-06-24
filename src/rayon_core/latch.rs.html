@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rayon-core-1.7.0/src/latch.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rayon-core-1.7.1/src/latch.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>latch.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -288,6 +288,10 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="213">213</span>
 <span id="214">214</span>
 <span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -298,13 +302,12 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
 <span class="kw">use</span> <span class=
 "ident">std</span>::<span class="ident">sync</span>::{<span class=
+"ident">Arc</span>, <span class=
 "ident">Condvar</span>, <span class="ident">Mutex</span>};
-<span class="kw">use</span> <span class=
-"ident">std</span>::<span class="ident">usize</span>;
 
 <span class="kw">use</span> <span class=
-"kw">crate</span>::<span class="ident">sleep</span>::<span class=
-"ident">Sleep</span>;
+"kw">crate</span>::<span class=
+"ident">registry</span>::<span class="ident">Registry</span>;
 
 <span class=
 "doccomment">/// We define various kinds of latches, which are all a primitive signaling</span>
@@ -639,9 +642,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "lifetime">'a</span>, <span class="ident">L</span>: <span class=
 "ident">Latch</span><span class="op">&gt;</span> {
     <span class="ident">inner</span>: <span class="ident">L</span>,
-    <span class="ident">sleep</span>: <span class=
+    <span class="ident">registry</span>: <span class=
 "kw-2">&</span><span class="lifetime">'a</span> <span class=
-"ident">Sleep</span>,
+"ident">Arc</span><span class="op">&lt;</span><span class=
+"ident">Registry</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class=
@@ -655,14 +659,18 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="kw">pub</span>(<span class=
 "kw">super</span>) <span class="kw">fn</span> <span class=
 "ident">new</span>(<span class="ident">latch</span>: <span class=
-"ident">L</span>, <span class="ident">sleep</span>: <span class=
+"ident">L</span>, <span class="ident">registry</span>: <span class=
 "kw-2">&</span><span class="lifetime">'a</span> <span class=
-"ident">Sleep</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="self">Self</span> {
+"ident">Arc</span><span class="op">&lt;</span><span class=
+"ident">Registry</span><span class="op">&gt;</span>) <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"self">Self</span> {
+        <span class="ident">registry</span>.<span class=
+"ident">increment_terminate_count</span>();
         <span class="ident">TickleLatch</span> {
             <span class="ident">inner</span>: <span class=
 "ident">latch</span>,
-            <span class="ident">sleep</span>,
+            <span class="ident">registry</span>,
         }
     }
 }
@@ -697,11 +705,19 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="kw">fn</span> <span class=
 "ident">set</span>(<span class="kw-2">&</span><span class=
 "self">self</span>) {
+        <span class=
+"comment">// Ensure the registry stays alive while we tickle it.</span>
+        <span class="kw">let</span> <span class=
+"ident">registry</span> <span class="op">=</span> <span class=
+"ident">Arc</span>::<span class="ident">clone</span>(<span class=
+"self">self</span>.<span class="ident">registry</span>);
+
+        <span class=
+"comment">// NOTE: Once we `set`, the target may proceed and invalidate `&amp;self`!</span>
         <span class="self">self</span>.<span class=
 "ident">inner</span>.<span class="ident">set</span>();
-        <span class="self">self</span>.<span class=
-"ident">sleep</span>.<span class="ident">tickle</span>(<span class=
-"ident">usize</span>::<span class="ident">MAX</span>);
+        <span class="ident">registry</span>.<span class=
+"ident">tickle</span>();
     }
 }
 

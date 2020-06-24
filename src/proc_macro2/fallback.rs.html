@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.17/src/fallback.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.18/src/fallback.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>fallback.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -929,6 +929,52 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="854">854</span>
 <span id="855">855</span>
 <span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -951,9 +997,12 @@ autocomplete="off" spellcheck="false" placeholder=
 <span class="kw">use</span> <span class=
 "ident">std</span>::<span class="ident">cmp</span>;
 <span class="kw">use</span> <span class=
-"ident">std</span>::<span class="ident">fmt</span>;
+"ident">std</span>::<span class="ident">fmt</span>::{<span class=
+"self">self</span>, <span class="ident">Debug</span>, <span class=
+"ident">Display</span>};
 <span class="kw">use</span> <span class=
-"ident">std</span>::<span class="ident">iter</span>;
+"ident">std</span>::<span class="ident">iter</span>::<span class=
+"ident">FromIterator</span>;
 <span class="kw">use</span> <span class=
 "ident">std</span>::<span class="ident">mem</span>;
 <span class="kw">use</span> <span class=
@@ -1053,6 +1102,123 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">mut</span> <span class="self">self</span>.<span class=
 "ident">inner</span>, <span class="ident">Vec</span>::<span class=
 "ident">new</span>())
+    }
+
+    <span class="kw">fn</span> <span class=
+"ident">push_token</span>(<span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class="self">self</span>, <span class=
+"ident">token</span>: <span class="ident">TokenTree</span>) {
+        <span class=
+"comment">// https://github.com/alexcrichton/proc-macro2/issues/235</span>
+        <span class="kw">match</span> <span class=
+"ident">token</span> {
+            <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">not</span>(<span class=
+"ident">no_bind_by_move_pattern_guard</span>))]</span>
+            <span class="ident">TokenTree</span>::<span class=
+"ident">Literal</span>(<span class="kw">crate</span>::<span class=
+"ident">Literal</span> {
+                <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">wrap_proc_macro</span>)]</span>
+                    <span class="ident">inner</span>: <span class=
+"kw">crate</span>::<span class="ident">imp</span>::<span class=
+"ident">Literal</span>::<span class=
+"ident">Fallback</span>(<span class="ident">literal</span>),
+                <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">not</span>(<span class=
+"ident">wrap_proc_macro</span>))]</span>
+                    <span class="ident">inner</span>: <span class=
+"ident">literal</span>,
+                ..
+            }) <span class="kw">if</span> <span class=
+"ident">literal</span>.<span class="ident">text</span>.<span class=
+"ident">starts_with</span>(<span class=
+"string">'-'</span>) <span class="op">=</span><span class=
+"op">&gt;</span> {
+                <span class=
+"ident">push_negative_literal</span>(<span class=
+"self">self</span>, <span class="ident">literal</span>);
+            }
+            <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">no_bind_by_move_pattern_guard</span>)]</span>
+            <span class="ident">TokenTree</span>::<span class=
+"ident">Literal</span>(<span class="kw">crate</span>::<span class=
+"ident">Literal</span> {
+                <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">wrap_proc_macro</span>)]</span>
+                    <span class="ident">inner</span>: <span class=
+"kw">crate</span>::<span class="ident">imp</span>::<span class=
+"ident">Literal</span>::<span class=
+"ident">Fallback</span>(<span class="ident">literal</span>),
+                <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">not</span>(<span class=
+"ident">wrap_proc_macro</span>))]</span>
+                    <span class="ident">inner</span>: <span class=
+"ident">literal</span>,
+                ..
+            }) <span class="op">=</span><span class=
+"op">&gt;</span> {
+                <span class="kw">if</span> <span class=
+"ident">literal</span>.<span class="ident">text</span>.<span class=
+"ident">starts_with</span>(<span class="string">'-'</span>) {
+                    <span class=
+"ident">push_negative_literal</span>(<span class=
+"self">self</span>, <span class="ident">literal</span>);
+                } <span class="kw">else</span> {
+                    <span class="self">self</span>.<span class=
+"ident">inner</span>
+                        .<span class=
+"ident">push</span>(<span class=
+"ident">TokenTree</span>::<span class=
+"ident">Literal</span>(<span class="kw">crate</span>::<span class=
+"ident">Literal</span>::<span class=
+"ident">_new_stable</span>(<span class="ident">literal</span>)));
+                }
+            }
+            <span class="kw">_</span> <span class=
+"op">=</span><span class="op">&gt;</span> <span class=
+"self">self</span>.<span class="ident">inner</span>.<span class=
+"ident">push</span>(<span class="ident">token</span>),
+        }
+
+        <span class="attribute">#[<span class=
+"ident">cold</span>]</span>
+        <span class="kw">fn</span> <span class=
+"ident">push_negative_literal</span>(<span class=
+"ident">stream</span>: <span class="kw-2">&</span><span class=
+"kw-2">mut</span> <span class=
+"ident">TokenStream</span>, <span class=
+"kw-2">mut</span> <span class="ident">literal</span>: <span class=
+"ident">Literal</span>) {
+            <span class="ident">literal</span>.<span class=
+"ident">text</span>.<span class="ident">remove</span>(<span class=
+"number">0</span>);
+            <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">punct</span> <span class=
+"op">=</span> <span class="kw">crate</span>::<span class=
+"ident">Punct</span>::<span class="ident">new</span>(<span class=
+"string">'-'</span>, <span class=
+"ident">Spacing</span>::<span class="ident">Alone</span>);
+            <span class="ident">punct</span>.<span class=
+"ident">set_span</span>(<span class="kw">crate</span>::<span class=
+"ident">Span</span>::<span class=
+"ident">_new_stable</span>(<span class=
+"ident">literal</span>.<span class="ident">span</span>));
+            <span class="ident">stream</span>.<span class=
+"ident">inner</span>.<span class="ident">push</span>(<span class=
+"ident">TokenTree</span>::<span class=
+"ident">Punct</span>(<span class="ident">punct</span>));
+            <span class="ident">stream</span>
+                .<span class="ident">inner</span>
+                .<span class="ident">push</span>(<span class=
+"ident">TokenTree</span>::<span class=
+"ident">Literal</span>(<span class="kw">crate</span>::<span class=
+"ident">Literal</span>::<span class=
+"ident">_new_stable</span>(<span class="ident">literal</span>)));
+        }
     }
 }
 
@@ -1192,8 +1358,8 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Display</span> <span class=
-"kw">for</span> <span class="ident">TokenStream</span> {
+"ident">Display</span> <span class="kw">for</span> <span class=
+"ident">TokenStream</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -1310,8 +1476,8 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Debug</span> <span class=
-"kw">for</span> <span class="ident">TokenStream</span> {
+"ident">Debug</span> <span class="kw">for</span> <span class=
+"ident">TokenStream</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -1381,14 +1547,17 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">from</span>(<span class="ident">tree</span>: <span class=
 "ident">TokenTree</span>) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="ident">TokenStream</span> {
-        <span class="ident">TokenStream</span> { <span class=
-"ident">inner</span>: <span class="macro">vec</span><span class=
-"macro">!</span>[<span class="ident">tree</span>] }
+        <span class="kw">let</span> <span class=
+"kw-2">mut</span> <span class="ident">stream</span> <span class=
+"op">=</span> <span class="ident">TokenStream</span>::<span class=
+"ident">new</span>();
+        <span class="ident">stream</span>.<span class=
+"ident">push_token</span>(<span class="ident">tree</span>);
+        <span class="ident">stream</span>
     }
 }
 
 <span class="kw">impl</span> <span class=
-"ident">iter</span>::<span class=
 "ident">FromIterator</span><span class="op">&lt;</span><span class=
 "ident">TokenTree</span><span class="op">&gt;</span> <span class=
 "kw">for</span> <span class="ident">TokenStream</span> {
@@ -1398,28 +1567,20 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">IntoIterator</span><span class="op">&lt;</span><span class=
 "ident">Item</span> <span class="op">=</span> <span class=
 "ident">TokenTree</span><span class="op">&gt;</span><span class=
-"op">&gt;</span>(<span class="ident">streams</span>: <span class=
+"op">&gt;</span>(<span class="ident">tokens</span>: <span class=
 "ident">I</span>) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class=
-"kw-2">mut</span> <span class="ident">v</span> <span class=
-"op">=</span> <span class="ident">Vec</span>::<span class=
+"kw-2">mut</span> <span class="ident">stream</span> <span class=
+"op">=</span> <span class="ident">TokenStream</span>::<span class=
 "ident">new</span>();
-
-        <span class="kw">for</span> <span class=
-"ident">token</span> <span class="kw">in</span> <span class=
-"ident">streams</span>.<span class="ident">into_iter</span>() {
-            <span class="ident">v</span>.<span class=
-"ident">push</span>(<span class="ident">token</span>);
-        }
-
-        <span class="ident">TokenStream</span> { <span class=
-"ident">inner</span>: <span class="ident">v</span> }
+        <span class="ident">stream</span>.<span class=
+"ident">extend</span>(<span class="ident">tokens</span>);
+        <span class="ident">stream</span>
     }
 }
 
 <span class="kw">impl</span> <span class=
-"ident">iter</span>::<span class=
 "ident">FromIterator</span><span class="op">&lt;</span><span class=
 "ident">TokenStream</span><span class="op">&gt;</span> <span class=
 "kw">for</span> <span class="ident">TokenStream</span> {
@@ -1439,8 +1600,7 @@ autocomplete="off" spellcheck="false" placeholder=
 
         <span class="kw">for</span> <span class=
 "kw-2">mut</span> <span class="ident">stream</span> <span class=
-"kw">in</span> <span class="ident">streams</span>.<span class=
-"ident">into_iter</span>() {
+"kw">in</span> <span class="ident">streams</span> {
             <span class="ident">v</span>.<span class=
 "ident">extend</span>(<span class=
 "ident">stream</span>.<span class="ident">take_inner</span>());
@@ -1463,10 +1623,13 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">TokenTree</span><span class="op">&gt;</span><span class=
 "op">&gt;</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class="self">self</span>, <span class=
-"ident">streams</span>: <span class="ident">I</span>) {
-        <span class="self">self</span>.<span class=
-"ident">inner</span>.<span class="ident">extend</span>(<span class=
-"ident">streams</span>);
+"ident">tokens</span>: <span class="ident">I</span>) {
+        <span class="ident">tokens</span>.<span class=
+"ident">into_iter</span>().<span class=
+"ident">for_each</span>(<span class="op">|</span><span class=
+"ident">token</span><span class="op">|</span> <span class=
+"self">self</span>.<span class=
+"ident">push_token</span>(<span class="ident">token</span>));
     }
 }
 
@@ -1484,13 +1647,9 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">mut</span> <span class="self">self</span>, <span class=
 "ident">streams</span>: <span class="ident">I</span>) {
         <span class="self">self</span>.<span class=
-"ident">inner</span>
-            .<span class="ident">extend</span>(<span class=
+"ident">inner</span>.<span class="ident">extend</span>(<span class=
 "ident">streams</span>.<span class=
-"ident">into_iter</span>().<span class=
-"ident">flat_map</span>(<span class="op">|</span><span class=
-"ident">stream</span><span class="op">|</span> <span class=
-"ident">stream</span>));
+"ident">into_iter</span>().<span class="ident">flatten</span>());
     }
 }
 
@@ -1555,8 +1714,8 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Debug</span> <span class=
-"kw">for</span> <span class="ident">SourceFile</span> {
+"ident">Debug</span> <span class="kw">for</span> <span class=
+"ident">SourceFile</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -2147,8 +2306,8 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Debug</span> <span class=
-"kw">for</span> <span class="ident">Span</span> {
+"ident">Debug</span> <span class="kw">for</span> <span class=
+"ident">Span</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -2159,7 +2318,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "prelude-ty">Result</span> {
         <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class=
-"ident">procmacro2_semver_exempt</span>)]</span>
+"ident">span_locations</span>)]</span>
         <span class="kw">return</span> <span class=
 "macro">write</span><span class="macro">!</span>(<span class=
 "ident">f</span>, <span class=
@@ -2169,7 +2328,7 @@ autocomplete="off" spellcheck="false" placeholder=
 
         <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class="ident">not</span>(<span class=
-"ident">procmacro2_semver_exempt</span>))]</span>
+"ident">span_locations</span>))]</span>
         <span class="macro">write</span><span class=
 "macro">!</span>(<span class="ident">f</span>, <span class=
 "string">"Span"</span>)
@@ -2183,9 +2342,24 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw-2">mut</span> <span class="ident">fmt</span>::<span class=
 "ident">DebugStruct</span>, <span class=
 "ident">span</span>: <span class="ident">Span</span>) {
+    <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class=
+"ident">span_locations</span>)]</span>
+    {
+        <span class="kw">if</span> <span class=
+"ident">span</span>.<span class="ident">lo</span> <span class=
+"op">=</span><span class="op">=</span> <span class=
+"number">0</span> <span class="kw-2">&</span><span class=
+"op">&</span> <span class="ident">span</span>.<span class=
+"ident">hi</span> <span class="op">=</span><span class=
+"op">=</span> <span class="number">0</span> {
+            <span class="kw">return</span>;
+        }
+    }
+
     <span class="kw">if</span> <span class=
 "macro">cfg</span><span class="macro">!</span>(<span class=
-"ident">procmacro2_semver_exempt</span>) {
+"ident">span_locations</span>) {
         <span class="ident">debug</span>.<span class=
 "ident">field</span>(<span class=
 "string">"span"</span>, <span class="kw-2">&</span><span class=
@@ -2279,8 +2453,8 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Display</span> <span class=
-"kw">for</span> <span class="ident">Group</span> {
+"ident">Display</span> <span class="kw">for</span> <span class=
+"ident">Group</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -2314,8 +2488,9 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="ident">f</span>.<span class=
 "ident">write_str</span>(<span class=
 "ident">left</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class=
-"ident">stream</span>.<span class="ident">fmt</span>(<span class=
+        <span class="ident">Display</span>::<span class=
+"ident">fmt</span>(<span class="kw-2">&</span><span class=
+"self">self</span>.<span class="ident">stream</span>, <span class=
 "ident">f</span>)<span class="question-mark">?</span>;
         <span class="ident">f</span>.<span class=
 "ident">write_str</span>(<span class=
@@ -2326,8 +2501,8 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Debug</span> <span class=
-"kw">for</span> <span class="ident">Group</span> {
+"ident">Debug</span> <span class="kw">for</span> <span class=
+"ident">Group</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">fmt</span>: <span class=
@@ -2349,13 +2524,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">field</span>(<span class=
 "string">"stream"</span>, <span class="kw-2">&</span><span class=
 "self">self</span>.<span class="ident">stream</span>);
-        <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class=
-"ident">procmacro2_semver_exempt</span>)]</span>
-        <span class="ident">debug</span>.<span class=
-"ident">field</span>(<span class=
-"string">"span"</span>, <span class="kw-2">&</span><span class=
-"self">self</span>.<span class="ident">span</span>);
+        <span class=
+"ident">debug_span_field_if_nontrivial</span>(<span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">debug</span>, <span class="self">self</span>.<span class=
+"ident">span</span>);
         <span class="ident">debug</span>.<span class=
 "ident">finish</span>()
     }
@@ -2635,8 +2808,8 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Display</span> <span class=
-"kw">for</span> <span class="ident">Ident</span> {
+"ident">Display</span> <span class="kw">for</span> <span class=
+"ident">Ident</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -2647,24 +2820,25 @@ autocomplete="off" spellcheck="false" placeholder=
 "prelude-ty">Result</span> {
         <span class="kw">if</span> <span class=
 "self">self</span>.<span class="ident">raw</span> {
-            <span class="string">"r#"</span>.<span class=
-"ident">fmt</span>(<span class="ident">f</span>)<span class=
-"question-mark">?</span>;
+            <span class="ident">f</span>.<span class=
+"ident">write_str</span>(<span class=
+"string">"r#"</span>)<span class="question-mark">?</span>;
         }
-        <span class="self">self</span>.<span class=
-"ident">sym</span>.<span class="ident">fmt</span>(<span class=
+        <span class="ident">Display</span>::<span class=
+"ident">fmt</span>(<span class="kw-2">&</span><span class=
+"self">self</span>.<span class="ident">sym</span>, <span class=
 "ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Debug</span> <span class=
-"kw">for</span> <span class="ident">Ident</span> {
+"ident">Debug</span> <span class="kw">for</span> <span class=
+"ident">Ident</span> {
     <span class=
 "comment">// Ident(proc_macro), Ident(r#union)</span>
     <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class="ident">not</span>(<span class=
-"ident">procmacro2_semver_exempt</span>))]</span>
+"ident">span_locations</span>))]</span>
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -2691,7 +2865,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="comment">// }</span>
     <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class=
-"ident">procmacro2_semver_exempt</span>)]</span>
+"ident">span_locations</span>)]</span>
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -2709,10 +2883,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "string">"sym"</span>, <span class="kw-2">&</span><span class=
 "macro">format_args</span><span class="macro">!</span>(<span class=
 "string">"{}"</span>, <span class="self">self</span>));
-        <span class="ident">debug</span>.<span class=
-"ident">field</span>(<span class=
-"string">"span"</span>, <span class="kw-2">&</span><span class=
-"self">self</span>.<span class="ident">span</span>);
+        <span class=
+"ident">debug_span_field_if_nontrivial</span>(<span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">debug</span>, <span class="self">self</span>.<span class=
+"ident">span</span>);
         <span class="ident">debug</span>.<span class=
 "ident">finish</span>()
     }
@@ -2895,7 +3070,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">to_string</span>();
         <span class="kw">if</span> <span class=
 "op">!</span><span class="ident">s</span>.<span class=
-"ident">contains</span>(<span class="string">"."</span>) {
+"ident">contains</span>(<span class="string">'.'</span>) {
             <span class="ident">s</span>.<span class=
 "ident">push_str</span>(<span class="string">".0"</span>);
         }
@@ -2915,7 +3090,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">to_string</span>();
         <span class="kw">if</span> <span class=
 "op">!</span><span class="ident">s</span>.<span class=
-"ident">contains</span>(<span class="string">"."</span>) {
+"ident">contains</span>(<span class="string">'.'</span>) {
             <span class="ident">s</span>.<span class=
 "ident">push_str</span>(<span class="string">".0"</span>);
         }
@@ -2999,6 +3174,9 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="kw">for</span> <span class=
 "ident">b</span> <span class="kw">in</span> <span class=
 "ident">bytes</span> {
+            <span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">clippy</span>::<span class="ident">match_overlapping_arm</span>)]</span>
             <span class="kw">match</span> <span class=
 "kw-2">*</span><span class="ident">b</span> {
                 <span class="string">b'\0'</span> <span class=
@@ -3080,8 +3258,8 @@ autocomplete="off" spellcheck="false" placeholder=
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Display</span> <span class=
-"kw">for</span> <span class="ident">Literal</span> {
+"ident">Display</span> <span class="kw">for</span> <span class=
+"ident">Literal</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">f</span>: <span class=
@@ -3090,15 +3268,16 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Formatter</span>) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="ident">fmt</span>::<span class=
 "prelude-ty">Result</span> {
-        <span class="self">self</span>.<span class=
-"ident">text</span>.<span class="ident">fmt</span>(<span class=
+        <span class="ident">Display</span>::<span class=
+"ident">fmt</span>(<span class="kw-2">&</span><span class=
+"self">self</span>.<span class="ident">text</span>, <span class=
 "ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class=
-"ident">fmt</span>::<span class="ident">Debug</span> <span class=
-"kw">for</span> <span class="ident">Literal</span> {
+"ident">Debug</span> <span class="kw">for</span> <span class=
+"ident">Literal</span> {
     <span class="kw">fn</span> <span class=
 "ident">fmt</span>(<span class="kw-2">&</span><span class=
 "self">self</span>, <span class="ident">fmt</span>: <span class=
@@ -3117,13 +3296,11 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro">format_args</span><span class="macro">!</span>(<span class=
 "string">"{}"</span>, <span class="self">self</span>.<span class=
 "ident">text</span>));
-        <span class="attribute">#[<span class=
-"ident">cfg</span>(<span class=
-"ident">procmacro2_semver_exempt</span>)]</span>
-        <span class="ident">debug</span>.<span class=
-"ident">field</span>(<span class=
-"string">"span"</span>, <span class="kw-2">&</span><span class=
-"self">self</span>.<span class="ident">span</span>);
+        <span class=
+"ident">debug_span_field_if_nontrivial</span>(<span class=
+"kw-2">&</span><span class="kw-2">mut</span> <span class=
+"ident">debug</span>, <span class="self">self</span>.<span class=
+"ident">span</span>);
         <span class="ident">debug</span>.<span class=
 "ident">finish</span>()
     }

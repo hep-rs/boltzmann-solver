@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-traits-0.2.11/src/float.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-traits-0.2.12/src/float.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>float.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -2432,6 +2432,37 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="2357">2357</span>
 <span id="2358">2358</span>
 <span id="2359">2359</span>
+<span id="2360">2360</span>
+<span id="2361">2361</span>
+<span id="2362">2362</span>
+<span id="2363">2363</span>
+<span id="2364">2364</span>
+<span id="2365">2365</span>
+<span id="2366">2366</span>
+<span id="2367">2367</span>
+<span id="2368">2368</span>
+<span id="2369">2369</span>
+<span id="2370">2370</span>
+<span id="2371">2371</span>
+<span id="2372">2372</span>
+<span id="2373">2373</span>
+<span id="2374">2374</span>
+<span id="2375">2375</span>
+<span id="2376">2376</span>
+<span id="2377">2377</span>
+<span id="2378">2378</span>
+<span id="2379">2379</span>
+<span id="2380">2380</span>
+<span id="2381">2381</span>
+<span id="2382">2382</span>
+<span id="2383">2383</span>
+<span id="2384">2384</span>
+<span id="2385">2385</span>
+<span id="2386">2386</span>
+<span id="2387">2387</span>
+<span id="2388">2388</span>
+<span id="2389">2389</span>
+<span id="2390">2390</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -2442,7 +2473,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">FpCategory</span>;
 <span class="kw">use</span> <span class=
 "ident">core</span>::<span class="ident">ops</span>::{<span class=
-"ident">Add</span>, <span class="ident">Neg</span>};
+"ident">Add</span>, <span class="ident">Div</span>, <span class=
+"ident">Neg</span>};
 
 <span class="kw">use</span> <span class=
 "ident">core</span>::<span class="ident">f32</span>;
@@ -3353,9 +3385,9 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="doccomment">/// use std::{f32, f64};</span>
     <span class="doccomment">///</span>
     <span class=
-"doccomment">/// fn check&lt;T: FloatCore&gt;(x: T, y: T, min: T) {</span>
+"doccomment">/// fn check&lt;T: FloatCore&gt;(x: T, y: T, max: T) {</span>
     <span class=
-"doccomment">///     assert!(x.max(y) == min);</span>
+"doccomment">///     assert!(x.max(y) == max);</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// check(1.0f32, 2.0, 2.0);</span>
@@ -6612,6 +6644,42 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">PI</span>() <span class="op">+</span> <span class=
 "self">Self</span>::<span class="ident">PI</span>()
             }
+            <span class="attribute">#[<span class=
+"ident">doc</span> <span class="op">=</span> <span class=
+"string">"Return `log10(2.0)`."</span>]</span>
+            <span class="attribute">#[<span class=
+"ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class=
+"ident">LOG10_2</span>() <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> <span class=
+"kw">where</span> <span class="self">Self</span>: <span class=
+"ident">Sized</span> <span class="op">+</span> <span class=
+"ident">Div</span><span class="op">&lt;</span><span class=
+"self">Self</span>, <span class="ident">Output</span> <span class=
+"op">=</span> <span class="self">Self</span><span class=
+"op">&gt;</span> {
+                <span class="self">Self</span>::<span class=
+"ident">LN_2</span>() <span class="op">/</span> <span class=
+"self">Self</span>::<span class="ident">LN_10</span>()
+            }
+            <span class="attribute">#[<span class=
+"ident">doc</span> <span class="op">=</span> <span class=
+"string">"Return `log2(10.0)`."</span>]</span>
+            <span class="attribute">#[<span class=
+"ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class=
+"ident">LOG2_10</span>() <span class="op">-</span><span class=
+"op">&gt;</span> <span class="self">Self</span> <span class=
+"kw">where</span> <span class="self">Self</span>: <span class=
+"ident">Sized</span> <span class="op">+</span> <span class=
+"ident">Div</span><span class="op">&lt;</span><span class=
+"self">Self</span>, <span class="ident">Output</span> <span class=
+"op">=</span> <span class="self">Self</span><span class=
+"op">&gt;</span> {
+                <span class="self">Self</span>::<span class=
+"ident">LN_10</span>() <span class="op">/</span> <span class=
+"self">Self</span>::<span class="ident">LN_2</span>()
+            }
         }
         <span class="macro">float_const_impl</span><span class=
 "macro">!</span> { @<span class="ident">float</span> <span class=
@@ -6650,6 +6718,12 @@ autocomplete="off" spellcheck="false" placeholder=
                 <span class="ident">TAU</span>() <span class=
 "op">-</span><span class="op">&gt;</span> <span class=
 "number">6.28318530717958647692528676655900577</span>;
+                <span class="ident">LOG10_2</span>() <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"number">0.301029995663981195213738894724493027</span>;
+                <span class="ident">LOG2_10</span>() <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"number">3.32192809488736234787031942948939018</span>;
             }
         }
     );
@@ -6856,6 +6930,73 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class=
 "number">57.2957795130823208767981548141051703</span>
         );
+    }
+
+    <span class="attribute">#[<span class=
+"ident">test</span>]</span>
+    <span class="attribute">#[<span class=
+"ident">cfg</span>(<span class="ident">any</span>(<span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"std"</span>, <span class=
+"ident">feature</span> <span class="op">=</span> <span class=
+"string">"libm"</span>))]</span>
+    <span class="kw">fn</span> <span class=
+"ident">extra_logs</span>() {
+        <span class="kw">use</span> <span class=
+"ident">float</span>::{<span class=
+"ident">Float</span>, <span class="ident">FloatConst</span>};
+
+        <span class="kw">fn</span> <span class=
+"ident">check</span><span class="op">&lt;</span><span class=
+"ident">F</span>: <span class="ident">Float</span> <span class=
+"op">+</span> <span class="ident">FloatConst</span><span class=
+"op">&gt;</span>(<span class="ident">diff</span>: <span class=
+"ident">F</span>) {
+            <span class="kw">let</span> <span class=
+"ident">_2</span> <span class="op">=</span> <span class=
+"ident">F</span>::<span class="ident">from</span>(<span class=
+"number">2.0</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert</span><span class=
+"macro">!</span>((<span class="ident">F</span>::<span class=
+"ident">LOG10_2</span>() <span class="op">-</span> <span class=
+"ident">F</span>::<span class="ident">log10</span>(<span class=
+"ident">_2</span>)).<span class="ident">abs</span>() <span class=
+"op">&lt;</span> <span class="ident">diff</span>);
+            <span class="macro">assert</span><span class=
+"macro">!</span>((<span class="ident">F</span>::<span class=
+"ident">LOG10_2</span>() <span class="op">-</span> <span class=
+"ident">F</span>::<span class="ident">LN_2</span>() <span class=
+"op">/</span> <span class="ident">F</span>::<span class=
+"ident">LN_10</span>()).<span class=
+"ident">abs</span>() <span class="op">&lt;</span> <span class=
+"ident">diff</span>);
+
+            <span class="kw">let</span> <span class=
+"ident">_10</span> <span class="op">=</span> <span class=
+"ident">F</span>::<span class="ident">from</span>(<span class=
+"number">10.0</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert</span><span class=
+"macro">!</span>((<span class="ident">F</span>::<span class=
+"ident">LOG2_10</span>() <span class="op">-</span> <span class=
+"ident">F</span>::<span class="ident">log2</span>(<span class=
+"ident">_10</span>)).<span class="ident">abs</span>() <span class=
+"op">&lt;</span> <span class="ident">diff</span>);
+            <span class="macro">assert</span><span class=
+"macro">!</span>((<span class="ident">F</span>::<span class=
+"ident">LOG2_10</span>() <span class="op">-</span> <span class=
+"ident">F</span>::<span class="ident">LN_10</span>() <span class=
+"op">/</span> <span class="ident">F</span>::<span class=
+"ident">LN_2</span>()).<span class=
+"ident">abs</span>() <span class="op">&lt;</span> <span class=
+"ident">diff</span>);
+        }
+
+        <span class="ident">check</span>::<span class=
+"op">&lt;</span><span class="ident">f32</span><span class=
+"op">&gt;</span>(<span class="number">1e-6</span>);
+        <span class="ident">check</span>::<span class=
+"op">&lt;</span><span class="ident">f64</span><span class=
+"op">&gt;</span>(<span class="number">1e-12</span>);
     }
 }
 </pre></div>

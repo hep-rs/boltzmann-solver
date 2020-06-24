@@ -205,7 +205,7 @@ href="../rayon/struct.ThreadPool.html" title=
 href='../src/rayon_core/lib.rs.html#200-202' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
-<p>Create a new <code>ThreadPool</code> initialized using this
+<p>Creates a new <code>ThreadPool</code> initialized using this
 configuration.</p>
 </div>
 <h4 id='method.build_global' class="method"><code id=
@@ -276,7 +276,7 @@ title=
 'srclink' href='../src/rayon_core/lib.rs.html#266-293' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
-<p>Create a scoped <code>ThreadPool</code> initialized using this
+<p>Creates a scoped <code>ThreadPool</code> initialized using this
 configuration.</p>
 <p>This is a convenience function for building a pool using
 <a href="https://docs.rs/crossbeam/0.7/crossbeam/fn.scope.html"><code>
@@ -377,7 +377,7 @@ title=
 href='../src/rayon_core/lib.rs.html#351-366' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
-<p>Set a custom function for spawning threads.</p>
+<p>Sets a custom function for spawning threads.</p>
 <p>Note that the threads will not exit until after the pool is
 dropped. It is up to the caller to wait for thread termination if
 that is important for any invariants. For instance, threads created
@@ -494,7 +494,7 @@ title="struct alloc::string::String">String</a> +
 '../src/rayon_core/lib.rs.html#407-413' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
-<p>Set a closure which takes a thread index and returns the
+<p>Sets a closure which takes a thread index and returns the
 thread's name.</p>
 </div>
 <h4 id='method.num_threads' class="method"><code id=
@@ -508,7 +508,7 @@ href=
 href='../src/rayon_core/lib.rs.html#441-444' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
-<p>Set the number of threads to be used in the rayon
+<p>Sets the number of threads to be used in the rayon
 threadpool.</p>
 <p>If you specify a non-zero number of threads using this function,
 then the resulting thread-pools are guaranteed to start at most
@@ -581,7 +581,7 @@ href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>)
 href='../src/rayon_core/lib.rs.html#479-482' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
-<p>Set the stack size of the worker threads</p>
+<p>Sets the stack size of the worker threads</p>
 </div>
 <h4 id='method.breadth_first' class="method"><code id=
 'breadth_first.v'>pub fn <a href='#method.breadth_first' class=
@@ -644,7 +644,7 @@ title="trait core::marker::Sync">Sync</a> +
 '../src/rayon_core/lib.rs.html#533-539' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
-<p>Set a callback to be invoked on thread start.</p>
+<p>Sets a callback to be invoked on thread start.</p>
 <p>The closure is passed the index of the thread on which it is
 invoked. Note that this same closure may be invoked multiple times
 in parallel. If this closure panics, the panic will be passed to
@@ -672,7 +672,7 @@ title="trait core::marker::Sync">Sync</a> +
 '../src/rayon_core/lib.rs.html#552-558' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
-<p>Set a callback to be invoked on thread exit.</p>
+<p>Sets a callback to be invoked on thread exit.</p>
 <p>The closure is passed the index of the thread on which it is
 invoked. Note that this same closure may be invoked multiple times
 in parallel. If this closure panics, the panic will be passed to
@@ -691,7 +691,7 @@ title="trait core::fmt::Debug">Debug</a> for <a class="struct"
 href="../rayon/struct.ThreadPoolBuilder.html" title=
 "struct rayon::ThreadPoolBuilder">ThreadPoolBuilder</a>&lt;S&gt;</code><a href='#impl-Debug'
 class='anchor'></a><a class='srclink' href=
-'../src/rayon_core/lib.rs.html#668-704' title=
+'../src/rayon_core/lib.rs.html#677-713' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.fmt' class="method hidden"><code id='fmt.v'>fn
@@ -709,7 +709,7 @@ title="enum core::result::Result">Result</a>&lt;<a class=
 <a class="struct" href=
 "https://doc.rust-lang.org/nightly/core/fmt/struct.Error.html"
 title="struct core::fmt::Error">Error</a>&gt;</code><a class=
-'srclink' href='../src/rayon_core/lib.rs.html#669-703' title=
+'srclink' href='../src/rayon_core/lib.rs.html#678-712' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Formats the value using the given formatter. <a href=
@@ -891,14 +891,14 @@ Read more</a></p>
 title="trait core::convert::From">From</a>&lt;T&gt; for
 T</code><a href='#impl-From%3CT%3E' class='anchor'></a><a class=
 'srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#565-569'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#566-570'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.from' class="method hidden"><code id='from.v'>fn
 <a href=
 'https://doc.rust-lang.org/nightly/core/convert/trait.From.html#tymethod.from'
 class='fnname'>from</a>(t: T) -&gt; T</code><a class='srclink'
-href='https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#566-568'
+href='https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#567-569'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the conversion.</p>
@@ -914,14 +914,14 @@ title="trait core::convert::Into">Into</a>&lt;U&gt; for T
 title=
 "trait core::convert::From">From</a>&lt;T&gt;,&nbsp;</span></code><a href='#impl-Into%3CU%3E'
 class='anchor'></a><a class='srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#554-561'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#555-562'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.into' class="method hidden"><code id='into.v'>fn
 <a href=
 'https://doc.rust-lang.org/nightly/core/convert/trait.Into.html#tymethod.into'
 class='fnname'>into</a>(self) -&gt; U</code><a class='srclink'
-href='https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#558-560'
+href='https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#559-561'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the conversion.</p>
@@ -937,7 +937,7 @@ title="trait core::convert::TryFrom">TryFrom</a>&lt;U&gt; for T
 title=
 "trait core::convert::Into">Into</a>&lt;T&gt;,&nbsp;</span></code><a href='#impl-TryFrom%3CU%3E'
 class='anchor'></a><a class='srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#602-611'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#603-612'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='associatedtype.Error' class="type"><code id='Error.t'>type
@@ -964,7 +964,7 @@ title=
 title=
 "type core::convert::TryFrom::Error">Error</a>&gt;</code><a class=
 'srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#608-610'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#609-611'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the conversion.</p>
@@ -980,7 +980,7 @@ title="trait core::convert::TryInto">TryInto</a>&lt;U&gt; for T
 title=
 "trait core::convert::TryFrom">TryFrom</a>&lt;T&gt;,&nbsp;</span></code><a href='#impl-TryInto%3CU%3E'
 class='anchor'></a><a class='srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#588-597'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#589-598'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='associatedtype.Error-1' class="type"><code id=
@@ -1011,7 +1011,7 @@ title=
 title=
 "type core::convert::TryFrom::Error">Error</a>&gt;</code><a class=
 'srclink' href=
-'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#594-596'
+'https://doc.rust-lang.org/nightly/src/core/convert/mod.rs.html#595-597'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Performs the conversion.</p>

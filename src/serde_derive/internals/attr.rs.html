@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive-1.0.110/src/internals/attr.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive-1.0.114/src/internals/attr.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>attr.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href=
@@ -2031,6 +2031,10 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="1955">1955</span>
 <span id="1956">1956</span>
 <span id="1957">1957</span>
+<span id="1958">1958</span>
+<span id="1959">1959</span>
+<span id="1960">1960</span>
+<span id="1961">1961</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -2038,7 +2042,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">internals</span>::<span class=
 "ident">symbol</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class=
-"ident">internals</span>::<span class="ident">Ctxt</span>;
+"ident">internals</span>::{<span class=
+"ident">ungroup</span>, <span class="ident">Ctxt</span>};
 <span class="kw">use</span> <span class=
 "ident">proc_macro2</span>::{<span class=
 "ident">Group</span>, <span class="ident">Span</span>, <span class=
@@ -3620,13 +3625,22 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">parse_args_with</span>(<span class=
 "op">|</span><span class="ident">input</span>: <span class=
 "ident">ParseStream</span><span class="op">|</span> {
-                    <span class=
+                    <span class="kw">while</span> <span class=
+"kw">let</span> <span class="prelude-val">Some</span>(<span class=
+"ident">token</span>) <span class="op">=</span> <span class=
+"ident">input</span>.<span class="ident">parse</span>()<span class=
+"question-mark">?</span> {
+                        <span class="kw">if</span> <span class=
+"kw">let</span> <span class="ident">TokenTree</span>::<span class=
+"ident">Ident</span>(<span class="ident">ident</span>) <span class=
+"op">=</span> <span class="ident">token</span> {
+                            <span class=
 "ident">is_packed</span> <span class="op">|</span><span class=
-"op">=</span> <span class="ident">input</span>.<span class=
-"ident">parse</span>::<span class="op">&lt;</span><span class=
-"ident">Ident</span><span class="op">&gt;</span>()<span class=
-"question-mark">?</span> <span class="op">=</span><span class=
-"op">=</span> <span class="string">"packed"</span>;
+"op">=</span> <span class="ident">ident</span> <span class=
+"op">=</span><span class="op">=</span> <span class=
+"string">"packed"</span>;
+                        }
+                    }
                     <span class="prelude-val">Ok</span>(())
                 });
             }
@@ -6801,7 +6815,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> <span class="ident">bool</span> {
     <span class="kw">let</span> <span class=
 "ident">path</span> <span class="op">=</span> <span class=
-"kw">match</span> <span class="ident">ty</span> {
+"kw">match</span> <span class="ident">ungroup</span>(<span class=
+"ident">ty</span>) {
         <span class="ident">syn</span>::<span class=
 "ident">Type</span>::<span class="ident">Path</span>(<span class=
 "ident">ty</span>) <span class="op">=</span><span class=
@@ -6880,7 +6895,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">bool</span> {
     <span class="kw">let</span> <span class=
 "ident">path</span> <span class="op">=</span> <span class=
-"kw">match</span> <span class="ident">ty</span> {
+"kw">match</span> <span class="ident">ungroup</span>(<span class=
+"ident">ty</span>) {
         <span class="ident">syn</span>::<span class=
 "ident">Type</span>::<span class="ident">Path</span>(<span class=
 "ident">ty</span>) <span class="op">=</span><span class=
@@ -6975,7 +6991,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "op">&gt;</span> <span class="ident">bool</span>) <span class=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">ty</span> {
+    <span class="kw">match</span> <span class=
+"ident">ungroup</span>(<span class="ident">ty</span>) {
         <span class="ident">syn</span>::<span class=
 "ident">Type</span>::<span class=
 "ident">Reference</span>(<span class=
@@ -7007,7 +7024,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">syn</span>::<span class="ident">Type</span>) <span class=
 "op">-</span><span class="op">&gt;</span> <span class=
 "ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">ty</span> {
+    <span class="kw">match</span> <span class=
+"ident">ungroup</span>(<span class="ident">ty</span>) {
         <span class="ident">syn</span>::<span class=
 "ident">Type</span>::<span class="ident">Slice</span>(<span class=
 "ident">ty</span>) <span class="op">=</span><span class=
@@ -7028,7 +7046,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">primitive</span>: <span class="kw-2">&</span><span class=
 "ident">str</span>) <span class="op">-</span><span class=
 "op">&gt;</span> <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">ty</span> {
+    <span class="kw">match</span> <span class=
+"ident">ungroup</span>(<span class="ident">ty</span>) {
         <span class="ident">syn</span>::<span class=
 "ident">Type</span>::<span class="ident">Path</span>(<span class=
 "ident">ty</span>) <span class="op">=</span><span class=

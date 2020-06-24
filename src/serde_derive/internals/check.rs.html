@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive-1.0.110/src/internals/check.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_derive-1.0.114/src/internals/check.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>check.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href=
@@ -509,6 +509,7 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">Identifier</span>, <span class="ident">TagType</span>};
 <span class="kw">use</span> <span class=
 "ident">internals</span>::{<span class=
+"ident">ungroup</span>, <span class=
 "ident">Ctxt</span>, <span class="ident">Derive</span>};
 <span class="kw">use</span> <span class=
 "ident">syn</span>::{<span class=
@@ -1375,8 +1376,9 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="kw">if</span> <span class=
 "kw">let</span> <span class="ident">Type</span>::<span class=
 "ident">Path</span>(<span class="ident">ty</span>) <span class=
-"op">=</span> <span class="ident">field</span>.<span class=
-"ident">ty</span> {
+"op">=</span> <span class="ident">ungroup</span>(<span class=
+"kw-2">&</span><span class="ident">field</span>.<span class=
+"ident">ty</span>) {
         <span class="kw">if</span> <span class=
 "kw">let</span> <span class="prelude-val">Some</span>(<span class=
 "ident">seg</span>) <span class="op">=</span> <span class=

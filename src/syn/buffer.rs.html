@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.27/src/buffer.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/syn-1.0.33/src/buffer.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>buffer.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -455,6 +455,8 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="380">380</span>
 <span id="381">381</span>
 <span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -913,9 +915,9 @@ autocomplete="off" spellcheck="false" placeholder=
     }
 
     <span class=
-"doccomment">/// If the cursor is looking at a `None`-delimited group, move it to look at</span>
+"doccomment">/// While the cursor is looking at a `None`-delimited group, move it to look</span>
     <span class=
-"doccomment">/// the first token inside instead. If the group is empty, this will move</span>
+"doccomment">/// at the first token inside instead. If the group is empty, this will move</span>
     <span class=
 "doccomment">/// the cursor past the `None`-delimited group.</span>
     <span class="doccomment">///</span>
@@ -924,7 +926,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="kw">fn</span> <span class=
 "ident">ignore_none</span>(<span class="kw-2">&</span><span class=
 "kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class=
+        <span class="kw">while</span> <span class=
 "kw">let</span> <span class="ident">Entry</span>::<span class=
 "ident">Group</span>(<span class="ident">group</span>, <span class=
 "ident">buf</span>) <span class="op">=</span> <span class=
@@ -949,6 +951,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "number">0</span>], <span class="self">self</span>.<span class=
 "ident">scope</span>);
                 }
+            } <span class="kw">else</span> {
+                <span class="kw">break</span>;
             }
         }
     }
