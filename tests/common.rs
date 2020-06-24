@@ -10,10 +10,10 @@ use std::{
 /// during tests.
 ///
 /// The verbosity options are:
-/// - 0: Warn level
-/// - 1: Info level
-/// - 2: Debug level
-/// - 3 and above: Trace level
+/// - `0`: Warn level
+/// - `1`: Info level
+/// - `2`: Debug level
+/// - `3` and above: Trace level
 #[allow(dead_code)]
 pub fn setup_logging(verbosity: usize) {
     let mut base_config = fern::Dispatch::new();
