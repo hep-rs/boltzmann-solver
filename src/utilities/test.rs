@@ -77,7 +77,7 @@ pub(crate) fn approx_eq(a: f64, b: f64, eps_rel: f64, eps_abs: f64) {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::approx_eq;
     use std::f64;
 
     #[test]
