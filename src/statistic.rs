@@ -323,7 +323,7 @@ impl Statistics for Statistic {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::{Statistic, Statistics};
     use crate::utilities::test::approx_eq;
     use std::f64;
 
@@ -332,6 +332,7 @@ mod tests {
     type Row8 = (f64, f64, f64, f64, f64, f64, f64, f64);
 
     #[test]
+    #[allow(clippy::similar_names)]
     fn phase_space() {
         let fd = Statistic::FermiDirac;
         let be = Statistic::BoseEinstein;
@@ -364,6 +365,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::similar_names)]
     fn massive() {
         let fd = Statistic::FermiDirac;
         let be = Statistic::BoseEinstein;
@@ -401,6 +403,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::similar_names)]
     fn massless() {
         let fd = Statistic::FermiDirac;
         let be = Statistic::BoseEinstein;

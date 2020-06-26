@@ -253,7 +253,7 @@ impl Particle {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::Particle;
     use crate::utilities::test::approx_eq;
 
     #[test]

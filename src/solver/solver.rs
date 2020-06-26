@@ -102,7 +102,7 @@ impl<M> SolverBuilder<M> {
     /// Most of the method for the builder are intended to be chained one after
     /// the other.
     ///
-    /// ```
+    /// ```rust
     /// use boltzmann_solver::prelude::*;
     /// use boltzmann_solver::model::StandardModel;
     ///
