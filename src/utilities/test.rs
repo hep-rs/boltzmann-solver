@@ -1,5 +1,6 @@
 //! Utility function for testing
 
+use num::Complex;
 use std::{convert, default, error, fmt};
 
 pub(crate) struct FloatEqError {
@@ -115,6 +116,23 @@ pub(crate) fn approx_eq(a: f64, b: f64, eps_rel: f64, eps_abs: f64) -> Result<()
     }
 }
 
+/// Check whether two complex numbers are approximately equal within the
+/// specified relative and absolute error, by checking both real and imaginary components
+pub(crate) fn complex_approx_eq(
+    a: Complex<f64>,
+    b: Complex<f64>,
+    eps_rel: f64,
+    eps_abs: f64,
+) -> Result<(), FloatEqError> {
+    if let Err(e) = approx_eq(a.re, b.re, eps_rel, eps_abs) {
+        return Err(format!("Real parts unequal: {}", e).into());
+    }
+    if let Err(e) = approx_eq(a.im, b.im, eps_rel, eps_abs) {
+        return Err(format!("Imag parts unequal: {}", e).into());
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::{approx_eq, complex_approx_eq};
@@ -207,4 +225,13 @@ mod tests {
         Ok(())
     }
 
+    #[test]
+    fn complex() -> Result<(), Box<dyn error::Error>> {
+        let z = Complex::new(1.0, 1.0);
+        complex_approx_eq(1e-20 * z, 2e-20 * z, 10.0, 1e-10)?;
+        complex_approx_eq(-1e-20 * z, 2e-20 * z, 10.0, 1e-10)?;
+        complex_approx_eq(1e-20 * z, -2e-20 * z, 10.0, 1e-10)?;
+        complex_approx_eq(-1e-20 * z, -2e-20 * z, 10.0, 1e-10)?;
+        Ok(())
+    }
 }
