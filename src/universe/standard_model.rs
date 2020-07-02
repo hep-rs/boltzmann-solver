@@ -21,7 +21,7 @@ mod tests {
     use crate::{model::Model, universe::Universe, utilities::test::*};
 
     #[test]
-    fn dof() {
+    fn dof() -> Result<(), Box<dyn error::Error>> {
         let sm = StandardModel::new();
         let expected = [
             (0.000_1, 106.75),
@@ -48,12 +48,14 @@ mod tests {
         ];
 
         for &(beta, g) in &expected {
-            approx_eq(g, sm.entropy_dof(beta), 5.0, 0.0);
+            approx_eq(g, sm.entropy_dof(beta), 5.0, 0.0)?;
         }
+
+        Ok(())
     }
 
     #[test]
-    fn hubble() {
+    fn hubble() -> Result<(), Box<dyn error::Error>> {
         let sm = StandardModel::new();
         let expected = [
             (0.000_1, 1.404_91e-10),
@@ -80,7 +82,9 @@ mod tests {
         ];
 
         for &(beta, h) in &expected {
-            approx_eq(h, sm.hubble_rate(beta), 4.0, 0.0);
+            approx_eq(h, sm.hubble_rate(beta), 4.0, 0.0)?;
         }
+
+        Ok(())
     }
 }

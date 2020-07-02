@@ -255,23 +255,24 @@ impl Particle {
 mod tests {
     use super::Particle;
     use crate::utilities::test::approx_eq;
+    use std::error;
 
     #[test]
-    fn real_scalar() {
+    fn real_scalar() -> Result<(), Box<dyn error::Error>> {
         let mut particle = Particle::new(0, 1.0, 0.1);
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
         assert!(!particle.is_complex());
 
-        approx_eq(particle.entropy_dof(1e-10), 1.0, 8.0, 0.0);
+        approx_eq(particle.entropy_dof(1e-10), 1.0, 8.0, 0.0)?;
         assert!(particle.entropy_dof(1e10) < 1e-30);
         approx_eq(
             particle.normalized_number_density(0.0, 1e-10),
             1.0,
             8.0,
             0.0,
-        );
+        )?;
 
         particle.set_mass(0.0);
         approx_eq(
@@ -279,24 +280,26 @@ mod tests {
             particle.entropy_dof(1e10),
             8.0,
             0.0,
-        );
+        )?;
         approx_eq(
             particle.normalized_number_density(0.0, 1e-10),
             1.0,
             8.0,
             0.0,
-        );
+        )?;
+
+        Ok(())
     }
 
     #[test]
-    fn complex_scalar() {
+    fn complex_scalar() -> Result<(), Box<dyn error::Error>> {
         let particle = Particle::new(0, 1.0, 0.1).complex();
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
         assert!(particle.is_complex());
 
-        approx_eq(particle.entropy_dof(1e-10), 2.0, 8.0, 0.0);
+        approx_eq(particle.entropy_dof(1e-10), 2.0, 8.0, 0.0)?;
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
@@ -304,18 +307,20 @@ mod tests {
             2.0,
             8.0,
             0.0,
-        );
+        )?;
+
+        Ok(())
     }
 
     #[test]
-    fn fermion() {
+    fn fermion() -> Result<(), Box<dyn error::Error>> {
         let particle = Particle::new(1, 1.0, 0.1);
 
         assert!(!particle.is_bosonic());
         assert!(particle.is_fermionic());
         assert!(!particle.is_complex());
 
-        approx_eq(particle.entropy_dof(1e-10), 2.0 * 0.875, 8.0, 0.0);
+        approx_eq(particle.entropy_dof(1e-10), 2.0 * 0.875, 8.0, 0.0)?;
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
@@ -323,18 +328,20 @@ mod tests {
             1.5,
             8.0,
             0.0,
-        );
+        )?;
+
+        Ok(())
     }
 
     #[test]
-    fn gauge_boson() {
+    fn gauge_boson() -> Result<(), Box<dyn error::Error>> {
         let particle = Particle::new(2, 1.0, 0.1);
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
         assert!(!particle.is_complex());
 
-        approx_eq(particle.entropy_dof(1e-10), 3.0, 8.0, 0.0);
+        approx_eq(particle.entropy_dof(1e-10), 3.0, 8.0, 0.0)?;
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
@@ -342,18 +349,20 @@ mod tests {
             3.0,
             8.0,
             0.0,
-        );
+        )?;
+
+        Ok(())
     }
 
     #[test]
-    fn complex_scalar_dof() {
+    fn complex_scalar_dof() -> Result<(), Box<dyn error::Error>> {
         let particle = Particle::new(0, 1.0, 0.1).complex().dof(2.5);
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
         assert!(particle.is_complex());
 
-        approx_eq(particle.entropy_dof(1e-10), 5.0, 8.0, 0.0);
+        approx_eq(particle.entropy_dof(1e-10), 5.0, 8.0, 0.0)?;
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
@@ -361,18 +370,20 @@ mod tests {
             5.0,
             8.0,
             0.0,
-        );
+        )?;
+
+        Ok(())
     }
 
     #[test]
-    fn fermion_dof() {
+    fn fermion_dof() -> Result<(), Box<dyn error::Error>> {
         let particle = Particle::new(1, 1.0, 0.1).dof(1.2);
 
         assert!(!particle.is_bosonic());
         assert!(particle.is_fermionic());
         assert!(!particle.is_complex());
 
-        approx_eq(particle.entropy_dof(1e-10), 2.0 * 1.2 * 0.875, 8.0, 0.0);
+        approx_eq(particle.entropy_dof(1e-10), 2.0 * 1.2 * 0.875, 8.0, 0.0)?;
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
@@ -380,6 +391,8 @@ mod tests {
             2.0 * 1.2 * 0.75,
             8.0,
             0.0,
-        );
+        )?;
+
+        Ok(())
     }
 }

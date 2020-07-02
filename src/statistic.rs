@@ -325,7 +325,7 @@ impl Statistics for Statistic {
 mod tests {
     use super::{Statistic, Statistics};
     use crate::utilities::test::approx_eq;
-    use std::f64;
+    use std::{error, f64};
 
     type Row6 = (f64, f64, f64, f64, f64, f64);
     type Row7 = (f64, f64, f64, f64, f64, f64, f64);
@@ -333,7 +333,7 @@ mod tests {
 
     #[test]
     #[allow(clippy::similar_names)]
-    fn phase_space() {
+    fn phase_space() -> Result<(), Box<dyn error::Error>> {
         let fd = Statistic::FermiDirac;
         let be = Statistic::BoseEinstein;
         let mb = Statistic::MaxwellBoltzmann;
@@ -347,26 +347,28 @@ mod tests {
 
             if !f_fd.is_nan() {
                 let f = fd.phase_space(e, m, mu, beta);
-                approx_eq(f_fd, f, 10.0, 0.0);
+                approx_eq(f_fd, f, 10.0, 0.0)?;
             }
             if !f_be.is_nan() {
                 let f = be.phase_space(e, m, mu, beta);
-                approx_eq(f_be, f, 10.0, 0.0);
+                approx_eq(f_be, f, 10.0, 0.0)?;
             }
             if !f_mb.is_nan() {
                 let f = mb.phase_space(e, m, mu, beta);
-                approx_eq(f_mb, f, 10.0, 0.0);
+                approx_eq(f_mb, f, 10.0, 0.0)?;
             }
             if !f_mj.is_nan() {
                 let f = mj.phase_space(e, m, mu, beta);
-                approx_eq(f_mj, f, 10.0, 0.0);
+                approx_eq(f_mj, f, 10.0, 0.0)?;
             }
         }
+
+        Ok(())
     }
 
     #[test]
     #[allow(clippy::similar_names)]
-    fn massive() {
+    fn massive() -> Result<(), Box<dyn error::Error>> {
         let fd = Statistic::FermiDirac;
         let be = Statistic::BoseEinstein;
         let mb = Statistic::MaxwellBoltzmann;
@@ -380,31 +382,33 @@ mod tests {
 
             if !n_fd.is_nan() {
                 let n = fd.number_density(m, mu, beta);
-                approx_eq(n_fd, n, 10.0, 1e-100);
+                approx_eq(n_fd, n, 10.0, 1e-100)?;
             }
             if !n_be.is_nan() {
                 let n = be.number_density(m, mu, beta);
-                approx_eq(n_be, n, 10.0, 1e-100);
+                approx_eq(n_be, n, 10.0, 1e-100)?;
             }
             if !n_mb.is_nan() {
                 // TODO: Check accuracy of Maxwell–Boltzmann distribution
                 let n = mb.number_density(m, mu, beta);
                 if !n.is_nan() {
-                    approx_eq(n_mb, n, 7.0, 1e-100);
+                    approx_eq(n_mb, n, 7.0, 1e-100)?;
                 }
             }
             if !n_mj.is_nan() {
                 let n = mj.number_density(m, mu, beta);
                 if !n.is_nan() {
-                    approx_eq(n_mj, n, 10.0, 1e-100);
+                    approx_eq(n_mj, n, 10.0, 1e-100)?;
                 }
             }
         }
+
+        Ok(())
     }
 
     #[test]
     #[allow(clippy::similar_names)]
-    fn massless() {
+    fn massless() -> Result<(), Box<dyn error::Error>> {
         let fd = Statistic::FermiDirac;
         let be = Statistic::BoseEinstein;
         let mb = Statistic::MaxwellBoltzmann;
@@ -418,22 +422,24 @@ mod tests {
 
             if !n_fd.is_nan() {
                 let n = fd.massless_number_density(mu, beta);
-                approx_eq(n_fd, n, 10.0, 1e-100);
+                approx_eq(n_fd, n, 10.0, 1e-100)?;
             }
             if !n_be.is_nan() {
                 let n = be.massless_number_density(mu, beta);
                 println!("μ = {:e}, β = {:e}, n = {:e}", mu, beta, n);
-                approx_eq(n_be, n, 10.0, 1e-100);
+                approx_eq(n_be, n, 10.0, 1e-100)?;
             }
             if !n_mb.is_nan() {
                 let n = mb.massless_number_density(mu, beta);
-                approx_eq(n_mb, n, 10.0, 1e-100);
+                approx_eq(n_mb, n, 10.0, 1e-100)?;
             }
             if !n_mj.is_nan() {
                 let n = mj.massless_number_density(mu, beta);
-                approx_eq(n_mj, n, 10.0, 1e-100);
+                approx_eq(n_mj, n, 10.0, 1e-100)?;
             }
         }
+
+        Ok(())
     }
 }
 
