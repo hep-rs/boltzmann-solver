@@ -1,12 +1,16 @@
 //! Basic implementation of a particle type
 
+mod propagator;
+
 use crate::{
     model::data,
     statistic::{Statistic, Statistics},
 };
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, f64};
+use std::{cmp, collections::HashMap, f64};
+
+pub use propagator::Propagator;
 
 /// Particle type
 ///
@@ -249,7 +253,20 @@ impl Particle {
             data::FERMION_GSTAR.sample((self.mass * beta).ln()).exp() * self.degrees_of_freedom()
         }
     }
+
+    /// Return the propagator denominator for the particle.
+    #[must_use]
+    pub fn propagator(&self, s: f64) -> Propagator {
+        Propagator::new(&self, s)
+    }
 }
+
+impl cmp::PartialEq for Particle {
+    fn eq(&self, other: &Self) -> bool {
+        self.spin == other.spin && self.mass == other.mass
+    }
+}
+impl Eq for Particle {}
 
 #[cfg(test)]
 mod tests {

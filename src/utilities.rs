@@ -6,8 +6,7 @@ pub mod spline;
 #[cfg(test)]
 pub(crate) mod test;
 
-use crate::{constants::PI_5, model::Particle};
-use num_complex::Complex;
+use crate::constants::PI_5;
 use quadrature::{clenshaw_curtis, double_exponential};
 use special_functions::bessel;
 use std::f64;
@@ -114,26 +113,6 @@ where
     (clenshaw_curtis::integrate(&s_integrand_0, s_min, s_med, INTEGRATION_PRECISION).integral
         + double_exponential::integrate(&s_integrand_1, 0.0, 1.0, INTEGRATION_PRECISION).integral)
         / (512.0 * PI_5 * beta)
-}
-
-/// Propagator with squared momentum `q2` involving particle `p`, defined as:
-///
-/// \\begin{equation}
-///   \mathcal{P}_{p}(q^2) \defeq \frac{1}{q^2 - m_p^2 + i m_p \Gamma_p}
-/// \\end{equation}
-///
-/// # To-do
-///
-/// Adjust the propagator to take into account particles in the thermal bath:
-///
-/// \\begin{equation}\begin{aligned}
-///   S(q^2, m) &= \left[\frac{i}{q^2 - m^2 + i0} - 2 \pi n \delta(q^2 - m^2)] (\slashed p + m) \\\\
-///   D(q^2, m) &= \left[\frac{i}{q^2 - m^2 + i0} + 2 \pi n \delta(q^2 - m^2)]
-/// \\end{aligned}\\end{equation}
-#[must_use]
-pub fn propagator(q2: f64, p: &Particle) -> Complex<f64> {
-    // TODO: Implement Dirac delta?
-    1.0 / (q2 - p.mass2 + Complex::i() * p.mass * p.width)
 }
 
 #[cfg(test)]
