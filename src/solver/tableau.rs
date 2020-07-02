@@ -69,7 +69,7 @@ pub use rk87::{RK_A, RK_B, RK_C, RK_E, RK_ORDER, RK_S};
 mod tests {
     use crate::utilities::test::approx_eq;
     use ndarray::{array, prelude::*};
-    use std::{f64::consts::PI, mem, ptr};
+    use std::{error, f64::consts::PI, mem, ptr};
 
     const TWO_PI: f64 = 2.0 * PI;
 
@@ -188,15 +188,17 @@ mod tests {
     macro_rules! test_sine {
         ( $name:ident, $solver:ident, $prec:expr ) => {
             #[test]
-            fn $name() {
+            fn $name() -> Result<(), Box<dyn error::Error>> {
                 let f = |_t: f64, x: &Array1<f64>| -> Array1<f64> { array![-x[1], x[0]] };
 
                 let x = array![1.0, 0.0];
                 let t = 0.0;
 
                 let (_t, x) = $solver(x, t, TWO_PI, f);
-                approx_eq(x[0], 1.0, $prec, 0.0);
-                approx_eq(x[1], 0.0, $prec, 10_f64.powf(-$prec));
+                approx_eq(x[0], 1.0, $prec, 0.0)?;
+                approx_eq(x[1], 0.0, $prec, 10_f64.powf(-$prec))?;
+
+                Ok(())
             }
         };
     }
@@ -213,7 +215,7 @@ mod tests {
     macro_rules! test_lotka_volterra {
         ( $name:ident, $solver:ident, $prec:expr ) => {
             #[test]
-            fn $name() {
+            fn $name() -> Result<(), Box<dyn error::Error>> {
                 let f = |_t: f64, x: &Array1<f64>| -> Array1<f64> {
                     array![x[0] * (2.0 - x[1]), x[1] * (x[0] - 1.0)]
                 };
@@ -222,8 +224,10 @@ mod tests {
                 let t = 0.0;
 
                 let (_t, x) = $solver(x, t, 10.0, f);
-                approx_eq(x[0], 0.622_374_063_518_922_9, $prec, 0.0);
-                approx_eq(x[1], 2.115_331_268_162_712_8, $prec, 0.0);
+                approx_eq(x[0], 0.622_374_063_518_922_9, $prec, 0.0)?;
+                approx_eq(x[1], 2.115_331_268_162_712_8, $prec, 0.0)?;
+
+                Ok(())
             }
         };
     }

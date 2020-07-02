@@ -139,9 +139,10 @@ pub fn propagator(q2: f64, p: &Particle) -> Complex<f64> {
 #[cfg(test)]
 mod tests {
     use crate::utilities::test::approx_eq;
+    use std::error;
 
     #[test]
-    fn t_range() {
+    fn t_range() -> Result<(), Box<dyn error::Error>> {
         let data = vec![
             [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
             [0.0, 0.0, 0.0, 0.0, 10.0, -10.0, 0.0],
@@ -159,14 +160,16 @@ mod tests {
 
         for &[m1, m2, m3, m4, s, ea, eb] in &data {
             let (ta, tb) = super::t_range(s, m1, m2, m3, m4);
-            approx_eq(ta, ea, 8.0, 0.0);
-            approx_eq(tb, eb, 8.0, 0.0);
+            approx_eq(ta, ea, 8.0, 0.0)?;
+            approx_eq(tb, eb, 8.0, 0.0)?;
         }
+
+        Ok(())
     }
 
     #[allow(clippy::shadow_unrelated)]
     #[test]
-    fn integrate_st() {
+    fn integrate_st() -> Result<(), Box<dyn error::Error>> {
         const BETA: f64 = 1e-2;
         const M1: f64 = 1.0;
         const M2: f64 = 10.0;
@@ -179,7 +182,7 @@ mod tests {
             2_538.664_748_452_267,
             1.5,
             0.0,
-        );
+        )?;
 
         let m2 = |s: f64, _| 1.0 / (s.powi(2) + 1.0);
         approx_eq(
@@ -187,7 +190,7 @@ mod tests {
             0.001_196_687_768_601_514,
             1.5,
             0.0,
-        );
+        )?;
 
         let m2 = |_, t: f64| 1.0 / (t.powi(2) + 1.0);
         approx_eq(
@@ -195,7 +198,7 @@ mod tests {
             0.678_416_052_166_338_6,
             1.5,
             0.0,
-        );
+        )?;
 
         let m2 = |s: f64, t: f64| (s * t) / (s + 1.0) / (t + 1.0);
         approx_eq(
@@ -203,7 +206,9 @@ mod tests {
             2_540.321_286_335_379,
             1.5,
             0.0,
-        );
+        )?;
+
+        Ok(())
     }
 }
 
