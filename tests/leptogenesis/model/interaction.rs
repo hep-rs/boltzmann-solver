@@ -1,9 +1,7 @@
 //! Define the various interactions involved in leptogenesis.
 
 use crate::LeptogenesisModel;
-use boltzmann_solver::{
-    constants::PI_2, model::interaction, pave, prelude::*, utilities::propagator,
-};
+use boltzmann_solver::{constants::PI_2, model::interaction, pave, prelude::*};
 use itertools::iproduct;
 use num::Complex;
 use std::convert::TryFrom;
@@ -437,9 +435,9 @@ pub fn hhll1() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
                             * p105.mass
                             * (s - p3.mass2 - p4.mass2)
                             * (2.0
-                                * (propagator(-t, p105) + propagator(-u, p105))
-                                * (propagator(-t, p5) + propagator(-u, p5)).conj()
-                                + propagator(-u, p105) * propagator(-u, p5).conj())
+                                * (p105.propagator(-t) + p105.propagator(-u))
+                                * (p5.propagator(-t) + p5.propagator(-u)).conj()
+                                + p105.propagator(-u) * p5.propagator(-u).conj())
                             .re
                     })
                     .sum()

@@ -7,7 +7,7 @@ edition = "2018"
 [dependencies]
 log = "0.4"
 ndarray = "0.13"
-num-complex = "0.3"
+num = "0.3"
 quadrature = "0.1"
 special-functions = { git = "https://github.com/hep-rs/special-functions.git" }
 
@@ -25,6 +25,7 @@ serde_json = "1.0"
 
 [features]
 default = ["rk87", "parallel", "serialization"]
+# default = ["rk87", "serialization"]
 
 nightly = []
 serialization = ["serde", "ndarray/serde", "num/serde"]
