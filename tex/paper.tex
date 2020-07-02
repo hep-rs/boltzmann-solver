@@ -1,0 +1,524 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% LaTeX Example
+%% Copyright (C) 2016  Joshua Ellis
+%%
+%%
+%% This LaTeX file is free: you can redistribute it and/or modify it under the
+%% terms of the GNU General Public License as published by the Free Software
+%% Foundation, either version 3 of the License, or (at your option) any later
+%% version.
+%%
+%% This is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+%% A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% HEADER
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% In general, LaTeX commands start with `\` and consist of letters only.
+%% Optional parameters are specified in brackets `[]`, whilst compulsory
+%% arguments (if any) are specified in braces `{}`.  (Strictly speaking, this is
+%% only a convention and packages can use other things.  One notable example is
+%% the Beamer package which adds extra optional arguments with `<>'.)
+%%
+%% LaTeX is generally insensitive to whitespaces including newlines.  So if a
+%% functions takes a lot of arguments or has many options, it can be easily
+%% split across lines without repercussions.  The one important exception is
+%% that full empty lines mark the end/start of a paragraph.
+
+%% All LaTeX documents begin with the the `\documentclass` command which serves
+%% to set the general style of the document.  It defines the page layout, the
+%% chapter/section styles, how figures appear, etc. and may provide some
+%% additional environments too.  LaTeX comes with four main classes: `article`,
+%% `report`, `book` and `letter`.
+%%
+%% The [KOMA-script](https://www.ctan.org/pkg/koma-script) package provides
+%% alternatives to replacements for the default classes (`scrartcl`, `scrreprt`,
+%% `scrbook`, `scrlttr2`) and provides a lot of options to more easily customize the
+%% layout of the page.
+\documentclass[
+  a4paper,             % The size of the layout
+  11pt,                % The font size (10pt, 11pt, 12pt)
+  oneside,             % Whether the document is one-sided or two-sided
+  onecolumn,           % Whether to have one or two columns in the layout
+  bibliography=totoc,  % Adjust how the bibliography appears in ToC
+  final,               % As opposed to draft (which speeds up compilation)
+]{scrartcl}
+%% Note all of these optional arguments are required; in fact, most of the ones
+%% specified here would have been chosen by default if left unspecified.  There
+%% are also some other options which have not be specified but they are
+%% documented in the [KOMA-script](https://www.ctan.org/pkg/koma-script)
+%% documentation.
+%%
+%% One of the important options in the list above is `draft`/`final`.  If draft
+%% mode is enabled, LaTeX and most packages will disable features which take up
+%% a lot of time in order to speed up compilation.  Draft mode also highlights
+%% certain error in the output document.  On the other hand, final mode enables
+%% all features which will increase (sometimes quite significantly) the
+%% compilation time of the document.
+
+%% The part of the document starting from here through to the `\begin{document}`
+%% command is called the preamble.  This is where you include additional
+%% packages which provide additional functionalities.  Below are many packages
+%% which I use on a semi-regular basis.
+%%
+%% Although you'll find that they are all enabled below, this is for the sake of
+%% checking compatibility between all the packages.  It is advisable to only
+%% enable those packages you actually need as this will speed up compilation,
+%% and decrease the likelihood that two packages conflict.
+%%
+%% All packages are available from the Comprehence TeX Archive Network (CTAN) at
+%% http://ctan.org.  Quite often, for each `\usepackage{pkg-name}`, it is
+%% possible to go to http://ctan.org/pkg/pkg-name in order to find information
+%% about the package (there are a few exception to this though, in which case a
+%% Google search will suffice).
+%%
+%% Although you'll know the reason for including a package initially, most
+%% people will forget this initial reason after a few months.  It is a **VERY**
+%% good idea to have a small comment next to *EVERY* `\usepackage` giving a
+%% quick recap as to what this package does.  This will be invaluable in case
+%% you include two packages which conflict each other.
+
+%% For the vast majority of packages, the order in which they are loaded does
+%% not matter.  There are a few exceptions though, mostly relating to the
+%% various referencing packages (hyperef, cleveref, ...).  The following package
+%% must be loaded first and provides some additional functionalities to other
+%% packages.
+
+\usepackage{ifluatex}  % Provides the command \ifluatex
+
+%% Languages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[UKenglish]{babel}           % Set up the language
+% \usepackage[style=british]{csquotes}    % Advanced handling of quotes.  Must be loaded after minted.
+\usepackage[perpage,symbol*]{footmisc}  % Have symbols instead of numbers for footnotes
+
+%% siunitx is an incredible useful package to display numbers and their
+%% associated units.  It also offers extra commands to specify lists and ranges
+%% of values with units.  Some commands which it provides include:
+%% - \SI{quantity}{units}
+%% - \SIRange{start}{end}{units}
+%% - \SIList{a, b, ..., d}{units}
+%% With the units being given as `\kilo\metre\per\year\per\pico\barn`.
+\usepackage{siunitx}
+
+%% Adjust the way units are displayed in ranges and units so that they are only
+%% mentinoed once.
+\sisetup{
+  range-units=single,
+  list-units=single,
+}
+
+%% Declare a few extra units
+\DeclareSIUnit\year{yr}
+\DeclareSIUnit\barn{b}
+\DeclareSIUnit\fb{\femto\barn}
+\DeclareSIUnit\pb{\pico\barn}
+
+%% Formatting
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{geometry}   % Customize text width, page height, margins, etc.
+\geometry{
+  %% See the geometry package's documentation for all the options available
+  textwidth=13cm,
+}
+
+\usepackage{multicol}   % {multicols}{n} environment
+\usepackage{pdflscape}  % {landscape} environment
+\usepackage{enumitem}   % Easily customize lists
+
+\usepackage{setspace}   % Line spacing
+\singlespacing
+% \onehalfspacing
+% \doublespacing
+
+%% Change the formatting of titles and sections.
+\setkomafont{part}{\normalfont\scshape\Huge}
+\setkomafont{partnumber}{\normalfont\scshape\huge}
+\setkomafont{section}{\normalfont\Huge}
+\setkomafont{subsection}{\normalfont\huge}
+\setkomafont{subsubsection}{\normalfont\Large}
+\setkomafont{paragraph}{\normalfont\large\scshape}
+
+%% Change the formatting of section entries in the table of contents
+\setkomafont{sectionentry}{\scshape}
+
+%% Modify the indentation at the start of each paragraph.
+\setlength{\parindent}{1em}
+
+%% Font
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{microtype}   % Fine small typographical details
+\usepackage{realscripts} % Use the font's sub- and superscripts
+
+%% LaTeX allows for some if-else statements.  It is very rare that you'll have
+%% to use them, though this is one example since we only want to include a
+%% particular package if this example is compiled with LuaLaTeX.
+\ifluatex
+  \usepackage{fontspec}  % Allows for any font to be specified
+
+  % Change the main font
+  \setmainfont{EBGaramond12}[
+    Path=fonts/,
+    Extension=.otf,
+    UprightFont=*-Regular,
+    ItalicFont=*-Italic,
+    SmallCapsFont=*-AllSC,
+    UprightFeatures={
+      Ligatures={
+        Common,
+        Discretionary,
+        % Historic,
+        TeX,
+      },
+      Contextuals={Alternate},
+      Numbers=OldStyle,
+    },
+    ItalicFeatures={
+      Ligatures={
+        Common,
+        Discretionary,
+        % Historic,
+        TeX,
+      },
+      Contextuals={Alternate},
+      Numbers=OldStyle,
+      CharacterVariant={4},    % &
+      CharacterVariant={5:3},  % v
+    },
+  ]
+
+  % Change the mono-space font
+  \setmonofont{FiraCode}[
+    Path=fonts/,
+    Extension=.ttf,
+    UprightFont=*-Regular,
+    BoldFont=*-SemiBold,
+    Contextuals=Alternate,  % Activate ligatures
+    Scale=MatchLowercase,
+  ]
+\else
+  % A fall-back that isn't as nice as fontspec
+  \usepackage{ebgaramond}
+\fi %% marks the end of the if-else statement
+
+%% Graphics & Figure
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Graphics can be included in a LaTeX document with
+%%
+%% ```
+%% \includegraphics[options]{image}
+%% ```
+%%
+%% Usually, the extension for the image is not specified and LaTeX will
+%% figure out the best one.  It is of course possible to add the extension to
+%% specify a particular image.
+%%
+%% In order to ensure that the image is a particular width, you can use
+%% `width=<distance>`.  This will also scale the height but keep the aspect
+%% ratio (if you also specify the height, the aspect ratio will not be kept).
+%% It is tempting to specify an exact distance such as `4cm`; but it is
+%% generally better to have a relative distance such as `0.4\linewidth`.  This
+%% way, the image will scale nicely if the context is changed.
+\usepackage{graphicx}   % Handle graphics
+
+%% Look for images in the './images/' sub-directory
+\graphicspath{{./images/}}
+
+\usepackage{xcolor}     % Define and use colours
+\usepackage{subcaption} % Subfigures inside a figure
+
+\usepackage{tikz}       % Powerful drawing language
+\usepackage{pgfplots}   % Plotting with LaTeX
+\usepackage[compat=1.1.0]{tikz-feynman}  % Package to draw Feynman diagram
+\pgfplotsset{compat=1.14}
+
+%% TikZ pictures and plots can significantly increase the time it takes to
+%% produce the output.  The `external` TikZ library library defers the creation
+%% of these figures to a sub-process which creates a separate PDF file which is
+%% then simply imported into the main document.  To call the sub-process, you
+%% have to execute the appropriate makefile.  If you are using LatexMk, you can
+%% use the `.latexmkrc` to automatically do this for you.
+%%
+%% The following setup works on Linux, and should work on OS X too.
+% \usetikzlibrary{external}
+% \tikzexternalize[shell escape=-shell-escape, prefix=images/tikz/]
+% \immediate\write18{mkdir -p images/tikz/}
+% \tikzset{
+%     external/mode=list and make,
+%     external/system call={
+%         lualatex \tikzexternalcheckshellescape -halt-on-error -interaction=batchmode -jobname="\image" "\texsource" || rm "\image.pdf"},
+% }
+
+%% Math Packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}     % The core math package
+\usepackage{amssymb}     % Defines additional math fonts and symbols
+\usepackage{mathtools}   % Various extra maths functions
+\usepackage{dsfont}      % A double stroke font (for double stroke 1)
+
+%% Define a new command called \withnumber which forces the line to have number
+%% (even if it is referenced elsewhere).
+\newcommand\withnumber{\refstepcounter{equation}\tag{\theequation}}
+
+%% Allows page breaks in math (1 = avoid if possible, 4 = whenever).  Page
+%% breaks can be avoided at particular places by using \\* instead of \\.
+\allowdisplaybreaks[2]
+
+\usepackage[cmintegrals,varg]{newtxmath}  % Nice math font with Garamond
+
+%% Tables
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tabularx}  % Improved tabular environment
+\usepackage{longtable} % Multipage tables
+\usepackage{array}     % New column types, including >x<
+\usepackage{booktabs}  % Provides nicer horizontal lines
+\usepackage{multirow}  % Allows cells to span multiple rows
+\usepackage{longtable} % Allows for tables to span multiple pages
+
+%% Define the maths version of clr columns.
+\newcolumntype{C}{>{\(}c<{\)}}
+\newcolumntype{L}{>{\(}l<{\)}}
+\newcolumntype{R}{>{\(}r<{\)}}
+
+%% When designing tables, it is better to avoid having too many lines.  In
+%% general, the vertical alignments will suffice to guide the eye and the only
+%% horizontal lines present should demarcate particular sections within the
+%% table (e.g. the title from the body, and the body from the averages at the
+%% bottom).  The `booktabs` package provides `\toprule`, `\midrule` and
+%% `\bottomrule` for this purpose.
+
+%% Code
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{minted}
+
+\newminted{rust}{
+  autogobble,
+  linenos,
+  numberfirstline,
+  stepnumber=5,
+}
+
+\newmintinline{rust}{}
+
+%% Adjust font of line numbers
+\renewcommand{\theFancyVerbLine}{%
+  \scriptsize\ttfamily\arabic{FancyVerbLine}%
+}
+
+%% Linking and Referencing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{hyperref}  % Automatically inserts hyperlinks.
+\usepackage{cleveref}  % Use `\cref` to reference anything
+
+%% Define some slightly nicer colors
+\definecolor{link-color}{RGB}{96 0 0}
+\definecolor{cite-color}{RGB}{0 96 0}
+\definecolor{file-color}{RGB}{0 0 96}
+\definecolor{url-color}{RGB}{0 0 96}
+\definecolor{link-border-color}{RGB}{255 159 159}
+\definecolor{cite-border-color}{RGB}{159 255 159}
+\definecolor{file-border-color}{RGB}{159 159 255}
+\definecolor{url-border-color}{RGB}{159 159 255}
+
+\hypersetup{
+  %% When `colorlinks` is true, all links will be coloured which looks nice in
+  %% digital version of the document but not in print.  If the document is
+  %% intended for printing, then `colorlinks` should set to false.
+  colorlinks=true,
+  linkcolor=link-color,
+  citecolor=cite-color,
+  filecolor=file-color,
+  urlcolor=url-color,
+  linkbordercolor=link-border-color,
+  citebordercolor=cite-border-color,
+  urlbordercolor=url-border-color,
+}
+
+%% Glossary
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This package requires `makeglossaries` to be run after the initial run of
+%% LaTeX so that the glossary is generated and the a second run of LaTeX is need
+%% to included the newly generated glossary.  (This is automatically handled by
+%% Latexmk with the provided .latexmkrc).
+
+%% hyperref should be loaded first
+\usepackage[toc]{glossaries}
+\usepackage{glossaries-extra}
+
+\setglossarystyle{index}
+\setabbreviationstyle[acronym]{long-short-sc}
+
+\loadglsentries{glossary.glos}
+
+\makeglossaries
+
+%% Bibliography
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% hyperref should be loaded first
+\usepackage[
+  %% See the extensive documentation for biblatex for a description of what
+  %% these options do
+  autocite=inline,
+  backend=biber,
+  biblabel=brackets,
+  doi=true,
+  eprint=true,
+  maxnames=4,
+  style=phys,
+]{biblatex}
+
+%% Add a bib file
+\addbibresource{references.bib}
+
+%% Other modifications/package
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[style=british]{csquotes}    % Advanced handling of quotes.  Must be loaded after minted.
+
+\usepackage{mwe}  % Useful for minimal working examples
+
+%% This is not a CTAN package but instead contains a whole lot of small scripts I
+%% use nearly all the time.
+\usepackage{jpellis}
+
+%% Document Information
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Define a few shorthand commands.  The `makeatletter' and `makeatother' allows
+%% the use of '@' in commands which is reserved for hidden functions.
+\makeatletter
+\newcommand\@degreetitle{}
+\newcommand\degreetitle[1]{\renewcommand\@degreetitle{#1}}
+
+\newcommand\@department{}
+\newcommand\department[1]{\renewcommand\@department{#1}}
+
+\newcommand\@university{}
+\newcommand\university[1]{\renewcommand\@university{#1}}
+
+\newcommand\@keywords{}
+\newcommand\keywords[1]{\renewcommand\@keywords{#1}}
+
+\AtEndPreamble{
+  %% Set the PDF metadata, though this can only be done once they've been all
+  %% defined which is at the end of the preamble.
+  \hypersetup{
+    pdftitle={\@title},
+    pdfauthor={\@author},
+    pdfsubject={\@subject},
+    pdfkeywords={\@keywords},
+  }
+}
+\makeatother
+
+%% The \texorpdfstring string will, depending on context, either print proper
+%% TeX command (in this case LaTeX will the special kerning), or the plain text
+%% fallback.  This is useful if you have equation, links or special formatting
+%% in titles as the PDF bookmarks can't handle them.
+\title{Boltzmann-Solver}
+% \subtitle{Foo}
+
+\subject{Boltzmann-Solver}
+\keywords{Boltzmann equations, baryogenesis, leptogenesis}
+
+\author{Joshua P.~\textsc{Ellis}}
+\department{School of Physics}
+\university{The University of Melbourne}
+
+\date{\today}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% DOCUMENT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\pagenumbering{roman}
+
+%% Title
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% We don't want any page numbers, chapter headings, etc. on the page
+\pagestyle{empty}
+
+% \begin{titlepage}
+%   \makeatletter
+%   \begin{center}
+%     \vspace*{2.5cm}
+
+%     {\Huge \@title} \\[0em]
+%     \rule{\linewidth}{2pt}
+%     {\huge \textsc{\@subtitle}} \\[6em]
+
+%     {\large By} \\[1cm]
+%     {\huge \@author} \\[0.5ex]
+%     {\Large \normalfont \@degreetitle}
+
+%     \vfill
+
+%     {\Large \@department} \\[1ex]
+%     {\Large \@university}
+
+%     \vfill
+
+%     {\large \@date}
+%   \end{center}
+
+%   \makeatother
+% \end{titlepage}
+
+%% Table of Content
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage
+\pagenumbering{arabic}
+\pagestyle{plain}
+
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CONTENT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage
+\pagestyle{headings}
+\pagenumbering{arabic}
+
+\section{Introduction}
+\label{sec:introduction}
+
+The \gls{SM} of particle physics.
+
+
+\begin{rustcode}
+  fn main() {
+      println!("Hello -> World.");
+  }
+\end{rustcode}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% APPENDIX
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage
+\appendix
+\pagenumbering{Roman}
+\pagestyle{plain}
+
+\printglossaries
+
+%% Bibliography
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage
+\pagestyle{plain}
+\printbibliography
+
+\end{document}
