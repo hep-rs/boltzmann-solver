@@ -8,7 +8,7 @@
 "width=device-width, initial-scale=1.0">
 <meta name="generator" content="rustdoc">
 <meta name="description" content=
-"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/memoffset-0.5.4/src/span_of.rs`.">
+"Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/memoffset-0.5.5/src/span_of.rs`.">
 <meta name="keywords" content="rust, rustlang, rust-lang">
 <title>span_of.rs.html -- source</title>
 <link rel="stylesheet" type="text/css" href="../../normalize.css">
@@ -336,11 +336,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="261">261</span>
 <span id="262">262</span>
 <span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -499,9 +494,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro">!</span>(<span class=
 "string">"Expected a range, found '..'"</span>)
     };
-    <span class=
-"comment">// Lots of UB due to taking references to uninitialized fields! But that can currently</span>
-    <span class="comment">// not be avoided.</span>
     <span class="comment">// No explicit begin for range.</span>
     (@<span class="ident">helper</span> <span class=
 "macro-nonterminal">$</span><span class=
@@ -511,6 +503,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">parent</span>:<span class=
 "ident">path</span>, [] ..) <span class="op">=</span><span class=
 "op">&gt;</span> {{
+        <span class=
+"comment">// UB due to taking references to uninitialized fields for `size_of_val`.</span>
         (<span class="macro-nonterminal">$</span><span class=
 "macro-nonterminal">root</span> <span class=
 "kw">as</span> <span class="ident">usize</span>,
@@ -536,22 +530,18 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">tt</span>) <span class="op">=</span><span class=
 "op">&gt;</span> {{
         <span class=
-"macro">_memoffset__field_check</span><span class=
-"macro">!</span>(<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">parent</span>, <span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">field</span>);
+"comment">// UB due to taking references to uninitialized fields for `size_of_val`.</span>
         (<span class="macro-nonterminal">$</span><span class=
 "macro-nonterminal">root</span> <span class=
 "kw">as</span> <span class="ident">usize</span>,
-         <span class="kw-2">&</span>(<span class=
-"kw-2">*</span><span class="macro-nonterminal">$</span><span class=
-"macro-nonterminal">root</span>).<span class=
+         <span class="macro">raw_field</span><span class=
+"macro">!</span>(<span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">field</span> <span class=
-"kw">as</span> <span class="kw-2">*</span><span class=
-"kw">const</span> <span class="kw">_</span> <span class=
+"macro-nonterminal">root</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">parent</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">field</span>) <span class=
 "kw">as</span> <span class="ident">usize</span> <span class=
 "op">+</span> <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
@@ -573,23 +563,16 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">field</span>:<span class=
 "ident">tt</span>) <span class="op">=</span><span class=
 "op">&gt;</span> {{
-        <span class=
-"macro">_memoffset__field_check</span><span class=
-"macro">!</span>(<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">parent</span>, <span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">field</span>);
         (<span class="macro-nonterminal">$</span><span class=
 "macro-nonterminal">root</span> <span class=
 "kw">as</span> <span class="ident">usize</span>, <span class=
-"kw-2">&</span>(<span class="kw-2">*</span><span class=
+"macro">raw_field</span><span class="macro">!</span>(<span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">root</span>).<span class=
+"macro-nonterminal">root</span>, <span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">field</span> <span class=
-"kw">as</span> <span class="kw-2">*</span><span class=
-"kw">const</span> <span class="kw">_</span> <span class=
+"macro-nonterminal">parent</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">field</span>) <span class=
 "kw">as</span> <span class="ident">usize</span>)
     }};
     <span class=
@@ -609,34 +592,24 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">tt</span>) <span class="op">=</span><span class=
 "op">&gt;</span> {{
         <span class=
-"macro">_memoffset__field_check</span><span class=
+"comment">// UB due to taking references to uninitialized fields for `size_of_val`.</span>
+        (<span class="macro">raw_field</span><span class=
 "macro">!</span>(<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">root</span>, <span class=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">parent</span>, <span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">begin</span>);
-        <span class=
-"macro">_memoffset__field_check</span><span class=
-"macro">!</span>(<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">parent</span>, <span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">end</span>);
-        (<span class="kw-2">&</span>(<span class=
-"kw-2">*</span><span class="macro-nonterminal">$</span><span class=
-"macro-nonterminal">root</span>).<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">begin</span> <span class=
-"kw">as</span> <span class="kw-2">*</span><span class=
-"kw">const</span> <span class="kw">_</span> <span class=
+"macro-nonterminal">begin</span>) <span class=
 "kw">as</span> <span class="ident">usize</span>,
-         <span class="kw-2">&</span>(<span class=
-"kw-2">*</span><span class="macro-nonterminal">$</span><span class=
-"macro-nonterminal">root</span>).<span class=
+         <span class="macro">raw_field</span><span class=
+"macro">!</span>(<span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">end</span> <span class=
-"kw">as</span> <span class="kw-2">*</span><span class=
-"kw">const</span> <span class="kw">_</span> <span class=
+"macro-nonterminal">root</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">parent</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">end</span>) <span class=
 "kw">as</span> <span class="ident">usize</span> <span class=
 "op">+</span> <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=
@@ -661,35 +634,23 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">end</span>:<span class=
 "ident">tt</span>) <span class="op">=</span><span class=
 "op">&gt;</span> {{
-        <span class=
-"macro">_memoffset__field_check</span><span class=
+        (<span class="macro">raw_field</span><span class=
 "macro">!</span>(<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">root</span>, <span class=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">parent</span>, <span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">begin</span>);
-        <span class=
-"macro">_memoffset__field_check</span><span class=
-"macro">!</span>(<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">parent</span>, <span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">end</span>);
-        (<span class="kw-2">&</span>(<span class=
-"kw-2">*</span><span class="macro-nonterminal">$</span><span class=
-"macro-nonterminal">root</span>).<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">begin</span> <span class=
-"kw">as</span> <span class="kw-2">*</span><span class=
-"kw">const</span> <span class="kw">_</span> <span class=
+"macro-nonterminal">begin</span>) <span class=
 "kw">as</span> <span class="ident">usize</span>,
-         <span class="kw-2">&</span>(<span class=
-"kw-2">*</span><span class="macro-nonterminal">$</span><span class=
-"macro-nonterminal">root</span>).<span class=
+         <span class="macro">raw_field</span><span class=
+"macro">!</span>(<span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">end</span> <span class=
-"kw">as</span> <span class="kw-2">*</span><span class=
-"kw">const</span> <span class="kw">_</span> <span class=
+"macro-nonterminal">root</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">parent</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">end</span>) <span class=
 "kw">as</span> <span class="ident">usize</span>)
     }};
     <span class="comment">// No explicit end for range.</span>
@@ -705,19 +666,15 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">tt</span> [] ..) <span class="op">=</span><span class=
 "op">&gt;</span> {{
         <span class=
-"macro">_memoffset__field_check</span><span class=
+"comment">// UB due to taking references to uninitialized fields for `size_of_val`.</span>
+        (<span class="macro">raw_field</span><span class=
 "macro">!</span>(<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">root</span>, <span class=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">parent</span>, <span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">begin</span>);
-        (<span class="kw-2">&</span>(<span class=
-"kw-2">*</span><span class="macro-nonterminal">$</span><span class=
-"macro-nonterminal">root</span>).<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">begin</span> <span class=
-"kw">as</span> <span class="kw-2">*</span><span class=
-"kw">const</span> <span class="kw">_</span> <span class=
+"macro-nonterminal">begin</span>) <span class=
 "kw">as</span> <span class="ident">usize</span>,
          <span class="macro-nonterminal">$</span><span class=
 "macro-nonterminal">root</span> <span class=
@@ -759,27 +716,24 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">tt</span> []) <span class="op">=</span><span class=
 "op">&gt;</span> {{
         <span class=
-"macro">_memoffset__field_check</span><span class=
+"comment">// UB due to taking references to uninitialized fields for `size_of_val`.</span>
+        (<span class="macro">raw_field</span><span class=
 "macro">!</span>(<span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">root</span>, <span class=
 "macro-nonterminal">$</span><span class=
 "macro-nonterminal">parent</span>, <span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">begin</span>);
-        (<span class="kw-2">&</span>(<span class=
-"kw-2">*</span><span class="macro-nonterminal">$</span><span class=
-"macro-nonterminal">root</span>).<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">begin</span> <span class=
-"kw">as</span> <span class="kw-2">*</span><span class=
-"kw">const</span> <span class="kw">_</span> <span class=
+"macro-nonterminal">begin</span>) <span class=
 "kw">as</span> <span class="ident">usize</span>,
-         <span class="kw-2">&</span>(<span class=
-"kw-2">*</span><span class="macro-nonterminal">$</span><span class=
-"macro-nonterminal">root</span>).<span class=
+         <span class="macro">raw_field</span><span class=
+"macro">!</span>(<span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">begin</span> <span class=
-"kw">as</span> <span class="kw-2">*</span><span class=
-"kw">const</span> <span class="kw">_</span> <span class=
+"macro-nonterminal">root</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">parent</span>, <span class=
+"macro-nonterminal">$</span><span class=
+"macro-nonterminal">begin</span>) <span class=
 "kw">as</span> <span class="ident">usize</span> <span class=
 "op">+</span> <span class="macro-nonterminal">$</span><span class=
 "kw">crate</span>::<span class=

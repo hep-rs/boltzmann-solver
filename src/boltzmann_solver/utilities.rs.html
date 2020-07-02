@@ -300,22 +300,6 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="225">225</span>
 <span id="226">226</span>
 <span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -333,12 +317,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">test</span>;
 
 <span class="kw">use</span> <span class=
-"kw">crate</span>::{<span class=
-"ident">constants</span>::<span class=
-"ident">PI_5</span>, <span class="ident">model</span>::<span class=
-"ident">Particle</span>};
-<span class="kw">use</span> <span class=
-"ident">num_complex</span>::<span class="ident">Complex</span>;
+"kw">crate</span>::<span class=
+"ident">constants</span>::<span class="ident">PI_5</span>;
 <span class="kw">use</span> <span class=
 "ident">quadrature</span>::{<span class=
 "ident">clenshaw_curtis</span>, <span class=
@@ -638,47 +618,6 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">beta</span>)
 }
 
-<span class=
-"doccomment">/// Propagator with squared momentum `q2` involving particle `p`, defined as:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// \\begin{equation}</span>
-<span class=
-"doccomment">///   \mathcal{P}_{p}(q^2) \defeq \frac{1}{q^2 - m_p^2 + i m_p \Gamma_p}</span>
-<span class="doccomment">/// \\end{equation}</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # To-do</span>
-<span class="doccomment">///</span>
-<span class=
-"doccomment">/// Adjust the propagator to take into account particles in the thermal bath:</span>
-<span class="doccomment">///</span>
-<span class=
-"doccomment">/// \\begin{equation}\begin{aligned}</span>
-<span class=
-"doccomment">///   S(q^2, m) &amp;= \left[\frac{i}{q^2 - m^2 + i0} - 2 \pi n \delta(q^2 - m^2)] (\slashed p + m) \\\\</span>
-<span class=
-"doccomment">///   D(q^2, m) &amp;= \left[\frac{i}{q^2 - m^2 + i0} + 2 \pi n \delta(q^2 - m^2)]</span>
-<span class="doccomment">/// \\end{aligned}\\end{equation}</span>
-<span class="attribute">#[<span class=
-"ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class=
-"ident">propagator</span>(<span class=
-"ident">q2</span>: <span class="ident">f64</span>, <span class=
-"ident">p</span>: <span class="kw-2">&</span><span class=
-"ident">Particle</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">Complex</span><span class=
-"op">&lt;</span><span class="ident">f64</span><span class=
-"op">&gt;</span> {
-    <span class="comment">// TODO: Implement Dirac delta?</span>
-    <span class="number">1.0</span> <span class=
-"op">/</span> (<span class="ident">q2</span> <span class=
-"op">-</span> <span class="ident">p</span>.<span class=
-"ident">mass2</span> <span class="op">+</span> <span class=
-"ident">Complex</span>::<span class="ident">i</span>() <span class=
-"op">*</span> <span class="ident">p</span>.<span class=
-"ident">mass</span> <span class="op">*</span> <span class=
-"ident">p</span>.<span class="ident">width</span>)
-}
-
 <span class="attribute">#[<span class=
 "ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
@@ -686,11 +625,18 @@ autocomplete="off" spellcheck="false" placeholder=
 "kw">crate</span>::<span class=
 "ident">utilities</span>::<span class=
 "ident">test</span>::<span class="ident">approx_eq</span>;
+    <span class="kw">use</span> <span class=
+"ident">std</span>::<span class="ident">error</span>;
 
     <span class="attribute">#[<span class=
 "ident">test</span>]</span>
     <span class="kw">fn</span> <span class=
-"ident">t_range</span>() {
+"ident">t_range</span>() <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Result</span><span class=
+"op">&lt;</span>(), <span class="ident">Box</span><span class=
+"op">&lt;</span><span class="kw">dyn</span> <span class=
+"ident">error</span>::<span class="ident">Error</span><span class=
+"op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class=
 "ident">data</span> <span class="op">=</span> <span class=
 "macro">vec</span><span class="macro">!</span>[
@@ -766,11 +712,15 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">m3</span>, <span class="ident">m4</span>);
             <span class="ident">approx_eq</span>(<span class=
 "ident">ta</span>, <span class="ident">ea</span>, <span class=
-"number">8.0</span>, <span class="number">0.0</span>);
+"number">8.0</span>, <span class="number">0.0</span>)<span class=
+"question-mark">?</span>;
             <span class="ident">approx_eq</span>(<span class=
 "ident">tb</span>, <span class="ident">eb</span>, <span class=
-"number">8.0</span>, <span class="number">0.0</span>);
+"number">8.0</span>, <span class="number">0.0</span>)<span class=
+"question-mark">?</span>;
         }
+
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="attribute">#[<span class=
@@ -779,7 +729,12 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="attribute">#[<span class=
 "ident">test</span>]</span>
     <span class="kw">fn</span> <span class=
-"ident">integrate_st</span>() {
+"ident">integrate_st</span>() <span class="op">-</span><span class=
+"op">&gt;</span> <span class="prelude-ty">Result</span><span class=
+"op">&lt;</span>(), <span class="ident">Box</span><span class=
+"op">&lt;</span><span class="kw">dyn</span> <span class=
+"ident">error</span>::<span class="ident">Error</span><span class=
+"op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">const</span> <span class=
 "ident">BETA</span>: <span class="ident">f64</span> <span class=
 "op">=</span> <span class="number">1e-2</span>;
@@ -810,7 +765,7 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="number">2_538.664_748_452_267</span>,
             <span class="number">1.5</span>,
             <span class="number">0.0</span>,
-        );
+        )<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class=
 "ident">m2</span> <span class="op">=</span> <span class=
@@ -829,7 +784,7 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="number">0.001_196_687_768_601_514</span>,
             <span class="number">1.5</span>,
             <span class="number">0.0</span>,
-        );
+        )<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class=
 "ident">m2</span> <span class="op">=</span> <span class=
@@ -848,7 +803,7 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="number">0.678_416_052_166_338_6</span>,
             <span class="number">1.5</span>,
             <span class="number">0.0</span>,
-        );
+        )<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class=
 "ident">m2</span> <span class="op">=</span> <span class=
@@ -870,7 +825,9 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="number">2_540.321_286_335_379</span>,
             <span class="number">1.5</span>,
             <span class="number">0.0</span>,
-        );
+        )<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(())
     }
 }
 

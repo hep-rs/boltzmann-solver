@@ -77,13 +77,14 @@
 "#method.is_fermionic">is_fermionic</a><a href=
 "#method.is_real">is_real</a><a href=
 "#method.name">name</a><a href="#method.new">new</a><a href=
-"#method.normalized_number_density">normalized_number_density</a><a href="#method.number_density">number_density</a><a href="#method.own_antiparticle">own_antiparticle</a><a href="#method.phase_space">phase_space</a><a href="#method.real">real</a><a href="#method.set_mass">set_mass</a><a href="#method.set_width">set_width</a></div>
+"#method.normalized_number_density">normalized_number_density</a><a href="#method.number_density">number_density</a><a href="#method.own_antiparticle">own_antiparticle</a><a href="#method.phase_space">phase_space</a><a href="#method.propagator">propagator</a><a href="#method.real">real</a><a href="#method.set_mass">set_mass</a><a href="#method.set_width">set_width</a></div>
 <a class="sidebar-title" href="#trait-implementations">Trait
 Implementations</a>
 <div class="sidebar-links"><a href="#impl-Clone">Clone</a><a href=
 "#impl-Debug">Debug</a><a href=
 "#impl-Deserialize%3C%27de%3E">Deserialize&lt;'de&gt;</a><a href=
-"#impl-Serialize">Serialize</a></div>
+"#impl-Eq">Eq</a><a href=
+"#impl-PartialEq%3CParticle%3E">PartialEq&lt;Particle&gt;</a><a href="#impl-Serialize">Serialize</a></div>
 <a class="sidebar-title" href="#synthetic-implementations">Auto
 Trait Implementations</a>
 <div class="sidebar-links"><a href=
@@ -135,7 +136,7 @@ autocomplete="off" spellcheck="false" placeholder=
 'render-detail'><a id="toggle-all-docs" href="javascript:void(0)"
 title="collapse all docs">[<span class=
 'inner'>−</span>]</a></span><a class='srclink' href=
-'../../src/boltzmann_solver/model/particle.rs.html#28-66' title=
+'../../src/boltzmann_solver/model/particle.rs.html#32-70' title=
 'goto source code'>[src]</a></span><span class='in-band'>Struct
 <a href='../index.html'>boltzmann_solver</a>::<wbr><a href=
 'index.html'>model</a>::<wbr><a class="struct" href=
@@ -278,7 +279,7 @@ Implementations<a href='#implementations' class='anchor'></a></h2>
 title=
 "struct boltzmann_solver::model::Particle">Particle</a></code><a href='#impl'
 class='anchor'></a><a class='srclink' href=
-'../../src/boltzmann_solver/model/particle.rs.html#68-252' title=
+'../../src/boltzmann_solver/model/particle.rs.html#72-262' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.new' class="method"><code id='new.v'><span class=
@@ -291,7 +292,7 @@ mass: <a class="primitive" href=
 width: <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
 -&gt; Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/model/particle.rs.html#75-88' title=
+'../../src/boltzmann_solver/model/particle.rs.html#79-92' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Create a new particle with the specified spin and mass.</p>
@@ -307,7 +308,7 @@ self, mass: <a class="primitive" href=
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut</a>
 Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/model/particle.rs.html#91-95' title=
+'../../src/boltzmann_solver/model/particle.rs.html#95-99' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Set the mass of the particle.</p>
@@ -320,7 +321,7 @@ href=
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut</a>
 Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/model/particle.rs.html#98-102' title=
+'../../src/boltzmann_solver/model/particle.rs.html#102-106' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Set the width of the particle.</p>
@@ -329,7 +330,7 @@ Self</code><a class='srclink' href=
 "docblock attributes">#[must_use]</span>pub fn <a href=
 '#method.real' class='fnname'>real</a>(self) -&gt;
 Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/model/particle.rs.html#108-111' title=
+'../../src/boltzmann_solver/model/particle.rs.html#112-115' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Indicate that the particle is real.</p>
@@ -340,7 +341,7 @@ constructors.</p>
 'complex.v'><span class="docblock attributes">#[must_use]</span>pub
 fn <a href='#method.complex' class='fnname'>complex</a>(self) -&gt;
 Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/model/particle.rs.html#117-120' title=
+'../../src/boltzmann_solver/model/particle.rs.html#121-124' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Indicate that the particle is complex.</p>
@@ -353,7 +354,7 @@ constructors.</p>
 '#method.own_antiparticle' class=
 'fnname'>own_antiparticle</a>(self) -&gt; Self</code><a class=
 'srclink' href=
-'../../src/boltzmann_solver/model/particle.rs.html#125-128' title=
+'../../src/boltzmann_solver/model/particle.rs.html#129-132' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Indicate that the particle is its own antiparticle, thereby
@@ -365,7 +366,7 @@ preventing any asymmetry from being generated in its density.</p>
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
 -&gt; Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/model/particle.rs.html#137-140' title=
+'../../src/boltzmann_solver/model/particle.rs.html#141-144' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Specify how many internal degrees of freedom this particle
@@ -385,7 +386,7 @@ href=
 "https://doc.rust-lang.org/nightly/alloc/string/struct.String.html"
 title="struct alloc::string::String">String</a>&gt;&gt;(self, name:
 S) -&gt; Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/model/particle.rs.html#144-147' title=
+'../../src/boltzmann_solver/model/particle.rs.html#148-151' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Specify the particle's name</p>
@@ -395,7 +396,7 @@ S) -&gt; Self</code><a class='srclink' href=
 fn <a href='#method.is_real' class='fnname'>is_real</a>(&amp;self)
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
-href='../../src/boltzmann_solver/model/particle.rs.html#151-153'
+href='../../src/boltzmann_solver/model/particle.rs.html#155-157'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Returns true if the particle is real (real scalar, Majorana
@@ -407,7 +408,7 @@ fermion)</p>
 '#method.is_complex' class='fnname'>is_complex</a>(&amp;self) -&gt;
 <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
-href='../../src/boltzmann_solver/model/particle.rs.html#157-159'
+href='../../src/boltzmann_solver/model/particle.rs.html#161-163'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Returns true if the particle is complex (complex scalar, Dirac
@@ -419,7 +420,7 @@ fermion)</p>
 '#method.is_bosonic' class='fnname'>is_bosonic</a>(&amp;self) -&gt;
 <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
-href='../../src/boltzmann_solver/model/particle.rs.html#163-165'
+href='../../src/boltzmann_solver/model/particle.rs.html#167-169'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Returns true if the particle is bosonic.</p>
@@ -430,7 +431,7 @@ title='goto source code'>[src]</a></h4>
 '#method.is_fermionic' class='fnname'>is_fermionic</a>(&amp;self)
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
-href='../../src/boltzmann_solver/model/particle.rs.html#169-171'
+href='../../src/boltzmann_solver/model/particle.rs.html#173-175'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Returns true if the particle is fermionic.</p>
@@ -442,7 +443,7 @@ title='goto source code'>[src]</a></h4>
 'fnname'>degrees_of_freedom</a>(&amp;self) -&gt; <a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
-href='../../src/boltzmann_solver/model/particle.rs.html#196-210'
+href='../../src/boltzmann_solver/model/particle.rs.html#200-214'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Return the number of degrees of freedom for the underlying
@@ -479,7 +480,7 @@ beta: <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
-href='../../src/boltzmann_solver/model/particle.rs.html#224-226'
+href='../../src/boltzmann_solver/model/particle.rs.html#228-230'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Return the equilibrium phase space occupation of the
@@ -496,7 +497,7 @@ beta: <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
-href='../../src/boltzmann_solver/model/particle.rs.html#230-232'
+href='../../src/boltzmann_solver/model/particle.rs.html#234-236'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Return the equilibrium number density of the particle.</p>
@@ -512,7 +513,7 @@ beta: <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
-href='../../src/boltzmann_solver/model/particle.rs.html#237-241'
+href='../../src/boltzmann_solver/model/particle.rs.html#241-245'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Return the equilibrium number density of the particle,
@@ -527,11 +528,23 @@ beta: <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
-href='../../src/boltzmann_solver/model/particle.rs.html#245-251'
+href='../../src/boltzmann_solver/model/particle.rs.html#249-255'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Return the entropy degrees of freedom associated with this
 particle.</p>
+</div>
+<h4 id='method.propagator' class="method"><code id=
+'propagator.v'><span class=
+"docblock attributes">#[must_use]</span>pub fn <a href=
+'#method.propagator' class='fnname'>propagator</a>(&amp;self, s:
+<a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)
+-&gt; Propagator</code><a class='srclink' href=
+'../../src/boltzmann_solver/model/particle.rs.html#259-261' title=
+'goto source code'>[src]</a></h4>
+<div class='docblock'>
+<p>Return the propagator denominator for the particle.</p>
 </div>
 </div>
 <h2 id='trait-implementations' class='small-section-header'>Trait
@@ -545,7 +558,7 @@ title="trait core::clone::Clone">Clone</a> for <a class="struct"
 href="../../boltzmann_solver/model/struct.Particle.html" title=
 "struct boltzmann_solver::model::Particle">Particle</a></code><a href='#impl-Clone'
 class='anchor'></a><a class='srclink' href=
-'../../src/boltzmann_solver/model/particle.rs.html#26' title=
+'../../src/boltzmann_solver/model/particle.rs.html#30' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.clone' class="method hidden"><code id='clone.v'>fn
@@ -554,7 +567,7 @@ class='anchor'></a><a class='srclink' href=
 class='fnname'>clone</a>(&amp;self) -&gt; <a class="struct" href=
 "../../boltzmann_solver/model/struct.Particle.html" title=
 "struct boltzmann_solver::model::Particle">Particle</a></code><a class='srclink'
-href='../../src/boltzmann_solver/model/particle.rs.html#26' title=
+href='../../src/boltzmann_solver/model/particle.rs.html#30' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Returns a copy of the value. <a href=
@@ -584,7 +597,7 @@ title="trait core::fmt::Debug">Debug</a> for <a class="struct"
 href="../../boltzmann_solver/model/struct.Particle.html" title=
 "struct boltzmann_solver::model::Particle">Particle</a></code><a href='#impl-Debug'
 class='anchor'></a><a class='srclink' href=
-'../../src/boltzmann_solver/model/particle.rs.html#26' title=
+'../../src/boltzmann_solver/model/particle.rs.html#30' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.fmt' class="method hidden"><code id='fmt.v'>fn
@@ -597,7 +610,7 @@ title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class=
 "type" href=
 "https://doc.rust-lang.org/nightly/core/fmt/type.Result.html"
 title="type core::fmt::Result">Result</a></code><a class='srclink'
-href='../../src/boltzmann_solver/model/particle.rs.html#26' title=
+href='../../src/boltzmann_solver/model/particle.rs.html#30' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Formats the value using the given formatter. <a href=
@@ -613,7 +626,7 @@ Read more</a></p>
 "../../boltzmann_solver/model/struct.Particle.html" title=
 "struct boltzmann_solver::model::Particle">Particle</a></code><a href='#impl-Deserialize%3C%27de%3E'
 class='anchor'></a><a class='srclink' href=
-'../../src/boltzmann_solver/model/particle.rs.html#27' title=
+'../../src/boltzmann_solver/model/particle.rs.html#31' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.deserialize' class="method hidden"><code id=
@@ -630,7 +643,7 @@ title="type serde::de::Deserializer::Error">Error</a>&gt;
 &nbsp;&nbsp;&nbsp;&nbsp;__D: <a class="trait" href=
 "../../serde/de/trait.Deserializer.html" title=
 "trait serde::de::Deserializer">Deserializer</a>&lt;'de&gt;,&nbsp;</span></code><a class='srclink'
-href='../../src/boltzmann_solver/model/particle.rs.html#27' title=
+href='../../src/boltzmann_solver/model/particle.rs.html#31' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Deserialize this value from the given Serde deserializer.
@@ -639,13 +652,66 @@ href='../../src/boltzmann_solver/model/particle.rs.html#27' title=
 more</a></p>
 </div>
 </div>
+<h3 id='impl-Eq' class='impl'><code class='in-band'>impl <a class=
+"trait" href=
+"https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html" title=
+"trait core::cmp::Eq">Eq</a> for <a class="struct" href=
+"../../boltzmann_solver/model/struct.Particle.html" title=
+"struct boltzmann_solver::model::Particle">Particle</a></code><a href='#impl-Eq'
+class='anchor'></a><a class='srclink' href=
+'../../src/boltzmann_solver/model/particle.rs.html#269' title=
+'goto source code'>[src]</a></h3>
+<div class='impl-items'></div>
+<h3 id='impl-PartialEq%3CParticle%3E' class='impl'><code class=
+'in-band'>impl <a class="trait" href=
+"https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html"
+title="trait core::cmp::PartialEq">PartialEq</a>&lt;<a class=
+"struct" href="../../boltzmann_solver/model/struct.Particle.html"
+title="struct boltzmann_solver::model::Particle">Particle</a>&gt;
+for <a class="struct" href=
+"../../boltzmann_solver/model/struct.Particle.html" title=
+"struct boltzmann_solver::model::Particle">Particle</a></code><a href='#impl-PartialEq%3CParticle%3E'
+class='anchor'></a><a class='srclink' href=
+'../../src/boltzmann_solver/model/particle.rs.html#264-268' title=
+'goto source code'>[src]</a></h3>
+<div class='impl-items'>
+<h4 id='method.eq' class="method hidden"><code id='eq.v'>fn
+<a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq'
+class='fnname'>eq</a>(&amp;self, other: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.reference.html">&</a>Self)
+-&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
+href='../../src/boltzmann_solver/model/particle.rs.html#265-267'
+title='goto source code'>[src]</a></h4>
+<div class='docblock hidden'>
+<p>This method tests for <code>self</code> and <code>other</code>
+values to be equal, and is used by <code>==</code>. <a href=
+"https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq">
+Read more</a></p>
+</div>
+<h4 id='method.ne' class="method hidden"><code id=
+'ne.v'><span class="docblock attributes">#[must_use]</span>fn
+<a href=
+'https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne'
+class='fnname'>ne</a>(&amp;self, other: <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.reference.html">&</a>Rhs)
+-&gt; <a class="primitive" href=
+"https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><span class='since'
+title='Stable since Rust version 1.0.0'>1.0.0</span><a class=
+'srclink' href=
+'https://doc.rust-lang.org/nightly/src/core/cmp.rs.html#216-218'
+title='goto source code'>[src]</a></h4>
+<div class='docblock hidden'>
+<p>This method tests for <code>!=</code>.</p>
+</div>
+</div>
 <h3 id='impl-Serialize' class='impl'><code class='in-band'>impl
 <a class="trait" href="../../serde/ser/trait.Serialize.html" title=
 "trait serde::ser::Serialize">Serialize</a> for <a class="struct"
 href="../../boltzmann_solver/model/struct.Particle.html" title=
 "struct boltzmann_solver::model::Particle">Particle</a></code><a href='#impl-Serialize'
 class='anchor'></a><a class='srclink' href=
-'../../src/boltzmann_solver/model/particle.rs.html#27' title=
+'../../src/boltzmann_solver/model/particle.rs.html#31' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.serialize' class="method hidden"><code id=
@@ -664,7 +730,7 @@ title="type serde::ser::Serializer::Error">Error</a>&gt;
 &nbsp;&nbsp;&nbsp;&nbsp;__S: <a class="trait" href=
 "../../serde/ser/trait.Serializer.html" title=
 "trait serde::ser::Serializer">Serializer</a>,&nbsp;</span></code><a class='srclink'
-href='../../src/boltzmann_solver/model/particle.rs.html#27' title=
+href='../../src/boltzmann_solver/model/particle.rs.html#31' title=
 'goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Serialize this value into the given Serde serializer. <a href=

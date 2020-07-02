@@ -380,6 +380,10 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="304">304</span>
 <span id="305">305</span>
 <span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
 </pre>
 <div class="example-wrap">
 <pre class="rust">
@@ -548,9 +552,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">array</span>, <span class=
 "ident">prelude</span>::<span class="kw-2">*</span>};
     <span class="kw">use</span> <span class=
-"ident">std</span>::{<span class="ident">f64</span>::<span class=
-"ident">consts</span>::<span class="ident">PI</span>, <span class=
-"ident">mem</span>, <span class="ident">ptr</span>};
+"ident">std</span>::{<span class="ident">error</span>, <span class=
+"ident">f64</span>::<span class="ident">consts</span>::<span class=
+"ident">PI</span>, <span class="ident">mem</span>, <span class=
+"ident">ptr</span>};
 
     <span class="kw">const</span> <span class=
 "ident">TWO_PI</span>: <span class="ident">f64</span> <span class=
@@ -884,7 +889,13 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">test</span>]</span>
             <span class="kw">fn</span> <span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">name</span>() {
+"macro-nonterminal">name</span>() <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"prelude-ty">Result</span><span class=
+"op">&lt;</span>(), <span class="ident">Box</span><span class=
+"op">&lt;</span><span class="kw">dyn</span> <span class=
+"ident">error</span>::<span class="ident">Error</span><span class=
+"op">&gt;</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class=
 "ident">f</span> <span class="op">=</span> <span class=
 "op">|</span><span class="ident">_t</span>: <span class=
@@ -918,7 +929,8 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">x</span>[<span class="number">0</span>], <span class=
 "number">1.0</span>, <span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">prec</span>, <span class="number">0.0</span>);
+"macro-nonterminal">prec</span>, <span class=
+"number">0.0</span>)<span class="question-mark">?</span>;
                 <span class="ident">approx_eq</span>(<span class=
 "ident">x</span>[<span class="number">1</span>], <span class=
 "number">0.0</span>, <span class=
@@ -926,7 +938,10 @@ autocomplete="off" spellcheck="false" placeholder=
 "macro-nonterminal">prec</span>, <span class=
 "number">10_f64</span>.<span class="ident">powf</span>(<span class=
 "op">-</span><span class="macro-nonterminal">$</span><span class=
-"macro-nonterminal">prec</span>));
+"macro-nonterminal">prec</span>))<span class=
+"question-mark">?</span>;
+
+                <span class="prelude-val">Ok</span>(())
             }
         };
     }
@@ -980,7 +995,13 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">test</span>]</span>
             <span class="kw">fn</span> <span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">name</span>() {
+"macro-nonterminal">name</span>() <span class=
+"op">-</span><span class="op">&gt;</span> <span class=
+"prelude-ty">Result</span><span class=
+"op">&lt;</span>(), <span class="ident">Box</span><span class=
+"op">&lt;</span><span class="kw">dyn</span> <span class=
+"ident">error</span>::<span class="ident">Error</span><span class=
+"op">&gt;</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class=
 "ident">f</span> <span class="op">=</span> <span class=
 "op">|</span><span class="ident">_t</span>: <span class=
@@ -1020,12 +1041,16 @@ autocomplete="off" spellcheck="false" placeholder=
 "ident">x</span>[<span class="number">0</span>], <span class=
 "number">0.622_374_063_518_922_9</span>, <span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">prec</span>, <span class="number">0.0</span>);
+"macro-nonterminal">prec</span>, <span class=
+"number">0.0</span>)<span class="question-mark">?</span>;
                 <span class="ident">approx_eq</span>(<span class=
 "ident">x</span>[<span class="number">1</span>], <span class=
 "number">2.115_331_268_162_712_8</span>, <span class=
 "macro-nonterminal">$</span><span class=
-"macro-nonterminal">prec</span>, <span class="number">0.0</span>);
+"macro-nonterminal">prec</span>, <span class=
+"number">0.0</span>)<span class="question-mark">?</span>;
+
+                <span class="prelude-val">Ok</span>(())
             }
         };
     }
