@@ -1,0 +1,25 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+black = "==19.10b0"
+isort = "*"
+jupyterlab-code-formatter = "*"
+
+[packages]
+jupyterlab = "*"
+matplotlib = "*"
+numpy = "*"
+pandas = "*"
+scipy = "*"
+jupyter-dash = "*"
+ipywidgets = "*"
+
+
+python_version = "3"
+
+[scripts]
+post-install = "jupyter labextension install jupyterlab-plotly @jupyter-widgets/jupyterlab-manager plotlywidget @ryantam626/jupyterlab_code_formatter"
+# post-install = "jupyter serverextension enable --py jupyterlab_code_formatter"
