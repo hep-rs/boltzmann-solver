@@ -119,6 +119,10 @@ impl Model for LeptogenesisModel {
 
     fn entropy_dof(&self, beta: f64) -> f64 {
         self.sm.entropy_dof(beta)
+            + self.particles()[20..]
+                .iter()
+                .map(|p| p.entropy_dof(self.sm.beta))
+                .sum::<f64>()
     }
 
     fn particles(&self) -> &[Particle] {
