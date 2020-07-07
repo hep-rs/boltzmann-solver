@@ -5,7 +5,7 @@ use ndarray::{array, prelude::*};
 use num::Complex;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::f64;
+use std::{f64, f64::consts::SQRT_2};
 
 /// The Standard Model of particle physics.
 // #[derive(Debug)]
@@ -91,21 +91,24 @@ impl Model for StandardModel {
             g2: 6.476e-01,
             g3: 1.164e+00,
             ckm: generate_ckm(),
-            yu: array![
-                [7.497e-06, 0.0, 0.0],
-                [0.0, 3.413e-03, 0.0],
-                [0.0, 0.0, 9.346e-01],
-            ],
-            yd: array![
-                [1.491e-05, 0.0, 0.0],
-                [0.0, 3.265e-04, 0.0],
-                [0.0, 0.0, 1.556e-02],
-            ],
-            ye: array![
-                [2.880e-06, 0.0, 0.0],
-                [0.0, 5.956e-04, 0.0],
-                [0.0, 0.0, 1.001e-02],
-            ],
+            yu: SQRT_2 / data::VEV
+                * array![
+                    [data::MASS_UP, 0.0, 0.0],
+                    [0.0, data::MASS_CH, 0.0],
+                    [0.0, 0.0, data::MASS_TO],
+                ],
+            yd: SQRT_2 / data::VEV
+                * array![
+                    [data::MASS_DO, 0.0, 0.0],
+                    [0.0, data::MASS_ST, 0.0],
+                    [0.0, 0.0, data::MASS_BO],
+                ],
+            ye: SQRT_2 / data::VEV
+                * array![
+                    [data::MASS_EL, 0.0, 0.0],
+                    [0.0, data::MASS_MU, 0.0],
+                    [0.0, 0.0, data::MASS_TA],
+                ],
             mh,
             vev,
             mu2,
