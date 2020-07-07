@@ -2,6 +2,7 @@ pub mod data;
 
 use crate::model::{Model, Particle};
 use ndarray::{array, prelude::*};
+use num::Complex;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::f64;
@@ -31,6 +32,8 @@ pub struct StandardModel {
     pub yd: Array2<f64>,
     /// Electron Yukawa
     pub ye: Array2<f64>,
+    /// CKM matrix
+    pub ckm: Array2<Complex<f64>>,
 
     // Scalar potential
     /// 0-temperature mass of the Higgs
@@ -87,6 +90,7 @@ impl Model for StandardModel {
             g1: 3.585e-01,
             g2: 6.476e-01,
             g3: 1.164e+00,
+            ckm: generate_ckm(),
             yu: array![
                 [7.497e-06, 0.0, 0.0],
                 [0.0, 3.413e-03, 0.0],
@@ -204,11 +208,81 @@ impl Model for StandardModel {
     }
 }
 
+fn generate_ckm() -> Array2<Complex<f64>> {
+    use crate::model::standard_model::data::{CKM_A, CKM_ETA, CKM_LAMBDA, CKM_RHO};
+
+    let a_2 = CKM_A.powi(2);
+    let lambda_2 = CKM_LAMBDA.powi(2);
+    let rho_eta = Complex::new(CKM_RHO, CKM_ETA);
+
+    // z = ρ + i η
+    let z = f64::sqrt((1.0 - a_2 * CKM_LAMBDA.powi(4)) / (1.0 - lambda_2))
+        * rho_eta
+        * (1.0 - CKM_A.powi(2) * CKM_LAMBDA.powi(4) * rho_eta).finv();
+
+    array![
+        [
+            Complex::new(
+                1.0 + lambda_2
+                    * (lambda_2 * (lambda_2 * (-5.0 / 128.0 * lambda_2 - 1.0 / 16.0) - 1.0 / 8.0)
+                        - 1.0 / 2.0)
+                    + 1.0 / 4.0 * a_2 * (lambda_2 - 2.0) * CKM_LAMBDA.powi(6) * z.norm_sqr(),
+                0.0
+            ),
+            Complex::new(
+                CKM_LAMBDA - 0.5 * a_2 * CKM_LAMBDA.powi(7) * z.norm_sqr(),
+                0.0
+            ),
+            CKM_A * CKM_LAMBDA.powi(3) * z.conj()
+        ],
+        [
+            0.5 * CKM_LAMBDA * (a_2 * CKM_LAMBDA.powi(4) * ((lambda_2 - 2.0) * z + 1.0) - 2.0),
+            1.0 + lambda_2
+                * (lambda_2
+                    * (lambda_2
+                        * (lambda_2 * (a_2 * (1.0 / 16.0 - a_2 / 8.0) - 5.0 / 128.0)
+                            + a_2 * (1.0 / 5.0 - z)
+                            - 1.0 / 16.0)
+                        - a_2 / 2.0
+                        - 1.0 / 8.0)
+                    - 1.0 / 2.0),
+            Complex::new(
+                CKM_A * lambda_2 - CKM_A.powi(3) * CKM_LAMBDA.powi(8) * z.norm_sqr(),
+                0.0
+            )
+        ],
+        [
+            CKM_LAMBDA.powi(3)
+                * (lambda_2
+                    * (lambda_2 * (CKM_A.powi(3) * z / 2.0 + CKM_A * z / 8.0) + CKM_A * z / 2.0)
+                    - CKM_A * z
+                    + CKM_A),
+            lambda_2
+                * (lambda_2
+                    * (lambda_2
+                        * (lambda_2 * (CKM_A.powi(3) * z / 2.0 + CKM_A / 16.0) + CKM_A / 8.0)
+                        - CKM_A * z
+                        + CKM_A / 2.0)
+                    - CKM_A),
+            Complex::new(
+                1.0 + CKM_LAMBDA.powi(4)
+                    * (lambda_2 * (-0.5 * a_2 * z.norm_sqr() - CKM_A.powi(4) * lambda_2)
+                        - a_2 / 2.0),
+                0.0
+            )
+        ]
+    ]
+}
+
 #[cfg(test)]
 mod tests {
     use super::StandardModel;
-    use crate::model::Model;
+    use crate::{model::Model, utilities::test::complex_approx_eq};
+    use num::Complex;
+    use std::error;
 
+    /// Check that the particle index is really corresponding to the correct
+    /// particle.
     #[test]
     fn particle_indices() {
         let model = StandardModel::zero();
@@ -224,5 +298,23 @@ mod tests {
                 assert_eq!(Ok(i), StandardModel::particle_idx(&head.to_string(), idx));
             }
         }
+    }
+
+    /// Check the values of the CKM matrix
+    #[test]
+    fn ckm() -> Result<(), Box<dyn error::Error>> {
+        let ckm = super::generate_ckm();
+
+        complex_approx_eq(ckm[[0, 0]], Complex::new(9.7439e-1, 0.0), 4.0, 0.0)?;
+        complex_approx_eq(ckm[[0, 1]], Complex::new(2.2484e-1, 0.0), 4.0, 0.0)?;
+        complex_approx_eq(ckm[[0, 2]], Complex::new(1.5042e-3, -3.3600e-3), 4.0, 0.0)?;
+        complex_approx_eq(ckm[[1, 0]], Complex::new(-2.2470e-1, -1.3634e-4), 4.0, 0.0)?;
+        complex_approx_eq(ckm[[1, 1]], Complex::new(9.7354e-1, -3.1449e-5), 4.0, 0.0)?;
+        complex_approx_eq(ckm[[1, 2]], Complex::new(4.1628e-2, 0.0), 4.0, 0.0)?;
+        complex_approx_eq(ckm[[2, 0]], Complex::new(7.8954e-3, -3.2711e-3), 4.0, 0.0)?;
+        complex_approx_eq(ckm[[2, 1]], Complex::new(-4.0901e-2, -7.5479e-4), 4.0, 0.0)?;
+        complex_approx_eq(ckm[[2, 2]], Complex::new(9.9913e-1, 0.0), 4.0, 0.0)?;
+
+        Ok(())
     }
 }
