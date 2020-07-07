@@ -1,0 +1,2443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="generator" content=
+"HTML Tidy for HTML5 for Linux version 5.6.0">
+<meta charset="utf-8">
+<meta name="viewport" content=
+"width=device-width, initial-scale=1.0">
+<meta name="generator" content="rustdoc">
+<meta name="description" content=
+"Source to the Rust file `src/model/standard_model/data.rs`.">
+<meta name="keywords" content="rust, rustlang, rust-lang">
+<title>data.rs.html -- source</title>
+<link rel="stylesheet" type="text/css" href=
+"../../../../normalize.css">
+<link rel="stylesheet" type="text/css" href=
+"../../../../rustdoc.css" id="mainThemeStyle">
+<link rel="stylesheet" type="text/css" href="../../../../dark.css">
+<link rel="stylesheet" type="text/css" href="../../../../light.css"
+id="themeStyle">
+<script src="../../../../storage.js"></script><noscript>
+<link rel="stylesheet" href="../../../../noscript.css"></noscript>
+<link rel="shortcut icon" href="../../../../favicon.ico">
+<style type="text/css">
+#crate-search{background-image:url("../../../../down-arrow.svg");}
+</style>
+<script>
+  MathJax = {
+    tex: {
+      macros: {
+        dd: "{\\mathop{}\\!\\mathrm{d}}",
+        textsc: ["\\mathrm{\\scriptsize #1}", 1],
+        vt: ["\\boldsymbol{#1}", 1],
+        pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2],
+        ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2],
+        defeq: "\\mathrel{\\vcenter:}=",
+        abs: ["\\lvert #1 \\rvert", 1],
+        angles: ["\\langle #1 \\rangle", 1]
+      }
+    }
+  };
+</script>
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+></script>
+</head>
+<body class="rustdoc source">
+<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
+<nav class="sidebar">
+<div class="sidebar-menu">☰</div>
+<a href='../../../../boltzmann_solver/index.html'>
+<div class='logo-container'><img src='../../../../rust-logo.png'
+alt='logo'></div>
+</a></nav>
+<div class="theme-picker"><button id="theme-picker" aria-label=
+"Pick another theme!"><img src="../../../../brush.svg" width="18"
+alt="Pick another theme!"></button>
+<div id="theme-choices"></div>
+</div>
+<script src="../../../../theme.js"></script>
+<nav class="sub">
+<form class="search-form">
+<div class="search-container">
+<div><select id="crate-search">
+<option value="All crates">All crates</option>
+</select><input class="search-input" name="search" disabled
+autocomplete="off" spellcheck="false" placeholder=
+"Click or press ‘S’ to search, ‘?’ for more options…" type=
+"search"></div>
+<a id="settings-menu" href="../../../../settings.html"><img src=
+"../../../../wheel.svg" width="18" alt="Change settings"></a></div>
+</form>
+</nav>
+<section id="main" class="content">
+<pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
+<span id="704">704</span>
+<span id="705">705</span>
+<span id="706">706</span>
+<span id="707">707</span>
+<span id="708">708</span>
+<span id="709">709</span>
+<span id="710">710</span>
+<span id="711">711</span>
+<span id="712">712</span>
+<span id="713">713</span>
+<span id="714">714</span>
+<span id="715">715</span>
+<span id="716">716</span>
+<span id="717">717</span>
+<span id="718">718</span>
+<span id="719">719</span>
+<span id="720">720</span>
+<span id="721">721</span>
+<span id="722">722</span>
+<span id="723">723</span>
+<span id="724">724</span>
+<span id="725">725</span>
+<span id="726">726</span>
+<span id="727">727</span>
+<span id="728">728</span>
+<span id="729">729</span>
+<span id="730">730</span>
+<span id="731">731</span>
+<span id="732">732</span>
+<span id="733">733</span>
+<span id="734">734</span>
+<span id="735">735</span>
+<span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
+<span id="922">922</span>
+<span id="923">923</span>
+<span id="924">924</span>
+<span id="925">925</span>
+</pre>
+<div class="example-wrap">
+<pre class="rust">
+<span class="doccomment">//! Standard model data</span>
+<span class="doccomment">//!</span>
+<span class=
+"doccomment">//! All values are taken from the PDG unless otherwise stated.</span>
+
+<span class="kw">use</span> <span class=
+"kw">crate</span>::<span class=
+"ident">utilities</span>::<span class=
+"ident">spline</span>::<span class=
+"ident">ConstCubicHermiteSpline</span>;
+
+<span class="doccomment">/// Z boson mass [GeV]</span>
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">MASS_Z</span>: <span class=
+"ident">f64</span> <span class="op">=</span> <span class=
+"number">91.187_6</span>;
+<span class="doccomment">/// W boson mass [GeV]</span>
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">MASS_W</span>: <span class=
+"ident">f64</span> <span class="op">=</span> <span class=
+"number">80.379</span>;
+<span class="doccomment">/// Higgs boson mass [GeV]</span>
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">MASS_H</span>: <span class=
+"ident">f64</span> <span class="op">=</span> <span class=
+"number">125.10</span>;
+
+<span class="doccomment">/// Electron mass [GeV]</span>
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">MASS_EL</span>: <span class=
+"ident">f64</span> <span class="op">=</span> <span class=
+"number">0.510_998_946_1e-3</span>;
+<span class="doccomment">/// Muon mass [GeV]</span>
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">MASS_MU</span>: <span class=
+"ident">f64</span> <span class="op">=</span> <span class=
+"number">105.658_374_5e-3</span>;
+<span class="doccomment">/// Tau mass [GeV]</span>
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">MASS_TA</span>: <span class=
+"ident">f64</span> <span class="op">=</span> <span class=
+"number">1776.86e-3</span>;
+
+<span class="doccomment">/// Up quark mass [GeV]</span>
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">MASS_UP</span>: <span class=
+"ident">f64</span> <span class="op">=</span> <span class=
+"number">2.16e-3</span>;
+<span class="doccomment">/// Down quark mass [GeV]</span>
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">MASS_DO</span>: <span class=
+"ident">f64</span> <span class="op">=</span> <span class=
+"number">4.67e-3</span>;
+<span class="doccomment">/// Strange quark mass [GeV]</span>
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">MASS_ST</span>: <span class=
+"ident">f64</span> <span class="op">=</span> <span class=
+"number">93e-3</span>;
+<span class="doccomment">/// Charm quark mass [GeV]</span>
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">MASS_CH</span>: <span class=
+"ident">f64</span> <span class="op">=</span> <span class=
+"number">1.27</span>;
+<span class="doccomment">/// Bottom quark mass [GeV]</span>
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">MASS_BO</span>: <span class=
+"ident">f64</span> <span class="op">=</span> <span class=
+"number">4.18</span>;
+<span class="doccomment">/// Top quark mass [GeV]</span>
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">MASS_TO</span>: <span class=
+"ident">f64</span> <span class="op">=</span> <span class=
+"number">172.76</span>;
+
+<span class="doccomment">/// Higgs boson VEV</span>
+<span class="kw">pub</span> <span class=
+"kw">const</span> <span class="ident">VEV</span>: <span class=
+"ident">f64</span> <span class="op">=</span> <span class=
+"number">246.22</span>;
+
+<span class=
+"doccomment">/// Value of \\(g_{*}\\) for the Standard Model.</span>
+<span class="doccomment">///</span>
+<span class=
+"doccomment">/// The first column is the log-transformed inverse temperature,</span>
+<span class=
+"doccomment">/// \\(\ln(\beta)\\), where \\(\beta\\) is in units of inverse</span>
+<span class="doccomment">/// gigaelectronvolts.</span>
+<span class="doccomment">///</span>
+<span class=
+"doccomment">/// The second column is the value of \\(g_{*}\\).</span>
+<span class="doccomment">///</span>
+<span class=
+"doccomment">/// Data is sourced from [`arXiv:1609.049_79`](https://arxiv.org/abs/1609.049_79).</span>
+<span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">clippy</span>::<span class="ident">approx_constant</span>)]</span>
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">const</span> <span class=
+"ident">STANDARD_MODEL_GSTAR</span>: <span class=
+"ident">ConstCubicHermiteSpline</span> <span class=
+"op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
+    <span class="ident">data</span>: <span class="kw-2">&</span>[
+        (<span class="op">-</span><span class=
+"number">9.210_340_371_976_184</span>, <span class=
+"number">106.75</span>, <span class="number">0.</span>),
+        (<span class="op">-</span><span class=
+"number">8.517_193_191_416_238</span>, <span class=
+"number">106.75</span>, <span class="op">-</span><span class=
+"number">0.005_000_000_000_002_558</span>),
+        (<span class="op">-</span><span class=
+"number">7.600_902_459_542_082</span>, <span class=
+"number">106.74</span>, <span class="op">-</span><span class=
+"number">0.023_782_353_986_828_1</span>),
+        (<span class="op">-</span><span class=
+"number">6.907_755_278_982_137</span>, <span class=
+"number">106.7</span>, <span class="op">-</span><span class=
+"number">0.089_999_999_999_996_3</span>),
+        (<span class="op">-</span><span class=
+"number">6.214_608_098_422_191</span>, <span class=
+"number">106.56</span>, <span class="op">-</span><span class=
+"number">0.567_534_966_642_117_1</span>),
+        (<span class="op">-</span><span class=
+"number">5.298_317_366_548_036</span>, <span class=
+"number">105.61</span>, <span class="op">-</span><span class=
+"number">1.739_323_628_748_867_6</span>),
+        (<span class="op">-</span><span class=
+"number">4.605_170_185_988_092</span>, <span class=
+"number">102.85</span>, <span class="op">-</span><span class=
+"number">4.540_000_000_000_002</span>),
+        (<span class="op">-</span><span class=
+"number">3.912_023_005_428_146</span>, <span class=
+"number">96.53</span>, <span class="op">-</span><span class=
+"number">8.372_292_779_844_06</span>),
+        (<span class="op">-</span><span class=
+"number">2.995_732_273_553_991</span>, <span class=
+"number">88.14</span>, <span class="op">-</span><span class=
+"number">4.178_394_994_950_497</span>),
+        (<span class="op">-</span><span class=
+"number">2.302_585_092_994_046</span>, <span class=
+"number">86.13</span>, <span class="op">-</span><span class=
+"number">1.384_999_999_999_999</span>),
+        (<span class="op">-</span><span class=
+"number">1.609_437_912_434_100_3</span>, <span class=
+"number">85.37</span>, <span class="op">-</span><span class=
+"number">2.287_332_676_057_195</span>),
+        (<span class="op">-</span><span class=
+"number">0.693_147_180_559_945_3</span>, <span class=
+"number">81.8</span>, <span class="op">-</span><span class=
+"number">4.500_300_373_298_365</span>),
+        (<span class="number">0.</span>, <span class=
+"number">75.5</span>, <span class="op">-</span><span class=
+"number">6.624_999_999_999_999</span>),
+        (<span class=
+"number">0.693_147_180_559_945_3</span>, <span class=
+"number">68.55</span>, <span class="op">-</span><span class=
+"number">7.392_802_803_889_832</span>),
+        (<span class=
+"number">1.539_445_540_614_065_5</span>, <span class=
+"number">62.25</span>, <span class="op">-</span><span class=
+"number">3.742_392_982_957_152_3</span>),
+        (<span class=
+"number">1.544_118_446_313_457_8</span>, <span class=
+"number">54.8</span>, <span class="op">-</span><span class=
+"number">56.734_317_669_096_42</span>),
+        (<span class=
+"number">1.609_437_912_434_100_3</span>, <span class=
+"number">45.47</span>, <span class="op">-</span><span class=
+"number">6.513_275_781_770_426</span>),
+        (<span class=
+"number">1.660_731_206_821_650_9</span>, <span class=
+"number">39.77</span>, <span class="op">-</span><span class=
+"number">5.434_127_195_575_209</span>),
+        (<span class=
+"number">1.714_798_428_091_926_6</span>, <span class=
+"number">34.91</span>, <span class="op">-</span><span class=
+"number">4.603_930_719_349_456_5</span>),
+        (<span class=
+"number">1.771_956_841_931_875_4</span>, <span class=
+"number">30.84</span>, <span class="op">-</span><span class=
+"number">3.833_406_735_041_674_7</span>),
+        (<span class=
+"number">1.832_581_463_748_310_2</span>, <span class=
+"number">27.49</span>, <span class="op">-</span><span class=
+"number">3.143_137_274_369_373_3</span>),
+        (<span class=
+"number">1.897_119_984_885_881_3</span>, <span class=
+"number">24.77</span>, <span class="op">-</span><span class=
+"number">2.543_865_126_878_939_6</span>),
+        (<span class=
+"number">1.966_112_856_372_832_7</span>, <span class=
+"number">22.59</span>, <span class="op">-</span><span class=
+"number">2.035_812_112_999_736</span>),
+        (<span class=
+"number">2.040_220_828_526_554_6</span>, <span class=
+"number">20.86</span>, <span class="op">-</span><span class=
+"number">4.717_357_289_896_269</span>),
+        (<span class=
+"number">2.302_585_092_994_046</span>, <span class=
+"number">17.55</span>, <span class="op">-</span><span class=
+"number">5.987_388_847_067_43</span>),
+        (<span class=
+"number">2.995_732_273_553_991</span>, <span class=
+"number">14.32</span>, <span class="op">-</span><span class=
+"number">3.669_913_873_243_092</span>),
+        (<span class=
+"number">3.912_023_005_428_146</span>, <span class=
+"number">11.25</span>, <span class="op">-</span><span class=
+"number">1.406_182_673_956_857_3</span>),
+        (<span class=
+"number">4.605_170_185_988_092</span>, <span class=
+"number">10.76</span>, <span class="op">-</span><span class=
+"number">0.254_999_999_999_999_45</span>),
+        (<span class=
+"number">5.298_317_366_548_036</span>, <span class=
+"number">10.74</span>, <span class="op">-</span><span class=
+"number">0.033_219_280_948_873_824</span>),
+        (<span class=
+"number">6.214_608_098_422_191</span>, <span class=
+"number">10.7</span>, <span class="op">-</span><span class=
+"number">0.085_129_415_947_320_35</span>),
+        (<span class=
+"number">6.907_755_278_982_137</span>, <span class=
+"number">10.56</span>, <span class="op">-</span><span class=
+"number">0.334_999_999_999_999_96</span>),
+        (<span class=
+"number">7.600_902_459_542_082</span>, <span class=
+"number">10.03</span>, <span class="op">-</span><span class=
+"number">1.590_310_945_145_152</span>),
+        (<span class=
+"number">8.517_193_191_416_238</span>, <span class=
+"number">7.55</span>, <span class="op">-</span><span class=
+"number">2.323_023_788_733_875_6</span>),
+        (<span class=
+"number">9.210_340_371_976_184</span>, <span class=
+"number">4.78</span>, <span class="op">-</span><span class=
+"number">1.809_999_999_999_996</span>),
+        (<span class=
+"number">9.903_487_552_536_127</span>, <span class=
+"number">3.93</span>, <span class="op">-</span><span class=
+"number">0.571_819_440_327_131</span>),
+        (<span class=
+"number">10.819_778_284_410_283</span>, <span class=
+"number">3.91</span>, <span class="op">-</span><span class=
+"number">0.007_564_707_973_660_3</span>),
+        (<span class=
+"number">11.512_925_464_970_229</span>, <span class=
+"number">3.91</span>, <span class="number">0.</span>),
+    ],
+};
+
+<span class=
+"doccomment">/// Value of \\(g_{*}\\) for a fermion.</span>
+<span class="doccomment">///</span>
+<span class=
+"doccomment">/// The first column is the log-transformed inverse temperature scaled to the</span>
+<span class=
+"doccomment">/// fermion's mass: \\(\ln(m\beta)\\).</span>
+<span class="doccomment">///</span>
+<span class=
+"doccomment">/// The second column is is log-transformed value of \\(g_{*}\\),</span>
+<span class="doccomment">/// \\(\log(g_{*})\\).</span>
+<span class="doccomment">///</span>
+<span class=
+"doccomment">/// Data is sourced from [`arXiv:1609.049_79`](https://arxiv.org/abs/1609.049_79).</span>
+<span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">clippy</span>::<span class="ident">approx_constant</span>)]</span>
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">const</span> <span class=
+"ident">FERMION_GSTAR</span>: <span class=
+"ident">ConstCubicHermiteSpline</span> <span class=
+"op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
+    <span class="attribute">#[<span class=
+"ident">rustfmt</span>::<span class="ident">skip</span>]</span>
+    <span class="ident">data</span>: <span class="kw-2">&</span>[
+        (<span class="op">-</span><span class=
+"number">2.302_585_092_994_046</span>, <span class=
+"op">-</span><span class=
+"number">0.133_531_392_624_522_63</span>, <span class=
+"op">-</span><span class=
+"number">0.001_143_510_702_078_964_8</span>),
+        (<span class="op">-</span><span class=
+"number">0.693_147_180_559_945_3</span>, <span class=
+"op">-</span><span class=
+"number">0.134_674_903_326_601_6</span>, <span class=
+"op">-</span><span class="number">0.012_993_166_039_755_6</span>),
+        (<span class="number">0.</span>, <span class=
+"op">-</span><span class=
+"number">0.160_168_752_152_821_34</span>, <span class=
+"op">-</span><span class="number">0.052_426_063_619_066_1</span>),
+        (<span class=
+"number">0.693_147_180_559_945_3</span>, <span class=
+"op">-</span><span class=
+"number">0.239_527_030_564_733_8</span>, <span class=
+"op">-</span><span class="number">0.171_519_009_089_152_46</span>),
+        (<span class=
+"number">1.098_612_288_668_109_8</span>, <span class=
+"op">-</span><span class=
+"number">0.536_143_431_750_280_7</span>, <span class=
+"op">-</span><span class="number">0.324_909_672_812_512</span>),
+        (<span class=
+"number">1.386_294_361_119_890_6</span>, <span class=
+"op">-</span><span class=
+"number">0.975_510_091_534_126_3</span>, <span class=
+"op">-</span><span class="number">0.435_183_531_721_403_95</span>),
+        (<span class=
+"number">1.609_437_912_434_100_3</span>, <span class=
+"op">-</span><span class=
+"number">1.505_077_897_109_857_5</span>, <span class=
+"op">-</span><span class="number">0.523_937_020_782_128_4</span>),
+        (<span class=
+"number">1.791_759_469_228_055</span>, <span class=
+"op">-</span><span class=
+"number">2.120_263_536_200_091</span>, <span class=
+"op">-</span><span class="number">0.936_818_292_479_132_3</span>),
+        (<span class=
+"number">1.945_910_149_055_313_2</span>, <span class=
+"op">-</span><span class=
+"number">3.473_768_074_496_991</span>, <span class=
+"op">-</span><span class="number">0.949_197_982_239_101_8</span>),
+        (<span class=
+"number">2.079_441_541_679_835_7</span>, <span class=
+"op">-</span><span class=
+"number">4.199_705_077_879_927</span>, <span class=
+"op">-</span><span class="number">0.710_603_955_940_963_3</span>),
+        (<span class=
+"number">2.197_224_577_336_219_6</span>, <span class=
+"op">-</span><span class=
+"number">4.980_591_172_747_879</span>, <span class=
+"op">-</span><span class="number">0.739_144_034_115_335_8</span>),
+        (<span class=
+"number">2.302_585_092_994_046</span>, <span class=
+"op">-</span><span class=
+"number">5.760_352_826_144_595_5</span>, <span class=
+"op">-</span><span class="number">1.480_184_188_474_602</span>),
+        (<span class=
+"number">2.484_906_649_788_000_4</span>, <span class=
+"op">-</span><span class=
+"number">7.371_379_301_263_834</span>, <span class=
+"op">-</span><span class="number">1.513_555_620_070_245_8</span>),
+        (<span class=
+"number">2.639_057_329_615_258_4</span>, <span class=
+"op">-</span><span class=
+"number">9.036_387_064_852_745</span>, <span class=
+"op">-</span><span class="number">1.572_053_280_541_367</span>),
+        (<span class=
+"number">2.772_588_722_239_781</span>, <span class=
+"op">-</span><span class=
+"number">10.738_198_297_417_86</span>, <span class=
+"op">-</span><span class="number">1.616_471_892_646_872_4</span>),
+        (<span class=
+"number">2.890_371_757_896_164_5</span>, <span class=
+"op">-</span><span class=
+"number">12.470_038_191_364_639</span>, <span class=
+"op">-</span><span class="number">1.654_328_690_409_699_4</span>),
+        (<span class=
+"number">2.995_732_273_553_991</span>, <span class=
+"op">-</span><span class=
+"number">14.229_511_997_094_725</span>, <span class=
+"op">-</span><span class="number">7.913_746_509_155_695</span>),
+        (<span class=
+"number">3.401_197_381_662_155_5</span>, <span class=
+"op">-</span><span class=
+"number">23.285_917_835_359_264</span>, <span class=
+"op">-</span><span class="number">7.871_310_473_829_766</span>),
+        (<span class=
+"number">3.688_879_454_113_936_3</span>, <span class=
+"op">-</span><span class=
+"number">32.602_916_581_708_875</span>, <span class=
+"op">-</span><span class="number">8.345_168_743_729_955</span>),
+        (<span class=
+"number">3.912_023_005_428_146</span>, <span class=
+"op">-</span><span class=
+"number">42.066_428_392_713_18</span>, <span class=
+"op">-</span><span class="number">38.853_498_165_506_36</span>),
+        (<span class=
+"number">4.605_170_185_988_092</span>, <span class=
+"op">-</span><span class=
+"number">90.377_072_055_856_23</span>, <span class=
+"op">-</span><span class="number">48.310_643_663_143_054</span>),
+    ],
+};
+
+<span class=
+"doccomment">/// Value of \\(g_{*}\\) for a boson.</span>
+<span class="doccomment">///</span>
+<span class=
+"doccomment">/// The first column is the log-transformed inverse temperature scaled to the</span>
+<span class=
+"doccomment">/// fermion's mass: \\(\ln(m\beta)\\).</span>
+<span class="doccomment">///</span>
+<span class=
+"doccomment">/// The second column is is log-transformed value of \\(g_{*}\\),</span>
+<span class="doccomment">/// \\(\log(g_{*})\\).</span>
+<span class="doccomment">///</span>
+<span class=
+"doccomment">/// Data is sourced from [`arXiv:1609.049_79`](https://arxiv.org/abs/1609.049_79).</span>
+<span class="attribute">#[<span class=
+"ident">allow</span>(<span class=
+"ident">clippy</span>::<span class="ident">approx_constant</span>)]</span>
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">const</span> <span class=
+"ident">BOSON_GSTAR</span>: <span class=
+"ident">ConstCubicHermiteSpline</span> <span class=
+"op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
+    <span class="attribute">#[<span class=
+"ident">rustfmt</span>::<span class="ident">skip</span>]</span>
+    <span class="ident">data</span>: <span class="kw-2">&</span>[
+        (<span class="op">-</span><span class=
+"number">2.302_585_092_994_046</span>, <span class=
+"number">0.</span>, <span class="op">-</span><span class=
+"number">0.002_002_002_670_673_079_3</span>),
+        (<span class="op">-</span><span class=
+"number">0.693_147_180_559_945</span>, <span class=
+"op">-</span><span class=
+"number">0.002_002_002_670_673_079_3</span>, <span class=
+"op">-</span><span class="number">0.019_841_103_734_520_65</span>),
+        (<span class="number">0.</span>, <span class=
+"op">-</span><span class=
+"number">0.040_821_994_520_255_166</span>, <span class=
+"op">-</span><span class="number">0.072_669_292_614_018_03</span>),
+        (<span class=
+"number">0.693_147_180_559_945_3</span>, <span class=
+"op">-</span><span class=
+"number">0.147_340_587_898_709_13</span>, <span class=
+"op">-</span><span class="number">0.202_179_568_951_588_48</span>),
+        (<span class=
+"number">1.098_612_288_668_109_8</span>, <span class=
+"op">-</span><span class=
+"number">0.489_390_343_045_925_66</span>, <span class=
+"op">-</span><span class="number">0.353_904_882_564_688_77</span>),
+        (<span class=
+"number">1.386_294_361_119_890_6</span>, <span class=
+"op">-</span><span class=
+"number">0.954_511_944_694_352_9</span>, <span class=
+"op">-</span><span class="number">0.455_671_147_601_678_15</span>),
+        (<span class=
+"number">1.609_437_912_434_100_3</span>, <span class=
+"op">-</span><span class=
+"number">1.505_077_897_109_857_5</span>, <span class=
+"op">-</span><span class="number">0.532_515_388_382_419_7</span>),
+        (<span class=
+"number">1.791_759_469_228_055</span>, <span class=
+"op">-</span><span class=
+"number">2.120_263_536_200_091</span>, <span class=
+"op">-</span><span class="number">0.936_818_292_479_132_3</span>),
+        (<span class=
+"number">1.945_910_149_055_313_2</span>, <span class=
+"op">-</span><span class=
+"number">3.473_768_074_496_991</span>, <span class=
+"op">-</span><span class="number">0.949_197_982_239_101_8</span>),
+        (<span class=
+"number">2.079_441_541_679_835_7</span>, <span class=
+"op">-</span><span class=
+"number">4.199_705_077_879_927</span>, <span class=
+"op">-</span><span class="number">0.710_603_955_940_963_3</span>),
+        (<span class=
+"number">2.197_224_577_336_219_6</span>, <span class=
+"op">-</span><span class=
+"number">4.980_591_172_747_879</span>, <span class=
+"op">-</span><span class="number">0.739_144_034_115_335_8</span>),
+        (<span class=
+"number">2.302_585_092_994_046</span>, <span class=
+"op">-</span><span class=
+"number">5.760_352_826_144_595_5</span>, <span class=
+"op">-</span><span class="number">1.480_184_188_474_602</span>),
+        (<span class=
+"number">2.484_906_649_788_000_4</span>, <span class=
+"op">-</span><span class=
+"number">7.371_379_301_263_834</span>, <span class=
+"op">-</span><span class="number">1.513_555_620_070_245_8</span>),
+        (<span class=
+"number">2.639_057_329_615_258_4</span>, <span class=
+"op">-</span><span class=
+"number">9.036_387_064_852_745</span>, <span class=
+"op">-</span><span class="number">1.572_053_280_541_367</span>),
+        (<span class=
+"number">2.772_588_722_239_781</span>, <span class=
+"op">-</span><span class=
+"number">10.738_198_297_417_86</span>, <span class=
+"op">-</span><span class="number">1.616_471_892_646_872_4</span>),
+        (<span class=
+"number">2.890_371_757_896_164_5</span>, <span class=
+"op">-</span><span class=
+"number">12.470_038_191_364_639</span>, <span class=
+"op">-</span><span class="number">1.654_328_690_409_699_4</span>),
+        (<span class=
+"number">2.995_732_273_553_991</span>, <span class=
+"op">-</span><span class=
+"number">14.229_511_997_094_725</span>, <span class=
+"op">-</span><span class="number">7.913_746_509_155_695</span>),
+        (<span class=
+"number">3.401_197_381_662_155_5</span>, <span class=
+"op">-</span><span class=
+"number">23.285_917_835_359_264</span>, <span class=
+"op">-</span><span class="number">7.871_310_473_829_766</span>),
+        (<span class=
+"number">3.688_879_454_113_936_3</span>, <span class=
+"op">-</span><span class=
+"number">32.602_916_581_708_875</span>, <span class=
+"op">-</span><span class="number">8.345_168_743_729_955</span>),
+        (<span class=
+"number">3.912_023_005_428_146</span>, <span class=
+"op">-</span><span class=
+"number">42.066_428_392_713_18</span>, <span class=
+"op">-</span><span class="number">38.853_498_165_506_36</span>),
+        (<span class=
+"number">4.605_170_185_988_092</span>, <span class=
+"op">-</span><span class=
+"number">90.377_072_055_856_23</span>, <span class=
+"op">-</span><span class="number">48.310_643_663_143_054</span>),
+    ],
+};
+
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">const</span> <span class=
+"ident">G1_RUNNING</span>: <span class=
+"ident">ConstCubicHermiteSpline</span> <span class=
+"op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
+    <span class="ident">data</span>: <span class="kw-2">&</span>[
+        (<span class="number">1e-17</span>, <span class=
+"number">0.588_709</span>, <span class="op">-</span><span class=
+"number">0.003_659_000_000_000_079</span>),
+        (
+            <span class="number">1.998_948_553_061_09e-17</span>,
+            <span class="number">0.585_05</span>,
+            <span class="op">-</span><span class=
+"number">0.005_452_578_400_413_114</span>,
+        ),
+        (
+            <span class=
+"number">3.995_796_422_163_883_6e-17</span>,
+            <span class="number">0.581_459</span>,
+            <span class="op">-</span><span class=
+"number">0.005_352_072_078_038_676_5</span>,
+        ),
+        (
+            <span class="number">7.987_348_040_703_526e-17</span>,
+            <span class="number">0.577_933</span>,
+            <span class="op">-</span><span class=
+"number">0.005_255_179_791_777_989</span>,
+        ),
+        (
+            <span class=
+"number">1.596_633_020_286_819_2e-16</span>,
+            <span class="number">0.574_471</span>,
+            <span class="op">-</span><span class=
+"number">0.005_161_166_766_141_278</span>,
+        ),
+        (
+            <span class=
+"number">3.191_584_430_174_515_6e-16</span>,
+            <span class="number">0.571_069</span>,
+            <span class="op">-</span><span class=
+"number">0.005_070_732_058_987_444</span>,
+        ),
+        (
+            <span class="number">6.379_829_530_954_933e-16</span>,
+            <span class="number">0.567_728</span>,
+            <span class="op">-</span><span class=
+"number">0.004_981_211_390_402_123</span>,
+        ),
+        (
+            <span class=
+"number">1.275_290_606_847_035_3e-15</span>,
+            <span class="number">0.564_444</span>,
+            <span class="op">-</span><span class=
+"number">0.004_896_280_540_555_485</span>,
+        ),
+        (
+            <span class="number">2.549_238_542_447_371e-15</span>,
+            <span class="number">0.561_216</span>,
+            <span class="op">-</span><span class=
+"number">0.004_812_810_737_160_987</span>,
+        ),
+        (
+            <span class=
+"number">5.095_801_059_926_620_5e-15</span>,
+            <span class="number">0.558_043</span>,
+            <span class="op">-</span><span class=
+"number">0.004_731_810_486_927_62</span>,
+        ),
+        (
+            <span class=
+"number">1.018_621_418_145_110_8e-14</span>,
+            <span class="number">0.554_922</span>,
+            <span class="op">-</span><span class=
+"number">0.004_653_364_492_382_703</span>,
+        ),
+        (
+            <span class=
+"number">2.036_170_533_354_509_5e-14</span>,
+            <span class="number">0.551_854</span>,
+            <span class="op">-</span><span class=
+"number">0.004_575_893_101_585_903</span>,
+        ),
+        (
+            <span class="number">4.070_202_858_910_488e-14</span>,
+            <span class="number">0.548_835</span>,
+            <span class="op">-</span><span class=
+"number">0.004_501_891_957_105_64_f64</span>,
+        ),
+        (
+            <span class="number">8.136_100_692_382_169e-14</span>,
+            <span class="number">0.545_866</span>,
+            <span class="op">-</span><span class=
+"number">0.004_428_450_830_066_243</span>,
+        ),
+        (
+            <span class="number">1.626_365_333_697_639e-13</span>,
+            <span class="number">0.542_944</span>,
+            <span class="op">-</span><span class=
+"number">0.004_358_457_139_854_289</span>,
+        ),
+        (
+            <span class="number">3.251_017_568_498_94e-13</span>,
+            <span class="number">0.540_068</span>,
+            <span class="op">-</span><span class=
+"number">0.004_289_986_907_369_462</span>,
+        ),
+        (
+            <span class="number">6.498_612_546_221_382e-13</span>,
+            <span class="number">0.537_237</span>,
+            <span class="op">-</span><span class=
+"number">0.004_223_511_365_508_486</span>,
+        ),
+        (
+            <span class=
+"number">1.299_038_711_353_598_3e-12</span>,
+            <span class="number">0.534_449</span>,
+            <span class="op">-</span><span class=
+"number">0.004_158_527_507_199_373</span>,
+        ),
+        (
+            <span class=
+"number">2.596_707_893_732_326_2e-12</span>,
+            <span class="number">0.531_705</span>,
+            <span class="op">-</span><span class=
+"number">0.004_094_055_075_548_02</span>,
+        ),
+        (
+            <span class="number">5.190_679_615_682_081e-12</span>,
+            <span class="number">0.529_002</span>,
+            <span class="op">-</span><span class=
+"number">0.004_032_580_218_868_076_5</span>,
+        ),
+        (
+            <span class="number">1.037_589_803_397_484e-11</span>,
+            <span class="number">0.526_34</span>,
+            <span class="op">-</span><span class=
+"number">0.003_972_095_585_651_16</span>,
+        ),
+        (
+            <span class=
+"number">2.074_086_364_956_236_7e-11</span>,
+            <span class="number">0.523_717</span>,
+            <span class="op">-</span><span class=
+"number">0.003_913_619_612_512_733</span>,
+        ),
+        (
+            <span class="number">4.145_988_548_779_628e-11</span>,
+            <span class="number">0.521_133</span>,
+            <span class="op">-</span><span class=
+"number">0.003_856_140_852_032_615</span>,
+        ),
+        (
+            <span class="number">8.287_613_333_112_331e-11</span>,
+            <span class="number">0.518_586</span>,
+            <span class="op">-</span><span class=
+"number">0.003_800_656_798_313_296_5</span>,
+        ),
+        (
+            <span class=
+"number">1.656_649_459_600_946_3e-10</span>,
+            <span class="number">0.516_076</span>,
+            <span class="op">-</span><span class=
+"number">0.003_746_179_088_753_531</span>,
+        ),
+        (
+            <span class="number">3.311_554_344_262_567e-10</span>,
+            <span class="number">0.513_601</span>,
+            <span class="op">-</span><span class=
+"number">0.003_693_198_192_922_159</span>,
+        ),
+        (
+            <span class="number">6.619_623_211_046_827e-10</span>,
+            <span class="number">0.511_162</span>,
+            <span class="op">-</span><span class=
+"number">0.003_640_214_575_357_172_6</span>,
+        ),
+        (
+            <span class="number">1.323_227_404_568_839_7e-9</span>,
+            <span class="number">0.508_757</span>,
+            <span class="op">-</span><span class=
+"number">0.003_590_234_754_036_226_6</span>,
+        ),
+        (
+            <span class="number">2.645_061_801_869_000_7e-9</span>,
+            <span class="number">0.506_384</span>,
+            <span class="op">-</span><span class=
+"number">0.003_541_252_245_340_059</span>,
+        ),
+        (
+            <span class="number">5.287_340_520_591_548e-9</span>,
+            <span class="number">0.504_045</span>,
+            <span class="op">-</span><span class=
+"number">0.003_491_768_297_215_414_3</span>,
+        ),
+        (
+            <span class="number">1.056_911_514_311_110_4e-8</span>,
+            <span class="number">0.501_737</span>,
+            <span class="op">-</span><span class=
+"number">0.003_445_281_605_479_519</span>,
+        ),
+        (
+            <span class="number">2.112_708_788_446_018_2e-8</span>,
+            <span class="number">0.499_46</span>,
+            <span class="op">-</span><span class=
+"number">0.003_399_296_203_098_719_7</span>,
+        ),
+        (
+            <span class="number">4.223_186_985_826_984_4e-8</span>,
+            <span class="number">0.497_213</span>,
+            <span class="op">-</span><span class=
+"number">0.003_354_334_033_808_383_2</span>,
+        ),
+        (
+            <span class="number">8.441_953_130_276_22e-8</span>,
+            <span class="number">0.494_996</span>,
+            <span class="op">-</span><span class=
+"number">0.003_310_318_387_341_806_2</span>,
+        ),
+        (
+            <span class="number">1.687_498_839_844_547_5e-7</span>,
+            <span class="number">0.492_807</span>,
+            <span class="op">-</span><span class=
+"number">0.003_267_859_787_737_401_5</span>,
+        ),
+        (
+            <span class="number">3.373_227_369_017_581_4e-7</span>,
+            <span class="number">0.490_647</span>,
+            <span class="op">-</span><span class=
+"number">0.003_225_360_906_649_058</span>,
+        ),
+        (
+            <span class="number">6.742_906_462_401_553e-7</span>,
+            <span class="number">0.488_514</span>,
+            <span class="op">-</span><span class=
+"number">0.003_184_367_835_718_990_6</span>,
+        ),
+        (
+            <span class="number">1.347_868_749_932_606_6e-6</span>,
+            <span class="number">0.486_409</span>,
+            <span class="op">-</span><span class=
+"number">0.003_143_900_311_023_372_7</span>,
+        ),
+        (
+            <span class="number">2.694_321_179_250_494e-6</span>,
+            <span class="number">0.484_329</span>,
+            <span class="op">-</span><span class=
+"number">0.003_105_908_331_645_95</span>,
+        ),
+        (
+            <span class="number">5.385_812_692_206_191e-6</span>,
+            <span class="number">0.482_275</span>,
+            <span class="op">-</span><span class=
+"number">0.003_067_402_641_102_525</span>,
+        ),
+        (
+            <span class=
+"number">0.000_010_765_919_834_807_726</span>,
+            <span class="number">0.480_246</span>,
+            <span class="op">-</span><span class=
+"number">0.003_029_939_510_746_484</span>,
+        ),
+        (
+            <span class=
+"number">0.000_021_520_510_122_171_935</span>,
+            <span class="number">0.478_242</span>,
+            <span class="op">-</span><span class=
+"number">0.002_993_442_341_571_449</span>,
+        ),
+        (
+            <span class=
+"number">0.000_043_018_338_717_795_396</span>,
+            <span class="number">0.476_261</span>,
+            <span class="op">-</span><span class=
+"number">0.002_958_448_646_045_957_4</span>,
+        ),
+        (
+            <span class=
+"number">0.000_085_991_177_305_208_48</span>,
+            <span class="number">0.474_304</span>,
+            <span class="op">-</span><span class=
+"number">0.002_922_982_963_205_684_2</span>,
+        ),
+        (
+            <span class=
+"number">0.000_171_892_189_218_921_88</span>,
+            <span class="number">0.472_37</span>,
+            <span class="op">-</span><span class=
+"number">0.002_889_480_477_405_368</span>,
+        ),
+        (
+            <span class=
+"number">0.000_343_603_646_321_894_76</span>,
+            <span class="number">0.470_457</span>,
+            <span class="op">-</span><span class=
+"number">0.002_857_495_367_334_073</span>,
+        ),
+        (
+            <span class=
+"number">0.000_686_846_208_265_507_2</span>,
+            <span class="number">0.468_566</span>,
+            <span class="op">-</span><span class=
+"number">0.002_824_999_653_271_480_7</span>,
+        ),
+        (
+            <span class=
+"number">0.001_372_968_178_716_521_9</span>,
+            <span class="number">0.466_696</span>,
+            <span class="op">-</span><span class=
+"number">0.002_794_020_270_788_895_6</span>,
+        ),
+        (
+            <span class="number">0.002_744_493_174_445_475</span>,
+            <span class="number">0.464_846</span>,
+            <span class="op">-</span><span class=
+"number">0.002_764_023_642_069_946_3</span>,
+        ),
+        (
+            <span class="number">0.005_486_095_490_978_116</span>,
+            <span class="number">0.463_016</span>,
+            <span class="op">-</span><span class=
+"number">0.002_735_033_204_235_737</span>,
+        ),
+        (
+            <span class="number">0.010_966_403_326_768_112</span>,
+            <span class="number">0.461_204</span>,
+            <span class="op">-</span><span class=
+"number">0.001_811_999_999_999_980_3</span>,
+        ),
+    ],
+};
+
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">const</span> <span class=
+"ident">G2_RUNNING</span>: <span class=
+"ident">ConstCubicHermiteSpline</span> <span class=
+"op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
+    <span class="ident">data</span>: <span class="kw-2">&</span>[
+        (<span class="number">1e-17</span>, <span class=
+"number">0.518_173</span>, <span class=
+"number">0.001_924_000_000_000_036_8</span>),
+        (
+            <span class="number">1.998_948_553_061_09e-17</span>,
+            <span class="number">0.520_097</span>,
+            <span class=
+"number">0.002_895_489_571_575_500_7</span>,
+        ),
+        (
+            <span class=
+"number">3.995_796_422_163_883_6e-17</span>,
+            <span class="number">0.522_042</span>,
+            <span class=
+"number">0.002_927_455_776_047_086_6</span>,
+        ),
+        (
+            <span class="number">7.987_348_040_703_526e-17</span>,
+            <span class="number">0.524_009</span>,
+            <span class=
+"number">0.002_960_484_586_054_230_5</span>,
+        ),
+        (
+            <span class=
+"number">1.596_633_020_286_819_2e-16</span>,
+            <span class="number">0.525_998</span>,
+            <span class=
+"number">0.002_993_946_764_256_219_4</span>,
+        ),
+        (
+            <span class=
+"number">3.191_584_430_174_515_6e-16</span>,
+            <span class="number">0.528_01</span>,
+            <span class=
+"number">0.003_028_454_409_959_715_8</span>,
+        ),
+        (
+            <span class="number">6.379_829_530_954_933e-16</span>,
+            <span class="number">0.530_045</span>,
+            <span class=
+"number">0.003_062_910_559_553_491_5</span>,
+        ),
+        (
+            <span class=
+"number">1.275_290_606_847_035_3e-15</span>,
+            <span class="number">0.532_103</span>,
+            <span class="number">0.003_097_922_458_119_13</span>,
+        ),
+        (
+            <span class="number">2.549_238_542_447_371e-15</span>,
+            <span class="number">0.534_185</span>,
+            <span class="number">0.003_133_910_456_867_809</span>,
+        ),
+        (
+            <span class=
+"number">5.095_801_059_926_620_5e-15</span>,
+            <span class="number">0.536_291</span>,
+            <span class=
+"number">0.003_170_378_627_629_767_3</span>,
+        ),
+        (
+            <span class=
+"number">1.018_621_418_145_110_8e-14</span>,
+            <span class="number">0.538_422</span>,
+            <span class="number">0.003_207_883_285_250_775</span>,
+        ),
+        (
+            <span class=
+"number">2.036_170_533_354_509_5e-14</span>,
+            <span class="number">0.540_578</span>,
+            <span class="number">0.003_245_870_771_518_654</span>,
+        ),
+        (
+            <span class="number">4.070_202_858_910_488e-14</span>,
+            <span class="number">0.542_76</span>,
+            <span class=
+"number">0.003_285_337_777_543_755_2</span>,
+        ),
+        (
+            <span class="number">8.136_100_692_382_169e-14</span>,
+            <span class="number">0.544_969</span>,
+            <span class=
+"number">0.003_325_347_384_175_272_5</span>,
+        ),
+        (
+            <span class="number">1.626_365_333_697_639e-13</span>,
+            <span class="number">0.547_204</span>,
+            <span class="number">0.003_364_819_886_233_516</span>,
+        ),
+        (
+            <span class="number">3.251_017_568_498_94e-13</span>,
+            <span class="number">0.549_466</span>,
+            <span class="number">0.003_405_809_938_967_21</span>,
+        ),
+        (
+            <span class="number">6.498_612_546_221_382e-13</span>,
+            <span class="number">0.551_756</span>,
+            <span class="number">0.003_448_295_841_403_864</span>,
+        ),
+        (
+            <span class=
+"number">1.299_038_711_353_598_3e-12</span>,
+            <span class="number">0.554_075</span>,
+            <span class=
+"number">0.003_491_275_211_332_577_6</span>,
+        ),
+        (
+            <span class=
+"number">2.596_707_893_732_326_2e-12</span>,
+            <span class="number">0.556_422</span>,
+            <span class="number">0.003_534_264_126_206_754</span>,
+        ),
+        (
+            <span class="number">5.190_679_615_682_081e-12</span>,
+            <span class="number">0.558_799</span>,
+            <span class=
+"number">0.003_579_751_454_032_412_3</span>,
+        ),
+        (
+            <span class="number">1.037_589_803_397_484e-11</span>,
+            <span class="number">0.561_207</span>,
+            <span class="number">0.003_625_729_590_626_563</span>,
+        ),
+        (
+            <span class=
+"number">2.074_086_364_956_236_7e-11</span>,
+            <span class="number">0.563_645</span>,
+            <span class=
+"number">0.003_671_216_971_142_134_3</span>,
+        ),
+        (
+            <span class="number">4.145_988_548_779_628e-11</span>,
+            <span class="number">0.566_114</span>,
+            <span class="number">0.003_718_201_340_429_026</span>,
+        ),
+        (
+            <span class="number">8.287_613_333_112_331e-11</span>,
+            <span class="number">0.568_615</span>,
+            <span class=
+"number">0.003_767_181_057_158_085_6</span>,
+        ),
+        (
+            <span class=
+"number">1.656_649_459_600_946_3e-10</span>,
+            <span class="number">0.571_15</span>,
+            <span class="number">0.003_817_165_932_267_055</span>,
+        ),
+        (
+            <span class="number">3.311_554_344_262_567e-10</span>,
+            <span class="number">0.573_717</span>,
+            <span class=
+"number">0.003_866_649_802_517_643_3</span>,
+        ),
+        (
+            <span class="number">6.619_623_211_046_827e-10</span>,
+            <span class="number">0.576_319</span>,
+            <span class="number">0.003_918_628_669_569_252</span>,
+        ),
+        (
+            <span class="number">1.323_227_404_568_839_7e-9</span>,
+            <span class="number">0.578_955</span>,
+            <span class="number">0.003_970_613_227_292_877</span>,
+        ),
+        (
+            <span class="number">2.645_061_801_869_000_7e-9</span>,
+            <span class="number">0.581_627</span>,
+            <span class="number">0.004_024_595_027_201_243</span>,
+        ),
+        (
+            <span class="number">5.287_340_520_591_548e-9</span>,
+            <span class="number">0.584_335</span>,
+            <span class="number">0.004_079_573_984_121_177</span>,
+        ),
+        (
+            <span class="number">1.056_911_514_311_110_4e-8</span>,
+            <span class="number">0.587_081</span>,
+            <span class="number">0.004_136_050_385_028_93</span>,
+        ),
+        (
+            <span class="number">2.112_708_788_446_018_2e-8</span>,
+            <span class="number">0.589_864</span>,
+            <span class="number">0.004_192_528_692_676_333</span>,
+        ),
+        (
+            <span class="number">4.223_186_985_826_984_4e-8</span>,
+            <span class="number">0.592_686</span>,
+            <span class="number">0.004_251_035_666_847_89</span>,
+        ),
+        (
+            <span class="number">8.441_953_130_276_22e-8</span>,
+            <span class="number">0.595_547</span>,
+            <span class=
+"number">0.004_310_475_149_384_214_4</span>,
+        ),
+        (
+            <span class="number">1.687_498_839_844_547_5e-7</span>,
+            <span class="number">0.598_449</span>,
+            <span class="number">0.004_371_488_398_361_75</span>,
+        ),
+        (
+            <span class="number">3.373_227_369_017_581_4e-7</span>,
+            <span class="number">0.601_391</span>,
+            <span class="number">0.004_432_948_512_667_391</span>,
+        ),
+        (
+            <span class="number">6.742_906_462_401_553e-7</span>,
+            <span class="number">0.604_376</span>,
+            <span class="number">0.004_497_415_606_948_538</span>,
+        ),
+        (
+            <span class="number">1.347_868_749_932_606_6e-6</span>,
+            <span class="number">0.607_404</span>,
+            <span class="number">0.004_561_918_119_609_854</span>,
+        ),
+        (
+            <span class="number">2.694_321_179_250_494e-6</span>,
+            <span class="number">0.610_475</span>,
+            <span class="number">0.004_627_388_214_656_094</span>,
+        ),
+        (
+            <span class="number">5.385_812_692_206_191e-6</span>,
+            <span class="number">0.613_591</span>,
+            <span class="number">0.004_695_335_262_743_659</span>,
+        ),
+        (
+            <span class=
+"number">0.000_010_765_919_834_807_726</span>,
+            <span class="number">0.616_753</span>,
+            <span class="number">0.004_763_847_330_202_228</span>,
+        ),
+        (
+            <span class=
+"number">0.000_021_520_510_122_171_935</span>,
+            <span class="number">0.619_96</span>,
+            <span class="number">0.004_832_807_429_850_063</span>,
+        ),
+        (
+            <span class=
+"number">0.000_043_018_338_717_795_396</span>,
+            <span class="number">0.623_215</span>,
+            <span class="number">0.004_904_772_510_287_558</span>,
+        ),
+        (
+            <span class=
+"number">0.000_085_991_177_305_208_48</span>,
+            <span class="number">0.626_518</span>,
+            <span class="number">0.004_977_283_458_083_069</span>,
+        ),
+        (
+            <span class=
+"number">0.000_171_892_189_218_921_88</span>,
+            <span class="number">0.629_87</span>,
+            <span class="number">0.005_050_732_968_078_003</span>,
+        ),
+        (
+            <span class=
+"number">0.000_343_603_646_321_894_76</span>,
+            <span class="number">0.633_271</span>,
+            <span class="number">0.005_124_713_928_020_437</span>,
+        ),
+        (
+            <span class=
+"number">0.000_686_846_208_265_507_2</span>,
+            <span class="number">0.636_722</span>,
+            <span class="number">0.005_199_674_406_895_686</span>,
+        ),
+        (
+            <span class=
+"number">0.001_372_968_178_716_521_9</span>,
+            <span class="number">0.640_223</span>,
+            <span class="number">0.005_275_165_758_305_832</span>,
+        ),
+        (
+            <span class="number">0.002_744_493_174_445_475</span>,
+            <span class="number">0.643_775</span>,
+            <span class="number">0.005_351_125_392_774_26</span>,
+        ),
+        (
+            <span class="number">0.005_486_095_490_978_116</span>,
+            <span class="number">0.647_377</span>,
+            <span class=
+"number">0.005_426_097_050_085_872_5</span>,
+        ),
+        (
+            <span class="number">0.010_966_403_326_768_112</span>,
+            <span class="number">0.651_029</span>,
+            <span class=
+"number">0.003_651_999_999_999_988_6</span>,
+        ),
+    ],
+};
+
+<span class="kw">pub</span>(<span class=
+"kw">crate</span>) <span class="kw">const</span> <span class=
+"ident">G3_RUNNING</span>: <span class=
+"ident">ConstCubicHermiteSpline</span> <span class=
+"op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
+    <span class="ident">data</span>: <span class="kw-2">&</span>[
+        (<span class="number">1e-17</span>, <span class=
+"number">0.513_992</span>, <span class=
+"number">0.004_241_999_999_999_968</span>),
+        (
+            <span class="number">1.998_948_553_061_09e-17</span>,
+            <span class="number">0.518_234</span>,
+            <span class="number">0.006_414_772_225_895_626</span>,
+        ),
+        (
+            <span class=
+"number">3.995_796_422_163_883_6e-17</span>,
+            <span class="number">0.522_584</span>,
+            <span class="number">0.006_578_664_589_102_921</span>,
+        ),
+        (
+            <span class="number">7.987_348_040_703_526e-17</span>,
+            <span class="number">0.527_046</span>,
+            <span class="number">0.006_748_696_605_477_427</span>,
+        ),
+        (
+            <span class=
+"number">1.596_633_020_286_819_2e-16</span>,
+            <span class="number">0.531_624</span>,
+            <span class="number">0.006_925_575_810_339_285</span>,
+        ),
+        (
+            <span class=
+"number">3.191_584_430_174_515_6e-16</span>,
+            <span class="number">0.536_324</span>,
+            <span class=
+"number">0.007_111_557_518_295_525_5</span>,
+        ),
+        (
+            <span class="number">6.379_829_530_954_933e-16</span>,
+            <span class="number">0.541_152</span>,
+            <span class="number">0.007_305_915_322_616_256</span>,
+        ),
+        (
+            <span class=
+"number">1.275_290_606_847_035_3e-15</span>,
+            <span class="number">0.546_113</span>,
+            <span class=
+"number">0.007_508_902_485_291_020_5</span>,
+        ),
+        (
+            <span class="number">2.549_238_542_447_371e-15</span>,
+            <span class="number">0.551_214</span>,
+            <span class=
+"number">0.007_722_330_566_994_610_5</span>,
+        ),
+        (
+            <span class=
+"number">5.095_801_059_926_620_5e-15</span>,
+            <span class="number">0.556_462</span>,
+            <span class="number">0.007_945_205_620_988_303</span>,
+        ),
+        (
+            <span class=
+"number">1.018_621_418_145_110_8e-14</span>,
+            <span class="number">0.561_862</span>,
+            <span class="number">0.008_178_170_220_719_887</span>,
+        ),
+        (
+            <span class=
+"number">2.036_170_533_354_509_5e-14</span>,
+            <span class="number">0.567_424</span>,
+            <span class="number">0.008_425_086_841_923_26</span>,
+        ),
+        (
+            <span class="number">4.070_202_858_910_488e-14</span>,
+            <span class="number">0.573_156</span>,
+            <span class="number">0.008_683_446_902_328_428</span>,
+        ),
+        (
+            <span class="number">8.136_100_692_382_169e-14</span>,
+            <span class="number">0.579_065</span>,
+            <span class="number">0.008_954_916_791_802_478</span>,
+        ),
+        (
+            <span class="number">1.626_365_333_697_639e-13</span>,
+            <span class="number">0.585_163</span>,
+            <span class="number">0.009_242_280_163_871_15</span>,
+        ),
+        (
+            <span class="number">3.251_017_568_498_94e-13</span>,
+            <span class="number">0.591_458</span>,
+            <span class="number">0.009_543_688_136_957_867</span>,
+        ),
+        (
+            <span class="number">6.498_612_546_221_382e-13</span>,
+            <span class="number">0.597_962</span>,
+            <span class="number">0.009_863_079_979_253_555</span>,
+        ),
+        (
+            <span class=
+"number">1.299_038_711_353_598_3e-12</span>,
+            <span class="number">0.604_687</span>,
+            <span class="number">0.010_200_448_165_679_98</span>,
+        ),
+        (
+            <span class=
+"number">2.596_707_893_732_326_2e-12</span>,
+            <span class="number">0.611_645</span>,
+            <span class="number">0.010_556_836_084_425_432</span>,
+        ),
+        (
+            <span class="number">5.190_679_615_682_081e-12</span>,
+            <span class="number">0.618_85</span>,
+            <span class="number">0.010_935_215_492_765_335</span>,
+        ),
+        (
+            <span class="number">1.037_589_803_397_484e-11</span>,
+            <span class="number">0.626_318</span>,
+            <span class="number">0.011_337_560_042_690_89</span>,
+        ),
+        (
+            <span class=
+"number">2.074_086_364_956_236_7e-11</span>,
+            <span class="number">0.634_065</span>,
+            <span class="number">0.011_764_423_041_607_165</span>,
+        ),
+        (
+            <span class="number">4.145_988_548_779_628e-11</span>,
+            <span class="number">0.642_108</span>,
+            <span class="number">0.012_218_769_494_155_695</span>,
+        ),
+        (
+            <span class="number">8.287_613_333_112_331e-11</span>,
+            <span class="number">0.650_468</span>,
+            <span class="number">0.012_704_091_218_649_164</span>,
+        ),
+        (
+            <span class=
+"number">1.656_649_459_600_946_3e-10</span>,
+            <span class="number">0.659_165</span>,
+            <span class="number">0.013_221_923_121_469_826</span>,
+        ),
+        (
+            <span class="number">3.311_554_344_262_567e-10</span>,
+            <span class="number">0.668_224</span>,
+            <span class="number">0.013_776_735_123_103_814</span>,
+        ),
+        (
+            <span class="number">6.619_623_211_046_827e-10</span>,
+            <span class="number">0.677_669</span>,
+            <span class="number">0.014_370_022_207_564_01</span>,
+        ),
+        (
+            <span class="number">1.323_227_404_568_839_7e-9</span>,
+            <span class="number">0.687_529</span>,
+            <span class="number">0.015_008_312_754_593_337</span>,
+        ),
+        (
+            <span class="number">2.645_061_801_869_000_7e-9</span>,
+            <span class="number">0.697_836</span>,
+            <span class="number">0.015_696_080_443_623_875</span>,
+        ),
+        (
+            <span class="number">5.287_340_520_591_548e-9</span>,
+            <span class="number">0.708_625</span>,
+            <span class="number">0.016_438_318_580_015_97</span>,
+        ),
+        (
+            <span class="number">1.056_911_514_311_110_4e-8</span>,
+            <span class="number">0.719_935</span>,
+            <span class="number">0.017_241_029_444_529_436</span>,
+        ),
+        (
+            <span class="number">2.112_708_788_446_018_2e-8</span>,
+            <span class="number">0.731_809</span>,
+            <span class="number">0.018_111_222_492_575_556</span>,
+        ),
+        (
+            <span class="number">4.223_186_985_826_984_4e-8</span>,
+            <span class="number">0.744_296</span>,
+            <span class="number">0.019_058_020_507_416_548</span>,
+        ),
+        (
+            <span class="number">8.441_953_130_276_22e-8</span>,
+            <span class="number">0.757_451</span>,
+            <span class="number">0.020_090_488_671_845_406</span>,
+        ),
+        (
+            <span class="number">1.687_498_839_844_547_5e-7</span>,
+            <span class="number">0.771_336</span>,
+            <span class="number">0.021_220_767_543_505_693</span>,
+        ),
+        (
+            <span class="number">3.373_227_369_017_581_4e-7</span>,
+            <span class="number">0.786_022</span>,
+            <span class="number">0.022_461_755_219_929_68</span>,
+        ),
+        (
+            <span class="number">6.742_906_462_401_553e-7</span>,
+            <span class="number">0.801_589</span>,
+            <span class="number">0.023_828_737_270_809_846</span>,
+        ),
+        (
+            <span class="number">1.347_868_749_932_606_6e-6</span>,
+            <span class="number">0.818_129</span>,
+            <span class="number">0.025_341_859_213_456_74</span>,
+        ),
+        (
+            <span class="number">2.694_321_179_250_494e-6</span>,
+            <span class="number">0.835_75</span>,
+            <span class="number">0.027_023_751_784_583_532</span>,
+        ),
+        (<span class=
+"number">5.385_812_692_206_191e-6</span>, <span class=
+"number">0.854_574</span>, <span class=
+"number">0.028_900_443_191_876_3</span>),
+        (
+            <span class=
+"number">0.000_010_765_919_834_807_726</span>,
+            <span class="number">0.874_747</span>,
+            <span class="number">0.031_008_956_259_383_38</span>,
+        ),
+        (
+            <span class=
+"number">0.000_021_520_510_122_171_935</span>,
+            <span class="number">0.896_44</span>,
+            <span class="number">0.033_388_551_005_842_84</span>,
+        ),
+        (
+            <span class=
+"number">0.000_043_018_338_717_795_396</span>,
+            <span class="number">0.919_854</span>,
+            <span class="number">0.036_091_073_749_883_84</span>,
+        ),
+        (
+            <span class=
+"number">0.000_085_991_177_305_208_48</span>,
+            <span class="number">0.945_233</span>,
+            <span class="number">0.039_184_310_742_563_934</span>,
+        ),
+        (
+            <span class=
+"number">0.000_171_892_189_218_921_88</span>,
+            <span class="number">0.972_87</span>,
+            <span class="number">0.042_747_430_948_320_82</span>,
+        ),
+        (
+            <span class=
+"number">0.000_343_603_646_321_894_76</span>,
+            <span class="number">1.003_12</span>,
+            <span class="number">0.046_894_113_884_921_76</span>,
+        ),
+        (
+            <span class=
+"number">0.000_686_846_208_265_507_2</span>,
+            <span class="number">1.036_44</span>,
+            <span class="number">0.051_777_373_583_820_74</span>,
+        ),
+        (
+            <span class=
+"number">0.001_372_968_178_716_521_9</span>,
+            <span class="number">1.073_39</span>,
+            <span class="number">0.057_570_641_179_491_996</span>,
+        ),
+        (
+            <span class="number">0.002_744_493_174_445_475</span>,
+            <span class="number">1.114_67</span>,
+            <span class="number">0.064_543_214_024_133_31</span>,
+        ),
+        (
+            <span class="number">0.005_486_095_490_978_116</span>,
+            <span class="number">1.161_24</span>,
+            <span class="number">0.073_090_396_896_862_67</span>,
+        ),
+        (
+            <span class="number">0.010_966_403_326_768_112</span>,
+            <span class="number">1.214_33</span>,
+            <span class="number">0.053_089_999_999_999_86</span>,
+        ),
+    ],
+};
+</pre></div>
+</section>
+<section id="search" class="content hidden"></section>
+<section class="footer"></section>
+<script>
+window.rootPath = "../../../../";window.currentCrate = "boltzmann_solver";
+</script>
+<script src="../../../../main.js"></script>
+<script src="../../../../source-script.js"></script>
+<script src="../../../../source-files.js"></script>
+<script defer src="../../../../search-index.js"></script>
+</body>
+</html>
