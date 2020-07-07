@@ -139,10 +139,12 @@ impl Model for LeptogenesisModel {
     }
 
     fn particle_idx<S: AsRef<str>>(name: S, i: usize) -> Result<usize, (S, usize)> {
-        StandardModel::particle_idx(name, i).or_else(|(name, i)| match (name.as_ref(), i) {
+        let idx = match (name.as_ref(), i) {
             ("N", i) if i < 3 => Ok(20 + i),
             (_, i) => Err((name, i)),
-        })
+        };
+
+        idx.or_else(|(name, i)| StandardModel::particle_idx(name, i))
     }
 }
 
