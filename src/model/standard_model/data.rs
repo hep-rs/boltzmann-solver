@@ -34,6 +34,15 @@ pub const MASS_TO: f64 = 172.76;
 /// Higgs boson VEV
 pub const VEV: f64 = 246.22;
 
+/// CKM Wolfenstain \\(A\\) parameter
+pub const CKM_A: f64 = 0.8235;
+/// CKM Wolfenstain \\(\lambda\\) parameter
+pub const CKM_LAMBDA: f64 = 0.224_837;
+/// CKM Wolfenstain \\(\overline\rho\\) parameter
+pub const CKM_RHO: f64 = 0.1569;
+/// CKM Wolfenstain \\(\overline\eta\\) parameter
+pub const CKM_ETA: f64 = 0.3499;
+
 /// Value of \\(g_{*}\\) for the Standard Model.
 ///
 /// The first column is the log-transformed inverse temperature,
