@@ -60,8 +60,8 @@
 "#fields">Fields</a>
 <div class="sidebar-links"><a href=
 "#structfield.beta">beta</a><a href=
-"#structfield.g1">g1</a><a href="#structfield.g2">g2</a><a href=
-"#structfield.g3">g3</a><a href=
+"#structfield.ckm">ckm</a><a href="#structfield.g1">g1</a><a href=
+"#structfield.g2">g2</a><a href="#structfield.g3">g3</a><a href=
 "#structfield.lambda">lambda</a><a href=
 "#structfield.mh">mh</a><a href="#structfield.mu2">mu2</a><a href=
 "#structfield.particles">particles</a><a href=
@@ -123,7 +123,7 @@ autocomplete="off" spellcheck="false" placeholder=
 'render-detail'><a id="toggle-all-docs" href="javascript:void(0)"
 title="collapse all docs">[<span class=
 'inner'>−</span>]</a></span><a class='srclink' href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#12-44'
+'../../src/boltzmann_solver/model/standard_model.rs.html#13-47'
 title='goto source code'>[src]</a></span><span class=
 'in-band'>Struct <a href=
 '../index.html'>boltzmann_solver</a>::<wbr><a href=
@@ -159,6 +159,13 @@ href=
 "type ndarray::aliases::Array2">Array2</a>&lt;<a class="primitive"
 href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;,
+    pub ckm: <a class="type" href=
+"../../ndarray/aliases/type.Array2.html" title=
+"type ndarray::aliases::Array2">Array2</a>&lt;<a class="struct"
+href="../../num_complex/struct.Complex.html" title=
+"struct num_complex::Complex">Complex</a>&lt;<a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;&gt;,
     pub mh: <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>,
     pub vev: <a class="primitive" href=
@@ -243,6 +250,18 @@ href=
 <div class='docblock'>
 <p>Electron Yukawa</p>
 </div>
+<span id="structfield.ckm" class=
+"structfield small-section-header"><a href="#structfield.ckm"
+class="anchor field"></a><code id="ckm.v">ckm: <a class="type"
+href="../../ndarray/aliases/type.Array2.html" title=
+"type ndarray::aliases::Array2">Array2</a>&lt;<a class="struct"
+href="../../num_complex/struct.Complex.html" title=
+"struct num_complex::Complex">Complex</a>&lt;<a class="primitive"
+href=
+"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;&gt;</code></span>
+<div class='docblock'>
+<p>CKM matrix</p>
+</div>
 <span id="structfield.mh" class=
 "structfield small-section-header"><a href="#structfield.mh" class=
 "anchor field"></a><code id="mh.v">mh: <a class="primitive" href=
@@ -286,7 +305,7 @@ Implementations<a href='#trait-implementations' class=
 "../../boltzmann_solver/model/struct.StandardModel.html" title=
 "struct boltzmann_solver::model::StandardModel">StandardModel</a></code><a href='#impl-Deserialize%3C%27de%3E'
 class='anchor'></a><a class='srclink' href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#11' title=
+'../../src/boltzmann_solver/model/standard_model.rs.html#12' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.deserialize' class="method hidden"><code id=
@@ -303,7 +322,7 @@ title="type serde::de::Deserializer::Error">Error</a>&gt;
 &nbsp;&nbsp;&nbsp;&nbsp;__D: <a class="trait" href=
 "../../serde/de/trait.Deserializer.html" title=
 "trait serde::de::Deserializer">Deserializer</a>&lt;'de&gt;,&nbsp;</span></code><a class='srclink'
-href='../../src/boltzmann_solver/model/standard_model.rs.html#11'
+href='../../src/boltzmann_solver/model/standard_model.rs.html#12'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Deserialize this value from the given Serde deserializer.
@@ -320,14 +339,14 @@ more</a></p>
 "../../boltzmann_solver/model/struct.StandardModel.html" title=
 "struct boltzmann_solver::model::StandardModel">StandardModel</a></code><a href='#impl-Model'
 class='anchor'></a><a class='srclink' href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#46-205'
+'../../src/boltzmann_solver/model/standard_model.rs.html#49-212'
 title='goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.zero' class="method hidden"><code id='zero.v'>fn
 <a href=
 '../../boltzmann_solver/model/trait.Model.html#tymethod.zero'
 class='fnname'>zero</a>() -&gt; Self</code><a class='srclink' href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#47-111'
+'../../src/boltzmann_solver/model/standard_model.rs.html#50-118'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Instantiate a new instance of the model at 0 temperature ((\beta
@@ -342,7 +361,7 @@ class='fnname'>set_beta</a>(&amp;mut self, beta: <a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>)</code><a class='srclink'
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#123-172'
+'../../src/boltzmann_solver/model/standard_model.rs.html#130-179'
 title='goto source code'>[src]</a></h4>
 <div class='docblock'>
 <p>Update beta for the model.</p>
@@ -361,7 +380,7 @@ class='fnname'>get_beta</a>(&amp;self) -&gt; <a class="primitive"
 href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#174-176'
+'../../src/boltzmann_solver/model/standard_model.rs.html#181-183'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Return the current value of beta for the model</p>
@@ -375,7 +394,7 @@ class='fnname'>entropy_dof</a>(&amp;self, beta: <a class=
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code><a class='srclink'
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#178-181'
+'../../src/boltzmann_solver/model/standard_model.rs.html#185-188'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Return the effective degrees of freedom contributing to the
@@ -395,7 +414,7 @@ href="../../boltzmann_solver/model/struct.Particle.html" title=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a></code><a class='srclink'
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#183-185'
+'../../src/boltzmann_solver/model/standard_model.rs.html#190-192'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Return a list of particles in the model.</p>
@@ -412,7 +431,7 @@ class='fnname'>particles_mut</a>(&amp;mut self) -&gt; <a class=
 "primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a></code><a class='srclink'
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#187-189'
+'../../src/boltzmann_solver/model/standard_model.rs.html#194-196'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Return a mutable list of particles in the model.</p>
@@ -439,7 +458,7 @@ title="enum core::result::Result">Result</a>&lt;<a class=
 href=
 "https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a>&gt;</code><a class='srclink'
 href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#191-204'
+'../../src/boltzmann_solver/model/standard_model.rs.html#198-211'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Return the index corresponding to a particle's name and
@@ -557,7 +576,7 @@ more</a></p>
 href="../../boltzmann_solver/model/struct.StandardModel.html"
 title="struct boltzmann_solver::model::StandardModel">StandardModel</a></code><a href='#impl-Serialize'
 class='anchor'></a><a class='srclink' href=
-'../../src/boltzmann_solver/model/standard_model.rs.html#11' title=
+'../../src/boltzmann_solver/model/standard_model.rs.html#12' title=
 'goto source code'>[src]</a></h3>
 <div class='impl-items'>
 <h4 id='method.serialize' class="method hidden"><code id=
@@ -576,7 +595,7 @@ title="type serde::ser::Serializer::Error">Error</a>&gt;
 &nbsp;&nbsp;&nbsp;&nbsp;__S: <a class="trait" href=
 "../../serde/ser/trait.Serializer.html" title=
 "trait serde::ser::Serializer">Serializer</a>,&nbsp;</span></code><a class='srclink'
-href='../../src/boltzmann_solver/model/standard_model.rs.html#11'
+href='../../src/boltzmann_solver/model/standard_model.rs.html#12'
 title='goto source code'>[src]</a></h4>
 <div class='docblock hidden'>
 <p>Serialize this value into the given Serde serializer. <a href=
