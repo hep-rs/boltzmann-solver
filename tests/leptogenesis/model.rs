@@ -79,10 +79,15 @@ impl Model for LeptogenesisModel {
         // Precompute the squared couplings to be used in the thermal masses
         let g1 = self.sm.g1.powi(2) / 8.0;
         let g2 = self.sm.g2.powi(2) / 8.0;
-        let yu = self.sm.yu.diag().mapv(|y| y.powi(2) / 16.0);
-        let yd = self.sm.yd.diag().mapv(|y| y.powi(2) / 16.0);
-        let ye = self.sm.ye.diag().mapv(|y| y.powi(2) / 16.0);
-        let yv = Array1::from_shape_fn(3, |i| (0..3).map(|k| self.yv[[k, i]].norm_sqr()).sum());
+        let yu = self.sm.yu.dot(&self.sm.yu).into_diag() / 16.0;
+        let yd = self.sm.yd.dot(&self.sm.yd).into_diag() / 16.0;
+        let ye = self.sm.ye.dot(&self.sm.ye).into_diag() / 16.0;
+        let yv = self
+            .yv
+            .dot(&self.yv.t().map(|y| y.conj()))
+            .into_diag()
+            .map(|y| y.re)
+            / 16.0;
         let lambda = 0.0 * self.sm.lambda / 4.0;
 
         self.particle_mut("H", 0).set_mass(

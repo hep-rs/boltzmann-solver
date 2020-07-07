@@ -139,10 +139,9 @@ impl Model for StandardModel {
         let g1 = self.g1.powi(2) / 8.0;
         let g2 = self.g2.powi(2) / 8.0;
         let g3 = self.g3.powi(2) / 8.0;
-        let yu = self.yu.diag().mapv(|y| y.powi(2) / 16.0);
-        let yd = self.yd.diag().mapv(|y| y.powi(2) / 16.0);
-        let ye = self.ye.diag().mapv(|y| y.powi(2) / 16.0);
-        // let mh = self.mh;
+        let yu = self.yu.dot(&self.yu).into_diag() / 16.0;
+        let yd = self.yd.dot(&self.yd).into_diag() / 16.0;
+        let ye = self.ye.dot(&self.ye).into_diag() / 16.0;
         let mu2 = self.mu2;
         let lambda = self.lambda / 4.0;
 
