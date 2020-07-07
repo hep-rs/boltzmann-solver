@@ -3,7 +3,7 @@
 mod propagator;
 
 use crate::{
-    model::data,
+    model::standard_model::data,
     statistic::{Statistic, Statistics},
 };
 #[cfg(feature = "serde")]

@@ -1,9 +1,8 @@
 //! Model information
 
-pub(crate) mod data;
 pub mod interaction;
 mod particle;
-mod standard_model;
+pub(crate) mod standard_model;
 
 pub use particle::Particle;
 pub use standard_model::StandardModel;

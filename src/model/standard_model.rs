@@ -1,4 +1,6 @@
-use crate::model::{data, Model, Particle};
+pub mod data;
+
+use crate::model::{Model, Particle};
 use ndarray::{array, prelude::*};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
