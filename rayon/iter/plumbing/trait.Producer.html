@@ -201,15 +201,15 @@ we inline IntoIterator here until that issue is fixed.</p>
 <h2 id='associated-types' class='small-section-header'>Associated
 Types<a href='#associated-types' class='anchor'></a></h2>
 <div class='methods'>
-<h3 id='associatedtype.Item' class='method'><code id='Item.t'>type
-<a href='#associatedtype.Item' class="type">Item</a></code></h3>
+<h3 id='associatedtype.Item' class='method'><code>type <a href=
+'#associatedtype.Item' class="type">Item</a></code></h3>
 <div class='docblock'>
 <p>The type of item that will be produced by this producer once it
 is converted into an iterator.</p>
 </div>
-<h3 id='associatedtype.IntoIter' class='method'><code id=
-'IntoIter.t'>type <a href='#associatedtype.IntoIter' class=
-"type">IntoIter</a>: <a class="trait" href=
+<h3 id='associatedtype.IntoIter' class='method'><code>type <a href=
+'#associatedtype.IntoIter' class="type">IntoIter</a>: <a class=
+"trait" href=
 "https://doc.rust-lang.org/nightly/core/iter/traits/iterator/trait.Iterator.html"
 title=
 "trait core::iter::traits::iterator::Iterator">Iterator</a>&lt;Item
@@ -232,9 +232,9 @@ title=
 <h2 id='required-methods' class='small-section-header'>Required
 methods<a href='#required-methods' class='anchor'></a></h2>
 <div class='methods'>
-<h3 id='tymethod.into_iter' class='method'><code id=
-'into_iter.v'>fn <a href='#tymethod.into_iter' class=
-'fnname'>into_iter</a>(self) -&gt; Self::<a class="type" href=
+<h3 id='tymethod.into_iter' class='method'><code>fn <a href=
+'#tymethod.into_iter' class='fnname'>into_iter</a>(self) -&gt;
+Self::<a class="type" href=
 "../../../rayon/iter/plumbing/trait.Producer.html#associatedtype.IntoIter"
 title=
 "type rayon::iter::plumbing::Producer::IntoIter">IntoIter</a></code></h3>
@@ -242,9 +242,9 @@ title=
 <p>Convert <code>self</code> into an iterator; at this point, no
 more parallel splits are possible.</p>
 </div>
-<h3 id='tymethod.split_at' class='method'><code id='split_at.v'>fn
-<a href='#tymethod.split_at' class='fnname'>split_at</a>(self,
-index: <a class="primitive" href=
+<h3 id='tymethod.split_at' class='method'><code>fn <a href=
+'#tymethod.split_at' class='fnname'>split_at</a>(self, index:
+<a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>)
 -&gt; <a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a>Self,
@@ -260,9 +260,9 @@ be less than or equal to <code>N</code>.</p>
 <h2 id='provided-methods' class='small-section-header'>Provided
 methods<a href='#provided-methods' class='anchor'></a></h2>
 <div class='methods'>
-<h3 id='method.min_len' class='method'><code id='min_len.v'>fn
-<a href='#method.min_len' class='fnname'>min_len</a>(&amp;self)
--&gt; <a class="primitive" href=
+<h3 id='method.min_len' class='method'><code>fn <a href=
+'#method.min_len' class='fnname'>min_len</a>(&amp;self) -&gt;
+<a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code></h3>
 <div class='docblock'>
 <p>The minimum number of items that we will process sequentially.
@@ -274,9 +274,9 @@ granularity. Note that Rayon automatically normally attempts to
 adjust the size of parallel splits to reduce overhead, so this
 should not be needed.</p>
 </div>
-<h3 id='method.max_len' class='method'><code id='max_len.v'>fn
-<a href='#method.max_len' class='fnname'>max_len</a>(&amp;self)
--&gt; <a class="primitive" href=
+<h3 id='method.max_len' class='method'><code>fn <a href=
+'#method.max_len' class='fnname'>max_len</a>(&amp;self) -&gt;
+<a class="primitive" href=
 "https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code></h3>
 <div class='docblock'>
 <p>The maximum number of items that we will process sequentially.
@@ -288,10 +288,9 @@ that Rayon automatically normally attempts to adjust the size of
 parallel splits to reduce overhead, so this should not be
 needed.</p>
 </div>
-<h3 id='method.fold_with' class='method'><code id='fold_with.v'>fn
-<a href='#method.fold_with' class=
-'fnname'>fold_with</a>&lt;F&gt;(self, folder: F) -&gt; F
-<span class="where fmt-newline">where<br>
+<h3 id='method.fold_with' class='method'><code>fn <a href=
+'#method.fold_with' class='fnname'>fold_with</a>&lt;F&gt;(self,
+folder: F) -&gt; F <span class="where fmt-newline">where<br>
 &nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href=
 "../../../rayon/iter/plumbing/trait.Folder.html" title=
 "trait rayon::iter::plumbing::Folder">Folder</a>&lt;Self::<a class=
