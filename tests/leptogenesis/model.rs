@@ -26,10 +26,10 @@ pub struct LeptogenesisModel {
     pub yv: Array2<Complex<f64>>,
     pub mn: Array1<f64>,
     #[cfg(feature = "parallel")]
-    #[serde(skip)]
+    #[cfg_attr(feature = "serde", serde(skip))]
     pub interactions: Vec<Box<dyn Interaction<Self> + Sync>>,
     #[cfg(not(feature = "parallel"))]
-    #[serde(skip)]
+    #[cfg_attr(feature = "serde", serde(skip))]
     pub interactions: Vec<Box<dyn Interaction<Self>>>,
 }
 
