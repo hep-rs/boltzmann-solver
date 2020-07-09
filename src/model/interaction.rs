@@ -200,13 +200,13 @@ where
     /// `None` when `self.gamma_enabled() == true`.
     fn gamma(&self, c: &Context<M>) -> Option<f64>;
 
-    /// Asymmetry between the interaction and its \\(\mathcal{CP}\\) conjugate:
+    /// Asymmetry between the interaction and its `$\CP$` conjugate:
     ///
-    /// \\begin{equation}
-    ///   \delta\gamma
-    ///     \defeq \gamma(\vt a \to \vt b) - \gamma(\overline{\vt a} \to \overline{\vt b})
-    ///     = \gamma(\vt a \to \vt b) - \gamma(\vt b \to \vt a)
-    /// \\end{equation}
+    /// ```math
+    /// \delta\gamma
+    ///   \defeq \gamma(\vt a \to \vt b) - \gamma(\overline{\vt a} \to \overline{\vt b})
+    ///   = \gamma(\vt a \to \vt b) - \gamma(\vt b \to \vt a)
+    /// ```
     ///
     /// If there is no (relevant) asymmetry, then this should return `None`.
     ///
