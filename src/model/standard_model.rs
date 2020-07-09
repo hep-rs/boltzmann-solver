@@ -11,7 +11,7 @@ use std::{f64, f64::consts::SQRT_2};
 // #[derive(Debug)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct StandardModel {
-    /// Inverse temperature in \\(GeV^{-1}\\)
+    /// Inverse temperature in GeV`$^{-1}$`
     pub beta: f64,
 
     /// Particles

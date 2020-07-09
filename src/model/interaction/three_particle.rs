@@ -21,7 +21,7 @@ pub struct ThreeParticle<M> {
     particles_sign: InteractionParticleSigns,
     /// Squared amplitude as a function of the model.
     squared_amplitude: Box<dyn Fn(&M) -> f64 + Sync>,
-    /// Asymmetry between the amplitude and its \\(\mathcal{CP}\\) conjugate.
+    /// Asymmetry between the amplitude and its `$\CP$` conjugate.
     asymmetry: Option<Box<dyn Fn(&M) -> f64 + Sync>>,
     gamma_enabled: bool,
     width_enabled: bool,
@@ -40,8 +40,8 @@ where
     /// Particle are indicated by positive integers and the corresponding
     /// antiparticles are indicated by negative integers.
     ///
-    /// If the process differs from its CP-conjugate process, the asymmetry can
-    /// be specified with [`ThreeParticle::asymmetry`].
+    /// If the process differs from its `$\CP$`-conjugate process, the asymmetry
+    /// can be specified with [`ThreeParticle::asymmetry`].
     pub fn new<F>(squared_amplitude: F, p1: isize, p2: isize, p3: isize) -> Self
     where
         F: Fn(&M) -> f64 + Sync + 'static,
@@ -68,9 +68,9 @@ where
     ///
     /// The interactions are all related through crossing symmetry:
     ///
-    /// - \\(p_1 \leftrightarrow p_2 p_3\\),
-    /// - \\(\overline{p_2} \leftrightarrow \overline{p_1} p_3\\), and
-    /// - \\(\overline{p_3} \leftrightarrow \overline{p_1} p_2\\).
+    /// - `$p_1 \leftrightarrow p_2 p_3$`,
+    /// - `$\overline{p_2} \leftrightarrow \overline{p_1} p_3$`, and
+    /// - `$\overline{p_3} \leftrightarrow \overline{p_1} p_2$`.
     pub fn new_all<F>(squared_amplitude: F, p1: isize, p2: isize, p3: isize) -> Vec<Self>
     where
         F: Fn(&M) -> f64 + Sync + Copy + 'static,
@@ -88,16 +88,16 @@ where
         v
     }
 
-    /// Specify the asymmetry between this process and its CP-conjugate.
+    /// Specify the asymmetry between this process and its `$\CP$`-conjugate.
     ///
     /// This asymmetry is specified in terms of the asymmetry in the squared
     /// amplitudes:
     ///
-    /// \\begin{equation}
-    ///   \delta \abs{\mathcal{M}}^2
-    ///     \defeq \abs{\mathcal{M}(p_1 \to p_2 p_3)}^2 - \abs{\mathcal{M}(\overline{p_1} \to \overline{p_2} \overline{p_3})}^2
-    ///     = \abs{\mathcal{M}(p_1 \to p_2 p_3)}^2 - \abs{\mathcal{M}(p_2 p_3 \to p_1)}^2
-    /// \\end{equation}
+    /// ```math
+    /// \delta \abs{\mathcal{M}}^2
+    ///   \defeq \abs{\mathcal{M}(p_1 \to p_2 p_3)}^2 - \abs{\mathcal{M}(\overline{p_1} \to \overline{p_2} \overline{p_3})}^2
+    ///   = \abs{\mathcal{M}(p_1 \to p_2 p_3)}^2 - \abs{\mathcal{M}(p_2 p_3 \to p_1)}^2
+    /// ```
     ///
     /// This asymmetry is subsequently used to compute the asymmetry in the
     /// interaction rate given by [`Interaction::asymmetry`].
@@ -214,14 +214,14 @@ where
     ///    normalized equilibrium number density of the particle such that
     ///    multiplying the result by the equilibrium number density will yield
     ///    the correct interaction density).  This is done in order to avoid a
-    ///    `0 / 0` division as the reaction rate is propoertional \\(K_1(m
-    ///    \beta)\\), while the number density of the decaying particle
-    ///    proportional to \\(K_2(m \beta)\\), and the ratio of Bessel function
+    ///    `0 / 0` division as the reaction rate is propoertional `$K_1(m
+    ///    \beta)$`, while the number density of the decaying particle
+    ///    proportional to `$K_2(m \beta)$`, and the ratio of Bessel function
     ///    tends to 1 (while each individually tends to 0 very quickly).
     /// 2. Otherwise, calculate the usual reaction rate.
     ///
     /// Note that in order to obtain the analytical normalized equilibrium
-    /// density, we must assume that \\(m \beta \gg 1 \\) so that the number
+    /// density, we must assume that `$m \beta \gg 1 $` so that the number
     /// density approximates a Maxwell--Boltzmann distribution (irrespective of
     /// the original statistic), hence why we must use a threshold to switch
     /// between the two methods.

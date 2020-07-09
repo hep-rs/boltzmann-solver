@@ -20,11 +20,11 @@ use std::{f64, fmt};
 
 /// Equilibrium number density for massless bosons, normalized to the
 /// equilibrium number density of a massless boson.  This is specified per
-/// degree of freedom (that is \\(g = 1\\)).
+/// degree of freedom (that is `$g = 1$`).
 pub const BOSON_EQ_DENSITY: f64 = 1.0;
 /// Equilibrium number density for massless fermions, normalized to the
 /// equilibrium number density of a massless boson.  This is specified per
-/// degree of freedom (that is \\(g = 1\\))
+/// degree of freedom (that is `$g = 1$`)
 pub const FERMION_EQ_DENSITY: f64 = 0.75;
 
 /// The statistics which describe the distribution of particles over energy
@@ -35,27 +35,27 @@ pub const FERMION_EQ_DENSITY: f64 = 0.75;
 pub enum Statistic {
     /// Fermi–Dirac statistic describing half-integer-spin particles:
     ///
-    /// \\begin{equation}
-    ///   f_{\textsc{FD}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.
-    /// \\end{equation}
+    /// ```math
+    /// f_{\textsc{FD}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.
+    /// ```
     FermiDirac,
     /// Bose–Einstein statistic describing integer-spin particles:
     ///
-    /// \\begin{equation}
-    ///   f_{\textsc{BE}} = \frac{1}{\exp[(E - \mu) \beta] - 1}.
-    /// \\end{equation}
+    /// ```math
+    /// f_{\textsc{BE}} = \frac{1}{\exp[(E - \mu) \beta] - 1}.
+    /// ```
     BoseEinstein,
     /// Maxwell–Boltzmann statistic describing classical particles:
     ///
-    /// \\begin{equation}
-    ///   f_{\textsc{MB}} = \exp[-(E - \mu) \beta].
-    /// \\end{equation}
+    /// ```math
+    /// f_{\textsc{MB}} = \exp[-(E - \mu) \beta].
+    /// ```
     MaxwellBoltzmann,
     /// Maxwell–Jüttner statistic describing relativistic classical particles:
     ///
-    /// \\begin{equation}
-    ///   f_{\textsc{MJ}} = \frac{E \beta \sqrt{E^2 - m^2}}{m K_2(m \beta)} \exp[- E \beta].
-    /// \\end{equation}
+    /// ```math
+    /// f_{\textsc{MJ}} = \frac{E \beta \sqrt{E^2 - m^2}}{m K_2(m \beta)} \exp[- E \beta].
+    /// ```
     MaxwellJuttner,
 }
 
@@ -78,9 +78,9 @@ pub trait Statistics {
 
     /// Return number density for a particle following the specified statistic.
     ///
-    /// \\begin{equation}
-    ///    n = \frac{1}{2 \pi^2} \int_{m}^{\infty} f_{i} u \sqrt{u^2 - m^2} \dd u.
-    /// \\end{equation}
+    /// ```math
+    /// n = \frac{1}{2 \pi^2} \int_{m}^{\infty} f_{i} u \sqrt{u^2 - m^2} \dd u.
+    /// ```
     ///
     /// The naïve implementation will perform a numerical integration.
     ///
@@ -118,9 +118,9 @@ pub trait Statistics {
     /// Return number density for a massless particle following the specified
     /// statistic.
     ///
-    /// \\begin{equation}
-    ///    n = \frac{1}{2 \pi^2} \int_{0}^{\infty} f_{i} u^2 \dd u
-    /// \\end{equation}
+    /// ```math
+    /// n = \frac{1}{2 \pi^2} \int_{0}^{\infty} f_{i} u^2 \dd u
+    /// ```
     ///
     /// The naïve implementation simply calls [`Statistics::number_density`]
     /// setting `mass = 0.0` and then uses numerical integration.
@@ -135,7 +135,7 @@ pub trait Statistics {
 }
 
 impl Statistics for Statistic {
-    /// Evaluate the phase space distribution, \\(f\\) as defined above for the
+    /// Evaluate the phase space distribution, `$f$` as defined above for the
     /// four statistics.
     fn phase_space(&self, e: f64, m: f64, mu: f64, beta: f64) -> f64 {
         match *self {
@@ -166,9 +166,9 @@ impl Statistics for Statistic {
 
     /// Return number density for a particle following the specified statistic.
     ///
-    /// \\begin{equation}
-    ///    n = \frac{1}{2 \pi^2} \int_{m}^{\infty} f_{i} u \sqrt{u^2 - m^2} \dd u
-    /// \\end{equation}
+    /// ```math
+    /// n = \frac{1}{2 \pi^2} \int_{m}^{\infty} f_{i} u \sqrt{u^2 - m^2} \dd u
+    /// ```
     ///
     /// # Implementation Details
     ///
@@ -295,9 +295,9 @@ impl Statistics for Statistic {
     /// Return number density for a massless particle following the specified
     /// statistic.
     ///
-    /// \\begin{equation}
-    ///    n = \frac{1}{2 \pi^2} \int_{0}^{\infty} f_{i} u^2 \dd u
-    /// \\end{equation}
+    /// ```math
+    /// n = \frac{1}{2 \pi^2} \int_{0}^{\infty} f_{i} u^2 \dd u
+    /// ```
     ///
     /// # Implementation Details
     ///

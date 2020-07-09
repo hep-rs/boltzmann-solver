@@ -21,16 +21,16 @@ use std::{collections::HashMap, iter};
 
 /// Contains all the information relevant to a particular model, including
 /// masses, widths and couplings.  All these attributes can be dependent on the
-/// inverse temperature \\(\beta\\).
+/// inverse temperature `$\beta$`.
 pub trait Model
 where
     Self: Sized,
 {
-    /// Instantiate a new instance of the model at 0 temperature (\\(\beta =
-    /// \infty\\)).
+    /// Instantiate a new instance of the model at 0 temperature (`$\beta =
+    /// \infty$`).
     ///
     /// This is implemented separately so that the computational peculiarities
-    /// of dealing with \\(\beta = \infty\\) can be avoided.
+    /// of dealing with `$\beta = \infty$` can be avoided.
     fn zero() -> Self;
 
     /// Update the model to be valid at the given inverse temperature `beta`.
@@ -52,9 +52,9 @@ where
     /// The default implementation assumes the Universe to be radiation
     /// dominated such that
     ///
-    /// \\begin{equation}
-    ///    H(\beta) = \sqrt{\frac{\pi^2}{90}} g_{*}^{1/2}(\beta) \frac{1}{m_{\text{Pl}}} \frac{1}{\beta^2}.
-    /// \\end{equation}
+    /// ```math
+    /// H(\beta) = \sqrt{\frac{\pi^2}{90}} g_{*}^{1/2}(\beta) \frac{1}{m_{\text{Pl}}} \frac{1}{\beta^2}.
+    /// ```
     ///
     /// Which is valid provided that the entropy density of the Universe does
     /// not change too rapidly.
@@ -63,7 +63,7 @@ where
     ///
     /// The dominated epoch in the Standard Model of cosmology ends at the
     /// matter–radiation equality, which occurs at an inverse temperature of
-    /// \\(\beta \approx 10^{8}\\) GeV^{-1}.
+    /// `$\beta \approx 10^{8}$` GeV^{-1}.
     fn hubble_rate(&self, beta: f64) -> f64 {
         debug_assert_warn!(
             beta > 1e8,

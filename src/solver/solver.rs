@@ -272,24 +272,24 @@ impl<M> SolverBuilder<M> {
 
     /// Specify how large or small the step size is allowed to become.
     ///
-    /// The evolution of number densities are discretized in steps of \\(h\\)
-    /// such that \\(\beta_{i+1} = \beta_{i} + h\\).  The algorithm will
-    /// determine automatically the optimal step size \\(h\\) such that the
-    /// error is deemed acceptable; however, one may wish to override this to
-    /// prevent step sizes which are either too large or too small.
+    /// The evolution of number densities are discretized in steps of `$h$` such
+    /// that `$\beta_{i+1} = \beta_{i} + h$`.  The algorithm will determine
+    /// automatically the optimal step size `$h$` such that the error is deemed
+    /// acceptable; however, one may wish to override this to prevent step sizes
+    /// which are either too large or too small.
     ///
-    /// The step precision sets the range of allowed values of \\(h\\) in
-    /// proportion to the current value of \\(\beta\\):
-    /// \\begin{equation}
-    ///   p_\text{min} \beta < h < p_\text{max} \beta
-    /// \\end{equation}
+    /// The step precision sets the range of allowed values of `$h$` in
+    /// proportion to the current value of `$\beta$`:
+    /// ```math
+    /// p_\text{min} \beta < h < p_\text{max} \beta
+    /// ```
     ///
     /// The default values are `min = 1e-10` and `max = 1.0`.
     ///
     /// The relative step precision has a higher priority on the step size than
     /// the error.  That is, the step size will never be less than
-    /// \\(p_\text{min} \beta\\) even if this results in a larger local error
-    /// than desired.
+    /// `$p_\text{min} \beta$` even if this results in a larger local error than
+    /// desired.
     ///
     /// # Panic
     ///

@@ -1,30 +1,31 @@
 //! # Butcher tableaux
 //!
 //! A Butcher tableau is as described at
-//! https://en.wikipedia.org/wiki/Butcher_tableau.  Specifically, given
-//! \\(y_n\\), the estimate for \\(y_{n+1}\\) is:
+//! https://en.wikipedia.org/wiki/Butcher_tableau.  Specifically, given `$y_n$`,
+//! the estimate for `$y_{n+1}$` is:
 //!
-//! \\begin{equation}
-//!   y_{n+1} = y_n + \sum_{i = 1}^{s} b_i k_i
-//! \\end{equation}
+//! ```math
+//! y_{n+1} = y_n + \sum_{i = 1}^{s} b_i k_i
+//! ```
 //!
 //! where
 //!
-//! \\begin{align}
-//!   k_1 &= h f(t_n, y_n), \\\\
-//!   k_i &= h f\left(t_n + c_i h, y_n + \sum_{j=1}^{i-1} a_{ij} k_j \right),
-//! \\end{align}
+//! ```math
+//! \\begin{aligned}
+//!   k_1 &= h f(t_n, y_n), \\
+//!   k_i &= h f \left(t_n + c_i h, y_n + \sum_{j=1}^{i-1} a_{ij} k_j \right),
+//! \\end{aligned}
+//! ```
 //!
 //! and he local error is given by
 //!
-//! \\begin{equation}
-//!   e = \sum_{i = 1}^{s} e_i k_i.
-//! \\end{equation}
+//! ```math
+//! e = \sum_{i = 1}^{s} e_i k_i.
+//! ```
 //!
-//! Each \\(a_{ij}\\), \\(b_i\\) and \\(c_i\\) are specified by the Butcher
-//! tableau, and \\(e_i = b_i - \hat b_i\\).  Note that although the above
-//! notation uses 1-indexing, the parameters are defined in the submodules using
-//! 0-indexing.
+//! Each `$a_{ij}$`, `$b_i$` and `$c_i$` are specified by the Butcher tableau,
+//! and `$e_i = b_i - \hat b_i$`.  Note that although the above notation uses
+//! 1-indexing, the parameters are defined in the submodules using 0-indexing.
 
 pub mod rk21;
 pub mod rk32;

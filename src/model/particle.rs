@@ -134,7 +134,7 @@ impl Particle {
     /// Specify how many internal degrees of freedom this particle has.
     ///
     /// This is a multiplicative factor to the degrees of freedom.  For a
-    /// 'pseudo' particle such as \\(B-L\\), this should be set to zero.
+    /// 'pseudo' particle such as `$B-L$`, this should be set to zero.
     ///
     /// This function returns self and should be used in constructors.
     #[must_use]
@@ -178,13 +178,13 @@ impl Particle {
     ///
     /// The general formula is:
     ///
-    /// \\begin{equation}
-    ///   N_\text{int} \times N_\text{spin} \times N_\text{complex}
-    /// \\end{equation}
+    /// ```math
+    /// N_\text{int} \times N_\text{spin} \times N_\text{complex}
+    /// ```
     ///
-    /// where \\(N_\text{int}\\) are the internal degrees of freedom,
-    /// \\(N_\text{spin}\\) are the spin degrees of freedom, and
-    /// \\(N_\text{complex}\\) are the degrees of freedom for complex particle.
+    /// where `$N_\text{int}$` are the internal degrees of freedom,
+    /// `$N_\text{spin}$` are the spin degrees of freedom, and
+    /// `$N_\text{complex}$` are the degrees of freedom for complex particle.
     ///
     /// The spin degrees of freedom are:
     /// - spin-0: 1
@@ -194,8 +194,8 @@ impl Particle {
     /// - spin-2: 2 for massless, 5 for massive
     ///
     /// or more generally, for half-integer spins `n/2`, the degrees of freedom
-    /// is `n + 1`; and for integer spin `n > 0`, the degrees of freedom are `2` for
-    /// massless or `2n + 1` for massive.
+    /// is `n + 1`; and for integer spin `n > 0`, the degrees of freedom are `2`
+    /// for massless or `2n + 1` for massive.
     #[must_use]
     pub fn degrees_of_freedom(&self) -> f64 {
         let dof = self.dof * if self.complex { 2.0 } else { 1.0 };

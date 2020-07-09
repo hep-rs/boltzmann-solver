@@ -39,11 +39,11 @@ impl<M> FourParticle<M> {
     ///
     /// The squared amplitude is defined of the form
     ///
-    /// \\begin{equation}
-    ///   \abs{\mathcal{M}(p_1 p_2 \leftrightarrow p_3 p_4)}^2(s, t, u)
-    /// \\end{equation}
+    /// ```math
+    /// \abs{\mathcal{M}(p_1 p_2 \leftrightarrow p_3 p_4)}^2(s, t, u)
+    /// ```
     ///
-    /// where \\(s\\), \\(t\\) and \\(u\\) are the usual Mandelstam variables.
+    /// where `$s$`, `$t$` and `$u$` are the usual Mandelstam variables.
     /// Crossing symmetry is then used in order to compute the other processes.
     ///
     /// The three-body decays are not currently computed.
@@ -76,18 +76,21 @@ impl<M> FourParticle<M> {
     /// This functions creates all three possible interactions from the same
     /// underlying squared amplitude, related through crossing symmetry:
     ///
-    /// \\begin{equation} \\begin{aligned} p_1 p_2 \leftrightarrow p_3 p_4, \\\\
+    /// ```math
+    /// \\begin{aligned}
+    ///   p_1 p_2 \leftrightarrow p_3 p_4, \\\\
     ///   p_1 \overline{p_3} \leftrightarrow \overline{p_2} p_4, \\\\
     ///   p_1 \overline{p_4} \leftrightarrow \overline{p_2} p_3. \\\\
-    /// \\end{aligned} \\end{equation}
+    /// \\end{aligned}
+    /// ```
     ///
     /// The squared amplitude is defined of the form:
     ///
-    /// \\begin{equation}
-    ///    \abs{\mathcal{M}(p_1 p_2 \leftrightarrow p_3 p_4)}^2(s, t, u)
-    /// \\end{equation}
+    /// ```math
+    /// \abs{\mathcal{M}(p_1 p_2 \leftrightarrow p_3 p_4)}^2(s, t, u)
+    /// ```
     ///
-    /// where \\(s\\), \\(t\\) and \\(u\\) are the usual Mandelstam variables.
+    /// where `$s$`, `$t$` and `$u$` are the usual Mandelstam variables.
     /// Crossing symmetry is then used in order to compute the other processes.
     pub fn new_all<F>(squared_amplitude: F, p1: isize, p2: isize, p3: isize, p4: isize) -> Vec<Self>
     where
@@ -119,16 +122,16 @@ impl<M> FourParticle<M> {
         v
     }
 
-    /// Specify the asymmetry between this process and its CP-conjugate.
+    /// Specify the asymmetry between this process and its `$\CP$`-conjugate.
     ///
     /// This asymmetry is specified in terms of the asymmetry in the squared
     /// amplitudes:
     ///
-    /// \\begin{equation}
-    ///   \delta \abs{\mathcal{M}}^2
-    ///     \defeq \abs{\mathcal{M}(p_1 p_2 \to p_3 p_4)}^2 - \abs{\mathcal{M}(\overline{p_1} \overline{p_2} \to \overline{p_3} \overline{p_4})}^2
-    ///     = \abs{\mathcal{M}(p_1 p_2 \to p_3 p_4)}^2 - \abs{\mathcal{M}(p_3 p_4 \to p_1 p_2)}^2
-    /// \\end{equation}
+    /// ```math
+    /// \delta \abs{\mathcal{M}}^2
+    ///   \defeq \abs{\mathcal{M}(p_1 p_2 \to p_3 p_4)}^2 - \abs{\mathcal{M}(\overline{p_1} \overline{p_2} \to \overline{p_3} \overline{p_4})}^2
+    ///   = \abs{\mathcal{M}(p_1 p_2 \to p_3 p_4)}^2 - \abs{\mathcal{M}(p_3 p_4 \to p_1 p_2)}^2
+    /// ```
     ///
     /// This asymmetry is subsequently used to compute the asymmetry in the
     /// interaction rate given by [`Interaction::asymmetry`].

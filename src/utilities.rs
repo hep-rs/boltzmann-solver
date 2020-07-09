@@ -15,18 +15,22 @@ pub use special_functions::particle_physics::{kallen_lambda, kallen_lambda_sqrt}
 
 const INTEGRATION_PRECISION: f64 = 1e-10;
 
-/// Return the minimum and maximum value of the Mandelstam variable \\(t\\)
-/// based on the four particle **squared** masses \\(m_1^2\\), \\(m_2^2\\),
-/// \\(m_3^2\\) and \\(m_4^2\\), where particles 1 and 2 are initial state and
-/// particles 3 and 4 are the final state particles.
+/// Return the minimum and maximum value of the Mandelstam variable `$t$` based
+/// on the four particle **squared** masses `$m_1^2$`, `$m_2^2$`, `$m_3^2$` and
+/// `$m_4^2$`, where particles 1 and 2 are initial state and particles 3 and 4
+/// are the final state particles.
 ///
 /// Explicitly, the values are:
 ///
-/// \\begin{equation}\\begin{aligned}
-///   t_{\text{min}} &= \frac{(m_1^2 - m_2^2 - m_3^3 + m_4^4)^2}{4 s}
-///       - \frac{\lambda^{\frac{1}{2}}(s, m_1^2, m_2^2) \lambda^{\frac{1}{2}}(s, m_3^2, m_4^2)}{s} \\\\
-///   t_{\text{max}} &= \frac{(m_1^2 - m_2^2 - m_3^3 + m_4^4)^2}{4 s}
-/// \\end{aligned}\\end{equation}
+/// ```math
+/// \begin{aligned}
+///   t_{\text{min}}
+///   &= \frac{(m_1^2 - m_2^2 - m_3^3 + m_4^4)^2}{4 s}
+///    - \frac{\lambda^{\frac{1}{2}}(s, m_1^2, m_2^2) \lambda^{\frac{1}{2}}(s, m_3^2, m_4^2)}{s} \\\\
+/// t_{\text{max}}
+///   &= \frac{(m_1^2 - m_2^2 - m_3^3 + m_4^4)^2}{4 s}
+/// \end{aligned}
+/// ```
 #[must_use]
 pub fn t_range(s: f64, m1: f64, m2: f64, m3: f64, m4: f64) -> (f64, f64) {
     debug_assert!(
@@ -48,17 +52,17 @@ pub fn t_range(s: f64, m1: f64, m2: f64, m3: f64, m4: f64) -> (f64, f64) {
     (baseline - delta, baseline)
 }
 
-/// Integrate the amplitude with respect to the Mandelstam variable \\(s\\) and
-/// \\(t\\):
+/// Integrate the amplitude with respect to the Mandelstam variable `$s$` and
+/// `$t$`:
 ///
-/// \\begin{equation}
-///   \int_{s_\text{min}}^{\infty} \int_{t_\text{min}}^{t_\text{max}}
-///       \abs{\mathcal{M}(s, t)}^2 \frac{K_1(\sqrt{s} \beta)}{\sqrt{s}}
-///   \dd t \dd s
-/// \\end{equation}
+/// ```math
+/// \int_{s_\text{min}}^{\infty} \int_{t_\text{min}}^{t_\text{max}}
+///     \abs{\mathcal{M}(s, t)}^2 \frac{K_1(\sqrt{s} \beta)}{\sqrt{s}}
+/// \dd t \dd s
+/// ```
 ///
-/// where \\(s_\text{min} = \mathop{\text{max}}(m_1^2 + m_2^2, m_3^2 + m_4^2)\\)
-/// and \\(t_{\text{min},\text{max}}\\) are determined from [`t_range`].
+/// where `$s_\text{min} = \mathop{\text{max}}(m_1^2 + m_2^2, m_3^2 + m_4^2)$`
+/// and `$t_{\text{min},\text{max}}$` are determined from [`t_range`].
 ///
 /// The squared masses should be given.
 #[must_use]

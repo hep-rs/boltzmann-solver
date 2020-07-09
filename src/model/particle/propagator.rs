@@ -102,19 +102,20 @@ impl<'a, 'b, 'x, 'y> ops::Mul<&'y SinglePropagator<'b>> for &'x SinglePropagator
 /// This is defined to correctly handle real intermediate states.  Specifically,
 /// the propagator is defined such that
 ///
-/// \\begin{equation}
-///   P_{i}^*(s) P_{j}(s) = \begin{cases}
-///     \frac{(s - m_i^2)^2 - (m_i \Gamma_i)^2}
-///          {[(s - m_i^2)^2 + (m_i \Gamma_i)^2]^2} & i = j \\
-///     P_i^*(s) P_j(s) & i \neq j
-///   \end{cases}
-/// \\end{equation}
+/// ```math
+/// P_{i}^*(s) P_{j}(s)
+/// = \begin{cases}
+///   \frac{(s - m_i^2)^2 - (m_i \Gamma_i)^2}
+///        {[(s - m_i^2)^2 + (m_i \Gamma_i)^2]^2} & i = j \\
+///   P_i^*(s) P_j(s) & i \neq j
+/// \end{cases}
+/// ```
 ///
 /// where
 ///
-/// \\begin{equation}
-///    P_{i}^{-1}(s) \defeq s - m_i^2 + i \theta(s) m_i \Gamma_i.
-/// \\end{equation}
+/// ```math
+/// P_{i}^{-1}(s) \defeq s - m_i^2 + i \theta(s) m_i \Gamma_i.
+/// ```
 ///
 /// When implementing this, it is always expected that it will be multiplied by
 /// complex conjugated propagator at which point the `Propagator` type will
@@ -158,9 +159,9 @@ impl<'a> Propagator<'a> {
 
     /// Propagator denominator for this particle:
     ///
-    /// \\begin{equation}
-    ///    P_{i}^{-1}(s) \defeq s - m_i^2 + i \theta(s) m_i \Gamma_i.
-    /// \\end{equation}
+    /// ```math
+    /// P_{i}^{-1}(s) \defeq s - m_i^2 + i \theta(s) m_i \Gamma_i.
+    /// ```
     #[must_use]
     pub fn eval(&self) -> Complex<f64> {
         self.propagators.iter().map(SinglePropagator::eval).sum()

@@ -265,16 +265,16 @@ pub fn rec_geomspace(start: f64, end: f64, recursions: u32) -> Vec<f64> {
 ///
 /// The resulting vector will have values in the following order:
 ///
-/// \\begin{equation}
-///   \left[
-///     a,
-///     b,
-///     \frac{a + b}{2},
-///     \frac{3a + b}{4}, \frac{a + 3b}{4},
-///     \frac{7a + b}{8}, \frac{5a + 3b}{8}, \frac{3a + 5b}{8}, \frac{a + 8b}{8},
-///     \dots
-///   \right]
-/// \\end{equation}
+/// ```math
+/// \left[
+///   a,
+///   b,
+///   \frac{a + b}{2},
+///   \frac{3a + b}{4}, \frac{a + 3b}{4},
+///   \frac{7a + b}{8}, \frac{5a + 3b}{8}, \frac{3a + 5b}{8}, \frac{a + 8b}{8},
+///   \dots
+/// \right]
+/// ```
 ///
 /// The number of recursions is determined by `recursions`.
 #[must_use]

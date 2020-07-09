@@ -34,22 +34,22 @@ pub const MASS_TO: f64 = 172.76;
 /// Higgs boson VEV
 pub const VEV: f64 = 246.22;
 
-/// CKM Wolfenstain \\(A\\) parameter
+/// CKM Wolfenstain `$A$` parameter
 pub const CKM_A: f64 = 0.8235;
-/// CKM Wolfenstain \\(\lambda\\) parameter
+/// CKM Wolfenstain `$\lambda$` parameter
 pub const CKM_LAMBDA: f64 = 0.224_837;
-/// CKM Wolfenstain \\(\overline\rho\\) parameter
+/// CKM Wolfenstain `$\overline\rho$` parameter
 pub const CKM_RHO: f64 = 0.1569;
-/// CKM Wolfenstain \\(\overline\eta\\) parameter
+/// CKM Wolfenstain `$\overline\eta$` parameter
 pub const CKM_ETA: f64 = 0.3499;
 
-/// Value of \\(g_{*}\\) for the Standard Model.
+/// Value of `$g_{*}$` for the Standard Model.
 ///
 /// The first column is the log-transformed inverse temperature,
-/// \\(\ln(\beta)\\), where \\(\beta\\) is in units of inverse
+/// `$\ln(\beta)$`, where `$\beta$` is in units of inverse
 /// gigaelectronvolts.
 ///
-/// The second column is the value of \\(g_{*}\\).
+/// The second column is the value of `$g_{*}$`.
 ///
 /// Data is sourced from [`arXiv:1609.049_79`](https://arxiv.org/abs/1609.049_79).
 #[allow(clippy::approx_constant)]
@@ -95,13 +95,13 @@ pub(crate) const STANDARD_MODEL_GSTAR: ConstCubicHermiteSpline = ConstCubicHermi
     ],
 };
 
-/// Value of \\(g_{*}\\) for a fermion.
+/// Value of `$g_{*}$` for a fermion.
 ///
 /// The first column is the log-transformed inverse temperature scaled to the
-/// fermion's mass: \\(\ln(m\beta)\\).
+/// fermion's mass: `$\ln(m\beta)$`.
 ///
-/// The second column is is log-transformed value of \\(g_{*}\\),
-/// \\(\log(g_{*})\\).
+/// The second column is is log-transformed value of `$g_{*}$`,
+/// `$\log(g_{*})$`.
 ///
 /// Data is sourced from [`arXiv:1609.049_79`](https://arxiv.org/abs/1609.049_79).
 #[allow(clippy::approx_constant)]
@@ -132,13 +132,13 @@ pub(crate) const FERMION_GSTAR: ConstCubicHermiteSpline = ConstCubicHermiteSplin
     ],
 };
 
-/// Value of \\(g_{*}\\) for a boson.
+/// Value of `$g_{*}$` for a boson.
 ///
 /// The first column is the log-transformed inverse temperature scaled to the
-/// fermion's mass: \\(\ln(m\beta)\\).
+/// fermion's mass: `$\ln(m\beta)$`.
 ///
-/// The second column is is log-transformed value of \\(g_{*}\\),
-/// \\(\log(g_{*})\\).
+/// The second column is is log-transformed value of `$g_{*}$`,
+/// `$\log(g_{*})$`.
 ///
 /// Data is sourced from [`arXiv:1609.049_79`](https://arxiv.org/abs/1609.049_79).
 #[allow(clippy::approx_constant)]
