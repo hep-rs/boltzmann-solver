@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use std::{f64, f64::consts::SQRT_2};
 
 /// The Standard Model of particle physics.
-// #[derive(Debug)]
+#[derive(Debug)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct StandardModel {
     /// Inverse temperature in GeV`$^{-1}$`
