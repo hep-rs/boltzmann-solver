@@ -1,79 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta name="generator" content=
-"HTML Tidy for HTML5 for Linux version 5.6.0">
-<meta charset="utf-8">
-<meta name="viewport" content=
-"width=device-width, initial-scale=1.0">
-<meta name="generator" content="rustdoc">
-<meta name="description" content=
-"Source to the Rust file `src/lib.rs`.">
-<meta name="keywords" content="rust, rustlang, rust-lang">
-<title>lib.rs.html -- source</title>
-<link rel="stylesheet" type="text/css" href="../../normalize.css">
-<link rel="stylesheet" type="text/css" href="../../rustdoc.css" id=
-"mainThemeStyle">
-<link rel="stylesheet" type="text/css" href="../../dark.css">
-<link rel="stylesheet" type="text/css" href="../../light.css" id=
-"themeStyle">
-<script src="../../storage.js"></script><noscript>
-<link rel="stylesheet" href="../../noscript.css"></noscript>
-<link rel="shortcut icon" href="../../favicon.ico">
-<style type="text/css">
-#crate-search{background-image:url("../../down-arrow.svg");}
-</style>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.11/dist/katex.min.css"
+  crossorigin="anonymous"
+/>
+<script
+  src="https://cdn.jsdelivr.net/npm/katex@0.11/dist/katex.min.js"
+  crossorigin="anonymous"
+></script>
 <script>
-  MathJax = {
-    tex: {
-      macros: {
-        dd: "{\\mathop{}\\!\\mathrm{d}}",
-        textsc: ["\\mathrm{\\scriptsize #1}", 1],
-        vt: ["\\boldsymbol{#1}", 1],
-        pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2],
-        ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2],
-        defeq: "\\mathrel{\\vcenter:}=",
-        abs: ["\\lvert #1 \\rvert", 1],
-        angles: ["\\langle #1 \\rangle", 1]
+  "use strict";
+  const macros = {
+    "\\vt": "\\boldsymbol{#1}",
+    "\\pfrac": "\\frac{\\partial{#1}}{\\partial{#2}}",
+    "\\dd": "\\mathop{}\\!\\mathrm{d}",
+    "\\ddfrac": "\\frac{\dd{#1}}{\dd{#2}}",
+    "\\defeq": "\\vcentcolon=",
+    "\\abs": "\\left\\lvert{#1}\\right\\rvert",
+    "\\CP": "\\mathcal{CP}",
+  };
+
+  // Display math is inputted in the documentation as:
+  //
+  // ```math
+  //   \int_0^1 x
+  // ```
+  //
+  // and in the HTML appears as
+  //
+  // ```html
+  // <pre><code class="language-math">...</code></pre>
+  // ```
+  document.addEventListener("DOMContentLoaded", function () {
+    // console.log("Replacing display maths");
+    const maths = document.getElementsByClassName("language-math");
+    for (let i = 0; i < maths.length; i++) {
+      const el = maths[i];
+      el.parentNode.replaceWith(el);
+      katex.render(el.innerText, el, { displayMode: true, macros: macros });
+    }
+  });
+
+  // Inline math is inputted in the documentation as `$...$` (with the
+  // backticks) and in the HTML appears as
+  //
+  // ```html
+  // <code>$...$</code>
+  // ```
+  document.addEventListener("DOMContentLoaded", function () {
+    // console.log("Replacing inline maths");
+    const maths = document.getElementsByTagName("code");
+    for (let i = 0; i < maths.length; i++) {
+      const el = maths[i];
+      console.log("Replacing element: " + el.innerText);
+      if (el.innerText.startsWith("$") && el.innerText.endsWith("$")) {
+        katex.render(el.innerText.substring(1, el.innerText.length - 1), el, {
+          macros: macros,
+        });
+        el.parentNode.insertBefore(el.firstChild, el);
+        el.remove();
+
+        // After being removed, the current index points to the next element.
+        i--;
       }
     }
-  };
+  });
 </script>
-<script
-  id="MathJax-script"
-  async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
-></script>
-</head>
-<body class="rustdoc source">
-<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
-<nav class="sidebar">
-<div class="sidebar-menu">☰</div>
-<a href='../../boltzmann_solver/index.html'>
-<div class='logo-container'><img src='../../rust-logo.png' alt=
-'logo'></div>
-</a></nav>
-<div class="theme-picker"><button id="theme-picker" aria-label=
-"Pick another theme!"><img src="../../brush.svg" width="18" alt=
-"Pick another theme!"></button>
-<div id="theme-choices"></div>
-</div>
-<script src="../../theme.js"></script>
-<nav class="sub">
-<form class="search-form">
-<div class="search-container">
-<div><select id="crate-search">
-<option value="All crates">All crates</option>
-</select><input class="search-input" name="search" disabled
-autocomplete="off" spellcheck="false" placeholder=
-"Click or press ‘S’ to search, ‘?’ for more options…" type=
-"search"></div>
-<a id="settings-menu" href="../../settings.html"><img src=
-"../../wheel.svg" width="18" alt="Change settings"></a></div>
-</form>
-</nav>
-<section id="main" class="content">
-<pre class="line-numbers"><span id="1">  1</span>
+
+<style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -236,299 +229,171 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="161">161</span>
 <span id="162">162</span>
 <span id="163">163</span>
-</pre>
-<div class="example-wrap">
-<pre class="rust">
+<span id="164">164</span>
+</pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Boltzmann-solver</span>
-<span class=
-"comment">// Copyright (C) 2020  JP-Ellis &lt;josh@jpells.me&gt;</span>
+<span class="comment">// Copyright (C) 2020  JP-Ellis &lt;josh@jpells.me&gt;</span>
 
-<span class=
-"comment">// This program is free software: you can redistribute it and/or modify it under</span>
-<span class=
-"comment">// the terms of the GNU General Public License as published by the Free Software</span>
-<span class=
-"comment">// Foundation, either version 3 of the License, or (at your option) any later</span>
+<span class="comment">// This program is free software: you can redistribute it and/or modify it under</span>
+<span class="comment">// the terms of the GNU General Public License as published by the Free Software</span>
+<span class="comment">// Foundation, either version 3 of the License, or (at your option) any later</span>
 <span class="comment">// version.</span>
 
-<span class=
-"comment">// This program is distributed in the hope that it will be useful, but WITHOUT</span>
-<span class=
-"comment">// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS</span>
-<span class=
-"comment">// FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more</span>
+<span class="comment">// This program is distributed in the hope that it will be useful, but WITHOUT</span>
+<span class="comment">// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS</span>
+<span class="comment">// FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more</span>
 <span class="comment">// details.</span>
 
-<span class=
-"comment">// You should have received a copy of the GNU General Public License along with</span>
-<span class=
-"comment">// this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
+<span class="comment">// You should have received a copy of the GNU General Public License along with</span>
+<span class="comment">// this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 
-<span class=
-"doccomment">//! `boltzmann-solver` is a library allowing for Boltzmann equation in the</span>
-<span class=
-"doccomment">//! context of particle physics / early cosmology.  It provides functionalities</span>
-<span class=
-"doccomment">//! to solve Boltzmann equation in the case where a single species is out of</span>
-<span class=
-"doccomment">//! equilibrium, as well as functionalities to solve the Boltzmann equations</span>
-<span class=
-"doccomment">//! more general when multiple species are all out of equilibrium.</span>
+<span class="doccomment">//! `boltzmann-solver` is a library allowing for Boltzmann equation in the</span>
+<span class="doccomment">//! context of particle physics / early cosmology.  It provides functionalities</span>
+<span class="doccomment">//! to solve Boltzmann equation in the case where a single species is out of</span>
+<span class="doccomment">//! equilibrium, as well as functionalities to solve the Boltzmann equations</span>
+<span class="doccomment">//! more general when multiple species are all out of equilibrium.</span>
 <span class="doccomment">//!</span>
-<span class=
-"doccomment">//! **This library is still undergoing development.**</span>
+<span class="doccomment">//! **This library is still undergoing development.**</span>
 <span class="doccomment">//!</span>
-<span class=
-"doccomment">//! [![crates.io](https://img.shields.io/crates/v/hep-boltmzann-solver.svg)](https://crates.io/crates/hep-boltzmann-solver)</span>
-<span class=
-"doccomment">//! [![crates.io](https://img.shields.io/crates/d/hep-boltmzann-solver.svg)](https://crates.io/crates/hep-boltmzann-solver)</span>
-<span class=
-"doccomment">//! [![Codecov branch](https://img.shields.io/codecov/c/github/hep-rs/boltzmann-solver/master)](https://codecov.io/gh/hep-rs/boltzmann-solver)</span>
-<span class=
-"doccomment">//! [![Build Status](https://img.shields.io/github/workflow/status/hep-rs/boltzmann-solver/Rust/master.svg)](https://github.com/hep-rs/boltzmann-solver/actions)</span>
+<span class="doccomment">//! [![crates.io](https://img.shields.io/crates/v/hep-boltmzann-solver.svg)](https://crates.io/crates/hep-boltzmann-solver)</span>
+<span class="doccomment">//! [![crates.io](https://img.shields.io/crates/d/hep-boltmzann-solver.svg)](https://crates.io/crates/hep-boltmzann-solver)</span>
+<span class="doccomment">//! [![Codecov</span>
+<span class="doccomment">//! branch](https://img.shields.io/codecov/c/github/hep-rs/boltzmann-solver/master)](https://codecov.io/gh/hep-rs/boltzmann-solver)</span>
+<span class="doccomment">//! [![Build</span>
+<span class="doccomment">//! Status](https://img.shields.io/github/workflow/status/hep-rs/boltzmann-solver/Rust/master.svg)](https://github.com/hep-rs/boltzmann-solver/actions)</span>
 <span class="doccomment">//!</span>
-<span class=
-"doccomment">//! Licensed under [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).</span>
-<span class="doccomment">//!</span>
-<span class=
-"doccomment">//! The documentation makes use of [MathJax](https://www.mathjax.org/) in order</span>
-<span class=
-"doccomment">//! to display mathematics.  A version of the documentation with MathJax</span>
-<span class=
-"doccomment">//! integrated is available [here](https://hep.rs/boltzmann-solver/boltzmann_solver).</span>
+<span class="doccomment">//! Licensed under [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Introduction</span>
 <span class="doccomment">//!</span>
-<span class=
-"doccomment">//! Within the context of cosmology, the Boltzmann equation is a differential</span>
-<span class=
-"doccomment">//! equation which describes the evolution of the phase-space distribution of a</span>
-<span class=
-"doccomment">//! species of particles.  In full generality, it is given by</span>
+<span class="doccomment">//! Within the context of cosmology, the Boltzmann equation is a differential</span>
+<span class="doccomment">//! equation which describes the evolution of the phase-space distribution of a</span>
+<span class="doccomment">//! species of particles.  In full generality, it is given by</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! \\begin{equation}</span>
-<span class="doccomment">//!   \vt L\[f\] = \vt C\[f\]</span>
-<span class="doccomment">//! \\end{equation}</span>
+<span class="doccomment">//! ```math</span>
+<span class="doccomment">//! \vt L[f] = \vt C[f]</span>
+<span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class=
-"doccomment">//! where \\(\vt L\\) is the Liouville operator and \\(\vt C\\) is the collision</span>
+<span class="doccomment">//! where `$\vt L$` is the Liouville operator and `$\vt C$` is the collision</span>
 <span class="doccomment">//! operator.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### Liouville Operator</span>
 <span class="doccomment">//!</span>
-<span class=
-"doccomment">//! In general, the phase space distribution dependent on position, momentum and</span>
-<span class=
-"doccomment">//! time \\(f(\vt x, \vt p, t)\\); however, assuming the early Universe to be</span>
-<span class=
-"doccomment">//! isotropic and homogeneous it can be expressed as a function of just energy</span>
-<span class=
-"doccomment">//! and time, \\(f(E, t)\\).  In the FLRW metric, the Liouville operator</span>
-<span class=
-"doccomment">//! simplifies to only be dependent the time-like derivatives:</span>
+<span class="doccomment">//! In general, the phase space distribution dependent on position, momentum and</span>
+<span class="doccomment">//! time `$f(\vt x, \vt p, t)$`; however, assuming the early Universe to be</span>
+<span class="doccomment">//! isotropic and homogeneous it can be expressed as a function of just energy</span>
+<span class="doccomment">//! and time, `$f(E, t)$`.  In the FLRW metric, the Liouville operator</span>
+<span class="doccomment">//! simplifies to only be dependent the time-like derivatives:</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! \\begin{equation}</span>
-<span class=
-"doccomment">//!   \vt L\[f\] \stackrel{\mathrm{\tiny FLRW}}{=} \left[ E \pfrac{}{t} - H (E^2 - m^2) \pfrac{}{E} \right] f,</span>
-<span class="doccomment">//! \\end{equation}</span>
+<span class="doccomment">//! ```math</span>
+<span class="doccomment">//! \vt L[f] \stackrel{\mathrm{\tiny FLRW}}{=}</span>
+<span class="doccomment">//! \left[ E \pfrac{}{t} - H (E^2 - m^2) \pfrac{}{E} \right] f,</span>
+<span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class=
-"doccomment">//! where \\(H \defeq \dot a / a\\) is Hubble's constant.  Unless there is a</span>
-<span class=
-"doccomment">//! sudden increase in entropy due to the out-of-equilibrium decay of a</span>
-<span class=
-"doccomment">//! particle, the entropy per comoving volume remains constant: \\(\dd(s a^3) =</span>
-<span class="doccomment">//! 0\\).  Furthermore,</span>
+<span class="doccomment">//! where `$H \defeq \dot a / a$` is Hubble&#39;s constant.  Unless there is a</span>
+<span class="doccomment">//! sudden increase in entropy due to the out-of-equilibrium decay of a</span>
+<span class="doccomment">//! particle, the entropy per comoving volume remains constant: `$\dd(s a^3) =</span>
+<span class="doccomment">//! 0$`.  Furthermore,</span>
 <span class="doccomment">//!</span>
-<span class=
-"doccomment">//! In the absence of any collisions, the Boltzmann equation ensures that the</span>
-<span class=
-"doccomment">//! phase space distribution is conserved.  This implies that after integrating</span>
-<span class=
-"doccomment">//! the phase space, the number density per comoving volume remains constant if</span>
-<span class=
-"doccomment">//! there are no collisions.  This is evident after integrating the Liouville</span>
+<span class="doccomment">//! In the absence of any collisions, the Boltzmann equation ensures that the</span>
+<span class="doccomment">//! phase space distribution is conserved.  This implies that after integrating</span>
+<span class="doccomment">//! the phase space, the number density per comoving volume remains constant if</span>
+<span class="doccomment">//! there are no collisions.  This is evident after integrating the Liouville</span>
 <span class="doccomment">//! operator over the phase space:</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! \\begin{equation}</span>
-<span class=
-"doccomment">//!   g \int \vt L\[f\] \frac{\dd^3 \vt p}{(2 \pi)^3} = \pfrac{n}{t} + 3 H n = \frac{1}{a^3} \pfrac{(n a^3)}{t}.</span>
-<span class="doccomment">//! \\end{equation}</span>
+<span class="doccomment">//! ```math</span>
+<span class="doccomment">//! g \int \vt L[f] \frac{\dd^3 \vt p}{(2 \pi)^3}</span>
+<span class="doccomment">//! = \pfrac{n}{t} + 3 H n = \frac{1}{a^3} \pfrac{(n a^3)}{t}.</span>
+<span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class=
-"doccomment">//! The number density is related to the phase space distribution through</span>
+<span class="doccomment">//! The number density is related to the phase space distribution through</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! \\begin{equation}</span>
-<span class=
-"doccomment">//!   n \defeq g \int f \frac{\dd^3 \vt p}{(2 \pi)^3} = \frac{g}{2 \pi^2} \int_m^\infty f \sqrt{E^2 - m^2} E \dd E,</span>
-<span class="doccomment">//! \\end{equation}</span>
+<span class="doccomment">//! ```math</span>
+<span class="doccomment">//!   n \defeq g \int f \frac{\dd^3 \vt p}{(2 \pi)^3}</span>
+<span class="doccomment">//!   = \frac{g}{2 \pi^2} \int_m^\infty f \sqrt{E^2 - m^2} E \dd E,</span>
+<span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class=
-"doccomment">//! where \\(g\\) is the number of internal degrees of freedom of the particle.</span>
+<span class="doccomment">//! where `$g$` is the number of internal degrees of freedom of the particle.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### Collision Operator</span>
 <span class="doccomment">//!</span>
-<span class=
-"doccomment">//! The collision term in the Boltzmann equation describes the changes to the</span>
-<span class=
-"doccomment">//! phase space distribution that arise from collisions—either through the</span>
-<span class=
-"doccomment">//! scattering of other particles, or creation/annihilation of the species in</span>
-<span class=
-"doccomment">//! question.  The integrated collision term for a particular process \\(a_1 +</span>
-<span class=
-"doccomment">//! \cdots + a_n \leftrightarrow b_1 + \cdots + b_m\\) (which we will denote as</span>
-<span class=
-"doccomment">//! \\(\vt a \leftrightarrow \vt b\\)) is:</span>
+<span class="doccomment">//! The collision term in the Boltzmann equation describes the changes to the</span>
+<span class="doccomment">//! phase space distribution that arise from collisions—either through the</span>
+<span class="doccomment">//! scattering of other particles, or creation/annihilation of the species in</span>
+<span class="doccomment">//! question.  The integrated collision term for a particular process `$a_1 +</span>
+<span class="doccomment">//! \cdots + a_n \leftrightarrow b_1 + \cdots + b_m$` (which we will denote as</span>
+<span class="doccomment">//! `$\vt a \leftrightarrow \vt b$`) is:</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! \\begin{equation}</span>
-<span class="doccomment">//!   \begin{aligned}</span>
-<span class=
-"doccomment">//!     g_{a_1} \int \vt C[f_{a_1}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3}</span>
-<span class=
-"doccomment">//!       &amp;= - \int_{\vt a}^{\vt b}</span>
-<span class=
-"doccomment">//!          \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right) \left(\prod_{\vt b} 1 \pm f_i \right)</span>
-<span class=
-"doccomment">//!                          - \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right),</span>
-<span class="doccomment">//!   \end{aligned}</span>
-<span class="doccomment">//! \\end{equation}</span>
+<span class="doccomment">//! ```math</span>
+<span class="doccomment">//! \begin{aligned}</span>
+<span class="doccomment">//!   g_{a_1} \int \vt C[f_{a_1}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3}</span>
+<span class="doccomment">//!   &amp;= - \int_{\vt a}^{\vt b}</span>
+<span class="doccomment">//!      \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right) \left(\prod_{\vt b} 1 \pm f_i \right)</span>
+<span class="doccomment">//!      - \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right),</span>
+<span class="doccomment">//! \end{aligned}</span>
+<span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class=
-"doccomment">//! where \\(\abs{\mathcal M(\vt a | \vt b)}^2\\) is the squared amplitude going</span>
-<span class=
-"doccomment">//! from initial state \\(\vt a\\) to \\(\vt b\\) and is *averaged over* all</span>
-<span class=
-"doccomment">//! *internal degrees of freedom*, and the integration is done of the</span>
+<span class="doccomment">//! where `$\abs{\mathcal M(\vt a | \vt b)}^2$` is the squared amplitude going</span>
+<span class="doccomment">//! from initial state `$\vt a$` to `$\vt b$` and is *averaged over* all</span>
+<span class="doccomment">//! *internal degrees of freedom*, and the integration is done of the</span>
 <span class="doccomment">//! Lorentz-invariant phase space</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! \\begin{equation}</span>
-<span class="doccomment">//!   \int_{\vt a}^{\vt b} \defeq</span>
-<span class=
-"doccomment">//!      \int \dd \Pi_{a_1} \dots \dd \Pi_{a_n} \dd \Pi_{b_1} \dots \dd \Pi_{b_m}</span>
-<span class=
-"doccomment">//!      (2 \pi)^4 \delta^4(p_{a_1} + \cdots + p_{a_n} - p_{b_1} - \cdots - p_{b_m})</span>
-<span class="doccomment">//! \\end{equation}</span>
+<span class="doccomment">//! ```math</span>
+<span class="doccomment">//! \int_{\vt a}^{\vt b} \defeq</span>
+<span class="doccomment">//!      \int \dd \Pi_{a_1} \dots \dd \Pi_{a_n} \dd \Pi_{b_1} \dots \dd \Pi_{b_m}</span>
+<span class="doccomment">//!      (2 \pi)^4 \delta^4(p_{a_1} + \cdots + p_{a_n} - p_{b_1} - \cdots - p_{b_m})</span>
+<span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! in which</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! \\begin{equation}</span>
-<span class=
-"doccomment">//!   \dd \Pi_i \defeq \frac{g_i \dd^3 \vt p_i}{(2 \pi)^3 2 E_i}.</span>
-<span class="doccomment">//! \\end{equation}</span>
+<span class="doccomment">//! ```math</span>
+<span class="doccomment">//!   \dd \Pi_i \defeq \frac{g_i \dd^3 \vt p_i}{(2 \pi)^3 2 E_i}.</span>
+<span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class=
-"doccomment">//! Note that as the squared amplitude is averaged over all internal degrees of</span>
-<span class=
-"doccomment">//! freedom, they will cancel out with the \\(g_i\\) factors in each \\(\dd</span>
-<span class=
-"doccomment">//! \Pi_i\\) term; as a result, some authors omit \\(g_i\\) from the definition</span>
-<span class="doccomment">//! of \\(\dd \Pi_i\\).</span>
+<span class="doccomment">//! Note that as the squared amplitude is averaged over all internal degrees of</span>
+<span class="doccomment">//! freedom, they will cancel out with the `$g_i$` factors in each `$\dd \Pi_i$`</span>
+<span class="doccomment">//! term; as a result, some authors omit `$g_i$` from the definition of `$\dd</span>
+<span class="doccomment">//! \Pi_i$`.</span>
 <span class="doccomment">//!</span>
-<span class=
-"doccomment">//! The factors \\(1 \pm f\\) account for Pauli suppression and Bose enhancement</span>
-<span class=
-"doccomment">//! in the transition \\(\vt a \leftrightarrow \vt b\\), where \\(1 + f\\) is</span>
-<span class=
-"doccomment">//! used for Bose–Einstein statistics as it increases the probability of a</span>
-<span class=
-"doccomment">//! transition into a highly occupied state; and \\(1 - f\\) is used for</span>
-<span class=
-"doccomment">//! Fermi–Dirac statistics as it decreases the probability of a transition into</span>
-<span class="doccomment">//! a highly occupied state.</span>
+<span class="doccomment">//! The factors `$\pm f$` account for Pauli suppression and Bose enhancement in</span>
+<span class="doccomment">//! the transition `$\vt a \leftrightarrow \vt b$`, where `$` + f$` is used for</span>
+<span class="doccomment">//! Bose–Einstein statistics as it increases the probability of a transition</span>
+<span class="doccomment">//! into a highly occupied state; and `$` - f$` is used for Fermi–Dirac</span>
+<span class="doccomment">//! statistics as it decreases the probability of a transition into a highly</span>
+<span class="doccomment">//! occupied state.</span>
 <span class="doccomment">//!</span>
-<span class=
-"doccomment">//! The above collision term accounts for a single interaction and in general a</span>
-<span class=
-"doccomment">//! sum over all possible interactions must be done.</span>
+<span class="doccomment">//! The above collision term accounts for a single interaction and in general a</span>
+<span class="doccomment">//! sum over all possible interactions must be done.</span>
 
-<span class=
-"comment">// Enable feature(test) on nightly builds to make use of the `test` crate.</span>
-<span class="attribute">#![<span class=
-"ident">cfg_attr</span>(<span class=
-"ident">feature</span> <span class="op">=</span> <span class=
-"string">"nightly"</span>, <span class=
-"ident">feature</span>(<span class="ident">test</span>))]</span>
+<span class="comment">// Enable feature(test) on nightly builds to make use of the `test` crate.</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>, <span class="ident">feature</span>(<span class="ident">test</span>))]</span>
 <span class="comment">// Configure warnings</span>
-<span class="attribute">#![<span class=
-"ident">warn</span>(<span class=
-"ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class=
-"ident">warn</span>(<span class="ident">clippy</span>::<span class=
-"ident">all</span>)]</span>
-<span class="attribute">#![<span class=
-"ident">warn</span>(<span class="ident">clippy</span>::<span class=
-"ident">pedantic</span>)]</span>
-<span class="attribute">#![<span class=
-"ident">allow</span>(<span class=
-"ident">clippy</span>::<span class="ident">doc_markdown</span>)]</span>
-<span class="attribute">#![<span class=
-"ident">allow</span>(<span class=
-"ident">clippy</span>::<span class="ident">non_ascii_literal</span>)]</span>
-<span class="attribute">#![<span class=
-"ident">allow</span>(<span class=
-"ident">clippy</span>::<span class="ident">cast_precision_loss</span>)]</span> <span class="comment">// Check this warning occasionally</span>
+<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
+<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">clippy</span>::<span class="ident">all</span>)]</span>
+<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">clippy</span>::<span class="ident">pedantic</span>)]</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">doc_markdown</span>)]</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">non_ascii_literal</span>)]</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">cast_precision_loss</span>)]</span> <span class="comment">// Check this warning occasionally</span>
 
-<span class="attribute">#[<span class=
-"ident">cfg</span>(<span class="ident">feature</span> <span class=
-"op">=</span> <span class="string">"nightly"</span>)]</span>
-<span class="kw">extern</span> <span class=
-"kw">crate</span> <span class="ident">test</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">test</span>;
 
-<span class="macro">macro_rules</span><span class=
-"macro">!</span> <span class="ident">debug_assert_warn</span> {
-    (<span class="macro-nonterminal">$</span><span class=
-"macro-nonterminal">cond</span>:<span class=
-"ident">expr</span>, $(<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">arg</span>:<span class=
-"ident">tt</span>)<span class="op">+</span>) <span class=
-"op">=</span><span class="op">&gt;</span> (
-        <span class="kw">if</span> <span class=
-"macro">cfg</span><span class="macro">!</span>(<span class=
-"ident">debug_assertions</span>) <span class=
-"kw-2">&</span><span class="op">&</span> (<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">cond</span>) {
-            <span class="ident">log</span>::<span class=
-"macro">warn</span><span class="macro">!</span>($(<span class=
-"macro-nonterminal">$</span><span class=
-"macro-nonterminal">arg</span>,)<span class="kw-2">*</span>);
+<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">debug_assert_warn</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cond</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">tt</span>)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> (
+        <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">debug_assertions</span>) <span class="kw-2">&amp;</span><span class="op">&amp;</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cond</span>) {
+            <span class="ident">log</span>::<span class="macro">warn</span><span class="macro">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>,)<span class="kw-2">*</span>);
         }
     )
 }
 
-<span class="kw">pub</span> <span class=
-"kw">mod</span> <span class="ident">constants</span>;
-<span class="kw">pub</span> <span class=
-"kw">mod</span> <span class="ident">model</span>;
-<span class="kw">pub</span> <span class=
-"kw">mod</span> <span class="ident">prelude</span>;
-<span class="kw">pub</span> <span class=
-"kw">mod</span> <span class="ident">solver</span>;
-<span class="kw">pub</span> <span class=
-"kw">mod</span> <span class="ident">statistic</span>;
-<span class="kw">pub</span> <span class=
-"kw">mod</span> <span class="ident">utilities</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">constants</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">model</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">solver</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">statistic</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">utilities</span>;
 
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="kw">crate</span>::<span class=
-"ident">model</span>::<span class=
-"ident">standard_model</span>::<span class=
-"ident">data</span> <span class="kw">as</span> <span class=
-"ident">sm_data</span>;
-<span class="kw">pub</span> <span class=
-"kw">use</span> <span class="ident">special_functions</span>::<span class="ident">particle_physics</span>::<span class="ident">pave_absorptive</span> <span class="kw">as</span> <span class="ident">pave</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">standard_model</span>::<span class="ident">data</span> <span class="kw">as</span> <span class="ident">sm_data</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">special_functions</span>::<span class="ident">particle_physics</span>::<span class="ident">pave_absorptive</span> <span class="kw">as</span> <span class="ident">pave</span>;
 </pre></div>
-</section>
-<section id="search" class="content hidden"></section>
-<section class="footer"></section>
-<script>
-window.rootPath = "../../";window.currentCrate = "boltzmann_solver";
-</script>
-<script src="../../main.js"></script>
-<script src="../../source-script.js"></script>
-<script src="../../source-files.js"></script>
-<script defer src="../../search-index.js"></script>
-</body>
-</html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "boltzmann_solver";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

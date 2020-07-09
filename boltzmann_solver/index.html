@@ -1,281 +1,160 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta name="generator" content=
-"HTML Tidy for HTML5 for Linux version 5.6.0">
-<meta charset="utf-8">
-<meta name="viewport" content=
-"width=device-width, initial-scale=1.0">
-<meta name="generator" content="rustdoc">
-<meta name="description" content=
-"API documentation for the Rust `boltzmann_solver` crate.">
-<meta name="keywords" content=
-"rust, rustlang, rust-lang, boltzmann_solver">
-<title>boltzmann_solver - Rust</title>
-<link rel="stylesheet" type="text/css" href="../normalize.css">
-<link rel="stylesheet" type="text/css" href="../rustdoc.css" id=
-"mainThemeStyle">
-<link rel="stylesheet" type="text/css" href="../dark.css">
-<link rel="stylesheet" type="text/css" href="../light.css" id=
-"themeStyle">
-<script src="../storage.js"></script><noscript>
-<link rel="stylesheet" href="../noscript.css"></noscript>
-<link rel="shortcut icon" href="../favicon.ico">
-<style type="text/css">
-#crate-search{background-image:url("../down-arrow.svg");}
-</style>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `boltzmann_solver` crate."><meta name="keywords" content="rust, rustlang, rust-lang, boltzmann_solver"><title>boltzmann_solver - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.11/dist/katex.min.css"
+  crossorigin="anonymous"
+/>
+<script
+  src="https://cdn.jsdelivr.net/npm/katex@0.11/dist/katex.min.js"
+  crossorigin="anonymous"
+></script>
 <script>
-  MathJax = {
-    tex: {
-      macros: {
-        dd: "{\\mathop{}\\!\\mathrm{d}}",
-        textsc: ["\\mathrm{\\scriptsize #1}", 1],
-        vt: ["\\boldsymbol{#1}", 1],
-        pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2],
-        ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2],
-        defeq: "\\mathrel{\\vcenter:}=",
-        abs: ["\\lvert #1 \\rvert", 1],
-        angles: ["\\langle #1 \\rangle", 1]
+  "use strict";
+  const macros = {
+    "\\vt": "\\boldsymbol{#1}",
+    "\\pfrac": "\\frac{\\partial{#1}}{\\partial{#2}}",
+    "\\dd": "\\mathop{}\\!\\mathrm{d}",
+    "\\ddfrac": "\\frac{\dd{#1}}{\dd{#2}}",
+    "\\defeq": "\\vcentcolon=",
+    "\\abs": "\\left\\lvert{#1}\\right\\rvert",
+    "\\CP": "\\mathcal{CP}",
+  };
+
+  // Display math is inputted in the documentation as:
+  //
+  // ```math
+  //   \int_0^1 x
+  // ```
+  //
+  // and in the HTML appears as
+  //
+  // ```html
+  // <pre><code class="language-math">...</code></pre>
+  // ```
+  document.addEventListener("DOMContentLoaded", function () {
+    // console.log("Replacing display maths");
+    const maths = document.getElementsByClassName("language-math");
+    for (let i = 0; i < maths.length; i++) {
+      const el = maths[i];
+      el.parentNode.replaceWith(el);
+      katex.render(el.innerText, el, { displayMode: true, macros: macros });
+    }
+  });
+
+  // Inline math is inputted in the documentation as `$...$` (with the
+  // backticks) and in the HTML appears as
+  //
+  // ```html
+  // <code>$...$</code>
+  // ```
+  document.addEventListener("DOMContentLoaded", function () {
+    // console.log("Replacing inline maths");
+    const maths = document.getElementsByTagName("code");
+    for (let i = 0; i < maths.length; i++) {
+      const el = maths[i];
+      console.log("Replacing element: " + el.innerText);
+      if (el.innerText.startsWith("$") && el.innerText.endsWith("$")) {
+        katex.render(el.innerText.substring(1, el.innerText.length - 1), el, {
+          macros: macros,
+        });
+        el.parentNode.insertBefore(el.firstChild, el);
+        el.remove();
+
+        // After being removed, the current index points to the next element.
+        i--;
       }
     }
-  };
+  });
 </script>
-<script
-  id="MathJax-script"
-  async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
-></script>
-</head>
-<body class="rustdoc mod">
-<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
-<nav class="sidebar">
-<div class="sidebar-menu">☰</div>
-<a href='../boltzmann_solver/index.html'>
-<div class='logo-container'><img src='../rust-logo.png' alt=
-'logo'></div>
-</a>
-<p class='location'>Crate boltzmann_solver</p>
-<div class="sidebar-elems"><a id='all-types' href='all.html'>
-<p>See all boltzmann_solver's items</p>
-</a>
-<div class="block items">
-<ul>
-<li><a href="#modules">Modules</a></li>
-</ul>
-</div>
-<p class='location'></p>
-<script>
-window.sidebarCurrent = {name: 'boltzmann_solver', ty: 'mod', relpath: '../'};
-</script></div>
-</nav>
-<div class="theme-picker"><button id="theme-picker" aria-label=
-"Pick another theme!"><img src="../brush.svg" width="18" alt=
-"Pick another theme!"></button>
-<div id="theme-choices"></div>
-</div>
-<script src="../theme.js"></script>
-<nav class="sub">
-<form class="search-form">
-<div class="search-container">
-<div><select id="crate-search">
-<option value="All crates">All crates</option>
-</select><input class="search-input" name="search" disabled
-autocomplete="off" spellcheck="false" placeholder=
-"Click or press ‘S’ to search, ‘?’ for more options…" type=
-"search"></div>
-<a id="settings-menu" href="../settings.html"><img src=
-"../wheel.svg" width="18" alt="Change settings"></a></div>
-</form>
-</nav>
-<section id="main" class="content">
-<h1 class='fqn'><span class='out-of-band'><span id=
-'render-detail'><a id="toggle-all-docs" href="javascript:void(0)"
-title="collapse all docs">[<span class=
-'inner'>−</span>]</a></span><a class='srclink' href=
-'../src/boltzmann_solver/lib.rs.html#17-163' title=
-'goto source code'>[src]</a></span><span class='in-band'>Crate
-<a class="mod" href=''>boltzmann_solver</a></span></h1>
-<div class='docblock'>
-<p><code>boltzmann-solver</code> is a library allowing for
-Boltzmann equation in the context of particle physics / early
-cosmology. It provides functionalities to solve Boltzmann equation
-in the case where a single species is out of equilibrium, as well
-as functionalities to solve the Boltzmann equations more general
-when multiple species are all out of equilibrium.</p>
-<p><strong>This library is still undergoing
-development.</strong></p>
-<p><a href=
-"https://crates.io/crates/hep-boltzmann-solver"><img src="https://img.shields.io/crates/v/hep-boltmzann-solver.svg"
-alt="crates.io"></a> <a href=
-"https://crates.io/crates/hep-boltmzann-solver"><img src=
-"https://img.shields.io/crates/d/hep-boltmzann-solver.svg" alt=
-"crates.io"></a> <a href=
-"https://codecov.io/gh/hep-rs/boltzmann-solver"><img src=
-"https://img.shields.io/codecov/c/github/hep-rs/boltzmann-solver/master"
-alt="Codecov branch"></a> <a href=
-"https://github.com/hep-rs/boltzmann-solver/actions"><img src=
-"https://img.shields.io/github/workflow/status/hep-rs/boltzmann-solver/Rust/master.svg"
-alt="Build Status"></a></p>
-<p>Licensed under <a href=
-"https://www.gnu.org/licenses/gpl-3.0.html">GPLv3</a>.</p>
-<p>The documentation makes use of <a href=
-"https://www.mathjax.org/">MathJax</a> in order to display
-mathematics. A version of the documentation with MathJax integrated
-is available <a href=
-"https://hep.rs/boltzmann-solver/boltzmann_solver">here</a>.</p>
-<h1 id="introduction" class="section-header"><a href=
-"#introduction">Introduction</a></h1>
-<p>Within the context of cosmology, the Boltzmann equation is a
-differential equation which describes the evolution of the
-phase-space distribution of a species of particles. In full
-generality, it is given by</p>
-<p>\begin{equation} \vt L[f] = \vt C[f] \end{equation}</p>
-<p>where \(\vt L\) is the Liouville operator and \(\vt C\) is the
-collision operator.</p>
-<h3 id="liouville-operator" class="section-header"><a href=
-"#liouville-operator">Liouville Operator</a></h3>
-<p>In general, the phase space distribution dependent on position,
-momentum and time \(f(\vt x, \vt p, t)\); however, assuming the
-early Universe to be isotropic and homogeneous it can be expressed
-as a function of just energy and time, \(f(E, t)\). In the FLRW
-metric, the Liouville operator simplifies to only be dependent the
-time-like derivatives:</p>
-<p>\begin{equation} \vt L[f] \stackrel{\mathrm{\tiny FLRW}}{=}
+
+<style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../boltzmann_solver/index.html'><div class='logo-container'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate boltzmann_solver</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all boltzmann_solver's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'boltzmann_solver', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/boltzmann_solver/lib.rs.html#17-164' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>boltzmann_solver</a></span></h1><div class='docblock'><p><code>boltzmann-solver</code> is a library allowing for Boltzmann equation in the
+context of particle physics / early cosmology.  It provides functionalities
+to solve Boltzmann equation in the case where a single species is out of
+equilibrium, as well as functionalities to solve the Boltzmann equations
+more general when multiple species are all out of equilibrium.</p>
+<p><strong>This library is still undergoing development.</strong></p>
+<p><a href="https://crates.io/crates/hep-boltzmann-solver"><img src="https://img.shields.io/crates/v/hep-boltmzann-solver.svg" alt="crates.io" /></a>
+<a href="https://crates.io/crates/hep-boltmzann-solver"><img src="https://img.shields.io/crates/d/hep-boltmzann-solver.svg" alt="crates.io" /></a>
+<a href="https://codecov.io/gh/hep-rs/boltzmann-solver"><img src="https://img.shields.io/codecov/c/github/hep-rs/boltzmann-solver/master" alt="Codecov branch" /></a>
+<a href="https://github.com/hep-rs/boltzmann-solver/actions"><img src="https://img.shields.io/github/workflow/status/hep-rs/boltzmann-solver/Rust/master.svg" alt="Build Status" /></a></p>
+<p>Licensed under <a href="https://www.gnu.org/licenses/gpl-3.0.html">GPLv3</a>.</p>
+<h1 id="introduction" class="section-header"><a href="#introduction">Introduction</a></h1>
+<p>Within the context of cosmology, the Boltzmann equation is a differential
+equation which describes the evolution of the phase-space distribution of a
+species of particles.  In full generality, it is given by</p>
+<pre><code class="language-math">\vt L[f] = \vt C[f]
+</code></pre>
+<p>where <code>$\vt L$</code> is the Liouville operator and <code>$\vt C$</code> is the collision
+operator.</p>
+<h3 id="liouville-operator" class="section-header"><a href="#liouville-operator">Liouville Operator</a></h3>
+<p>In general, the phase space distribution dependent on position, momentum and
+time <code>$f(\vt x, \vt p, t)$</code>; however, assuming the early Universe to be
+isotropic and homogeneous it can be expressed as a function of just energy
+and time, <code>$f(E, t)$</code>.  In the FLRW metric, the Liouville operator
+simplifies to only be dependent the time-like derivatives:</p>
+<pre><code class="language-math">\vt L[f] \stackrel{\mathrm{\tiny FLRW}}{=}
 \left[ E \pfrac{}{t} - H (E^2 - m^2) \pfrac{}{E} \right] f,
-\end{equation}</p>
-<p>where \(H \defeq \dot a / a\) is Hubble's constant. Unless there
-is a sudden increase in entropy due to the out-of-equilibrium decay
-of a particle, the entropy per comoving volume remains constant:
-\(\dd(s a^3) = 0\). Furthermore,</p>
-<p>In the absence of any collisions, the Boltzmann equation ensures
-that the phase space distribution is conserved. This implies that
-after integrating the phase space, the number density per comoving
-volume remains constant if there are no collisions. This is evident
-after integrating the Liouville operator over the phase space:</p>
-<p>\begin{equation} g \int \vt L[f] \frac{\dd^3 \vt p}{(2 \pi)^3} =
-\pfrac{n}{t} + 3 H n = \frac{1}{a^3} \pfrac{(n a^3)}{t}.
-\end{equation}</p>
-<p>The number density is related to the phase space distribution
-through</p>
-<p>\begin{equation} n \defeq g \int f \frac{\dd^3 \vt p}{(2 \pi)^3}
-= \frac{g}{2 \pi^2} \int_m^\infty f \sqrt{E^2 - m^2} E \dd E,
-\end{equation}</p>
-<p>where \(g\) is the number of internal degrees of freedom of the
-particle.</p>
-<h3 id="collision-operator" class="section-header"><a href=
-"#collision-operator">Collision Operator</a></h3>
-<p>The collision term in the Boltzmann equation describes the
-changes to the phase space distribution that arise from
-collisions—either through the scattering of other particles, or
-creation/annihilation of the species in question. The integrated
-collision term for a particular process \(a_1 + \cdots + a_n
-\leftrightarrow b_1 + \cdots + b_m\) (which we will denote as \(\vt
-a \leftrightarrow \vt b\)) is:</p>
-<p>\begin{equation} \begin{aligned} g_{a_1} \int \vt C[f_{a_1}]
-\frac{\dd^3 \vt p_{a_1}}{(2\pi)^3} &amp;= - \int_{\vt a}^{\vt b}
-\abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right)
-\left(\prod_{\vt b} 1 \pm f_i \right) - \abs{\mathcal M(\vt b | \vt
-a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm
-f_i \right), \end{aligned} \end{equation}</p>
-<p>where \(\abs{\mathcal M(\vt a | \vt b)}^2\) is the squared
-amplitude going from initial state \(\vt a\) to \(\vt b\) and is
-<em>averaged over</em> all <em>internal degrees of freedom</em>,
-and the integration is done of the Lorentz-invariant phase
-space</p>
-<p>\begin{equation} \int_{\vt a}^{\vt b} \defeq \int \dd \Pi_{a_1}
-\dots \dd \Pi_{a_n} \dd \Pi_{b_1} \dots \dd \Pi_{b_m} (2 \pi)^4
-\delta^4(p_{a_1} + \cdots + p_{a_n} - p_{b_1} - \cdots - p_{b_m})
-\end{equation}</p>
+</code></pre>
+<p>where <code>$H \defeq \dot a / a$</code> is Hubble's constant.  Unless there is a
+sudden increase in entropy due to the out-of-equilibrium decay of a
+particle, the entropy per comoving volume remains constant: <code>$\dd(s a^3) = 0$</code>.  Furthermore,</p>
+<p>In the absence of any collisions, the Boltzmann equation ensures that the
+phase space distribution is conserved.  This implies that after integrating
+the phase space, the number density per comoving volume remains constant if
+there are no collisions.  This is evident after integrating the Liouville
+operator over the phase space:</p>
+<pre><code class="language-math">g \int \vt L[f] \frac{\dd^3 \vt p}{(2 \pi)^3}
+= \pfrac{n}{t} + 3 H n = \frac{1}{a^3} \pfrac{(n a^3)}{t}.
+</code></pre>
+<p>The number density is related to the phase space distribution through</p>
+<pre><code class="language-math">  n \defeq g \int f \frac{\dd^3 \vt p}{(2 \pi)^3}
+  = \frac{g}{2 \pi^2} \int_m^\infty f \sqrt{E^2 - m^2} E \dd E,
+</code></pre>
+<p>where <code>$g$</code> is the number of internal degrees of freedom of the particle.</p>
+<h3 id="collision-operator" class="section-header"><a href="#collision-operator">Collision Operator</a></h3>
+<p>The collision term in the Boltzmann equation describes the changes to the
+phase space distribution that arise from collisions—either through the
+scattering of other particles, or creation/annihilation of the species in
+question.  The integrated collision term for a particular process <code>$a_1 + \cdots + a_n \leftrightarrow b_1 + \cdots + b_m$</code> (which we will denote as
+<code>$\vt a \leftrightarrow \vt b$</code>) is:</p>
+<pre><code class="language-math">\begin{aligned}
+  g_{a_1} \int \vt C[f_{a_1}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3}
+  &amp;= - \int_{\vt a}^{\vt b}
+     \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right) \left(\prod_{\vt b} 1 \pm f_i \right)
+     - \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right),
+\end{aligned}
+</code></pre>
+<p>where <code>$\abs{\mathcal M(\vt a | \vt b)}^2$</code> is the squared amplitude going
+from initial state <code>$\vt a$</code> to <code>$\vt b$</code> and is <em>averaged over</em> all
+<em>internal degrees of freedom</em>, and the integration is done of the
+Lorentz-invariant phase space</p>
+<pre><code class="language-math">\int_{\vt a}^{\vt b} \defeq
+     \int \dd \Pi_{a_1} \dots \dd \Pi_{a_n} \dd \Pi_{b_1} \dots \dd \Pi_{b_m}
+     (2 \pi)^4 \delta^4(p_{a_1} + \cdots + p_{a_n} - p_{b_1} - \cdots - p_{b_m})
+</code></pre>
 <p>in which</p>
-<p>\begin{equation} \dd \Pi_i \defeq \frac{g_i \dd^3 \vt p_i}{(2
-\pi)^3 2 E_i}. \end{equation}</p>
-<p>Note that as the squared amplitude is averaged over all internal
-degrees of freedom, they will cancel out with the \(g_i\) factors
-in each \(\dd \Pi_i\) term; as a result, some authors omit \(g_i\)
-from the definition of \(\dd \Pi_i\).</p>
-<p>The factors \(1 \pm f\) account for Pauli suppression and Bose
-enhancement in the transition \(\vt a \leftrightarrow \vt b\),
-where \(1 + f\) is used for Bose–Einstein statistics as it
-increases the probability of a transition into a highly occupied
-state; and \(1 - f\) is used for Fermi–Dirac statistics as it
-decreases the probability of a transition into a highly occupied
-state.</p>
-<p>The above collision term accounts for a single interaction and
-in general a sum over all possible interactions must be done.</p>
-</div>
-<h2 id='modules' class='section-header'><a href=
-"#modules">Modules</a></h2>
-<table>
-<tr class='module-item'>
-<td><a class="mod" href="constants/index.html" title=
-'boltzmann_solver::constants mod'>constants</a></td>
-<td class='docblock-short'>
-<p>Collection of physical and mathematical constants which appear
-frequently.</p>
-</td>
-</tr>
-<tr class='module-item'>
-<td><a class="mod" href="model/index.html" title=
-'boltzmann_solver::model mod'>model</a></td>
-<td class='docblock-short'>
-<p>Model information</p>
-</td>
-</tr>
-<tr class='module-item'>
-<td><a class="mod" href="pave/index.html" title=
-'boltzmann_solver::pave mod'>pave</a></td>
-<td class='docblock-short'>
-<p>Passarino-Veltman coefficient functions.</p>
-</td>
-</tr>
-<tr class='module-item'>
-<td><a class="mod" href="prelude/index.html" title=
-'boltzmann_solver::prelude mod'>prelude</a></td>
-<td class='docblock-short'>
-<p>Common imports for this crate.</p>
-</td>
-</tr>
-<tr class='module-item'>
-<td><a class="mod" href="sm_data/index.html" title=
-'boltzmann_solver::sm_data mod'>sm_data</a></td>
-<td class='docblock-short'>
-<p>Standard model data</p>
-</td>
-</tr>
-<tr class='module-item'>
-<td><a class="mod" href="solver/index.html" title=
-'boltzmann_solver::solver mod'>solver</a></td>
-<td class='docblock-short'>
-<p>Solver for the number density evolution given by integrating the
-Boltzmann equation.</p>
-</td>
-</tr>
-<tr class='module-item'>
-<td><a class="mod" href="statistic/index.html" title=
-'boltzmann_solver::statistic mod'>statistic</a></td>
-<td class='docblock-short'>
-<p>If the rate of collisions between particles is sufficiently high
-(as is usually the case), the phase space distribution of the
-particles will quickly converge onto either the Fermi–Dirac
-statistic or the Bose–Einstein statistic depending on whether the
-particle is a half-integer or integer spin particle.</p>
-</td>
-</tr>
-<tr class='module-item'>
-<td><a class="mod" href="utilities/index.html" title=
-'boltzmann_solver::utilities mod'>utilities</a></td>
-<td class='docblock-short'>
-<p>Module of various useful miscellaneous functions.</p>
-</td>
-</tr>
-</table>
-</section>
-<section id="search" class="content hidden"></section>
-<section class="footer"></section>
-<script>
-window.rootPath = "../";window.currentCrate = "boltzmann_solver";
-</script>
-<script src="../main.js"></script>
-<script defer src="../search-index.js"></script>
-</body>
-</html>
+<pre><code class="language-math">  \dd \Pi_i \defeq \frac{g_i \dd^3 \vt p_i}{(2 \pi)^3 2 E_i}.
+</code></pre>
+<p>Note that as the squared amplitude is averaged over all internal degrees of
+freedom, they will cancel out with the <code>$g_i$</code> factors in each <code>$\dd \Pi_i$</code>
+term; as a result, some authors omit <code>$g_i$</code> from the definition of <code>$\dd \Pi_i$</code>.</p>
+<p>The factors <code>$\pm f$</code> account for Pauli suppression and Bose enhancement in
+the transition <code>$\vt a \leftrightarrow \vt b$</code>, where <code>$</code> + f$<code>is used for Bose–Einstein statistics as it increases the probability of a transition into a highly occupied state; and</code>$<code> - f$</code> is used for Fermi–Dirac
+statistics as it decreases the probability of a transition into a highly
+occupied state.</p>
+<p>The above collision term accounts for a single interaction and in general a
+sum over all possible interactions must be done.</p>
+</div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+<table><tr class='module-item'><td><a class="mod" href="constants/index.html" title='boltzmann_solver::constants mod'>constants</a></td><td class='docblock-short'><p>Collection of physical and mathematical constants which appear frequently.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="model/index.html" title='boltzmann_solver::model mod'>model</a></td><td class='docblock-short'><p>Model information</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="pave/index.html" title='boltzmann_solver::pave mod'>pave</a></td><td class='docblock-short'><p>Passarino-Veltman coefficient functions.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="prelude/index.html" title='boltzmann_solver::prelude mod'>prelude</a></td><td class='docblock-short'><p>Common imports for this crate.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="sm_data/index.html" title='boltzmann_solver::sm_data mod'>sm_data</a></td><td class='docblock-short'><p>Standard model data</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="solver/index.html" title='boltzmann_solver::solver mod'>solver</a></td><td class='docblock-short'><p>Solver for the number density evolution given by integrating the Boltzmann
+equation.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="statistic/index.html" title='boltzmann_solver::statistic mod'>statistic</a></td><td class='docblock-short'><p>If the rate of collisions between particles is sufficiently high (as is
+usually the case), the phase space distribution of the particles will
+quickly converge onto either the Fermi–Dirac statistic or the Bose–Einstein
+statistic depending on whether the particle is a half-integer or integer
+spin particle.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="utilities/index.html" title='boltzmann_solver::utilities mod'>utilities</a></td><td class='docblock-short'><p>Module of various useful miscellaneous functions.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../";window.currentCrate = "boltzmann_solver";</script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>

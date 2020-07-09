@@ -1,80 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta name="generator" content=
-"HTML Tidy for HTML5 for Linux version 5.6.0">
-<meta charset="utf-8">
-<meta name="viewport" content=
-"width=device-width, initial-scale=1.0">
-<meta name="generator" content="rustdoc">
-<meta name="description" content=
-"Source to the Rust file `src/model/standard_model/data.rs`.">
-<meta name="keywords" content="rust, rustlang, rust-lang">
-<title>data.rs.html -- source</title>
-<link rel="stylesheet" type="text/css" href=
-"../../../../normalize.css">
-<link rel="stylesheet" type="text/css" href=
-"../../../../rustdoc.css" id="mainThemeStyle">
-<link rel="stylesheet" type="text/css" href="../../../../dark.css">
-<link rel="stylesheet" type="text/css" href="../../../../light.css"
-id="themeStyle">
-<script src="../../../../storage.js"></script><noscript>
-<link rel="stylesheet" href="../../../../noscript.css"></noscript>
-<link rel="shortcut icon" href="../../../../favicon.ico">
-<style type="text/css">
-#crate-search{background-image:url("../../../../down-arrow.svg");}
-</style>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/model/standard_model/data.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>data.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.11/dist/katex.min.css"
+  crossorigin="anonymous"
+/>
+<script
+  src="https://cdn.jsdelivr.net/npm/katex@0.11/dist/katex.min.js"
+  crossorigin="anonymous"
+></script>
 <script>
-  MathJax = {
-    tex: {
-      macros: {
-        dd: "{\\mathop{}\\!\\mathrm{d}}",
-        textsc: ["\\mathrm{\\scriptsize #1}", 1],
-        vt: ["\\boldsymbol{#1}", 1],
-        pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2],
-        ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2],
-        defeq: "\\mathrel{\\vcenter:}=",
-        abs: ["\\lvert #1 \\rvert", 1],
-        angles: ["\\langle #1 \\rangle", 1]
+  "use strict";
+  const macros = {
+    "\\vt": "\\boldsymbol{#1}",
+    "\\pfrac": "\\frac{\\partial{#1}}{\\partial{#2}}",
+    "\\dd": "\\mathop{}\\!\\mathrm{d}",
+    "\\ddfrac": "\\frac{\dd{#1}}{\dd{#2}}",
+    "\\defeq": "\\vcentcolon=",
+    "\\abs": "\\left\\lvert{#1}\\right\\rvert",
+    "\\CP": "\\mathcal{CP}",
+  };
+
+  // Display math is inputted in the documentation as:
+  //
+  // ```math
+  //   \int_0^1 x
+  // ```
+  //
+  // and in the HTML appears as
+  //
+  // ```html
+  // <pre><code class="language-math">...</code></pre>
+  // ```
+  document.addEventListener("DOMContentLoaded", function () {
+    // console.log("Replacing display maths");
+    const maths = document.getElementsByClassName("language-math");
+    for (let i = 0; i < maths.length; i++) {
+      const el = maths[i];
+      el.parentNode.replaceWith(el);
+      katex.render(el.innerText, el, { displayMode: true, macros: macros });
+    }
+  });
+
+  // Inline math is inputted in the documentation as `$...$` (with the
+  // backticks) and in the HTML appears as
+  //
+  // ```html
+  // <code>$...$</code>
+  // ```
+  document.addEventListener("DOMContentLoaded", function () {
+    // console.log("Replacing inline maths");
+    const maths = document.getElementsByTagName("code");
+    for (let i = 0; i < maths.length; i++) {
+      const el = maths[i];
+      console.log("Replacing element: " + el.innerText);
+      if (el.innerText.startsWith("$") && el.innerText.endsWith("$")) {
+        katex.render(el.innerText.substring(1, el.innerText.length - 1), el, {
+          macros: macros,
+        });
+        el.parentNode.insertBefore(el.firstChild, el);
+        el.remove();
+
+        // After being removed, the current index points to the next element.
+        i--;
       }
     }
-  };
+  });
 </script>
-<script
-  id="MathJax-script"
-  async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
-></script>
-</head>
-<body class="rustdoc source">
-<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
-<nav class="sidebar">
-<div class="sidebar-menu">☰</div>
-<a href='../../../../boltzmann_solver/index.html'>
-<div class='logo-container'><img src='../../../../rust-logo.png'
-alt='logo'></div>
-</a></nav>
-<div class="theme-picker"><button id="theme-picker" aria-label=
-"Pick another theme!"><img src="../../../../brush.svg" width="18"
-alt="Pick another theme!"></button>
-<div id="theme-choices"></div>
-</div>
-<script src="../../../../theme.js"></script>
-<nav class="sub">
-<form class="search-form">
-<div class="search-container">
-<div><select id="crate-search">
-<option value="All crates">All crates</option>
-</select><input class="search-input" name="search" disabled
-autocomplete="off" spellcheck="false" placeholder=
-"Click or press ‘S’ to search, ‘?’ for more options…" type=
-"search"></div>
-<a id="settings-menu" href="../../../../settings.html"><img src=
-"../../../../wheel.svg" width="18" alt="Change settings"></a></div>
-</form>
-</nav>
-<section id="main" class="content">
-<pre class="line-numbers"><span id="1">  1</span>
+
+<style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -1008,932 +1000,469 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="932">932</span>
 <span id="933">933</span>
 <span id="934">934</span>
-</pre>
-<div class="example-wrap">
-<pre class="rust">
+</pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Standard model data</span>
 <span class="doccomment">//!</span>
-<span class=
-"doccomment">//! All values are taken from the PDG unless otherwise stated.</span>
+<span class="doccomment">//! All values are taken from the PDG unless otherwise stated.</span>
 
-<span class="kw">use</span> <span class=
-"kw">crate</span>::<span class=
-"ident">utilities</span>::<span class=
-"ident">spline</span>::<span class=
-"ident">ConstCubicHermiteSpline</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utilities</span>::<span class="ident">spline</span>::<span class="ident">ConstCubicHermiteSpline</span>;
 
 <span class="doccomment">/// Z boson mass [GeV]</span>
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">MASS_Z</span>: <span class=
-"ident">f64</span> <span class="op">=</span> <span class=
-"number">91.187_6</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MASS_Z</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">91.187_6</span>;
 <span class="doccomment">/// W boson mass [GeV]</span>
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">MASS_W</span>: <span class=
-"ident">f64</span> <span class="op">=</span> <span class=
-"number">80.379</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MASS_W</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">80.379</span>;
 <span class="doccomment">/// Higgs boson mass [GeV]</span>
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">MASS_H</span>: <span class=
-"ident">f64</span> <span class="op">=</span> <span class=
-"number">125.10</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MASS_H</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">125.10</span>;
 
 <span class="doccomment">/// Electron mass [GeV]</span>
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">MASS_EL</span>: <span class=
-"ident">f64</span> <span class="op">=</span> <span class=
-"number">0.510_998_946_1e-3</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MASS_EL</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.510_998_946_1e-3</span>;
 <span class="doccomment">/// Muon mass [GeV]</span>
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">MASS_MU</span>: <span class=
-"ident">f64</span> <span class="op">=</span> <span class=
-"number">105.658_374_5e-3</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MASS_MU</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">105.658_374_5e-3</span>;
 <span class="doccomment">/// Tau mass [GeV]</span>
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">MASS_TA</span>: <span class=
-"ident">f64</span> <span class="op">=</span> <span class=
-"number">1776.86e-3</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MASS_TA</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">1776.86e-3</span>;
 
 <span class="doccomment">/// Up quark mass [GeV]</span>
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">MASS_UP</span>: <span class=
-"ident">f64</span> <span class="op">=</span> <span class=
-"number">2.16e-3</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MASS_UP</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">2.16e-3</span>;
 <span class="doccomment">/// Down quark mass [GeV]</span>
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">MASS_DO</span>: <span class=
-"ident">f64</span> <span class="op">=</span> <span class=
-"number">4.67e-3</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MASS_DO</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">4.67e-3</span>;
 <span class="doccomment">/// Strange quark mass [GeV]</span>
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">MASS_ST</span>: <span class=
-"ident">f64</span> <span class="op">=</span> <span class=
-"number">93e-3</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MASS_ST</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">93e-3</span>;
 <span class="doccomment">/// Charm quark mass [GeV]</span>
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">MASS_CH</span>: <span class=
-"ident">f64</span> <span class="op">=</span> <span class=
-"number">1.27</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MASS_CH</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">1.27</span>;
 <span class="doccomment">/// Bottom quark mass [GeV]</span>
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">MASS_BO</span>: <span class=
-"ident">f64</span> <span class="op">=</span> <span class=
-"number">4.18</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MASS_BO</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">4.18</span>;
 <span class="doccomment">/// Top quark mass [GeV]</span>
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">MASS_TO</span>: <span class=
-"ident">f64</span> <span class="op">=</span> <span class=
-"number">172.76</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MASS_TO</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">172.76</span>;
 
 <span class="doccomment">/// Higgs boson VEV</span>
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">VEV</span>: <span class=
-"ident">f64</span> <span class="op">=</span> <span class=
-"number">246.22</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VEV</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">246.22</span>;
 
-<span class=
-"doccomment">/// CKM Wolfenstain \\(A\\) parameter</span>
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">CKM_A</span>: <span class=
-"ident">f64</span> <span class="op">=</span> <span class=
-"number">0.8235</span>;
-<span class=
-"doccomment">/// CKM Wolfenstain \\(\lambda\\) parameter</span>
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class=
-"ident">CKM_LAMBDA</span>: <span class=
-"ident">f64</span> <span class="op">=</span> <span class=
-"number">0.224_837</span>;
-<span class=
-"doccomment">/// CKM Wolfenstain \\(\overline\rho\\) parameter</span>
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">CKM_RHO</span>: <span class=
-"ident">f64</span> <span class="op">=</span> <span class=
-"number">0.1569</span>;
-<span class=
-"doccomment">/// CKM Wolfenstain \\(\overline\eta\\) parameter</span>
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">CKM_ETA</span>: <span class=
-"ident">f64</span> <span class="op">=</span> <span class=
-"number">0.3499</span>;
+<span class="doccomment">/// CKM Wolfenstain `$A$` parameter</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CKM_A</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.8235</span>;
+<span class="doccomment">/// CKM Wolfenstain `$\lambda$` parameter</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CKM_LAMBDA</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.224_837</span>;
+<span class="doccomment">/// CKM Wolfenstain `$\overline\rho$` parameter</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CKM_RHO</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.1569</span>;
+<span class="doccomment">/// CKM Wolfenstain `$\overline\eta$` parameter</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CKM_ETA</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.3499</span>;
 
-<span class=
-"doccomment">/// Value of \\(g_{*}\\) for the Standard Model.</span>
+<span class="doccomment">/// Value of `$g_{*}$` for the Standard Model.</span>
 <span class="doccomment">///</span>
-<span class=
-"doccomment">/// The first column is the log-transformed inverse temperature,</span>
-<span class=
-"doccomment">/// \\(\ln(\beta)\\), where \\(\beta\\) is in units of inverse</span>
+<span class="doccomment">/// The first column is the log-transformed inverse temperature,</span>
+<span class="doccomment">/// `$\ln(\beta)$`, where `$\beta$` is in units of inverse</span>
 <span class="doccomment">/// gigaelectronvolts.</span>
 <span class="doccomment">///</span>
-<span class=
-"doccomment">/// The second column is the value of \\(g_{*}\\).</span>
+<span class="doccomment">/// The second column is the value of `$g_{*}$`.</span>
 <span class="doccomment">///</span>
-<span class=
-"doccomment">/// Data is sourced from [`arXiv:1609.049_79`](https://arxiv.org/abs/1609.049_79).</span>
-<span class="attribute">#[<span class=
-"ident">allow</span>(<span class=
-"ident">clippy</span>::<span class="ident">approx_constant</span>)]</span>
-<span class="kw">pub</span>(<span class=
-"kw">crate</span>) <span class="kw">const</span> <span class=
-"ident">STANDARD_MODEL_GSTAR</span>: <span class=
-"ident">ConstCubicHermiteSpline</span> <span class=
-"op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
-    <span class="ident">data</span>: <span class="kw-2">&</span>[
-        (<span class="op">-</span><span class=
-"number">9.210_340_371_976_184</span>, <span class=
-"number">106.75</span>, <span class="number">0.</span>),
-        (<span class="op">-</span><span class=
-"number">8.517_193_191_416_238</span>, <span class=
-"number">106.75</span>, <span class="op">-</span><span class=
-"number">0.005_000_000_000_002_558</span>),
-        (<span class="op">-</span><span class=
-"number">7.600_902_459_542_082</span>, <span class=
-"number">106.74</span>, <span class="op">-</span><span class=
-"number">0.023_782_353_986_828_1</span>),
-        (<span class="op">-</span><span class=
-"number">6.907_755_278_982_137</span>, <span class=
-"number">106.7</span>, <span class="op">-</span><span class=
-"number">0.089_999_999_999_996_3</span>),
-        (<span class="op">-</span><span class=
-"number">6.214_608_098_422_191</span>, <span class=
-"number">106.56</span>, <span class="op">-</span><span class=
-"number">0.567_534_966_642_117_1</span>),
-        (<span class="op">-</span><span class=
-"number">5.298_317_366_548_036</span>, <span class=
-"number">105.61</span>, <span class="op">-</span><span class=
-"number">1.739_323_628_748_867_6</span>),
-        (<span class="op">-</span><span class=
-"number">4.605_170_185_988_092</span>, <span class=
-"number">102.85</span>, <span class="op">-</span><span class=
-"number">4.540_000_000_000_002</span>),
-        (<span class="op">-</span><span class=
-"number">3.912_023_005_428_146</span>, <span class=
-"number">96.53</span>, <span class="op">-</span><span class=
-"number">8.372_292_779_844_06</span>),
-        (<span class="op">-</span><span class=
-"number">2.995_732_273_553_991</span>, <span class=
-"number">88.14</span>, <span class="op">-</span><span class=
-"number">4.178_394_994_950_497</span>),
-        (<span class="op">-</span><span class=
-"number">2.302_585_092_994_046</span>, <span class=
-"number">86.13</span>, <span class="op">-</span><span class=
-"number">1.384_999_999_999_999</span>),
-        (<span class="op">-</span><span class=
-"number">1.609_437_912_434_100_3</span>, <span class=
-"number">85.37</span>, <span class="op">-</span><span class=
-"number">2.287_332_676_057_195</span>),
-        (<span class="op">-</span><span class=
-"number">0.693_147_180_559_945_3</span>, <span class=
-"number">81.8</span>, <span class="op">-</span><span class=
-"number">4.500_300_373_298_365</span>),
-        (<span class="number">0.</span>, <span class=
-"number">75.5</span>, <span class="op">-</span><span class=
-"number">6.624_999_999_999_999</span>),
-        (<span class=
-"number">0.693_147_180_559_945_3</span>, <span class=
-"number">68.55</span>, <span class="op">-</span><span class=
-"number">7.392_802_803_889_832</span>),
-        (<span class=
-"number">1.539_445_540_614_065_5</span>, <span class=
-"number">62.25</span>, <span class="op">-</span><span class=
-"number">3.742_392_982_957_152_3</span>),
-        (<span class=
-"number">1.544_118_446_313_457_8</span>, <span class=
-"number">54.8</span>, <span class="op">-</span><span class=
-"number">56.734_317_669_096_42</span>),
-        (<span class=
-"number">1.609_437_912_434_100_3</span>, <span class=
-"number">45.47</span>, <span class="op">-</span><span class=
-"number">6.513_275_781_770_426</span>),
-        (<span class=
-"number">1.660_731_206_821_650_9</span>, <span class=
-"number">39.77</span>, <span class="op">-</span><span class=
-"number">5.434_127_195_575_209</span>),
-        (<span class=
-"number">1.714_798_428_091_926_6</span>, <span class=
-"number">34.91</span>, <span class="op">-</span><span class=
-"number">4.603_930_719_349_456_5</span>),
-        (<span class=
-"number">1.771_956_841_931_875_4</span>, <span class=
-"number">30.84</span>, <span class="op">-</span><span class=
-"number">3.833_406_735_041_674_7</span>),
-        (<span class=
-"number">1.832_581_463_748_310_2</span>, <span class=
-"number">27.49</span>, <span class="op">-</span><span class=
-"number">3.143_137_274_369_373_3</span>),
-        (<span class=
-"number">1.897_119_984_885_881_3</span>, <span class=
-"number">24.77</span>, <span class="op">-</span><span class=
-"number">2.543_865_126_878_939_6</span>),
-        (<span class=
-"number">1.966_112_856_372_832_7</span>, <span class=
-"number">22.59</span>, <span class="op">-</span><span class=
-"number">2.035_812_112_999_736</span>),
-        (<span class=
-"number">2.040_220_828_526_554_6</span>, <span class=
-"number">20.86</span>, <span class="op">-</span><span class=
-"number">4.717_357_289_896_269</span>),
-        (<span class=
-"number">2.302_585_092_994_046</span>, <span class=
-"number">17.55</span>, <span class="op">-</span><span class=
-"number">5.987_388_847_067_43</span>),
-        (<span class=
-"number">2.995_732_273_553_991</span>, <span class=
-"number">14.32</span>, <span class="op">-</span><span class=
-"number">3.669_913_873_243_092</span>),
-        (<span class=
-"number">3.912_023_005_428_146</span>, <span class=
-"number">11.25</span>, <span class="op">-</span><span class=
-"number">1.406_182_673_956_857_3</span>),
-        (<span class=
-"number">4.605_170_185_988_092</span>, <span class=
-"number">10.76</span>, <span class="op">-</span><span class=
-"number">0.254_999_999_999_999_45</span>),
-        (<span class=
-"number">5.298_317_366_548_036</span>, <span class=
-"number">10.74</span>, <span class="op">-</span><span class=
-"number">0.033_219_280_948_873_824</span>),
-        (<span class=
-"number">6.214_608_098_422_191</span>, <span class=
-"number">10.7</span>, <span class="op">-</span><span class=
-"number">0.085_129_415_947_320_35</span>),
-        (<span class=
-"number">6.907_755_278_982_137</span>, <span class=
-"number">10.56</span>, <span class="op">-</span><span class=
-"number">0.334_999_999_999_999_96</span>),
-        (<span class=
-"number">7.600_902_459_542_082</span>, <span class=
-"number">10.03</span>, <span class="op">-</span><span class=
-"number">1.590_310_945_145_152</span>),
-        (<span class=
-"number">8.517_193_191_416_238</span>, <span class=
-"number">7.55</span>, <span class="op">-</span><span class=
-"number">2.323_023_788_733_875_6</span>),
-        (<span class=
-"number">9.210_340_371_976_184</span>, <span class=
-"number">4.78</span>, <span class="op">-</span><span class=
-"number">1.809_999_999_999_996</span>),
-        (<span class=
-"number">9.903_487_552_536_127</span>, <span class=
-"number">3.93</span>, <span class="op">-</span><span class=
-"number">0.571_819_440_327_131</span>),
-        (<span class=
-"number">10.819_778_284_410_283</span>, <span class=
-"number">3.91</span>, <span class="op">-</span><span class=
-"number">0.007_564_707_973_660_3</span>),
-        (<span class=
-"number">11.512_925_464_970_229</span>, <span class=
-"number">3.91</span>, <span class="number">0.</span>),
+<span class="doccomment">/// Data is sourced from [`arXiv:1609.049_79`](https://arxiv.org/abs/1609.049_79).</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">approx_constant</span>)]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">STANDARD_MODEL_GSTAR</span>: <span class="ident">ConstCubicHermiteSpline</span> <span class="op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
+    <span class="ident">data</span>: <span class="kw-2">&amp;</span>[
+        (<span class="op">-</span><span class="number">9.210_340_371_976_184</span>, <span class="number">106.75</span>, <span class="number">0.</span>),
+        (<span class="op">-</span><span class="number">8.517_193_191_416_238</span>, <span class="number">106.75</span>, <span class="op">-</span><span class="number">0.005_000_000_000_002_558</span>),
+        (<span class="op">-</span><span class="number">7.600_902_459_542_082</span>, <span class="number">106.74</span>, <span class="op">-</span><span class="number">0.023_782_353_986_828_1</span>),
+        (<span class="op">-</span><span class="number">6.907_755_278_982_137</span>, <span class="number">106.7</span>, <span class="op">-</span><span class="number">0.089_999_999_999_996_3</span>),
+        (<span class="op">-</span><span class="number">6.214_608_098_422_191</span>, <span class="number">106.56</span>, <span class="op">-</span><span class="number">0.567_534_966_642_117_1</span>),
+        (<span class="op">-</span><span class="number">5.298_317_366_548_036</span>, <span class="number">105.61</span>, <span class="op">-</span><span class="number">1.739_323_628_748_867_6</span>),
+        (<span class="op">-</span><span class="number">4.605_170_185_988_092</span>, <span class="number">102.85</span>, <span class="op">-</span><span class="number">4.540_000_000_000_002</span>),
+        (<span class="op">-</span><span class="number">3.912_023_005_428_146</span>, <span class="number">96.53</span>, <span class="op">-</span><span class="number">8.372_292_779_844_06</span>),
+        (<span class="op">-</span><span class="number">2.995_732_273_553_991</span>, <span class="number">88.14</span>, <span class="op">-</span><span class="number">4.178_394_994_950_497</span>),
+        (<span class="op">-</span><span class="number">2.302_585_092_994_046</span>, <span class="number">86.13</span>, <span class="op">-</span><span class="number">1.384_999_999_999_999</span>),
+        (<span class="op">-</span><span class="number">1.609_437_912_434_100_3</span>, <span class="number">85.37</span>, <span class="op">-</span><span class="number">2.287_332_676_057_195</span>),
+        (<span class="op">-</span><span class="number">0.693_147_180_559_945_3</span>, <span class="number">81.8</span>, <span class="op">-</span><span class="number">4.500_300_373_298_365</span>),
+        (<span class="number">0.</span>, <span class="number">75.5</span>, <span class="op">-</span><span class="number">6.624_999_999_999_999</span>),
+        (<span class="number">0.693_147_180_559_945_3</span>, <span class="number">68.55</span>, <span class="op">-</span><span class="number">7.392_802_803_889_832</span>),
+        (<span class="number">1.539_445_540_614_065_5</span>, <span class="number">62.25</span>, <span class="op">-</span><span class="number">3.742_392_982_957_152_3</span>),
+        (<span class="number">1.544_118_446_313_457_8</span>, <span class="number">54.8</span>, <span class="op">-</span><span class="number">56.734_317_669_096_42</span>),
+        (<span class="number">1.609_437_912_434_100_3</span>, <span class="number">45.47</span>, <span class="op">-</span><span class="number">6.513_275_781_770_426</span>),
+        (<span class="number">1.660_731_206_821_650_9</span>, <span class="number">39.77</span>, <span class="op">-</span><span class="number">5.434_127_195_575_209</span>),
+        (<span class="number">1.714_798_428_091_926_6</span>, <span class="number">34.91</span>, <span class="op">-</span><span class="number">4.603_930_719_349_456_5</span>),
+        (<span class="number">1.771_956_841_931_875_4</span>, <span class="number">30.84</span>, <span class="op">-</span><span class="number">3.833_406_735_041_674_7</span>),
+        (<span class="number">1.832_581_463_748_310_2</span>, <span class="number">27.49</span>, <span class="op">-</span><span class="number">3.143_137_274_369_373_3</span>),
+        (<span class="number">1.897_119_984_885_881_3</span>, <span class="number">24.77</span>, <span class="op">-</span><span class="number">2.543_865_126_878_939_6</span>),
+        (<span class="number">1.966_112_856_372_832_7</span>, <span class="number">22.59</span>, <span class="op">-</span><span class="number">2.035_812_112_999_736</span>),
+        (<span class="number">2.040_220_828_526_554_6</span>, <span class="number">20.86</span>, <span class="op">-</span><span class="number">4.717_357_289_896_269</span>),
+        (<span class="number">2.302_585_092_994_046</span>, <span class="number">17.55</span>, <span class="op">-</span><span class="number">5.987_388_847_067_43</span>),
+        (<span class="number">2.995_732_273_553_991</span>, <span class="number">14.32</span>, <span class="op">-</span><span class="number">3.669_913_873_243_092</span>),
+        (<span class="number">3.912_023_005_428_146</span>, <span class="number">11.25</span>, <span class="op">-</span><span class="number">1.406_182_673_956_857_3</span>),
+        (<span class="number">4.605_170_185_988_092</span>, <span class="number">10.76</span>, <span class="op">-</span><span class="number">0.254_999_999_999_999_45</span>),
+        (<span class="number">5.298_317_366_548_036</span>, <span class="number">10.74</span>, <span class="op">-</span><span class="number">0.033_219_280_948_873_824</span>),
+        (<span class="number">6.214_608_098_422_191</span>, <span class="number">10.7</span>, <span class="op">-</span><span class="number">0.085_129_415_947_320_35</span>),
+        (<span class="number">6.907_755_278_982_137</span>, <span class="number">10.56</span>, <span class="op">-</span><span class="number">0.334_999_999_999_999_96</span>),
+        (<span class="number">7.600_902_459_542_082</span>, <span class="number">10.03</span>, <span class="op">-</span><span class="number">1.590_310_945_145_152</span>),
+        (<span class="number">8.517_193_191_416_238</span>, <span class="number">7.55</span>, <span class="op">-</span><span class="number">2.323_023_788_733_875_6</span>),
+        (<span class="number">9.210_340_371_976_184</span>, <span class="number">4.78</span>, <span class="op">-</span><span class="number">1.809_999_999_999_996</span>),
+        (<span class="number">9.903_487_552_536_127</span>, <span class="number">3.93</span>, <span class="op">-</span><span class="number">0.571_819_440_327_131</span>),
+        (<span class="number">10.819_778_284_410_283</span>, <span class="number">3.91</span>, <span class="op">-</span><span class="number">0.007_564_707_973_660_3</span>),
+        (<span class="number">11.512_925_464_970_229</span>, <span class="number">3.91</span>, <span class="number">0.</span>),
     ],
 };
 
-<span class=
-"doccomment">/// Value of \\(g_{*}\\) for a fermion.</span>
+<span class="doccomment">/// Value of `$g_{*}$` for a fermion.</span>
 <span class="doccomment">///</span>
-<span class=
-"doccomment">/// The first column is the log-transformed inverse temperature scaled to the</span>
-<span class=
-"doccomment">/// fermion's mass: \\(\ln(m\beta)\\).</span>
+<span class="doccomment">/// The first column is the log-transformed inverse temperature scaled to the</span>
+<span class="doccomment">/// fermion&#39;s mass: `$\ln(m\beta)$`.</span>
 <span class="doccomment">///</span>
-<span class=
-"doccomment">/// The second column is is log-transformed value of \\(g_{*}\\),</span>
-<span class="doccomment">/// \\(\log(g_{*})\\).</span>
+<span class="doccomment">/// The second column is is log-transformed value of `$g_{*}$`,</span>
+<span class="doccomment">/// `$\log(g_{*})$`.</span>
 <span class="doccomment">///</span>
-<span class=
-"doccomment">/// Data is sourced from [`arXiv:1609.049_79`](https://arxiv.org/abs/1609.049_79).</span>
-<span class="attribute">#[<span class=
-"ident">allow</span>(<span class=
-"ident">clippy</span>::<span class="ident">approx_constant</span>)]</span>
-<span class="kw">pub</span>(<span class=
-"kw">crate</span>) <span class="kw">const</span> <span class=
-"ident">FERMION_GSTAR</span>: <span class=
-"ident">ConstCubicHermiteSpline</span> <span class=
-"op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
-    <span class="attribute">#[<span class=
-"ident">rustfmt</span>::<span class="ident">skip</span>]</span>
-    <span class="ident">data</span>: <span class="kw-2">&</span>[
-        (<span class="op">-</span><span class=
-"number">2.302_585_092_994_046</span>, <span class=
-"op">-</span><span class=
-"number">0.133_531_392_624_522_63</span>, <span class=
-"op">-</span><span class=
-"number">0.001_143_510_702_078_964_8</span>),
-        (<span class="op">-</span><span class=
-"number">0.693_147_180_559_945_3</span>, <span class=
-"op">-</span><span class=
-"number">0.134_674_903_326_601_6</span>, <span class=
-"op">-</span><span class="number">0.012_993_166_039_755_6</span>),
-        (<span class="number">0.</span>, <span class=
-"op">-</span><span class=
-"number">0.160_168_752_152_821_34</span>, <span class=
-"op">-</span><span class="number">0.052_426_063_619_066_1</span>),
-        (<span class=
-"number">0.693_147_180_559_945_3</span>, <span class=
-"op">-</span><span class=
-"number">0.239_527_030_564_733_8</span>, <span class=
-"op">-</span><span class="number">0.171_519_009_089_152_46</span>),
-        (<span class=
-"number">1.098_612_288_668_109_8</span>, <span class=
-"op">-</span><span class=
-"number">0.536_143_431_750_280_7</span>, <span class=
-"op">-</span><span class="number">0.324_909_672_812_512</span>),
-        (<span class=
-"number">1.386_294_361_119_890_6</span>, <span class=
-"op">-</span><span class=
-"number">0.975_510_091_534_126_3</span>, <span class=
-"op">-</span><span class="number">0.435_183_531_721_403_95</span>),
-        (<span class=
-"number">1.609_437_912_434_100_3</span>, <span class=
-"op">-</span><span class=
-"number">1.505_077_897_109_857_5</span>, <span class=
-"op">-</span><span class="number">0.523_937_020_782_128_4</span>),
-        (<span class=
-"number">1.791_759_469_228_055</span>, <span class=
-"op">-</span><span class=
-"number">2.120_263_536_200_091</span>, <span class=
-"op">-</span><span class="number">0.936_818_292_479_132_3</span>),
-        (<span class=
-"number">1.945_910_149_055_313_2</span>, <span class=
-"op">-</span><span class=
-"number">3.473_768_074_496_991</span>, <span class=
-"op">-</span><span class="number">0.949_197_982_239_101_8</span>),
-        (<span class=
-"number">2.079_441_541_679_835_7</span>, <span class=
-"op">-</span><span class=
-"number">4.199_705_077_879_927</span>, <span class=
-"op">-</span><span class="number">0.710_603_955_940_963_3</span>),
-        (<span class=
-"number">2.197_224_577_336_219_6</span>, <span class=
-"op">-</span><span class=
-"number">4.980_591_172_747_879</span>, <span class=
-"op">-</span><span class="number">0.739_144_034_115_335_8</span>),
-        (<span class=
-"number">2.302_585_092_994_046</span>, <span class=
-"op">-</span><span class=
-"number">5.760_352_826_144_595_5</span>, <span class=
-"op">-</span><span class="number">1.480_184_188_474_602</span>),
-        (<span class=
-"number">2.484_906_649_788_000_4</span>, <span class=
-"op">-</span><span class=
-"number">7.371_379_301_263_834</span>, <span class=
-"op">-</span><span class="number">1.513_555_620_070_245_8</span>),
-        (<span class=
-"number">2.639_057_329_615_258_4</span>, <span class=
-"op">-</span><span class=
-"number">9.036_387_064_852_745</span>, <span class=
-"op">-</span><span class="number">1.572_053_280_541_367</span>),
-        (<span class=
-"number">2.772_588_722_239_781</span>, <span class=
-"op">-</span><span class=
-"number">10.738_198_297_417_86</span>, <span class=
-"op">-</span><span class="number">1.616_471_892_646_872_4</span>),
-        (<span class=
-"number">2.890_371_757_896_164_5</span>, <span class=
-"op">-</span><span class=
-"number">12.470_038_191_364_639</span>, <span class=
-"op">-</span><span class="number">1.654_328_690_409_699_4</span>),
-        (<span class=
-"number">2.995_732_273_553_991</span>, <span class=
-"op">-</span><span class=
-"number">14.229_511_997_094_725</span>, <span class=
-"op">-</span><span class="number">7.913_746_509_155_695</span>),
-        (<span class=
-"number">3.401_197_381_662_155_5</span>, <span class=
-"op">-</span><span class=
-"number">23.285_917_835_359_264</span>, <span class=
-"op">-</span><span class="number">7.871_310_473_829_766</span>),
-        (<span class=
-"number">3.688_879_454_113_936_3</span>, <span class=
-"op">-</span><span class=
-"number">32.602_916_581_708_875</span>, <span class=
-"op">-</span><span class="number">8.345_168_743_729_955</span>),
-        (<span class=
-"number">3.912_023_005_428_146</span>, <span class=
-"op">-</span><span class=
-"number">42.066_428_392_713_18</span>, <span class=
-"op">-</span><span class="number">38.853_498_165_506_36</span>),
-        (<span class=
-"number">4.605_170_185_988_092</span>, <span class=
-"op">-</span><span class=
-"number">90.377_072_055_856_23</span>, <span class=
-"op">-</span><span class="number">48.310_643_663_143_054</span>),
+<span class="doccomment">/// Data is sourced from [`arXiv:1609.049_79`](https://arxiv.org/abs/1609.049_79).</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">approx_constant</span>)]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">FERMION_GSTAR</span>: <span class="ident">ConstCubicHermiteSpline</span> <span class="op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
+    <span class="attribute">#[<span class="ident">rustfmt</span>::<span class="ident">skip</span>]</span>
+    <span class="ident">data</span>: <span class="kw-2">&amp;</span>[
+        (<span class="op">-</span><span class="number">2.302_585_092_994_046</span>, <span class="op">-</span><span class="number">0.133_531_392_624_522_63</span>, <span class="op">-</span><span class="number">0.001_143_510_702_078_964_8</span>),
+        (<span class="op">-</span><span class="number">0.693_147_180_559_945_3</span>, <span class="op">-</span><span class="number">0.134_674_903_326_601_6</span>, <span class="op">-</span><span class="number">0.012_993_166_039_755_6</span>),
+        (<span class="number">0.</span>, <span class="op">-</span><span class="number">0.160_168_752_152_821_34</span>, <span class="op">-</span><span class="number">0.052_426_063_619_066_1</span>),
+        (<span class="number">0.693_147_180_559_945_3</span>, <span class="op">-</span><span class="number">0.239_527_030_564_733_8</span>, <span class="op">-</span><span class="number">0.171_519_009_089_152_46</span>),
+        (<span class="number">1.098_612_288_668_109_8</span>, <span class="op">-</span><span class="number">0.536_143_431_750_280_7</span>, <span class="op">-</span><span class="number">0.324_909_672_812_512</span>),
+        (<span class="number">1.386_294_361_119_890_6</span>, <span class="op">-</span><span class="number">0.975_510_091_534_126_3</span>, <span class="op">-</span><span class="number">0.435_183_531_721_403_95</span>),
+        (<span class="number">1.609_437_912_434_100_3</span>, <span class="op">-</span><span class="number">1.505_077_897_109_857_5</span>, <span class="op">-</span><span class="number">0.523_937_020_782_128_4</span>),
+        (<span class="number">1.791_759_469_228_055</span>, <span class="op">-</span><span class="number">2.120_263_536_200_091</span>, <span class="op">-</span><span class="number">0.936_818_292_479_132_3</span>),
+        (<span class="number">1.945_910_149_055_313_2</span>, <span class="op">-</span><span class="number">3.473_768_074_496_991</span>, <span class="op">-</span><span class="number">0.949_197_982_239_101_8</span>),
+        (<span class="number">2.079_441_541_679_835_7</span>, <span class="op">-</span><span class="number">4.199_705_077_879_927</span>, <span class="op">-</span><span class="number">0.710_603_955_940_963_3</span>),
+        (<span class="number">2.197_224_577_336_219_6</span>, <span class="op">-</span><span class="number">4.980_591_172_747_879</span>, <span class="op">-</span><span class="number">0.739_144_034_115_335_8</span>),
+        (<span class="number">2.302_585_092_994_046</span>, <span class="op">-</span><span class="number">5.760_352_826_144_595_5</span>, <span class="op">-</span><span class="number">1.480_184_188_474_602</span>),
+        (<span class="number">2.484_906_649_788_000_4</span>, <span class="op">-</span><span class="number">7.371_379_301_263_834</span>, <span class="op">-</span><span class="number">1.513_555_620_070_245_8</span>),
+        (<span class="number">2.639_057_329_615_258_4</span>, <span class="op">-</span><span class="number">9.036_387_064_852_745</span>, <span class="op">-</span><span class="number">1.572_053_280_541_367</span>),
+        (<span class="number">2.772_588_722_239_781</span>, <span class="op">-</span><span class="number">10.738_198_297_417_86</span>, <span class="op">-</span><span class="number">1.616_471_892_646_872_4</span>),
+        (<span class="number">2.890_371_757_896_164_5</span>, <span class="op">-</span><span class="number">12.470_038_191_364_639</span>, <span class="op">-</span><span class="number">1.654_328_690_409_699_4</span>),
+        (<span class="number">2.995_732_273_553_991</span>, <span class="op">-</span><span class="number">14.229_511_997_094_725</span>, <span class="op">-</span><span class="number">7.913_746_509_155_695</span>),
+        (<span class="number">3.401_197_381_662_155_5</span>, <span class="op">-</span><span class="number">23.285_917_835_359_264</span>, <span class="op">-</span><span class="number">7.871_310_473_829_766</span>),
+        (<span class="number">3.688_879_454_113_936_3</span>, <span class="op">-</span><span class="number">32.602_916_581_708_875</span>, <span class="op">-</span><span class="number">8.345_168_743_729_955</span>),
+        (<span class="number">3.912_023_005_428_146</span>, <span class="op">-</span><span class="number">42.066_428_392_713_18</span>, <span class="op">-</span><span class="number">38.853_498_165_506_36</span>),
+        (<span class="number">4.605_170_185_988_092</span>, <span class="op">-</span><span class="number">90.377_072_055_856_23</span>, <span class="op">-</span><span class="number">48.310_643_663_143_054</span>),
     ],
 };
 
-<span class=
-"doccomment">/// Value of \\(g_{*}\\) for a boson.</span>
+<span class="doccomment">/// Value of `$g_{*}$` for a boson.</span>
 <span class="doccomment">///</span>
-<span class=
-"doccomment">/// The first column is the log-transformed inverse temperature scaled to the</span>
-<span class=
-"doccomment">/// fermion's mass: \\(\ln(m\beta)\\).</span>
+<span class="doccomment">/// The first column is the log-transformed inverse temperature scaled to the</span>
+<span class="doccomment">/// fermion&#39;s mass: `$\ln(m\beta)$`.</span>
 <span class="doccomment">///</span>
-<span class=
-"doccomment">/// The second column is is log-transformed value of \\(g_{*}\\),</span>
-<span class="doccomment">/// \\(\log(g_{*})\\).</span>
+<span class="doccomment">/// The second column is is log-transformed value of `$g_{*}$`,</span>
+<span class="doccomment">/// `$\log(g_{*})$`.</span>
 <span class="doccomment">///</span>
-<span class=
-"doccomment">/// Data is sourced from [`arXiv:1609.049_79`](https://arxiv.org/abs/1609.049_79).</span>
-<span class="attribute">#[<span class=
-"ident">allow</span>(<span class=
-"ident">clippy</span>::<span class="ident">approx_constant</span>)]</span>
-<span class="kw">pub</span>(<span class=
-"kw">crate</span>) <span class="kw">const</span> <span class=
-"ident">BOSON_GSTAR</span>: <span class=
-"ident">ConstCubicHermiteSpline</span> <span class=
-"op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
-    <span class="attribute">#[<span class=
-"ident">rustfmt</span>::<span class="ident">skip</span>]</span>
-    <span class="ident">data</span>: <span class="kw-2">&</span>[
-        (<span class="op">-</span><span class=
-"number">2.302_585_092_994_046</span>, <span class=
-"number">0.</span>, <span class="op">-</span><span class=
-"number">0.002_002_002_670_673_079_3</span>),
-        (<span class="op">-</span><span class=
-"number">0.693_147_180_559_945</span>, <span class=
-"op">-</span><span class=
-"number">0.002_002_002_670_673_079_3</span>, <span class=
-"op">-</span><span class="number">0.019_841_103_734_520_65</span>),
-        (<span class="number">0.</span>, <span class=
-"op">-</span><span class=
-"number">0.040_821_994_520_255_166</span>, <span class=
-"op">-</span><span class="number">0.072_669_292_614_018_03</span>),
-        (<span class=
-"number">0.693_147_180_559_945_3</span>, <span class=
-"op">-</span><span class=
-"number">0.147_340_587_898_709_13</span>, <span class=
-"op">-</span><span class="number">0.202_179_568_951_588_48</span>),
-        (<span class=
-"number">1.098_612_288_668_109_8</span>, <span class=
-"op">-</span><span class=
-"number">0.489_390_343_045_925_66</span>, <span class=
-"op">-</span><span class="number">0.353_904_882_564_688_77</span>),
-        (<span class=
-"number">1.386_294_361_119_890_6</span>, <span class=
-"op">-</span><span class=
-"number">0.954_511_944_694_352_9</span>, <span class=
-"op">-</span><span class="number">0.455_671_147_601_678_15</span>),
-        (<span class=
-"number">1.609_437_912_434_100_3</span>, <span class=
-"op">-</span><span class=
-"number">1.505_077_897_109_857_5</span>, <span class=
-"op">-</span><span class="number">0.532_515_388_382_419_7</span>),
-        (<span class=
-"number">1.791_759_469_228_055</span>, <span class=
-"op">-</span><span class=
-"number">2.120_263_536_200_091</span>, <span class=
-"op">-</span><span class="number">0.936_818_292_479_132_3</span>),
-        (<span class=
-"number">1.945_910_149_055_313_2</span>, <span class=
-"op">-</span><span class=
-"number">3.473_768_074_496_991</span>, <span class=
-"op">-</span><span class="number">0.949_197_982_239_101_8</span>),
-        (<span class=
-"number">2.079_441_541_679_835_7</span>, <span class=
-"op">-</span><span class=
-"number">4.199_705_077_879_927</span>, <span class=
-"op">-</span><span class="number">0.710_603_955_940_963_3</span>),
-        (<span class=
-"number">2.197_224_577_336_219_6</span>, <span class=
-"op">-</span><span class=
-"number">4.980_591_172_747_879</span>, <span class=
-"op">-</span><span class="number">0.739_144_034_115_335_8</span>),
-        (<span class=
-"number">2.302_585_092_994_046</span>, <span class=
-"op">-</span><span class=
-"number">5.760_352_826_144_595_5</span>, <span class=
-"op">-</span><span class="number">1.480_184_188_474_602</span>),
-        (<span class=
-"number">2.484_906_649_788_000_4</span>, <span class=
-"op">-</span><span class=
-"number">7.371_379_301_263_834</span>, <span class=
-"op">-</span><span class="number">1.513_555_620_070_245_8</span>),
-        (<span class=
-"number">2.639_057_329_615_258_4</span>, <span class=
-"op">-</span><span class=
-"number">9.036_387_064_852_745</span>, <span class=
-"op">-</span><span class="number">1.572_053_280_541_367</span>),
-        (<span class=
-"number">2.772_588_722_239_781</span>, <span class=
-"op">-</span><span class=
-"number">10.738_198_297_417_86</span>, <span class=
-"op">-</span><span class="number">1.616_471_892_646_872_4</span>),
-        (<span class=
-"number">2.890_371_757_896_164_5</span>, <span class=
-"op">-</span><span class=
-"number">12.470_038_191_364_639</span>, <span class=
-"op">-</span><span class="number">1.654_328_690_409_699_4</span>),
-        (<span class=
-"number">2.995_732_273_553_991</span>, <span class=
-"op">-</span><span class=
-"number">14.229_511_997_094_725</span>, <span class=
-"op">-</span><span class="number">7.913_746_509_155_695</span>),
-        (<span class=
-"number">3.401_197_381_662_155_5</span>, <span class=
-"op">-</span><span class=
-"number">23.285_917_835_359_264</span>, <span class=
-"op">-</span><span class="number">7.871_310_473_829_766</span>),
-        (<span class=
-"number">3.688_879_454_113_936_3</span>, <span class=
-"op">-</span><span class=
-"number">32.602_916_581_708_875</span>, <span class=
-"op">-</span><span class="number">8.345_168_743_729_955</span>),
-        (<span class=
-"number">3.912_023_005_428_146</span>, <span class=
-"op">-</span><span class=
-"number">42.066_428_392_713_18</span>, <span class=
-"op">-</span><span class="number">38.853_498_165_506_36</span>),
-        (<span class=
-"number">4.605_170_185_988_092</span>, <span class=
-"op">-</span><span class=
-"number">90.377_072_055_856_23</span>, <span class=
-"op">-</span><span class="number">48.310_643_663_143_054</span>),
+<span class="doccomment">/// Data is sourced from [`arXiv:1609.049_79`](https://arxiv.org/abs/1609.049_79).</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">approx_constant</span>)]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">BOSON_GSTAR</span>: <span class="ident">ConstCubicHermiteSpline</span> <span class="op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
+    <span class="attribute">#[<span class="ident">rustfmt</span>::<span class="ident">skip</span>]</span>
+    <span class="ident">data</span>: <span class="kw-2">&amp;</span>[
+        (<span class="op">-</span><span class="number">2.302_585_092_994_046</span>, <span class="number">0.</span>, <span class="op">-</span><span class="number">0.002_002_002_670_673_079_3</span>),
+        (<span class="op">-</span><span class="number">0.693_147_180_559_945</span>, <span class="op">-</span><span class="number">0.002_002_002_670_673_079_3</span>, <span class="op">-</span><span class="number">0.019_841_103_734_520_65</span>),
+        (<span class="number">0.</span>, <span class="op">-</span><span class="number">0.040_821_994_520_255_166</span>, <span class="op">-</span><span class="number">0.072_669_292_614_018_03</span>),
+        (<span class="number">0.693_147_180_559_945_3</span>, <span class="op">-</span><span class="number">0.147_340_587_898_709_13</span>, <span class="op">-</span><span class="number">0.202_179_568_951_588_48</span>),
+        (<span class="number">1.098_612_288_668_109_8</span>, <span class="op">-</span><span class="number">0.489_390_343_045_925_66</span>, <span class="op">-</span><span class="number">0.353_904_882_564_688_77</span>),
+        (<span class="number">1.386_294_361_119_890_6</span>, <span class="op">-</span><span class="number">0.954_511_944_694_352_9</span>, <span class="op">-</span><span class="number">0.455_671_147_601_678_15</span>),
+        (<span class="number">1.609_437_912_434_100_3</span>, <span class="op">-</span><span class="number">1.505_077_897_109_857_5</span>, <span class="op">-</span><span class="number">0.532_515_388_382_419_7</span>),
+        (<span class="number">1.791_759_469_228_055</span>, <span class="op">-</span><span class="number">2.120_263_536_200_091</span>, <span class="op">-</span><span class="number">0.936_818_292_479_132_3</span>),
+        (<span class="number">1.945_910_149_055_313_2</span>, <span class="op">-</span><span class="number">3.473_768_074_496_991</span>, <span class="op">-</span><span class="number">0.949_197_982_239_101_8</span>),
+        (<span class="number">2.079_441_541_679_835_7</span>, <span class="op">-</span><span class="number">4.199_705_077_879_927</span>, <span class="op">-</span><span class="number">0.710_603_955_940_963_3</span>),
+        (<span class="number">2.197_224_577_336_219_6</span>, <span class="op">-</span><span class="number">4.980_591_172_747_879</span>, <span class="op">-</span><span class="number">0.739_144_034_115_335_8</span>),
+        (<span class="number">2.302_585_092_994_046</span>, <span class="op">-</span><span class="number">5.760_352_826_144_595_5</span>, <span class="op">-</span><span class="number">1.480_184_188_474_602</span>),
+        (<span class="number">2.484_906_649_788_000_4</span>, <span class="op">-</span><span class="number">7.371_379_301_263_834</span>, <span class="op">-</span><span class="number">1.513_555_620_070_245_8</span>),
+        (<span class="number">2.639_057_329_615_258_4</span>, <span class="op">-</span><span class="number">9.036_387_064_852_745</span>, <span class="op">-</span><span class="number">1.572_053_280_541_367</span>),
+        (<span class="number">2.772_588_722_239_781</span>, <span class="op">-</span><span class="number">10.738_198_297_417_86</span>, <span class="op">-</span><span class="number">1.616_471_892_646_872_4</span>),
+        (<span class="number">2.890_371_757_896_164_5</span>, <span class="op">-</span><span class="number">12.470_038_191_364_639</span>, <span class="op">-</span><span class="number">1.654_328_690_409_699_4</span>),
+        (<span class="number">2.995_732_273_553_991</span>, <span class="op">-</span><span class="number">14.229_511_997_094_725</span>, <span class="op">-</span><span class="number">7.913_746_509_155_695</span>),
+        (<span class="number">3.401_197_381_662_155_5</span>, <span class="op">-</span><span class="number">23.285_917_835_359_264</span>, <span class="op">-</span><span class="number">7.871_310_473_829_766</span>),
+        (<span class="number">3.688_879_454_113_936_3</span>, <span class="op">-</span><span class="number">32.602_916_581_708_875</span>, <span class="op">-</span><span class="number">8.345_168_743_729_955</span>),
+        (<span class="number">3.912_023_005_428_146</span>, <span class="op">-</span><span class="number">42.066_428_392_713_18</span>, <span class="op">-</span><span class="number">38.853_498_165_506_36</span>),
+        (<span class="number">4.605_170_185_988_092</span>, <span class="op">-</span><span class="number">90.377_072_055_856_23</span>, <span class="op">-</span><span class="number">48.310_643_663_143_054</span>),
     ],
 };
 
-<span class="kw">pub</span>(<span class=
-"kw">crate</span>) <span class="kw">const</span> <span class=
-"ident">G1_RUNNING</span>: <span class=
-"ident">ConstCubicHermiteSpline</span> <span class=
-"op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
-    <span class="ident">data</span>: <span class="kw-2">&</span>[
-        (<span class="number">1e-17</span>, <span class=
-"number">0.588_709</span>, <span class="op">-</span><span class=
-"number">0.003_659_000_000_000_079</span>),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">G1_RUNNING</span>: <span class="ident">ConstCubicHermiteSpline</span> <span class="op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
+    <span class="ident">data</span>: <span class="kw-2">&amp;</span>[
+        (<span class="number">1e-17</span>, <span class="number">0.588_709</span>, <span class="op">-</span><span class="number">0.003_659_000_000_000_079</span>),
         (
             <span class="number">1.998_948_553_061_09e-17</span>,
             <span class="number">0.585_05</span>,
-            <span class="op">-</span><span class=
-"number">0.005_452_578_400_413_114</span>,
+            <span class="op">-</span><span class="number">0.005_452_578_400_413_114</span>,
         ),
         (
-            <span class=
-"number">3.995_796_422_163_883_6e-17</span>,
+            <span class="number">3.995_796_422_163_883_6e-17</span>,
             <span class="number">0.581_459</span>,
-            <span class="op">-</span><span class=
-"number">0.005_352_072_078_038_676_5</span>,
+            <span class="op">-</span><span class="number">0.005_352_072_078_038_676_5</span>,
         ),
         (
             <span class="number">7.987_348_040_703_526e-17</span>,
             <span class="number">0.577_933</span>,
-            <span class="op">-</span><span class=
-"number">0.005_255_179_791_777_989</span>,
+            <span class="op">-</span><span class="number">0.005_255_179_791_777_989</span>,
         ),
         (
-            <span class=
-"number">1.596_633_020_286_819_2e-16</span>,
+            <span class="number">1.596_633_020_286_819_2e-16</span>,
             <span class="number">0.574_471</span>,
-            <span class="op">-</span><span class=
-"number">0.005_161_166_766_141_278</span>,
+            <span class="op">-</span><span class="number">0.005_161_166_766_141_278</span>,
         ),
         (
-            <span class=
-"number">3.191_584_430_174_515_6e-16</span>,
+            <span class="number">3.191_584_430_174_515_6e-16</span>,
             <span class="number">0.571_069</span>,
-            <span class="op">-</span><span class=
-"number">0.005_070_732_058_987_444</span>,
+            <span class="op">-</span><span class="number">0.005_070_732_058_987_444</span>,
         ),
         (
             <span class="number">6.379_829_530_954_933e-16</span>,
             <span class="number">0.567_728</span>,
-            <span class="op">-</span><span class=
-"number">0.004_981_211_390_402_123</span>,
+            <span class="op">-</span><span class="number">0.004_981_211_390_402_123</span>,
         ),
         (
-            <span class=
-"number">1.275_290_606_847_035_3e-15</span>,
+            <span class="number">1.275_290_606_847_035_3e-15</span>,
             <span class="number">0.564_444</span>,
-            <span class="op">-</span><span class=
-"number">0.004_896_280_540_555_485</span>,
+            <span class="op">-</span><span class="number">0.004_896_280_540_555_485</span>,
         ),
         (
             <span class="number">2.549_238_542_447_371e-15</span>,
             <span class="number">0.561_216</span>,
-            <span class="op">-</span><span class=
-"number">0.004_812_810_737_160_987</span>,
+            <span class="op">-</span><span class="number">0.004_812_810_737_160_987</span>,
         ),
         (
-            <span class=
-"number">5.095_801_059_926_620_5e-15</span>,
+            <span class="number">5.095_801_059_926_620_5e-15</span>,
             <span class="number">0.558_043</span>,
-            <span class="op">-</span><span class=
-"number">0.004_731_810_486_927_62</span>,
+            <span class="op">-</span><span class="number">0.004_731_810_486_927_62</span>,
         ),
         (
-            <span class=
-"number">1.018_621_418_145_110_8e-14</span>,
+            <span class="number">1.018_621_418_145_110_8e-14</span>,
             <span class="number">0.554_922</span>,
-            <span class="op">-</span><span class=
-"number">0.004_653_364_492_382_703</span>,
+            <span class="op">-</span><span class="number">0.004_653_364_492_382_703</span>,
         ),
         (
-            <span class=
-"number">2.036_170_533_354_509_5e-14</span>,
+            <span class="number">2.036_170_533_354_509_5e-14</span>,
             <span class="number">0.551_854</span>,
-            <span class="op">-</span><span class=
-"number">0.004_575_893_101_585_903</span>,
+            <span class="op">-</span><span class="number">0.004_575_893_101_585_903</span>,
         ),
         (
             <span class="number">4.070_202_858_910_488e-14</span>,
             <span class="number">0.548_835</span>,
-            <span class="op">-</span><span class=
-"number">0.004_501_891_957_105_64_f64</span>,
+            <span class="op">-</span><span class="number">0.004_501_891_957_105_64_f64</span>,
         ),
         (
             <span class="number">8.136_100_692_382_169e-14</span>,
             <span class="number">0.545_866</span>,
-            <span class="op">-</span><span class=
-"number">0.004_428_450_830_066_243</span>,
+            <span class="op">-</span><span class="number">0.004_428_450_830_066_243</span>,
         ),
         (
             <span class="number">1.626_365_333_697_639e-13</span>,
             <span class="number">0.542_944</span>,
-            <span class="op">-</span><span class=
-"number">0.004_358_457_139_854_289</span>,
+            <span class="op">-</span><span class="number">0.004_358_457_139_854_289</span>,
         ),
         (
             <span class="number">3.251_017_568_498_94e-13</span>,
             <span class="number">0.540_068</span>,
-            <span class="op">-</span><span class=
-"number">0.004_289_986_907_369_462</span>,
+            <span class="op">-</span><span class="number">0.004_289_986_907_369_462</span>,
         ),
         (
             <span class="number">6.498_612_546_221_382e-13</span>,
             <span class="number">0.537_237</span>,
-            <span class="op">-</span><span class=
-"number">0.004_223_511_365_508_486</span>,
+            <span class="op">-</span><span class="number">0.004_223_511_365_508_486</span>,
         ),
         (
-            <span class=
-"number">1.299_038_711_353_598_3e-12</span>,
+            <span class="number">1.299_038_711_353_598_3e-12</span>,
             <span class="number">0.534_449</span>,
-            <span class="op">-</span><span class=
-"number">0.004_158_527_507_199_373</span>,
+            <span class="op">-</span><span class="number">0.004_158_527_507_199_373</span>,
         ),
         (
-            <span class=
-"number">2.596_707_893_732_326_2e-12</span>,
+            <span class="number">2.596_707_893_732_326_2e-12</span>,
             <span class="number">0.531_705</span>,
-            <span class="op">-</span><span class=
-"number">0.004_094_055_075_548_02</span>,
+            <span class="op">-</span><span class="number">0.004_094_055_075_548_02</span>,
         ),
         (
             <span class="number">5.190_679_615_682_081e-12</span>,
             <span class="number">0.529_002</span>,
-            <span class="op">-</span><span class=
-"number">0.004_032_580_218_868_076_5</span>,
+            <span class="op">-</span><span class="number">0.004_032_580_218_868_076_5</span>,
         ),
         (
             <span class="number">1.037_589_803_397_484e-11</span>,
             <span class="number">0.526_34</span>,
-            <span class="op">-</span><span class=
-"number">0.003_972_095_585_651_16</span>,
+            <span class="op">-</span><span class="number">0.003_972_095_585_651_16</span>,
         ),
         (
-            <span class=
-"number">2.074_086_364_956_236_7e-11</span>,
+            <span class="number">2.074_086_364_956_236_7e-11</span>,
             <span class="number">0.523_717</span>,
-            <span class="op">-</span><span class=
-"number">0.003_913_619_612_512_733</span>,
+            <span class="op">-</span><span class="number">0.003_913_619_612_512_733</span>,
         ),
         (
             <span class="number">4.145_988_548_779_628e-11</span>,
             <span class="number">0.521_133</span>,
-            <span class="op">-</span><span class=
-"number">0.003_856_140_852_032_615</span>,
+            <span class="op">-</span><span class="number">0.003_856_140_852_032_615</span>,
         ),
         (
             <span class="number">8.287_613_333_112_331e-11</span>,
             <span class="number">0.518_586</span>,
-            <span class="op">-</span><span class=
-"number">0.003_800_656_798_313_296_5</span>,
+            <span class="op">-</span><span class="number">0.003_800_656_798_313_296_5</span>,
         ),
         (
-            <span class=
-"number">1.656_649_459_600_946_3e-10</span>,
+            <span class="number">1.656_649_459_600_946_3e-10</span>,
             <span class="number">0.516_076</span>,
-            <span class="op">-</span><span class=
-"number">0.003_746_179_088_753_531</span>,
+            <span class="op">-</span><span class="number">0.003_746_179_088_753_531</span>,
         ),
         (
             <span class="number">3.311_554_344_262_567e-10</span>,
             <span class="number">0.513_601</span>,
-            <span class="op">-</span><span class=
-"number">0.003_693_198_192_922_159</span>,
+            <span class="op">-</span><span class="number">0.003_693_198_192_922_159</span>,
         ),
         (
             <span class="number">6.619_623_211_046_827e-10</span>,
             <span class="number">0.511_162</span>,
-            <span class="op">-</span><span class=
-"number">0.003_640_214_575_357_172_6</span>,
+            <span class="op">-</span><span class="number">0.003_640_214_575_357_172_6</span>,
         ),
         (
             <span class="number">1.323_227_404_568_839_7e-9</span>,
             <span class="number">0.508_757</span>,
-            <span class="op">-</span><span class=
-"number">0.003_590_234_754_036_226_6</span>,
+            <span class="op">-</span><span class="number">0.003_590_234_754_036_226_6</span>,
         ),
         (
             <span class="number">2.645_061_801_869_000_7e-9</span>,
             <span class="number">0.506_384</span>,
-            <span class="op">-</span><span class=
-"number">0.003_541_252_245_340_059</span>,
+            <span class="op">-</span><span class="number">0.003_541_252_245_340_059</span>,
         ),
         (
             <span class="number">5.287_340_520_591_548e-9</span>,
             <span class="number">0.504_045</span>,
-            <span class="op">-</span><span class=
-"number">0.003_491_768_297_215_414_3</span>,
+            <span class="op">-</span><span class="number">0.003_491_768_297_215_414_3</span>,
         ),
         (
             <span class="number">1.056_911_514_311_110_4e-8</span>,
             <span class="number">0.501_737</span>,
-            <span class="op">-</span><span class=
-"number">0.003_445_281_605_479_519</span>,
+            <span class="op">-</span><span class="number">0.003_445_281_605_479_519</span>,
         ),
         (
             <span class="number">2.112_708_788_446_018_2e-8</span>,
             <span class="number">0.499_46</span>,
-            <span class="op">-</span><span class=
-"number">0.003_399_296_203_098_719_7</span>,
+            <span class="op">-</span><span class="number">0.003_399_296_203_098_719_7</span>,
         ),
         (
             <span class="number">4.223_186_985_826_984_4e-8</span>,
             <span class="number">0.497_213</span>,
-            <span class="op">-</span><span class=
-"number">0.003_354_334_033_808_383_2</span>,
+            <span class="op">-</span><span class="number">0.003_354_334_033_808_383_2</span>,
         ),
         (
             <span class="number">8.441_953_130_276_22e-8</span>,
             <span class="number">0.494_996</span>,
-            <span class="op">-</span><span class=
-"number">0.003_310_318_387_341_806_2</span>,
+            <span class="op">-</span><span class="number">0.003_310_318_387_341_806_2</span>,
         ),
         (
             <span class="number">1.687_498_839_844_547_5e-7</span>,
             <span class="number">0.492_807</span>,
-            <span class="op">-</span><span class=
-"number">0.003_267_859_787_737_401_5</span>,
+            <span class="op">-</span><span class="number">0.003_267_859_787_737_401_5</span>,
         ),
         (
             <span class="number">3.373_227_369_017_581_4e-7</span>,
             <span class="number">0.490_647</span>,
-            <span class="op">-</span><span class=
-"number">0.003_225_360_906_649_058</span>,
+            <span class="op">-</span><span class="number">0.003_225_360_906_649_058</span>,
         ),
         (
             <span class="number">6.742_906_462_401_553e-7</span>,
             <span class="number">0.488_514</span>,
-            <span class="op">-</span><span class=
-"number">0.003_184_367_835_718_990_6</span>,
+            <span class="op">-</span><span class="number">0.003_184_367_835_718_990_6</span>,
         ),
         (
             <span class="number">1.347_868_749_932_606_6e-6</span>,
             <span class="number">0.486_409</span>,
-            <span class="op">-</span><span class=
-"number">0.003_143_900_311_023_372_7</span>,
+            <span class="op">-</span><span class="number">0.003_143_900_311_023_372_7</span>,
         ),
         (
             <span class="number">2.694_321_179_250_494e-6</span>,
             <span class="number">0.484_329</span>,
-            <span class="op">-</span><span class=
-"number">0.003_105_908_331_645_95</span>,
+            <span class="op">-</span><span class="number">0.003_105_908_331_645_95</span>,
         ),
         (
             <span class="number">5.385_812_692_206_191e-6</span>,
             <span class="number">0.482_275</span>,
-            <span class="op">-</span><span class=
-"number">0.003_067_402_641_102_525</span>,
+            <span class="op">-</span><span class="number">0.003_067_402_641_102_525</span>,
         ),
         (
-            <span class=
-"number">0.000_010_765_919_834_807_726</span>,
+            <span class="number">0.000_010_765_919_834_807_726</span>,
             <span class="number">0.480_246</span>,
-            <span class="op">-</span><span class=
-"number">0.003_029_939_510_746_484</span>,
+            <span class="op">-</span><span class="number">0.003_029_939_510_746_484</span>,
         ),
         (
-            <span class=
-"number">0.000_021_520_510_122_171_935</span>,
+            <span class="number">0.000_021_520_510_122_171_935</span>,
             <span class="number">0.478_242</span>,
-            <span class="op">-</span><span class=
-"number">0.002_993_442_341_571_449</span>,
+            <span class="op">-</span><span class="number">0.002_993_442_341_571_449</span>,
         ),
         (
-            <span class=
-"number">0.000_043_018_338_717_795_396</span>,
+            <span class="number">0.000_043_018_338_717_795_396</span>,
             <span class="number">0.476_261</span>,
-            <span class="op">-</span><span class=
-"number">0.002_958_448_646_045_957_4</span>,
+            <span class="op">-</span><span class="number">0.002_958_448_646_045_957_4</span>,
         ),
         (
-            <span class=
-"number">0.000_085_991_177_305_208_48</span>,
+            <span class="number">0.000_085_991_177_305_208_48</span>,
             <span class="number">0.474_304</span>,
-            <span class="op">-</span><span class=
-"number">0.002_922_982_963_205_684_2</span>,
+            <span class="op">-</span><span class="number">0.002_922_982_963_205_684_2</span>,
         ),
         (
-            <span class=
-"number">0.000_171_892_189_218_921_88</span>,
+            <span class="number">0.000_171_892_189_218_921_88</span>,
             <span class="number">0.472_37</span>,
-            <span class="op">-</span><span class=
-"number">0.002_889_480_477_405_368</span>,
+            <span class="op">-</span><span class="number">0.002_889_480_477_405_368</span>,
         ),
         (
-            <span class=
-"number">0.000_343_603_646_321_894_76</span>,
+            <span class="number">0.000_343_603_646_321_894_76</span>,
             <span class="number">0.470_457</span>,
-            <span class="op">-</span><span class=
-"number">0.002_857_495_367_334_073</span>,
+            <span class="op">-</span><span class="number">0.002_857_495_367_334_073</span>,
         ),
         (
-            <span class=
-"number">0.000_686_846_208_265_507_2</span>,
+            <span class="number">0.000_686_846_208_265_507_2</span>,
             <span class="number">0.468_566</span>,
-            <span class="op">-</span><span class=
-"number">0.002_824_999_653_271_480_7</span>,
+            <span class="op">-</span><span class="number">0.002_824_999_653_271_480_7</span>,
         ),
         (
-            <span class=
-"number">0.001_372_968_178_716_521_9</span>,
+            <span class="number">0.001_372_968_178_716_521_9</span>,
             <span class="number">0.466_696</span>,
-            <span class="op">-</span><span class=
-"number">0.002_794_020_270_788_895_6</span>,
+            <span class="op">-</span><span class="number">0.002_794_020_270_788_895_6</span>,
         ),
         (
             <span class="number">0.002_744_493_174_445_475</span>,
             <span class="number">0.464_846</span>,
-            <span class="op">-</span><span class=
-"number">0.002_764_023_642_069_946_3</span>,
+            <span class="op">-</span><span class="number">0.002_764_023_642_069_946_3</span>,
         ),
         (
             <span class="number">0.005_486_095_490_978_116</span>,
             <span class="number">0.463_016</span>,
-            <span class="op">-</span><span class=
-"number">0.002_735_033_204_235_737</span>,
+            <span class="op">-</span><span class="number">0.002_735_033_204_235_737</span>,
         ),
         (
             <span class="number">0.010_966_403_326_768_112</span>,
             <span class="number">0.461_204</span>,
-            <span class="op">-</span><span class=
-"number">0.001_811_999_999_999_980_3</span>,
+            <span class="op">-</span><span class="number">0.001_811_999_999_999_980_3</span>,
         ),
     ],
 };
 
-<span class="kw">pub</span>(<span class=
-"kw">crate</span>) <span class="kw">const</span> <span class=
-"ident">G2_RUNNING</span>: <span class=
-"ident">ConstCubicHermiteSpline</span> <span class=
-"op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
-    <span class="ident">data</span>: <span class="kw-2">&</span>[
-        (<span class="number">1e-17</span>, <span class=
-"number">0.518_173</span>, <span class=
-"number">0.001_924_000_000_000_036_8</span>),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">G2_RUNNING</span>: <span class="ident">ConstCubicHermiteSpline</span> <span class="op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
+    <span class="ident">data</span>: <span class="kw-2">&amp;</span>[
+        (<span class="number">1e-17</span>, <span class="number">0.518_173</span>, <span class="number">0.001_924_000_000_000_036_8</span>),
         (
             <span class="number">1.998_948_553_061_09e-17</span>,
             <span class="number">0.520_097</span>,
-            <span class=
-"number">0.002_895_489_571_575_500_7</span>,
+            <span class="number">0.002_895_489_571_575_500_7</span>,
         ),
         (
-            <span class=
-"number">3.995_796_422_163_883_6e-17</span>,
+            <span class="number">3.995_796_422_163_883_6e-17</span>,
             <span class="number">0.522_042</span>,
-            <span class=
-"number">0.002_927_455_776_047_086_6</span>,
+            <span class="number">0.002_927_455_776_047_086_6</span>,
         ),
         (
             <span class="number">7.987_348_040_703_526e-17</span>,
             <span class="number">0.524_009</span>,
-            <span class=
-"number">0.002_960_484_586_054_230_5</span>,
+            <span class="number">0.002_960_484_586_054_230_5</span>,
         ),
         (
-            <span class=
-"number">1.596_633_020_286_819_2e-16</span>,
+            <span class="number">1.596_633_020_286_819_2e-16</span>,
             <span class="number">0.525_998</span>,
-            <span class=
-"number">0.002_993_946_764_256_219_4</span>,
+            <span class="number">0.002_993_946_764_256_219_4</span>,
         ),
         (
-            <span class=
-"number">3.191_584_430_174_515_6e-16</span>,
+            <span class="number">3.191_584_430_174_515_6e-16</span>,
             <span class="number">0.528_01</span>,
-            <span class=
-"number">0.003_028_454_409_959_715_8</span>,
+            <span class="number">0.003_028_454_409_959_715_8</span>,
         ),
         (
             <span class="number">6.379_829_530_954_933e-16</span>,
             <span class="number">0.530_045</span>,
-            <span class=
-"number">0.003_062_910_559_553_491_5</span>,
+            <span class="number">0.003_062_910_559_553_491_5</span>,
         ),
         (
-            <span class=
-"number">1.275_290_606_847_035_3e-15</span>,
+            <span class="number">1.275_290_606_847_035_3e-15</span>,
             <span class="number">0.532_103</span>,
             <span class="number">0.003_097_922_458_119_13</span>,
         ),
@@ -1943,35 +1472,29 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="number">0.003_133_910_456_867_809</span>,
         ),
         (
-            <span class=
-"number">5.095_801_059_926_620_5e-15</span>,
+            <span class="number">5.095_801_059_926_620_5e-15</span>,
             <span class="number">0.536_291</span>,
-            <span class=
-"number">0.003_170_378_627_629_767_3</span>,
+            <span class="number">0.003_170_378_627_629_767_3</span>,
         ),
         (
-            <span class=
-"number">1.018_621_418_145_110_8e-14</span>,
+            <span class="number">1.018_621_418_145_110_8e-14</span>,
             <span class="number">0.538_422</span>,
             <span class="number">0.003_207_883_285_250_775</span>,
         ),
         (
-            <span class=
-"number">2.036_170_533_354_509_5e-14</span>,
+            <span class="number">2.036_170_533_354_509_5e-14</span>,
             <span class="number">0.540_578</span>,
             <span class="number">0.003_245_870_771_518_654</span>,
         ),
         (
             <span class="number">4.070_202_858_910_488e-14</span>,
             <span class="number">0.542_76</span>,
-            <span class=
-"number">0.003_285_337_777_543_755_2</span>,
+            <span class="number">0.003_285_337_777_543_755_2</span>,
         ),
         (
             <span class="number">8.136_100_692_382_169e-14</span>,
             <span class="number">0.544_969</span>,
-            <span class=
-"number">0.003_325_347_384_175_272_5</span>,
+            <span class="number">0.003_325_347_384_175_272_5</span>,
         ),
         (
             <span class="number">1.626_365_333_697_639e-13</span>,
@@ -1989,23 +1512,19 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="number">0.003_448_295_841_403_864</span>,
         ),
         (
-            <span class=
-"number">1.299_038_711_353_598_3e-12</span>,
+            <span class="number">1.299_038_711_353_598_3e-12</span>,
             <span class="number">0.554_075</span>,
-            <span class=
-"number">0.003_491_275_211_332_577_6</span>,
+            <span class="number">0.003_491_275_211_332_577_6</span>,
         ),
         (
-            <span class=
-"number">2.596_707_893_732_326_2e-12</span>,
+            <span class="number">2.596_707_893_732_326_2e-12</span>,
             <span class="number">0.556_422</span>,
             <span class="number">0.003_534_264_126_206_754</span>,
         ),
         (
             <span class="number">5.190_679_615_682_081e-12</span>,
             <span class="number">0.558_799</span>,
-            <span class=
-"number">0.003_579_751_454_032_412_3</span>,
+            <span class="number">0.003_579_751_454_032_412_3</span>,
         ),
         (
             <span class="number">1.037_589_803_397_484e-11</span>,
@@ -2013,11 +1532,9 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="number">0.003_625_729_590_626_563</span>,
         ),
         (
-            <span class=
-"number">2.074_086_364_956_236_7e-11</span>,
+            <span class="number">2.074_086_364_956_236_7e-11</span>,
             <span class="number">0.563_645</span>,
-            <span class=
-"number">0.003_671_216_971_142_134_3</span>,
+            <span class="number">0.003_671_216_971_142_134_3</span>,
         ),
         (
             <span class="number">4.145_988_548_779_628e-11</span>,
@@ -2027,20 +1544,17 @@ autocomplete="off" spellcheck="false" placeholder=
         (
             <span class="number">8.287_613_333_112_331e-11</span>,
             <span class="number">0.568_615</span>,
-            <span class=
-"number">0.003_767_181_057_158_085_6</span>,
+            <span class="number">0.003_767_181_057_158_085_6</span>,
         ),
         (
-            <span class=
-"number">1.656_649_459_600_946_3e-10</span>,
+            <span class="number">1.656_649_459_600_946_3e-10</span>,
             <span class="number">0.571_15</span>,
             <span class="number">0.003_817_165_932_267_055</span>,
         ),
         (
             <span class="number">3.311_554_344_262_567e-10</span>,
             <span class="number">0.573_717</span>,
-            <span class=
-"number">0.003_866_649_802_517_643_3</span>,
+            <span class="number">0.003_866_649_802_517_643_3</span>,
         ),
         (
             <span class="number">6.619_623_211_046_827e-10</span>,
@@ -2080,8 +1594,7 @@ autocomplete="off" spellcheck="false" placeholder=
         (
             <span class="number">8.441_953_130_276_22e-8</span>,
             <span class="number">0.595_547</span>,
-            <span class=
-"number">0.004_310_475_149_384_214_4</span>,
+            <span class="number">0.004_310_475_149_384_214_4</span>,
         ),
         (
             <span class="number">1.687_498_839_844_547_5e-7</span>,
@@ -2114,50 +1627,42 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="number">0.004_695_335_262_743_659</span>,
         ),
         (
-            <span class=
-"number">0.000_010_765_919_834_807_726</span>,
+            <span class="number">0.000_010_765_919_834_807_726</span>,
             <span class="number">0.616_753</span>,
             <span class="number">0.004_763_847_330_202_228</span>,
         ),
         (
-            <span class=
-"number">0.000_021_520_510_122_171_935</span>,
+            <span class="number">0.000_021_520_510_122_171_935</span>,
             <span class="number">0.619_96</span>,
             <span class="number">0.004_832_807_429_850_063</span>,
         ),
         (
-            <span class=
-"number">0.000_043_018_338_717_795_396</span>,
+            <span class="number">0.000_043_018_338_717_795_396</span>,
             <span class="number">0.623_215</span>,
             <span class="number">0.004_904_772_510_287_558</span>,
         ),
         (
-            <span class=
-"number">0.000_085_991_177_305_208_48</span>,
+            <span class="number">0.000_085_991_177_305_208_48</span>,
             <span class="number">0.626_518</span>,
             <span class="number">0.004_977_283_458_083_069</span>,
         ),
         (
-            <span class=
-"number">0.000_171_892_189_218_921_88</span>,
+            <span class="number">0.000_171_892_189_218_921_88</span>,
             <span class="number">0.629_87</span>,
             <span class="number">0.005_050_732_968_078_003</span>,
         ),
         (
-            <span class=
-"number">0.000_343_603_646_321_894_76</span>,
+            <span class="number">0.000_343_603_646_321_894_76</span>,
             <span class="number">0.633_271</span>,
             <span class="number">0.005_124_713_928_020_437</span>,
         ),
         (
-            <span class=
-"number">0.000_686_846_208_265_507_2</span>,
+            <span class="number">0.000_686_846_208_265_507_2</span>,
             <span class="number">0.636_722</span>,
             <span class="number">0.005_199_674_406_895_686</span>,
         ),
         (
-            <span class=
-"number">0.001_372_968_178_716_521_9</span>,
+            <span class="number">0.001_372_968_178_716_521_9</span>,
             <span class="number">0.640_223</span>,
             <span class="number">0.005_275_165_758_305_832</span>,
         ),
@@ -2169,35 +1674,26 @@ autocomplete="off" spellcheck="false" placeholder=
         (
             <span class="number">0.005_486_095_490_978_116</span>,
             <span class="number">0.647_377</span>,
-            <span class=
-"number">0.005_426_097_050_085_872_5</span>,
+            <span class="number">0.005_426_097_050_085_872_5</span>,
         ),
         (
             <span class="number">0.010_966_403_326_768_112</span>,
             <span class="number">0.651_029</span>,
-            <span class=
-"number">0.003_651_999_999_999_988_6</span>,
+            <span class="number">0.003_651_999_999_999_988_6</span>,
         ),
     ],
 };
 
-<span class="kw">pub</span>(<span class=
-"kw">crate</span>) <span class="kw">const</span> <span class=
-"ident">G3_RUNNING</span>: <span class=
-"ident">ConstCubicHermiteSpline</span> <span class=
-"op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
-    <span class="ident">data</span>: <span class="kw-2">&</span>[
-        (<span class="number">1e-17</span>, <span class=
-"number">0.513_992</span>, <span class=
-"number">0.004_241_999_999_999_968</span>),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">G3_RUNNING</span>: <span class="ident">ConstCubicHermiteSpline</span> <span class="op">=</span> <span class="ident">ConstCubicHermiteSpline</span> {
+    <span class="ident">data</span>: <span class="kw-2">&amp;</span>[
+        (<span class="number">1e-17</span>, <span class="number">0.513_992</span>, <span class="number">0.004_241_999_999_999_968</span>),
         (
             <span class="number">1.998_948_553_061_09e-17</span>,
             <span class="number">0.518_234</span>,
             <span class="number">0.006_414_772_225_895_626</span>,
         ),
         (
-            <span class=
-"number">3.995_796_422_163_883_6e-17</span>,
+            <span class="number">3.995_796_422_163_883_6e-17</span>,
             <span class="number">0.522_584</span>,
             <span class="number">0.006_578_664_589_102_921</span>,
         ),
@@ -2207,17 +1703,14 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="number">0.006_748_696_605_477_427</span>,
         ),
         (
-            <span class=
-"number">1.596_633_020_286_819_2e-16</span>,
+            <span class="number">1.596_633_020_286_819_2e-16</span>,
             <span class="number">0.531_624</span>,
             <span class="number">0.006_925_575_810_339_285</span>,
         ),
         (
-            <span class=
-"number">3.191_584_430_174_515_6e-16</span>,
+            <span class="number">3.191_584_430_174_515_6e-16</span>,
             <span class="number">0.536_324</span>,
-            <span class=
-"number">0.007_111_557_518_295_525_5</span>,
+            <span class="number">0.007_111_557_518_295_525_5</span>,
         ),
         (
             <span class="number">6.379_829_530_954_933e-16</span>,
@@ -2225,33 +1718,27 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="number">0.007_305_915_322_616_256</span>,
         ),
         (
-            <span class=
-"number">1.275_290_606_847_035_3e-15</span>,
+            <span class="number">1.275_290_606_847_035_3e-15</span>,
             <span class="number">0.546_113</span>,
-            <span class=
-"number">0.007_508_902_485_291_020_5</span>,
+            <span class="number">0.007_508_902_485_291_020_5</span>,
         ),
         (
             <span class="number">2.549_238_542_447_371e-15</span>,
             <span class="number">0.551_214</span>,
-            <span class=
-"number">0.007_722_330_566_994_610_5</span>,
+            <span class="number">0.007_722_330_566_994_610_5</span>,
         ),
         (
-            <span class=
-"number">5.095_801_059_926_620_5e-15</span>,
+            <span class="number">5.095_801_059_926_620_5e-15</span>,
             <span class="number">0.556_462</span>,
             <span class="number">0.007_945_205_620_988_303</span>,
         ),
         (
-            <span class=
-"number">1.018_621_418_145_110_8e-14</span>,
+            <span class="number">1.018_621_418_145_110_8e-14</span>,
             <span class="number">0.561_862</span>,
             <span class="number">0.008_178_170_220_719_887</span>,
         ),
         (
-            <span class=
-"number">2.036_170_533_354_509_5e-14</span>,
+            <span class="number">2.036_170_533_354_509_5e-14</span>,
             <span class="number">0.567_424</span>,
             <span class="number">0.008_425_086_841_923_26</span>,
         ),
@@ -2281,14 +1768,12 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="number">0.009_863_079_979_253_555</span>,
         ),
         (
-            <span class=
-"number">1.299_038_711_353_598_3e-12</span>,
+            <span class="number">1.299_038_711_353_598_3e-12</span>,
             <span class="number">0.604_687</span>,
             <span class="number">0.010_200_448_165_679_98</span>,
         ),
         (
-            <span class=
-"number">2.596_707_893_732_326_2e-12</span>,
+            <span class="number">2.596_707_893_732_326_2e-12</span>,
             <span class="number">0.611_645</span>,
             <span class="number">0.010_556_836_084_425_432</span>,
         ),
@@ -2303,8 +1788,7 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="number">0.011_337_560_042_690_89</span>,
         ),
         (
-            <span class=
-"number">2.074_086_364_956_236_7e-11</span>,
+            <span class="number">2.074_086_364_956_236_7e-11</span>,
             <span class="number">0.634_065</span>,
             <span class="number">0.011_764_423_041_607_165</span>,
         ),
@@ -2319,8 +1803,7 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="number">0.012_704_091_218_649_164</span>,
         ),
         (
-            <span class=
-"number">1.656_649_459_600_946_3e-10</span>,
+            <span class="number">1.656_649_459_600_946_3e-10</span>,
             <span class="number">0.659_165</span>,
             <span class="number">0.013_221_923_121_469_826</span>,
         ),
@@ -2394,55 +1877,44 @@ autocomplete="off" spellcheck="false" placeholder=
             <span class="number">0.835_75</span>,
             <span class="number">0.027_023_751_784_583_532</span>,
         ),
-        (<span class=
-"number">5.385_812_692_206_191e-6</span>, <span class=
-"number">0.854_574</span>, <span class=
-"number">0.028_900_443_191_876_3</span>),
+        (<span class="number">5.385_812_692_206_191e-6</span>, <span class="number">0.854_574</span>, <span class="number">0.028_900_443_191_876_3</span>),
         (
-            <span class=
-"number">0.000_010_765_919_834_807_726</span>,
+            <span class="number">0.000_010_765_919_834_807_726</span>,
             <span class="number">0.874_747</span>,
             <span class="number">0.031_008_956_259_383_38</span>,
         ),
         (
-            <span class=
-"number">0.000_021_520_510_122_171_935</span>,
+            <span class="number">0.000_021_520_510_122_171_935</span>,
             <span class="number">0.896_44</span>,
             <span class="number">0.033_388_551_005_842_84</span>,
         ),
         (
-            <span class=
-"number">0.000_043_018_338_717_795_396</span>,
+            <span class="number">0.000_043_018_338_717_795_396</span>,
             <span class="number">0.919_854</span>,
             <span class="number">0.036_091_073_749_883_84</span>,
         ),
         (
-            <span class=
-"number">0.000_085_991_177_305_208_48</span>,
+            <span class="number">0.000_085_991_177_305_208_48</span>,
             <span class="number">0.945_233</span>,
             <span class="number">0.039_184_310_742_563_934</span>,
         ),
         (
-            <span class=
-"number">0.000_171_892_189_218_921_88</span>,
+            <span class="number">0.000_171_892_189_218_921_88</span>,
             <span class="number">0.972_87</span>,
             <span class="number">0.042_747_430_948_320_82</span>,
         ),
         (
-            <span class=
-"number">0.000_343_603_646_321_894_76</span>,
+            <span class="number">0.000_343_603_646_321_894_76</span>,
             <span class="number">1.003_12</span>,
             <span class="number">0.046_894_113_884_921_76</span>,
         ),
         (
-            <span class=
-"number">0.000_686_846_208_265_507_2</span>,
+            <span class="number">0.000_686_846_208_265_507_2</span>,
             <span class="number">1.036_44</span>,
             <span class="number">0.051_777_373_583_820_74</span>,
         ),
         (
-            <span class=
-"number">0.001_372_968_178_716_521_9</span>,
+            <span class="number">0.001_372_968_178_716_521_9</span>,
             <span class="number">1.073_39</span>,
             <span class="number">0.057_570_641_179_491_996</span>,
         ),
@@ -2464,15 +1936,4 @@ autocomplete="off" spellcheck="false" placeholder=
     ],
 };
 </pre></div>
-</section>
-<section id="search" class="content hidden"></section>
-<section class="footer"></section>
-<script>
-window.rootPath = "../../../../";window.currentCrate = "boltzmann_solver";
-</script>
-<script src="../../../../main.js"></script>
-<script src="../../../../source-script.js"></script>
-<script src="../../../../source-files.js"></script>
-<script defer src="../../../../search-index.js"></script>
-</body>
-</html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "boltzmann_solver";</script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>

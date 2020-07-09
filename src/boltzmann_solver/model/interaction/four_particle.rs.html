@@ -1,80 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta name="generator" content=
-"HTML Tidy for HTML5 for Linux version 5.6.0">
-<meta charset="utf-8">
-<meta name="viewport" content=
-"width=device-width, initial-scale=1.0">
-<meta name="generator" content="rustdoc">
-<meta name="description" content=
-"Source to the Rust file `src/model/interaction/four_particle.rs`.">
-<meta name="keywords" content="rust, rustlang, rust-lang">
-<title>four_particle.rs.html -- source</title>
-<link rel="stylesheet" type="text/css" href=
-"../../../../normalize.css">
-<link rel="stylesheet" type="text/css" href=
-"../../../../rustdoc.css" id="mainThemeStyle">
-<link rel="stylesheet" type="text/css" href="../../../../dark.css">
-<link rel="stylesheet" type="text/css" href="../../../../light.css"
-id="themeStyle">
-<script src="../../../../storage.js"></script><noscript>
-<link rel="stylesheet" href="../../../../noscript.css"></noscript>
-<link rel="shortcut icon" href="../../../../favicon.ico">
-<style type="text/css">
-#crate-search{background-image:url("../../../../down-arrow.svg");}
-</style>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/model/interaction/four_particle.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>four_particle.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.11/dist/katex.min.css"
+  crossorigin="anonymous"
+/>
+<script
+  src="https://cdn.jsdelivr.net/npm/katex@0.11/dist/katex.min.js"
+  crossorigin="anonymous"
+></script>
 <script>
-  MathJax = {
-    tex: {
-      macros: {
-        dd: "{\\mathop{}\\!\\mathrm{d}}",
-        textsc: ["\\mathrm{\\scriptsize #1}", 1],
-        vt: ["\\boldsymbol{#1}", 1],
-        pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2],
-        ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2],
-        defeq: "\\mathrel{\\vcenter:}=",
-        abs: ["\\lvert #1 \\rvert", 1],
-        angles: ["\\langle #1 \\rangle", 1]
+  "use strict";
+  const macros = {
+    "\\vt": "\\boldsymbol{#1}",
+    "\\pfrac": "\\frac{\\partial{#1}}{\\partial{#2}}",
+    "\\dd": "\\mathop{}\\!\\mathrm{d}",
+    "\\ddfrac": "\\frac{\dd{#1}}{\dd{#2}}",
+    "\\defeq": "\\vcentcolon=",
+    "\\abs": "\\left\\lvert{#1}\\right\\rvert",
+    "\\CP": "\\mathcal{CP}",
+  };
+
+  // Display math is inputted in the documentation as:
+  //
+  // ```math
+  //   \int_0^1 x
+  // ```
+  //
+  // and in the HTML appears as
+  //
+  // ```html
+  // <pre><code class="language-math">...</code></pre>
+  // ```
+  document.addEventListener("DOMContentLoaded", function () {
+    // console.log("Replacing display maths");
+    const maths = document.getElementsByClassName("language-math");
+    for (let i = 0; i < maths.length; i++) {
+      const el = maths[i];
+      el.parentNode.replaceWith(el);
+      katex.render(el.innerText, el, { displayMode: true, macros: macros });
+    }
+  });
+
+  // Inline math is inputted in the documentation as `$...$` (with the
+  // backticks) and in the HTML appears as
+  //
+  // ```html
+  // <code>$...$</code>
+  // ```
+  document.addEventListener("DOMContentLoaded", function () {
+    // console.log("Replacing inline maths");
+    const maths = document.getElementsByTagName("code");
+    for (let i = 0; i < maths.length; i++) {
+      const el = maths[i];
+      console.log("Replacing element: " + el.innerText);
+      if (el.innerText.startsWith("$") && el.innerText.endsWith("$")) {
+        katex.render(el.innerText.substring(1, el.innerText.length - 1), el, {
+          macros: macros,
+        });
+        el.parentNode.insertBefore(el.firstChild, el);
+        el.remove();
+
+        // After being removed, the current index points to the next element.
+        i--;
       }
     }
-  };
+  });
 </script>
-<script
-  id="MathJax-script"
-  async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
-></script>
-</head>
-<body class="rustdoc source">
-<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
-<nav class="sidebar">
-<div class="sidebar-menu">☰</div>
-<a href='../../../../boltzmann_solver/index.html'>
-<div class='logo-container'><img src='../../../../rust-logo.png'
-alt='logo'></div>
-</a></nav>
-<div class="theme-picker"><button id="theme-picker" aria-label=
-"Pick another theme!"><img src="../../../../brush.svg" width="18"
-alt="Pick another theme!"></button>
-<div id="theme-choices"></div>
-</div>
-<script src="../../../../theme.js"></script>
-<nav class="sub">
-<form class="search-form">
-<div class="search-container">
-<div><select id="crate-search">
-<option value="All crates">All crates</option>
-</select><input class="search-input" name="search" disabled
-autocomplete="off" spellcheck="false" placeholder=
-"Click or press ‘S’ to search, ‘?’ for more options…" type=
-"search"></div>
-<a id="settings-menu" href="../../../../settings.html"><img src=
-"../../../../wheel.svg" width="18" alt="Change settings"></a></div>
-</form>
-</nav>
-<section id="main" class="content">
-<pre class="line-numbers"><span id="1">  1</span>
+
+<style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -351,699 +343,289 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="275">275</span>
 <span id="276">276</span>
 <span id="277">277</span>
-</pre>
-<div class="example-wrap">
-<pre class="rust">
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+</pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">model</span>::{
         <span class="ident">interaction</span>::{
-            <span class="ident">Interaction</span>, <span class=
-"ident">InteractionParticleIndices</span>, <span class=
-"ident">InteractionParticleSigns</span>, <span class=
-"ident">InteractionParticles</span>,
+            <span class="ident">Interaction</span>, <span class="ident">InteractionParticleIndices</span>, <span class="ident">InteractionParticleSigns</span>, <span class="ident">InteractionParticles</span>,
         },
         <span class="ident">Model</span>,
     },
-    <span class="ident">solver</span>::<span class=
-"ident">Context</span>,
-    <span class="ident">utilities</span>::{<span class=
-"ident">integrate_st</span>, <span class=
-"ident">spline</span>::<span class=
-"ident">CubicHermiteSpline</span>},
+    <span class="ident">solver</span>::<span class="ident">Context</span>,
+    <span class="ident">utilities</span>::{<span class="ident">integrate_st</span>, <span class="ident">spline</span>::<span class="ident">CubicHermiteSpline</span>},
 };
-<span class="kw">use</span> <span class=
-"ident">std</span>::{<span class="ident">fmt</span>, <span class=
-"ident">sync</span>::<span class="ident">RwLock</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">sync</span>::<span class="ident">RwLock</span>};
 
-<span class=
-"comment">// TODO: Define a trait alias for MandelstamFn once it is stabilised</span>
-<span class=
-"comment">// (https://github.com/rust-lang/rust/issues/41517)</span>
+<span class="comment">// TODO: Define a trait alias for MandelstamFn once it is stabilised</span>
+<span class="comment">// (https://github.com/rust-lang/rust/issues/41517)</span>
 
-<span class=
-"doccomment">/// Three particle interaction, all determined from the underlying squared</span>
+<span class="doccomment">/// Three particle interaction, all determined from the underlying squared</span>
 <span class="doccomment">/// amplitude.</span>
-<span class="kw">pub</span> <span class=
-"kw">struct</span> <span class=
-"ident">FourParticle</span><span class="op">&lt;</span><span class=
-"ident">M</span><span class="op">&gt;</span> {
-    <span class="ident">particles</span>: <span class=
-"ident">InteractionParticles</span>,
-    <span class="ident">particles_idx</span>: <span class=
-"ident">InteractionParticleIndices</span>,
-    <span class="ident">particles_sign</span>: <span class=
-"ident">InteractionParticleSigns</span>,
-    <span class=
-"doccomment">/// Squared amplitude as a function of the model.</span>
-    <span class="ident">squared_amplitude</span>: <span class=
-"ident">Box</span><span class="op">&lt;</span><span class=
-"kw">dyn</span> <span class="ident">Fn</span>(<span class=
-"kw-2">&</span><span class="ident">M</span>, <span class=
-"ident">f64</span>, <span class="ident">f64</span>, <span class=
-"ident">f64</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">f64</span> <span class=
-"op">+</span> <span class="ident">Sync</span><span class=
-"op">&gt;</span>,
-    <span class="ident">gamma_spline</span>: <span class=
-"ident">RwLock</span><span class="op">&lt;</span><span class=
-"ident">CubicHermiteSpline</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class=
-"ident">allow</span>(<span class=
-"ident">clippy</span>::<span class="ident">type_complexity</span>)]</span>
-    <span class="ident">asymmetry</span>: <span class=
-"prelude-ty">Option</span><span class="op">&lt;</span><span class=
-"ident">Box</span><span class="op">&lt;</span><span class=
-"kw">dyn</span> <span class="ident">Fn</span>(<span class=
-"kw-2">&</span><span class="ident">M</span>, <span class=
-"ident">f64</span>, <span class="ident">f64</span>, <span class=
-"ident">f64</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">f64</span> <span class=
-"op">+</span> <span class="ident">Sync</span><span class=
-"op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">asymmetry_spline</span>: <span class=
-"ident">RwLock</span><span class="op">&lt;</span><span class=
-"ident">CubicHermiteSpline</span><span class="op">&gt;</span>,
-    <span class="ident">gamma_enabled</span>: <span class=
-"ident">bool</span>,
-    <span class="ident">width_enabled</span>: <span class=
-"ident">bool</span>,
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FourParticle</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="ident">particles</span>: <span class="ident">InteractionParticles</span>,
+    <span class="ident">particles_idx</span>: <span class="ident">InteractionParticleIndices</span>,
+    <span class="ident">particles_sign</span>: <span class="ident">InteractionParticleSigns</span>,
+    <span class="doccomment">/// Squared amplitude as a function of the model.</span>
+    <span class="ident">squared_amplitude</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
+    <span class="ident">gamma_spline</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">CubicHermiteSpline</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">type_complexity</span>)]</span>
+    <span class="ident">asymmetry</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">asymmetry_spline</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">CubicHermiteSpline</span><span class="op">&gt;</span>,
+    <span class="ident">gamma_enabled</span>: <span class="ident">bool</span>,
+    <span class="ident">width_enabled</span>: <span class="ident">bool</span>,
 }
 
-<span class="kw">impl</span><span class=
-"op">&lt;</span><span class="ident">M</span><span class=
-"op">&gt;</span> <span class=
-"ident">FourParticle</span><span class="op">&lt;</span><span class=
-"ident">M</span><span class="op">&gt;</span> {
-    <span class=
-"doccomment">/// Create a new four-particle interaction.</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="ident">FourParticle</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Create a new four-particle interaction.</span>
     <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// The interaction will result in the annihilation of `p1` and `p2`, and</span>
-    <span class=
-"doccomment">/// the creation of `p3` and `p4`.  Particles are indicated by positive</span>
-    <span class=
-"doccomment">/// integers and the corresponding antiparticles are indicates by negative</span>
+    <span class="doccomment">/// The interaction will result in the annihilation of `p1` and `p2`, and</span>
+    <span class="doccomment">/// the creation of `p3` and `p4`.  Particles are indicated by positive</span>
+    <span class="doccomment">/// integers and the corresponding antiparticles are indicates by negative</span>
     <span class="doccomment">/// integers.</span>
     <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// The squared amplitude is defined of the form</span>
+    <span class="doccomment">/// The squared amplitude is defined of the form</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// \\begin{equation}</span>
-    <span class=
-"doccomment">///   \abs{\mathcal{M}(p_1 p_2 \leftrightarrow p_3 p_4)}^2(s, t, u)</span>
-    <span class="doccomment">/// \\end{equation}</span>
+    <span class="doccomment">/// ```math</span>
+    <span class="doccomment">/// \abs{\mathcal{M}(p_1 p_2 \leftrightarrow p_3 p_4)}^2(s, t, u)</span>
+    <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// where \\(s\\), \\(t\\) and \\(u\\) are the usual Mandelstam variables.</span>
-    <span class=
-"doccomment">/// Crossing symmetry is then used in order to compute the other processes.</span>
+    <span class="doccomment">/// where `$s$`, `$t$` and `$u$` are the usual Mandelstam variables.</span>
+    <span class="doccomment">/// Crossing symmetry is then used in order to compute the other processes.</span>
     <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// The three-body decays are not currently computed.</span>
-    <span class="kw">pub</span> <span class=
-"kw">fn</span> <span class="ident">new</span><span class=
-"op">&lt;</span><span class="ident">F</span><span class=
-"op">&gt;</span>(<span class=
-"ident">squared_amplitude</span>: <span class=
-"ident">F</span>, <span class="ident">p1</span>: <span class=
-"ident">isize</span>, <span class="ident">p2</span>: <span class=
-"ident">isize</span>, <span class="ident">p3</span>: <span class=
-"ident">isize</span>, <span class="ident">p4</span>: <span class=
-"ident">isize</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="self">Self</span>
+    <span class="doccomment">/// The three-body decays are not currently computed.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">squared_amplitude</span>: <span class="ident">F</span>, <span class="ident">p1</span>: <span class="ident">isize</span>, <span class="ident">p2</span>: <span class="ident">isize</span>, <span class="ident">p3</span>: <span class="ident">isize</span>, <span class="ident">p4</span>: <span class="ident">isize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class=
-"ident">Fn</span>(<span class="kw-2">&</span><span class=
-"ident">M</span>, <span class="ident">f64</span>, <span class=
-"ident">f64</span>, <span class="ident">f64</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"ident">f64</span> <span class="op">+</span> <span class=
-"ident">Sync</span> <span class="op">+</span> <span class=
-"lifetime">'static</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class=
-"ident">particles</span> <span class="op">=</span> <span class=
-"ident">InteractionParticles</span> {
-            <span class="ident">incoming</span>: <span class=
-"macro">vec</span><span class="macro">!</span>[<span class=
-"ident">p1</span>, <span class="ident">p2</span>],
-            <span class="ident">outgoing</span>: <span class=
-"macro">vec</span><span class="macro">!</span>[<span class=
-"ident">p3</span>, <span class="ident">p4</span>],
+        <span class="kw">let</span> <span class="ident">particles</span> <span class="op">=</span> <span class="ident">InteractionParticles</span> {
+            <span class="ident">incoming</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">p1</span>, <span class="ident">p2</span>],
+            <span class="ident">outgoing</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">p3</span>, <span class="ident">p4</span>],
         };
-        <span class="kw">let</span> <span class=
-"ident">particles_idx</span> <span class="op">=</span> <span class=
-"ident">particles</span>.<span class="ident">as_idx</span>();
-        <span class="kw">let</span> <span class=
-"ident">particles_sign</span> <span class=
-"op">=</span> <span class="ident">particles</span>.<span class=
-"ident">as_sign</span>();
+        <span class="kw">let</span> <span class="ident">particles_idx</span> <span class="op">=</span> <span class="ident">particles</span>.<span class="ident">as_idx</span>();
+        <span class="kw">let</span> <span class="ident">particles_sign</span> <span class="op">=</span> <span class="ident">particles</span>.<span class="ident">as_sign</span>();
 
         <span class="self">Self</span> {
             <span class="ident">particles</span>,
             <span class="ident">particles_idx</span>,
             <span class="ident">particles_sign</span>,
-            <span class=
-"ident">squared_amplitude</span>: <span class=
-"ident">Box</span>::<span class="ident">new</span>(<span class=
-"ident">squared_amplitude</span>),
-            <span class="ident">gamma_spline</span>: <span class=
-"ident">RwLock</span>::<span class="ident">new</span>(<span class=
-"ident">CubicHermiteSpline</span>::<span class=
-"ident">empty</span>()),
-            <span class="ident">asymmetry</span>: <span class=
-"prelude-val">None</span>,
-            <span class=
-"ident">asymmetry_spline</span>: <span class=
-"ident">RwLock</span>::<span class="ident">new</span>(<span class=
-"ident">CubicHermiteSpline</span>::<span class=
-"ident">empty</span>()),
-            <span class="ident">width_enabled</span>: <span class=
-"bool-val">false</span>,
-            <span class="ident">gamma_enabled</span>: <span class=
-"bool-val">true</span>,
+            <span class="ident">squared_amplitude</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">squared_amplitude</span>),
+            <span class="ident">gamma_spline</span>: <span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="ident">CubicHermiteSpline</span>::<span class="ident">empty</span>()),
+            <span class="ident">asymmetry</span>: <span class="prelude-val">None</span>,
+            <span class="ident">asymmetry_spline</span>: <span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="ident">CubicHermiteSpline</span>::<span class="ident">empty</span>()),
+            <span class="ident">width_enabled</span>: <span class="bool-val">false</span>,
+            <span class="ident">gamma_enabled</span>: <span class="bool-val">true</span>,
         }
     }
 
-    <span class=
-"doccomment">/// Create a set of related four-particle interactions.</span>
+    <span class="doccomment">/// Create a set of related four-particle interactions.</span>
     <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// This functions creates all three possible interactions from the same</span>
-    <span class=
-"doccomment">/// underlying squared amplitude, related through crossing symmetry:</span>
+    <span class="doccomment">/// This functions creates all three possible interactions from the same</span>
+    <span class="doccomment">/// underlying squared amplitude, related through crossing symmetry:</span>
     <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// \\begin{equation} \\begin{aligned} p_1 p_2 \leftrightarrow p_3 p_4, \\\\</span>
-    <span class=
-"doccomment">///   p_1 \overline{p_3} \leftrightarrow \overline{p_2} p_4, \\\\</span>
-    <span class=
-"doccomment">///   p_1 \overline{p_4} \leftrightarrow \overline{p_2} p_3. \\\\</span>
-    <span class=
-"doccomment">/// \\end{aligned} \\end{equation}</span>
+    <span class="doccomment">/// ```math</span>
+    <span class="doccomment">/// \\begin{aligned}</span>
+    <span class="doccomment">///   p_1 p_2 \leftrightarrow p_3 p_4, \\\\</span>
+    <span class="doccomment">///   p_1 \overline{p_3} \leftrightarrow \overline{p_2} p_4, \\\\</span>
+    <span class="doccomment">///   p_1 \overline{p_4} \leftrightarrow \overline{p_2} p_3. \\\\</span>
+    <span class="doccomment">/// \\end{aligned}</span>
+    <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// The squared amplitude is defined of the form:</span>
+    <span class="doccomment">/// The squared amplitude is defined of the form:</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// \\begin{equation}</span>
-    <span class=
-"doccomment">///    \abs{\mathcal{M}(p_1 p_2 \leftrightarrow p_3 p_4)}^2(s, t, u)</span>
-    <span class="doccomment">/// \\end{equation}</span>
+    <span class="doccomment">/// ```math</span>
+    <span class="doccomment">/// \abs{\mathcal{M}(p_1 p_2 \leftrightarrow p_3 p_4)}^2(s, t, u)</span>
+    <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// where \\(s\\), \\(t\\) and \\(u\\) are the usual Mandelstam variables.</span>
-    <span class=
-"doccomment">/// Crossing symmetry is then used in order to compute the other processes.</span>
-    <span class="kw">pub</span> <span class=
-"kw">fn</span> <span class="ident">new_all</span><span class=
-"op">&lt;</span><span class="ident">F</span><span class=
-"op">&gt;</span>(<span class=
-"ident">squared_amplitude</span>: <span class=
-"ident">F</span>, <span class="ident">p1</span>: <span class=
-"ident">isize</span>, <span class="ident">p2</span>: <span class=
-"ident">isize</span>, <span class="ident">p3</span>: <span class=
-"ident">isize</span>, <span class="ident">p4</span>: <span class=
-"ident">isize</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="ident">Vec</span><span class=
-"op">&lt;</span><span class="self">Self</span><span class=
-"op">&gt;</span>
+    <span class="doccomment">/// where `$s$`, `$t$` and `$u$` are the usual Mandelstam variables.</span>
+    <span class="doccomment">/// Crossing symmetry is then used in order to compute the other processes.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_all</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">squared_amplitude</span>: <span class="ident">F</span>, <span class="ident">p1</span>: <span class="ident">isize</span>, <span class="ident">p2</span>: <span class="ident">isize</span>, <span class="ident">p3</span>: <span class="ident">isize</span>, <span class="ident">p4</span>: <span class="ident">isize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class=
-"ident">Fn</span>(<span class="kw-2">&</span><span class=
-"ident">M</span>, <span class="ident">f64</span>, <span class=
-"ident">f64</span>, <span class="ident">f64</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"ident">f64</span> <span class="op">+</span> <span class=
-"ident">Sync</span> <span class="op">+</span> <span class=
-"ident">Copy</span> <span class="op">+</span> <span class=
-"lifetime">'static</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class=
-"kw-2">mut</span> <span class="ident">v</span> <span class=
-"op">=</span> <span class="ident">Vec</span>::<span class=
-"ident">with_capacity</span>(<span class="number">3</span>);
-        <span class="ident">v</span>.<span class=
-"ident">push</span>(<span class="self">Self</span>::<span class=
-"ident">new</span>(<span class=
-"ident">squared_amplitude</span>, <span class=
-"ident">p1</span>, <span class="ident">p2</span>, <span class=
-"ident">p3</span>, <span class="ident">p4</span>));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="number">3</span>);
+        <span class="ident">v</span>.<span class="ident">push</span>(<span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">squared_amplitude</span>, <span class="ident">p1</span>, <span class="ident">p2</span>, <span class="ident">p3</span>, <span class="ident">p4</span>));
 
-        <span class=
-"comment">// Avoid doubling up interactions if they have the same particles</span>
-        <span class="kw">if</span> <span class=
-"ident">p2</span> <span class="op">!</span><span class=
-"op">=</span> <span class="op">-</span><span class=
-"ident">p3</span> {
-            <span class="ident">v</span>.<span class=
-"ident">push</span>(<span class="self">Self</span>::<span class=
-"ident">new</span>(
-                <span class="kw">move</span> <span class=
-"op">|</span><span class="ident">c</span>, <span class=
-"ident">s</span>, <span class="ident">t</span>, <span class=
-"ident">u</span><span class="op">|</span> <span class=
-"ident">squared_amplitude</span>(<span class=
-"ident">c</span>, <span class="ident">t</span>, <span class=
-"ident">s</span>, <span class="ident">u</span>),
+        <span class="comment">// Avoid doubling up interactions if they have the same particles</span>
+        <span class="kw">if</span> <span class="ident">p2</span> <span class="op">!</span><span class="op">=</span> <span class="op">-</span><span class="ident">p3</span> {
+            <span class="ident">v</span>.<span class="ident">push</span>(<span class="self">Self</span>::<span class="ident">new</span>(
+                <span class="kw">move</span> <span class="op">|</span><span class="ident">c</span>, <span class="ident">s</span>, <span class="ident">t</span>, <span class="ident">u</span><span class="op">|</span> <span class="ident">squared_amplitude</span>(<span class="ident">c</span>, <span class="ident">t</span>, <span class="ident">s</span>, <span class="ident">u</span>),
                 <span class="ident">p1</span>,
-                <span class="op">-</span><span class=
-"ident">p3</span>,
-                <span class="op">-</span><span class=
-"ident">p2</span>,
+                <span class="op">-</span><span class="ident">p3</span>,
+                <span class="op">-</span><span class="ident">p2</span>,
                 <span class="ident">p4</span>,
             ));
         }
-        <span class="kw">if</span> <span class=
-"ident">p3</span> <span class="op">!</span><span class=
-"op">=</span> <span class="ident">p4</span> {
-            <span class="ident">v</span>.<span class=
-"ident">push</span>(<span class="self">Self</span>::<span class=
-"ident">new</span>(
-                <span class="kw">move</span> <span class=
-"op">|</span><span class="ident">c</span>, <span class=
-"ident">s</span>, <span class="ident">t</span>, <span class=
-"ident">u</span><span class="op">|</span> <span class=
-"ident">squared_amplitude</span>(<span class=
-"ident">c</span>, <span class="ident">u</span>, <span class=
-"ident">t</span>, <span class="ident">s</span>),
+        <span class="kw">if</span> <span class="ident">p3</span> <span class="op">!</span><span class="op">=</span> <span class="ident">p4</span> {
+            <span class="ident">v</span>.<span class="ident">push</span>(<span class="self">Self</span>::<span class="ident">new</span>(
+                <span class="kw">move</span> <span class="op">|</span><span class="ident">c</span>, <span class="ident">s</span>, <span class="ident">t</span>, <span class="ident">u</span><span class="op">|</span> <span class="ident">squared_amplitude</span>(<span class="ident">c</span>, <span class="ident">u</span>, <span class="ident">t</span>, <span class="ident">s</span>),
                 <span class="ident">p1</span>,
-                <span class="op">-</span><span class=
-"ident">p4</span>,
+                <span class="op">-</span><span class="ident">p4</span>,
                 <span class="ident">p3</span>,
-                <span class="op">-</span><span class=
-"ident">p2</span>,
+                <span class="op">-</span><span class="ident">p2</span>,
             ))
         }
 
         <span class="ident">v</span>
     }
 
-    <span class=
-"doccomment">/// Specify the asymmetry between this process and its CP-conjugate.</span>
+    <span class="doccomment">/// Specify the asymmetry between this process and its `$\CP$`-conjugate.</span>
     <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// This asymmetry is specified in terms of the asymmetry in the squared</span>
+    <span class="doccomment">/// This asymmetry is specified in terms of the asymmetry in the squared</span>
     <span class="doccomment">/// amplitudes:</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// \\begin{equation}</span>
-    <span class=
-"doccomment">///   \delta \abs{\mathcal{M}}^2</span>
-    <span class=
-"doccomment">///     \defeq \abs{\mathcal{M}(p_1 p_2 \to p_3 p_4)}^2 - \abs{\mathcal{M}(\overline{p_1} \overline{p_2} \to \overline{p_3} \overline{p_4})}^2</span>
-    <span class=
-"doccomment">///     = \abs{\mathcal{M}(p_1 p_2 \to p_3 p_4)}^2 - \abs{\mathcal{M}(p_3 p_4 \to p_1 p_2)}^2</span>
-    <span class="doccomment">/// \\end{equation}</span>
+    <span class="doccomment">/// ```math</span>
+    <span class="doccomment">/// \delta \abs{\mathcal{M}}^2</span>
+    <span class="doccomment">///   \defeq \abs{\mathcal{M}(p_1 p_2 \to p_3 p_4)}^2 - \abs{\mathcal{M}(\overline{p_1} \overline{p_2} \to \overline{p_3} \overline{p_4})}^2</span>
+    <span class="doccomment">///   = \abs{\mathcal{M}(p_1 p_2 \to p_3 p_4)}^2 - \abs{\mathcal{M}(p_3 p_4 \to p_1 p_2)}^2</span>
+    <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class=
-"doccomment">/// This asymmetry is subsequently used to compute the asymmetry in the</span>
-    <span class=
-"doccomment">/// interaction rate given by [`Interaction::asymmetry`].</span>
-    <span class="kw">pub</span> <span class=
-"kw">fn</span> <span class="ident">set_asymmetry</span><span class=
-"op">&lt;</span><span class="ident">F</span><span class=
-"op">&gt;</span>(<span class="kw-2">&</span><span class=
-"kw-2">mut</span> <span class="self">self</span>, <span class=
-"ident">asymmetry</span>: <span class=
-"ident">F</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="kw-2">&</span><span class=
-"self">Self</span>
+    <span class="doccomment">/// This asymmetry is subsequently used to compute the asymmetry in the</span>
+    <span class="doccomment">/// interaction rate given by [`Interaction::asymmetry`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_asymmetry</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">asymmetry</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class=
-"ident">Fn</span>(<span class="kw-2">&</span><span class=
-"ident">M</span>, <span class="ident">f64</span>, <span class=
-"ident">f64</span>, <span class="ident">f64</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"ident">f64</span> <span class="op">+</span> <span class=
-"ident">Sync</span> <span class="op">+</span> <span class=
-"lifetime">'static</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class=
-"ident">asymmetry</span> <span class="op">=</span> <span class=
-"prelude-val">Some</span>(<span class=
-"ident">Box</span>::<span class="ident">new</span>(<span class=
-"ident">asymmetry</span>));
+        <span class="self">self</span>.<span class="ident">asymmetry</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">asymmetry</span>));
         <span class="self">self</span>
     }
 
-    <span class=
-"doccomment">/// Adjust whether this interaction will calculate decay widths.</span>
-    <span class="kw">pub</span> <span class=
-"kw">fn</span> <span class="ident">enable_width</span>(<span class=
-"kw-2">mut</span> <span class="self">self</span>, <span class=
-"ident">v</span>: <span class="ident">bool</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
-        <span class="self">self</span>.<span class=
-"ident">width_enabled</span> <span class="op">=</span> <span class=
-"ident">v</span>;
+    <span class="doccomment">/// Adjust whether this interaction will calculate decay widths.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_width</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">width_enabled</span> <span class="op">=</span> <span class="ident">v</span>;
         <span class="self">self</span>
     }
 
-    <span class=
-"doccomment">/// Adjust whether this interaction will calculate decay widths.</span>
-    <span class="kw">pub</span> <span class=
-"kw">fn</span> <span class="ident">enable_gamma</span>(<span class=
-"kw-2">mut</span> <span class="self">self</span>, <span class=
-"ident">v</span>: <span class="ident">bool</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"self">Self</span> {
-        <span class="self">self</span>.<span class=
-"ident">gamma_enabled</span> <span class="op">=</span> <span class=
-"ident">v</span>;
+    <span class="doccomment">/// Adjust whether this interaction will calculate decay widths.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_gamma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">gamma_enabled</span> <span class="op">=</span> <span class="ident">v</span>;
         <span class="self">self</span>
     }
 }
 
-<span class="kw">impl</span><span class=
-"op">&lt;</span><span class="ident">M</span><span class=
-"op">&gt;</span> <span class="ident">fmt</span>::<span class=
-"ident">Debug</span> <span class="kw">for</span> <span class=
-"ident">FourParticle</span><span class="op">&lt;</span><span class=
-"ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class=
-"ident">fmt</span>(<span class="kw-2">&</span><span class=
-"self">self</span>, <span class="ident">f</span>: <span class=
-"kw-2">&</span><span class="kw-2">mut</span> <span class=
-"ident">fmt</span>::<span class=
-"ident">Formatter</span><span class="op">&lt;</span><span class=
-"lifetime">'_</span><span class="op">&gt;</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="macro">write</span><span class=
-"macro">!</span>(
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">FourParticle</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="macro">write</span><span class="macro">!</span>(
             <span class="ident">f</span>,
-            <span class="string">"FourParticle {{ \
+            <span class="string">&quot;FourParticle {{ \
              particles: {:?}, \
              particles_idx: {:?}, \
              particles_sign: {:?}, \
              squared_amplitude: Box&lt;Fn&gt;, \
-             }}"</span>,
-            <span class="self">self</span>.<span class=
-"ident">particles</span>, <span class=
-"self">self</span>.<span class=
-"ident">particles_idx</span>, <span class=
-"self">self</span>.<span class="ident">particles_sign</span>
+             }}&quot;</span>,
+            <span class="self">self</span>.<span class="ident">particles</span>, <span class="self">self</span>.<span class="ident">particles_idx</span>, <span class="self">self</span>.<span class="ident">particles_sign</span>
         )
     }
 }
 
-<span class="kw">impl</span><span class=
-"op">&lt;</span><span class="ident">M</span><span class=
-"op">&gt;</span> <span class="ident">Interaction</span><span class=
-"op">&lt;</span><span class="ident">M</span><span class=
-"op">&gt;</span> <span class="kw">for</span> <span class=
-"ident">FourParticle</span><span class="op">&lt;</span><span class=
-"ident">M</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="ident">Interaction</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FourParticle</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">M</span>: <span class="ident">Model</span>,
 {
-    <span class="kw">fn</span> <span class=
-"ident">particles</span>(<span class="kw-2">&</span><span class=
-"self">self</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="kw-2">&</span><span class=
-"ident">InteractionParticles</span> {
-        <span class="kw-2">&</span><span class=
-"self">self</span>.<span class="ident">particles</span>
+    <span class="kw">fn</span> <span class="ident">particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">InteractionParticles</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">particles</span>
     }
 
-    <span class="kw">fn</span> <span class=
-"ident">particles_idx</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"kw-2">&</span><span class=
-"ident">InteractionParticleIndices</span> {
-        <span class="kw-2">&</span><span class=
-"self">self</span>.<span class="ident">particles_idx</span>
+    <span class="kw">fn</span> <span class="ident">particles_idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">InteractionParticleIndices</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">particles_idx</span>
     }
 
-    <span class="kw">fn</span> <span class=
-"ident">particles_sign</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"kw-2">&</span><span class=
-"ident">InteractionParticleSigns</span> {
-        <span class="kw-2">&</span><span class=
-"self">self</span>.<span class="ident">particles_sign</span>
+    <span class="kw">fn</span> <span class="ident">particles_sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">InteractionParticleSigns</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">particles_sign</span>
     }
 
-    <span class="kw">fn</span> <span class=
-"ident">width_enabled</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"ident">bool</span> {
-        <span class="self">self</span>.<span class=
-"ident">width_enabled</span>
+    <span class="kw">fn</span> <span class="ident">width_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">width_enabled</span>
     }
 
-    <span class=
-"comment">// TODO: Implement three-body decays</span>
-    <span class=
-"comment">// fn width(&amp;self, c: &amp;Context&lt;M&gt;) -&gt; Option&lt;PartialWidth&gt; {}</span>
+    <span class="comment">// TODO: Implement three-body decays</span>
+    <span class="comment">// fn width(&amp;self, c: &amp;Context&lt;M&gt;) -&gt; Option&lt;PartialWidth&gt; {}</span>
 
-    <span class="kw">fn</span> <span class=
-"ident">gamma_enabled</span>(<span class=
-"kw-2">&</span><span class="self">self</span>) <span class=
-"op">-</span><span class="op">&gt;</span> <span class=
-"ident">bool</span> {
-        <span class="self">self</span>.<span class=
-"ident">gamma_enabled</span>
+    <span class="kw">fn</span> <span class="ident">gamma_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">gamma_enabled</span>
     }
 
-    <span class="kw">fn</span> <span class=
-"ident">gamma</span>(<span class="kw-2">&</span><span class=
-"self">self</span>, <span class="ident">c</span>: <span class=
-"kw-2">&</span><span class="ident">Context</span><span class=
-"op">&lt;</span><span class="ident">M</span><span class=
-"op">&gt;</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="prelude-ty">Option</span><span class=
-"op">&lt;</span><span class="ident">f64</span><span class=
-"op">&gt;</span> {
-        <span class="kw">if</span> <span class=
-"op">!</span><span class="self">self</span>.<span class=
-"ident">gamma_enabled</span> {
-            <span class="kw">return</span> <span class=
-"prelude-val">None</span>;
+    <span class="kw">fn</span> <span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">gamma_enabled</span> {
+            <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class=
-"ident">ln_beta</span> <span class="op">=</span> <span class=
-"ident">c</span>.<span class="ident">beta</span>.<span class=
-"ident">ln</span>();
+        <span class="kw">let</span> <span class="ident">ln_beta</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">beta</span>.<span class="ident">ln</span>();
 
-        <span class="kw">if</span> <span class=
-"kw">let</span> <span class="prelude-val">Ok</span>(<span class=
-"ident">gamma_spline</span>) <span class="op">=</span> <span class=
-"self">self</span>.<span class=
-"ident">gamma_spline</span>.<span class="ident">read</span>() {
-            <span class="kw">if</span> <span class=
-"ident">gamma_spline</span>.<span class=
-"ident">accurate</span>(<span class="ident">ln_beta</span>) {
-                <span class="kw">return</span> <span class=
-"prelude-val">Some</span>(<span class=
-"ident">gamma_spline</span>.<span class=
-"ident">sample</span>(<span class=
-"ident">ln_beta</span>).<span class="ident">exp</span>());
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">gamma_spline</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">gamma_spline</span>.<span class="ident">read</span>() {
+            <span class="kw">if</span> <span class="ident">gamma_spline</span>.<span class="ident">accurate</span>(<span class="ident">ln_beta</span>) {
+                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">gamma_spline</span>.<span class="ident">sample</span>(<span class="ident">ln_beta</span>).<span class="ident">exp</span>());
             }
         }
-        <span class="kw">let</span> <span class=
-"ident">ptcl</span> <span class="op">=</span> <span class=
-"ident">c</span>.<span class="ident">model</span>.<span class=
-"ident">particles</span>();
+        <span class="kw">let</span> <span class="ident">ptcl</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">model</span>.<span class="ident">particles</span>();
 
         <span class="comment">// Get the *squared* masses</span>
-        <span class="kw">let</span> <span class=
-"ident">m0</span> <span class="op">=</span> <span class=
-"ident">ptcl</span>[<span class="self">self</span>.<span class=
-"ident">particles_idx</span>.<span class=
-"ident">incoming</span>[<span class=
-"number">0</span>]].<span class="ident">mass2</span>;
-        <span class="kw">let</span> <span class=
-"ident">m1</span> <span class="op">=</span> <span class=
-"ident">ptcl</span>[<span class="self">self</span>.<span class=
-"ident">particles_idx</span>.<span class=
-"ident">incoming</span>[<span class=
-"number">1</span>]].<span class="ident">mass2</span>;
-        <span class="kw">let</span> <span class=
-"ident">m2</span> <span class="op">=</span> <span class=
-"ident">ptcl</span>[<span class="self">self</span>.<span class=
-"ident">particles_idx</span>.<span class=
-"ident">outgoing</span>[<span class=
-"number">0</span>]].<span class="ident">mass2</span>;
-        <span class="kw">let</span> <span class=
-"ident">m3</span> <span class="op">=</span> <span class=
-"ident">ptcl</span>[<span class="self">self</span>.<span class=
-"ident">particles_idx</span>.<span class=
-"ident">outgoing</span>[<span class=
-"number">1</span>]].<span class="ident">mass2</span>;
+        <span class="kw">let</span> <span class="ident">m0</span> <span class="op">=</span> <span class="ident">ptcl</span>[<span class="self">self</span>.<span class="ident">particles_idx</span>.<span class="ident">incoming</span>[<span class="number">0</span>]].<span class="ident">mass2</span>;
+        <span class="kw">let</span> <span class="ident">m1</span> <span class="op">=</span> <span class="ident">ptcl</span>[<span class="self">self</span>.<span class="ident">particles_idx</span>.<span class="ident">incoming</span>[<span class="number">1</span>]].<span class="ident">mass2</span>;
+        <span class="kw">let</span> <span class="ident">m2</span> <span class="op">=</span> <span class="ident">ptcl</span>[<span class="self">self</span>.<span class="ident">particles_idx</span>.<span class="ident">outgoing</span>[<span class="number">0</span>]].<span class="ident">mass2</span>;
+        <span class="kw">let</span> <span class="ident">m3</span> <span class="op">=</span> <span class="ident">ptcl</span>[<span class="self">self</span>.<span class="ident">particles_idx</span>.<span class="ident">outgoing</span>[<span class="number">1</span>]].<span class="ident">mass2</span>;
 
-        <span class="kw">let</span> <span class=
-"ident">gamma</span> <span class="op">=</span> <span class=
-"ident">integrate_st</span>(
-            <span class="op">|</span><span class=
-"ident">s</span>, <span class="ident">t</span><span class=
-"op">|</span> {
-                <span class="kw">let</span> <span class=
-"ident">u</span> <span class="op">=</span> <span class=
-"ident">m0</span> <span class="op">+</span> <span class=
-"ident">m1</span> <span class="op">+</span> <span class=
-"ident">m2</span> <span class="op">+</span> <span class=
-"ident">m3</span> <span class="op">-</span> <span class=
-"ident">s</span> <span class="op">-</span> <span class=
-"ident">t</span>;
-                (<span class="self">self</span>.<span class=
-"ident">squared_amplitude</span>)(<span class=
-"kw-2">&</span><span class="ident">c</span>.<span class=
-"ident">model</span>, <span class="ident">s</span>, <span class=
-"ident">t</span>, <span class="ident">u</span>).<span class=
-"ident">abs</span>()
+        <span class="kw">let</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="ident">integrate_st</span>(
+            <span class="op">|</span><span class="ident">s</span>, <span class="ident">t</span><span class="op">|</span> {
+                <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">m0</span> <span class="op">+</span> <span class="ident">m1</span> <span class="op">+</span> <span class="ident">m2</span> <span class="op">+</span> <span class="ident">m3</span> <span class="op">-</span> <span class="ident">s</span> <span class="op">-</span> <span class="ident">t</span>;
+                (<span class="self">self</span>.<span class="ident">squared_amplitude</span>)(<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">model</span>, <span class="ident">s</span>, <span class="ident">t</span>, <span class="ident">u</span>).<span class="ident">abs</span>()
             },
-            <span class="ident">c</span>.<span class=
-"ident">beta</span>,
+            <span class="ident">c</span>.<span class="ident">beta</span>,
             <span class="ident">m0</span>,
             <span class="ident">m1</span>,
             <span class="ident">m2</span>,
             <span class="ident">m3</span>,
         )
-        <span class=
-"comment">// FIXME: Should we take the absolute value?</span>
+        <span class="comment">// FIXME: Should we take the absolute value?</span>
         .<span class="ident">abs</span>();
 
-        <span class="kw">if</span> <span class=
-"kw">let</span> <span class="prelude-val">Ok</span>(<span class=
-"kw-2">mut</span> <span class=
-"ident">gamma_spline</span>) <span class="op">=</span> <span class=
-"self">self</span>.<span class=
-"ident">gamma_spline</span>.<span class="ident">write</span>() {
-            <span class="ident">gamma_spline</span>.<span class=
-"ident">add</span>(<span class="ident">ln_beta</span>, <span class=
-"ident">gamma</span>.<span class="ident">ln</span>());
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">gamma_spline</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">gamma_spline</span>.<span class="ident">write</span>() {
+            <span class="ident">gamma_spline</span>.<span class="ident">add</span>(<span class="ident">ln_beta</span>, <span class="ident">gamma</span>.<span class="ident">ln</span>());
         }
 
-        <span class="prelude-val">Some</span>(<span class=
-"ident">gamma</span>)
+        <span class="prelude-val">Some</span>(<span class="ident">gamma</span>)
     }
 
-    <span class="kw">fn</span> <span class=
-"ident">asymmetry</span>(<span class="kw-2">&</span><span class=
-"self">self</span>, <span class="ident">c</span>: <span class=
-"kw-2">&</span><span class="ident">Context</span><span class=
-"op">&lt;</span><span class="ident">M</span><span class=
-"op">&gt;</span>) <span class="op">-</span><span class=
-"op">&gt;</span> <span class="prelude-ty">Option</span><span class=
-"op">&lt;</span><span class="ident">f64</span><span class=
-"op">&gt;</span> {
-        <span class="kw">let</span> <span class=
-"ident">asymmetry</span> <span class="op">=</span> <span class=
-"self">self</span>.<span class=
-"ident">asymmetry</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">asymmetry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">asymmetry</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">asymmetry</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class=
-"ident">ln_beta</span> <span class="op">=</span> <span class=
-"ident">c</span>.<span class="ident">beta</span>.<span class=
-"ident">ln</span>();
+        <span class="kw">let</span> <span class="ident">ln_beta</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">beta</span>.<span class="ident">ln</span>();
 
-        <span class="kw">if</span> <span class=
-"kw">let</span> <span class="prelude-val">Ok</span>(<span class=
-"ident">asymmetry_spline</span>) <span class=
-"op">=</span> <span class="self">self</span>.<span class=
-"ident">asymmetry_spline</span>.<span class="ident">read</span>() {
-            <span class="kw">if</span> <span class=
-"ident">asymmetry_spline</span>.<span class=
-"ident">accurate</span>(<span class="ident">ln_beta</span>) {
-                <span class="kw">return</span> <span class=
-"prelude-val">Some</span>(<span class=
-"ident">asymmetry_spline</span>.<span class=
-"ident">sample</span>(<span class=
-"ident">ln_beta</span>).<span class="ident">exp</span>());
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">asymmetry_spline</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">asymmetry_spline</span>.<span class="ident">read</span>() {
+            <span class="kw">if</span> <span class="ident">asymmetry_spline</span>.<span class="ident">accurate</span>(<span class="ident">ln_beta</span>) {
+                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">asymmetry_spline</span>.<span class="ident">sample</span>(<span class="ident">ln_beta</span>).<span class="ident">exp</span>());
             }
         }
-        <span class="kw">let</span> <span class=
-"ident">ptcl</span> <span class="op">=</span> <span class=
-"ident">c</span>.<span class="ident">model</span>.<span class=
-"ident">particles</span>();
+        <span class="kw">let</span> <span class="ident">ptcl</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">model</span>.<span class="ident">particles</span>();
 
         <span class="comment">// Get the *squared* masses</span>
-        <span class="kw">let</span> <span class=
-"ident">m0</span> <span class="op">=</span> <span class=
-"ident">ptcl</span>[<span class="self">self</span>.<span class=
-"ident">particles_idx</span>.<span class=
-"ident">incoming</span>[<span class=
-"number">0</span>]].<span class="ident">mass2</span>;
-        <span class="kw">let</span> <span class=
-"ident">m1</span> <span class="op">=</span> <span class=
-"ident">ptcl</span>[<span class="self">self</span>.<span class=
-"ident">particles_idx</span>.<span class=
-"ident">incoming</span>[<span class=
-"number">1</span>]].<span class="ident">mass2</span>;
-        <span class="kw">let</span> <span class=
-"ident">m2</span> <span class="op">=</span> <span class=
-"ident">ptcl</span>[<span class="self">self</span>.<span class=
-"ident">particles_idx</span>.<span class=
-"ident">outgoing</span>[<span class=
-"number">0</span>]].<span class="ident">mass2</span>;
-        <span class="kw">let</span> <span class=
-"ident">m3</span> <span class="op">=</span> <span class=
-"ident">ptcl</span>[<span class="self">self</span>.<span class=
-"ident">particles_idx</span>.<span class=
-"ident">outgoing</span>[<span class=
-"number">1</span>]].<span class="ident">mass2</span>;
+        <span class="kw">let</span> <span class="ident">m0</span> <span class="op">=</span> <span class="ident">ptcl</span>[<span class="self">self</span>.<span class="ident">particles_idx</span>.<span class="ident">incoming</span>[<span class="number">0</span>]].<span class="ident">mass2</span>;
+        <span class="kw">let</span> <span class="ident">m1</span> <span class="op">=</span> <span class="ident">ptcl</span>[<span class="self">self</span>.<span class="ident">particles_idx</span>.<span class="ident">incoming</span>[<span class="number">1</span>]].<span class="ident">mass2</span>;
+        <span class="kw">let</span> <span class="ident">m2</span> <span class="op">=</span> <span class="ident">ptcl</span>[<span class="self">self</span>.<span class="ident">particles_idx</span>.<span class="ident">outgoing</span>[<span class="number">0</span>]].<span class="ident">mass2</span>;
+        <span class="kw">let</span> <span class="ident">m3</span> <span class="op">=</span> <span class="ident">ptcl</span>[<span class="self">self</span>.<span class="ident">particles_idx</span>.<span class="ident">outgoing</span>[<span class="number">1</span>]].<span class="ident">mass2</span>;
 
-        <span class="kw">let</span> <span class=
-"ident">delta_gamma</span> <span class="op">=</span> <span class=
-"ident">integrate_st</span>(
-            <span class="op">|</span><span class=
-"ident">s</span>, <span class="ident">t</span><span class=
-"op">|</span> {
-                <span class="kw">let</span> <span class=
-"ident">u</span> <span class="op">=</span> <span class=
-"ident">m0</span> <span class="op">+</span> <span class=
-"ident">m1</span> <span class="op">+</span> <span class=
-"ident">m2</span> <span class="op">+</span> <span class=
-"ident">m3</span> <span class="op">-</span> <span class=
-"ident">s</span> <span class="op">-</span> <span class=
-"ident">t</span>;
-                <span class="ident">asymmetry</span>(<span class=
-"kw-2">&</span><span class="ident">c</span>.<span class=
-"ident">model</span>, <span class="ident">s</span>, <span class=
-"ident">t</span>, <span class="ident">u</span>).<span class=
-"ident">abs</span>()
+        <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">integrate_st</span>(
+            <span class="op">|</span><span class="ident">s</span>, <span class="ident">t</span><span class="op">|</span> {
+                <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">m0</span> <span class="op">+</span> <span class="ident">m1</span> <span class="op">+</span> <span class="ident">m2</span> <span class="op">+</span> <span class="ident">m3</span> <span class="op">-</span> <span class="ident">s</span> <span class="op">-</span> <span class="ident">t</span>;
+                <span class="ident">asymmetry</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">model</span>, <span class="ident">s</span>, <span class="ident">t</span>, <span class="ident">u</span>).<span class="ident">abs</span>()
             },
-            <span class="ident">c</span>.<span class=
-"ident">beta</span>,
+            <span class="ident">c</span>.<span class="ident">beta</span>,
             <span class="ident">m0</span>,
             <span class="ident">m1</span>,
             <span class="ident">m2</span>,
             <span class="ident">m3</span>,
         )
-        <span class=
-"comment">// FIXME: Should we take the absolute value?</span>
+        <span class="comment">// FIXME: Should we take the absolute value?</span>
         .<span class="ident">abs</span>();
 
-        <span class="kw">if</span> <span class=
-"kw">let</span> <span class="prelude-val">Ok</span>(<span class=
-"kw-2">mut</span> <span class=
-"ident">asymmetry_spline</span>) <span class=
-"op">=</span> <span class="self">self</span>.<span class=
-"ident">asymmetry_spline</span>.<span class=
-"ident">write</span>() {
-            <span class=
-"ident">asymmetry_spline</span>.<span class="ident">add</span>(<span class="ident">ln_beta</span>, <span class="ident">delta_gamma</span>.<span class="ident">ln</span>());
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">asymmetry_spline</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">asymmetry_spline</span>.<span class="ident">write</span>() {
+            <span class="ident">asymmetry_spline</span>.<span class="ident">add</span>(<span class="ident">ln_beta</span>, <span class="ident">delta_gamma</span>.<span class="ident">ln</span>());
         }
 
-        <span class="prelude-val">Some</span>(<span class=
-"ident">delta_gamma</span>)
+        <span class="prelude-val">Some</span>(<span class="ident">delta_gamma</span>)
     }
 }
 </pre></div>
-</section>
-<section id="search" class="content hidden"></section>
-<section class="footer"></section>
-<script>
-window.rootPath = "../../../../";window.currentCrate = "boltzmann_solver";
-</script>
-<script src="../../../../main.js"></script>
-<script src="../../../../source-script.js"></script>
-<script src="../../../../source-files.js"></script>
-<script defer src="../../../../search-index.js"></script>
-</body>
-</html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "boltzmann_solver";</script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>

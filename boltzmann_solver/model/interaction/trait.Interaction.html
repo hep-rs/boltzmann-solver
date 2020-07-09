@@ -1,1015 +1,163 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta name="generator" content=
-"HTML Tidy for HTML5 for Linux version 5.6.0">
-<meta charset="utf-8">
-<meta name="viewport" content=
-"width=device-width, initial-scale=1.0">
-<meta name="generator" content="rustdoc">
-<meta name="description" content=
-"API documentation for the Rust `Interaction` trait in crate `boltzmann_solver`.">
-<meta name="keywords" content=
-"rust, rustlang, rust-lang, Interaction">
-<title>boltzmann_solver::model::interaction::Interaction -
-Rust</title>
-<link rel="stylesheet" type="text/css" href=
-"../../../normalize.css">
-<link rel="stylesheet" type="text/css" href="../../../rustdoc.css"
-id="mainThemeStyle">
-<link rel="stylesheet" type="text/css" href="../../../dark.css">
-<link rel="stylesheet" type="text/css" href="../../../light.css"
-id="themeStyle">
-<script src="../../../storage.js"></script><noscript>
-<link rel="stylesheet" href="../../../noscript.css"></noscript>
-<link rel="shortcut icon" href="../../../favicon.ico">
-<style type="text/css">
-#crate-search{background-image:url("../../../down-arrow.svg");}
-</style>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `Interaction` trait in crate `boltzmann_solver`."><meta name="keywords" content="rust, rustlang, rust-lang, Interaction"><title>boltzmann_solver::model::interaction::Interaction - Rust</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.11/dist/katex.min.css"
+  crossorigin="anonymous"
+/>
+<script
+  src="https://cdn.jsdelivr.net/npm/katex@0.11/dist/katex.min.js"
+  crossorigin="anonymous"
+></script>
 <script>
-  MathJax = {
-    tex: {
-      macros: {
-        dd: "{\\mathop{}\\!\\mathrm{d}}",
-        textsc: ["\\mathrm{\\scriptsize #1}", 1],
-        vt: ["\\boldsymbol{#1}", 1],
-        pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2],
-        ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2],
-        defeq: "\\mathrel{\\vcenter:}=",
-        abs: ["\\lvert #1 \\rvert", 1],
-        angles: ["\\langle #1 \\rangle", 1]
+  "use strict";
+  const macros = {
+    "\\vt": "\\boldsymbol{#1}",
+    "\\pfrac": "\\frac{\\partial{#1}}{\\partial{#2}}",
+    "\\dd": "\\mathop{}\\!\\mathrm{d}",
+    "\\ddfrac": "\\frac{\dd{#1}}{\dd{#2}}",
+    "\\defeq": "\\vcentcolon=",
+    "\\abs": "\\left\\lvert{#1}\\right\\rvert",
+    "\\CP": "\\mathcal{CP}",
+  };
+
+  // Display math is inputted in the documentation as:
+  //
+  // ```math
+  //   \int_0^1 x
+  // ```
+  //
+  // and in the HTML appears as
+  //
+  // ```html
+  // <pre><code class="language-math">...</code></pre>
+  // ```
+  document.addEventListener("DOMContentLoaded", function () {
+    // console.log("Replacing display maths");
+    const maths = document.getElementsByClassName("language-math");
+    for (let i = 0; i < maths.length; i++) {
+      const el = maths[i];
+      el.parentNode.replaceWith(el);
+      katex.render(el.innerText, el, { displayMode: true, macros: macros });
+    }
+  });
+
+  // Inline math is inputted in the documentation as `$...$` (with the
+  // backticks) and in the HTML appears as
+  //
+  // ```html
+  // <code>$...$</code>
+  // ```
+  document.addEventListener("DOMContentLoaded", function () {
+    // console.log("Replacing inline maths");
+    const maths = document.getElementsByTagName("code");
+    for (let i = 0; i < maths.length; i++) {
+      const el = maths[i];
+      console.log("Replacing element: " + el.innerText);
+      if (el.innerText.startsWith("$") && el.innerText.endsWith("$")) {
+        katex.render(el.innerText.substring(1, el.innerText.length - 1), el, {
+          macros: macros,
+        });
+        el.parentNode.insertBefore(el.firstChild, el);
+        el.remove();
+
+        // After being removed, the current index points to the next element.
+        i--;
       }
     }
-  };
+  });
 </script>
-<script
-  id="MathJax-script"
-  async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
-></script>
-</head>
-<body class="rustdoc trait">
-<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
-<nav class="sidebar">
-<div class="sidebar-menu">☰</div>
-<a href='../../../boltzmann_solver/index.html'>
-<div class='logo-container'><img src='../../../rust-logo.png' alt=
-'logo'></div>
-</a>
-<p class='location'>Trait Interaction</p>
-<div class="sidebar-elems">
-<div class="block items"><a class="sidebar-title" href=
-"#required-methods">Required Methods</a>
-<div class="sidebar-links"><a href=
-"#tymethod.gamma">gamma</a><a href=
-"#tymethod.gamma_enabled">gamma_enabled</a><a href=
-"#tymethod.particles">particles</a><a href=
-"#tymethod.particles_idx">particles_idx</a><a href=
-"#tymethod.particles_sign">particles_sign</a><a href=
-"#tymethod.width_enabled">width_enabled</a></div>
-<a class="sidebar-title" href="#provided-methods">Provided
-Methods</a>
-<div class="sidebar-links"><a href=
-"#method.adjusted_rate">adjusted_rate</a><a href=
-"#method.asymmetry">asymmetry</a><a href=
-"#method.change">change</a><a href="#method.rate">rate</a><a href=
-"#method.width">width</a></div>
-<a class="sidebar-title" href="#foreign-impls">Implementations on
-Foreign Types</a>
-<div class="sidebar-links"><a href=
-"#impl-Interaction%3CM%3E-for-%26%27_%20I">&amp;'_ I</a><a href=
-"#impl-Interaction%3CM%3E-for-Box%3CI%3E">Box&lt;I&gt;</a></div>
-<a class="sidebar-title" href=
-"#implementors">Implementors</a></div>
-<p class='location'><a href=
-'../../index.html'>boltzmann_solver</a>::<wbr><a href=
-'../index.html'>model</a>::<wbr><a href=
-'index.html'>interaction</a></p>
-<script>
-window.sidebarCurrent = {name: 'Interaction', ty: 'trait', relpath: ''};
-</script>
-<script defer src="sidebar-items.js"></script></div>
-</nav>
-<div class="theme-picker"><button id="theme-picker" aria-label=
-"Pick another theme!"><img src="../../../brush.svg" width="18" alt=
-"Pick another theme!"></button>
-<div id="theme-choices"></div>
-</div>
-<script src="../../../theme.js"></script>
-<nav class="sub">
-<form class="search-form">
-<div class="search-container">
-<div><select id="crate-search">
-<option value="All crates">All crates</option>
-</select><input class="search-input" name="search" disabled
-autocomplete="off" spellcheck="false" placeholder=
-"Click or press ‘S’ to search, ‘?’ for more options…" type=
-"search"></div>
-<a id="settings-menu" href="../../../settings.html"><img src=
-"../../../wheel.svg" width="18" alt="Change settings"></a></div>
-</form>
-</nav>
-<section id="main" class="content">
-<h1 class='fqn'><span class='out-of-band'><span id=
-'render-detail'><a id="toggle-all-docs" href="javascript:void(0)"
-title="collapse all docs">[<span class=
-'inner'>−</span>]</a></span><a class='srclink' href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#150-418'
-title='goto source code'>[src]</a></span><span class=
-'in-band'>Trait <a href=
-'../../index.html'>boltzmann_solver</a>::<wbr><a href=
-'../index.html'>model</a>::<wbr><a href=
-'index.html'>interaction</a>::<wbr><a class="trait" href=
-''>Interaction</a></span></h1>
-<div class="docblock type-decl hidden-by-usual-hider">
-<pre class='rust trait'>pub trait Interaction&lt;M&gt; <span class=
-"where fmt-newline">where<br>    M: <a class="trait" href=
-"../../../boltzmann_solver/model/trait.Model.html" title=
-"trait boltzmann_solver::model::Model">Model</a>, </span>{
-    fn <a href='#tymethod.particles' class=
-'fnname'>particles</a>(&amp;self) -&gt; &<a class="struct" href=
-"../../../boltzmann_solver/model/interaction/struct.InteractionParticles.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticles">InteractionParticles</a>;
-</pre>
-<div class='item-spacer'></div>
-<pre>    fn <a href='#tymethod.particles_idx' class=
-'fnname'>particles_idx</a>(&amp;self) -&gt; &<a class="struct"
-href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleIndices.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticleIndices">InteractionParticleIndices</a>;
-</pre>
-<div class='item-spacer'></div>
-<pre>    fn <a href='#tymethod.particles_sign' class=
-'fnname'>particles_sign</a>(&amp;self) -&gt; &<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.InteractionParticleSigns.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticleSigns">InteractionParticleSigns</a>;
-</pre>
-<div class='item-spacer'></div>
-<pre>    fn <a href='#tymethod.width_enabled' class=
-'fnname'>width_enabled</a>(&amp;self) -&gt; <a class="primitive"
-href=
-"https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>;
-</pre>
-<div class='item-spacer'></div>
-<pre>    fn <a href='#tymethod.gamma_enabled' class=
-'fnname'>gamma_enabled</a>(&amp;self) -&gt; <a class="primitive"
-href=
-"https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>;
-</pre>
-<div class='item-spacer'></div>
-<pre>    fn <a href='#tymethod.gamma' class=
-'fnname'>gamma</a>(&amp;self, c: &<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum"
-href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class=
-"primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;;
 
-    fn <a href='#method.width' class=
-'fnname'>width</a>(&amp;self, _c: &<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum"
-href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.PartialWidth.html"
-title=
-"struct boltzmann_solver::model::interaction::PartialWidth">PartialWidth</a>&gt; { ... }
-</pre>
-<div class='item-spacer'></div>
-<pre>    fn <a href='#method.asymmetry' class=
-'fnname'>asymmetry</a>(&amp;self, _c: &<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum"
-href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class=
-"primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt; { ... }
-</pre>
-<div class='item-spacer'></div>
-<pre>    fn <a href='#method.rate' class=
-'fnname'>rate</a>(&amp;self, c: &<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum"
-href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.RateDensity.html"
-title=
-"struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt; { ... }
-</pre>
-<div class='item-spacer'></div>
-<pre>    fn <a href='#method.adjusted_rate' class=
-'fnname'>adjusted_rate</a>(&amp;self, c: &<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum"
-href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.RateDensity.html"
-title=
-"struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt; { ... }
-</pre>
-<div class='item-spacer'></div>
-<pre>    fn <a href='#method.change' class=
-'fnname'>change</a>(<br>        &amp;self, <br>        dn: &amp;mut <a class="type"
-href="../../../ndarray/aliases/type.Array1.html" title=
-"type ndarray::aliases::Array1">Array1</a>&lt;<a class="primitive"
-href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;, <br>        dna: &amp;mut <a class="type"
-href="../../../ndarray/aliases/type.Array1.html" title=
-"type ndarray::aliases::Array1">Array1</a>&lt;<a class="primitive"
-href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;, <br>        c: &<a class="struct"
-href="../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;<br>    ) { ... }
-}</pre></div>
-<div class='docblock'>
-<p>Generic interaction between particles.</p>
+<style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc trait"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a><p class='location'>Trait Interaction</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#required-methods">Required Methods</a><div class="sidebar-links"><a href="#tymethod.gamma">gamma</a><a href="#tymethod.gamma_enabled">gamma_enabled</a><a href="#tymethod.particles">particles</a><a href="#tymethod.particles_idx">particles_idx</a><a href="#tymethod.particles_sign">particles_sign</a><a href="#tymethod.width_enabled">width_enabled</a></div><a class="sidebar-title" href="#provided-methods">Provided Methods</a><div class="sidebar-links"><a href="#method.adjusted_rate">adjusted_rate</a><a href="#method.asymmetry">asymmetry</a><a href="#method.change">change</a><a href="#method.rate">rate</a><a href="#method.width">width</a></div><a class="sidebar-title" href="#foreign-impls">Implementations on Foreign Types</a><div class="sidebar-links"><a href="#impl-Interaction%3CM%3E-for-%26%27_%20I">&amp;&#39;_ I</a><a href="#impl-Interaction%3CM%3E-for-Box%3CI%3E">Box&lt;I&gt;</a></div><a class="sidebar-title" href="#implementors">Implementors</a></div><p class='location'><a href='../../index.html'>boltzmann_solver</a>::<wbr><a href='../index.html'>model</a>::<wbr><a href='index.html'>interaction</a></p><script>window.sidebarCurrent = {name: 'Interaction', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#150-418' title='goto source code'>[src]</a></span><span class='in-band'>Trait <a href='../../index.html'>boltzmann_solver</a>::<wbr><a href='../index.html'>model</a>::<wbr><a href='index.html'>interaction</a>::<wbr><a class="trait" href=''>Interaction</a></span></h1><div class="docblock type-decl hidden-by-usual-hider"><pre class='rust trait'>pub trait Interaction&lt;M&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;M: <a class="trait" href="../../../boltzmann_solver/model/trait.Model.html" title="trait boltzmann_solver::model::Model">Model</a>,&nbsp;</span>{
+    fn <a href='#tymethod.particles' class='fnname'>particles</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticles.html" title="struct boltzmann_solver::model::interaction::InteractionParticles">InteractionParticles</a>;
+<div class='item-spacer'></div>    fn <a href='#tymethod.particles_idx' class='fnname'>particles_idx</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleIndices.html" title="struct boltzmann_solver::model::interaction::InteractionParticleIndices">InteractionParticleIndices</a>;
+<div class='item-spacer'></div>    fn <a href='#tymethod.particles_sign' class='fnname'>particles_sign</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleSigns.html" title="struct boltzmann_solver::model::interaction::InteractionParticleSigns">InteractionParticleSigns</a>;
+<div class='item-spacer'></div>    fn <a href='#tymethod.width_enabled' class='fnname'>width_enabled</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>;
+<div class='item-spacer'></div>    fn <a href='#tymethod.gamma_enabled' class='fnname'>gamma_enabled</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>;
+<div class='item-spacer'></div>    fn <a href='#tymethod.gamma' class='fnname'>gamma</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;;
+
+    fn <a href='#method.width' class='fnname'>width</a>(&amp;self, _c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.PartialWidth.html" title="struct boltzmann_solver::model::interaction::PartialWidth">PartialWidth</a>&gt; { ... }
+<div class='item-spacer'></div>    fn <a href='#method.asymmetry' class='fnname'>asymmetry</a>(&amp;self, _c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt; { ... }
+<div class='item-spacer'></div>    fn <a href='#method.rate' class='fnname'>rate</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.RateDensity.html" title="struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt; { ... }
+<div class='item-spacer'></div>    fn <a href='#method.adjusted_rate' class='fnname'>adjusted_rate</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.RateDensity.html" title="struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt; { ... }
+<div class='item-spacer'></div>    fn <a href='#method.change' class='fnname'>change</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dn: &amp;mut <a class="type" href="https://docs.rs/ndarray/0.13/ndarray/aliases/type.Array1.html" title="type ndarray::aliases::Array1">Array1</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dna: &amp;mut <a class="type" href="https://docs.rs/ndarray/0.13/ndarray/aliases/type.Array1.html" title="type ndarray::aliases::Array1">Array1</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;) { ... }
+}</pre></div><div class='docblock'><p>Generic interaction between particles.</p>
 </div>
-<h2 id='required-methods' class='small-section-header'>Required
-methods<a href='#required-methods' class='anchor'></a></h2>
-<div class='methods'>
-<h3 id='tymethod.particles' class='method'><code>fn <a href=
-'#tymethod.particles' class='fnname'>particles</a>(&amp;self) -&gt;
-&<a class="struct" href=
-"../../../boltzmann_solver/model/interaction/struct.InteractionParticles.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticles">InteractionParticles</a></code></h3>
-<div class='docblock'>
-<p>Return the particles involved in this interaction</p>
-</div>
-<h3 id='tymethod.particles_idx' class='method'><code>fn <a href=
-'#tymethod.particles_idx' class=
-'fnname'>particles_idx</a>(&amp;self) -&gt; &<a class="struct"
-href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleIndices.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticleIndices">InteractionParticleIndices</a></code></h3>
-<div class='docblock'>
-<p>Return the particles involved in this interaction, not
-distinguishing between particles an antiparticles.</p>
-</div>
-<h3 id='tymethod.particles_sign' class='method'><code>fn <a href=
-'#tymethod.particles_sign' class=
-'fnname'>particles_sign</a>(&amp;self) -&gt; &<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.InteractionParticleSigns.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticleSigns">InteractionParticleSigns</a></code></h3>
-<div class='docblock'>
-<p>Return the sign of the particles, with +1 for a particle and -1
-for an antiparticle.</p>
-</div>
-<h3 id='tymethod.width_enabled' class='method'><code>fn <a href=
-'#tymethod.width_enabled' class=
-'fnname'>width_enabled</a>(&amp;self) -&gt; <a class="primitive"
-href=
-"https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></h3>
-<div class='docblock'>
-<p>Whether this interaction is to be used to determine decays.</p>
-<p>If width calcuilations are disable, then <a href=
-"../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.width"
-title="`Interaction::width`"><code>Interaction::width</code></a> is
-expected to return <code>None</code> all the time. If it is
-enabled, then <a href=
-"../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.width"
-title="`Interaction::width`"><code>Interaction::width</code></a> is
-expected to return <code>None</code> only when the decay is not
-kinematically allowed.</p>
-</div>
-<h3 id='tymethod.gamma_enabled' class='method'><code>fn <a href=
-'#tymethod.gamma_enabled' class=
-'fnname'>gamma_enabled</a>(&amp;self) -&gt; <a class="primitive"
-href=
-"https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></h3>
-<div class='docblock'>
-<p>Whether this interaction is to be used within the Boltzmann
-equations.</p>
-<p>If this returns true, then <a href=
-"../../../boltzmann_solver/model/interaction/trait.Interaction.html#tymethod.gamma"
-title="`Interaction::gamma`"><code>Interaction::gamma</code></a> is
-expected to return <code>None</code>.</p>
-</div>
-<h3 id='tymethod.gamma' class='method'><code>fn <a href=
-'#tymethod.gamma' class='fnname'>gamma</a>(&amp;self, c: &<a class=
-"struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class=
-"primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code></h3>
-<div class='docblock'>
-<p>Calculate the reaction rate density of this interaction.</p>
-<p>This must return the result <em>before</em> it is normalized by
-the Hubble rate or other factors related to the number densities of
-particles involved. It also must <em>not</em> be normalized to the
-integration step size.</p>
-<p>Care must be taken to obey <a href=
-"../../../boltzmann_solver/model/interaction/trait.Interaction.html#tymethod.gamma_enabled"
-title=
-"`Interaction::gamma_enabled`"><code>Interaction::gamma_enabled</code></a>
-in order to avoid unnecessary computations. Specifically, this
-should always return <code>None</code> when
-<code>self.gamma_enabled() == true</code>.</p>
-</div>
-</div>
-<span class='loading-content'>Loading content...</span>
-<h2 id='provided-methods' class='small-section-header'>Provided
-methods<a href='#provided-methods' class='anchor'></a></h2>
-<div class='methods'>
-<h3 id='method.width' class='method'><code>fn <a href=
-'#method.width' class='fnname'>width</a>(&amp;self, _c: &<a class=
-"struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.PartialWidth.html"
-title=
-"struct boltzmann_solver::model::interaction::PartialWidth">PartialWidth</a>&gt;</code></h3>
-<div class='docblock'>
-<p>Calculate the decay width associated with a particular
-interaction.</p>
-<p>There may not be a result if the decay is not kinematically
-allowed, or not relevant.</p>
-<p>The default implementation simply returns <code>None</code> and
-must be implemented manually. Care must be taken to obey <a href=
-"../../../boltzmann_solver/model/interaction/trait.Interaction.html#tymethod.width_enabled"
-title=
-"`Interaction::width_enabled`"><code>Interaction::width_enabled</code></a>
-in order to avoid unnecessary computation (though the incorrect
-implementation will not be detrimental other than in
-performance).</p>
-</div>
-<h3 id='method.asymmetry' class='method'><code>fn <a href=
-'#method.asymmetry' class='fnname'>asymmetry</a>(&amp;self, _c:
-&<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class=
-"primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code></h3>
-<div class='docblock'>
-<p>Asymmetry between the interaction and its \(\mathcal{CP}\)
-conjugate:</p>
-<p>\begin{equation} \delta\gamma \defeq \gamma(\vt a \to \vt b) -
-\gamma(\overline{\vt a} \to \overline{\vt b}) = \gamma(\vt a \to
-\vt b) - \gamma(\vt b \to \vt a) \end{equation}</p>
-<p>If there is no (relevant) asymmetry, then this should return
+            <h2 id='required-methods' class='small-section-header'>Required methods<a href='#required-methods' class='anchor'></a></h2><div class='methods'><h3 id='tymethod.particles' class='method'><code>fn <a href='#tymethod.particles' class='fnname'>particles</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticles.html" title="struct boltzmann_solver::model::interaction::InteractionParticles">InteractionParticles</a></code></h3><div class='docblock'><p>Return the particles involved in this interaction</p>
+</div><h3 id='tymethod.particles_idx' class='method'><code>fn <a href='#tymethod.particles_idx' class='fnname'>particles_idx</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleIndices.html" title="struct boltzmann_solver::model::interaction::InteractionParticleIndices">InteractionParticleIndices</a></code></h3><div class='docblock'><p>Return the particles involved in this interaction, not distinguishing
+between particles an antiparticles.</p>
+</div><h3 id='tymethod.particles_sign' class='method'><code>fn <a href='#tymethod.particles_sign' class='fnname'>particles_sign</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleSigns.html" title="struct boltzmann_solver::model::interaction::InteractionParticleSigns">InteractionParticleSigns</a></code></h3><div class='docblock'><p>Return the sign of the particles, with +1 for a particle and -1 for an
+antiparticle.</p>
+</div><h3 id='tymethod.width_enabled' class='method'><code>fn <a href='#tymethod.width_enabled' class='fnname'>width_enabled</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></h3><div class='docblock'><p>Whether this interaction is to be used to determine decays.</p>
+<p>If width calcuilations are disable, then <a href="../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.width" title="`Interaction::width`"><code>Interaction::width</code></a> is
+expected to return <code>None</code> all the time.  If it is enabled, then
+<a href="../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.width" title="`Interaction::width`"><code>Interaction::width</code></a> is expected to return <code>None</code> only when the decay
+is not kinematically allowed.</p>
+</div><h3 id='tymethod.gamma_enabled' class='method'><code>fn <a href='#tymethod.gamma_enabled' class='fnname'>gamma_enabled</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></h3><div class='docblock'><p>Whether this interaction is to be used within the Boltzmann equations.</p>
+<p>If this returns true, then <a href="../../../boltzmann_solver/model/interaction/trait.Interaction.html#tymethod.gamma" title="`Interaction::gamma`"><code>Interaction::gamma</code></a> is expected to return
 <code>None</code>.</p>
-<p>Note that his is not the same as the asymmetry specified in
-creating the interaction, with the latter being defined as the
-asymmetry in the squared amplitudes and the former being
-subsequently computed.</p>
-</div>
-<h3 id='method.rate' class='method'><code>fn <a href='#method.rate'
-class='fnname'>rate</a>(&amp;self, c: &<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.RateDensity.html"
-title=
-"struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;</code></h3>
-<div class='docblock'>
-<p>Calculate the actual interaction rates density taking into
-account factors related to the number densities of particles
-involved.</p>
-<p>The result must not be normalized by the Hubble rate, nor
-include the factors relating to the integration step size.</p>
-<p>The rate density is defined such that the change initial state
-particles is proportional to the negative of the rates contained,
-while the change for final state particles is proportional to the
-rates themselves.</p>
-</div>
-<h3 id='method.adjusted_rate' class='method'><code>fn <a href=
-'#method.adjusted_rate' class='fnname'>adjusted_rate</a>(&amp;self,
-c: &<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.RateDensity.html"
-title=
-"struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;</code></h3>
-<div class='docblock'>
-<p>Adjust the backward and forward rates such that they do not
-overshoot the equilibrium number densities.</p>
-<p>The rate density going into this function is expected to be the
-output of <a href=
-"../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.rate"
-title="`Interaction::rate`"><code>Interaction::rate</code></a> and
-must not be previously normalized to the Hubble rate nor include
+</div><h3 id='tymethod.gamma' class='method'><code>fn <a href='#tymethod.gamma' class='fnname'>gamma</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code></h3><div class='docblock'><p>Calculate the reaction rate density of this interaction.</p>
+<p>This must return the result <em>before</em> it is normalized by the Hubble rate
+or other factors related to the number densities of particles involved.
+It also must <em>not</em> be normalized to the integration step size.</p>
+<p>Care must be taken to obey <a href="../../../boltzmann_solver/model/interaction/trait.Interaction.html#tymethod.gamma_enabled" title="`Interaction::gamma_enabled`"><code>Interaction::gamma_enabled</code></a> in order to
+avoid unnecessary computations.  Specifically, this should always return
+<code>None</code> when <code>self.gamma_enabled() == true</code>.</p>
+</div></div><span class='loading-content'>Loading content...</span>
+            <h2 id='provided-methods' class='small-section-header'>Provided methods<a href='#provided-methods' class='anchor'></a></h2><div class='methods'><h3 id='method.width' class='method'><code>fn <a href='#method.width' class='fnname'>width</a>(&amp;self, _c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.PartialWidth.html" title="struct boltzmann_solver::model::interaction::PartialWidth">PartialWidth</a>&gt;</code></h3><div class='docblock'><p>Calculate the decay width associated with a particular interaction.</p>
+<p>There may not be a result if the decay is not kinematically allowed, or
+not relevant.</p>
+<p>The default implementation simply returns <code>None</code> and must be implemented
+manually.  Care must be taken to obey <a href="../../../boltzmann_solver/model/interaction/trait.Interaction.html#tymethod.width_enabled" title="`Interaction::width_enabled`"><code>Interaction::width_enabled</code></a> in
+order to avoid unnecessary computation (though the incorrect
+implementation will not be detrimental other than in performance).</p>
+</div><h3 id='method.asymmetry' class='method'><code>fn <a href='#method.asymmetry' class='fnname'>asymmetry</a>(&amp;self, _c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code></h3><div class='docblock'><p>Asymmetry between the interaction and its <code>$\CP$</code> conjugate:</p>
+<pre><code class="language-math">\delta\gamma
+  \defeq \gamma(\vt a \to \vt b) - \gamma(\overline{\vt a} \to \overline{\vt b})
+  = \gamma(\vt a \to \vt b) - \gamma(\vt b \to \vt a)
+</code></pre>
+<p>If there is no (relevant) asymmetry, then this should return <code>None</code>.</p>
+<p>Note that his is not the same as the asymmetry specified in creating the
+interaction, with the latter being defined as the asymmetry in the
+squared amplitudes and the former being subsequently computed.</p>
+</div><h3 id='method.rate' class='method'><code>fn <a href='#method.rate' class='fnname'>rate</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.RateDensity.html" title="struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;</code></h3><div class='docblock'><p>Calculate the actual interaction rates density taking into account
+factors related to the number densities of particles involved.</p>
+<p>The result must not be normalized by the Hubble rate, nor include the
 factors relating to the integration step size.</p>
-<p>The output of this function however <em>will</em> be normalized
-by the HUbble rate and <em>will</em> factors relating to the
-numerical integration.</p>
-</div>
-<h3 id='method.change' class='method'><code>fn <a href=
-'#method.change' class='fnname'>change</a>(&amp;self, dn: &amp;mut
-<a class="type" href="../../../ndarray/aliases/type.Array1.html"
-title="type ndarray::aliases::Array1">Array1</a>&lt;<a class=
-"primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;,
-dna: &amp;mut <a class="type" href=
-"../../../ndarray/aliases/type.Array1.html" title=
-"type ndarray::aliases::Array1">Array1</a>&lt;<a class="primitive"
-href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;,
-c: &<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)</code></h3>
-<div class='docblock'>
-<p>Add this interaction to the <code>dn</code> and <code>dna</code>
-array.</p>
-<p>The changes in <code>dn</code> should contain only the effect
-from the integrated collision operator and not take into account
-the normalization to inverse-temperature evolution nor the dilation
-factor from expansion of the Universe. These factors are handled
-separately and automatically.</p>
+<p>The rate density is defined such that the change initial state particles
+is proportional to the negative of the rates contained, while the change
+for final state particles is proportional to the rates themselves.</p>
+</div><h3 id='method.adjusted_rate' class='method'><code>fn <a href='#method.adjusted_rate' class='fnname'>adjusted_rate</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.RateDensity.html" title="struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;</code></h3><div class='docblock'><p>Adjust the backward and forward rates such that they do not overshoot
+the equilibrium number densities.</p>
+<p>The rate density going into this function is expected to be the output
+of <a href="../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.rate" title="`Interaction::rate`"><code>Interaction::rate</code></a> and must not be previously normalized to the
+Hubble rate nor include factors relating to the integration step size.</p>
+<p>The output of this function however <em>will</em> be normalized by the HUbble
+rate and <em>will</em> factors relating to the numerical integration.</p>
+</div><h3 id='method.change' class='method'><code>fn <a href='#method.change' class='fnname'>change</a>(&amp;self, dn: &amp;mut <a class="type" href="https://docs.rs/ndarray/0.13/ndarray/aliases/type.Array1.html" title="type ndarray::aliases::Array1">Array1</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;, dna: &amp;mut <a class="type" href="https://docs.rs/ndarray/0.13/ndarray/aliases/type.Array1.html" title="type ndarray::aliases::Array1">Array1</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)</code></h3><div class='docblock'><p>Add this interaction to the <code>dn</code> and <code>dna</code> array.</p>
+<p>The changes in <code>dn</code> should contain only the effect from the integrated
+collision operator and not take into account the normalization to
+inverse-temperature evolution nor the dilation factor from expansion of
+the Universe.  These factors are handled separately and automatically.</p>
 <p>This function automatically adjusts the rate calculated by
-<a href=
-"../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.rate"
-title="`Interaction::rate`"><code>Interaction::rate</code></a> so
-that overshooting is avoided.</p>
-</div>
-</div>
-<span class='loading-content'>Loading content...</span>
-<h2 id='foreign-impls' class='small-section-header'>Implementations
-on Foreign Types<a href='#foreign-impls' class='anchor'></a></h2>
-<h3 id='impl-Interaction%3CM%3E-for-%26%27_%20I' class='impl'>
-<code class='in-band'>impl&lt;'_, I:&nbsp;?<a class="trait" href=
-"https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html"
-title="trait core::marker::Sized">Sized</a>, M&gt; <a class="trait"
-href=
-"../../../boltzmann_solver/model/interaction/trait.Interaction.html"
-title=
-"trait boltzmann_solver::model::interaction::Interaction">Interaction</a>&lt;M&gt;
-for <a class="primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;'_</a>
-I <span class="where fmt-newline">where<br>
-&nbsp;&nbsp;&nbsp;&nbsp;I: <a class="trait" href=
-"../../../boltzmann_solver/model/interaction/trait.Interaction.html"
-title=
-"trait boltzmann_solver::model::interaction::Interaction">Interaction</a>&lt;M&gt;,<br>
-
-&nbsp;&nbsp;&nbsp;&nbsp;M: <a class="trait" href=
-"../../../boltzmann_solver/model/trait.Model.html" title=
-"trait boltzmann_solver::model::Model">Model</a>,&nbsp;</span></code><a href='#impl-Interaction%3CM%3E-for-%26%27_%20I'
-class='anchor'></a><a class='srclink' href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#446-493'
-title='goto source code'>[src]</a></h3>
-<div class='impl-items'>
-<h4 id='method.particles' class="method hidden"><code>fn <a href=
-'#method.particles' class='fnname'>particles</a>(&amp;self) -&gt;
-&<a class="struct" href=
-"../../../boltzmann_solver/model/interaction/struct.InteractionParticles.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticles">InteractionParticles</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#451-453'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.particles_idx' class="method hidden"><code>fn
-<a href='#method.particles_idx' class=
-'fnname'>particles_idx</a>(&amp;self) -&gt; &<a class="struct"
-href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleIndices.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticleIndices">InteractionParticleIndices</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#455-457'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.particles_sign' class="method hidden"><code>fn
-<a href='#method.particles_sign' class=
-'fnname'>particles_sign</a>(&amp;self) -&gt; &<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.InteractionParticleSigns.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticleSigns">InteractionParticleSigns</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#459-461'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.width_enabled' class="method hidden"><code>fn
-<a href='#method.width_enabled' class=
-'fnname'>width_enabled</a>(&amp;self) -&gt; <a class="primitive"
-href=
-"https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#463-465'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.width-1' class="method hidden"><code>fn <a href=
-'#method.width' class='fnname'>width</a>(&amp;self, c: &<a class=
-"struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.PartialWidth.html"
-title=
-"struct boltzmann_solver::model::interaction::PartialWidth">PartialWidth</a>&gt;</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#467-469'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.gamma_enabled' class="method hidden"><code>fn
-<a href='#method.gamma_enabled' class=
-'fnname'>gamma_enabled</a>(&amp;self) -&gt; <a class="primitive"
-href=
-"https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#471-473'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.gamma' class="method hidden"><code>fn <a href=
-'#method.gamma' class='fnname'>gamma</a>(&amp;self, c: &<a class=
-"struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class=
-"primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#475-477'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.asymmetry-1' class="method hidden"><code>fn <a href=
-'#method.asymmetry' class='fnname'>asymmetry</a>(&amp;self, c:
-&<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class=
-"primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#479-481'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.rate-1' class="method hidden"><code>fn <a href=
-'#method.rate' class='fnname'>rate</a>(&amp;self, c: &<a class=
-"struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.RateDensity.html"
-title=
-"struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#482-484'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.adjusted_rate-1' class="method hidden"><code>fn
-<a href='#method.adjusted_rate' class=
-'fnname'>adjusted_rate</a>(&amp;self, c: &<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.RateDensity.html"
-title=
-"struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#486-488'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.change-1' class="method hidden"><code>fn <a href=
-'#method.change' class='fnname'>change</a>(&amp;self, dn: &amp;mut
-<a class="type" href="../../../ndarray/aliases/type.Array1.html"
-title="type ndarray::aliases::Array1">Array1</a>&lt;<a class=
-"primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;,
-dna: &amp;mut <a class="type" href=
-"../../../ndarray/aliases/type.Array1.html" title=
-"type ndarray::aliases::Array1">Array1</a>&lt;<a class="primitive"
-href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;,
-c: &<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#490-492'
-title='goto source code'>[src]</a></h4>
-</div>
-<h3 id='impl-Interaction%3CM%3E-for-Box%3CI%3E' class='impl'>
-<code class='in-band'>impl&lt;I:&nbsp;?<a class="trait" href=
-"https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html"
-title="trait core::marker::Sized">Sized</a>, M&gt; <a class="trait"
-href=
-"../../../boltzmann_solver/model/interaction/trait.Interaction.html"
-title=
-"trait boltzmann_solver::model::interaction::Interaction">Interaction</a>&lt;M&gt;
-for <a class="struct" href=
-"https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html"
-title="struct alloc::boxed::Box">Box</a>&lt;I&gt; <span class=
-"where fmt-newline">where<br>
-&nbsp;&nbsp;&nbsp;&nbsp;I: <a class="trait" href=
-"../../../boltzmann_solver/model/interaction/trait.Interaction.html"
-title=
-"trait boltzmann_solver::model::interaction::Interaction">Interaction</a>&lt;M&gt;,<br>
-
-&nbsp;&nbsp;&nbsp;&nbsp;M: <a class="trait" href=
-"../../../boltzmann_solver/model/trait.Model.html" title=
-"trait boltzmann_solver::model::Model">Model</a>,&nbsp;</span></code><a href='#impl-Interaction%3CM%3E-for-Box%3CI%3E'
-class='anchor'></a><a class='srclink' href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#495-543'
-title='goto source code'>[src]</a></h3>
-<div class='impl-items'>
-<h4 id='method.particles-1' class="method hidden"><code>fn <a href=
-'#method.particles' class='fnname'>particles</a>(&amp;self) -&gt;
-&<a class="struct" href=
-"../../../boltzmann_solver/model/interaction/struct.InteractionParticles.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticles">InteractionParticles</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#500-502'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.particles_idx-1' class="method hidden"><code>fn
-<a href='#method.particles_idx' class=
-'fnname'>particles_idx</a>(&amp;self) -&gt; &<a class="struct"
-href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleIndices.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticleIndices">InteractionParticleIndices</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#504-506'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.particles_sign-1' class="method hidden"><code>fn
-<a href='#method.particles_sign' class=
-'fnname'>particles_sign</a>(&amp;self) -&gt; &<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.InteractionParticleSigns.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticleSigns">InteractionParticleSigns</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#508-510'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.width_enabled-1' class="method hidden"><code>fn
-<a href='#method.width_enabled' class=
-'fnname'>width_enabled</a>(&amp;self) -&gt; <a class="primitive"
-href=
-"https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#512-514'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.width-2' class="method hidden"><code>fn <a href=
-'#method.width' class='fnname'>width</a>(&amp;self, c: &<a class=
-"struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.PartialWidth.html"
-title=
-"struct boltzmann_solver::model::interaction::PartialWidth">PartialWidth</a>&gt;</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#516-518'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.gamma_enabled-1' class="method hidden"><code>fn
-<a href='#method.gamma_enabled' class=
-'fnname'>gamma_enabled</a>(&amp;self) -&gt; <a class="primitive"
-href=
-"https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#520-522'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.gamma-1' class="method hidden"><code>fn <a href=
-'#method.gamma' class='fnname'>gamma</a>(&amp;self, c: &<a class=
-"struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class=
-"primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#524-526'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.asymmetry-2' class="method hidden"><code>fn <a href=
-'#method.asymmetry' class='fnname'>asymmetry</a>(&amp;self, c:
-&<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class=
-"primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#528-530'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.rate-2' class="method hidden"><code>fn <a href=
-'#method.rate' class='fnname'>rate</a>(&amp;self, c: &<a class=
-"struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.RateDensity.html"
-title=
-"struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#532-534'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.adjusted_rate-2' class="method hidden"><code>fn
-<a href='#method.adjusted_rate' class=
-'fnname'>adjusted_rate</a>(&amp;self, c: &<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.RateDensity.html"
-title=
-"struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#536-538'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.change-2' class="method hidden"><code>fn <a href=
-'#method.change' class='fnname'>change</a>(&amp;self, dn: &amp;mut
-<a class="type" href="../../../ndarray/aliases/type.Array1.html"
-title="type ndarray::aliases::Array1">Array1</a>&lt;<a class=
-"primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;,
-dna: &amp;mut <a class="type" href=
-"../../../ndarray/aliases/type.Array1.html" title=
-"type ndarray::aliases::Array1">Array1</a>&lt;<a class="primitive"
-href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;,
-c: &<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction.rs.html#540-542'
-title='goto source code'>[src]</a></h4>
-</div>
-<span class='loading-content'>Loading content...</span>
-<h2 id='implementors' class='small-section-header'>
-Implementors<a href='#implementors' class='anchor'></a></h2>
-<div class='item-list' id='implementors-list'>
-<h3 id='impl-Interaction%3CM%3E' class='impl'><code class=
-'in-band'>impl&lt;M&gt; Interaction&lt;M&gt; for <a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.FourParticle.html"
-title=
-"struct boltzmann_solver::model::interaction::FourParticle">FourParticle</a>&lt;M&gt;
-<span class="where fmt-newline">where<br>
-&nbsp;&nbsp;&nbsp;&nbsp;M: <a class="trait" href=
-"../../../boltzmann_solver/model/trait.Model.html" title=
-"trait boltzmann_solver::model::Model">Model</a>,&nbsp;</span></code><a href='#impl-Interaction%3CM%3E'
-class='anchor'></a><a class='srclink' href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#171-277'
-title='goto source code'>[src]</a></h3>
-<div class='impl-items'>
-<h4 id='method.particles-2' class="method hidden"><code>fn <a href=
-'#method.particles-2' class='fnname'>particles</a>(&amp;self) -&gt;
-&<a class="struct" href=
-"../../../boltzmann_solver/model/interaction/struct.InteractionParticles.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticles">InteractionParticles</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#175-177'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.particles_idx-2' class="method hidden"><code>fn
-<a href='#method.particles_idx-2' class=
-'fnname'>particles_idx</a>(&amp;self) -&gt; &<a class="struct"
-href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleIndices.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticleIndices">InteractionParticleIndices</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#179-181'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.particles_sign-2' class="method hidden"><code>fn
-<a href='#method.particles_sign-2' class=
-'fnname'>particles_sign</a>(&amp;self) -&gt; &<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.InteractionParticleSigns.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticleSigns">InteractionParticleSigns</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#183-185'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.width_enabled-2' class="method hidden"><code>fn
-<a href='#method.width_enabled-2' class=
-'fnname'>width_enabled</a>(&amp;self) -&gt; <a class="primitive"
-href=
-"https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#187-189'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.gamma_enabled-2' class="method hidden"><code>fn
-<a href='#method.gamma_enabled-2' class=
-'fnname'>gamma_enabled</a>(&amp;self) -&gt; <a class="primitive"
-href=
-"https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#194-196'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.gamma-2' class="method hidden"><code>fn <a href=
-'#method.gamma-2' class='fnname'>gamma</a>(&amp;self, c: &<a class=
-"struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class=
-"primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#198-237'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.asymmetry-3' class="method hidden"><code>fn <a href=
-'#method.asymmetry-3' class='fnname'>asymmetry</a>(&amp;self, c:
-&<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class=
-"primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#239-276'
-title='goto source code'>[src]</a></h4>
-</div>
-<h3 id='impl-Interaction%3CM%3E-1' class='impl'><code class=
-'in-band'>impl&lt;M&gt; Interaction&lt;M&gt; for <a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.ThreeParticle.html"
-title=
-"struct boltzmann_solver::model::interaction::ThreeParticle">ThreeParticle</a>&lt;M&gt;
-<span class="where fmt-newline">where<br>
-&nbsp;&nbsp;&nbsp;&nbsp;M: <a class="trait" href=
-"../../../boltzmann_solver/model/trait.Model.html" title=
-"trait boltzmann_solver::model::Model">Model</a>,&nbsp;</span></code><a href='#impl-Interaction%3CM%3E-1'
-class='anchor'></a><a class='srclink' href=
-'../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#157-354'
-title='goto source code'>[src]</a></h3>
-<div class='impl-items'>
-<h4 id='method.particles-3' class="method hidden"><code>fn <a href=
-'#method.particles-3' class='fnname'>particles</a>(&amp;self) -&gt;
-&<a class="struct" href=
-"../../../boltzmann_solver/model/interaction/struct.InteractionParticles.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticles">InteractionParticles</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#161-163'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.particles_idx-3' class="method hidden"><code>fn
-<a href='#method.particles_idx-3' class=
-'fnname'>particles_idx</a>(&amp;self) -&gt; &<a class="struct"
-href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleIndices.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticleIndices">InteractionParticleIndices</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#165-167'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.particles_sign-3' class="method hidden"><code>fn
-<a href='#method.particles_sign-3' class=
-'fnname'>particles_sign</a>(&amp;self) -&gt; &<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.InteractionParticleSigns.html"
-title=
-"struct boltzmann_solver::model::interaction::InteractionParticleSigns">InteractionParticleSigns</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#169-171'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.width_enabled-3' class="method hidden"><code>fn
-<a href='#method.width_enabled-3' class=
-'fnname'>width_enabled</a>(&amp;self) -&gt; <a class="primitive"
-href=
-"https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#173-175'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.width-3' class="method hidden"><code>fn <a href=
-'#method.width-3' class='fnname'>width</a>(&amp;self, c: &<a class=
-"struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.PartialWidth.html"
-title=
-"struct boltzmann_solver::model::interaction::PartialWidth">PartialWidth</a>&gt;</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#177-204'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.gamma_enabled-3' class="method hidden"><code>fn
-<a href='#method.gamma_enabled-3' class=
-'fnname'>gamma_enabled</a>(&amp;self) -&gt; <a class="primitive"
-href=
-"https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#206-208'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.gamma-3' class="method"><code>fn <a href=
-'#method.gamma-3' class='fnname'>gamma</a>(&amp;self, c: &<a class=
-"struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class=
-"primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#228-265'
-title='goto source code'>[src]</a></h4>
-<div class='docblock'>
-<p>Unlike other function, this is computed in one of two ways:</p>
+<a href="../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.rate" title="`Interaction::rate`"><code>Interaction::rate</code></a> so that overshooting is avoided.</p>
+</div></div><span class='loading-content'>Loading content...</span>
+            <h2 id='foreign-impls' class='small-section-header'>Implementations on Foreign Types<a href='#foreign-impls' class='anchor'></a></h2><h3 id='impl-Interaction%3CM%3E-for-%26%27_%20I' class='impl'><code class='in-band'>impl&lt;'_, I:&nbsp;?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>, M&gt; <a class="trait" href="../../../boltzmann_solver/model/interaction/trait.Interaction.html" title="trait boltzmann_solver::model::interaction::Interaction">Interaction</a>&lt;M&gt; for <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;'_ </a>I <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;I: <a class="trait" href="../../../boltzmann_solver/model/interaction/trait.Interaction.html" title="trait boltzmann_solver::model::interaction::Interaction">Interaction</a>&lt;M&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;M: <a class="trait" href="../../../boltzmann_solver/model/trait.Model.html" title="trait boltzmann_solver::model::Model">Model</a>,&nbsp;</span></code><a href='#impl-Interaction%3CM%3E-for-%26%27_%20I' class='anchor'></a><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#446-493' title='goto source code'>[src]</a></h3><div class='impl-items'><h4 id='method.particles' class="method hidden"><code>fn <a href='#method.particles' class='fnname'>particles</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticles.html" title="struct boltzmann_solver::model::interaction::InteractionParticles">InteractionParticles</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#451-453' title='goto source code'>[src]</a></h4><h4 id='method.particles_idx' class="method hidden"><code>fn <a href='#method.particles_idx' class='fnname'>particles_idx</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleIndices.html" title="struct boltzmann_solver::model::interaction::InteractionParticleIndices">InteractionParticleIndices</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#455-457' title='goto source code'>[src]</a></h4><h4 id='method.particles_sign' class="method hidden"><code>fn <a href='#method.particles_sign' class='fnname'>particles_sign</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleSigns.html" title="struct boltzmann_solver::model::interaction::InteractionParticleSigns">InteractionParticleSigns</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#459-461' title='goto source code'>[src]</a></h4><h4 id='method.width_enabled' class="method hidden"><code>fn <a href='#method.width_enabled' class='fnname'>width_enabled</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#463-465' title='goto source code'>[src]</a></h4><h4 id='method.width-1' class="method hidden"><code>fn <a href='#method.width' class='fnname'>width</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.PartialWidth.html" title="struct boltzmann_solver::model::interaction::PartialWidth">PartialWidth</a>&gt;</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#467-469' title='goto source code'>[src]</a></h4><h4 id='method.gamma_enabled' class="method hidden"><code>fn <a href='#method.gamma_enabled' class='fnname'>gamma_enabled</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#471-473' title='goto source code'>[src]</a></h4><h4 id='method.gamma' class="method hidden"><code>fn <a href='#method.gamma' class='fnname'>gamma</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#475-477' title='goto source code'>[src]</a></h4><h4 id='method.asymmetry-1' class="method hidden"><code>fn <a href='#method.asymmetry' class='fnname'>asymmetry</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#479-481' title='goto source code'>[src]</a></h4><h4 id='method.rate-1' class="method hidden"><code>fn <a href='#method.rate' class='fnname'>rate</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.RateDensity.html" title="struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#482-484' title='goto source code'>[src]</a></h4><h4 id='method.adjusted_rate-1' class="method hidden"><code>fn <a href='#method.adjusted_rate' class='fnname'>adjusted_rate</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.RateDensity.html" title="struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#486-488' title='goto source code'>[src]</a></h4><h4 id='method.change-1' class="method hidden"><code>fn <a href='#method.change' class='fnname'>change</a>(&amp;self, dn: &amp;mut <a class="type" href="https://docs.rs/ndarray/0.13/ndarray/aliases/type.Array1.html" title="type ndarray::aliases::Array1">Array1</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;, dna: &amp;mut <a class="type" href="https://docs.rs/ndarray/0.13/ndarray/aliases/type.Array1.html" title="type ndarray::aliases::Array1">Array1</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#490-492' title='goto source code'>[src]</a></h4></div><h3 id='impl-Interaction%3CM%3E-for-Box%3CI%3E' class='impl'><code class='in-band'>impl&lt;I:&nbsp;?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>, M&gt; <a class="trait" href="../../../boltzmann_solver/model/interaction/trait.Interaction.html" title="trait boltzmann_solver::model::interaction::Interaction">Interaction</a>&lt;M&gt; for <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;I&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;I: <a class="trait" href="../../../boltzmann_solver/model/interaction/trait.Interaction.html" title="trait boltzmann_solver::model::interaction::Interaction">Interaction</a>&lt;M&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;M: <a class="trait" href="../../../boltzmann_solver/model/trait.Model.html" title="trait boltzmann_solver::model::Model">Model</a>,&nbsp;</span></code><a href='#impl-Interaction%3CM%3E-for-Box%3CI%3E' class='anchor'></a><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#495-543' title='goto source code'>[src]</a></h3><div class='impl-items'><h4 id='method.particles-1' class="method hidden"><code>fn <a href='#method.particles' class='fnname'>particles</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticles.html" title="struct boltzmann_solver::model::interaction::InteractionParticles">InteractionParticles</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#500-502' title='goto source code'>[src]</a></h4><h4 id='method.particles_idx-1' class="method hidden"><code>fn <a href='#method.particles_idx' class='fnname'>particles_idx</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleIndices.html" title="struct boltzmann_solver::model::interaction::InteractionParticleIndices">InteractionParticleIndices</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#504-506' title='goto source code'>[src]</a></h4><h4 id='method.particles_sign-1' class="method hidden"><code>fn <a href='#method.particles_sign' class='fnname'>particles_sign</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleSigns.html" title="struct boltzmann_solver::model::interaction::InteractionParticleSigns">InteractionParticleSigns</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#508-510' title='goto source code'>[src]</a></h4><h4 id='method.width_enabled-1' class="method hidden"><code>fn <a href='#method.width_enabled' class='fnname'>width_enabled</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#512-514' title='goto source code'>[src]</a></h4><h4 id='method.width-2' class="method hidden"><code>fn <a href='#method.width' class='fnname'>width</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.PartialWidth.html" title="struct boltzmann_solver::model::interaction::PartialWidth">PartialWidth</a>&gt;</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#516-518' title='goto source code'>[src]</a></h4><h4 id='method.gamma_enabled-1' class="method hidden"><code>fn <a href='#method.gamma_enabled' class='fnname'>gamma_enabled</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#520-522' title='goto source code'>[src]</a></h4><h4 id='method.gamma-1' class="method hidden"><code>fn <a href='#method.gamma' class='fnname'>gamma</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#524-526' title='goto source code'>[src]</a></h4><h4 id='method.asymmetry-2' class="method hidden"><code>fn <a href='#method.asymmetry' class='fnname'>asymmetry</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#528-530' title='goto source code'>[src]</a></h4><h4 id='method.rate-2' class="method hidden"><code>fn <a href='#method.rate' class='fnname'>rate</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.RateDensity.html" title="struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#532-534' title='goto source code'>[src]</a></h4><h4 id='method.adjusted_rate-2' class="method hidden"><code>fn <a href='#method.adjusted_rate' class='fnname'>adjusted_rate</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.RateDensity.html" title="struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#536-538' title='goto source code'>[src]</a></h4><h4 id='method.change-2' class="method hidden"><code>fn <a href='#method.change' class='fnname'>change</a>(&amp;self, dn: &amp;mut <a class="type" href="https://docs.rs/ndarray/0.13/ndarray/aliases/type.Array1.html" title="type ndarray::aliases::Array1">Array1</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;, dna: &amp;mut <a class="type" href="https://docs.rs/ndarray/0.13/ndarray/aliases/type.Array1.html" title="type ndarray::aliases::Array1">Array1</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction.rs.html#540-542' title='goto source code'>[src]</a></h4></div><span class='loading-content'>Loading content...</span>
+            <h2 id='implementors' class='small-section-header'>Implementors<a href='#implementors' class='anchor'></a></h2><div class='item-list' id='implementors-list'><h3 id='impl-Interaction%3CM%3E' class='impl'><code class='in-band'>impl&lt;M&gt; Interaction&lt;M&gt; for <a class="struct" href="../../../boltzmann_solver/model/interaction/struct.FourParticle.html" title="struct boltzmann_solver::model::interaction::FourParticle">FourParticle</a>&lt;M&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;M: <a class="trait" href="../../../boltzmann_solver/model/trait.Model.html" title="trait boltzmann_solver::model::Model">Model</a>,&nbsp;</span></code><a href='#impl-Interaction%3CM%3E' class='anchor'></a><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#174-280' title='goto source code'>[src]</a></h3><div class='impl-items'><h4 id='method.particles-2' class="method hidden"><code>fn <a href='#method.particles-2' class='fnname'>particles</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticles.html" title="struct boltzmann_solver::model::interaction::InteractionParticles">InteractionParticles</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#178-180' title='goto source code'>[src]</a></h4><h4 id='method.particles_idx-2' class="method hidden"><code>fn <a href='#method.particles_idx-2' class='fnname'>particles_idx</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleIndices.html" title="struct boltzmann_solver::model::interaction::InteractionParticleIndices">InteractionParticleIndices</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#182-184' title='goto source code'>[src]</a></h4><h4 id='method.particles_sign-2' class="method hidden"><code>fn <a href='#method.particles_sign-2' class='fnname'>particles_sign</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleSigns.html" title="struct boltzmann_solver::model::interaction::InteractionParticleSigns">InteractionParticleSigns</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#186-188' title='goto source code'>[src]</a></h4><h4 id='method.width_enabled-2' class="method hidden"><code>fn <a href='#method.width_enabled-2' class='fnname'>width_enabled</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#190-192' title='goto source code'>[src]</a></h4><h4 id='method.gamma_enabled-2' class="method hidden"><code>fn <a href='#method.gamma_enabled-2' class='fnname'>gamma_enabled</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#197-199' title='goto source code'>[src]</a></h4><h4 id='method.gamma-2' class="method hidden"><code>fn <a href='#method.gamma-2' class='fnname'>gamma</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#201-240' title='goto source code'>[src]</a></h4><h4 id='method.asymmetry-3' class="method hidden"><code>fn <a href='#method.asymmetry-3' class='fnname'>asymmetry</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/four_particle.rs.html#242-279' title='goto source code'>[src]</a></h4></div><h3 id='impl-Interaction%3CM%3E-1' class='impl'><code class='in-band'>impl&lt;M&gt; Interaction&lt;M&gt; for <a class="struct" href="../../../boltzmann_solver/model/interaction/struct.ThreeParticle.html" title="struct boltzmann_solver::model::interaction::ThreeParticle">ThreeParticle</a>&lt;M&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;M: <a class="trait" href="../../../boltzmann_solver/model/trait.Model.html" title="trait boltzmann_solver::model::Model">Model</a>,&nbsp;</span></code><a href='#impl-Interaction%3CM%3E-1' class='anchor'></a><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#157-354' title='goto source code'>[src]</a></h3><div class='impl-items'><h4 id='method.particles-3' class="method hidden"><code>fn <a href='#method.particles-3' class='fnname'>particles</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticles.html" title="struct boltzmann_solver::model::interaction::InteractionParticles">InteractionParticles</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#161-163' title='goto source code'>[src]</a></h4><h4 id='method.particles_idx-3' class="method hidden"><code>fn <a href='#method.particles_idx-3' class='fnname'>particles_idx</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleIndices.html" title="struct boltzmann_solver::model::interaction::InteractionParticleIndices">InteractionParticleIndices</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#165-167' title='goto source code'>[src]</a></h4><h4 id='method.particles_sign-3' class="method hidden"><code>fn <a href='#method.particles_sign-3' class='fnname'>particles_sign</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.InteractionParticleSigns.html" title="struct boltzmann_solver::model::interaction::InteractionParticleSigns">InteractionParticleSigns</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#169-171' title='goto source code'>[src]</a></h4><h4 id='method.width_enabled-3' class="method hidden"><code>fn <a href='#method.width_enabled-3' class='fnname'>width_enabled</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#173-175' title='goto source code'>[src]</a></h4><h4 id='method.width-3' class="method hidden"><code>fn <a href='#method.width-3' class='fnname'>width</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.PartialWidth.html" title="struct boltzmann_solver::model::interaction::PartialWidth">PartialWidth</a>&gt;</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#177-204' title='goto source code'>[src]</a></h4><h4 id='method.gamma_enabled-3' class="method hidden"><code>fn <a href='#method.gamma_enabled-3' class='fnname'>gamma_enabled</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#206-208' title='goto source code'>[src]</a></h4><h4 id='method.gamma-3' class="method"><code>fn <a href='#method.gamma-3' class='fnname'>gamma</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#228-265' title='goto source code'>[src]</a></h4><div class='docblock'><p>Unlike other function, this is computed in one of two ways:</p>
 <ol>
-<li>If incoming particle's mass is greater than the temperature by
-a specific threshold, then the result is divided analytically by
-the normalized equilibrium number density of the particle such that
+<li>If incoming particle's mass is greater than the temperature by a
+specific threshold, then the result is divided analytically by the
+normalized equilibrium number density of the particle such that
 multiplying the result by the equilibrium number density will yield
-the correct interaction density). This is done in order to avoid a
-<code>0 / 0</code> division as the reaction rate is propoertional
-\(K_1(m \beta)\), while the number density of the decaying particle
-proportional to \(K_2(m \beta)\), and the ratio of Bessel function
+the correct interaction density).  This is done in order to avoid a
+<code>0 / 0</code> division as the reaction rate is propoertional <code>$K_1(m \beta)$</code>, while the number density of the decaying particle
+proportional to <code>$K_2(m \beta)$</code>, and the ratio of Bessel function
 tends to 1 (while each individually tends to 0 very quickly).</li>
 <li>Otherwise, calculate the usual reaction rate.</li>
 </ol>
-<p>Note that in order to obtain the analytical normalized
-equilibrium density, we must assume that \(m \beta \gg 1 \) so that
-the number density approximates a Maxwell--Boltzmann distribution
-(irrespective of the original statistic), hence why we must use a
-threshold to switch between the two methods.</p>
-</div>
-<h4 id='method.asymmetry-4' class="method hidden"><code>fn <a href=
-'#method.asymmetry-4' class='fnname'>asymmetry</a>(&amp;self, c:
-&<a class="struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class=
-"primitive" href=
-"https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#267-302'
-title='goto source code'>[src]</a></h4>
-<h4 id='method.rate-3' class="method"><code>fn <a href=
-'#method.rate-3' class='fnname'>rate</a>(&amp;self, c: &<a class=
-"struct" href=
-"../../../boltzmann_solver/prelude/struct.Context.html" title=
-"struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;)
--&gt; <a class="enum" href=
-"https://doc.rust-lang.org/nightly/core/option/enum.Option.html"
-title="enum core::option::Option">Option</a>&lt;<a class="struct"
-href=
-"../../../boltzmann_solver/model/interaction/struct.RateDensity.html"
-title=
-"struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;</code><a class='srclink'
-href=
-'../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#306-353'
-title='goto source code'>[src]</a></h4>
-<div class='docblock'>
-<p>Override the default implementation of <a href=
-"../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.rate"
-title="`Interaction::rate`"><code>Interaction::rate</code></a> to
-make use of the adjusted reaction rate density.</p>
-</div>
-</div>
-</div>
-<span class='loading-content'>Loading content...</span>
-<script type="text/javascript" src=
-"../../../implementors/boltzmann_solver/model/interaction/trait.Interaction.js"
-async></script></section>
-<section id="search" class="content hidden"></section>
-<section class="footer"></section>
-<script>
-window.rootPath = "../../../";window.currentCrate = "boltzmann_solver";
-</script>
-<script src="../../../main.js"></script>
-<script defer src="../../../search-index.js"></script>
-</body>
-</html>
+<p>Note that in order to obtain the analytical normalized equilibrium
+density, we must assume that <code>$m \beta \gg 1 $</code> so that the number
+density approximates a Maxwell--Boltzmann distribution (irrespective of
+the original statistic), hence why we must use a threshold to switch
+between the two methods.</p>
+</div><h4 id='method.asymmetry-4' class="method hidden"><code>fn <a href='#method.asymmetry-4' class='fnname'>asymmetry</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#267-302' title='goto source code'>[src]</a></h4><h4 id='method.rate-3' class="method"><code>fn <a href='#method.rate-3' class='fnname'>rate</a>(&amp;self, c: &amp;<a class="struct" href="../../../boltzmann_solver/prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../../boltzmann_solver/model/interaction/struct.RateDensity.html" title="struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;</code><a class='srclink' href='../../../src/boltzmann_solver/model/interaction/three_particle.rs.html#306-353' title='goto source code'>[src]</a></h4><div class='docblock'><p>Override the default implementation of <a href="../../../boltzmann_solver/model/interaction/trait.Interaction.html#method.rate" title="`Interaction::rate`"><code>Interaction::rate</code></a> to make use
+of the adjusted reaction rate density.</p>
+</div></div></div><span class='loading-content'>Loading content...</span><script type="text/javascript" src="../../../implementors/boltzmann_solver/model/interaction/trait.Interaction.js" async></script></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "boltzmann_solver";</script><script src="../../../main.js"></script><script defer src="../../../search-index.js"></script></body></html>

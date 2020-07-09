@@ -1,80 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta name="generator" content=
-"HTML Tidy for HTML5 for Linux version 5.6.0">
-<meta charset="utf-8">
-<meta name="viewport" content=
-"width=device-width, initial-scale=1.0">
-<meta name="generator" content="rustdoc">
-<meta name="description" content=
-"Source to the Rust file `src/solver/tableau/rk87.rs`.">
-<meta name="keywords" content="rust, rustlang, rust-lang">
-<title>rk87.rs.html -- source</title>
-<link rel="stylesheet" type="text/css" href=
-"../../../../normalize.css">
-<link rel="stylesheet" type="text/css" href=
-"../../../../rustdoc.css" id="mainThemeStyle">
-<link rel="stylesheet" type="text/css" href="../../../../dark.css">
-<link rel="stylesheet" type="text/css" href="../../../../light.css"
-id="themeStyle">
-<script src="../../../../storage.js"></script><noscript>
-<link rel="stylesheet" href="../../../../noscript.css"></noscript>
-<link rel="shortcut icon" href="../../../../favicon.ico">
-<style type="text/css">
-#crate-search{background-image:url("../../../../down-arrow.svg");}
-</style>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/solver/tableau/rk87.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rk87.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.11/dist/katex.min.css"
+  crossorigin="anonymous"
+/>
+<script
+  src="https://cdn.jsdelivr.net/npm/katex@0.11/dist/katex.min.js"
+  crossorigin="anonymous"
+></script>
 <script>
-  MathJax = {
-    tex: {
-      macros: {
-        dd: "{\\mathop{}\\!\\mathrm{d}}",
-        textsc: ["\\mathrm{\\scriptsize #1}", 1],
-        vt: ["\\boldsymbol{#1}", 1],
-        pfrac: ["\\frac{\\partial #1}{\\partial #2}", 2],
-        ddfrac: ["\\frac{\\dd #1}{\\dd #2}", 2],
-        defeq: "\\mathrel{\\vcenter:}=",
-        abs: ["\\lvert #1 \\rvert", 1],
-        angles: ["\\langle #1 \\rangle", 1]
+  "use strict";
+  const macros = {
+    "\\vt": "\\boldsymbol{#1}",
+    "\\pfrac": "\\frac{\\partial{#1}}{\\partial{#2}}",
+    "\\dd": "\\mathop{}\\!\\mathrm{d}",
+    "\\ddfrac": "\\frac{\dd{#1}}{\dd{#2}}",
+    "\\defeq": "\\vcentcolon=",
+    "\\abs": "\\left\\lvert{#1}\\right\\rvert",
+    "\\CP": "\\mathcal{CP}",
+  };
+
+  // Display math is inputted in the documentation as:
+  //
+  // ```math
+  //   \int_0^1 x
+  // ```
+  //
+  // and in the HTML appears as
+  //
+  // ```html
+  // <pre><code class="language-math">...</code></pre>
+  // ```
+  document.addEventListener("DOMContentLoaded", function () {
+    // console.log("Replacing display maths");
+    const maths = document.getElementsByClassName("language-math");
+    for (let i = 0; i < maths.length; i++) {
+      const el = maths[i];
+      el.parentNode.replaceWith(el);
+      katex.render(el.innerText, el, { displayMode: true, macros: macros });
+    }
+  });
+
+  // Inline math is inputted in the documentation as `$...$` (with the
+  // backticks) and in the HTML appears as
+  //
+  // ```html
+  // <code>$...$</code>
+  // ```
+  document.addEventListener("DOMContentLoaded", function () {
+    // console.log("Replacing inline maths");
+    const maths = document.getElementsByTagName("code");
+    for (let i = 0; i < maths.length; i++) {
+      const el = maths[i];
+      console.log("Replacing element: " + el.innerText);
+      if (el.innerText.startsWith("$") && el.innerText.endsWith("$")) {
+        katex.render(el.innerText.substring(1, el.innerText.length - 1), el, {
+          macros: macros,
+        });
+        el.parentNode.insertBefore(el.firstChild, el);
+        el.remove();
+
+        // After being removed, the current index points to the next element.
+        i--;
       }
     }
-  };
+  });
 </script>
-<script
-  id="MathJax-script"
-  async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
-></script>
-</head>
-<body class="rustdoc source">
-<!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]-->
-<nav class="sidebar">
-<div class="sidebar-menu">☰</div>
-<a href='../../../../boltzmann_solver/index.html'>
-<div class='logo-container'><img src='../../../../rust-logo.png'
-alt='logo'></div>
-</a></nav>
-<div class="theme-picker"><button id="theme-picker" aria-label=
-"Pick another theme!"><img src="../../../../brush.svg" width="18"
-alt="Pick another theme!"></button>
-<div id="theme-choices"></div>
-</div>
-<script src="../../../../theme.js"></script>
-<nav class="sub">
-<form class="search-form">
-<div class="search-container">
-<div><select id="crate-search">
-<option value="All crates">All crates</option>
-</select><input class="search-input" name="search" disabled
-autocomplete="off" spellcheck="false" placeholder=
-"Click or press ‘S’ to search, ‘?’ for more options…" type=
-"search"></div>
-<a id="settings-menu" href="../../../../settings.html"><img src=
-"../../../../wheel.svg" width="18" alt="Change settings"></a></div>
-</form>
-</nav>
-<section id="main" class="content">
-<pre class="line-numbers"><span id="1">  1</span>
+
+<style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -287,49 +279,20 @@ autocomplete="off" spellcheck="false" placeholder=
 <span id="211">211</span>
 <span id="212">212</span>
 <span id="213">213</span>
-</pre>
-<div class="example-wrap">
-<pre class="rust">
-<span class=
-"doccomment">//! Runge-Kutta method of order 8 in 13 stages.</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="doccomment">//! Runge-Kutta method of order 8 in 13 stages.</span>
 <span class="doccomment">//!</span>
-<span class=
-"doccomment">//! Coefficients are exported from Mathematica and can be obtained from</span>
+<span class="doccomment">//! Coefficients are exported from Mathematica and can be obtained from</span>
 <span class="doccomment">//! references therein.</span>
 
-<span class="attribute">#![<span class=
-"ident">allow</span>(<span class=
-"ident">clippy</span>::<span class="ident">all</span>)]</span>
-<span class="attribute">#![<span class=
-"ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">all</span>)]</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">RK_ORDER</span>: <span class=
-"ident">i32</span> <span class="op">=</span> <span class=
-"number">8</span>;
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">RK_S</span>: <span class=
-"ident">usize</span> <span class="op">=</span> <span class=
-"number">13</span>;
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">RK_A</span>: [[<span class=
-"ident">f64</span>; <span class="ident">RK_S</span> <span class=
-"op">-</span> <span class="number">1</span>]; <span class=
-"ident">RK_S</span>] <span class="op">=</span> [
-    [<span class="number">0.</span>, <span class=
-"number">0.</span>, <span class="number">0.</span>, <span class=
-"number">0.</span>, <span class="number">0.</span>, <span class=
-"number">0.</span>, <span class="number">0.</span>, <span class=
-"number">0.</span>, <span class="number">0.</span>, <span class=
-"number">0.</span>, <span class="number">0.</span>, <span class=
-"number">0.</span>],
-    [<span class="number">0.25</span>, <span class=
-"number">0.</span>, <span class="number">0.</span>, <span class=
-"number">0.</span>, <span class="number">0.</span>, <span class=
-"number">0.</span>, <span class="number">0.</span>, <span class=
-"number">0.</span>, <span class="number">0.</span>, <span class=
-"number">0.</span>, <span class="number">0.</span>, <span class=
-"number">0.</span>],
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_ORDER</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">8</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_S</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">13</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_A</span>: [[<span class="ident">f64</span>; <span class="ident">RK_S</span> <span class="op">-</span> <span class="number">1</span>]; <span class="ident">RK_S</span>] <span class="op">=</span> [
+    [<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>],
+    [<span class="number">0.25</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>],
     [
         <span class="number">0.087_400_846_504_915_24</span>,
         <span class="number">0.025_487_604_938_654_32</span>,
@@ -361,8 +324,7 @@ autocomplete="off" spellcheck="false" placeholder=
     [
         <span class="number">0.426_095_058_887_422_6</span>,
         <span class="number">0.</span>,
-        <span class="op">-</span><span class=
-"number">1.598_795_284_659_152_2</span>,
+        <span class="op">-</span><span class="number">1.598_795_284_659_152_2</span>,
         <span class="number">1.596_700_225_771_729_8</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
@@ -388,13 +350,11 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="number">0.</span>,
     ],
     [
-        <span class="op">-</span><span class=
-"number">0.290_003_747_175_231_1</span>,
+        <span class="op">-</span><span class="number">0.290_003_747_175_231_1</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
         <span class="number">1.344_187_391_026_078_9</span>,
-        <span class="op">-</span><span class=
-"number">2.864_777_943_361_443</span>,
+        <span class="op">-</span><span class="number">2.864_777_943_361_443</span>,
         <span class="number">2.677_594_299_510_595</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
@@ -409,8 +369,7 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="number">0.</span>,
         <span class="number">0.</span>,
         <span class="number">0.221_926_806_307_513_85</span>,
-        <span class="op">-</span><span class=
-"number">0.181_406_229_118_069_94</span>,
+        <span class="op">-</span><span class="number">0.181_406_229_118_069_94</span>,
         <span class="number">0.010_944_411_472_562_547</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
@@ -422,11 +381,9 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="number">0.387_110_525_457_311_4</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
-        <span class="op">-</span><span class=
-"number">1.442_445_497_485_527_6</span>,
+        <span class="op">-</span><span class="number">1.442_445_497_485_527_6</span>,
         <span class="number">2.905_398_189_069_950_7</span>,
-        <span class="op">-</span><span class=
-"number">1.853_771_069_630_106</span>,
+        <span class="op">-</span><span class="number">1.853_771_069_630_106</span>,
         <span class="number">0.140_036_480_987_281_53</span>,
         <span class="number">0.572_739_408_114_958_2</span>,
         <span class="number">0.</span>,
@@ -435,35 +392,27 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="number">0.</span>,
     ],
     [
-        <span class="op">-</span><span class=
-"number">0.161_244_034_444_393_06</span>,
+        <span class="op">-</span><span class="number">0.161_244_034_444_393_06</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
-        <span class="op">-</span><span class=
-"number">0.173_396_029_573_589_85</span>,
-        <span class="op">-</span><span class=
-"number">1.301_289_281_406_514_7</span>,
+        <span class="op">-</span><span class="number">0.173_396_029_573_589_85</span>,
+        <span class="op">-</span><span class="number">1.301_289_281_406_514_7</span>,
         <span class="number">1.137_950_375_173_861_8</span>,
-        <span class="op">-</span><span class=
-"number">0.031_747_649_663_966_88</span>,
+        <span class="op">-</span><span class="number">0.031_747_649_663_966_88</span>,
         <span class="number">0.933_512_938_249_336_8</span>,
-        <span class="op">-</span><span class=
-"number">0.083_786_318_334_733_85</span>,
+        <span class="op">-</span><span class="number">0.083_786_318_334_733_85</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
     ],
     [
-        <span class="op">-</span><span class=
-"number">0.019_199_444_881_589_534</span>,
+        <span class="op">-</span><span class="number">0.019_199_444_881_589_534</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
         <span class="number">0.273_308_572_652_642_86</span>,
-        <span class="op">-</span><span class=
-"number">0.675_349_732_069_443_7</span>,
+        <span class="op">-</span><span class="number">0.675_349_732_069_443_7</span>,
         <span class="number">0.341_518_498_138_460_14</span>,
-        <span class="op">-</span><span class=
-"number">0.067_950_064_803_375_77</span>,
+        <span class="op">-</span><span class="number">0.067_950_064_803_375_77</span>,
         <span class="number">0.096_591_752_247_623_87</span>,
         <span class="number">0.132_530_825_111_821_02</span>,
         <span class="number">0.368_549_593_603_861_1</span>,
@@ -474,11 +423,9 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="number">0.609_187_740_364_528_9</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
-        <span class="op">-</span><span class=
-"number">2.272_569_085_898_002</span>,
+        <span class="op">-</span><span class="number">2.272_569_085_898_002</span>,
         <span class="number">4.757_898_342_694_03</span>,
-        <span class="op">-</span><span class=
-"number">5.516_106_706_692_758</span>,
+        <span class="op">-</span><span class="number">5.516_106_706_692_758</span>,
         <span class="number">0.290_059_636_968_011_96</span>,
         <span class="number">0.569_142_396_335_903_7</span>,
         <span class="number">0.792_679_576_033_216_7</span>,
@@ -490,11 +437,9 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="number">0.887_357_622_085_347_2</span>,
         <span class="number">0.</span>,
         <span class="number">0.</span>,
-        <span class="op">-</span><span class=
-"number">2.975_459_782_108_536_5</span>,
+        <span class="op">-</span><span class="number">2.975_459_782_108_536_5</span>,
         <span class="number">5.600_717_009_488_163_5</span>,
-        <span class="op">-</span><span class=
-"number">5.915_607_450_536_674</span>,
+        <span class="op">-</span><span class="number">5.915_607_450_536_674</span>,
         <span class="number">0.220_296_891_561_349_27</span>,
         <span class="number">0.101_550_978_244_622_17</span>,
         <span class="number">1.151_434_564_738_605_5</span>,
@@ -503,10 +448,7 @@ autocomplete="off" spellcheck="false" placeholder=
         <span class="number">0.</span>,
     ],
 ];
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">RK_B</span>: [<span class=
-"ident">f64</span>; <span class="ident">RK_S</span>] <span class=
-"op">=</span> [
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_B</span>: [<span class="ident">f64</span>; <span class="ident">RK_S</span>] <span class="op">=</span> [
     <span class="number">0.044_729_564_666_695_705</span>,
     <span class="number">0.</span>,
     <span class="number">0.</span>,
@@ -521,10 +463,7 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="number">0.041_811_958_638_991_63</span>,
     <span class="number">0.</span>,
 ];
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">RK_C</span>: [<span class=
-"ident">f64</span>; <span class="ident">RK_S</span>] <span class=
-"op">=</span> [
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_C</span>: [<span class="ident">f64</span>; <span class="ident">RK_S</span>] <span class="op">=</span> [
     <span class="number">0.</span>,
     <span class="number">0.25</span>,
     <span class="number">0.112_888_451_443_569_56</span>,
@@ -539,39 +478,20 @@ autocomplete="off" spellcheck="false" placeholder=
     <span class="number">1.</span>,
     <span class="number">1.</span>,
 ];
-<span class="kw">pub</span> <span class=
-"kw">const</span> <span class="ident">RK_E</span>: [<span class=
-"ident">f64</span>; <span class="ident">RK_S</span>] <span class=
-"op">=</span> [
-    <span class="op">-</span><span class=
-"number">0.001_117_546_733_800_211_4</span>,
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RK_E</span>: [<span class="ident">f64</span>; <span class="ident">RK_S</span>] <span class="op">=</span> [
+    <span class="op">-</span><span class="number">0.001_117_546_733_800_211_4</span>,
     <span class="number">0.</span>,
     <span class="number">0.</span>,
     <span class="number">0.</span>,
     <span class="number">0.</span>,
-    <span class="op">-</span><span class=
-"number">0.105_408_578_764_441_87</span>,
-    <span class="op">-</span><span class=
-"number">0.007_083_989_297_009_742</span>,
+    <span class="op">-</span><span class="number">0.105_408_578_764_441_87</span>,
+    <span class="op">-</span><span class="number">0.007_083_989_297_009_742</span>,
     <span class="number">0.008_072_082_741_843_727</span>,
     <span class="number">0.020_564_260_271_365_28</span>,
-    <span class="op">-</span><span class=
-"number">0.039_049_761_408_697_44</span>,
+    <span class="op">-</span><span class="number">0.039_049_761_408_697_44</span>,
     <span class="number">0.122_772_902_350_186_19</span>,
     <span class="number">0.041_811_958_638_991_63</span>,
-    <span class="op">-</span><span class=
-"number">0.040_561_327_798_437_56</span>,
+    <span class="op">-</span><span class="number">0.040_561_327_798_437_56</span>,
 ];
 </pre></div>
-</section>
-<section id="search" class="content hidden"></section>
-<section class="footer"></section>
-<script>
-window.rootPath = "../../../../";window.currentCrate = "boltzmann_solver";
-</script>
-<script src="../../../../main.js"></script>
-<script src="../../../../source-script.js"></script>
-<script src="../../../../source-files.js"></script>
-<script defer src="../../../../search-index.js"></script>
-</body>
-</html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "boltzmann_solver";</script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>

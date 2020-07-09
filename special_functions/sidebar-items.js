@@ -1,1 +1,0 @@
-initSidebarItems({"macro":[["approx_fn","Create a function from a module containing all the information for the split."]],"mod":[["approximations","Approximations"],["basic","Basic functions."],["bessel","Bessel functions"],["other","Miscellaneous functions"],["particle_physics","Particle statistics"]]});
