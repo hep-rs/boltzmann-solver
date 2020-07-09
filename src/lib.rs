@@ -123,11 +123,11 @@
 //! \Pi_i$`.
 //!
 //! The factors `$\pm f$` account for Pauli suppression and Bose enhancement in
-//! the transition `$\vt a \leftrightarrow \vt b$`, where `$` + f$` is used for
+//! the transition `$\vt a \leftrightarrow \vt b$`, where `$+f$` is used for
 //! Bose–Einstein statistics as it increases the probability of a transition
-//! into a highly occupied state; and `$` - f$` is used for Fermi–Dirac
-//! statistics as it decreases the probability of a transition into a highly
-//! occupied state.
+//! into a highly occupied state; and `$-f$` is used for Fermi–Dirac statistics
+//! as it decreases the probability of a transition into a highly occupied
+//! state.
 //!
 //! The above collision term accounts for a single interaction and in general a
 //! sum over all possible interactions must be done.
