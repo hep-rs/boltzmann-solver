@@ -524,6 +524,7 @@ pub fn scan() -> Result<(), Box<dyn error::Error>> {
     Ok(())
 }
 
+#[cfg(feature = "serde")]
 #[test]
 fn evolution() -> Result<(), Box<dyn error::Error>> {
     init();

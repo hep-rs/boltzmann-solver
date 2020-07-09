@@ -445,7 +445,7 @@ mod tests {
 
 #[cfg(all(test, feature = "nightly"))]
 mod benches {
-    use super::*;
+    use super::{Statistic, Statistics};
     use std::result::Result;
     use test::{black_box, Bencher};
 
