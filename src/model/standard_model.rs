@@ -80,8 +80,8 @@ impl Model for StandardModel {
             Particle::new(1, 0.0, 0.0).name("d3").dof(3.0),
         ];
 
-        let mh: f64 = 125.10;
-        let vev: f64 = 246.0;
+        let mh: f64 = data::MASS_H;
+        let vev: f64 = data::VEV;
         let mu2 = -2.0 * mh.powi(2);
         let lambda = (mh / vev).powi(2);
 
