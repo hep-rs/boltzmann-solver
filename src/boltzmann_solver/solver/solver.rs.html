@@ -916,8 +916,6 @@
 <span id="848">848</span>
 <span id="849">849</span>
 <span id="850">850</span>
-<span id="851">851</span>
-<span id="852">852</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">model</span>::{<span class="ident">interaction</span>::<span class="ident">Interaction</span>, <span class="ident">Model</span>, <span class="ident">ModelInteractions</span>, <span class="ident">Particle</span>},
@@ -1665,22 +1663,20 @@
                 .<span class="ident">chain</span>(<span class="ident">dna_err</span>.<span class="ident">iter</span>())
                 .<span class="ident">fold</span>(<span class="number">0_f64</span>, <span class="op">|</span><span class="ident">e</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">max</span>(<span class="ident">v</span>.<span class="ident">abs</span>()));
 
-            <span class="comment">// DEBUG</span>
-            <span class="comment">// log::trace!(&quot;     dn = {:&lt;+10.3e}&quot;, dn);</span>
-            <span class="comment">// log::trace!(&quot;    dna = {:&lt;+10.3e}&quot;, dna);</span>
-            <span class="comment">// log::trace!(&quot; dn_err = {:&lt;+10.3e}&quot;, dn_err);</span>
-            <span class="comment">// log::trace!(&quot;dna_err = {:&lt;+10.3e}&quot;, dna_err);</span>
-
             <span class="comment">// If the error is within the tolerance, we&#39;ll be advancing the</span>
             <span class="comment">// iteration step</span>
             <span class="kw">if</span> <span class="ident">err</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">error_tolerance</span> {
                 <span class="ident">advance</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot; dn = {:&lt;+10.3e}&quot;</span>, <span class="ident">dn</span>);
+                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;dna = {:&lt;+10.3e}&quot;</span>, <span class="ident">dna</span>);
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">log</span>::<span class="macro">log_enabled</span><span class="macro">!</span>(<span class="ident">log</span>::<span class="ident">Level</span>::<span class="ident">Trace</span>) {
                 <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(
                     <span class="string">&quot;Error is not within tolerance ({:e} &gt; {:e}).&quot;</span>,
                     <span class="ident">err</span>,
                     <span class="self">self</span>.<span class="ident">error_tolerance</span>
                 );
+                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot; n_err = {:&lt;+10.3e}&quot;</span>, <span class="ident">dn_err</span>);
+                <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;na_err = {:&lt;+10.3e}&quot;</span>, <span class="ident">dna_err</span>);
             }
 
             <span class="comment">// Compute the change in step size based on the current error and</span>
