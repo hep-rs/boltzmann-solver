@@ -8,7 +8,7 @@ use crate::{
 };
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::{cmp, collections::HashMap, f64};
+use std::{cmp, collections::HashMap, f64, fmt};
 
 pub use propagator::Propagator;
 
@@ -267,6 +267,16 @@ impl cmp::PartialEq for Particle {
     }
 }
 impl Eq for Particle {}
+
+/// Display the particle by its name.
+///
+/// To display all of the particle's properties, use the
+/// [`Debug`](std::fmt::Display).
+impl fmt::Display for Particle {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.name)
+    }
+}
 
 #[cfg(test)]
 mod tests {
