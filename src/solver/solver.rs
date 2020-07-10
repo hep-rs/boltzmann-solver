@@ -744,22 +744,20 @@ where
                 .chain(dna_err.iter())
                 .fold(0_f64, |e, v| e.max(v.abs()));
 
-            // DEBUG
-            // log::trace!("     dn = {:<+10.3e}", dn);
-            // log::trace!("    dna = {:<+10.3e}", dna);
-            // log::trace!(" dn_err = {:<+10.3e}", dn_err);
-            // log::trace!("dna_err = {:<+10.3e}", dna_err);
-
             // If the error is within the tolerance, we'll be advancing the
             // iteration step
             if err < self.error_tolerance {
                 advance = true;
+                log::trace!(" dn = {:<+10.3e}", dn);
+                log::trace!("dna = {:<+10.3e}", dna);
             } else if log::log_enabled!(log::Level::Trace) {
                 log::trace!(
                     "Error is not within tolerance ({:e} > {:e}).",
                     err,
                     self.error_tolerance
                 );
+                log::trace!(" n_err = {:<+10.3e}", dn_err);
+                log::trace!("na_err = {:<+10.3e}", dna_err);
             }
 
             // Compute the change in step size based on the current error and
