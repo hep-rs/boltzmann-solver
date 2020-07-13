@@ -385,6 +385,105 @@ impl error::Error for Error {
     }
 }
 
+/// Workspace of functions to reuse during the integration
+struct Workspace {
+    /// Number density
+    n: Array1<f64>,
+    /// Number density change
+    dn: Array1<f64>,
+    /// Number density local error estimate
+    dn_err: Array1<f64>,
+    /// Number density asymmetry
+    na: Array1<f64>,
+    /// Number density asymmetry change
+    dna: Array1<f64>,
+    /// Number density asymmetry local error estimate
+    dna_err: Array1<f64>,
+
+    /// k array for the number density
+    k: [Array1<f64>; tableau::RK_S],
+    /// k array for the number density asymmetry
+    ka: [Array1<f64>; tableau::RK_S],
+}
+
+/// Workspace of variables allocated once and then reused during the integration.
+impl Workspace {
+    fn new(initial_densities: &Array1<f64>, initial_asymmetries: &Array1<f64>) -> Self {
+        let dim = initial_densities.dim();
+
+        let mut k: [Array1<f64>; tableau::RK_S];
+        let mut ka: [Array1<f64>; tableau::RK_S];
+        unsafe {
+            k = mem::MaybeUninit::uninit().assume_init();
+            for ki in &mut k[..] {
+                ptr::write(ki, Array1::zeros(dim));
+            }
+            ka = mem::MaybeUninit::uninit().assume_init();
+            for ki in &mut ka[..] {
+                ptr::write(ki, Array1::zeros(dim));
+            }
+        };
+
+        Self {
+            n: initial_densities.clone(),
+            dn: Array1::zeros(dim),
+            dn_err: Array1::zeros(dim),
+            na: initial_asymmetries.clone(),
+            dna: Array1::zeros(dim),
+            dna_err: Array1::zeros(dim),
+
+            k,
+            ka,
+        }
+    }
+
+    /// Clear the workspace for the next step, filling the changes to 0 and the
+    /// error estimates to 0.
+    fn clear_step(&mut self) {
+        self.dn.fill(0.0);
+        self.dn_err.fill(0.0);
+        self.dna.fill(0.0);
+        self.dna_err.fill(0.0);
+    }
+
+    /// Compute and update the changes to number density from k and a given step
+    /// of the Runge-Kutta integration.
+    fn compute_dn(&mut self, i: usize) {
+        let bi = tableau::RK_B[i];
+        let ei = tableau::RK_E[i];
+        Zip::from(&mut self.dn)
+            .and(&mut self.dn_err)
+            .and(&self.k[i])
+            .and(&mut self.dna)
+            .and(&mut self.dna_err)
+            .and(&self.ka[i])
+            .apply(|dn, dn_err, &ki, dna, dna_err, &kai| {
+                *dn += bi * ki;
+                *dn_err += ei * ki;
+                *dna += bi * kai;
+                *dna_err += ei * kai;
+            });
+    }
+
+    /// Get the local error using L∞-norm
+    fn local_error(&self) -> f64 {
+        self.dn_err
+            .iter()
+            .chain(self.dna_err.iter())
+            .fold(0_f64, |e, v| e.max(v.abs()))
+    }
+
+    /// Advance the integration by apply the computed changes to far to the number densities.
+    fn advance(&mut self) {
+        self.n += &self.dn;
+        self.na += &self.dna;
+    }
+
+    fn result(self) -> (Array1<f64>, Array1<f64>) {
+        (self.n, self.na)
+    }
+}
+
 /// Boltzmann solver
 pub struct Solver<M> {
     model: M,
@@ -414,7 +513,7 @@ where
     #[allow(clippy::similar_names)]
     #[cfg(feature = "parallel")]
     fn compute_ki(&self, ki: &mut Array1<f64>, kai: &mut Array1<f64>, ci: &Context<M>) {
-        let n = ki.dim();
+        let dim = ki.dim();
         ki.fill(0.0);
         kai.fill(0.0);
 
@@ -423,19 +522,31 @@ where
             .interactions()
             .par_iter()
             .fold(
-                || (Array1::zeros(n), Array1::zeros(n)),
+                || (Array1::zeros(dim), Array1::zeros(dim)),
                 |(mut dn, mut dna), interaction| {
                     interaction.change(&mut dn, &mut dna, &ci);
                     (dn, dna)
                 },
             )
             .reduce(
-                || (Array1::zeros(n), Array1::zeros(n)),
+                || (Array1::zeros(dim), Array1::zeros(dim)),
                 |(dn, dna), (dni, dnai)| (dn + dni, dna + dnai),
             );
 
         *ki = new_ki;
         *kai = new_kai;
+    }
+
+    // Adjust dn and/or dna for those particles held in equilibrium and/or
+    // without asymmetry.
+    fn fix_equilibrium(&self, c: &Context<M>, workspace: &mut Workspace) {
+        for &eq in &self.in_equilibrium {
+            workspace.dn[eq] = c.eq[eq] - workspace.n[eq];
+            workspace.dna[eq] = -workspace.na[eq];
+        }
+        for &eq in &self.no_asymmetry {
+            workspace.dna[eq] = -workspace.na[eq];
+        }
     }
 
     /// Evolve the initial conditions by solving the PDEs.
@@ -444,32 +555,11 @@ where
     /// into an ODE in time (or inverse temperature in this case), with the
     /// derivative in energy being calculated solely from the previous
     /// time-step.
-    #[allow(clippy::cognitive_complexity)]
-    #[allow(clippy::similar_names)]
-    #[allow(clippy::too_many_lines)]
     pub fn solve(&mut self) -> (Array1<f64>, Array1<f64>) {
-        use tableau::{RK_A, RK_B, RK_C, RK_E, RK_ORDER, RK_S};
+        use tableau::{RK_A, RK_C, RK_ORDER, RK_S};
 
         // Initialize all the variables that will be used in the integration
-        let mut n = self.initial_densities.clone();
-        let mut dn = Array1::zeros(n.dim());
-        let mut dn_err = Array1::zeros(n.dim());
-        let mut na = self.initial_asymmetries.clone();
-        let mut dna = Array1::zeros(na.dim());
-        let mut dna_err = Array1::zeros(na.dim());
-
-        let mut k: [Array1<f64>; RK_S];
-        let mut ka: [Array1<f64>; RK_S];
-        unsafe {
-            k = mem::MaybeUninit::uninit().assume_init();
-            for ki in &mut k[..] {
-                ptr::write(ki, Array1::zeros(n.dim()));
-            }
-            ka = mem::MaybeUninit::uninit().assume_init();
-            for ki in &mut ka[..] {
-                ptr::write(ki, Array1::zeros(n.dim()));
-            }
-        };
+        let mut workspace = Workspace::new(&self.initial_densities, &self.initial_asymmetries);
 
         let mut step = 0;
         let mut steps_discarded = 0_u64;
@@ -481,17 +571,14 @@ where
         // Run logger for 0th step
         {
             self.model.set_beta(beta);
-            let c = self.context(step, h, beta, &n, &na);
+            let c = self.context(step, h, beta, &workspace.n, &workspace.na);
             (*self.logger)(&c);
         }
 
         while beta < self.beta_range.1 {
             step += 1;
             advance = false;
-            dn.fill(0.0);
-            dna.fill(0.0);
-            dn_err.fill(0.0);
-            dna_err.fill(0.0);
+            workspace.clear_step();
 
             // Ensure that h is within the desired range of step sizes.
             let h_on_beta = h / beta;
@@ -515,8 +602,8 @@ where
             } else {
                 log::trace!("Step {}, β = {:.4e}, h = {:.4e}", step, beta, h);
             }
-            log::trace!("      n = {:<+10.3e}", n);
-            log::trace!("     na = {:<+10.3e}", na);
+            log::trace!("      n = {:<+10.3e}", workspace.n);
+            log::trace!("     na = {:<+10.3e}", workspace.na);
 
             for i in 0..RK_S {
                 // DEBUG
@@ -526,71 +613,51 @@ where
                 // Compute the sub-step values
                 let beta_i = beta + RK_C[i] * h;
                 let ai = RK_A[i];
-                let ni = (0..i).fold(n.clone(), |total, j| total + ai[j] * &k[j]);
-                let nai = (0..i).fold(na.clone(), |total, j| total + ai[j] * &ka[j]);
+                let ni = (0..i).fold(workspace.n.clone(), |total, j| {
+                    total + ai[j] * &workspace.k[j]
+                });
+                let nai = (0..i).fold(workspace.na.clone(), |total, j| {
+                    total + ai[j] * &workspace.ka[j]
+                });
                 self.model.set_beta(beta_i);
                 let ci = self.context(step, h, beta_i, &ni, &nai);
 
                 // Compute k[i] and ka[i] from each interaction
-                self.compute_ki(&mut k[i], &mut ka[i], &ci);
+                self.compute_ki(&mut workspace.k[i], &mut workspace.ka[i], &ci);
 
                 // Set changes to zero for those particles in equilibrium
                 for &eq in &self.in_equilibrium {
-                    k[i][eq] = 0.0;
-                    ka[i][eq] = 0.0;
+                    workspace.k[i][eq] = 0.0;
+                    workspace.ka[i][eq] = 0.0;
                 }
                 for &eq in &self.no_asymmetry {
-                    ka[i][eq] = 0.0;
+                    workspace.ka[i][eq] = 0.0;
                 }
 
-                let bi = RK_B[i];
-                let ei = RK_E[i];
-                Zip::from(&mut dn)
-                    .and(&mut dn_err)
-                    .and(&k[i])
-                    .and(&mut dna)
-                    .and(&mut dna_err)
-                    .and(&ka[i])
-                    .apply(|dn, dn_err, &ki, dna, dna_err, &kai| {
-                        *dn += bi * ki;
-                        *dn_err += ei * ki;
-                        *dna += bi * kai;
-                        *dna_err += ei * kai;
-                    });
+                workspace.compute_dn(i)
             }
 
             self.model.set_beta(beta);
-            let c = self.context(step, h, beta, &n, &na);
+            let c = self.context(step, h, beta, &workspace.n, &workspace.na);
 
-            // Adjust dn for those particles in equilibrium
-            for &eq in &self.in_equilibrium {
-                dn[eq] = c.eq[eq] - n[eq];
-                dna[eq] = -na[eq];
-            }
-            for &eq in &self.no_asymmetry {
-                dna[eq] = -na[eq];
-            }
+            self.fix_equilibrium(&c, &mut workspace);
 
-            // Get the local error using L∞-norm
-            let err = dn_err
-                .iter()
-                .chain(dna_err.iter())
-                .fold(0_f64, |e, v| e.max(v.abs()));
+            let err = workspace.local_error();
 
             // If the error is within the tolerance, we'll be advancing the
             // iteration step
             if err < self.error_tolerance {
                 advance = true;
-                log::trace!(" dn = {:<+10.3e}", dn);
-                log::trace!("dna = {:<+10.3e}", dna);
+                log::trace!(" dn = {:<+10.3e}", workspace.dn);
+                log::trace!("dna = {:<+10.3e}", workspace.dna);
             } else if log::log_enabled!(log::Level::Trace) {
                 log::trace!(
                     "Error is not within tolerance ({:e} > {:e}).",
                     err,
                     self.error_tolerance
                 );
-                log::trace!(" n_err = {:<+10.3e}", dn_err);
-                log::trace!("na_err = {:<+10.3e}", dna_err);
+                log::trace!(" n_err = {:<+10.3e}", workspace.dn_err);
+                log::trace!("na_err = {:<+10.3e}", workspace.dna_err);
             }
 
             // Compute the change in step size based on the current error and
@@ -605,8 +672,7 @@ where
             // Update n and beta
             if advance {
                 // Advance n and beta
-                n += &dn;
-                na += &dna;
+                workspace.advance();
                 beta += h;
 
                 (*self.logger)(&c);
@@ -628,7 +694,7 @@ where
         log::info!("Number of integration steps discarded: {}", steps_discarded);
         log::info!("Number of evaluations: {}", evals);
 
-        (n, na)
+        workspace.result()
     }
 }
 
