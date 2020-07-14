@@ -14,7 +14,7 @@ use crate::{model::Model, solver::Context};
 use ndarray::prelude::*;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, hash};
+use std::{collections::HashMap, fmt, hash};
 
 struct IdentityHasher {
     state: u64,
@@ -94,27 +94,37 @@ impl InteractionParticles {
     {
         let mut s = String::new();
 
-        if let Some(&p) = self.incoming.first() {
-            s.push_str(&model.particle_name(p).map_err(|_| ())?);
-            s.push(' ');
-        }
-        for &p in self.incoming.iter().skip(1) {
+        for &p in &self.incoming {
             s.push_str(&model.particle_name(p).map_err(|_| ())?);
             s.push(' ');
         }
 
         s.push_str("↔");
 
-        if let Some(&p) = self.outgoing.first() {
-            s.push(' ');
-            s.push_str(&model.particle_name(p).map_err(|_| ())?);
-        }
-        for &p in self.outgoing.iter().skip(1) {
+        for &p in &self.outgoing {
             s.push(' ');
             s.push_str(&model.particle_name(p).map_err(|_| ())?);
         }
 
         Ok(s)
+    }
+}
+
+impl fmt::Display for InteractionParticles {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut s = String::new();
+
+        for &p in &self.incoming {
+            s.push_str(&format!("{} ", p));
+        }
+
+        s.push_str("↔");
+
+        for &p in &self.outgoing {
+            s.push_str(&format!(" {}", p));
+        }
+
+        write!(f, "{}", s)
     }
 }
 
