@@ -76,7 +76,7 @@ pub struct SolverBuilder<M> {
     logger: Box<dyn Fn(&Context<M>)>,
     step_precision: StepPrecision,
     error_tolerance: f64,
-    skip_precomputation: bool,
+    precompute: bool,
 }
 
 impl<M> SolverBuilder<M> {
@@ -111,7 +111,7 @@ impl<M> SolverBuilder<M> {
             logger: Box::new(|_| {}),
             step_precision: StepPrecision::default(),
             error_tolerance: 1e-4,
-            skip_precomputation: false,
+            precompute: true,
         }
     }
 
@@ -304,12 +304,12 @@ impl<M> SolverBuilder<M> {
         self
     }
 
-    /// Upon calling [`SolverBuilder::build`], skip the precomputation of
-    /// interactions.
+    /// Upon calling [`SolverBuilder::build`], set whether interactions should
+    /// be precomputed.
     ///
     /// By default, interactions are precomputed.
-    pub fn skip_precomputation(mut self, v: bool) -> Self {
-        self.skip_precomputation = v;
+    pub fn precompute(mut self, v: bool) -> Self {
+        self.precompute = v;
         self
     }
 
@@ -386,7 +386,7 @@ where
 {
     /// Precompute the interaction rates.
     #[cfg(not(feature = "parallel"))]
-    fn precompute(model: &mut M, beta_range: (f64, f64)) {
+    fn do_precompute(model: &mut M, beta_range: (f64, f64)) {
         log::info!("Pre-computing γ...");
         for (i, &beta) in vec![
             0.98 * beta_range.0,
@@ -405,8 +405,14 @@ where
             if i % 64 == 3 {
                 log::debug!(
                     "Precomputing step {} / {}",
-                    i,
-                    2_usize.pow(PRECOMPUTE_SUBDIV) + 3
+                    i - 3,
+                    2_usize.pow(PRECOMPUTE_SUBDIV)
+                );
+            } else if i >= 3 {
+                log::trace!(
+                    "Precomputing step {} / {}",
+                    i - 3,
+                    2_usize.pow(PRECOMPUTE_SUBDIV)
                 );
             }
             model.set_beta(beta);
@@ -420,7 +426,7 @@ where
 
     /// Precompute the interaction rates.
     #[cfg(feature = "parallel")]
-    fn precompute(model: &mut M, beta_range: (f64, f64)) {
+    fn do_precompute(model: &mut M, beta_range: (f64, f64)) {
         log::info!("Pre-computing γ...");
         for (i, &beta) in vec![
             0.98 * beta_range.0,
@@ -439,8 +445,14 @@ where
             if i % 64 == 3 {
                 log::debug!(
                     "Precomputing step {} / {}",
-                    i,
-                    2_usize.pow(PRECOMPUTE_SUBDIV) + 3
+                    i - 3,
+                    2_usize.pow(PRECOMPUTE_SUBDIV)
+                );
+            } else if i >= 3 {
+                log::trace!(
+                    "Precomputing step {} / {}",
+                    i - 3,
+                    2_usize.pow(PRECOMPUTE_SUBDIV)
                 );
             }
             model.set_beta(beta);
@@ -528,8 +540,8 @@ where
 
         // Run the precomputations so that the solver can run multiple times
         // later.
-        if !self.skip_precomputation {
-            Self::precompute(&mut model, beta_range);
+        if self.precompute {
+            Self::do_precompute(&mut model, beta_range);
         }
 
         Ok(Solver {
