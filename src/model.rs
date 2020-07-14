@@ -120,7 +120,8 @@ where
     /// Convert a signed particle number to the corresponding particle name.
     ///
     /// If the particle number is negative and the particle is not its own
-    /// antiparticle, the particle name is prepending with `~`.
+    /// antiparticle, a macron (◌̄) will be place over the first character of
+    /// the name.
     ///
     /// # Errors
     ///
@@ -131,11 +132,11 @@ where
         let idx = i.abs() as usize;
 
         if let Some(p) = self.particles().get(idx) {
+            let mut name = p.name.clone();
             if !p.own_antiparticle && sign < 0 {
-                Ok(format!("~{}", p.name))
-            } else {
-                Ok(p.name.clone())
+                name.insert(1, '\u{304}');
             }
+            Ok(name)
         } else {
             Err(i)
         }
