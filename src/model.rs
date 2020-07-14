@@ -17,7 +17,7 @@ use ndarray::prelude::*;
 use rayon::prelude::*;
 #[cfg(feature = "parallel")]
 use std::sync::RwLock;
-use std::{collections::HashMap, iter};
+use std::{collections::HashMap, convert::TryFrom, iter};
 
 /// Contains all the information relevant to a particular model, including
 /// masses, widths and couplings.  All these attributes can be dependent on the
@@ -103,6 +103,19 @@ where
     /// If the particle is not within the model, the name and index should be
     /// returned as an error so that they can be subsequently handled.
     fn particle_idx<S: AsRef<str>>(name: S, i: usize) -> Result<usize, (S, usize)>;
+
+    /// The signed version of [`particle_idx`].
+    ///
+    /// This is identical to [`particle_idx`] but returns an `isize` type.
+    ///
+    /// # Errors
+    ///
+    /// If the particle is not within the model, the name and index should be
+    /// returned as an error so that they can be subsequently handled.
+    fn particle_num<S: AsRef<str>>(name: S, i: usize) -> Result<isize, (S, usize)> {
+        Self::particle_idx(name, i)
+            .map(|idx| isize::try_from(idx).expect("Unable to convert particle index to isize"))
+    }
 
     /// Convert a signed particle number to the corresponding particle name.
     ///
