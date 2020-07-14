@@ -696,6 +696,130 @@ where
 
         workspace.result()
     }
+
+    /// Compute the interaction rates.
+    ///
+    /// The interactions rates are returned as two dimensional array with the
+    /// first index indexing values of beta, and the second index corresponding
+    /// to the index of the interaction, as returned by [`interactions`].  The
+    /// second index is offset by one with the first index being for beta
+    /// itself.
+    ///
+    /// The entries of the returned array as `Option<f64>` in order to
+    /// distinguish cases where the rate is not computed due to being unphysical
+    /// from cases where it is 0.
+    ///
+    /// The number of logarithmic steps in beta is specified by `n`.
+    pub fn gammas(&mut self, size: usize) -> (Vec<String>, Array2<Option<f64>>) {
+        let mut gammas = Array2::from_elem((size, self.model.interactions().len() + 1), None);
+        let n = Array1::zeros(self.model.particles().len());
+        let na = Array1::zeros(n.dim());
+
+        for (i, &beta) in Array1::geomspace(self.beta_range.0, self.beta_range.1, size)
+            .unwrap()
+            .into_iter()
+            .enumerate()
+        {
+            self.model.set_beta(beta);
+            gammas[[i, 0]] = Some(beta);
+            let mut c = self.context(0, 1.0, beta, &n, &na);
+            c.n = c.eq.clone();
+
+            #[cfg(not(feature = "parallel"))]
+            let values: Vec<_> = self
+                .model
+                .interactions()
+                .iter()
+                .enumerate()
+                .map(|(j, interaction)| (j, interaction.gamma(&c)))
+                .collect();
+
+            #[cfg(feature = "parallel")]
+            let values: Vec<_> = self
+                .model
+                .interactions()
+                .par_iter()
+                .enumerate()
+                .map(|(j, interaction)| (j, interaction.gamma(&c)))
+                .collect();
+
+            for (j, v) in values {
+                gammas[[i, j + 1]] = v;
+            }
+        }
+
+        let mut names = vec!["beta".to_string()];
+        names.extend(self.model.interactions().iter().map(|interaction| {
+            let ptcls = interaction.particles();
+            ptcls
+                .display(&self.model)
+                .unwrap_or_else(|_| format!("{}", ptcls))
+        }));
+
+        (names, gammas)
+    }
+
+    /// Compute the interaction rates.
+    ///
+    /// The interactions rates are returned as two dimensional array with the
+    /// first index indexing values of beta, and the second index corresponding
+    /// to the index of the interaction, as returned by [`interactions`].  The
+    /// second index is offset by one with the first index being for beta
+    /// itself.
+    ///
+    /// The entries of the returned array as `Option<f64>` in order to
+    /// distinguish cases where the rate is not computed due to being unphysical
+    /// from cases where it is 0.
+    ///
+    /// The number of logarithmic steps in beta is specified by `n`.
+    pub fn asymmetries(&mut self, size: usize) -> (Vec<String>, Array2<Option<f64>>) {
+        let mut gammas = Array2::from_elem((size, self.model.interactions().len() + 1), None);
+        let n = Array1::zeros(self.model.particles().len());
+        let na = Array1::zeros(n.dim());
+
+        for (i, &beta) in Array1::geomspace(self.beta_range.0, self.beta_range.1, size)
+            .unwrap()
+            .into_iter()
+            .enumerate()
+        {
+            self.model.set_beta(beta);
+            gammas[[i, 0]] = Some(beta);
+            let mut c = self.context(0, 1.0, beta, &n, &na);
+            c.n = c.eq.clone();
+
+            #[cfg(not(feature = "parallel"))]
+            let values: Vec<_> = self
+                .model
+                .interactions()
+                .iter()
+                .enumerate()
+                .map(|(j, interaction)| (j, interaction.asymmetry(&c)))
+                .collect();
+
+            #[cfg(feature = "parallel")]
+            let values: Vec<_> = self
+                .model
+                .interactions()
+                .par_iter()
+                .enumerate()
+                .map(|(j, interaction)| (j, interaction.asymmetry(&c)))
+                .collect();
+
+            for (j, v) in values {
+                gammas[[i, j + 1]] = v;
+            }
+        }
+
+        let mut names = vec!["beta".to_string()];
+        names.extend(self.model.interactions().iter().map(|interaction| {
+            let ptcls = interaction.particles();
+            ptcls
+                .display(&self.model)
+                .unwrap_or_else(|_| format!("{}", ptcls))
+        }));
+
+        (names, gammas)
+    }
 }
 
 impl<M> Solver<M>
