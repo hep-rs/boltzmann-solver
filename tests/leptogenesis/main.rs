@@ -5,11 +5,7 @@ mod common;
 mod model;
 
 use crate::model::{interaction, LeptogenesisModel};
-use boltzmann_solver::{
-    prelude::*,
-    statistic::{Statistic, Statistics},
-    utilities::spline::rec_geomspace,
-};
+use boltzmann_solver::prelude::*;
 use common::{into_interaction_box, one_generation};
 #[cfg(not(debug_assertions))]
 use itertools::iproduct;
@@ -670,11 +666,10 @@ pub fn lepton_equilibrium() -> Result<(), Box<dyn error::Error>> {
 fn gammas() -> Result<(), Box<dyn error::Error>> {
     init();
 
-    // We'll be using models[0] as the precomputed (default) model, and
-    // models[1] as the comparison.
-    let mut models = [LeptogenesisModel::zero(), LeptogenesisModel::zero()];
-    let beta = (1e-17, 1e-2);
+    let output_dir = common::output_dir("leptogenesis/gamma");
 
+    // Create two copies of the model for both solvers
+    let mut models = vec![LeptogenesisModel::zero(), LeptogenesisModel::zero()];
     for model in &mut models {
         for i in &[
             interaction::hle,
@@ -688,7 +683,7 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
         ] {
             model.interactions.extend(
                 i().drain(..)
-                    .filter(one_generation)
+                    // .filter(one_generation)
                     .map(into_interaction_box),
             );
         }
@@ -704,146 +699,68 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
         ] {
             model.interactions.extend(
                 i().drain(..)
-                    .filter(one_generation)
+                    // .filter(one_generation)
                     .map(into_interaction_box),
             );
         }
     }
 
-    // Precompute gamma for models[0]
-    const N: u32 = 10;
-    for (i, &beta) in vec![0.98 * beta.0, 0.99 * beta.0, 1.01 * beta.1, 1.02 * beta.1]
-        .iter()
-        .chain(&rec_geomspace(1e-17, 1e-2, N))
+    let mut solvers: Vec<_> = models
+        .into_iter()
         .enumerate()
-    {
-        if i % 64 == 3 {
-            log::debug!("Precomputing step {} / {}", i, 2_usize.pow(N) + 4 - 1);
-        } else {
-            log::trace!("Precomputing step {} / {}", i, 2_usize.pow(N) + 4 - 1);
-        }
+        .map(|(i, model)| {
+            SolverBuilder::new()
+                .model(model)
+                .beta_range(1e-18, 1e-2)
+                .precompute(i == 0)
+                .build()
+                .unwrap()
+        })
+        .collect();
 
-        let model = &mut models[0];
-
-        model.set_beta(beta);
-        let c = model.as_context();
-
-        #[cfg(feature = "parallel")]
-        model.interactions().par_iter().for_each(|interaction| {
-            interaction.gamma(&c);
-        });
-        #[cfg(not(feature = "parallel"))]
-        for interaction in model.interactions() {
-            interaction.gamma(&c);
-        }
-    }
-
-    // Create the CSV files
-    let base_output_dir = common::output_dir("leptogenesis/gamma");
-    let output_dirs = [
-        common::output_dir("leptogenesis/gamma/spline"),
-        common::output_dir("leptogenesis/gamma/raw"),
-    ];
-
-    let mut normalization_csv = csv::Writer::from_path({
-        let mut path = base_output_dir;
-        path.push("normalization.csv");
+    let mut precomputed = csv::Writer::from_path({
+        let mut path = output_dir.clone();
+        path.push("gamma_pre.csv");
         path
     })?;
-    normalization_csv.serialize(("beta", "H", "n1", "normalization"))?;
-
-    let mut csvs = [Vec::new(), Vec::new()];
-    for i in 0..models.len() {
-        let model = &models[i];
-        for interaction in model.interactions() {
-            let ptcl = interaction.particles();
-            let ptcl_idx = interaction.particles_idx();
-            let mut ptcl_idx: Vec<_> = ptcl_idx
-                .incoming
-                .iter()
-                .chain(&ptcl_idx.outgoing)
-                .map(|i| format!("{:02}", i))
-                .collect();
-            ptcl_idx.sort_unstable();
-
-            let mut csv = csv::Writer::from_path({
-                let mut path = output_dirs[i].clone();
-                path.push(ptcl_idx.join(" "));
-                if !path.is_dir() {
-                    fs::create_dir(&path)?;
-                }
-                path.push(format!("{}.csv", ptcl.display(model).unwrap()));
-                path
-            })?;
-            csv.serialize((
-                "beta",
-                "gamma",
-                "symmetric",
-                "asymmetric",
-                "gamma [normalized]",
-                "symmetric [normalized]",
-                "asymmetric [normalized]",
-            ))?;
-
-            #[cfg(feature = "parallel")]
-            csvs[i].push(RwLock::new(csv));
-            #[cfg(not(feature = "parallel"))]
-            csvs[i].push(csv);
-        }
+    let (header, data) = solvers[0].gammas(1024);
+    precomputed.serialize(header)?;
+    precomputed.flush()?;
+    for row in data.axis_iter(Axis(0)) {
+        precomputed.serialize(row.as_slice().unwrap())?;
     }
 
-    // Write out all the outputs
-    for &beta in Array1::geomspace(beta.0, beta.1, 512).unwrap().iter() {
-        for i in 0..models.len() {
-            models[i].set_beta(beta);
-            let c = models[i].as_context();
+    let mut precomputed_asymmetry = csv::Writer::from_path({
+        let mut path = output_dir.clone();
+        path.push("asymmetry_pre.csv");
+        path
+    })?;
+    let (header, data) = solvers[0].asymmetries(1024);
+    precomputed_asymmetry.serialize(header)?;
+    for row in data.axis_iter(Axis(0)) {
+        precomputed_asymmetry.serialize(row.as_slice().unwrap())?;
+    }
 
-            if i == 0 {
-                normalization_csv.serialize((
-                    c.beta,
-                    c.hubble_rate,
-                    Statistic::BoseEinstein.massless_number_density(0.0, beta),
-                    c.normalization,
-                ))?;
-            }
+    let mut non_precomputed = csv::Writer::from_path({
+        let mut path = output_dir.clone();
+        path.push("gamma_nopre.csv");
+        path
+    })?;
+    let (header, data) = solvers[1].gammas(1024);
+    non_precomputed.serialize(header)?;
+    for row in data.axis_iter(Axis(0)) {
+        non_precomputed.serialize(row.as_slice().unwrap())?;
+    }
 
-            #[cfg(feature = "parallel")]
-            models[i]
-                .interactions()
-                .par_iter()
-                .zip(&mut csvs[i])
-                .for_each(|(interaction, csv)| {
-                    let gamma = interaction.gamma(&c);
-                    let rate = interaction.rate(&c);
-                    csv.write()
-                        .unwrap()
-                        .serialize((
-                            beta,
-                            gamma,
-                            rate.map(|r| r.symmetric),
-                            rate.map(|r| r.asymmetric),
-                            gamma.map(|g| g * c.normalization),
-                            rate.map(|r| r.symmetric * c.normalization),
-                            rate.map(|r| r.asymmetric * c.normalization),
-                        ))
-                        .unwrap();
-                });
-
-            #[cfg(not(feature = "parallel"))]
-            for (interaction, csv) in models[i].interactions().iter().zip(&mut csvs[i]) {
-                let gamma = interaction.gamma(&c);
-                let rate = interaction.rate(&c);
-                csv.serialize((
-                    beta,
-                    gamma,
-                    rate.map(|r| r.symmetric),
-                    rate.map(|r| r.asymmetric),
-                    gamma.map(|g| g * c.normalization),
-                    rate.map(|r| r.symmetric * c.normalization),
-                    rate.map(|r| r.asymmetric * c.normalization),
-                ))?;
-            }
-        }
+    let mut non_precomputed_asymmetry = csv::Writer::from_path({
+        let mut path = output_dir;
+        path.push("asymmetry_nopre.csv");
+        path
+    })?;
+    let (header, data) = solvers[1].asymmetries(1024);
+    non_precomputed_asymmetry.serialize(header)?;
+    for row in data.axis_iter(Axis(0)) {
+        non_precomputed_asymmetry.serialize(row.as_slice().unwrap())?;
     }
 
     Ok(())
