@@ -87,7 +87,7 @@ impl Particle {
             decays: HashMap::new(),
             complex: false,
             dof: 1.0,
-            name: "".to_string(),
+            name: "?".to_string(),
         }
     }
 
@@ -143,10 +143,17 @@ impl Particle {
         self
     }
 
-    /// Specify the particle's name
+    /// Specify the particle's name.
+    ///
+    /// # Panics
+    ///
+    /// The particle name cannot be an empty string.
     #[must_use]
     pub fn name<S: Into<String>>(mut self, name: S) -> Self {
         self.name = name.into();
+        if self.name.is_empty() {
+            panic!("Particle name cannot be empty.");
+        }
         self
     }
 
