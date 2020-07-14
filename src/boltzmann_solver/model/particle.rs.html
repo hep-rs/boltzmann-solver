@@ -491,6 +491,13 @@
 <span id="423">423</span>
 <span id="424">424</span>
 <span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Basic implementation of a particle type</span>
 
@@ -581,7 +588,7 @@
             <span class="ident">decays</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
             <span class="ident">complex</span>: <span class="bool-val">false</span>,
             <span class="ident">dof</span>: <span class="number">1.0</span>,
-            <span class="ident">name</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="ident">name</span>: <span class="string">&quot;?&quot;</span>.<span class="ident">to_string</span>(),
         }
     }
 
@@ -637,10 +644,17 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Specify the particle&#39;s name</span>
+    <span class="doccomment">/// Specify the particle&#39;s name.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Panics</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The particle name cannot be an empty string.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">is_empty</span>() {
+            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Particle name cannot be empty.&quot;</span>);
+        }
         <span class="self">self</span>
     }
 

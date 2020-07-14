@@ -372,6 +372,20 @@
 <span id="304">304</span>
 <span id="305">305</span>
 <span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Model information</span>
 
@@ -392,7 +406,7 @@
 <span class="kw">use</span> <span class="ident">rayon</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">RwLock</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections</span>::<span class="ident">HashMap</span>, <span class="ident">iter</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections</span>::<span class="ident">HashMap</span>, <span class="ident">convert</span>::<span class="ident">TryFrom</span>, <span class="ident">iter</span>};
 
 <span class="doccomment">/// Contains all the information relevant to a particular model, including</span>
 <span class="doccomment">/// masses, widths and couplings.  All these attributes can be dependent on the</span>
@@ -479,10 +493,24 @@
     <span class="doccomment">/// returned as an error so that they can be subsequently handled.</span>
     <span class="kw">fn</span> <span class="ident">particle_idx</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">S</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, (<span class="ident">S</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>;
 
+    <span class="doccomment">/// The signed version of [`particle_idx`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is identical to [`particle_idx`] but returns an `isize` type.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the particle is not within the model, the name and index should be</span>
+    <span class="doccomment">/// returned as an error so that they can be subsequently handled.</span>
+    <span class="kw">fn</span> <span class="ident">particle_num</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">S</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">isize</span>, (<span class="ident">S</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
+        <span class="self">Self</span>::<span class="ident">particle_idx</span>(<span class="ident">name</span>, <span class="ident">i</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">isize</span>::<span class="ident">try_from</span>(<span class="ident">idx</span>).<span class="ident">expect</span>(<span class="string">&quot;Unable to convert particle index to isize&quot;</span>))
+    }
+
     <span class="doccomment">/// Convert a signed particle number to the corresponding particle name.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the particle number is negative and the particle is not its own</span>
-    <span class="doccomment">/// antiparticle, the particle name is prepending with `~`.</span>
+    <span class="doccomment">/// antiparticle, a macron (◌̄) will be place over the first character of</span>
+    <span class="doccomment">/// the name.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
@@ -493,11 +521,11 @@
         <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">abs</span>() <span class="kw">as</span> <span class="ident">usize</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">particles</span>().<span class="ident">get</span>(<span class="ident">idx</span>) {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
             <span class="kw">if</span> <span class="op">!</span><span class="ident">p</span>.<span class="ident">own_antiparticle</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">sign</span> <span class="op">&lt;</span> <span class="number">0</span> {
-                <span class="prelude-val">Ok</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;~{}&quot;</span>, <span class="ident">p</span>.<span class="ident">name</span>))
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">p</span>.<span class="ident">name</span>.<span class="ident">clone</span>())
+                <span class="ident">name</span>.<span class="ident">insert</span>(<span class="number">1</span>, <span class="string">&#39;\u{304}&#39;</span>);
             }
+            <span class="prelude-val">Ok</span>(<span class="ident">name</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">Err</span>(<span class="ident">i</span>)
         }

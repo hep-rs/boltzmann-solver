@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Context","Current context at a particular step in the numerical integration."],["Solver","Boltzmann solver"],["SolverBuilder","Boltzmann solver builder"]]});
+initSidebarItems({"enum":[["Error","Error type returned by the solver builder in case there is an error."]],"struct":[["Context","Current context at a particular step in the numerical integration."],["Solver","Boltzmann solver"],["SolverBuilder","Boltzmann solver builder"]]});
