@@ -117,7 +117,7 @@ impl Model for StandardModel {
         }
     }
 
-    /// Update beta for the model.
+    /// Set inverse temperature for the model.
     ///
     /// This does **not** compute the widths as it is assumed that most
     /// implementation will add more particles, thus making any Standard Model
