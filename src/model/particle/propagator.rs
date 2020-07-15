@@ -122,18 +122,19 @@ impl<'a, 'b, 'x, 'y> ops::Mul<&'y SinglePropagator<'b>> for &'x SinglePropagator
 /// produce a floating point.  For example:
 ///
 /// ```rust
-/// use boltzman_solver::{prelude::*, utilities::propagator};
+/// use boltzmann_solver::prelude::*;
 ///
 /// let p1 = Particle::new(0, 125.0, 1e-3);
 /// let p2 = Particle::new(1, 350.0, 1.0);
 ///
-/// let m1 = 4.0 * propagator(&p1, 125.0) * propagator(&p1, 125.0).conj();
-/// let m2 = 4.0 * propagator(&p1, 125.0) * propagator(&p2, 125.0).conj();
-/// let m3 = 4.0 * propagator(&p2, 125.0) * propagator(&p2, 125.0).conj();
+/// let m11 = p1.propagator(125.0) * p1.propagator(125.0).conj();
+/// let m12 = p1.propagator(125.0) * p2.propagator(125.0).conj();
+/// let m22 = p2.propagator(125.0) * p2.propagator(125.0).conj();
 ///
-/// println!("m1 = {}", m1);
-/// println!("m2 = {}", m2);
-/// println!("m3 = {}", m3);
+/// let m = (p1.propagator(125.0) + p2.propagator(125.0)) * (p1.propagator(125.0) + p2.propagator(125.0)).conj();
+///
+/// assert!((dbg!(m11 + m12 + m12.conj() + m22 - m)).re.abs() < f64::EPSILON);
+/// assert!((dbg!(m11 + m12 + m12.conj() + m22 - m)).im.abs() < f64::EPSILON);
 /// ```
 #[derive(Debug)]
 pub struct Propagator<'a> {
