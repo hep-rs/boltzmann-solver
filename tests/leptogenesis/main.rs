@@ -12,6 +12,8 @@ use itertools::iproduct;
 use ndarray::prelude::*;
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
+#[cfg(not(debug_assertions))]
+use std::fs;
 use std::{error, fmt, fs, io, sync::RwLock};
 
 /// Common initialization function, used to setup common logging for all
@@ -215,11 +217,12 @@ pub fn decay_only_3gen() -> Result<(), Box<dyn error::Error>> {
     // Check that the solution is fine
     println!("Final number density: {:.3e}", n);
     println!("Final number density asymmetry: {:.3e}", na);
+    let mut lepton_asymmetry = 0.0;
     for i in 0..3 {
-        let nai = na[LeptogenesisModel::particle_idx("L", i).unwrap()].abs();
-        assert!(1e-10 < nai && nai < 1e-5);
+        lepton_asymmetry += na[LeptogenesisModel::particle_idx("L", i).unwrap()].abs();
         assert!(n[LeptogenesisModel::particle_idx("N", i).unwrap()] < 1e-8);
     }
+    assert!(1e-10 < lepton_asymmetry.abs() && lepton_asymmetry.abs() < 1e-6);
 
     Ok(())
 }
