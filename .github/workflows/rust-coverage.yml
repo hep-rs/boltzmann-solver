@@ -22,6 +22,8 @@ jobs:
           override: true
       - name: Tarpaulin
         uses: actions-rs/tarpaulin@v0.1
+        with:
+          args: "--timeout 3600"
       - name: Upload
         uses: codecov/codecov-action@v1
         with:
