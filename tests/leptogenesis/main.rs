@@ -17,7 +17,7 @@ use std::{error, fmt, fs, io, sync::RwLock};
 /// Common initialization function, used to setup common logging for all
 /// functions.
 fn init() {
-    common::setup_logging(1);
+    common::setup_logging(0);
 }
 
 /// Solve the Boltzmann equations and return the final values.
