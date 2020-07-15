@@ -939,6 +939,8 @@
 <span id="871">871</span>
 <span id="872">872</span>
 <span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Solver for the number density evolution given by integrating the Boltzmann</span>
 <span class="doccomment">//! equation.</span>
@@ -1641,6 +1643,13 @@
 
     <span class="doccomment">/// Compute the interaction rates.</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// The number of logarithmic steps in beta is specified by `n`, with the</span>
+    <span class="doccomment">/// range of `$\beta$` values being taken from the solver.  If `normalize`</span>
+    <span class="doccomment">/// is true, the interaction rate is divided by `$n_1 H \beta$`, where</span>
+    <span class="doccomment">/// `$n_1$` is the equilibrium number density of a single bosonic degree of</span>
+    <span class="doccomment">/// freedom, `$H$` is the Hubble rate and `$\beta$` is the inverse</span>
+    <span class="doccomment">/// temperature.</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// The interactions rates are returned as two dimensional array with the</span>
     <span class="doccomment">/// first index indexing values of beta, and the second index corresponding</span>
     <span class="doccomment">/// to the index of the interaction, as returned by [`interactions`].  The</span>
@@ -1651,8 +1660,7 @@
     <span class="doccomment">/// distinguish cases where the rate is not computed due to being unphysical</span>
     <span class="doccomment">/// from cases where it is 0.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The number of logarithmic steps in beta is specified by `n`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gammas</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">Array2</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gammas</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">usize</span>, <span class="ident">normalize</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">Array2</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gammas</span> <span class="op">=</span> <span class="ident">Array2</span>::<span class="ident">from_elem</span>((<span class="ident">size</span>, <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">interactions</span>().<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>), <span class="prelude-val">None</span>);
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="self">self</span>.<span class="ident">model</span>.<span class="ident">particles</span>().<span class="ident">len</span>());
         <span class="kw">let</span> <span class="ident">na</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>());
@@ -1666,6 +1674,7 @@
             <span class="ident">gammas</span>[[<span class="ident">i</span>, <span class="number">0</span>]] <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">beta</span>);
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="number">0</span>, <span class="number">1.0</span>, <span class="ident">beta</span>, <span class="kw-2">&amp;</span><span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">na</span>);
             <span class="ident">c</span>.<span class="ident">n</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">eq</span>.<span class="ident">clone</span>();
+            <span class="kw">let</span> <span class="ident">normalization</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">normalize</span> { <span class="ident">c</span>.<span class="ident">normalization</span> } <span class="kw">else</span> { <span class="number">1.0</span> };
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>))]</span>
             <span class="kw">let</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
@@ -1673,7 +1682,7 @@
                 .<span class="ident">interactions</span>()
                 .<span class="ident">iter</span>()
                 .<span class="ident">enumerate</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">j</span>, <span class="ident">interaction</span>)<span class="op">|</span> (<span class="ident">j</span>, <span class="ident">interaction</span>.<span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>)))
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">j</span>, <span class="ident">interaction</span>)<span class="op">|</span> (<span class="ident">j</span>, <span class="ident">interaction</span>.<span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">normalization</span>)))
                 .<span class="ident">collect</span>();
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>)]</span>
@@ -1682,7 +1691,7 @@
                 .<span class="ident">interactions</span>()
                 .<span class="ident">par_iter</span>()
                 .<span class="ident">enumerate</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">j</span>, <span class="ident">interaction</span>)<span class="op">|</span> (<span class="ident">j</span>, <span class="ident">interaction</span>.<span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>)))
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">j</span>, <span class="ident">interaction</span>)<span class="op">|</span> (<span class="ident">j</span>, <span class="ident">interaction</span>.<span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">normalization</span>)))
                 .<span class="ident">collect</span>();
 
             <span class="kw">for</span> (<span class="ident">j</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">values</span> {
@@ -1701,20 +1710,14 @@
         (<span class="ident">names</span>, <span class="ident">gammas</span>)
     }
 
-    <span class="doccomment">/// Compute the interaction rates.</span>
+    <span class="doccomment">/// Compute the asymmetric interaction rates.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The interactions rates are returned as two dimensional array with the</span>
-    <span class="doccomment">/// first index indexing values of beta, and the second index corresponding</span>
-    <span class="doccomment">/// to the index of the interaction, as returned by [`interactions`].  The</span>
-    <span class="doccomment">/// second index is offset by one with the first index being for beta</span>
-    <span class="doccomment">/// itself.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The entries of the returned array as `Option&lt;f64&gt;` in order to</span>
-    <span class="doccomment">/// distinguish cases where the rate is not computed due to being unphysical</span>
-    <span class="doccomment">/// from cases where it is 0.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The number of logarithmic steps in beta is specified by `n`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">asymmetries</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">Array2</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+    <span class="doccomment">/// The arguments and returned values are identical to [`gammas`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">asymmetries</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">size</span>: <span class="ident">usize</span>,
+        <span class="ident">normalize</span>: <span class="ident">bool</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">Array2</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gammas</span> <span class="op">=</span> <span class="ident">Array2</span>::<span class="ident">from_elem</span>((<span class="ident">size</span>, <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">interactions</span>().<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>), <span class="prelude-val">None</span>);
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="self">self</span>.<span class="ident">model</span>.<span class="ident">particles</span>().<span class="ident">len</span>());
         <span class="kw">let</span> <span class="ident">na</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>());
@@ -1728,6 +1731,7 @@
             <span class="ident">gammas</span>[[<span class="ident">i</span>, <span class="number">0</span>]] <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">beta</span>);
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>(<span class="number">0</span>, <span class="number">1.0</span>, <span class="ident">beta</span>, <span class="kw-2">&amp;</span><span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">na</span>);
             <span class="ident">c</span>.<span class="ident">n</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">eq</span>.<span class="ident">clone</span>();
+            <span class="kw">let</span> <span class="ident">normalization</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">normalize</span> { <span class="ident">c</span>.<span class="ident">normalization</span> } <span class="kw">else</span> { <span class="number">1.0</span> };
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>))]</span>
             <span class="kw">let</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
@@ -1735,7 +1739,7 @@
                 .<span class="ident">interactions</span>()
                 .<span class="ident">iter</span>()
                 .<span class="ident">enumerate</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">j</span>, <span class="ident">interaction</span>)<span class="op">|</span> (<span class="ident">j</span>, <span class="ident">interaction</span>.<span class="ident">asymmetry</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>)))
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">j</span>, <span class="ident">interaction</span>)<span class="op">|</span> (<span class="ident">j</span>, <span class="ident">interaction</span>.<span class="ident">asymmetry</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">normalization</span>)))
                 .<span class="ident">collect</span>();
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>)]</span>
@@ -1744,7 +1748,7 @@
                 .<span class="ident">interactions</span>()
                 .<span class="ident">par_iter</span>()
                 .<span class="ident">enumerate</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">j</span>, <span class="ident">interaction</span>)<span class="op">|</span> (<span class="ident">j</span>, <span class="ident">interaction</span>.<span class="ident">asymmetry</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>)))
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">j</span>, <span class="ident">interaction</span>)<span class="op">|</span> (<span class="ident">j</span>, <span class="ident">interaction</span>.<span class="ident">asymmetry</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">normalization</span>)))
                 .<span class="ident">collect</span>();
 
             <span class="kw">for</span> (<span class="ident">j</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">values</span> {

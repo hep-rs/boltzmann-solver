@@ -412,6 +412,7 @@
 <span id="344">344</span>
 <span id="345">345</span>
 <span id="346">346</span>
+<span id="347">347</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Particle propagators</span>
 
@@ -537,18 +538,19 @@
 <span class="doccomment">/// produce a floating point.  For example:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use boltzman_solver::{prelude::*, utilities::propagator};</span>
+<span class="doccomment">/// use boltzmann_solver::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let p1 = Particle::new(0, 125.0, 1e-3);</span>
 <span class="doccomment">/// let p2 = Particle::new(1, 350.0, 1.0);</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let m1 = 4.0 * propagator(&amp;p1, 125.0) * propagator(&amp;p1, 125.0).conj();</span>
-<span class="doccomment">/// let m2 = 4.0 * propagator(&amp;p1, 125.0) * propagator(&amp;p2, 125.0).conj();</span>
-<span class="doccomment">/// let m3 = 4.0 * propagator(&amp;p2, 125.0) * propagator(&amp;p2, 125.0).conj();</span>
+<span class="doccomment">/// let m11 = p1.propagator(125.0) * p1.propagator(125.0).conj();</span>
+<span class="doccomment">/// let m12 = p1.propagator(125.0) * p2.propagator(125.0).conj();</span>
+<span class="doccomment">/// let m22 = p2.propagator(125.0) * p2.propagator(125.0).conj();</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// println!(&quot;m1 = {}&quot;, m1);</span>
-<span class="doccomment">/// println!(&quot;m2 = {}&quot;, m2);</span>
-<span class="doccomment">/// println!(&quot;m3 = {}&quot;, m3);</span>
+<span class="doccomment">/// let m = (p1.propagator(125.0) + p2.propagator(125.0)) * (p1.propagator(125.0) + p2.propagator(125.0)).conj();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// assert!((dbg!(m11 + m12 + m12.conj() + m22 - m)).re.abs() &lt; f64::EPSILON);</span>
+<span class="doccomment">/// assert!((dbg!(m11 + m12 + m12.conj() + m22 - m)).im.abs() &lt; f64::EPSILON);</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Propagator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
