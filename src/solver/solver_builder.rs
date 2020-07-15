@@ -402,7 +402,13 @@ where
         ))
         .enumerate()
         {
-            if i % 64 == 3 {
+            if i % 1024 == 3 {
+                log::info!(
+                    "Precomputing step {} / {}",
+                    i - 3,
+                    2_usize.pow(PRECOMPUTE_SUBDIV)
+                );
+            } else if i % 64 == 3 {
                 log::debug!(
                     "Precomputing step {} / {}",
                     i - 3,
@@ -415,6 +421,7 @@ where
                     2_usize.pow(PRECOMPUTE_SUBDIV)
                 );
             }
+
             model.set_beta(beta);
             let c = model.as_context();
 
@@ -442,7 +449,13 @@ where
         ))
         .enumerate()
         {
-            if i % 64 == 3 {
+            if i % 1024 == 3 {
+                log::info!(
+                    "Precomputing step {} / {}",
+                    i - 3,
+                    2_usize.pow(PRECOMPUTE_SUBDIV)
+                );
+            } else if i % 64 == 3 {
                 log::debug!(
                     "Precomputing step {} / {}",
                     i - 3,
@@ -455,6 +468,7 @@ where
                     2_usize.pow(PRECOMPUTE_SUBDIV)
                 );
             }
+
             model.set_beta(beta);
             let c = model.as_context();
 
