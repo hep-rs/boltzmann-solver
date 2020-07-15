@@ -723,9 +723,8 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
         path.push("gamma_pre.csv");
         path
     })?;
-    let (header, data) = solvers[0].gammas(1024);
+    let (header, data) = solvers[0].gammas(1024, true);
     precomputed.serialize(header)?;
-    precomputed.flush()?;
     for row in data.axis_iter(Axis(0)) {
         precomputed.serialize(row.as_slice().unwrap())?;
     }
@@ -735,7 +734,7 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
         path.push("asymmetry_pre.csv");
         path
     })?;
-    let (header, data) = solvers[0].asymmetries(1024);
+    let (header, data) = solvers[0].asymmetries(1024, true);
     precomputed_asymmetry.serialize(header)?;
     for row in data.axis_iter(Axis(0)) {
         precomputed_asymmetry.serialize(row.as_slice().unwrap())?;
@@ -746,7 +745,7 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
         path.push("gamma_nopre.csv");
         path
     })?;
-    let (header, data) = solvers[1].gammas(1024);
+    let (header, data) = solvers[1].gammas(1024, true);
     non_precomputed.serialize(header)?;
     for row in data.axis_iter(Axis(0)) {
         non_precomputed.serialize(row.as_slice().unwrap())?;
@@ -757,7 +756,7 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
         path.push("asymmetry_nopre.csv");
         path
     })?;
-    let (header, data) = solvers[1].asymmetries(1024);
+    let (header, data) = solvers[1].asymmetries(1024, true);
     non_precomputed_asymmetry.serialize(header)?;
     for row in data.axis_iter(Axis(0)) {
         non_precomputed_asymmetry.serialize(row.as_slice().unwrap())?;
