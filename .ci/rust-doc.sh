@@ -21,5 +21,8 @@ cd gh-pages
 # Commit the changes
 git config --global user.email "CI"
 git config --global user.name "CI"
-git add --all
-git commit --message "CI: cargo doc ${GITHUB_SHA:0:7}"
+
+if ! git diff --quiet ; then
+    git add --all
+    git commit --message "CI: cargo doc ${GITHUB_SHA:0:7}"
+fi
