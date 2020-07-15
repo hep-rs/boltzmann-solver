@@ -4,34 +4,34 @@
 
 use crate::utilities::spline::ConstCubicHermiteSpline;
 
-/// Z boson mass [GeV]
+/// Z boson mass in GeV.
 pub const MASS_Z: f64 = 91.187_6;
-/// W boson mass [GeV]
+/// W boson mass in GeV.
 pub const MASS_W: f64 = 80.379;
-/// Higgs boson mass [GeV]
+/// Higgs boson mass in GeV.
 pub const MASS_H: f64 = 125.10;
 
-/// Electron mass [GeV]
+/// Electron mass in GeV.
 pub const MASS_EL: f64 = 0.510_998_946_1e-3;
-/// Muon mass [GeV]
+/// Muon mass in GeV.
 pub const MASS_MU: f64 = 105.658_374_5e-3;
-/// Tau mass [GeV]
+/// Tau mass in GeV.
 pub const MASS_TA: f64 = 1776.86e-3;
 
-/// Up quark mass [GeV]
+/// Up quark mass in GeV.
 pub const MASS_UP: f64 = 2.16e-3;
-/// Down quark mass [GeV]
+/// Down quark mass in GeV.
 pub const MASS_DO: f64 = 4.67e-3;
-/// Strange quark mass [GeV]
+/// Strange quark mass in GeV.
 pub const MASS_ST: f64 = 93e-3;
-/// Charm quark mass [GeV]
+/// Charm quark mass in GeV.
 pub const MASS_CH: f64 = 1.27;
-/// Bottom quark mass [GeV]
+/// Bottom quark mass in GeV.
 pub const MASS_BO: f64 = 4.18;
-/// Top quark mass [GeV]
+/// Top quark mass in GeV.
 pub const MASS_TO: f64 = 172.76;
 
-/// Higgs boson VEV
+/// Higgs boson VEV in GeV.
 pub const VEV: f64 = 246.22;
 
 /// CKM Wolfenstain `$A$` parameter
