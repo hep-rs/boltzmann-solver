@@ -8,7 +8,7 @@ use std::ops;
 ///
 /// This isn't designed to be used on its own and instead allows for better
 /// handling of multiple propagators.
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 struct SinglePropagator<'a> {
     particle: &'a Particle,
     momentum: f64,
@@ -167,10 +167,28 @@ impl<'a> Propagator<'a> {
     pub fn eval(&self) -> Complex<f64> {
         self.propagators.iter().map(SinglePropagator::eval).sum()
     }
+
+    /// Compute the norm squared of the propagator.
+    ///
+    /// This is equivalent to having `p * p.conj()`, but does not require the
+    /// allocation of a second propagator.
+    #[must_use]
+    pub fn norm_sqr(&self) -> Complex<f64> {
+        let mut result = Complex::zero();
+
+        for pi in &self.propagators {
+            for pj in &self.propagators {
+                let mut pj = *pj;
+                result += pi * pj.conj()
+            }
+        }
+
+        result
+    }
 }
 
 /// Add propagators together
-impl<'a> ops::Add<Propagator<'a>> for Propagator<'a> {
+impl<'a> ops::Add<Self> for Propagator<'a> {
     type Output = Self;
 
     fn add(mut self, mut other: Self) -> Self::Output {
