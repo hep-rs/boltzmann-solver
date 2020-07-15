@@ -699,6 +699,13 @@ where
 
     /// Compute the interaction rates.
     ///
+    /// The number of logarithmic steps in beta is specified by `n`, with the
+    /// range of `$\beta$` values being taken from the solver.  If `normalize`
+    /// is true, the interaction rate is divided by `$n_1 H \beta$`, where
+    /// `$n_1$` is the equilibrium number density of a single bosonic degree of
+    /// freedom, `$H$` is the Hubble rate and `$\beta$` is the inverse
+    /// temperature.
+    ///
     /// The interactions rates are returned as two dimensional array with the
     /// first index indexing values of beta, and the second index corresponding
     /// to the index of the interaction, as returned by [`interactions`].  The
@@ -709,8 +716,7 @@ where
     /// distinguish cases where the rate is not computed due to being unphysical
     /// from cases where it is 0.
     ///
-    /// The number of logarithmic steps in beta is specified by `n`.
-    pub fn gammas(&mut self, size: usize) -> (Vec<String>, Array2<Option<f64>>) {
+    pub fn gammas(&mut self, size: usize, normalize: bool) -> (Vec<String>, Array2<Option<f64>>) {
         let mut gammas = Array2::from_elem((size, self.model.interactions().len() + 1), None);
         let n = Array1::zeros(self.model.particles().len());
         let na = Array1::zeros(n.dim());
@@ -724,6 +730,7 @@ where
             gammas[[i, 0]] = Some(beta);
             let mut c = self.context(0, 1.0, beta, &n, &na);
             c.n = c.eq.clone();
+            let normalization = if normalize { c.normalization } else { 1.0 };
 
             #[cfg(not(feature = "parallel"))]
             let values: Vec<_> = self
@@ -731,7 +738,7 @@ where
                 .interactions()
                 .iter()
                 .enumerate()
-                .map(|(j, interaction)| (j, interaction.gamma(&c)))
+                .map(|(j, interaction)| (j, interaction.gamma(&c).map(|v| v * normalization)))
                 .collect();
 
             #[cfg(feature = "parallel")]
@@ -740,7 +747,7 @@ where
                 .interactions()
                 .par_iter()
                 .enumerate()
-                .map(|(j, interaction)| (j, interaction.gamma(&c)))
+                .map(|(j, interaction)| (j, interaction.gamma(&c).map(|v| v * normalization)))
                 .collect();
 
             for (j, v) in values {
@@ -759,20 +766,14 @@ where
         (names, gammas)
     }
 
-    /// Compute the interaction rates.
+    /// Compute the asymmetric interaction rates.
     ///
-    /// The interactions rates are returned as two dimensional array with the
-    /// first index indexing values of beta, and the second index corresponding
-    /// to the index of the interaction, as returned by [`interactions`].  The
-    /// second index is offset by one with the first index being for beta
-    /// itself.
-    ///
-    /// The entries of the returned array as `Option<f64>` in order to
-    /// distinguish cases where the rate is not computed due to being unphysical
-    /// from cases where it is 0.
-    ///
-    /// The number of logarithmic steps in beta is specified by `n`.
-    pub fn asymmetries(&mut self, size: usize) -> (Vec<String>, Array2<Option<f64>>) {
+    /// The arguments and returned values are identical to [`gammas`].
+    pub fn asymmetries(
+        &mut self,
+        size: usize,
+        normalize: bool,
+    ) -> (Vec<String>, Array2<Option<f64>>) {
         let mut gammas = Array2::from_elem((size, self.model.interactions().len() + 1), None);
         let n = Array1::zeros(self.model.particles().len());
         let na = Array1::zeros(n.dim());
@@ -786,6 +787,7 @@ where
             gammas[[i, 0]] = Some(beta);
             let mut c = self.context(0, 1.0, beta, &n, &na);
             c.n = c.eq.clone();
+            let normalization = if normalize { c.normalization } else { 1.0 };
 
             #[cfg(not(feature = "parallel"))]
             let values: Vec<_> = self
@@ -793,7 +795,7 @@ where
                 .interactions()
                 .iter()
                 .enumerate()
-                .map(|(j, interaction)| (j, interaction.asymmetry(&c)))
+                .map(|(j, interaction)| (j, interaction.asymmetry(&c).map(|v| v * normalization)))
                 .collect();
 
             #[cfg(feature = "parallel")]
@@ -802,7 +804,7 @@ where
                 .interactions()
                 .par_iter()
                 .enumerate()
-                .map(|(j, interaction)| (j, interaction.asymmetry(&c)))
+                .map(|(j, interaction)| (j, interaction.asymmetry(&c).map(|v| v * normalization)))
                 .collect();
 
             for (j, v) in values {
