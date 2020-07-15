@@ -167,7 +167,7 @@ pub fn decay_only_1gen() -> Result<(), Box<dyn error::Error>> {
     println!("Final number density asymmetry: {:.3e}", na);
 
     let nai = na[LeptogenesisModel::particle_idx("L", 0).unwrap()].abs();
-    assert!(1e-10 < nai && nai < 1e-5);
+    assert!(1e-14 < nai && nai < 1e-10);
     assert!(n[LeptogenesisModel::particle_idx("N", 0).unwrap()] < 1e-8);
 
     Ok(())
