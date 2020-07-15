@@ -47,7 +47,9 @@ pub fn setup_logging(verbosity: usize) {
     base_config.chain(stderr_config).apply().unwrap_or(());
 
     match verbosity {
-        0 => log::warn!("Verbosity set to Warn"),
+        0 => {
+            // log::warn!("Verbosity set to Warn")
+        }
         1 => log::info!("Verbosity set to Info."),
         2 => log::debug!("Verbosity set to Debug."),
         _3_or_more => log::trace!("Verbosity set to Trace."),
