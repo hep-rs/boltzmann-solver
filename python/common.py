@@ -102,12 +102,14 @@ def plot_asymmetry(data, ptcls):
         data=[
             go.Scatter(
                 name="ΔB-L",
+                legendgroup="ΔB-L",
                 x=data["n"]["beta"],
                 y=data["n"]["ΔB-L"],
                 line=go.scatter.Line(width=3, color="black"),
             ),
             go.Scatter(
                 name="ΔB-L",
+                legendgroup="ΔB-L",
                 showlegend=False,
                 x=data["-n"]["beta"],
                 y=data["-n"]["ΔB-L"],
@@ -117,6 +119,7 @@ def plot_asymmetry(data, ptcls):
         + [
             go.Scatter(
                 name=ptcl,
+                legendgroup=ptcl,
                 x=data["n"]["beta"],
                 y=data["n"][f"Δ{ptcl}"],
                 line=go.scatter.Line(color=color),
@@ -126,10 +129,11 @@ def plot_asymmetry(data, ptcls):
         + [
             go.Scatter(
                 name=ptcl,
+                legendgroup=ptcl,
                 showlegend=False,
                 x=data["-n"]["beta"],
                 y=data["-n"][f"Δ{ptcl}"],
-                line=go.scatter.Line(dash="dash"),
+                line=go.scatter.Line(color=color, dash="dash"),
             )
             for ptcl, color in zip(ptcls, COLORS)
         ],
@@ -159,6 +163,7 @@ def plot_density(data, ptcls):
         data=[
             go.Scatter(
                 name=ptcl,
+                legendgroup=ptcl,
                 x=data["n"]["beta"],
                 y=data["n"][ptcl],
                 line=go.scatter.Line(color=color),
@@ -168,6 +173,7 @@ def plot_density(data, ptcls):
         + [
             go.Scatter(
                 name=ptcl,
+                legendgroup=ptcl,
                 showlegend=False,
                 x=data["n"]["beta"],
                 y=data["n"][f"({ptcl})"],
