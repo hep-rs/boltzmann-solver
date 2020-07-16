@@ -23,8 +23,9 @@ def read_csv(f):
 
     # Read CSV
     data["n"] = pd.read_csv(f)
-    if data["n"].index.size > 100_000:
-        data["n"] = data["n"].sample(100_000)
+    if data["n"].index.size > 20_000:
+        data["n"] = data["n"].sample(20_000)
+        data["n"].sort_values(by=["beta"], inplace=True)
 
     # Calculate B-L
     data["n"]["ΔB-L"] = (1 / 3) * data["n"][
