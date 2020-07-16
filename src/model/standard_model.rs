@@ -82,8 +82,8 @@ impl Model for StandardModel {
 
         let mh: f64 = data::MASS_H;
         let vev: f64 = data::VEV;
-        let mu2 = -2.0 * mh.powi(2);
-        let lambda = (mh / vev).powi(2);
+        let mu2 = -mh.powi(2) / 2.0;
+        let lambda = (mu2 / (2.0 * vev)).powi(2);
 
         StandardModel {
             beta: f64::INFINITY,
