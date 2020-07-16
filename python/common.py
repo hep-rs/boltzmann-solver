@@ -192,3 +192,52 @@ def plot_density(data, ptcls):
     )
 
     return fig
+
+
+def standardize(s: str) -> str:
+    """Standardize the name of an interaction"""
+    return " ".join(sorted(s.replace("↔", "").replace("\u0304", "").split()))
+
+
+def plot_gamma(data):
+    groups = data.columns[1:].map(standardize).unique()
+
+    def new_fig():
+        return go.Figure(
+            layout=go.Layout(
+                xaxis=go.layout.XAxis(
+                    title="Inverse Temperature", type="log", exponentformat="power",
+                ),
+                yaxis=go.layout.YAxis(
+                    title="Interaction Rate",
+                    type="log",
+                    exponentformat="power",
+                    range=[-20, 20],
+                ),
+            )
+        )
+
+    fig = new_fig()
+    group = groups[0]
+
+    for column in data.columns[1:]:
+        if group != standardize(column):
+            if len(fig.data) > 0:
+                fig.add_shape(
+                    type="rect",
+                    x0=1e-18,
+                    x1=1e-2,
+                    y0=1e-1,
+                    y1=1e1,
+                    fillcolor="Grey",
+                    line_color="Grey",
+                    opacity=0.2,
+                )
+                fig.show()
+
+            fig = new_fig()
+            group = standardize(column)
+
+        if not data[column].isnull().all() and data[column].map(lambda x: x > 0).any():
+            fig.add_trace(go.Scatter(name=column, x=data["beta"], y=data[column]))
+
