@@ -62,7 +62,7 @@ def read_evolution(f):
                 [get_mass_width(d["sm"]["particles"], name) for name in particles]
                 for d in data
             ]
-        ).reshape((1024, 44)),
+        ).reshape((len(data), 2 * len(particles))),
         columns=pd.MultiIndex.from_product([particles, ["mass", "width"]]),
     )
     df["beta"] = [d["sm"]["beta"] for d in data]
