@@ -12,8 +12,6 @@ use itertools::iproduct;
 use ndarray::prelude::*;
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
-#[cfg(not(debug_assertions))]
-use std::fs;
 use std::{error, fmt, fs, io, sync::RwLock};
 
 /// Common initialization function, used to setup common logging for all
@@ -141,6 +139,7 @@ pub fn decay_only_1gen() -> Result<(), Box<dyn error::Error>> {
         interaction::hha,
         interaction::ffa,
         interaction::ffw,
+        interaction::ffg,
     ] {
         model.interactions.extend(
             i().drain(..)
@@ -148,7 +147,7 @@ pub fn decay_only_1gen() -> Result<(), Box<dyn error::Error>> {
                 .map(into_interaction_box),
         );
     }
-    for i in &[interaction::hhww, interaction::hhaa] {
+    for i in &[interaction::hhww, interaction::hhaa, interaction::hhaw] {
         model.interactions.extend(
             i().drain(..)
                 .filter(one_generation)
@@ -193,12 +192,13 @@ pub fn decay_only_3gen() -> Result<(), Box<dyn error::Error>> {
         interaction::hha,
         interaction::ffa,
         interaction::ffw,
+        interaction::ffg,
     ] {
         model
             .interactions
             .extend(i().drain(..).map(common::into_interaction_box));
     }
-    for i in &[interaction::hhww, interaction::hhaa] {
+    for i in &[interaction::hhww, interaction::hhaa, interaction::hhaw] {
         model.interactions.extend(
             i().drain(..)
                 .filter(one_generation)
@@ -244,6 +244,7 @@ pub fn washout_only_1gen() -> Result<(), Box<dyn error::Error>> {
         interaction::hhw,
         interaction::ffa,
         interaction::ffw,
+        interaction::ffg,
     ] {
         model.interactions.extend(
             i().drain(..)
@@ -254,8 +255,16 @@ pub fn washout_only_1gen() -> Result<(), Box<dyn error::Error>> {
     for i in &[
         interaction::hhww,
         interaction::hhaa,
+        interaction::hhaw,
         interaction::hhll1,
         interaction::hhll2,
+        interaction::hhen,
+        interaction::nhla,
+        interaction::nhlw,
+        interaction::quln,
+        interaction::qdln,
+        interaction::leln,
+        interaction::lnln,
     ] {
         model.interactions.extend(
             i().drain(..)
@@ -306,6 +315,7 @@ pub fn washout_only_3gen() -> Result<(), Box<dyn error::Error>> {
         interaction::hhw,
         interaction::ffa,
         interaction::ffw,
+        interaction::ffg,
     ] {
         model
             .interactions
@@ -314,8 +324,16 @@ pub fn washout_only_3gen() -> Result<(), Box<dyn error::Error>> {
     for i in &[
         interaction::hhww,
         interaction::hhaa,
+        interaction::hhaw,
         interaction::hhll1,
         interaction::hhll2,
+        interaction::hhen,
+        interaction::nhla,
+        interaction::nhlw,
+        interaction::quln,
+        interaction::qdln,
+        interaction::leln,
+        interaction::lnln,
     ] {
         model
             .interactions
@@ -365,6 +383,7 @@ pub fn decay_washout_1gen() -> Result<(), Box<dyn error::Error>> {
         interaction::hha,
         interaction::ffa,
         interaction::ffw,
+        interaction::ffg,
     ] {
         model.interactions.extend(
             i().drain(..)
@@ -375,8 +394,16 @@ pub fn decay_washout_1gen() -> Result<(), Box<dyn error::Error>> {
     for i in &[
         interaction::hhww,
         interaction::hhaa,
+        interaction::hhaw,
         interaction::hhll1,
         interaction::hhll2,
+        interaction::hhen,
+        interaction::nhla,
+        interaction::nhlw,
+        interaction::quln,
+        interaction::qdln,
+        interaction::leln,
+        interaction::lnln,
     ] {
         model.interactions.extend(
             i().drain(..)
@@ -421,6 +448,7 @@ pub fn decay_washout_3gen() -> Result<(), Box<dyn error::Error>> {
         interaction::hha,
         interaction::ffa,
         interaction::ffw,
+        interaction::ffg,
     ] {
         model
             .interactions
@@ -429,8 +457,16 @@ pub fn decay_washout_3gen() -> Result<(), Box<dyn error::Error>> {
     for i in &[
         interaction::hhww,
         interaction::hhaa,
+        interaction::hhaw,
         interaction::hhll1,
         interaction::hhll2,
+        interaction::hhen,
+        interaction::nhla,
+        interaction::nhlw,
+        interaction::quln,
+        interaction::qdln,
+        interaction::leln,
+        interaction::lnln,
     ] {
         model.interactions.extend(
             i().drain(..)
@@ -544,6 +580,7 @@ fn evolution() -> Result<(), Box<dyn error::Error>> {
             interaction::hhw,
             interaction::ffa,
             interaction::ffw,
+            interaction::ffg,
         ] {
             model
                 .interactions
@@ -591,7 +628,7 @@ pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
                 .interactions
                 .extend(i().drain(..).map(into_interaction_box));
         }
-        for i in &[interaction::hhaa, interaction::hhww] {
+        for i in &[interaction::hhaa, interaction::hhww, interaction::hhaw] {
             model
                 .interactions
                 .extend(i().drain(..).map(into_interaction_box));
@@ -639,7 +676,7 @@ pub fn lepton_equilibrium() -> Result<(), Box<dyn error::Error>> {
         let csv = csv::Writer::from_path(output_dir.join(format!("{:03}.csv", i))).unwrap();
 
         let mut model = LeptogenesisModel::zero();
-        for i in &[interaction::ffa, interaction::ffw] {
+        for i in &[interaction::ffa, interaction::ffw, interaction::ffg] {
             model.interactions.extend(
                 i().drain(..)
                     .filter(one_generation)
@@ -683,6 +720,7 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
             interaction::hhw,
             interaction::ffa,
             interaction::ffw,
+            interaction::ffg,
         ] {
             model.interactions.extend(
                 i().drain(..)
@@ -693,12 +731,18 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
 
         #[cfg(not(debug_assertions))]
         for i in &[
+            interaction::hhww,
+            interaction::hhaa,
+            interaction::hhaw,
             interaction::hhll1,
             interaction::hhll2,
-            interaction::nlqd,
-            interaction::nlqu,
-            interaction::hhaa,
-            interaction::hhww,
+            interaction::hhen,
+            interaction::nhla,
+            interaction::nhlw,
+            interaction::quln,
+            interaction::qdln,
+            interaction::leln,
+            interaction::lnln,
         ] {
             model.interactions.extend(
                 i().drain(..)
