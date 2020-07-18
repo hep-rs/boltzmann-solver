@@ -473,7 +473,7 @@ where
             let c = model.as_context();
 
             model.interactions().par_iter().for_each(|interaction| {
-                interaction.gamma(&c);
+                interaction.gamma(&c, false);
             });
         }
     }

@@ -217,7 +217,8 @@ where
     ///    `0 / 0` division as the reaction rate is propoertional `$K_1(m
     ///    \beta)$`, while the number density of the decaying particle
     ///    proportional to `$K_2(m \beta)$`, and the ratio of Bessel function
-    ///    tends to 1 (while each individually tends to 0 very quickly).
+    ///    tends to 1 (while each individually they both tend to 0 very
+    ///    quickly).
     /// 2. Otherwise, calculate the usual reaction rate.
     ///
     /// Note that in order to obtain the analytical normalized equilibrium
@@ -225,7 +226,7 @@ where
     /// density approximates a Maxwell--Boltzmann distribution (irrespective of
     /// the original statistic), hence why we must use a threshold to switch
     /// between the two methods.
-    fn gamma(&self, c: &Context<M>) -> Option<f64> {
+    fn gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
         if !self.gamma_enabled() {
             return None;
         }
@@ -242,7 +243,16 @@ where
             return Some(0.0);
         }
 
-        if p1.mass * c.beta > M_BETA_THRESHOLD {
+        if real || p1.mass * c.beta < M_BETA_THRESHOLD {
+            // 1 / 32 π³ ≅ 0.001007860451037484
+            let z = p1.mass * c.beta;
+            Some(
+                0.001_007_860_451_037_484
+                    * (self.squared_amplitude)(&c.model).abs()
+                    * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
+                    * (bessel::k1(z) / z),
+            )
+        } else {
             // ζ(3) / 16 π³ ≅ 0.0024230112251823
             let z = p1.mass * c.beta;
             Some(
@@ -252,19 +262,10 @@ where
                     * (bessel::k1_on_k2(z) / z.powi(3))
                     / p1.degrees_of_freedom(),
             )
-        } else {
-            // 1 / 32 π³ ≅ 0.001007860451037484
-            let z = p1.mass * c.beta;
-            Some(
-                0.001_007_860_451_037_484
-                    * (self.squared_amplitude)(&c.model).abs()
-                    * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
-                    * (bessel::k1(z) / z),
-            )
         }
     }
 
-    fn asymmetry(&self, c: &Context<M>) -> Option<f64> {
+    fn asymmetry(&self, c: &Context<M>, real: bool) -> Option<f64> {
         let asymmetry = self.asymmetry.as_ref()?;
 
         let ptcl = c.model.particles();
@@ -279,7 +280,16 @@ where
             return Some(0.0);
         }
 
-        if p1.mass * c.beta > M_BETA_THRESHOLD {
+        if real || p1.mass * c.beta < M_BETA_THRESHOLD {
+            // 1 / 32 π³ ≅ 0.001007860451037484
+            let z = p1.mass * c.beta;
+            Some(
+                0.001_007_860_451_037_484
+                    * asymmetry(&c.model).abs()
+                    * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
+                    * (bessel::k1(z) / z),
+            )
+        } else {
             // ζ(3) / 16 π³ ≅ 0.0024230112251823
             let z = p1.mass * c.beta;
             Some(
@@ -289,23 +299,14 @@ where
                     * (bessel::k1_on_k2(z) / z.powi(3))
                     / p1.degrees_of_freedom(),
             )
-        } else {
-            // 1 / 32 π³ ≅ 0.001007860451037484
-            let z = p1.mass * c.beta;
-            Some(
-                0.001_007_860_451_037_484
-                    * asymmetry(&c.model).abs()
-                    * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
-                    * (bessel::k1(z) / z),
-            )
         }
     }
 
     /// Override the default implementation of [`Interaction::rate`] to make use
     /// of the adjusted reaction rate density.
     fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
-        let gamma = self.gamma(c).unwrap_or(0.0);
-        let asymmetry = self.asymmetry(c).unwrap_or(0.0);
+        let gamma = self.gamma(c, false).unwrap_or(0.0);
+        let asymmetry = self.asymmetry(c, false).unwrap_or(0.0);
 
         // If both rates are 0, there's no need to adjust it to the particles'
         // number densities.
@@ -331,14 +332,7 @@ where
         let [eq1, eq2, eq3] = [c.eq[i0], c.eq[i1], c.eq[i2]];
 
         let mut rate = RateDensity::zero();
-        if p1.mass * c.beta > M_BETA_THRESHOLD {
-            // Above the M_BETA_THRESHOLD, `gamma` is already divided by eq1, so
-            // we need not divide by `eq1` to calculate the forward rates, and we
-            // have to multiply by `eq1` to get the backward rate.
-            rate.symmetric = gamma * (n1 - eq1 * checked_div(n2, eq2) * checked_div(n3, eq3));
-            rate.asymmetric = asymmetry * (n1 + eq1 * checked_div(n2, eq2) * checked_div(n3, eq3))
-                + gamma * (na1 - eq1 * checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
-        } else {
+        if p1.mass * c.beta < M_BETA_THRESHOLD {
             // Below the M_BETA_THRESHOLD, `gamma` is the usual rate which must
             // be scaled by factors of `n / eq` to get the actual forward and
             // backward rates.
@@ -347,6 +341,13 @@ where
             rate.asymmetric = asymmetry
                 * (checked_div(n1, eq1) + checked_div(n2, eq2) * checked_div(n3, eq3))
                 + gamma * (checked_div(na1, eq1) - checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
+        } else {
+            // Above the M_BETA_THRESHOLD, `gamma` is already divided by eq1, so
+            // we need not divide by `eq1` to calculate the forward rates, and we
+            // have to multiply by `eq1` to get the backward rate.
+            rate.symmetric = gamma * (n1 - eq1 * checked_div(n2, eq2) * checked_div(n3, eq3));
+            rate.asymmetric = asymmetry * (n1 + eq1 * checked_div(n2, eq2) * checked_div(n3, eq3))
+                + gamma * (na1 - eq1 * checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
         }
 
         Some(rate)

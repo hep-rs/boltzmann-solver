@@ -208,7 +208,15 @@ where
     /// Care must be taken to obey [`Interaction::gamma_enabled`] in order to
     /// avoid unnecessary computations.  Specifically, this should always return
     /// `None` when `self.gamma_enabled() == true`.
-    fn gamma(&self, c: &Context<M>) -> Option<f64>;
+    ///
+    /// As there can be some nice mathematical cancellations between the
+    /// interaction rate and the number density normalizations, the result may
+    /// not be the 'real' interaction rate and may be normalized by another
+    /// factor.  For example, decays will be normalized by the equilibrium
+    /// number density of the decaying particle in order to avoid possible `0 /
+    /// 0` errors.  In order to get the real interaction rate, `real` should be
+    /// set to true.
+    fn gamma(&self, c: &Context<M>, real: bool) -> Option<f64>;
 
     /// Asymmetry between the interaction and its `$\CP$` conjugate:
     ///
@@ -223,7 +231,15 @@ where
     /// Note that his is not the same as the asymmetry specified in creating the
     /// interaction, with the latter being defined as the asymmetry in the
     /// squared amplitudes and the former being subsequently computed.
-    fn asymmetry(&self, _c: &Context<M>) -> Option<f64> {
+    ///
+    /// As there can be some nice mathematical cancellations between the
+    /// interaction rate and the number density normalizations, the result may
+    /// not be the 'real' interaction rate and may be normalized by another
+    /// factor.  For example, decays will be normalized by the equilibrium
+    /// number density of the decaying particle in order to avoid possible `0 /
+    /// 0` errors.  In order to get the real interaction rate, `real` should be
+    /// set to true.
+    fn asymmetry(&self, _c: &Context<M>, _real: bool) -> Option<f64> {
         None
     }
 
@@ -237,8 +253,8 @@ where
     /// is proportional to the negative of the rates contained, while the change
     /// for final state particles is proportional to the rates themselves.
     fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
-        let gamma = self.gamma(c).unwrap_or(0.0);
-        let asymmetry = self.asymmetry(c).unwrap_or(0.0);
+        let gamma = self.gamma(c, false).unwrap_or(0.0);
+        let asymmetry = self.asymmetry(c, false).unwrap_or(0.0);
 
         // If both rates are 0, there's no need to adjust it to the particles'
         // number densities.
@@ -482,12 +498,12 @@ where
         (*self).gamma_enabled()
     }
 
-    fn gamma(&self, c: &Context<M>) -> Option<f64> {
-        (*self).gamma(c)
+    fn gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
+        (*self).gamma(c, real)
     }
 
-    fn asymmetry(&self, c: &Context<M>) -> Option<f64> {
-        (*self).asymmetry(c)
+    fn asymmetry(&self, c: &Context<M>, real: bool) -> Option<f64> {
+        (*self).asymmetry(c, real)
     }
     fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
         (*self).rate(c)
@@ -531,12 +547,12 @@ where
         self.as_ref().gamma_enabled()
     }
 
-    fn gamma(&self, c: &Context<M>) -> Option<f64> {
-        self.as_ref().gamma(c)
+    fn gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
+        self.as_ref().gamma(c, real)
     }
 
-    fn asymmetry(&self, c: &Context<M>) -> Option<f64> {
-        self.as_ref().asymmetry(c)
+    fn asymmetry(&self, c: &Context<M>, real: bool) -> Option<f64> {
+        self.as_ref().asymmetry(c, real)
     }
 
     fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
