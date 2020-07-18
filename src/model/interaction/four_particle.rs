@@ -198,7 +198,7 @@ where
         self.gamma_enabled
     }
 
-    fn gamma(&self, c: &Context<M>) -> Option<f64> {
+    fn gamma(&self, c: &Context<M>, _real: bool) -> Option<f64> {
         if !self.gamma_enabled {
             return None;
         }
@@ -239,7 +239,7 @@ where
         Some(gamma)
     }
 
-    fn asymmetry(&self, c: &Context<M>) -> Option<f64> {
+    fn asymmetry(&self, c: &Context<M>, _real: bool) -> Option<f64> {
         let asymmetry = self.asymmetry.as_ref()?;
 
         let ln_beta = c.beta.ln();

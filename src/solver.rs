@@ -738,7 +738,7 @@ where
                 .interactions()
                 .iter()
                 .enumerate()
-                .map(|(j, interaction)| (j, interaction.gamma(&c).map(|v| v * normalization)))
+                .map(|(j, interaction)| (j, interaction.gamma(&c, true).map(|v| v * normalization)))
                 .collect();
 
             #[cfg(feature = "parallel")]
@@ -747,7 +747,7 @@ where
                 .interactions()
                 .par_iter()
                 .enumerate()
-                .map(|(j, interaction)| (j, interaction.gamma(&c).map(|v| v * normalization)))
+                .map(|(j, interaction)| (j, interaction.gamma(&c, true).map(|v| v * normalization)))
                 .collect();
 
             for (j, v) in values {
@@ -795,7 +795,12 @@ where
                 .interactions()
                 .iter()
                 .enumerate()
-                .map(|(j, interaction)| (j, interaction.asymmetry(&c).map(|v| v * normalization)))
+                .map(|(j, interaction)| {
+                    (
+                        j,
+                        interaction.asymmetry(&c, true).map(|v| v * normalization),
+                    )
+                })
                 .collect();
 
             #[cfg(feature = "parallel")]
@@ -804,7 +809,12 @@ where
                 .interactions()
                 .par_iter()
                 .enumerate()
-                .map(|(j, interaction)| (j, interaction.asymmetry(&c).map(|v| v * normalization)))
+                .map(|(j, interaction)| {
+                    (
+                        j,
+                        interaction.asymmetry(&c, true).map(|v| v * normalization),
+                    )
+                })
                 .collect();
 
             for (j, v) in values {
