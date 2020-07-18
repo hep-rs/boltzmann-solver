@@ -22,9 +22,14 @@ use std::f64;
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct LeptogenesisModel {
     pub sm: StandardModel,
+
+    /// Heavy neutrino masses
+    pub mn: Array1<f64>,
+
     /// Coupling between H L(i1) and N(i2)
     pub yv: Array2<Complex<f64>>,
-    pub mn: Array1<f64>,
+
+    /// Interactions
     #[cfg(feature = "parallel")]
     #[cfg_attr(feature = "serde", serde(skip))]
     pub interactions: Vec<Box<dyn Interaction<Self> + Sync>>,
