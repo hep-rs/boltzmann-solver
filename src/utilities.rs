@@ -16,7 +16,7 @@ pub use special_functions::particle_physics::{kallen_lambda, kallen_lambda_sqrt}
 const INTEGRATION_PRECISION: f64 = 1e-10;
 
 /// Return the minimum and maximum value of the Mandelstam variable `$t$` based
-/// on the four particle **squared** masses `$m_1^2$`, `$m_2^2$`, `$m_3^2$` and
+/// on the four particle *squared* masses `$m_1^2$`, `$m_2^2$`, `$m_3^2$` and
 /// `$m_4^2$`, where particles 1 and 2 are initial state and particles 3 and 4
 /// are the final state particles.
 ///
@@ -57,7 +57,7 @@ pub fn t_range(s: f64, m1: f64, m2: f64, m3: f64, m4: f64) -> (f64, f64) {
 ///
 /// ```math
 /// \int_{s_\text{min}}^{\infty} \int_{t_\text{min}}^{t_\text{max}}
-///     \abs{\mathcal{M}(s, t)}^2 \frac{K_1(\sqrt{s} \beta)}{\sqrt{s}}
+///     \abs{\scM(s, t)}^2 \frac{K_1(\sqrt{s} \beta)}{\sqrt{s}}
 /// \dd t \dd s
 /// ```
 ///

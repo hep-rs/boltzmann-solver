@@ -104,9 +104,10 @@ where
     /// returned as an error so that they can be subsequently handled.
     fn particle_idx<S: AsRef<str>>(name: S, i: usize) -> Result<usize, (S, usize)>;
 
-    /// The signed version of [`particle_idx`].
+    /// The signed version of [`particle_idx`](Model::particle_idx).
     ///
-    /// This is identical to [`particle_idx`] but returns an `isize` type.
+    /// This is identical to [`particle_idx`](Model::particle_idx) but returns
+    /// an `isize` type.
     ///
     /// # Errors
     ///

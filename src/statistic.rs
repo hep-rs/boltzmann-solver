@@ -36,25 +36,25 @@ pub enum Statistic {
     /// Fermi–Dirac statistic describing half-integer-spin particles:
     ///
     /// ```math
-    /// f_{\textsc{FD}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.
+    /// f_{\text{FD}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.
     /// ```
     FermiDirac,
     /// Bose–Einstein statistic describing integer-spin particles:
     ///
     /// ```math
-    /// f_{\textsc{BE}} = \frac{1}{\exp[(E - \mu) \beta] - 1}.
+    /// f_{\text{BE}} = \frac{1}{\exp[(E - \mu) \beta] - 1}.
     /// ```
     BoseEinstein,
     /// Maxwell–Boltzmann statistic describing classical particles:
     ///
     /// ```math
-    /// f_{\textsc{MB}} = \exp[-(E - \mu) \beta].
+    /// f_{\text{MB}} = \exp[-(E - \mu) \beta].
     /// ```
     MaxwellBoltzmann,
     /// Maxwell–Jüttner statistic describing relativistic classical particles:
     ///
     /// ```math
-    /// f_{\textsc{MJ}} = \frac{E \beta \sqrt{E^2 - m^2}}{m K_2(m \beta)} \exp[- E \beta].
+    /// f_{\text{MJ}} = \frac{E \beta \sqrt{E^2 - m^2}}{m K_2(m \beta)} \exp[- E \beta].
     /// ```
     MaxwellJuttner,
 }

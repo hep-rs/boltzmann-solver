@@ -19,8 +19,8 @@
 //!   Fermi–Dirac distributions:
 //!
 //!   ```math
-//!   f_{\textsc{BE}} = \frac{1}{\exp[(E - \mu) \beta] - 1}, \qquad
-//!   f_{\textsc{FD}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.
+//!   f_{\text{BE}} = \frac{1}{\exp[(E - \mu) \beta] - 1}, \qquad
+//!   f_{\text{FD}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.
 //!   ```
 //!
 //!   For a particular that remains in kinetic equilibrium, the evolution of its
@@ -32,7 +32,7 @@
 //!   Bose–Einstein approach the Maxwell–Boltzmann distribution,
 //!
 //!   ```math
-//!   f_{\textsc{MB}} = \exp[-(E - \mu) \beta].
+//!   f_{\text{MB}} = \exp[-(E - \mu) \beta].
 //!   ```
 //!
 //!   This simplifies the expression for the number density to
@@ -46,11 +46,11 @@
 //!   expressed in terms of the `$\mu = 0$` distribution:
 //!
 //!   ```math
-//!   f_{\textsc{MB}} = e^{\mu \beta} f_{\textsc{MB}}^{(0)} = \frac{n}{n^{(0)}} f_{\textsc{MB}}^{(0)}.
+//!   f_{\text{MB}} = e^{\mu \beta} f_{\text{MB}}^{(0)} = \frac{n}{n^{(0)}} f_{\text{MB}}^{(0)}.
 //!   ```
 //!
 //!   Furthermore, the assumption that `$\beta \gg E - \mu$` implies that
-//!   `$f_{\textsc{BE}}, f_{\textsc{FD}} \ll 1$`.  Consequently, the Pauli
+//!   `$f_{\text{BE}}, f_{\text{FD}} \ll 1$`.  Consequently, the Pauli
 //!   suppression and Bose enhancement factors in the collision term can all be
 //!   neglected resulting in:
 //!
@@ -58,11 +58,11 @@
 //!   \begin{aligned}
 //!     g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
 //!       &= - \int_{\vt a}^{\vt b}
-//!          \abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f_i \right)
-//!          - \abs{\mathcal M(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} f_i \right) \\\\
+//!          \abs{\scM(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f_i \right)
+//!          - \abs{\scM(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} f_i \right) \\\\
 //!       &= - \int_{\vt a}^{\vt b}
-//!          \abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right)
-//!           - \abs{\mathcal M(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right).
+//!          \abs{\scM(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right)
+//!           - \abs{\scM(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right).
 //!   \end{aligned}
 //!   ```
 //!
@@ -79,12 +79,12 @@
 //!   ```math
 //!   \gamma(\vt a \to \vt b)
 //!     = \int_{\vt a}^{\vt b}
-//!       \abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f^{(0)}_i \right).
+//!       \abs{\scM(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f^{(0)}_i \right).
 //!   ```
 //!
 //! # Interactions
 //!
-//! The majority of interactions can be accounted for by looking at simply `$`
+//! The majority of interactions can be accounted for by looking at simply `$1
 //! \leftrightarrow 2$` decays/inverse decays and `$2 \leftrightarrow 2$`
 //! scatterings.  In the former case, the phase space integration can be done
 //! entirely analytically and is presented below; whilst in the latter case, the
@@ -96,7 +96,7 @@
 //!
 //! ```math
 //! \begin{aligned}
-//!   g_a \int \vt C\[f_a\] \frac{\dd \vt p_a}{(2\pi)^3}
+//!   g_a \int \vt C[f_a] \frac{\dd \vt p_a}{(2\pi)^3}
 //!     &= - \frac{n_a}{n^{(0)}_a} \gamma(a \to bc) + \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} \gamma(bc \to a)
 //! \end{aligned}
 //! ```
@@ -115,8 +115,8 @@
 //! ```math
 //! \begin{aligned}
 //!   \gamma(a \to bc)
-//!     &= - \abs{\mathcal M(a \to bc)}^2 \int_{a}^{b,c} f^{(0)}_a \\\\
-//!     &= - \frac{\abs{\mathcal M(a \to bc)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}
+//!     &= - \abs{\scM(a \to bc)}^2 \int_{a}^{b,c} f^{(0)}_a \\\\
+//!     &= - \frac{\abs{\scM(a \to bc)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}
 //! \end{aligned}
 //! ```
 //!
@@ -124,7 +124,7 @@
 //!
 //! ```math
 //! \frac{n_a}{n^{(0)}_a} \gamma(a \to bc)
-//!   = n_a \frac{\abs{\mathcal M(a \to bc)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
+//!   = n_a \frac{\abs{\scM(a \to bc)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
 //! ```
 //!
 //! where the analytic expression for `$n^{(0)}_a$` was used to introduce the
@@ -137,11 +137,11 @@
 //!
 //! If the final state particles are essentially massless in comparison to the
 //! decaying particle, then the decay rate in the rest frame of the particle of
-//! `$\Gamma_\text{rest} = \abs{\mathcal M}^2 / 16 \pi m_a$` and the above
-//! expression can be simplified to
+//! `$\Gamma_\text{rest} = \abs{\scM}^2 / 16 \pi m_a$` and the above expression
+//! can be simplified to
 //!
 //! ```math
-//! \frac{n_a}{n^{(0)}\_a} \gamma(a \to bc)
+//! \frac{n_a}{n^{(0)}_a} \gamma(a \to bc)
 //! = n_a \Gamma_\text{rest} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}.
 //! ```
 //!
@@ -151,7 +151,7 @@
 //!
 //! ```math
 //! \gamma(bc \to a)
-//!   = \abs{\mathcal M(bc \to a)}^2 \int_{a}^{b,c} f^{(0)}_b f^{(0)}_c
+//!   = \abs{\scM(bc \to a)}^2 \int_{a}^{b,c} f^{(0)}_b f^{(0)}_c
 //! ```
 //!
 //! The Dirac delta enforces that `$E_a = E_b + E_c$` which implies that
@@ -160,15 +160,15 @@
 //!
 //! ```math
 //! \gamma(bc \to a)
-//!   = \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}
-//!   = n^{(0)}_a \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
+//!   = \frac{\abs{\scM(bc \to a)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}
+//!   = n^{(0)}_a \frac{\abs{\scM(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
 //! ```
 //!
 //! The full expression including the number density scaling becomes:
 //!
 //! ```math
 //! \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} \gamma(bc \to a)
-//!   = \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} n^{(0)}_a \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
+//!   = \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} n^{(0)}_a \frac{\abs{\scM(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
 //! ```
 //!
 //! ### Combined Decay and Inverse Decay
@@ -182,10 +182,10 @@
 //! In particular, we can define an alternative reaction rate,
 //!
 //! ```math
-//! \tilde \gamma(a \to bc) = \frac{\abs{\mathcal{M}(a \to bc)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)},
+//! \tilde \gamma(a \to bc) = \frac{\abs{\scM(a \to bc)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)},
 //! ```
 //!
-//! which allows for the overall `$` \leftrightarrow 2$` reaction rate to be
+//! which allows for the overall `$1 \leftrightarrow 2$` reaction rate to be
 //! expressed as:
 //!
 //! ```math
@@ -200,7 +200,7 @@
 //! The two-to-two scattering `$ab \to cd$` reaction density is given by
 //!
 //! ```math
-//! \gamma(ab \to cd) = \int_{a,b}^{c,d} \abs{\mathcal M(ab \to cd)}^2 f_a^{(0)} f_b^{(0)}
+//! \gamma(ab \to cd) = \int_{a,b}^{c,d} \abs{\scM(ab \to cd)}^2 f_a^{(0)} f_b^{(0)}
 //! ```
 //!
 //! The two initial-state phase space integrals can be reduced to a simple
@@ -213,7 +213,7 @@
 //! where `$\hat \sigma(s)$` is the reduced cross-section:
 //!
 //! ```math
-//! \hat \sigma_{ab}^{cd}(s) = \frac{g_a g_b g_c g_d}{64 \pi^2 s} \int \abs{\mathcal M(ab \to cd)}^2 \dd t
+//! \hat \sigma_{ab}^{cd}(s) = \frac{g_a g_b g_c g_d}{64 \pi^2 s} \int \abs{\scM(ab \to cd)}^2 \dd t
 //! ```
 //!
 //! in which `$t$` is the usual Mandelstam variable.
@@ -221,12 +221,12 @@
 //! As a result, the full `$2 \to 2$` cross-section can be expressed as
 //!
 //! ```math
-//! \gamma(ab \to cd) = \frac{g_a g_b g_c g_d}{512 \pi^5 \beta} \int \abs{\mathcal M(ab \to cd)}^2 \frac{K_1(\sqrt s \beta)}{\sqrt s} \dd s \dd t
+//! \gamma(ab \to cd) = \frac{g_a g_b g_c g_d}{512 \pi^5 \beta} \int \abs{\scM(ab \to cd)}^2 \frac{K_1(\sqrt s \beta)}{\sqrt s} \dd s \dd t
 //! ```
 //!
 //! ### Real Intermediate State
 //!
-//! When considering both `$` \leftrightarrow 2$` and `$2 \leftrightarrow 2$`
+//! When considering both `$1 \leftrightarrow 2$` and `$2 \leftrightarrow 2$`
 //! scattering processes, there is a double counting issue that arises from
 //! having a real intermediate state (RIS) in `$2 \leftrightarrow 2$`
 //! interactions.
@@ -237,18 +237,19 @@
 //! needs to subtract the RIS:
 //!
 //! ```math
-//! \abs{\mathcal M(ab \leftrightarrow cd)}^2 = \abs{\mathcal M_\text{full}(ab \leftrightarrow cd)}^2 - \abs{\mathcal M_\textsc{RIS}(ab \leftrightarrow cd)}^2
+//! \abs{\scM(ab \leftrightarrow cd)}^2 = \abs{\scM_\text{full}(ab \leftrightarrow cd)}^2
+//! - \abs{\scM_\text{RIS}(ab \leftrightarrow cd)}^2
 //! ```
 //!
 //! In the case of a single scalar RIS, the RIS-subtracted amplitude is given by
 //!
 //! ```math
 //! \begin{aligned}
-//!   \abs{\mathcal M_\textsc{RIS}(ab \to cd)}
+//!   \abs{\scM_\text{RIS}(ab \to cd)}
 //!   &= \frac{\pi}{m_X \Gamma_X} \delta(s - m_X^2) \theta(\sqrt{s}) \\
 //!   &\quad \Big[
-//!       \abs{\mathcal M(ab \to X)}^2 \abs{\mathcal M(X \to cd)}^2
-//!     + \abs{\mathcal M(ab \to \overline X)}^2 \abs{\mathcal M(\overline X \to cd)}^2
+//!       \abs{\scM(ab \to X)}^2 \abs{\scM(X \to cd)}^2
+//!     + \abs{\scM(ab \to \overline X)}^2 \abs{\scM(\overline X \to cd)}^2
 //!   \Big].
 //! \end{aligned}
 //! ```
@@ -272,10 +273,10 @@
 //! As a result, the actual change in the number density, it becomes
 //!
 //! ```math
-//! \pfrac{n}{\beta} = \frac{1}{H \beta} \left[\vt C\[n\] - 3 H n\right]
+//! \pfrac{n}{\beta} = \frac{1}{H \beta} \left[\vt C[n] - 3 H n\right]
 //! ```
 //!
-//! and one must only input `$\vt C\[n\]$` in the interaction.
+//! and one must only input `$\vt C[n]$` in the interaction.
 //!
 //! # Normalized Number Density
 //!
@@ -289,10 +290,10 @@
 //! When dealing with number densities, the Liouville operator is:
 //!
 //! ```math
-//! \pfrac{n}{t} + 3 H n = \vt C\[n\]
+//! \pfrac{n}{t} + 3 H n = \vt C[n]
 //! ```
 //!
-//! where `$\vt C\[n\]$` is the change in the number density.  If we now define
+//! where `$\vt C[n]$` is the change in the number density.  If we now define
 //!
 //! ```math
 //! Y \defeq \frac{n}{n_{\text{eq}}},
@@ -301,7 +302,7 @@
 //! then the change in this normalized number density is:
 //!
 //! ```math
-//! \pfrac{Y}{t} = \frac{1}{n_{\text{eq}}} \vt C\[n\]
+//! \pfrac{Y}{t} = \frac{1}{n_{\text{eq}}} \vt C[n]
 //! ```
 //!
 //! with `$n_{\text{eq}}$` having the simple analytic form `$3 \zeta(3) / 4
@@ -309,10 +310,10 @@
 //! to inverse temperature `$\beta$`, we get:
 //!
 //! ```math
-//! \pfrac{Y}{\beta} = \frac{1}{H \beta n_{\text{eq}}} \vt C\[n\].
+//! \pfrac{Y}{\beta} = \frac{1}{H \beta n_{\text{eq}}} \vt C[n].
 //! ```
 //!
-//! As with the non-normalized number density calculations, only `$\vt C\[n\]$`
+//! As with the non-normalized number density calculations, only `$\vt C[n]$`
 //! must be inputted in the interaction.
 
 mod context;
@@ -706,11 +707,12 @@ where
     /// freedom, `$H$` is the Hubble rate and `$\beta$` is the inverse
     /// temperature.
     ///
-    /// The interactions rates are returned as two dimensional array with the
-    /// first index indexing values of beta, and the second index corresponding
-    /// to the index of the interaction, as returned by [`interactions`].  The
-    /// second index is offset by one with the first index being for beta
-    /// itself.
+    /// The interactions rates are returned as two dimensional array with
+    /// `data[[i, j]]` giving the interaction rate for the `$j$`th interaction
+    /// at the `$i$`th `$\beta$` step.  The interaction index corresponds to the
+    /// index of the interaction as returned by
+    /// [`ModelInteractions::interactions`], offset by 1 such that the 0th value
+    /// is for `$\beta$` itself.
     ///
     /// The entries of the returned array as `Option<f64>` in order to
     /// distinguish cases where the rate is not computed due to being unphysical
