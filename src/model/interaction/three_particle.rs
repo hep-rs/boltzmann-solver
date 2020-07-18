@@ -94,9 +94,9 @@ where
     /// amplitudes:
     ///
     /// ```math
-    /// \delta \abs{\mathcal{M}}^2
-    ///   \defeq \abs{\mathcal{M}(p_1 \to p_2 p_3)}^2 - \abs{\mathcal{M}(\overline{p_1} \to \overline{p_2} \overline{p_3})}^2
-    ///   = \abs{\mathcal{M}(p_1 \to p_2 p_3)}^2 - \abs{\mathcal{M}(p_2 p_3 \to p_1)}^2
+    /// \delta \abs{\scM}^2
+    ///   \defeq \abs{\scM(p_1 \to p_2 p_3)}^2 - \abs{\scM(\overline{p_1} \to \overline{p_2} \overline{p_3})}^2
+    ///   = \abs{\scM(p_1 \to p_2 p_3)}^2 - \abs{\scM(p_2 p_3 \to p_1)}^2
     /// ```
     ///
     /// This asymmetry is subsequently used to compute the asymmetry in the

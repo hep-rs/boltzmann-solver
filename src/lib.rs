@@ -95,12 +95,12 @@
 //! \begin{aligned}
 //!   g_{a_1} \int \vt C[f_{a_1}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3}
 //!   &= - \int_{\vt a}^{\vt b}
-//!      \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right) \left(\prod_{\vt b} 1 \pm f_i \right)
-//!      - \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right),
+//!      \abs{\scM(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right) \left(\prod_{\vt b} 1 \pm f_i \right)
+//!      - \abs{\scM(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right),
 //! \end{aligned}
 //! ```
 //!
-//! where `$\abs{\mathcal M(\vt a | \vt b)}^2$` is the squared amplitude going
+//! where `$\abs{\scM(\vt a | \vt b)}^2$` is the squared amplitude going
 //! from initial state `$\vt a$` to `$\vt b$` and is *averaged over* all
 //! *internal degrees of freedom*, and the integration is done of the
 //! Lorentz-invariant phase space

@@ -40,7 +40,7 @@ impl<M> FourParticle<M> {
     /// The squared amplitude is defined of the form
     ///
     /// ```math
-    /// \abs{\mathcal{M}(p_1 p_2 \leftrightarrow p_3 p_4)}^2(s, t, u)
+    /// \abs{\scM(p_1 p_2 \leftrightarrow p_3 p_4)}^2(s, t, u)
     /// ```
     ///
     /// where `$s$`, `$t$` and `$u$` are the usual Mandelstam variables.
@@ -87,7 +87,7 @@ impl<M> FourParticle<M> {
     /// The squared amplitude is defined of the form:
     ///
     /// ```math
-    /// \abs{\mathcal{M}(p_1 p_2 \leftrightarrow p_3 p_4)}^2(s, t, u)
+    /// \abs{\scM(p_1 p_2 \leftrightarrow p_3 p_4)}^2(s, t, u)
     /// ```
     ///
     /// where `$s$`, `$t$` and `$u$` are the usual Mandelstam variables.
@@ -128,9 +128,9 @@ impl<M> FourParticle<M> {
     /// amplitudes:
     ///
     /// ```math
-    /// \delta \abs{\mathcal{M}}^2
-    ///   \defeq \abs{\mathcal{M}(p_1 p_2 \to p_3 p_4)}^2 - \abs{\mathcal{M}(\overline{p_1} \overline{p_2} \to \overline{p_3} \overline{p_4})}^2
-    ///   = \abs{\mathcal{M}(p_1 p_2 \to p_3 p_4)}^2 - \abs{\mathcal{M}(p_3 p_4 \to p_1 p_2)}^2
+    /// \delta \abs{\scM}^2
+    ///   \defeq \abs{\scM(p_1 p_2 \to p_3 p_4)}^2 - \abs{\scM(\overline{p_1} \overline{p_2} \to \overline{p_3} \overline{p_4})}^2
+    ///   = \abs{\scM(p_1 p_2 \to p_3 p_4)}^2 - \abs{\scM(p_3 p_4 \to p_1 p_2)}^2
     /// ```
     ///
     /// This asymmetry is subsequently used to compute the asymmetry in the

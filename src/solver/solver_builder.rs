@@ -82,7 +82,7 @@ pub struct SolverBuilder<M> {
 impl<M> SolverBuilder<M> {
     /// Creates a new builder for the Boltzmann solver.
     ///
-    /// The default range of temperatures span 1 GeV through to 10^{20} GeV, and
+    /// The default range of temperatures span 1 GeV through to 10`$^{20}$` GeV, and
     /// it uses normalization by default.
     ///
     /// Most of the method for the builder are intended to be chained one after
@@ -164,11 +164,11 @@ impl<M> SolverBuilder<M> {
     /// Set the range of inverse temperature values over which the solution is
     /// calculated.
     ///
-    /// Inverse temperature must be provided in units of GeV^{-1}.
+    /// Inverse temperature must be provided in units of GeV`$^{-1}$`.
     ///
     /// This function has a convenience alternative called
-    /// [`SolverBuilder::temperature_range`] allowing for the limits to be specified as
-    /// temperature in the units of GeV.
+    /// [`SolverBuilder::temperature_range`] allowing for the limits to be
+    /// specified as temperature in the units of GeV.
     ///
     /// # Panics
     ///
@@ -270,7 +270,8 @@ impl<M> SolverBuilder<M> {
     /// p_\text{min} \beta < h < p_\text{max} \beta
     /// ```
     ///
-    /// The default values are `min = 1e-10` and `max = 1.0`.
+    /// The default values are `$p_\text{min} = 10^{-10}$` and `$p_\text{max} =
+    /// 1$`.
     ///
     /// The relative step precision has a higher priority on the step size than
     /// the error.  That is, the step size will never be less than
@@ -279,7 +280,7 @@ impl<M> SolverBuilder<M> {
     ///
     /// # Panic
     ///
-    /// This will panic if `min >= max`.
+    /// This will panic if `$p_\text{min} \geq p_\text{max}$`.
     pub fn step_precision(mut self, min: f64, max: f64) -> Self {
         assert!(
             min < max,
