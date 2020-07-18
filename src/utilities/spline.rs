@@ -96,7 +96,7 @@ impl CubicHermiteSpline {
     pub fn empty() -> Self {
         CubicHermiteSpline {
             data: Vec::new(),
-            min_points: 24,
+            min_points: 64,
         }
     }
 
