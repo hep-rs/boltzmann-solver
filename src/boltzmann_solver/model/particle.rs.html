@@ -17,6 +17,7 @@
     "\\defeq": "\\vcentcolon=",
     "\\abs": "\\left\\lvert{#1}\\right\\rvert",
     "\\CP": "\\mathcal{CP}",
+    "\\scM": "\\mathcal{M}",
   };
 
   // Display math is inputted in the documentation as:
@@ -577,7 +578,7 @@
     <span class="doccomment">/// factor of two such that a spin-½ particle has `spin == 1` and a spin-1</span>
     <span class="doccomment">/// particle has `spin == 2`.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">spin</span>: <span class="ident">u8</span>, <span class="ident">mass</span>: <span class="ident">f64</span>, <span class="ident">width</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">spin</span>: <span class="ident">u8</span>, <span class="ident">mass</span>: <span class="ident">f64</span>, <span class="ident">width</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">spin</span>,
             <span class="ident">own_antiparticle</span>: <span class="bool-val">false</span>,
@@ -593,14 +594,14 @@
     }
 
     <span class="doccomment">/// Set the mass of the particle.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_mass</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">mass</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_mass</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">mass</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">mass</span> <span class="op">=</span> <span class="ident">mass</span>;
         <span class="self">self</span>.<span class="ident">mass2</span> <span class="op">=</span> <span class="ident">mass</span>.<span class="ident">powi</span>(<span class="number">2</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the width of the particle.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_width</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">width</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_width</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">width</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">width</span> <span class="op">=</span> <span class="ident">width</span>;
         <span class="self">self</span>.<span class="ident">width2</span> <span class="op">=</span> <span class="ident">width</span>.<span class="ident">powi</span>(<span class="number">2</span>);
         <span class="self">self</span>
@@ -610,7 +611,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This function returns self and should be used in constructors.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">real</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">real</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">complex</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="self">self</span>
     }
@@ -619,7 +620,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This function returns self and should be used in constructors.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">complex</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">complex</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">complex</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="self">self</span>
     }
@@ -627,7 +628,7 @@
     <span class="doccomment">/// Indicate that the particle is its own antiparticle, thereby preventing</span>
     <span class="doccomment">/// any asymmetry from being generated in its density.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">own_antiparticle</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">own_antiparticle</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">own_antiparticle</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="self">self</span>
     }
@@ -639,7 +640,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This function returns self and should be used in constructors.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dof</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dof</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dof</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dof</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">dof</span> <span class="op">=</span> <span class="ident">dof</span>;
         <span class="self">self</span>
     }
@@ -650,7 +651,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The particle name cannot be an empty string.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">is_empty</span>() {
             <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Particle name cannot be empty.&quot;</span>);
@@ -660,26 +661,26 @@
 
     <span class="doccomment">/// Returns true if the particle is real (real scalar, Majorana fermion)</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_real</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_real</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="op">!</span><span class="self">self</span>.<span class="ident">complex</span>
     }
 
     <span class="doccomment">/// Returns true if the particle is complex (complex scalar, Dirac fermion)</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_complex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_complex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">complex</span>
     }
 
     <span class="doccomment">/// Returns true if the particle is bosonic.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_bosonic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">spin</span> <span class="op">%</span> <span class="number">2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_bosonic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">spin</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span>
     }
 
     <span class="doccomment">/// Returns true if the particle is fermionic.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_fermionic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">spin</span> <span class="op">%</span> <span class="number">2</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_fermionic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">spin</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">1</span>
     }
 
     <span class="doccomment">/// Return the number of degrees of freedom for the underlying particle.</span>
@@ -705,25 +706,25 @@
     <span class="doccomment">/// is `n + 1`; and for integer spin `n &gt; 0`, the degrees of freedom are `2`</span>
     <span class="doccomment">/// for massless or `2n + 1` for massive.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">degrees_of_freedom</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">degrees_of_freedom</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
         <span class="kw">let</span> <span class="ident">dof</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">dof</span> <span class="op">*</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">complex</span> { <span class="number">2.0</span> } <span class="kw">else</span> { <span class="number">1.0</span> };
         <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">spin</span>, <span class="self">self</span>.<span class="ident">mass</span>) {
-            (<span class="number">0</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dof</span>,
-            (<span class="ident">n</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">%</span> <span class="number">2</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f64</span>::<span class="ident">from</span>(<span class="ident">n</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">*</span> <span class="ident">dof</span>,
-            (<span class="ident">n</span>, <span class="ident">m</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">%</span> <span class="number">2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">m</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+            (<span class="number">0</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">dof</span>,
+            (<span class="ident">n</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">1</span> <span class="op">=&gt;</span> <span class="ident">f64</span>::<span class="ident">from</span>(<span class="ident">n</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">*</span> <span class="ident">dof</span>,
+            (<span class="ident">n</span>, <span class="ident">m</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> <span class="op">=&gt;</span> {
+                <span class="kw">if</span> <span class="ident">m</span> <span class="op">==</span> <span class="number">0.0</span> {
                     <span class="number">2.0</span> <span class="op">*</span> <span class="ident">dof</span>
                 } <span class="kw">else</span> {
                     <span class="ident">f64</span>::<span class="ident">from</span>(<span class="ident">n</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">*</span> <span class="ident">dof</span>
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented</span><span class="macro">!</span>(<span class="string">&quot;Particles with spin greater than 2 are not supported.&quot;</span>),
+            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="macro">unimplemented</span><span class="macro">!</span>(<span class="string">&quot;Particles with spin greater than 2 are not supported.&quot;</span>),
         }
     }
 
     <span class="doccomment">/// Return the quantum statistic that this particle obeys.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">fn</span> <span class="ident">statistic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Statistic</span> {
+    <span class="kw">fn</span> <span class="ident">statistic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Statistic</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_fermionic</span>() {
             <span class="ident">Statistic</span>::<span class="ident">FermiDirac</span>
         } <span class="kw">else</span> {
@@ -733,20 +734,20 @@
 
     <span class="doccomment">/// Return the equilibrium phase space occupation of the particle.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">phase_space</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">e</span>: <span class="ident">f64</span>, <span class="ident">mu</span>: <span class="ident">f64</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">phase_space</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">e</span>: <span class="ident">f64</span>, <span class="ident">mu</span>: <span class="ident">f64</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
         <span class="self">self</span>.<span class="ident">statistic</span>().<span class="ident">phase_space</span>(<span class="ident">e</span>, <span class="self">self</span>.<span class="ident">mass</span>, <span class="ident">mu</span>, <span class="ident">beta</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">degrees_of_freedom</span>()
     }
 
     <span class="doccomment">/// Return the equilibrium number density of the particle.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">number_density</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mu</span>: <span class="ident">f64</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">number_density</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mu</span>: <span class="ident">f64</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
         <span class="self">self</span>.<span class="ident">statistic</span>().<span class="ident">number_density</span>(<span class="self">self</span>.<span class="ident">mass</span>, <span class="ident">mu</span>, <span class="ident">beta</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">degrees_of_freedom</span>()
     }
 
     <span class="doccomment">/// Return the equilibrium number density of the particle, normalized to the</span>
     <span class="doccomment">/// number density of a massless boson with one degree of freedom.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normalized_number_density</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mu</span>: <span class="ident">f64</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normalized_number_density</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mu</span>: <span class="ident">f64</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
         <span class="self">self</span>.<span class="ident">statistic</span>()
             .<span class="ident">normalized_number_density</span>(<span class="self">self</span>.<span class="ident">mass</span>, <span class="ident">mu</span>, <span class="ident">beta</span>)
             <span class="op">*</span> <span class="self">self</span>.<span class="ident">degrees_of_freedom</span>()
@@ -754,7 +755,7 @@
 
     <span class="doccomment">/// Return the entropy degrees of freedom associated with this particle.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">entropy_dof</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">entropy_dof</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_bosonic</span>() {
             <span class="ident">data</span>::<span class="ident">BOSON_GSTAR</span>.<span class="ident">sample</span>((<span class="self">self</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">beta</span>).<span class="ident">ln</span>()).<span class="ident">exp</span>() <span class="op">*</span> <span class="self">self</span>.<span class="ident">degrees_of_freedom</span>()
         } <span class="kw">else</span> {
@@ -764,14 +765,14 @@
 
     <span class="doccomment">/// Return the propagator denominator for the particle.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">propagator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Propagator</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">propagator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">Propagator</span> {
         <span class="ident">Propagator</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">cmp</span>::<span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Particle</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">spin</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">spin</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">mass</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">mass</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">spin</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">spin</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">mass</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">mass</span>
     }
 }
 <span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Particle</span> {}
@@ -781,7 +782,7 @@
 <span class="doccomment">/// To display all of the particle&#39;s properties, use the</span>
 <span class="doccomment">/// [`Debug`](std::fmt::Display).</span>
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Particle</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>)
     }
 }
@@ -793,7 +794,7 @@
     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">real_scalar</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">real_scalar</span>() <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">particle</span> <span class="op">=</span> <span class="ident">Particle</span>::<span class="ident">new</span>(<span class="number">0</span>, <span class="number">1.0</span>, <span class="number">0.1</span>);
 
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">is_bosonic</span>());
@@ -827,7 +828,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">complex_scalar</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">complex_scalar</span>() <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;&gt;</span> {
         <span class="kw">let</span> <span class="ident">particle</span> <span class="op">=</span> <span class="ident">Particle</span>::<span class="ident">new</span>(<span class="number">0</span>, <span class="number">1.0</span>, <span class="number">0.1</span>).<span class="ident">complex</span>();
 
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">is_bosonic</span>());
@@ -848,7 +849,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">fermion</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fermion</span>() <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;&gt;</span> {
         <span class="kw">let</span> <span class="ident">particle</span> <span class="op">=</span> <span class="ident">Particle</span>::<span class="ident">new</span>(<span class="number">1</span>, <span class="number">1.0</span>, <span class="number">0.1</span>);
 
         <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_bosonic</span>());
@@ -869,7 +870,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">gauge_boson</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">gauge_boson</span>() <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;&gt;</span> {
         <span class="kw">let</span> <span class="ident">particle</span> <span class="op">=</span> <span class="ident">Particle</span>::<span class="ident">new</span>(<span class="number">2</span>, <span class="number">1.0</span>, <span class="number">0.1</span>);
 
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">is_bosonic</span>());
@@ -890,7 +891,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">complex_scalar_dof</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">complex_scalar_dof</span>() <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;&gt;</span> {
         <span class="kw">let</span> <span class="ident">particle</span> <span class="op">=</span> <span class="ident">Particle</span>::<span class="ident">new</span>(<span class="number">0</span>, <span class="number">1.0</span>, <span class="number">0.1</span>).<span class="ident">complex</span>().<span class="ident">dof</span>(<span class="number">2.5</span>);
 
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">particle</span>.<span class="ident">is_bosonic</span>());
@@ -911,7 +912,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">fermion_dof</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fermion_dof</span>() <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;&gt;</span> {
         <span class="kw">let</span> <span class="ident">particle</span> <span class="op">=</span> <span class="ident">Particle</span>::<span class="ident">new</span>(<span class="number">1</span>, <span class="number">1.0</span>, <span class="number">0.1</span>).<span class="ident">dof</span>(<span class="number">1.2</span>);
 
         <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_bosonic</span>());

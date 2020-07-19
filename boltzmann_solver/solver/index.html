@@ -17,6 +17,7 @@
     "\\defeq": "\\vcentcolon=",
     "\\abs": "\\left\\lvert{#1}\\right\\rvert",
     "\\CP": "\\mathcal{CP}",
+    "\\scM": "\\mathcal{M}",
   };
 
   // Display math is inputted in the documentation as:
@@ -66,7 +67,7 @@
   });
 </script>
 
-<style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a><p class='location'>Module solver</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li></ul></div><p class='location'><a href='../index.html'>boltzmann_solver</a></p><script>window.sidebarCurrent = {name: 'solver', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../src/boltzmann_solver/solver.rs.html#1-875' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../index.html'>boltzmann_solver</a>::<wbr><a class="mod" href=''>solver</a></span></h1><div class='docblock'><p>Solver for the number density evolution given by integrating the Boltzmann
+<style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a><p class='location'>Module solver</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li></ul></div><p class='location'><a href='../index.html'>boltzmann_solver</a></p><script>window.sidebarCurrent = {name: 'solver', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../src/boltzmann_solver/solver.rs.html#1-887' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../index.html'>boltzmann_solver</a>::<wbr><a class="mod" href=''>solver</a></span></h1><div class='docblock'><p>Solver for the number density evolution given by integrating the Boltzmann
 equation.</p>
 <p>Solving the Boltzmann equation in generality without making any assumption
 about the phase space distribution <code>$f$</code> (other than specifying some initial
@@ -83,8 +84,8 @@ that the number densities can be computed directly.</p>
 scattering is sufficiently fast, phase space distribution of this species
 will rapidly converge converge onto either the Bose–Einstein or
 Fermi–Dirac distributions:</p>
-<pre><code class="language-math">f_{\textsc{BE}} = \frac{1}{\exp[(E - \mu) \beta] - 1}, \qquad
-f_{\textsc{FD}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.
+<pre><code class="language-math">f_{\text{BE}} = \frac{1}{\exp[(E - \mu) \beta] - 1}, \qquad
+f_{\text{FD}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.
 </code></pre>
 <p>For a particular that remains in kinetic equilibrium, the evolution of its
 phase space is entirely described by the evolution of <code>$\mu$</code> in time.</p>
@@ -94,7 +95,7 @@ phase space is entirely described by the evolution of <code>$\mu$</code> in time
 less than <code>$E - \mu$</code> (or equivalently, that the inverse temperature
 <code>$\beta$</code> is greater than <code>$E - \mu$</code>), both the Fermi–Dirac and
 Bose–Einstein approach the Maxwell–Boltzmann distribution,</p>
-<pre><code class="language-math">f_{\textsc{MB}} = \exp[-(E - \mu) \beta].
+<pre><code class="language-math">f_{\text{MB}} = \exp[-(E - \mu) \beta].
 </code></pre>
 <p>This simplifies the expression for the number density to</p>
 <pre><code class="language-math">n = \frac{g m^2 K_2(m \beta)}{2 \pi^2 \beta} e^{\mu \beta} = n^{(0)} e^{\mu \beta},
@@ -102,20 +103,20 @@ Bose–Einstein approach the Maxwell–Boltzmann distribution,</p>
 <p>where <code>$n^{(0)}$</code> is the equilibrium number density when <code>$\mu = 0$</code>.
 This also allows for the equilibrium phase space distribution to be
 expressed in terms of the <code>$\mu = 0$</code> distribution:</p>
-<pre><code class="language-math">f_{\textsc{MB}} = e^{\mu \beta} f_{\textsc{MB}}^{(0)} = \frac{n}{n^{(0)}} f_{\textsc{MB}}^{(0)}.
+<pre><code class="language-math">f_{\text{MB}} = e^{\mu \beta} f_{\text{MB}}^{(0)} = \frac{n}{n^{(0)}} f_{\text{MB}}^{(0)}.
 </code></pre>
 <p>Furthermore, the assumption that <code>$\beta \gg E - \mu$</code> implies that
-<code>$f_{\textsc{BE}}, f_{\textsc{FD}} \ll 1$</code>.  Consequently, the Pauli
+<code>$f_{\text{BE}}, f_{\text{FD}} \ll 1$</code>.  Consequently, the Pauli
 suppression and Bose enhancement factors in the collision term can all be
 neglected resulting in:</p>
 <pre><code class="language-math">\begin{aligned}
   g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}
     &amp;= - \int_{\vt a}^{\vt b}
-       \abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f_i \right)
-       - \abs{\mathcal M(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} f_i \right) \\\\
+       \abs{\scM(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f_i \right)
+       - \abs{\scM(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} f_i \right) \\\\
     &amp;= - \int_{\vt a}^{\vt b}
-       \abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right)
-        - \abs{\mathcal M(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right).
+       \abs{\scM(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right)
+        - \abs{\scM(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right).
 \end{aligned}
 </code></pre>
 <p>This is then commonly expressed as,</p>
@@ -126,20 +127,19 @@ neglected resulting in:</p>
 <p>where we have introduced the interaction density</p>
 <pre><code class="language-math">\gamma(\vt a \to \vt b)
   = \int_{\vt a}^{\vt b}
-    \abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f^{(0)}_i \right).
+    \abs{\scM(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f^{(0)}_i \right).
 </code></pre>
 </li>
 </ul>
 <h1 id="interactions" class="section-header"><a href="#interactions">Interactions</a></h1>
-<p>The majority of interactions can be accounted for by looking at simply <code>$</code>
-\leftrightarrow 2$<code>decays/inverse decays and</code>$2 \leftrightarrow 2$`
+<p>The majority of interactions can be accounted for by looking at simply <code>$1 \leftrightarrow 2$</code> decays/inverse decays and <code>$2 \leftrightarrow 2$</code>
 scatterings.  In the former case, the phase space integration can be done
 entirely analytically and is presented below; whilst in the latter case, the
 phase space integration can be simplified to just two integrals.</p>
 <h2 id="decays-and-inverse-decays" class="section-header"><a href="#decays-and-inverse-decays">Decays and Inverse Decays</a></h2>
 <p>Considering the interaction <code>$a \leftrightarrow b + c$</code>, the reaction is</p>
 <pre><code class="language-math">\begin{aligned}
-  g_a \int \vt C\[f_a\] \frac{\dd \vt p_a}{(2\pi)^3}
+  g_a \int \vt C[f_a] \frac{\dd \vt p_a}{(2\pi)^3}
     &amp;= - \frac{n_a}{n^{(0)}_a} \gamma(a \to bc) + \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} \gamma(bc \to a)
 \end{aligned}
 </code></pre>
@@ -153,13 +153,13 @@ function.  Consequently, we need only integrate over the initial state
 momentum:</p>
 <pre><code class="language-math">\begin{aligned}
   \gamma(a \to bc)
-    &amp;= - \abs{\mathcal M(a \to bc)}^2 \int_{a}^{b,c} f^{(0)}_a \\\\
-    &amp;= - \frac{\abs{\mathcal M(a \to bc)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}
+    &amp;= - \abs{\scM(a \to bc)}^2 \int_{a}^{b,c} f^{(0)}_a \\\\
+    &amp;= - \frac{\abs{\scM(a \to bc)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}
 \end{aligned}
 </code></pre>
 <p>Combined with the number density scaling:</p>
 <pre><code class="language-math">\frac{n_a}{n^{(0)}_a} \gamma(a \to bc)
-  = n_a \frac{\abs{\mathcal M(a \to bc)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
+  = n_a \frac{\abs{\scM(a \to bc)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
 </code></pre>
 <p>where the analytic expression for <code>$n^{(0)}_a$</code> was used to introduce the
 second Bessel function.</p>
@@ -169,26 +169,26 @@ Bessel functions approaches 1, and when <code>$m \beta \ll 1$</code>, the ratio
 approaches <code>$0$</code>.</p>
 <p>If the final state particles are essentially massless in comparison to the
 decaying particle, then the decay rate in the rest frame of the particle of
-<code>$\Gamma_\text{rest} = \abs{\mathcal M}^2 / 16 \pi m_a$</code> and the above
-expression can be simplified to</p>
-<pre><code class="language-math">\frac{n_a}{n^{(0)}\_a} \gamma(a \to bc)
+<code>$\Gamma_\text{rest} = \abs{\scM}^2 / 16 \pi m_a$</code> and the above expression
+can be simplified to</p>
+<pre><code class="language-math">\frac{n_a}{n^{(0)}_a} \gamma(a \to bc)
 = n_a \Gamma_\text{rest} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}.
 </code></pre>
 <h3 id="inverse-decay" class="section-header"><a href="#inverse-decay">Inverse Decay</a></h3>
 <p>The inverse decay rate is given by</p>
 <pre><code class="language-math">\gamma(bc \to a)
-  = \abs{\mathcal M(bc \to a)}^2 \int_{a}^{b,c} f^{(0)}_b f^{(0)}_c
+  = \abs{\scM(bc \to a)}^2 \int_{a}^{b,c} f^{(0)}_b f^{(0)}_c
 </code></pre>
 <p>The Dirac delta enforces that <code>$E_a = E_b + E_c$</code> which implies that
 <code>$f^{(0)}_a = f^{(0)}_b f^{(0)}_c$</code> thereby making the integral identical to
 the decay scenario:</p>
 <pre><code class="language-math">\gamma(bc \to a)
-  = \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}
-  = n^{(0)}_a \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
+  = \frac{\abs{\scM(bc \to a)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}
+  = n^{(0)}_a \frac{\abs{\scM(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
 </code></pre>
 <p>The full expression including the number density scaling becomes:</p>
 <pre><code class="language-math">\frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} \gamma(bc \to a)
-  = \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} n^{(0)}_a \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
+  = \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} n^{(0)}_a \frac{\abs{\scM(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}
 </code></pre>
 <h3 id="combined-decay-and-inverse-decay" class="section-header"><a href="#combined-decay-and-inverse-decay">Combined Decay and Inverse Decay</a></h3>
 <p>If only the tree-level contributions are considered for the decay and
@@ -197,9 +197,9 @@ thus <code>$\gamma(ab \to c) \equiv \gamma(c \to ab)$</code>.  As a result, the 
 and inverse decay only differ by a scaling factor to take into account the
 initial state particles.</p>
 <p>In particular, we can define an alternative reaction rate,</p>
-<pre><code class="language-math">\tilde \gamma(a \to bc) = \frac{\abs{\mathcal{M}(a \to bc)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)},
+<pre><code class="language-math">\tilde \gamma(a \to bc) = \frac{\abs{\scM(a \to bc)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)},
 </code></pre>
-<p>which allows for the overall <code>$</code> \leftrightarrow 2$` reaction rate to be
+<p>which allows for the overall <code>$1 \leftrightarrow 2$</code> reaction rate to be
 expressed as:</p>
 <pre><code class="language-math">\frac{n_a}{n_a^{(0)}} \gamma(a \to bc) - \frac{n_b n_c}{n_b^{(0)} n_c^{(0)}} \gamma(bc \to a)
 = \left[ n_a - \frac{n_b n_c}{n_b^{(0)} n_c^{(0)}} n_a^{(0)} \right] \tilde \gamma(a \to bc)
@@ -207,35 +207,38 @@ expressed as:</p>
 <p>provided the forward and backward rates are equal.</p>
 <h2 id="two-body-scattering" class="section-header"><a href="#two-body-scattering">Two Body Scattering</a></h2>
 <p>The two-to-two scattering <code>$ab \to cd$</code> reaction density is given by</p>
-<pre><code class="language-math">\gamma(ab \to cd) = \int_{a,b}^{c,d} \abs{\mathcal M(ab \to cd)}^2 f_a^{(0)} f_b^{(0)}
+<pre><code class="language-math">\gamma(ab \to cd) = \int_{a,b}^{c,d} \abs{\scM(ab \to cd)}^2 f_a^{(0)} f_b^{(0)}
 </code></pre>
 <p>The two initial-state phase space integrals can be reduced to a simple
 integral over the centre-of-mass <code>$s$</code>:</p>
 <pre><code class="language-math">\gamma(ab \to cd) = \frac{1}{8 \pi^3 \beta} \int \hat \sigma_{ab}^{cd}(s) \sqrt{s} K_1(\sqrt{s} \beta) \dd s
 </code></pre>
 <p>where <code>$\hat \sigma(s)$</code> is the reduced cross-section:</p>
-<pre><code class="language-math">\hat \sigma_{ab}^{cd}(s) = \frac{g_a g_b g_c g_d}{64 \pi^2 s} \int \abs{\mathcal M(ab \to cd)}^2 \dd t
+<pre><code class="language-math">\hat \sigma_{ab}^{cd}(s) = \frac{g_a g_b g_c g_d}{64 \pi^2 s} \int \abs{\scM(ab \to cd)}^2 \dd t
 </code></pre>
 <p>in which <code>$t$</code> is the usual Mandelstam variable.</p>
 <p>As a result, the full <code>$2 \to 2$</code> cross-section can be expressed as</p>
-<pre><code class="language-math">\gamma(ab \to cd) = \frac{g_a g_b g_c g_d}{512 \pi^5 \beta} \int \abs{\mathcal M(ab \to cd)}^2 \frac{K_1(\sqrt s \beta)}{\sqrt s} \dd s \dd t
+<pre><code class="language-math">\gamma(ab \to cd) = \frac{g_a g_b g_c g_d}{512 \pi^5 \beta} \int \abs{\scM(ab \to cd)}^2 \frac{K_1(\sqrt s \beta)}{\sqrt s} \dd s \dd t
 </code></pre>
 <h3 id="real-intermediate-state" class="section-header"><a href="#real-intermediate-state">Real Intermediate State</a></h3>
-<p>When considering both <code>$</code> \leftrightarrow 2$<code>and</code>$2 \leftrightarrow 2$<code>scattering processes, there is a double counting issue that arises from having a real intermediate state (RIS) in</code>$2 \leftrightarrow 2$`
+<p>When considering both <code>$1 \leftrightarrow 2$</code> and <code>$2 \leftrightarrow 2$</code>
+scattering processes, there is a double counting issue that arises from
+having a real intermediate state (RIS) in <code>$2 \leftrightarrow 2$</code>
 interactions.</p>
 <p>As a concrete example, one may have the processes <code>$ab \leftrightarrow X$</code>
 and <code>$X \leftrightarrow cd$</code> and thus also <code>$ab \leftrightarrow cd$</code>.  In
 computing the squared amplitude for the <code>$2 \leftrightarrow 2$</code> process, one
 needs to subtract the RIS:</p>
-<pre><code class="language-math">\abs{\mathcal M(ab \leftrightarrow cd)}^2 = \abs{\mathcal M_\text{full}(ab \leftrightarrow cd)}^2 - \abs{\mathcal M_\textsc{RIS}(ab \leftrightarrow cd)}^2
+<pre><code class="language-math">\abs{\scM(ab \leftrightarrow cd)}^2 = \abs{\scM_\text{full}(ab \leftrightarrow cd)}^2
+- \abs{\scM_\text{RIS}(ab \leftrightarrow cd)}^2
 </code></pre>
 <p>In the case of a single scalar RIS, the RIS-subtracted amplitude is given by</p>
 <pre><code class="language-math">\begin{aligned}
-  \abs{\mathcal M_\textsc{RIS}(ab \to cd)}
+  \abs{\scM_\text{RIS}(ab \to cd)}
   &amp;= \frac{\pi}{m_X \Gamma_X} \delta(s - m_X^2) \theta(\sqrt{s}) \\
   &amp;\quad \Big[
-      \abs{\mathcal M(ab \to X)}^2 \abs{\mathcal M(X \to cd)}^2
-    + \abs{\mathcal M(ab \to \overline X)}^2 \abs{\mathcal M(\overline X \to cd)}^2
+      \abs{\scM(ab \to X)}^2 \abs{\scM(X \to cd)}^2
+    + \abs{\scM(ab \to \overline X)}^2 \abs{\scM(\overline X \to cd)}^2
   \Big].
 \end{aligned}
 </code></pre>
@@ -251,9 +254,9 @@ particular time.  We therefore make the change of variables from <code>$t$</code
 <pre><code class="language-math">\pfrac{n}{t} + 3 H n \equiv H \beta \pfrac{n}{\beta} + 3 H n.
 </code></pre>
 <p>As a result, the actual change in the number density, it becomes</p>
-<pre><code class="language-math">\pfrac{n}{\beta} = \frac{1}{H \beta} \left[\vt C\[n\] - 3 H n\right]
+<pre><code class="language-math">\pfrac{n}{\beta} = \frac{1}{H \beta} \left[\vt C[n] - 3 H n\right]
 </code></pre>
-<p>and one must only input <code>$\vt C\[n\]$</code> in the interaction.</p>
+<p>and one must only input <code>$\vt C[n]$</code> in the interaction.</p>
 <h1 id="normalized-number-density" class="section-header"><a href="#normalized-number-density">Normalized Number Density</a></h1>
 <p>The number densities themselves can be often quite large (especially in the
 early Universe), and often are compared to other number densities; as a
@@ -262,19 +265,19 @@ result, they are often normalized to either the photon number density
 number density of a single massless bosonic degree of freedom (and thus
 differs from using the photon number density by a factor of 2).</p>
 <p>When dealing with number densities, the Liouville operator is:</p>
-<pre><code class="language-math">\pfrac{n}{t} + 3 H n = \vt C\[n\]
+<pre><code class="language-math">\pfrac{n}{t} + 3 H n = \vt C[n]
 </code></pre>
-<p>where <code>$\vt C\[n\]$</code> is the change in the number density.  If we now define</p>
+<p>where <code>$\vt C[n]$</code> is the change in the number density.  If we now define</p>
 <pre><code class="language-math">Y \defeq \frac{n}{n_{\text{eq}}},
 </code></pre>
 <p>then the change in this normalized number density is:</p>
-<pre><code class="language-math">\pfrac{Y}{t} = \frac{1}{n_{\text{eq}}} \vt C\[n\]
+<pre><code class="language-math">\pfrac{Y}{t} = \frac{1}{n_{\text{eq}}} \vt C[n]
 </code></pre>
 <p>with <code>$n_{\text{eq}}$</code> having the simple analytic form <code>$3 \zeta(3) / 4 \pi^2 \beta^3$</code>.  Furthermore, make the change of variable from time <code>$t$</code>
 to inverse temperature <code>$\beta$</code>, we get:</p>
-<pre><code class="language-math">\pfrac{Y}{\beta} = \frac{1}{H \beta n_{\text{eq}}} \vt C\[n\].
+<pre><code class="language-math">\pfrac{Y}{\beta} = \frac{1}{H \beta n_{\text{eq}}} \vt C[n].
 </code></pre>
-<p>As with the non-normalized number density calculations, only <code>$\vt C\[n\]$</code>
+<p>As with the non-normalized number density calculations, only <code>$\vt C[n]$</code>
 must be inputted in the interaction.</p>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table><tr class='module-item'><td><a class="struct" href="struct.Context.html" title='boltzmann_solver::solver::Context struct'>Context</a></td><td class='docblock-short'><p>Current context at a particular step in the numerical integration.</p>

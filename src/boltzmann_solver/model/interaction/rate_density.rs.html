@@ -17,6 +17,7 @@
     "\\defeq": "\\vcentcolon=",
     "\\abs": "\\left\\lvert{#1}\\right\\rvert",
     "\\CP": "\\mathcal{CP}",
+    "\\scM": "\\mathcal{M}",
   };
 
   // Display math is inputted in the documentation as:
@@ -154,7 +155,7 @@
 <span class="kw">impl</span> <span class="ident">RateDensity</span> {
     <span class="doccomment">/// Create a new instanse with both rates being 0.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zero</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zero</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="ident">RateDensity</span> {
             <span class="ident">symmetric</span>: <span class="number">0.0</span>,
             <span class="ident">asymmetric</span>: <span class="number">0.0</span>,
@@ -163,13 +164,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">default</span>::<span class="ident">Default</span> <span class="kw">for</span> <span class="ident">RateDensity</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span>::<span class="ident">zero</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">RateDensity</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="macro">write</span><span class="macro">!</span>(
             <span class="ident">f</span>,
             <span class="string">&quot;RateDensity {{ symmetric: {:e}, asymmetric: {:e} }}&quot;</span>,
@@ -181,7 +182,7 @@
 <span class="kw">impl</span> <span class="ident">ops</span>::<span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RateDensity</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">symmetric</span>: <span class="self">self</span>.<span class="ident">symmetric</span> <span class="op">*</span> <span class="ident">rhs</span>,
             <span class="ident">asymmetric</span>: <span class="self">self</span>.<span class="ident">asymmetric</span> <span class="op">*</span> <span class="ident">rhs</span>,
@@ -191,8 +192,8 @@
 
 <span class="kw">impl</span> <span class="ident">ops</span>::<span class="ident">MulAssign</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RateDensity</span> {
     <span class="kw">fn</span> <span class="ident">mul_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">f64</span>) {
-        <span class="self">self</span>.<span class="ident">symmetric</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">rhs</span>;
-        <span class="self">self</span>.<span class="ident">asymmetric</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">rhs</span>;
+        <span class="self">self</span>.<span class="ident">symmetric</span> <span class="op">*=</span> <span class="ident">rhs</span>;
+        <span class="self">self</span>.<span class="ident">asymmetric</span> <span class="op">*=</span> <span class="ident">rhs</span>;
     }
 }
 </pre></div>

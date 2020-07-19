@@ -17,6 +17,7 @@
     "\\defeq": "\\vcentcolon=",
     "\\abs": "\\left\\lvert{#1}\\right\\rvert",
     "\\CP": "\\mathcal{CP}",
+    "\\scM": "\\mathcal{M}",
   };
 
   // Display math is inputted in the documentation as:
@@ -328,12 +329,12 @@
 <span class="doccomment">//! \begin{aligned}</span>
 <span class="doccomment">//!   g_{a_1} \int \vt C[f_{a_1}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3}</span>
 <span class="doccomment">//!   &amp;= - \int_{\vt a}^{\vt b}</span>
-<span class="doccomment">//!      \abs{\mathcal M(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right) \left(\prod_{\vt b} 1 \pm f_i \right)</span>
-<span class="doccomment">//!      - \abs{\mathcal M(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right),</span>
+<span class="doccomment">//!      \abs{\scM(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right) \left(\prod_{\vt b} 1 \pm f_i \right)</span>
+<span class="doccomment">//!      - \abs{\scM(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right),</span>
 <span class="doccomment">//! \end{aligned}</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! where `$\abs{\mathcal M(\vt a | \vt b)}^2$` is the squared amplitude going</span>
+<span class="doccomment">//! where `$\abs{\scM(\vt a | \vt b)}^2$` is the squared amplitude going</span>
 <span class="doccomment">//! from initial state `$\vt a$` to `$\vt b$` and is *averaged over* all</span>
 <span class="doccomment">//! *internal degrees of freedom*, and the integration is done of the</span>
 <span class="doccomment">//! Lorentz-invariant phase space</span>
@@ -379,8 +380,8 @@
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">test</span>;
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">debug_assert_warn</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cond</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">tt</span>)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> (
-        <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">debug_assertions</span>) <span class="kw-2">&amp;</span><span class="op">&amp;</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cond</span>) {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cond</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">tt</span>)<span class="op">+</span>) <span class="op">=&gt;</span> (
+        <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">debug_assertions</span>) <span class="op">&amp;&amp;</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cond</span>) {
             <span class="ident">log</span>::<span class="macro">warn</span><span class="macro">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>,)<span class="kw-2">*</span>);
         }
     )

@@ -17,6 +17,7 @@
     "\\defeq": "\\vcentcolon=",
     "\\abs": "\\left\\lvert{#1}\\right\\rvert",
     "\\CP": "\\mathcal{CP}",
+    "\\scM": "\\mathcal{M}",
   };
 
   // Display math is inputted in the documentation as:
@@ -941,6 +942,18 @@
 <span id="873">873</span>
 <span id="874">874</span>
 <span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Solver for the number density evolution given by integrating the Boltzmann</span>
 <span class="doccomment">//! equation.</span>
@@ -963,8 +976,8 @@
 <span class="doccomment">//!   Fermi–Dirac distributions:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!   ```math</span>
-<span class="doccomment">//!   f_{\textsc{BE}} = \frac{1}{\exp[(E - \mu) \beta] - 1}, \qquad</span>
-<span class="doccomment">//!   f_{\textsc{FD}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.</span>
+<span class="doccomment">//!   f_{\text{BE}} = \frac{1}{\exp[(E - \mu) \beta] - 1}, \qquad</span>
+<span class="doccomment">//!   f_{\text{FD}} = \frac{1}{\exp[(E - \mu) \beta] + 1}.</span>
 <span class="doccomment">//!   ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!   For a particular that remains in kinetic equilibrium, the evolution of its</span>
@@ -976,7 +989,7 @@
 <span class="doccomment">//!   Bose–Einstein approach the Maxwell–Boltzmann distribution,</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!   ```math</span>
-<span class="doccomment">//!   f_{\textsc{MB}} = \exp[-(E - \mu) \beta].</span>
+<span class="doccomment">//!   f_{\text{MB}} = \exp[-(E - \mu) \beta].</span>
 <span class="doccomment">//!   ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!   This simplifies the expression for the number density to</span>
@@ -990,11 +1003,11 @@
 <span class="doccomment">//!   expressed in terms of the `$\mu = 0$` distribution:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!   ```math</span>
-<span class="doccomment">//!   f_{\textsc{MB}} = e^{\mu \beta} f_{\textsc{MB}}^{(0)} = \frac{n}{n^{(0)}} f_{\textsc{MB}}^{(0)}.</span>
+<span class="doccomment">//!   f_{\text{MB}} = e^{\mu \beta} f_{\text{MB}}^{(0)} = \frac{n}{n^{(0)}} f_{\text{MB}}^{(0)}.</span>
 <span class="doccomment">//!   ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!   Furthermore, the assumption that `$\beta \gg E - \mu$` implies that</span>
-<span class="doccomment">//!   `$f_{\textsc{BE}}, f_{\textsc{FD}} \ll 1$`.  Consequently, the Pauli</span>
+<span class="doccomment">//!   `$f_{\text{BE}}, f_{\text{FD}} \ll 1$`.  Consequently, the Pauli</span>
 <span class="doccomment">//!   suppression and Bose enhancement factors in the collision term can all be</span>
 <span class="doccomment">//!   neglected resulting in:</span>
 <span class="doccomment">//!</span>
@@ -1002,11 +1015,11 @@
 <span class="doccomment">//!   \begin{aligned}</span>
 <span class="doccomment">//!     g_{a_1} \int \vt C[f_{a_{1}}] \frac{\dd \vt p_{a_1}}{(2\pi)^3}</span>
 <span class="doccomment">//!       &amp;= - \int_{\vt a}^{\vt b}</span>
-<span class="doccomment">//!          \abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f_i \right)</span>
-<span class="doccomment">//!          - \abs{\mathcal M(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} f_i \right) \\\\</span>
+<span class="doccomment">//!          \abs{\scM(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f_i \right)</span>
+<span class="doccomment">//!          - \abs{\scM(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} f_i \right) \\\\</span>
 <span class="doccomment">//!       &amp;= - \int_{\vt a}^{\vt b}</span>
-<span class="doccomment">//!          \abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right)</span>
-<span class="doccomment">//!           - \abs{\mathcal M(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right).</span>
+<span class="doccomment">//!          \abs{\scM(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right)</span>
+<span class="doccomment">//!           - \abs{\scM(\vt b \to \vt a)}^2 \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right).</span>
 <span class="doccomment">//!   \end{aligned}</span>
 <span class="doccomment">//!   ```</span>
 <span class="doccomment">//!</span>
@@ -1023,12 +1036,12 @@
 <span class="doccomment">//!   ```math</span>
 <span class="doccomment">//!   \gamma(\vt a \to \vt b)</span>
 <span class="doccomment">//!     = \int_{\vt a}^{\vt b}</span>
-<span class="doccomment">//!       \abs{\mathcal M(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f^{(0)}_i \right).</span>
+<span class="doccomment">//!       \abs{\scM(\vt a \to \vt b)}^2 \left( \prod_{i \in \vt a} f^{(0)}_i \right).</span>
 <span class="doccomment">//!   ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Interactions</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! The majority of interactions can be accounted for by looking at simply `$`</span>
+<span class="doccomment">//! The majority of interactions can be accounted for by looking at simply `$1</span>
 <span class="doccomment">//! \leftrightarrow 2$` decays/inverse decays and `$2 \leftrightarrow 2$`</span>
 <span class="doccomment">//! scatterings.  In the former case, the phase space integration can be done</span>
 <span class="doccomment">//! entirely analytically and is presented below; whilst in the latter case, the</span>
@@ -1040,7 +1053,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
 <span class="doccomment">//! \begin{aligned}</span>
-<span class="doccomment">//!   g_a \int \vt C\[f_a\] \frac{\dd \vt p_a}{(2\pi)^3}</span>
+<span class="doccomment">//!   g_a \int \vt C[f_a] \frac{\dd \vt p_a}{(2\pi)^3}</span>
 <span class="doccomment">//!     &amp;= - \frac{n_a}{n^{(0)}_a} \gamma(a \to bc) + \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} \gamma(bc \to a)</span>
 <span class="doccomment">//! \end{aligned}</span>
 <span class="doccomment">//! ```</span>
@@ -1059,8 +1072,8 @@
 <span class="doccomment">//! ```math</span>
 <span class="doccomment">//! \begin{aligned}</span>
 <span class="doccomment">//!   \gamma(a \to bc)</span>
-<span class="doccomment">//!     &amp;= - \abs{\mathcal M(a \to bc)}^2 \int_{a}^{b,c} f^{(0)}_a \\\\</span>
-<span class="doccomment">//!     &amp;= - \frac{\abs{\mathcal M(a \to bc)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}</span>
+<span class="doccomment">//!     &amp;= - \abs{\scM(a \to bc)}^2 \int_{a}^{b,c} f^{(0)}_a \\\\</span>
+<span class="doccomment">//!     &amp;= - \frac{\abs{\scM(a \to bc)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}</span>
 <span class="doccomment">//! \end{aligned}</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
@@ -1068,7 +1081,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
 <span class="doccomment">//! \frac{n_a}{n^{(0)}_a} \gamma(a \to bc)</span>
-<span class="doccomment">//!   = n_a \frac{\abs{\mathcal M(a \to bc)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}</span>
+<span class="doccomment">//!   = n_a \frac{\abs{\scM(a \to bc)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! where the analytic expression for `$n^{(0)}_a$` was used to introduce the</span>
@@ -1081,11 +1094,11 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! If the final state particles are essentially massless in comparison to the</span>
 <span class="doccomment">//! decaying particle, then the decay rate in the rest frame of the particle of</span>
-<span class="doccomment">//! `$\Gamma_\text{rest} = \abs{\mathcal M}^2 / 16 \pi m_a$` and the above</span>
-<span class="doccomment">//! expression can be simplified to</span>
+<span class="doccomment">//! `$\Gamma_\text{rest} = \abs{\scM}^2 / 16 \pi m_a$` and the above expression</span>
+<span class="doccomment">//! can be simplified to</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
-<span class="doccomment">//! \frac{n_a}{n^{(0)}\_a} \gamma(a \to bc)</span>
+<span class="doccomment">//! \frac{n_a}{n^{(0)}_a} \gamma(a \to bc)</span>
 <span class="doccomment">//! = n_a \Gamma_\text{rest} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}.</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
@@ -1095,7 +1108,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
 <span class="doccomment">//! \gamma(bc \to a)</span>
-<span class="doccomment">//!   = \abs{\mathcal M(bc \to a)}^2 \int_{a}^{b,c} f^{(0)}_b f^{(0)}_c</span>
+<span class="doccomment">//!   = \abs{\scM(bc \to a)}^2 \int_{a}^{b,c} f^{(0)}_b f^{(0)}_c</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The Dirac delta enforces that `$E_a = E_b + E_c$` which implies that</span>
@@ -1104,15 +1117,15 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
 <span class="doccomment">//! \gamma(bc \to a)</span>
-<span class="doccomment">//!   = \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}</span>
-<span class="doccomment">//!   = n^{(0)}_a \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}</span>
+<span class="doccomment">//!   = \frac{\abs{\scM(bc \to a)}^2}{16 \pi} \frac{m_a K_1(m_a \beta)}{2 \pi^2 \beta}</span>
+<span class="doccomment">//!   = n^{(0)}_a \frac{\abs{\scM(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The full expression including the number density scaling becomes:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
 <span class="doccomment">//! \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} \gamma(bc \to a)</span>
-<span class="doccomment">//!   = \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} n^{(0)}_a \frac{\abs{\mathcal M(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}</span>
+<span class="doccomment">//!   = \frac{n_b n_c}{n^{(0)}_b n^{(0)}_c} n^{(0)}_a \frac{\abs{\scM(bc \to a)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)}</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### Combined Decay and Inverse Decay</span>
@@ -1126,10 +1139,10 @@
 <span class="doccomment">//! In particular, we can define an alternative reaction rate,</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
-<span class="doccomment">//! \tilde \gamma(a \to bc) = \frac{\abs{\mathcal{M}(a \to bc)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)},</span>
+<span class="doccomment">//! \tilde \gamma(a \to bc) = \frac{\abs{\scM(a \to bc)}^2}{16 \pi m_a} \frac{K_1(m_a \beta)}{K_2(m_a \beta)},</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! which allows for the overall `$` \leftrightarrow 2$` reaction rate to be</span>
+<span class="doccomment">//! which allows for the overall `$1 \leftrightarrow 2$` reaction rate to be</span>
 <span class="doccomment">//! expressed as:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
@@ -1144,7 +1157,7 @@
 <span class="doccomment">//! The two-to-two scattering `$ab \to cd$` reaction density is given by</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
-<span class="doccomment">//! \gamma(ab \to cd) = \int_{a,b}^{c,d} \abs{\mathcal M(ab \to cd)}^2 f_a^{(0)} f_b^{(0)}</span>
+<span class="doccomment">//! \gamma(ab \to cd) = \int_{a,b}^{c,d} \abs{\scM(ab \to cd)}^2 f_a^{(0)} f_b^{(0)}</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The two initial-state phase space integrals can be reduced to a simple</span>
@@ -1157,7 +1170,7 @@
 <span class="doccomment">//! where `$\hat \sigma(s)$` is the reduced cross-section:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
-<span class="doccomment">//! \hat \sigma_{ab}^{cd}(s) = \frac{g_a g_b g_c g_d}{64 \pi^2 s} \int \abs{\mathcal M(ab \to cd)}^2 \dd t</span>
+<span class="doccomment">//! \hat \sigma_{ab}^{cd}(s) = \frac{g_a g_b g_c g_d}{64 \pi^2 s} \int \abs{\scM(ab \to cd)}^2 \dd t</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! in which `$t$` is the usual Mandelstam variable.</span>
@@ -1165,12 +1178,12 @@
 <span class="doccomment">//! As a result, the full `$2 \to 2$` cross-section can be expressed as</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
-<span class="doccomment">//! \gamma(ab \to cd) = \frac{g_a g_b g_c g_d}{512 \pi^5 \beta} \int \abs{\mathcal M(ab \to cd)}^2 \frac{K_1(\sqrt s \beta)}{\sqrt s} \dd s \dd t</span>
+<span class="doccomment">//! \gamma(ab \to cd) = \frac{g_a g_b g_c g_d}{512 \pi^5 \beta} \int \abs{\scM(ab \to cd)}^2 \frac{K_1(\sqrt s \beta)}{\sqrt s} \dd s \dd t</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### Real Intermediate State</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! When considering both `$` \leftrightarrow 2$` and `$2 \leftrightarrow 2$`</span>
+<span class="doccomment">//! When considering both `$1 \leftrightarrow 2$` and `$2 \leftrightarrow 2$`</span>
 <span class="doccomment">//! scattering processes, there is a double counting issue that arises from</span>
 <span class="doccomment">//! having a real intermediate state (RIS) in `$2 \leftrightarrow 2$`</span>
 <span class="doccomment">//! interactions.</span>
@@ -1181,18 +1194,19 @@
 <span class="doccomment">//! needs to subtract the RIS:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
-<span class="doccomment">//! \abs{\mathcal M(ab \leftrightarrow cd)}^2 = \abs{\mathcal M_\text{full}(ab \leftrightarrow cd)}^2 - \abs{\mathcal M_\textsc{RIS}(ab \leftrightarrow cd)}^2</span>
+<span class="doccomment">//! \abs{\scM(ab \leftrightarrow cd)}^2 = \abs{\scM_\text{full}(ab \leftrightarrow cd)}^2</span>
+<span class="doccomment">//! - \abs{\scM_\text{RIS}(ab \leftrightarrow cd)}^2</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! In the case of a single scalar RIS, the RIS-subtracted amplitude is given by</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
 <span class="doccomment">//! \begin{aligned}</span>
-<span class="doccomment">//!   \abs{\mathcal M_\textsc{RIS}(ab \to cd)}</span>
+<span class="doccomment">//!   \abs{\scM_\text{RIS}(ab \to cd)}</span>
 <span class="doccomment">//!   &amp;= \frac{\pi}{m_X \Gamma_X} \delta(s - m_X^2) \theta(\sqrt{s}) \\</span>
 <span class="doccomment">//!   &amp;\quad \Big[</span>
-<span class="doccomment">//!       \abs{\mathcal M(ab \to X)}^2 \abs{\mathcal M(X \to cd)}^2</span>
-<span class="doccomment">//!     + \abs{\mathcal M(ab \to \overline X)}^2 \abs{\mathcal M(\overline X \to cd)}^2</span>
+<span class="doccomment">//!       \abs{\scM(ab \to X)}^2 \abs{\scM(X \to cd)}^2</span>
+<span class="doccomment">//!     + \abs{\scM(ab \to \overline X)}^2 \abs{\scM(\overline X \to cd)}^2</span>
 <span class="doccomment">//!   \Big].</span>
 <span class="doccomment">//! \end{aligned}</span>
 <span class="doccomment">//! ```</span>
@@ -1216,10 +1230,10 @@
 <span class="doccomment">//! As a result, the actual change in the number density, it becomes</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
-<span class="doccomment">//! \pfrac{n}{\beta} = \frac{1}{H \beta} \left[\vt C\[n\] - 3 H n\right]</span>
+<span class="doccomment">//! \pfrac{n}{\beta} = \frac{1}{H \beta} \left[\vt C[n] - 3 H n\right]</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! and one must only input `$\vt C\[n\]$` in the interaction.</span>
+<span class="doccomment">//! and one must only input `$\vt C[n]$` in the interaction.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Normalized Number Density</span>
 <span class="doccomment">//!</span>
@@ -1233,10 +1247,10 @@
 <span class="doccomment">//! When dealing with number densities, the Liouville operator is:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
-<span class="doccomment">//! \pfrac{n}{t} + 3 H n = \vt C\[n\]</span>
+<span class="doccomment">//! \pfrac{n}{t} + 3 H n = \vt C[n]</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! where `$\vt C\[n\]$` is the change in the number density.  If we now define</span>
+<span class="doccomment">//! where `$\vt C[n]$` is the change in the number density.  If we now define</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
 <span class="doccomment">//! Y \defeq \frac{n}{n_{\text{eq}}},</span>
@@ -1245,7 +1259,7 @@
 <span class="doccomment">//! then the change in this normalized number density is:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
-<span class="doccomment">//! \pfrac{Y}{t} = \frac{1}{n_{\text{eq}}} \vt C\[n\]</span>
+<span class="doccomment">//! \pfrac{Y}{t} = \frac{1}{n_{\text{eq}}} \vt C[n]</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! with `$n_{\text{eq}}$` having the simple analytic form `$3 \zeta(3) / 4</span>
@@ -1253,10 +1267,10 @@
 <span class="doccomment">//! to inverse temperature `$\beta$`, we get:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```math</span>
-<span class="doccomment">//! \pfrac{Y}{\beta} = \frac{1}{H \beta n_{\text{eq}}} \vt C\[n\].</span>
+<span class="doccomment">//! \pfrac{Y}{\beta} = \frac{1}{H \beta n_{\text{eq}}} \vt C[n].</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! As with the non-normalized number density calculations, only `$\vt C\[n\]$`</span>
+<span class="doccomment">//! As with the non-normalized number density calculations, only `$\vt C[n]$`</span>
 <span class="doccomment">//! must be inputted in the interaction.</span>
 
 <span class="kw">mod</span> <span class="ident">context</span>;
@@ -1299,32 +1313,32 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error</span>::<span class="ident">DuplicateInitialDensities</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error</span>::<span class="ident">DuplicateInitialDensities</span> <span class="op">=&gt;</span> {
                 <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;one or more initial density is specified multiple times&quot;</span>)
             }
-            <span class="ident">Error</span>::<span class="ident">InvalidInitialDensities</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;initial number densities are invalid&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">DuplicateInitialAsymmetries</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(
+            <span class="ident">Error</span>::<span class="ident">InvalidInitialDensities</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;initial number densities are invalid&quot;</span>),
+            <span class="ident">Error</span>::<span class="ident">DuplicateInitialAsymmetries</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(
                 <span class="ident">f</span>,
                 <span class="string">&quot;one or more initial density asymmetry is specified multiple times&quot;</span>
             ),
-            <span class="ident">Error</span>::<span class="ident">InvalidInitialAsymmetries</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error</span>::<span class="ident">InvalidInitialAsymmetries</span> <span class="op">=&gt;</span> {
                 <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;initial number density asymmetries are invalid&quot;</span>)
             }
-            <span class="ident">Error</span>::<span class="ident">TooManyInEquilibrium</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error</span>::<span class="ident">TooManyInEquilibrium</span> <span class="op">=&gt;</span> {
                 <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;too many particles held in equilibrium for the model&quot;</span>)
             }
-            <span class="ident">Error</span>::<span class="ident">TooManyNoAsymmetry</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error</span>::<span class="ident">TooManyNoAsymmetry</span> <span class="op">=&gt;</span> {
                 <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;too many particles without asymmetry for the model&quot;</span>)
             }
-            <span class="ident">Error</span>::<span class="ident">UndefinedModel</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;underlying model is not defined&quot;</span>),
+            <span class="ident">Error</span>::<span class="ident">UndefinedModel</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;underlying model is not defined&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 }
@@ -1352,7 +1366,7 @@
 
 <span class="doccomment">/// Workspace of variables allocated once and then reused during the integration.</span>
 <span class="kw">impl</span> <span class="ident">Workspace</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">initial_densities</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">initial_asymmetries</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">initial_densities</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">initial_asymmetries</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">dim</span> <span class="op">=</span> <span class="ident">initial_densities</span>.<span class="ident">dim</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k</span>: [<span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>; <span class="ident">tableau</span>::<span class="ident">RK_S</span>];
@@ -1402,15 +1416,15 @@
             .<span class="ident">and</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">dna_err</span>)
             .<span class="ident">and</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ka</span>[<span class="ident">i</span>])
             .<span class="ident">apply</span>(<span class="op">|</span><span class="ident">dn</span>, <span class="ident">dn_err</span>, <span class="kw-2">&amp;</span><span class="ident">ki</span>, <span class="ident">dna</span>, <span class="ident">dna_err</span>, <span class="kw-2">&amp;</span><span class="ident">kai</span><span class="op">|</span> {
-                <span class="kw-2">*</span><span class="ident">dn</span> <span class="op">+</span><span class="op">=</span> <span class="ident">bi</span> <span class="op">*</span> <span class="ident">ki</span>;
-                <span class="kw-2">*</span><span class="ident">dn_err</span> <span class="op">+</span><span class="op">=</span> <span class="ident">ei</span> <span class="op">*</span> <span class="ident">ki</span>;
-                <span class="kw-2">*</span><span class="ident">dna</span> <span class="op">+</span><span class="op">=</span> <span class="ident">bi</span> <span class="op">*</span> <span class="ident">kai</span>;
-                <span class="kw-2">*</span><span class="ident">dna_err</span> <span class="op">+</span><span class="op">=</span> <span class="ident">ei</span> <span class="op">*</span> <span class="ident">kai</span>;
+                <span class="kw-2">*</span><span class="ident">dn</span> <span class="op">+=</span> <span class="ident">bi</span> <span class="op">*</span> <span class="ident">ki</span>;
+                <span class="kw-2">*</span><span class="ident">dn_err</span> <span class="op">+=</span> <span class="ident">ei</span> <span class="op">*</span> <span class="ident">ki</span>;
+                <span class="kw-2">*</span><span class="ident">dna</span> <span class="op">+=</span> <span class="ident">bi</span> <span class="op">*</span> <span class="ident">kai</span>;
+                <span class="kw-2">*</span><span class="ident">dna_err</span> <span class="op">+=</span> <span class="ident">ei</span> <span class="op">*</span> <span class="ident">kai</span>;
             });
     }
 
     <span class="doccomment">/// Get the local error using L∞-norm</span>
-    <span class="kw">fn</span> <span class="ident">local_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">fn</span> <span class="ident">local_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
         <span class="self">self</span>.<span class="ident">dn_err</span>
             .<span class="ident">iter</span>()
             .<span class="ident">chain</span>(<span class="self">self</span>.<span class="ident">dna_err</span>.<span class="ident">iter</span>())
@@ -1419,11 +1433,11 @@
 
     <span class="doccomment">/// Advance the integration by apply the computed changes to far to the number densities.</span>
     <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">n</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dn</span>;
-        <span class="self">self</span>.<span class="ident">na</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dna</span>;
+        <span class="self">self</span>.<span class="ident">n</span> <span class="op">+=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dn</span>;
+        <span class="self">self</span>.<span class="ident">na</span> <span class="op">+=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dna</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">result</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">result</span>(<span class="self">self</span>) <span class="op">-&gt;</span> (<span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) {
         (<span class="self">self</span>.<span class="ident">n</span>, <span class="self">self</span>.<span class="ident">na</span>)
     }
 }
@@ -1466,14 +1480,14 @@
             .<span class="ident">interactions</span>()
             .<span class="ident">par_iter</span>()
             .<span class="ident">fold</span>(
-                <span class="op">|</span><span class="op">|</span> (<span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">dim</span>), <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">dim</span>)),
+                <span class="op">||</span> (<span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">dim</span>), <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">dim</span>)),
                 <span class="op">|</span>(<span class="kw-2">mut</span> <span class="ident">dn</span>, <span class="kw-2">mut</span> <span class="ident">dna</span>), <span class="ident">interaction</span><span class="op">|</span> {
                     <span class="ident">interaction</span>.<span class="ident">change</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dn</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dna</span>, <span class="kw-2">&amp;</span><span class="ident">ci</span>);
                     (<span class="ident">dn</span>, <span class="ident">dna</span>)
                 },
             )
             .<span class="ident">reduce</span>(
-                <span class="op">|</span><span class="op">|</span> (<span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">dim</span>), <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">dim</span>)),
+                <span class="op">||</span> (<span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">dim</span>), <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">dim</span>)),
                 <span class="op">|</span>(<span class="ident">dn</span>, <span class="ident">dna</span>), (<span class="ident">dni</span>, <span class="ident">dnai</span>)<span class="op">|</span> (<span class="ident">dn</span> <span class="op">+</span> <span class="ident">dni</span>, <span class="ident">dna</span> <span class="op">+</span> <span class="ident">dnai</span>),
             );
 
@@ -1499,7 +1513,7 @@
     <span class="doccomment">/// into an ODE in time (or inverse temperature in this case), with the</span>
     <span class="doccomment">/// derivative in energy being calculated solely from the previous</span>
     <span class="doccomment">/// time-step.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">solve</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">solve</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> (<span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) {
         <span class="kw">use</span> <span class="ident">tableau</span>::{<span class="ident">RK_A</span>, <span class="ident">RK_C</span>, <span class="ident">RK_ORDER</span>, <span class="ident">RK_S</span>};
 
         <span class="comment">// Initialize all the variables that will be used in the integration</span>
@@ -1520,7 +1534,7 @@
         }
 
         <span class="kw">while</span> <span class="ident">beta</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">1</span> {
-            <span class="ident">step</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="ident">step</span> <span class="op">+=</span> <span class="number">1</span>;
             <span class="ident">advance</span> <span class="op">=</span> <span class="bool-val">false</span>;
             <span class="ident">workspace</span>.<span class="ident">clear_step</span>();
 
@@ -1539,9 +1553,9 @@
             }
 
             <span class="comment">// Log the progress of the integration</span>
-            <span class="kw">if</span> <span class="ident">step</span> <span class="op">%</span> <span class="number">100</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">step</span> <span class="op">%</span> <span class="number">100</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="ident">log</span>::<span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Step {}, β = {:.4e}&quot;</span>, <span class="ident">step</span>, <span class="ident">beta</span>);
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">step</span> <span class="op">%</span> <span class="number">10</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">step</span> <span class="op">%</span> <span class="number">10</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="ident">log</span>::<span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Step {}, β = {:.4e}&quot;</span>, <span class="ident">step</span>, <span class="ident">beta</span>);
             } <span class="kw">else</span> {
                 <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Step {}, β = {:.4e}, h = {:.4e}&quot;</span>, <span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">h</span>);
@@ -1552,7 +1566,7 @@
             <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">RK_S</span> {
                 <span class="comment">// DEBUG</span>
                 <span class="comment">// log::trace!(&quot;i = {}&quot;, i);</span>
-                <span class="ident">evals</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                <span class="ident">evals</span> <span class="op">+=</span> <span class="number">1</span>;
 
                 <span class="comment">// Compute the sub-step values</span>
                 <span class="kw">let</span> <span class="ident">beta_i</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">+</span> <span class="ident">RK_C</span>[<span class="ident">i</span>] <span class="op">*</span> <span class="ident">h</span>;
@@ -1606,7 +1620,7 @@
 
             <span class="comment">// Compute the change in step size based on the current error and</span>
             <span class="comment">// correspondingly adjust the step size</span>
-            <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">err</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+            <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">err</span> <span class="op">==</span> <span class="number">0.0</span> {
                 <span class="number">10.0</span>
             } <span class="kw">else</span> {
                 <span class="number">0.9</span> <span class="op">*</span> (<span class="self">self</span>.<span class="ident">error_tolerance</span> <span class="op">/</span> <span class="ident">err</span>).<span class="ident">powf</span>(<span class="number">1.0</span> <span class="op">/</span> <span class="ident">f64</span>::<span class="ident">from</span>(<span class="ident">RK_ORDER</span> <span class="op">+</span> <span class="number">1</span>))
@@ -1617,11 +1631,11 @@
             <span class="kw">if</span> <span class="ident">advance</span> {
                 <span class="comment">// Advance n and beta</span>
                 <span class="ident">workspace</span>.<span class="ident">advance</span>();
-                <span class="ident">beta</span> <span class="op">+</span><span class="op">=</span> <span class="ident">h</span>;
+                <span class="ident">beta</span> <span class="op">+=</span> <span class="ident">h</span>;
 
                 (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">logger</span>)(<span class="kw-2">&amp;</span><span class="ident">c</span>);
             } <span class="kw">else</span> {
-                <span class="ident">steps_discarded</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                <span class="ident">steps_discarded</span> <span class="op">+=</span> <span class="number">1</span>;
                 <span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Discarding integration step.&quot;</span>);
             }
 
@@ -1650,17 +1664,18 @@
     <span class="doccomment">/// freedom, `$H$` is the Hubble rate and `$\beta$` is the inverse</span>
     <span class="doccomment">/// temperature.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The interactions rates are returned as two dimensional array with the</span>
-    <span class="doccomment">/// first index indexing values of beta, and the second index corresponding</span>
-    <span class="doccomment">/// to the index of the interaction, as returned by [`interactions`].  The</span>
-    <span class="doccomment">/// second index is offset by one with the first index being for beta</span>
-    <span class="doccomment">/// itself.</span>
+    <span class="doccomment">/// The interactions rates are returned as two dimensional array with</span>
+    <span class="doccomment">/// `data[[i, j]]` giving the interaction rate for the `$j$`th interaction</span>
+    <span class="doccomment">/// at the `$i$`th `$\beta$` step.  The interaction index corresponds to the</span>
+    <span class="doccomment">/// index of the interaction as returned by</span>
+    <span class="doccomment">/// [`ModelInteractions::interactions`], offset by 1 such that the 0th value</span>
+    <span class="doccomment">/// is for `$\beta$` itself.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The entries of the returned array as `Option&lt;f64&gt;` in order to</span>
     <span class="doccomment">/// distinguish cases where the rate is not computed due to being unphysical</span>
     <span class="doccomment">/// from cases where it is 0.</span>
     <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gammas</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">usize</span>, <span class="ident">normalize</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">Array2</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gammas</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">usize</span>, <span class="ident">normalize</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">Array2</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;&gt;</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gammas</span> <span class="op">=</span> <span class="ident">Array2</span>::<span class="ident">from_elem</span>((<span class="ident">size</span>, <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">interactions</span>().<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>), <span class="prelude-val">None</span>);
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="self">self</span>.<span class="ident">model</span>.<span class="ident">particles</span>().<span class="ident">len</span>());
         <span class="kw">let</span> <span class="ident">na</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>());
@@ -1682,7 +1697,7 @@
                 .<span class="ident">interactions</span>()
                 .<span class="ident">iter</span>()
                 .<span class="ident">enumerate</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">j</span>, <span class="ident">interaction</span>)<span class="op">|</span> (<span class="ident">j</span>, <span class="ident">interaction</span>.<span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">normalization</span>)))
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">j</span>, <span class="ident">interaction</span>)<span class="op">|</span> (<span class="ident">j</span>, <span class="ident">interaction</span>.<span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>, <span class="bool-val">true</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">normalization</span>)))
                 .<span class="ident">collect</span>();
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>)]</span>
@@ -1691,7 +1706,7 @@
                 .<span class="ident">interactions</span>()
                 .<span class="ident">par_iter</span>()
                 .<span class="ident">enumerate</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">j</span>, <span class="ident">interaction</span>)<span class="op">|</span> (<span class="ident">j</span>, <span class="ident">interaction</span>.<span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">normalization</span>)))
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">j</span>, <span class="ident">interaction</span>)<span class="op">|</span> (<span class="ident">j</span>, <span class="ident">interaction</span>.<span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>, <span class="bool-val">true</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">normalization</span>)))
                 .<span class="ident">collect</span>();
 
             <span class="kw">for</span> (<span class="ident">j</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">values</span> {
@@ -1717,7 +1732,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">size</span>: <span class="ident">usize</span>,
         <span class="ident">normalize</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">Array2</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+    ) <span class="op">-&gt;</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">Array2</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;&gt;</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gammas</span> <span class="op">=</span> <span class="ident">Array2</span>::<span class="ident">from_elem</span>((<span class="ident">size</span>, <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">interactions</span>().<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>), <span class="prelude-val">None</span>);
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="self">self</span>.<span class="ident">model</span>.<span class="ident">particles</span>().<span class="ident">len</span>());
         <span class="kw">let</span> <span class="ident">na</span> <span class="op">=</span> <span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="ident">n</span>.<span class="ident">dim</span>());
@@ -1739,7 +1754,12 @@
                 .<span class="ident">interactions</span>()
                 .<span class="ident">iter</span>()
                 .<span class="ident">enumerate</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">j</span>, <span class="ident">interaction</span>)<span class="op">|</span> (<span class="ident">j</span>, <span class="ident">interaction</span>.<span class="ident">asymmetry</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">normalization</span>)))
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">j</span>, <span class="ident">interaction</span>)<span class="op">|</span> {
+                    (
+                        <span class="ident">j</span>,
+                        <span class="ident">interaction</span>.<span class="ident">asymmetry</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>, <span class="bool-val">true</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">normalization</span>),
+                    )
+                })
                 .<span class="ident">collect</span>();
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>)]</span>
@@ -1748,7 +1768,12 @@
                 .<span class="ident">interactions</span>()
                 .<span class="ident">par_iter</span>()
                 .<span class="ident">enumerate</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">j</span>, <span class="ident">interaction</span>)<span class="op">|</span> (<span class="ident">j</span>, <span class="ident">interaction</span>.<span class="ident">asymmetry</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">normalization</span>)))
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">j</span>, <span class="ident">interaction</span>)<span class="op">|</span> {
+                    (
+                        <span class="ident">j</span>,
+                        <span class="ident">interaction</span>.<span class="ident">asymmetry</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>, <span class="bool-val">true</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">normalization</span>),
+                    )
+                })
                 .<span class="ident">collect</span>();
 
             <span class="kw">for</span> (<span class="ident">j</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">values</span> {
@@ -1781,7 +1806,7 @@
         <span class="ident">beta</span>: <span class="ident">f64</span>,
         <span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
         <span class="ident">na</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    ) <span class="op">-&gt;</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">hubble_rate</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">hubble_rate</span>(<span class="ident">beta</span>);
         <span class="kw">let</span> <span class="ident">normalization</span> <span class="op">=</span>
             (<span class="ident">hubble_rate</span> <span class="op">*</span> <span class="ident">beta</span> <span class="op">*</span> <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span>.<span class="ident">massless_number_density</span>(<span class="number">0.0</span>, <span class="ident">beta</span>))
@@ -1808,7 +1833,7 @@
 <span class="doccomment">/// Fermi–Dirac distribution as determined by their spin.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The `normalized` flag</span>
-<span class="kw">fn</span> <span class="ident">equilibrium_number_densities</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">particles</span>: <span class="ident">I</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">equilibrium_number_densities</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">particles</span>: <span class="ident">I</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Particle</span><span class="op">&gt;</span>,
 {

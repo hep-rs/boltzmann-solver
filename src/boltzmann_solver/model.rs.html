@@ -17,6 +17,7 @@
     "\\defeq": "\\vcentcolon=",
     "\\abs": "\\left\\lvert{#1}\\right\\rvert",
     "\\CP": "\\mathcal{CP}",
+    "\\scM": "\\mathcal{M}",
   };
 
   // Display math is inputted in the documentation as:
@@ -386,6 +387,7 @@
 <span id="318">318</span>
 <span id="319">319</span>
 <span id="320">320</span>
+<span id="321">321</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Model information</span>
 
@@ -420,7 +422,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is implemented separately so that the computational peculiarities</span>
     <span class="doccomment">/// of dealing with `$\beta = \infty$` can be avoided.</span>
-    <span class="kw">fn</span> <span class="ident">zero</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">zero</span>() <span class="op">-&gt;</span> <span class="self">Self</span>;
 
     <span class="doccomment">/// Update the model to be valid at the given inverse temperature `beta`.</span>
     <span class="doccomment">///</span>
@@ -430,11 +432,11 @@
     <span class="kw">fn</span> <span class="ident">set_beta</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">beta</span>: <span class="ident">f64</span>);
 
     <span class="doccomment">/// Return the current value of beta for the model</span>
-    <span class="kw">fn</span> <span class="ident">get_beta</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span>;
+    <span class="kw">fn</span> <span class="ident">get_beta</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f64</span>;
 
     <span class="doccomment">/// Return the effective degrees of freedom contributing to the entropy</span>
     <span class="doccomment">/// density of the Universe at the specified inverse temperature.</span>
-    <span class="kw">fn</span> <span class="ident">entropy_dof</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span>;
+    <span class="kw">fn</span> <span class="ident">entropy_dof</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span>;
 
     <span class="doccomment">/// Return the Hubble rate at the specified inverse temperature.</span>
     <span class="doccomment">///</span>
@@ -453,7 +455,7 @@
     <span class="doccomment">/// The dominated epoch in the Standard Model of cosmology ends at the</span>
     <span class="doccomment">/// matter–radiation equality, which occurs at an inverse temperature of</span>
     <span class="doccomment">/// `$\beta \approx 10^{8}$` GeV^{-1}.</span>
-    <span class="kw">fn</span> <span class="ident">hubble_rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">fn</span> <span class="ident">hubble_rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">beta</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
         <span class="macro">debug_assert_warn</span><span class="macro">!</span>(
             <span class="ident">beta</span> <span class="op">&gt;</span> <span class="number">1e8</span>,
             <span class="string">&quot;For β &gt; 10⁸ GeV⁻¹, our Universe transitions into the matter
@@ -466,15 +468,15 @@
     }
 
     <span class="doccomment">/// Return the number of particles in the model.</span>
-    <span class="kw">fn</span> <span class="ident">len_particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">len_particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">particles</span>().<span class="ident">len</span>()
     }
 
     <span class="doccomment">/// Return a list of particles in the model.</span>
-    <span class="kw">fn</span> <span class="ident">particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">Particle</span>];
+    <span class="kw">fn</span> <span class="ident">particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">Particle</span>];
 
     <span class="doccomment">/// Return a mutable list of particles in the model.</span>
-    <span class="kw">fn</span> <span class="ident">particles_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Particle</span>];
+    <span class="kw">fn</span> <span class="ident">particles_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Particle</span>];
 
     <span class="doccomment">/// Return the index corresponding to a particle&#39;s name and generation</span>
     <span class="doccomment">/// index.</span>
@@ -491,17 +493,18 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the particle is not within the model, the name and index should be</span>
     <span class="doccomment">/// returned as an error so that they can be subsequently handled.</span>
-    <span class="kw">fn</span> <span class="ident">particle_idx</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">S</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, (<span class="ident">S</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">particle_idx</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;&gt;</span>(<span class="ident">name</span>: <span class="ident">S</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, (<span class="ident">S</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>;
 
-    <span class="doccomment">/// The signed version of [`particle_idx`].</span>
+    <span class="doccomment">/// The signed version of [`particle_idx`](Model::particle_idx).</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is identical to [`particle_idx`] but returns an `isize` type.</span>
+    <span class="doccomment">/// This is identical to [`particle_idx`](Model::particle_idx) but returns</span>
+    <span class="doccomment">/// an `isize` type.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the particle is not within the model, the name and index should be</span>
     <span class="doccomment">/// returned as an error so that they can be subsequently handled.</span>
-    <span class="kw">fn</span> <span class="ident">particle_num</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">S</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">isize</span>, (<span class="ident">S</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">particle_num</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;&gt;</span>(<span class="ident">name</span>: <span class="ident">S</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">isize</span>, (<span class="ident">S</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
         <span class="self">Self</span>::<span class="ident">particle_idx</span>(<span class="ident">name</span>, <span class="ident">i</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">isize</span>::<span class="ident">try_from</span>(<span class="ident">idx</span>).<span class="ident">expect</span>(<span class="string">&quot;Unable to convert particle index to isize&quot;</span>))
     }
@@ -516,13 +519,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the particle is not found within the model, the number is returned is</span>
     <span class="doccomment">/// it can be handled separately.</span>
-    <span class="kw">fn</span> <span class="ident">particle_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">isize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">isize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">particle_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">isize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">isize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sign</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">signum</span>();
         <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">abs</span>() <span class="kw">as</span> <span class="ident">usize</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">particles</span>().<span class="ident">get</span>(<span class="ident">idx</span>) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">p</span>.<span class="ident">own_antiparticle</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">sign</span> <span class="op">&lt;</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">p</span>.<span class="ident">own_antiparticle</span> <span class="op">&amp;&amp;</span> <span class="ident">sign</span> <span class="op">&lt;</span> <span class="number">0</span> {
                 <span class="ident">name</span>.<span class="ident">insert</span>(<span class="number">1</span>, <span class="string">&#39;\u{304}&#39;</span>);
             }
             <span class="prelude-val">Ok</span>(<span class="ident">name</span>)
@@ -536,10 +539,10 @@
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if then name or particle is not known within the model.</span>
-    <span class="kw">fn</span> <span class="ident">particle</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Particle</span> {
+    <span class="kw">fn</span> <span class="ident">particle</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Particle</span> {
         <span class="kw">match</span> <span class="self">Self</span>::<span class="ident">particle_idx</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>(), <span class="ident">i</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">idx</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">particles</span>()[<span class="ident">idx</span>],
-            <span class="prelude-val">Err</span>((<span class="ident">name</span>, <span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">idx</span>) <span class="op">=&gt;</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">particles</span>()[<span class="ident">idx</span>],
+            <span class="prelude-val">Err</span>((<span class="ident">name</span>, <span class="ident">i</span>)) <span class="op">=&gt;</span> {
                 <span class="ident">log</span>::<span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;unknown particle {}{}&quot;</span>, <span class="ident">name</span>, <span class="ident">i</span>);
                 <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;unknown particle {}{}&quot;</span>, <span class="ident">name</span>, <span class="ident">i</span>);
             }
@@ -551,10 +554,10 @@
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if then name or particle is not known within the model.</span>
-    <span class="kw">fn</span> <span class="ident">particle_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Particle</span> {
+    <span class="kw">fn</span> <span class="ident">particle_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Particle</span> {
         <span class="kw">match</span> <span class="self">Self</span>::<span class="ident">particle_idx</span>(<span class="ident">name</span>, <span class="ident">i</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">idx</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">particles_mut</span>()[<span class="ident">idx</span>],
-            <span class="prelude-val">Err</span>((<span class="ident">name</span>, <span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">idx</span>) <span class="op">=&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">particles_mut</span>()[<span class="ident">idx</span>],
+            <span class="prelude-val">Err</span>((<span class="ident">name</span>, <span class="ident">i</span>)) <span class="op">=&gt;</span> {
                 <span class="ident">log</span>::<span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;unknown particle {}{}&quot;</span>, <span class="ident">name</span>, <span class="ident">i</span>);
                 <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;unknown particle {}{}&quot;</span>, <span class="ident">name</span>, <span class="ident">i</span>);
             }
@@ -573,7 +576,7 @@
     <span class="doccomment">/// - `na` is an array of `0.0`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// All other attribute contexts will be as expected.</span>
-    <span class="kw">fn</span> <span class="ident">as_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">beta</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_beta</span>();
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">Statistic</span>::<span class="ident">BoseEinstein</span>.<span class="ident">massless_number_density</span>(<span class="number">0.0</span>, <span class="ident">beta</span>);
         <span class="kw">let</span> <span class="ident">hubble_rate</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">hubble_rate</span>(<span class="ident">beta</span>);
@@ -612,7 +615,7 @@
     <span class="kw">type</span> <span class="ident">Item</span>: <span class="ident">Interaction</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Return an iterator over all interactions in the model.</span>
-    <span class="kw">fn</span> <span class="ident">interactions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="self">Self</span>::<span class="ident">Item</span>];
+    <span class="kw">fn</span> <span class="ident">interactions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span>[<span class="self">Self</span>::<span class="ident">Item</span>];
 
     <span class="doccomment">/// Calculate the widths of all particles.</span>
     <span class="doccomment">///</span>
@@ -623,7 +626,7 @@
     <span class="doccomment">/// The information is stored in each particle&#39;s [`Particle::width`] and the</span>
     <span class="doccomment">/// partial widths are stored in [`Particle::decays`].</span>
     <span class="kw">fn</span> <span class="ident">update_widths</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">widths</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">iter</span>::<span class="ident">repeat_with</span>(<span class="op">|</span><span class="op">|</span> (<span class="number">0.0</span>, <span class="ident">HashMap</span>::<span class="ident">new</span>()))
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">widths</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">iter</span>::<span class="ident">repeat_with</span>(<span class="op">||</span> (<span class="number">0.0</span>, <span class="ident">HashMap</span>::<span class="ident">new</span>()))
             .<span class="ident">take</span>(<span class="self">self</span>.<span class="ident">particles</span>().<span class="ident">len</span>())
             .<span class="ident">collect</span>();
 
@@ -631,7 +634,7 @@
         <span class="kw">for</span> <span class="ident">interaction</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">interactions</span>() {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">partial_width</span>) <span class="op">=</span> <span class="ident">interaction</span>.<span class="ident">width</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) {
                 <span class="kw">let</span> <span class="ident">parent_idx</span> <span class="op">=</span> <span class="ident">partial_width</span>.<span class="ident">parent_idx</span>();
-                <span class="ident">widths</span>[<span class="ident">parent_idx</span>].<span class="number">0</span> <span class="op">+</span><span class="op">=</span> <span class="ident">partial_width</span>.<span class="ident">width</span>;
+                <span class="ident">widths</span>[<span class="ident">parent_idx</span>].<span class="number">0</span> <span class="op">+=</span> <span class="ident">partial_width</span>.<span class="ident">width</span>;
                 <span class="ident">widths</span>[<span class="ident">parent_idx</span>]
                     .<span class="number">1</span>
                     .<span class="ident">insert</span>(<span class="ident">partial_width</span>.<span class="ident">daughters</span>, <span class="ident">partial_width</span>.<span class="ident">width</span>);
@@ -662,7 +665,7 @@
     <span class="kw">type</span> <span class="ident">Item</span>: <span class="ident">Interaction</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Sync</span>;
 
     <span class="doccomment">/// Return an iterator over all interactions in the model.</span>
-    <span class="kw">fn</span> <span class="ident">interactions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="self">Self</span>::<span class="ident">Item</span>];
+    <span class="kw">fn</span> <span class="ident">interactions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span>[<span class="self">Self</span>::<span class="ident">Item</span>];
 
     <span class="doccomment">/// Calculate the widths of all particles.</span>
     <span class="doccomment">///</span>
@@ -673,8 +676,8 @@
     <span class="doccomment">/// The information is stored in each particle&#39;s [`Particle::width`] and the</span>
     <span class="doccomment">/// partial widths are stored in [`Particle::decays`].</span>
     <span class="kw">fn</span> <span class="ident">update_widths</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">widths</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">RwLock</span>::<span class="ident">new</span>(
-            <span class="ident">iter</span>::<span class="ident">repeat_with</span>(<span class="op">|</span><span class="op">|</span> (<span class="number">0.0</span>, <span class="ident">HashMap</span>::<span class="ident">new</span>()))
+        <span class="kw">let</span> <span class="ident">widths</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;&gt;</span> <span class="op">=</span> <span class="ident">RwLock</span>::<span class="ident">new</span>(
+            <span class="ident">iter</span>::<span class="ident">repeat_with</span>(<span class="op">||</span> (<span class="number">0.0</span>, <span class="ident">HashMap</span>::<span class="ident">new</span>()))
                 .<span class="ident">take</span>(<span class="self">self</span>.<span class="ident">particles</span>().<span class="ident">len</span>())
                 .<span class="ident">collect</span>(),
         );
@@ -687,7 +690,7 @@
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">widths</span> <span class="op">=</span> <span class="ident">widths</span>
                     .<span class="ident">write</span>()
                     .<span class="ident">expect</span>(<span class="string">&quot;cannot get write access of widths behind RwLock&quot;</span>);
-                <span class="ident">widths</span>[<span class="ident">parent_idx</span>].<span class="number">0</span> <span class="op">+</span><span class="op">=</span> <span class="ident">partial_width</span>.<span class="ident">width</span>;
+                <span class="ident">widths</span>[<span class="ident">parent_idx</span>].<span class="number">0</span> <span class="op">+=</span> <span class="ident">partial_width</span>.<span class="ident">width</span>;
                 <span class="ident">widths</span>[<span class="ident">parent_idx</span>]
                     .<span class="number">1</span>
                     .<span class="ident">insert</span>(<span class="ident">partial_width</span>.<span class="ident">daughters</span>, <span class="ident">partial_width</span>.<span class="ident">width</span>);
