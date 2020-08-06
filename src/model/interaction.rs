@@ -189,7 +189,8 @@ where
     /// manually.  Care must be taken to obey [`Interaction::width_enabled`] in
     /// order to avoid unnecessary computation (though the incorrect
     /// implementation will not be detrimental other than in performance).
-    fn width(&self, _c: &Context<M>) -> Option<PartialWidth> {
+    #[allow(unused_variables)]
+    fn width(&self, c: &Context<M>) -> Option<PartialWidth> {
         None
     }
 
@@ -239,7 +240,8 @@ where
     /// number density of the decaying particle in order to avoid possible `0 /
     /// 0` errors.  In order to get the real interaction rate, `real` should be
     /// set to true.
-    fn asymmetry(&self, _c: &Context<M>, _real: bool) -> Option<f64> {
+    #[allow(unused_variables)]
+    fn asymmetry(&self, c: &Context<M>, real: bool) -> Option<f64> {
         None
     }
 
