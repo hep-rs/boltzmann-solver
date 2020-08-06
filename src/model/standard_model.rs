@@ -2,7 +2,7 @@ pub mod data;
 
 use crate::model::{Model, Particle};
 use ndarray::{array, prelude::*};
-use num::Complex;
+use num::{Complex, One, Zero};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::{f64, f64::consts::SQRT_2};
@@ -34,6 +34,8 @@ pub struct StandardModel {
     pub ye: Array2<f64>,
     /// CKM matrix
     pub ckm: Array2<Complex<f64>>,
+    /// PMNS matrix
+    pub pmns: Array2<Complex<f64>>,
 
     // Scalar potential
     /// 0-temperature mass of the Higgs
@@ -91,6 +93,7 @@ impl Model for StandardModel {
             g2: 6.476e-01,
             g3: 1.164e+00,
             ckm: generate_ckm(),
+            pmns: generate_pmns(),
             yu: SQRT_2 / data::VEV
                 * array![
                     [data::MASS_UP, 0.0, 0.0],
@@ -274,6 +277,61 @@ fn generate_ckm() -> Array2<Complex<f64>> {
             )
         ]
     ]
+}
+
+fn generate_pmns() -> Array2<Complex<f64>> {
+    use crate::model::standard_model::data::{PMNS_DELTA, PMNS_T12, PMNS_T13, PMNS_T23};
+
+    let r23 = {
+        let (sin, cos) = PMNS_T23.sin_cos();
+        array![
+            [Complex::one(), Complex::zero(), Complex::zero()],
+            [
+                Complex::zero(),
+                Complex::new(cos, 0.0),
+                Complex::new(sin, 0.0)
+            ],
+            [
+                Complex::zero(),
+                Complex::new(-sin, 0.0),
+                Complex::new(cos, 0.0)
+            ]
+        ]
+    };
+    let r13 = {
+        let (sin, cos) = PMNS_T13.sin_cos();
+        array![
+            [
+                Complex::new(cos, 0.0),
+                Complex::zero(),
+                Complex::from_polar(sin, -PMNS_DELTA),
+            ],
+            [Complex::zero(), Complex::one(), Complex::zero(),],
+            [
+                Complex::from_polar(-sin, PMNS_DELTA),
+                Complex::zero(),
+                Complex::new(cos, 0.0),
+            ]
+        ]
+    };
+    let r12 = {
+        let (sin, cos) = PMNS_T12.sin_cos();
+        array![
+            [
+                Complex::new(cos, 0.0),
+                Complex::new(sin, 0.0),
+                Complex::zero()
+            ],
+            [
+                Complex::new(-sin, 0.0),
+                Complex::new(cos, 0.0),
+                Complex::zero()
+            ],
+            [Complex::zero(), Complex::zero(), Complex::one()]
+        ]
+    };
+
+    r23.dot(&r13).dot(&r12)
 }
 
 #[cfg(test)]
