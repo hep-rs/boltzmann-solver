@@ -543,7 +543,6 @@ where
     fn fix_equilibrium(&self, c: &Context<M>, workspace: &mut Workspace) {
         for &eq in &self.in_equilibrium {
             workspace.dn[eq] = c.eq[eq] - workspace.n[eq];
-            workspace.dna[eq] = -workspace.na[eq];
         }
         for &eq in &self.no_asymmetry {
             workspace.dna[eq] = -workspace.na[eq];
@@ -629,7 +628,6 @@ where
                 // Set changes to zero for those particles in equilibrium
                 for &eq in &self.in_equilibrium {
                     workspace.k[i][eq] = 0.0;
-                    workspace.ka[i][eq] = 0.0;
                 }
                 for &eq in &self.no_asymmetry {
                     workspace.ka[i][eq] = 0.0;

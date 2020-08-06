@@ -39,7 +39,15 @@ where
             LeptogenesisModel::particle_idx("A", 0).unwrap(),
             LeptogenesisModel::particle_idx("W", 0).unwrap(),
             LeptogenesisModel::particle_idx("G", 0).unwrap(),
-            // LeptogenesisModel::particle_idx("H", 0).unwrap(),
+        ]
+        .iter()
+        .cloned(),
+    );
+    builder = builder.no_asymmetry(
+        [
+            LeptogenesisModel::particle_idx("A", 0).unwrap(),
+            LeptogenesisModel::particle_idx("W", 0).unwrap(),
+            LeptogenesisModel::particle_idx("G", 0).unwrap(),
         ]
         .iter()
         .cloned(),
