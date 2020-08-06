@@ -204,8 +204,9 @@ impl<M> SolverBuilder<M> {
     /// Specify the particles which must remain in equilibrium.
     ///
     /// Particles which are held in equilibrium will never have their number
-    /// density deviate from equilibrium, and the corresponding asymmetry never
-    /// deviates from 0.
+    /// density deviate from equilibrium.  The corresponding asymmetry may
+    /// deviate from 0 unless this is also pegged by
+    /// [`SolverBuilder::no_asymmetry`].
     ///
     /// These particles are specified by their index.
     ///
