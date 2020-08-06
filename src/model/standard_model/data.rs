@@ -31,6 +31,11 @@ pub const MASS_BO: f64 = 4.18;
 /// Top quark mass in GeV.
 pub const MASS_TO: f64 = 172.76;
 
+/// Neutrino `$|\Delta m_{21}|$` in GeV
+pub const DELTA_M21: f64 = 8.61394e-12;
+/// Neutrino `$|\Delta m_{3\ell}|$` in GeV
+pub const DELTA_M3L: f64 = 5.01697e-11;
+
 /// Higgs boson VEV in GeV.
 pub const VEV: f64 = 246.22;
 
@@ -42,6 +47,15 @@ pub const CKM_LAMBDA: f64 = 0.224_837;
 pub const CKM_RHO: f64 = 0.1569;
 /// CKM Wolfenstain `$\overline\eta$` parameter
 pub const CKM_ETA: f64 = 0.3499;
+
+/// PMNS `$\theta_{12}$` in radians
+pub const PMNS_T12: f64 = 0.583_638;
+/// PMNS `$\theta_{23}$` in radians
+pub const PMNS_T23: f64 = 0.858_702;
+/// PMNS `$\theta_{13}$` in radians
+pub const PMNS_T13: f64 = 0.149_575;
+/// PMNS `$\delta_{CP}$` in radians
+pub const PMNS_DELTA: f64 = 3.4383;
 
 /// Value of `$g_{*}$` for the Standard Model.
 ///
