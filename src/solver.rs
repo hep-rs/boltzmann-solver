@@ -770,7 +770,7 @@ where
 
     /// Compute the asymmetric interaction rates.
     ///
-    /// The arguments and returned values are identical to [`gammas`].
+    /// The arguments and returned values are identical to [`Solver::gammas`].
     pub fn asymmetries(
         &mut self,
         size: usize,
