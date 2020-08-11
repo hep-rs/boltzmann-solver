@@ -304,7 +304,7 @@ where
 
         let mut rate = RateDensity::zero();
         rate.symmetric = gamma * (forward_prefactor - backward_prefactor);
-        rate.asymmetric = asymmetry * (forward_prefactor + backward_prefactor)
+        rate.asymmetric = asymmetry * (forward_prefactor - backward_prefactor)
             + gamma
                 * (checked_div(
                     particles_idx
@@ -325,7 +325,7 @@ where
                     particles_idx
                         .incoming
                         .iter()
-                        .map(|&p| c.n[p])
+                        .map(|&p| c.eq[p])
                         .product::<f64>(),
                 ) - checked_div(
                     particles_idx
@@ -346,7 +346,7 @@ where
                     particles_idx
                         .outgoing
                         .iter()
-                        .map(|&p| c.n[p])
+                        .map(|&p| c.eq[p])
                         .product::<f64>(),
                 ));
 
