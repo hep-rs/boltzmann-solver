@@ -350,6 +350,6 @@ where
                 + gamma * (na1 - eq1 * checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
         }
 
-        Some(rate)
+        Some(rate * c.normalization)
     }
 }

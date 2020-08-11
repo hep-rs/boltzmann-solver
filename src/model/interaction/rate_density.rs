@@ -56,9 +56,35 @@ impl ops::Mul<f64> for RateDensity {
     }
 }
 
+impl ops::Mul<RateDensity> for f64 {
+    type Output = RateDensity;
+
+    fn mul(self, rhs: RateDensity) -> RateDensity {
+        rhs * self
+    }
+}
+
 impl ops::MulAssign<f64> for RateDensity {
     fn mul_assign(&mut self, rhs: f64) {
         self.symmetric *= rhs;
         self.asymmetric *= rhs;
+    }
+}
+
+impl ops::Div<f64> for RateDensity {
+    type Output = Self;
+
+    fn div(self, rhs: f64) -> Self {
+        Self {
+            symmetric: self.symmetric / rhs,
+            asymmetric: self.asymmetric / rhs,
+        }
+    }
+}
+
+impl ops::DivAssign<f64> for RateDensity {
+    fn div_assign(&mut self, rhs: f64) {
+        self.symmetric /= rhs;
+        self.asymmetric /= rhs;
     }
 }
