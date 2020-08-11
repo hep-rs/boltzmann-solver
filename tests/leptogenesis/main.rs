@@ -773,48 +773,48 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
         })
         .collect();
 
-    let mut precomputed = csv::Writer::from_path({
+    let mut csv = csv::Writer::from_path({
         let mut path = output_dir.clone();
-        path.push("gamma_precomputed.csv");
+        path.push("gamma.csv");
         path
     })?;
     let (header, data) = solvers[0].gammas(1024, true);
-    precomputed.serialize(header)?;
+    csv.serialize(header)?;
     for row in data.axis_iter(Axis(0)) {
-        precomputed.serialize(row.as_slice().unwrap())?;
+        csv.serialize(row.as_slice().unwrap())?;
     }
 
-    let mut precomputed_asymmetry = csv::Writer::from_path({
+    let mut csv = csv::Writer::from_path({
         let mut path = output_dir;
-        path.push("asymmetry_precomputed.csv");
+        path.push("asymmetry.csv");
         path
     })?;
     let (header, data) = solvers[0].asymmetries(1024, true);
-    precomputed_asymmetry.serialize(header)?;
+    csv.serialize(header)?;
     for row in data.axis_iter(Axis(0)) {
-        precomputed_asymmetry.serialize(row.as_slice().unwrap())?;
+        csv.serialize(row.as_slice().unwrap())?;
     }
 
-    // let mut non_precomputed = csv::Writer::from_path({
+    // let mut csv = csv::Writer::from_path({
     //     let mut path = output_dir.clone();
     //     path.push("gamma_raw.csv");
     //     path
     // })?;
     // let (header, data) = solvers[1].gammas(1024, true);
-    // non_precomputed.serialize(header)?;
+    // csv.serialize(header)?;
     // for row in data.axis_iter(Axis(0)) {
-    //     non_precomputed.serialize(row.as_slice().unwrap())?;
+    //     csv.serialize(row.as_slice().unwrap())?;
     // }
 
-    // let mut non_precomputed_asymmetry = csv::Writer::from_path({
+    // let mut csv = csv::Writer::from_path({
     //     let mut path = output_dir;
-    //     path.push("asymmetry_raw.csv");
+    //     path.push("asymmetry.csv");
     //     path
     // })?;
     // let (header, data) = solvers[1].asymmetries(1024, true);
-    // non_precomputed_asymmetry.serialize(header)?;
+    // csv.serialize(header)?;
     // for row in data.axis_iter(Axis(0)) {
-    //     non_precomputed_asymmetry.serialize(row.as_slice().unwrap())?;
+    //     csv.serialize(row.as_slice().unwrap())?;
     // }
 
     Ok(())
