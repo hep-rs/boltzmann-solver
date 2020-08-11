@@ -205,6 +205,13 @@ where
     /// This must return the result *before* it is normalized by the Hubble rate
     /// or other factors related to the number densities of particles involved.
     /// It also must *not* be normalized to the integration step size.
+    /// Specifically, this corresponds to `$\gamma$` in the following expression:
+    ///
+    /// ```math
+    /// H \beta n_1 \pfrac{n_a}{\beta} =
+    ///   - \left( \prod_{i \in X} \right) \gamma(a X \to Y)
+    ///   + \left( \prod_{i \in Y} \right) \gamma(Y \to a X)
+    /// ```
     ///
     /// Care must be taken to obey [`Interaction::gamma_enabled`] in order to
     /// avoid unnecessary computations.  Specifically, this should always return
@@ -248,12 +255,26 @@ where
     /// Calculate the actual interaction rates density taking into account
     /// factors related to the number densities of particles involved.
     ///
-    /// The result must not be normalized by the Hubble rate, nor include the
-    /// factors relating to the integration step size.
+    /// The result is normalized by the Hubble rate, but does not include
+    /// factors relating to the integration step size.  Specifically, it
+    /// corresponds to the right hand side of the equation:
+    ///
+    /// ```math
+    /// \pfrac{n_a}{\beta} = \frac{1}{H \beta n_1} \left[
+    ///   - \left( \prod_{i \in X} \right) \gamma(a X \to Y)
+    ///   + \left( \prod_{i \in Y} \right) \gamma(Y \to a X)
+    /// \right].
+    /// ```
+    ///
+    /// The normalization factor `$(H \beta n_1)^{-1}$` is accessible within the
+    /// current context through [`Context::normalization`].
     ///
     /// The rate density is defined such that the change initial state particles
     /// is proportional to the negative of the rates contained, while the change
     /// for final state particles is proportional to the rates themselves.
+    ///
+    /// The default implementation uses the output of [`Interaction::gamma`] and
+    /// [`Interaction::asymmetry`] in order to computer the actual rate.
     fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
         let gamma = self.gamma(c, false).unwrap_or(0.0);
         let asymmetry = self.asymmetry(c, false).unwrap_or(0.0);
@@ -329,20 +350,29 @@ where
                         .product::<f64>(),
                 ));
 
-        Some(rate)
+        Some(rate * c.normalization)
     }
 
-    /// Adjust the backward and forward rates such that they do not overshoot
-    /// the equilibrium number densities.
+    /// Compute the adjusted rate to handle possible overshoots of the
+    /// equilibrium number density.
     ///
-    /// The rate density going into this function is expected to be the output
-    /// of [`Interaction::rate`] and must not be previously normalized to the
-    /// Hubble rate nor include factors relating to the integration step size.
+    /// The output of this function should be in principle the same as [`rate`],
+    /// but may be smaller if the interaction rate would overshoot an
+    /// equilibrium number density.  Furthermore, it is scale by the current
+    /// integration step size:
     ///
-    /// The output of this function however *will* be normalized by the HUbble
-    /// rate and *will* factors relating to the numerical integration.
+    /// ```math
+    /// \Delta n = \pfrac{n}{\beta} h.
+    /// ```
+    ///
+    /// The default implementation uses the output of [`Interaction::rate`] in
+    /// order to computer the actual rate.
+    ///
+    /// This method should generally not be implemented.  If it is implemented
+    /// separately, one must take care to take into account the integration step
+    /// size which is available in [`Context::step_size`].
     fn adjusted_rate(&self, c: &Context<M>) -> Option<RateDensity> {
-        let mut rate = self.rate(c)? * c.step_size * c.normalization;
+        let mut rate = self.rate(c)? * c.step_size;
 
         // No need to do anything of both rates are 0.
         if rate.symmetric == 0.0 && rate.asymmetric == 0.0 {
@@ -421,13 +451,14 @@ where
 
     /// Add this interaction to the `dn` and `dna` array.
     ///
-    /// The changes in `dn` should contain only the effect from the integrated
-    /// collision operator and not take into account the normalization to
-    /// inverse-temperature evolution nor the dilation factor from expansion of
-    /// the Universe.  These factors are handled separately and automatically.
+    /// This must use the final `$\Delta n$` taking into account all
+    /// normalization (`$(H \beta n_1)^{-1}$`) and numerical integration factors
+    /// (the step size `$h$`).
     ///
-    /// This function automatically adjusts the rate calculated by
-    /// [`Interaction::rate`] so that overshooting is avoided.
+    /// The default implementation uses the output of
+    /// [`Interaction::adjusted_rate`] in order to computer the actual rate.
+    ///
+    /// This method should generally not be implemented.
     fn change(&self, dn: &mut Array1<f64>, dna: &mut Array1<f64>, c: &Context<M>) {
         if let Some(rate) = self.adjusted_rate(c) {
             let particles_idx = self.particles_idx();
