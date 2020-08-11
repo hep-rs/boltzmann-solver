@@ -228,8 +228,8 @@ def plot_gamma(data):
             if len(fig.data) > 0:
                 fig.add_shape(
                     type="rect",
-                    x0=1e-18,
-                    x1=1e-2,
+                    x0=data["beta"].min(),
+                    x1=data["beta"].max(),
                     y0=1e-1,
                     y1=1e1,
                     fillcolor="Grey",
@@ -242,5 +242,7 @@ def plot_gamma(data):
             group = standardize(column)
 
         if not data[column].isnull().all() and data[column].map(lambda x: x > 0).any():
-            fig.add_trace(go.Scatter(name=column, x=data["beta"], y=data[column]))
+            fig.add_trace(
+                go.Scatter(name=column, showlegend=True, x=data["beta"], y=data[column])
+            )
 
