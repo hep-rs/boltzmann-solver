@@ -50,10 +50,10 @@ pub const CKM_ETA: f64 = 0.3499;
 
 /// PMNS `$\theta_{12}$` in radians
 pub const PMNS_T12: f64 = 0.583_638;
-/// PMNS `$\theta_{23}$` in radians
-pub const PMNS_T23: f64 = 0.858_702;
 /// PMNS `$\theta_{13}$` in radians
 pub const PMNS_T13: f64 = 0.149_575;
+/// PMNS `$\theta_{23}$` in radians
+pub const PMNS_T23: f64 = 0.858_702;
 /// PMNS `$\delta_{CP}$` in radians
 pub const PMNS_DELTA: f64 = 3.4383;
 
