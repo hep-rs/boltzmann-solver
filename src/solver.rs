@@ -625,14 +625,6 @@ where
                 // Compute k[i] and ka[i] from each interaction
                 self.compute_ki(&mut workspace.k[i], &mut workspace.ka[i], &ci);
 
-                // Set changes to zero for those particles in equilibrium
-                for &eq in &self.in_equilibrium {
-                    workspace.k[i][eq] = 0.0;
-                }
-                for &eq in &self.no_asymmetry {
-                    workspace.ka[i][eq] = 0.0;
-                }
-
                 workspace.compute_dn(i)
             }
 
