@@ -399,15 +399,7 @@ where
         }
 
         // DEBUG
-        // if log::log_enabled!(log::Level::Info) {
-        //     log::info!(
-        //         "γ({}) = {:>10.3e} | {:>10.3e}",
-        //         self.particles().display(c.model).unwrap(),
-        //         rate.symmetric,
-        //         rate.asymmetric,
-        //     );
-        //     log::info!("counts: {:?}", counts);
-        // }
+        // let old_rate = rate.clone();
 
         let mut changed = true;
         while changed {
@@ -436,9 +428,16 @@ where
                 }
             }
 
-            // if changed && log::log_enabled!(log::Level::Info) {
-            //     log::info!(
-            //         "--> γ({}) = {:>10.3e} | {:>10.3e}",
+            // DEBUG
+            // if changed {
+            //     log::trace!(
+            //         "old γ({}) = {:>10.3e} | {:>10.3e}",
+            //         self.particles().display(c.model).unwrap(),
+            //         old_rate.symmetric,
+            //         old_rate.asymmetric,
+            //     );
+            //     log::trace!(
+            //         "new γ({}) = {:>10.3e} | {:>10.3e}",
             //         self.particles().display(c.model).unwrap(),
             //         rate.symmetric,
             //         rate.asymmetric,
