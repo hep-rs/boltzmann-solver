@@ -386,6 +386,9 @@ pub fn decay_washout_1gen() -> Result<(), Box<dyn error::Error>> {
     // Get the solution
     let mut model = LeptogenesisModel::zero();
     for i in &[
+        interaction::hqu,
+        interaction::hqd,
+        interaction::hle,
         interaction::hln,
         interaction::hhw,
         interaction::hha,
@@ -404,13 +407,13 @@ pub fn decay_washout_1gen() -> Result<(), Box<dyn error::Error>> {
         interaction::hhaa,
         interaction::hhaw,
         interaction::hhll1,
-        interaction::hhll2,
-        interaction::hhen,
-        interaction::nhla,
-        interaction::nhlw,
+        // interaction::hhll2, // problematic
+        // interaction::hhen, // problematic
+        // interaction::nhla, // problematic
+        // interaction::nhlw, // problematic
         interaction::quln,
         interaction::qdln,
-        interaction::leln,
+        // interaction::leln, // problematic
         interaction::lnln,
     ] {
         model.interactions.extend(
