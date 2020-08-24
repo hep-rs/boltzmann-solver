@@ -132,12 +132,12 @@ fn particle_indices() {
 /// Test the effects of the right-handed neutrino decay on its own in the
 /// 1-generation case.
 #[test]
-pub fn decay_only_1gen() -> Result<(), Box<dyn error::Error>> {
+pub fn decay_1() -> Result<(), Box<dyn error::Error>> {
     init();
 
     // Create the CSV file
-    let output_dir = common::output_dir("leptogenesis/decay_only/1gen");
-    let csv = csv::Writer::from_path(output_dir.join("n.csv"))?;
+    let output_dir = common::output_dir("full");
+    let csv = csv::Writer::from_path(output_dir.join("decay_1.csv"))?;
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
@@ -185,12 +185,12 @@ pub fn decay_only_1gen() -> Result<(), Box<dyn error::Error>> {
 /// Test the effects of the right-handed neutrino decay on its own in the
 /// 3-generation case.
 #[test]
-pub fn decay_only_3gen() -> Result<(), Box<dyn error::Error>> {
+pub fn decay_3() -> Result<(), Box<dyn error::Error>> {
     init();
 
     // Create the CSV file
-    let output_dir = common::output_dir("leptogenesis/decay_only/3gen");
-    let csv = csv::Writer::from_path(output_dir.join("n.csv"))?;
+    let output_dir = common::output_dir("full");
+    let csv = csv::Writer::from_path(output_dir.join("decay_3.csv"))?;
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
@@ -238,12 +238,12 @@ pub fn decay_only_3gen() -> Result<(), Box<dyn error::Error>> {
 /// Test the effects of a washout term on its own in the 1-generation case.
 #[test]
 #[cfg(not(debug_assertions))]
-pub fn washout_only_1gen() -> Result<(), Box<dyn error::Error>> {
+pub fn washout_1() -> Result<(), Box<dyn error::Error>> {
     init();
 
     // Create the CSV file
-    let output_dir = common::output_dir("leptogenesis/washout_only/1gen");
-    let csv = csv::Writer::from_path(output_dir.join("n.csv"))?;
+    let output_dir = common::output_dir("full");
+    let csv = csv::Writer::from_path(output_dir.join("washout_1.csv"))?;
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
@@ -309,12 +309,12 @@ pub fn washout_only_1gen() -> Result<(), Box<dyn error::Error>> {
 /// Test the effects of a washout terms on their own in the 3-generation case.
 #[test]
 #[cfg(not(debug_assertions))]
-pub fn washout_only_3gen() -> Result<(), Box<dyn error::Error>> {
+pub fn washout_3() -> Result<(), Box<dyn error::Error>> {
     init();
 
     // Create the CSV file
-    let output_dir = common::output_dir("leptogenesis/washout_only/3gen");
-    let csv = csv::Writer::from_path(output_dir.join("n.csv"))?;
+    let output_dir = common::output_dir("full");
+    let csv = csv::Writer::from_path(output_dir.join("washout_3.csv"))?;
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
@@ -376,12 +376,12 @@ pub fn washout_only_3gen() -> Result<(), Box<dyn error::Error>> {
 
 #[test]
 #[cfg(not(debug_assertions))]
-pub fn decay_washout_1gen() -> Result<(), Box<dyn error::Error>> {
+pub fn full_1() -> Result<(), Box<dyn error::Error>> {
     init();
 
     // Create the CSV files
-    let output_dir = common::output_dir("leptogenesis/decay_washout/1gen");
-    let csv = csv::Writer::from_path(output_dir.join("n.csv"))?;
+    let output_dir = common::output_dir("full");
+    let csv = csv::Writer::from_path(output_dir.join("full_1.csv"))?;
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
@@ -444,12 +444,12 @@ pub fn decay_washout_1gen() -> Result<(), Box<dyn error::Error>> {
 
 #[test]
 #[cfg(not(debug_assertions))]
-pub fn decay_washout_3gen() -> Result<(), Box<dyn error::Error>> {
+pub fn full_3() -> Result<(), Box<dyn error::Error>> {
     init();
 
     // Create the CSV file
-    let output_dir = common::output_dir("leptogenesis/decay_washout/3gen");
-    let csv = csv::Writer::from_path(output_dir.join("n.csv"))?;
+    let output_dir = common::output_dir("full");
+    let csv = csv::Writer::from_path(output_dir.join("full_3.csv"))?;
 
     // Get the solution
     let mut model = LeptogenesisModel::zero();
@@ -509,67 +509,6 @@ pub fn decay_washout_3gen() -> Result<(), Box<dyn error::Error>> {
     Ok(())
 }
 
-/// Scan some parameter space and store the B-L from the scan in a CSV file.
-#[test]
-#[ignore]
-#[cfg(not(debug_assertions))]
-pub fn scan() -> Result<(), Box<dyn error::Error>> {
-    init();
-
-    // Create the CSV file
-    let output_dir = common::output_dir("leptogenesis");
-    let mut csv = csv::Writer::from_path(output_dir.join("scan.csv"))?;
-
-    // Write the header for the CSV
-    csv.serialize(("y", "m", "B-L", "N1"))?;
-
-    for (&y, &m) in iproduct!(
-        Array1::linspace(-8.0, -2.0, 8).into_iter(),
-        Array1::linspace(6.0, 14.0, 8).into_iter()
-    ) {
-        // Convert y and m from the exponent to their actual values
-        let y = 10f64.powf(y);
-        let m = 10f64.powf(m);
-
-        // Adjust the model with the necessary Yukawa and mass
-        let mut model = LeptogenesisModel::zero();
-        model.yv.mapv_inplace(|yi| yi / 1e-4 * y);
-        model.mn[0] = m;
-
-        let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
-        let builder = SolverBuilder::new().model(model).beta_range(1e-17, 1e-3);
-
-        let (n, na) = solve(builder, &names, None::<csv::Writer<fs::File>>)?;
-
-        // Write to the CSV file
-        csv.serialize((
-            format!("{:e}", y),
-            format!("{:e}", m),
-            format!(
-                "{:e}",
-                iproduct!(
-                    [
-                        ("Q", 1.0 / 3.0),
-                        ("u", 1.0 / 3.0),
-                        ("d", 1.0 / 3.0),
-                        ("L", -1.0),
-                        ("e", -1.0)
-                    ]
-                    .iter(),
-                    0..3
-                )
-                .map(|((p, f), i)| f * na[LeptogenesisModel::particle_idx(p, i).unwrap()])
-                .sum::<f64>()
-            ),
-            format!("{:e}", n[LeptogenesisModel::particle_idx("N", 0).unwrap()]),
-            format!("{:e}", n[LeptogenesisModel::particle_idx("N", 1).unwrap()]),
-            format!("{:e}", n[LeptogenesisModel::particle_idx("N", 2).unwrap()]),
-        ))?;
-    }
-
-    Ok(())
-}
-
 #[cfg(feature = "serde")]
 #[test]
 fn evolution() -> Result<(), Box<dyn error::Error>> {
@@ -616,7 +555,7 @@ pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
     init();
 
     // Create the CSV file
-    let output_dir = common::output_dir("leptogenesis/higgs_equilibrium");
+    let output_dir = common::output_dir("full/higgs_equilibrium");
 
     let v: Vec<(usize, f64)> = Array1::geomspace(1e-17, 1e-4, 50)
         .unwrap()
@@ -669,7 +608,7 @@ pub fn lepton_equilibrium() -> Result<(), Box<dyn error::Error>> {
     init();
 
     // Create the CSV file
-    let output_dir = common::output_dir("leptogenesis/lepton_equilibrium");
+    let output_dir = common::output_dir("full/lepton_equilibrium");
 
     let v: Vec<(usize, f64)> = Array1::geomspace(1e-17, 1e-4, 50)
         .unwrap()
@@ -717,7 +656,7 @@ pub fn lepton_equilibrium() -> Result<(), Box<dyn error::Error>> {
 fn gammas() -> Result<(), Box<dyn error::Error>> {
     init();
 
-    let output_dir = common::output_dir("leptogenesis/gamma");
+    let output_dir = common::output_dir("full/gamma");
 
     // Create two copies of the model for both solvers
     let mut models = vec![LeptogenesisModel::zero(), LeptogenesisModel::zero()];
