@@ -67,7 +67,8 @@ impl error::Error for Error {
 /// Boltzmann solver builder
 #[allow(clippy::module_name_repetitions)]
 pub struct SolverBuilder<M> {
-    model: Option<M>,
+    /// Inner model
+    pub model: Option<M>,
     initial_densities: Vec<(usize, f64)>,
     initial_asymmetries: Vec<(usize, f64)>,
     beta_range: (f64, f64),
