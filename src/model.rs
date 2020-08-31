@@ -98,11 +98,36 @@ where
     /// that particle is its own anti-particle (so the distinction is
     /// irrelevant).
     ///
+    /// By default, this implementation defers to
+    /// [`static_particle_idx`](Model::static_particle_idx) as models generally
+    /// do not need access to particular instances of the model.
+    ///
     /// # Errors
     ///
     /// If the particle is not within the model, the name and index should be
     /// returned as an error so that they can be subsequently handled.
-    fn particle_idx<S: AsRef<str>>(name: S, i: usize) -> Result<usize, (S, usize)>;
+    fn particle_idx<S: AsRef<str>>(&self, name: S, i: usize) -> Result<usize, (S, usize)> {
+        Self::static_particle_idx(name, i)
+    }
+
+    /// A static implementation of [`particle_idx`](Model::particle_idx) which
+    /// does not need a reference to an instance of the class (i.e. `&self`).
+    ///
+    /// # Errors
+    ///
+    /// If the particle is not within the model, the name and index should be
+    /// returned as an error so that they can be subsequently handled.
+    ///
+    /// # Implementation
+    ///
+    /// If possible, this method should be implemented over
+    /// [`particle_idx`](Model::particle_idx) as models typically will always
+    /// have the same particle content (with only the value of parameters
+    /// varying); however, if the particles might vary between instances of the
+    /// model, this implementation should be
+    /// [`unimplemented!()`](std::unimplemented) and
+    /// [`particle_idx`](Model::particle_idx) should be implemented instead.
+    fn static_particle_idx<S: AsRef<str>>(name: S, i: usize) -> Result<usize, (S, usize)>;
 
     /// The signed version of [`particle_idx`](Model::particle_idx).
     ///
@@ -113,8 +138,20 @@ where
     ///
     /// If the particle is not within the model, the name and index should be
     /// returned as an error so that they can be subsequently handled.
-    fn particle_num<S: AsRef<str>>(name: S, i: usize) -> Result<isize, (S, usize)> {
-        Self::particle_idx(name, i)
+    fn particle_num<S: AsRef<str>>(&self, name: S, i: usize) -> Result<isize, (S, usize)> {
+        self.particle_idx(name, i)
+            .map(|idx| isize::try_from(idx).expect("Unable to convert particle index to isize"))
+    }
+
+    /// A static implementation of [`particle_num`](Model::particle_num) which
+    /// does not need a reference to an instance of the class (i.e. `&self`).
+    ///
+    /// # Errors
+    ///
+    /// If the particle is not within the model, the name and index should be
+    /// returned as an error so that they can be subsequently handled.
+    fn static_particle_num<S: AsRef<str>>(name: S, i: usize) -> Result<isize, (S, usize)> {
+        Self::static_particle_idx(name, i)
             .map(|idx| isize::try_from(idx).expect("Unable to convert particle index to isize"))
     }
 
@@ -149,7 +186,7 @@ where
     ///
     /// Panics if then name or particle is not known within the model.
     fn particle<S: AsRef<str>>(&self, name: S, i: usize) -> &Particle {
-        match Self::particle_idx(name.as_ref(), i) {
+        match self.particle_idx(name.as_ref(), i) {
             Ok(idx) => &self.particles()[idx],
             Err((name, i)) => {
                 log::error!("unknown particle {}{}", name, i);
@@ -164,7 +201,7 @@ where
     ///
     /// Panics if then name or particle is not known within the model.
     fn particle_mut(&mut self, name: &str, i: usize) -> &mut Particle {
-        match Self::particle_idx(name, i) {
+        match self.particle_idx(name, i) {
             Ok(idx) => &mut self.particles_mut()[idx],
             Err((name, i)) => {
                 log::error!("unknown particle {}{}", name, i);

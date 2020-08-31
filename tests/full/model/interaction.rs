@@ -24,9 +24,9 @@ pub fn hle() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
 
         interactions.append(&mut interaction::ThreeParticle::new_all(
             squared_amplitude,
-            LeptogenesisModel::particle_num("H", i1).unwrap(),
-            LeptogenesisModel::particle_num("L", i2).unwrap(),
-            -LeptogenesisModel::particle_num("e", i3).unwrap(),
+            LeptogenesisModel::static_particle_num("H", i1).unwrap(),
+            LeptogenesisModel::static_particle_num("L", i2).unwrap(),
+            -LeptogenesisModel::static_particle_num("e", i3).unwrap(),
         ));
     }
 
@@ -52,9 +52,9 @@ pub fn hqu() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
 
         interactions.append(&mut interaction::ThreeParticle::new_all(
             squared_amplitude,
-            LeptogenesisModel::particle_num("H", i1).unwrap(),
-            LeptogenesisModel::particle_num("Q", i2).unwrap(),
-            -LeptogenesisModel::particle_num("u", i3).unwrap(),
+            LeptogenesisModel::static_particle_num("H", i1).unwrap(),
+            LeptogenesisModel::static_particle_num("Q", i2).unwrap(),
+            -LeptogenesisModel::static_particle_num("u", i3).unwrap(),
         ));
     }
 
@@ -80,9 +80,9 @@ pub fn hqd() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
 
         interactions.append(&mut interaction::ThreeParticle::new_all(
             squared_amplitude,
-            LeptogenesisModel::particle_num("H", i1).unwrap(),
-            LeptogenesisModel::particle_num("Q", i2).unwrap(),
-            -LeptogenesisModel::particle_num("d", i3).unwrap(),
+            LeptogenesisModel::static_particle_num("H", i1).unwrap(),
+            LeptogenesisModel::static_particle_num("Q", i2).unwrap(),
+            -LeptogenesisModel::static_particle_num("d", i3).unwrap(),
         ));
     }
 
@@ -105,9 +105,9 @@ pub fn hln() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
         interactions.extend(
             interaction::ThreeParticle::new_all(
                 squared_amplitude,
-                LeptogenesisModel::particle_num("H", i1).unwrap(),
-                -LeptogenesisModel::particle_num("L", i2).unwrap(),
-                LeptogenesisModel::particle_num("N", i3).unwrap(),
+                LeptogenesisModel::static_particle_num("H", i1).unwrap(),
+                -LeptogenesisModel::static_particle_num("L", i2).unwrap(),
+                LeptogenesisModel::static_particle_num("N", i3).unwrap(),
             )
             .drain(..),
         );
@@ -201,9 +201,9 @@ pub fn ffa() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
 
             interactions.extend(interaction::ThreeParticle::new_all(
                 squared_amplitude,
-                LeptogenesisModel::particle_num(fermion, i1).unwrap(),
-                LeptogenesisModel::particle_num(fermion, i2).unwrap(),
-                LeptogenesisModel::particle_num("A", i3).unwrap(),
+                LeptogenesisModel::static_particle_num(fermion, i1).unwrap(),
+                LeptogenesisModel::static_particle_num(fermion, i2).unwrap(),
+                LeptogenesisModel::static_particle_num("A", i3).unwrap(),
             ));
         }
     }
@@ -231,9 +231,9 @@ pub fn ffw() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
 
             interactions.extend(interaction::ThreeParticle::new_all(
                 squared_amplitude,
-                LeptogenesisModel::particle_num(fermion, i1).unwrap(),
-                LeptogenesisModel::particle_num(fermion, i2).unwrap(),
-                LeptogenesisModel::particle_num("W", i3).unwrap(),
+                LeptogenesisModel::static_particle_num(fermion, i1).unwrap(),
+                LeptogenesisModel::static_particle_num(fermion, i2).unwrap(),
+                LeptogenesisModel::static_particle_num("W", i3).unwrap(),
             ));
         }
     }
@@ -261,9 +261,9 @@ pub fn ffg() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
 
             interactions.extend(interaction::ThreeParticle::new_all(
                 squared_amplitude,
-                LeptogenesisModel::particle_num(fermion, i1).unwrap(),
-                LeptogenesisModel::particle_num(fermion, i2).unwrap(),
-                LeptogenesisModel::particle_num("G", i3).unwrap(),
+                LeptogenesisModel::static_particle_num(fermion, i1).unwrap(),
+                LeptogenesisModel::static_particle_num(fermion, i2).unwrap(),
+                LeptogenesisModel::static_particle_num("G", i3).unwrap(),
             ));
         }
     }
@@ -290,9 +290,9 @@ pub fn hha() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
 
         interactions.append(&mut interaction::ThreeParticle::new_all(
             squared_amplitude,
-            LeptogenesisModel::particle_num("H", i1).unwrap(),
-            LeptogenesisModel::particle_num("H", i2).unwrap(),
-            LeptogenesisModel::particle_num("A", i3).unwrap(),
+            LeptogenesisModel::static_particle_num("H", i1).unwrap(),
+            LeptogenesisModel::static_particle_num("H", i2).unwrap(),
+            LeptogenesisModel::static_particle_num("A", i3).unwrap(),
         ));
     }
 
@@ -322,10 +322,10 @@ pub fn hhaa() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
 
         interactions.append(&mut interaction::FourParticle::new_all(
             squared_amplitude,
-            LeptogenesisModel::particle_num("H", i1).unwrap(),
-            -LeptogenesisModel::particle_num("H", i2).unwrap(),
-            LeptogenesisModel::particle_num("A", i3).unwrap(),
-            LeptogenesisModel::particle_num("A", i4).unwrap(),
+            LeptogenesisModel::static_particle_num("H", i1).unwrap(),
+            -LeptogenesisModel::static_particle_num("H", i2).unwrap(),
+            LeptogenesisModel::static_particle_num("A", i3).unwrap(),
+            LeptogenesisModel::static_particle_num("A", i4).unwrap(),
         ));
     }
 
@@ -351,9 +351,9 @@ pub fn hhw() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
 
         interactions.append(&mut interaction::ThreeParticle::new_all(
             squared_amplitude,
-            LeptogenesisModel::particle_num("H", i1).unwrap(),
-            LeptogenesisModel::particle_num("H", i2).unwrap(),
-            LeptogenesisModel::particle_num("W", 0).unwrap(),
+            LeptogenesisModel::static_particle_num("H", i1).unwrap(),
+            LeptogenesisModel::static_particle_num("H", i2).unwrap(),
+            LeptogenesisModel::static_particle_num("W", 0).unwrap(),
         ));
     }
 
@@ -383,10 +383,10 @@ pub fn hhww() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
 
         interactions.append(&mut interaction::FourParticle::new_all(
             squared_amplitude,
-            LeptogenesisModel::particle_num("H", i1).unwrap(),
-            -LeptogenesisModel::particle_num("H", i2).unwrap(),
-            LeptogenesisModel::particle_num("W", i3).unwrap(),
-            LeptogenesisModel::particle_num("W", i4).unwrap(),
+            LeptogenesisModel::static_particle_num("H", i1).unwrap(),
+            -LeptogenesisModel::static_particle_num("H", i2).unwrap(),
+            LeptogenesisModel::static_particle_num("W", i3).unwrap(),
+            LeptogenesisModel::static_particle_num("W", i4).unwrap(),
         ));
     }
 
@@ -417,10 +417,10 @@ pub fn hhaw() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
 
         interactions.append(&mut interaction::FourParticle::new_all(
             squared_amplitude,
-            LeptogenesisModel::particle_num("H", i1).unwrap(),
-            -LeptogenesisModel::particle_num("H", i2).unwrap(),
-            LeptogenesisModel::particle_num("A", i3).unwrap(),
-            LeptogenesisModel::particle_num("W", i4).unwrap(),
+            LeptogenesisModel::static_particle_num("H", i1).unwrap(),
+            -LeptogenesisModel::static_particle_num("H", i2).unwrap(),
+            LeptogenesisModel::static_particle_num("A", i3).unwrap(),
+            LeptogenesisModel::static_particle_num("W", i4).unwrap(),
         ));
     }
 
@@ -467,10 +467,10 @@ pub fn hhll1() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
 
         interactions.append(&mut interaction::FourParticle::new_all(
             squared_amplitude,
-            LeptogenesisModel::particle_num("H", i1).unwrap(),
-            LeptogenesisModel::particle_num("H", i2).unwrap(),
-            -LeptogenesisModel::particle_num("L", i3).unwrap(),
-            -LeptogenesisModel::particle_num("L", i4).unwrap(),
+            LeptogenesisModel::static_particle_num("H", i1).unwrap(),
+            LeptogenesisModel::static_particle_num("H", i2).unwrap(),
+            -LeptogenesisModel::static_particle_num("L", i3).unwrap(),
+            -LeptogenesisModel::static_particle_num("L", i4).unwrap(),
         ));
     }
 
@@ -526,10 +526,10 @@ pub fn hhll2() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
 
         interactions.append(&mut interaction::FourParticle::new_all(
             squared_amplitude,
-            LeptogenesisModel::particle_num("H", i1).unwrap(),
-            -LeptogenesisModel::particle_num("H", i2).unwrap(),
-            -LeptogenesisModel::particle_num("L", i3).unwrap(),
-            LeptogenesisModel::particle_num("L", i4).unwrap(),
+            LeptogenesisModel::static_particle_num("H", i1).unwrap(),
+            -LeptogenesisModel::static_particle_num("H", i2).unwrap(),
+            -LeptogenesisModel::static_particle_num("L", i3).unwrap(),
+            LeptogenesisModel::static_particle_num("L", i4).unwrap(),
         ));
     }
 
@@ -577,10 +577,10 @@ pub fn hhen() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
 
         interactions.append(&mut interaction::FourParticle::new_all(
             squared_amplitude,
-            LeptogenesisModel::particle_num("H", i1).unwrap(),
-            LeptogenesisModel::particle_num("H", i2).unwrap(),
-            -LeptogenesisModel::particle_num("e", i3).unwrap(),
-            LeptogenesisModel::particle_num("N", i4).unwrap(),
+            LeptogenesisModel::static_particle_num("H", i1).unwrap(),
+            LeptogenesisModel::static_particle_num("H", i2).unwrap(),
+            -LeptogenesisModel::static_particle_num("e", i3).unwrap(),
+            LeptogenesisModel::static_particle_num("N", i4).unwrap(),
         ));
     }
 
@@ -654,10 +654,10 @@ pub fn nhla() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
 
         interactions.append(&mut interaction::FourParticle::new_all(
             squared_amplitude,
-            LeptogenesisModel::particle_num("N", i1).unwrap(),
-            LeptogenesisModel::particle_num("H", i2).unwrap(),
-            -LeptogenesisModel::particle_num("L", i3).unwrap(),
-            LeptogenesisModel::particle_num("A", i4).unwrap(),
+            LeptogenesisModel::static_particle_num("N", i1).unwrap(),
+            LeptogenesisModel::static_particle_num("H", i2).unwrap(),
+            -LeptogenesisModel::static_particle_num("L", i3).unwrap(),
+            LeptogenesisModel::static_particle_num("A", i4).unwrap(),
         ));
     }
 
@@ -726,10 +726,10 @@ pub fn nhlw() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
 
         interactions.append(&mut interaction::FourParticle::new_all(
             squared_amplitude,
-            LeptogenesisModel::particle_num("N", i1).unwrap(),
-            LeptogenesisModel::particle_num("H", i2).unwrap(),
-            -LeptogenesisModel::particle_num("L", i3).unwrap(),
-            LeptogenesisModel::particle_num("W", i4).unwrap(),
+            LeptogenesisModel::static_particle_num("N", i1).unwrap(),
+            LeptogenesisModel::static_particle_num("H", i2).unwrap(),
+            -LeptogenesisModel::static_particle_num("L", i3).unwrap(),
+            LeptogenesisModel::static_particle_num("W", i4).unwrap(),
         ));
     }
 
@@ -773,10 +773,10 @@ pub fn quln() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
 
         interactions.append(&mut interaction::FourParticle::new_all(
             squared_amplitude,
-            LeptogenesisModel::particle_num("Q", i1).unwrap(),
-            -LeptogenesisModel::particle_num("u", i2).unwrap(),
-            LeptogenesisModel::particle_num("L", i3).unwrap(),
-            LeptogenesisModel::particle_num("N", i4).unwrap(),
+            LeptogenesisModel::static_particle_num("Q", i1).unwrap(),
+            -LeptogenesisModel::static_particle_num("u", i2).unwrap(),
+            LeptogenesisModel::static_particle_num("L", i3).unwrap(),
+            LeptogenesisModel::static_particle_num("N", i4).unwrap(),
         ));
     }
 
@@ -820,10 +820,10 @@ pub fn qdln() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
 
         interactions.append(&mut interaction::FourParticle::new_all(
             squared_amplitude,
-            LeptogenesisModel::particle_num("Q", i1).unwrap(),
-            -LeptogenesisModel::particle_num("d", i2).unwrap(),
-            LeptogenesisModel::particle_num("L", i3).unwrap(),
-            LeptogenesisModel::particle_num("N", i4).unwrap(),
+            LeptogenesisModel::static_particle_num("Q", i1).unwrap(),
+            -LeptogenesisModel::static_particle_num("d", i2).unwrap(),
+            LeptogenesisModel::static_particle_num("L", i3).unwrap(),
+            LeptogenesisModel::static_particle_num("N", i4).unwrap(),
         ));
     }
 
@@ -896,10 +896,10 @@ pub fn leln() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
 
         interactions.append(&mut interaction::FourParticle::new_all(
             squared_amplitude,
-            LeptogenesisModel::particle_num("L", i1).unwrap(),
-            -LeptogenesisModel::particle_num("e", i2).unwrap(),
-            -LeptogenesisModel::particle_num("L", i3).unwrap(),
-            LeptogenesisModel::particle_num("N", i4).unwrap(),
+            LeptogenesisModel::static_particle_num("L", i1).unwrap(),
+            -LeptogenesisModel::static_particle_num("e", i2).unwrap(),
+            -LeptogenesisModel::static_particle_num("L", i3).unwrap(),
+            LeptogenesisModel::static_particle_num("N", i4).unwrap(),
         ));
     }
 
@@ -949,10 +949,10 @@ pub fn lnln() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
 
         interactions.append(&mut interaction::FourParticle::new_all(
             squared_amplitude,
-            LeptogenesisModel::particle_num("L", i1).unwrap(),
-            LeptogenesisModel::particle_num("N", i2).unwrap(),
-            LeptogenesisModel::particle_num("L", i3).unwrap(),
-            LeptogenesisModel::particle_num("N", i4).unwrap(),
+            LeptogenesisModel::static_particle_num("L", i1).unwrap(),
+            LeptogenesisModel::static_particle_num("N", i2).unwrap(),
+            LeptogenesisModel::static_particle_num("L", i3).unwrap(),
+            LeptogenesisModel::static_particle_num("N", i4).unwrap(),
         ));
     }
 

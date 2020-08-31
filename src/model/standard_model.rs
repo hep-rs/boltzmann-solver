@@ -197,7 +197,7 @@ impl Model for StandardModel {
         &mut self.particles
     }
 
-    fn particle_idx<S: AsRef<str>>(name: S, i: usize) -> Result<usize, (S, usize)> {
+    fn static_particle_idx<S: AsRef<str>>(name: S, i: usize) -> Result<usize, (S, usize)> {
         match (name.as_ref(), i) {
             ("A", _) => Ok(1),
             ("W", _) => Ok(2),
@@ -350,12 +350,17 @@ mod tests {
         for (i, p) in model.particles().iter().enumerate() {
             let name = &p.name;
             if name.len() == 1 {
-                assert_eq!(Ok(i), StandardModel::particle_idx(name, 0));
+                assert_eq!(Ok(i), StandardModel::static_particle_idx(name, 0));
+                assert_eq!(Ok(i), model.particle_idx(name, 0));
             } else if name.len() == 2 {
                 let mut chars = name.chars();
                 let head = chars.next().unwrap();
                 let idx = chars.next().unwrap() as usize - 49;
-                assert_eq!(Ok(i), StandardModel::particle_idx(&head.to_string(), idx));
+                assert_eq!(
+                    Ok(i),
+                    StandardModel::static_particle_idx(&head.to_string(), idx)
+                );
+                assert_eq!(Ok(i), model.particle_idx(&head.to_string(), idx));
             }
         }
     }

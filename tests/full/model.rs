@@ -261,13 +261,13 @@ impl Model for LeptogenesisModel {
         &mut self.sm.particles
     }
 
-    fn particle_idx<S: AsRef<str>>(name: S, i: usize) -> Result<usize, (S, usize)> {
+    fn static_particle_idx<S: AsRef<str>>(name: S, i: usize) -> Result<usize, (S, usize)> {
         let idx = match (name.as_ref(), i) {
             ("N", i) if i < 3 => Ok(20 + i),
             (_, i) => Err((name, i)),
         };
 
-        idx.or_else(|(name, i)| StandardModel::particle_idx(name, i))
+        idx.or_else(|(name, i)| StandardModel::static_particle_idx(name, i))
     }
 }
 

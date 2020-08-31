@@ -36,18 +36,18 @@ where
     // Set equilibrium conditions for the vector bosons.
     builder = builder.in_equilibrium(
         [
-            LeptogenesisModel::particle_idx("A", 0).unwrap(),
-            LeptogenesisModel::particle_idx("W", 0).unwrap(),
-            LeptogenesisModel::particle_idx("G", 0).unwrap(),
+            LeptogenesisModel::static_particle_idx("A", 0).unwrap(),
+            LeptogenesisModel::static_particle_idx("W", 0).unwrap(),
+            LeptogenesisModel::static_particle_idx("G", 0).unwrap(),
         ]
         .iter()
         .cloned(),
     );
     builder = builder.no_asymmetry(
         [
-            LeptogenesisModel::particle_idx("A", 0).unwrap(),
-            LeptogenesisModel::particle_idx("W", 0).unwrap(),
-            LeptogenesisModel::particle_idx("G", 0).unwrap(),
+            LeptogenesisModel::static_particle_idx("A", 0).unwrap(),
+            LeptogenesisModel::static_particle_idx("W", 0).unwrap(),
+            LeptogenesisModel::static_particle_idx("G", 0).unwrap(),
         ]
         .iter()
         .cloned(),
@@ -116,15 +116,17 @@ fn particle_indices() {
     for (i, p) in model.particles().iter().enumerate() {
         let name = &p.name;
         if name.len() == 1 {
-            assert_eq!(Ok(i), LeptogenesisModel::particle_idx(name, 0));
+            assert_eq!(Ok(i), LeptogenesisModel::static_particle_idx(name, 0));
+            assert_eq!(Ok(i), model.particle_idx(name, 0));
         } else if name.len() == 2 {
             let mut chars = name.chars();
             let head = chars.next().unwrap();
             let idx = chars.next().unwrap() as usize - 49;
             assert_eq!(
                 Ok(i),
-                LeptogenesisModel::particle_idx(&head.to_string(), idx)
+                LeptogenesisModel::static_particle_idx(&head.to_string(), idx)
             );
+            assert_eq!(Ok(i), model.particle_idx(&head.to_string(), idx));
         }
     }
 }
@@ -175,9 +177,9 @@ pub fn decay_1() -> Result<(), Box<dyn error::Error>> {
     println!("Final number density: {:.3e}", n);
     println!("Final number density asymmetry: {:.3e}", na);
 
-    let nai = na[LeptogenesisModel::particle_idx("L", 0).unwrap()].abs();
+    let nai = na[LeptogenesisModel::static_particle_idx("L", 0).unwrap()].abs();
     assert!(1e-14 < nai && nai < 1e-10);
-    assert!(n[LeptogenesisModel::particle_idx("N", 0).unwrap()] < 1e-8);
+    assert!(n[LeptogenesisModel::static_particle_idx("N", 0).unwrap()] < 1e-8);
 
     Ok(())
 }
@@ -227,8 +229,8 @@ pub fn decay_3() -> Result<(), Box<dyn error::Error>> {
     println!("Final number density asymmetry: {:.3e}", na);
     let mut lepton_asymmetry = 0.0;
     for i in 0..3 {
-        lepton_asymmetry += na[LeptogenesisModel::particle_idx("L", i).unwrap()].abs();
-        assert!(n[LeptogenesisModel::particle_idx("N", i).unwrap()] < 1e-8);
+        lepton_asymmetry += na[LeptogenesisModel::static_particle_idx("L", i).unwrap()].abs();
+        assert!(n[LeptogenesisModel::static_particle_idx("N", i).unwrap()] < 1e-8);
     }
     assert!(1e-10 < lepton_asymmetry.abs() && lepton_asymmetry.abs() < 1e-6);
 
@@ -287,7 +289,7 @@ pub fn washout_1() -> Result<(), Box<dyn error::Error>> {
 
     let builder = SolverBuilder::new()
         .initial_asymmetries(vec![(
-            LeptogenesisModel::particle_idx("L", 0).unwrap(),
+            LeptogenesisModel::static_particle_idx("L", 0).unwrap(),
             1e-2,
         )])
         .model(model)
@@ -300,7 +302,7 @@ pub fn washout_1() -> Result<(), Box<dyn error::Error>> {
     println!("Final number density asymmetry: {:.3e}", na);
 
     // FIXME
-    // let nai = na[LeptogenesisModel::particle_idx("L", 0).unwrap()].abs();
+    // let nai = na[LeptogenesisModel::static_particle_idx("L", 0).unwrap()].abs();
     // assert!(nai < 1e-5);
 
     Ok(())
@@ -354,9 +356,18 @@ pub fn washout_3() -> Result<(), Box<dyn error::Error>> {
 
     let builder = SolverBuilder::new()
         .initial_asymmetries(vec![
-            (LeptogenesisModel::particle_idx("L", 0).unwrap(), 1e-2),
-            (LeptogenesisModel::particle_idx("L", 1).unwrap(), 2e-2),
-            (LeptogenesisModel::particle_idx("L", 2).unwrap(), 3e-2),
+            (
+                LeptogenesisModel::static_particle_idx("L", 0).unwrap(),
+                1e-2,
+            ),
+            (
+                LeptogenesisModel::static_particle_idx("L", 1).unwrap(),
+                2e-2,
+            ),
+            (
+                LeptogenesisModel::static_particle_idx("L", 2).unwrap(),
+                3e-2,
+            ),
         ])
         .model(model)
         .beta_range(1e-17, 1e-3);
@@ -368,7 +379,7 @@ pub fn washout_3() -> Result<(), Box<dyn error::Error>> {
     println!("Final number density asymmetry: {:.3e}", na);
 
     // FIXME
-    // let nai = na[LeptogenesisModel::particle_idx("L", 0).unwrap()].abs();
+    // let nai = na[LeptogenesisModel::static_particle_idx("L", 0).unwrap()].abs();
     // assert!(nai < 1e-5);
 
     Ok(())
@@ -435,9 +446,9 @@ pub fn full_1() -> Result<(), Box<dyn error::Error>> {
     println!("Final number density: {:.3e}", n);
     println!("Final number density asymmetry: {:.3e}", na);
 
-    let nai = na[LeptogenesisModel::particle_idx("L", 0).unwrap()].abs();
+    let nai = na[LeptogenesisModel::static_particle_idx("L", 0).unwrap()].abs();
     assert!(1e-10 < nai && nai < 1e-5);
-    assert!(n[LeptogenesisModel::particle_idx("N", 0).unwrap()] < 1e-8);
+    assert!(n[LeptogenesisModel::static_particle_idx("N", 0).unwrap()] < 1e-8);
 
     Ok(())
 }
@@ -498,12 +509,12 @@ pub fn full_3() -> Result<(), Box<dyn error::Error>> {
     println!("Final number density: {:.3e}", n);
     println!("Final number density asymmetry: {:.3e}", na);
 
-    let nai = na[LeptogenesisModel::particle_idx("L", 0).unwrap()].abs();
+    let nai = na[LeptogenesisModel::static_particle_idx("L", 0).unwrap()].abs();
     assert!(1e-10 < nai && nai < 1e-5);
     for i in 0..3 {
-        let nai = na[LeptogenesisModel::particle_idx("L", i).unwrap()].abs();
+        let nai = na[LeptogenesisModel::static_particle_idx("L", i).unwrap()].abs();
         assert!(1e-10 < nai && nai < 1e-5);
-        assert!(n[LeptogenesisModel::particle_idx("N", i).unwrap()] < 1e-8);
+        assert!(n[LeptogenesisModel::static_particle_idx("N", i).unwrap()] < 1e-8);
     }
 
     Ok(())
@@ -515,7 +526,7 @@ fn evolution() -> Result<(), Box<dyn error::Error>> {
     init();
 
     // Create the CSV files
-    let output_dir = common::output_dir("leptogenesis");
+    let output_dir = common::output_dir("full");
 
     let mut data = Vec::new();
 
@@ -584,7 +595,7 @@ pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
                 .extend(i().drain(..).map(into_interaction_box));
         }
 
-        let p_h = LeptogenesisModel::particle_idx("H", 0).unwrap();
+        let p_h = model.particle_idx("H", 0).unwrap();
         let n_eq = model.particles()[p_h].normalized_number_density(0.0, beta);
 
         // Collect the names now as SolverBuilder takes ownership of the model
@@ -634,7 +645,7 @@ pub fn lepton_equilibrium() -> Result<(), Box<dyn error::Error>> {
             );
         }
 
-        let p_l = LeptogenesisModel::particle_idx("L", 0).unwrap();
+        let p_l = model.particle_idx("L", 0).unwrap();
         let n_eq = model.particles()[p_l].normalized_number_density(0.0, beta);
 
         // Collect the names now as SolverBuilder takes ownership of the model
@@ -656,7 +667,7 @@ pub fn lepton_equilibrium() -> Result<(), Box<dyn error::Error>> {
 fn gammas() -> Result<(), Box<dyn error::Error>> {
     init();
 
-    let output_dir = common::output_dir("full/gamma");
+    let output_dir = common::output_dir("full");
 
     // Create two copies of the model for both solvers
     let mut models = vec![LeptogenesisModel::zero(), LeptogenesisModel::zero()];
