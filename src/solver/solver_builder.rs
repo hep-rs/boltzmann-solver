@@ -1,7 +1,7 @@
 use crate::{
     model::{interaction::Interaction, ModelInteractions, Particle},
     solver::{options::StepPrecision, Context, Solver},
-    utilities::spline::rec_geomspace,
+    utilities::rec_geomspace,
 };
 use ndarray::prelude::*;
 #[cfg(feature = "parallel")]
