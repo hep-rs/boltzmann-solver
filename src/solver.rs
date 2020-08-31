@@ -316,13 +316,13 @@
 //! As with the non-normalized number density calculations, only `$\vt C[n]$`
 //! must be inputted in the interaction.
 
+mod builder;
 mod context;
 mod options;
-mod solver_builder;
 mod tableau;
 
+pub use builder::SolverBuilder;
 pub use context::Context;
-pub use solver_builder::SolverBuilder;
 
 use crate::{
     model::{interaction::Interaction, Model, ModelInteractions, Particle},
