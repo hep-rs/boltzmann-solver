@@ -6,7 +6,7 @@ use crate::{
         Model,
     },
     solver::Context,
-    utilities::{integrate_st, spline::CubicHermiteSpline},
+    utilities::{integrate_st, spline::Spline},
 };
 use std::{fmt, sync::RwLock};
 
@@ -21,10 +21,10 @@ pub struct FourParticle<M> {
     particles_sign: InteractionParticleSigns,
     /// Squared amplitude as a function of the model.
     squared_amplitude: Box<dyn Fn(&M, f64, f64, f64) -> f64 + Sync>,
-    gamma_spline: RwLock<CubicHermiteSpline>,
+    gamma_spline: RwLock<Spline>,
     #[allow(clippy::type_complexity)]
     asymmetry: Option<Box<dyn Fn(&M, f64, f64, f64) -> f64 + Sync>>,
-    asymmetry_spline: RwLock<CubicHermiteSpline>,
+    asymmetry_spline: RwLock<Spline>,
     gamma_enabled: bool,
     width_enabled: bool,
 }
@@ -63,9 +63,9 @@ impl<M> FourParticle<M> {
             particles_idx,
             particles_sign,
             squared_amplitude: Box::new(squared_amplitude),
-            gamma_spline: RwLock::new(CubicHermiteSpline::empty()),
+            gamma_spline: RwLock::new(Spline::empty()),
             asymmetry: None,
-            asymmetry_spline: RwLock::new(CubicHermiteSpline::empty()),
+            asymmetry_spline: RwLock::new(Spline::empty()),
             width_enabled: false,
             gamma_enabled: true,
         }
