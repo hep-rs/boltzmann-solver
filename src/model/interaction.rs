@@ -489,7 +489,11 @@ pub fn asymmetry_overshoots<M>(c: &Context<M>, i: usize, rate: f64) -> bool {
     (c.na[i] > 0.0 && c.na[i] + rate < 0.0) || (c.na[i] < 0.0 && c.na[i] + rate > 0.0)
 }
 
-/// Converts NaN floating points to 0
+/// Computes the ratio `a / b` in a manner that never returns NaN
+///
+/// This is to be used in the context of calculating the scaling of the
+/// interaction density by the number density ratios `n / eq`.  Note that a NaN
+/// value arises only from have `n == eq == 0.0`, and the result is
 #[must_use]
 #[inline]
 pub(crate) fn checked_div(a: f64, b: f64) -> f64 {
@@ -597,5 +601,35 @@ where
 
     fn change(&self, dn: &mut Array1<f64>, dna: &mut Array1<f64>, c: &Context<M>) {
         self.as_ref().change(dn, dna, c)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::f64;
+
+    #[test]
+    #[allow(clippy::float_cmp)]
+    fn checked_dev() {
+        let vals = [-10.0, -2.0, -1.0, -0.5, -0.1, 0.1, 0.5, 1.0, 2.0, 10.0];
+        for &a in &vals {
+            for &b in &vals {
+                assert_eq!(a / b, super::checked_div(a, b));
+            }
+        }
+
+        for &a in &vals {
+            if a > 0.0 {
+                assert_eq!(f64::INFINITY, super::checked_div(a, 0.0));
+            } else {
+                assert_eq!(f64::NEG_INFINITY, super::checked_div(a, 0.0));
+            }
+        }
+
+        for &a in &vals {
+            assert_eq!(0.0, super::checked_div(0.0, a));
+        }
+
+        assert_eq!(0.0, super::checked_div(0.0, 0.0));
     }
 }
