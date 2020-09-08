@@ -193,6 +193,13 @@ where
             let width =
                 0.039_788_735_772_973_836 * p / p1.mass2 * (self.squared_amplitude)(c.model).abs();
 
+            debug_assert!(
+                width.is_finite(),
+                "Computed a non-finit width at step {} in interaction {:?}",
+                c.step,
+                self
+            );
+
             Some(PartialWidth {
                 width,
                 parent: self.particles.incoming[0],
@@ -246,22 +253,32 @@ where
         if real || p1.mass * c.beta < M_BETA_THRESHOLD {
             // 1 / 32 π³ ≅ 0.001007860451037484
             let z = p1.mass * c.beta;
-            Some(
-                0.001_007_860_451_037_484
-                    * (self.squared_amplitude)(&c.model).abs()
-                    * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
-                    * (bessel::k1(z) / z),
-            )
+            let gamma = 0.001_007_860_451_037_484
+                * (self.squared_amplitude)(&c.model).abs()
+                * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
+                * (bessel::k1(z) / z);
+            debug_assert!(
+                gamma.is_finite(),
+                "Computed a non-finit value for γ at step {} in interaction {:?}",
+                c.step,
+                self
+            );
+            Some(gamma)
         } else {
             // ζ(3) / 16 π³ ≅ 0.0024230112251823
             let z = p1.mass * c.beta;
-            Some(
-                0.002_423_011_225_182_3
-                    * (self.squared_amplitude)(&c.model).abs()
-                    * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
-                    * (bessel::k1_on_k2(z) / z.powi(3))
-                    / p1.degrees_of_freedom(),
-            )
+            let gamma = 0.002_423_011_225_182_3
+                * (self.squared_amplitude)(&c.model).abs()
+                * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
+                * (bessel::k1_on_k2(z) / z.powi(3))
+                / p1.degrees_of_freedom();
+            debug_assert!(
+                gamma.is_finite(),
+                "Computed a non-finit value for γ at step {} in interaction {:?}",
+                c.step,
+                self
+            );
+            Some(gamma)
         }
     }
 
@@ -283,22 +300,32 @@ where
         if real || p1.mass * c.beta < M_BETA_THRESHOLD {
             // 1 / 32 π³ ≅ 0.001007860451037484
             let z = p1.mass * c.beta;
-            Some(
-                0.001_007_860_451_037_484
-                    * asymmetry(&c.model).abs()
-                    * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
-                    * (bessel::k1(z) / z),
-            )
+            let delta_gamma = 0.001_007_860_451_037_484
+                * asymmetry(&c.model).abs()
+                * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
+                * (bessel::k1(z) / z);
+            debug_assert!(
+                delta_gamma.is_finite(),
+                "Computed a non-finit value for δγ at step {} in interaction {:?}",
+                c.step,
+                self
+            );
+            Some(delta_gamma)
         } else {
             // ζ(3) / 16 π³ ≅ 0.0024230112251823
             let z = p1.mass * c.beta;
-            Some(
-                0.002_423_011_225_182_3
-                    * asymmetry(&c.model).abs()
-                    * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
-                    * (bessel::k1_on_k2(z) / z.powi(3))
-                    / p1.degrees_of_freedom(),
-            )
+            let delta_gamma = 0.002_423_011_225_182_3
+                * asymmetry(&c.model).abs()
+                * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
+                * (bessel::k1_on_k2(z) / z.powi(3))
+                / p1.degrees_of_freedom();
+            debug_assert!(
+                delta_gamma.is_finite(),
+                "Computed a non-finit value for δγ at step {} in interaction {:?}",
+                c.step,
+                self
+            );
+            Some(delta_gamma)
         }
     }
 

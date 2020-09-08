@@ -232,6 +232,13 @@ where
         // FIXME: Should we take the absolute value?
         .abs();
 
+        debug_assert!(
+            gamma.is_finite(),
+            "Computed a non-finit value for γ at step {} in interaction {:?}",
+            c.step,
+            self
+        );
+
         if let Ok(mut gamma_spline) = self.gamma_spline.write() {
             gamma_spline.add(ln_beta, gamma.ln());
         }
@@ -270,6 +277,13 @@ where
         )
         // FIXME: Should we take the absolute value?
         .abs();
+
+        debug_assert!(
+            delta_gamma.is_finite(),
+            "Computed a non-finit value for δγ at step {} in interaction {:?}",
+            c.step,
+            self
+        );
 
         if let Ok(mut asymmetry_spline) = self.asymmetry_spline.write() {
             asymmetry_spline.add(ln_beta, delta_gamma.ln());
