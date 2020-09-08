@@ -295,38 +295,3 @@ mod tests {
         Ok(())
     }
 }
-
-#[cfg(all(test, feature = "nightly"))]
-mod benches {
-    use test::Bencher;
-
-    const BETA: f64 = 1e-2;
-    const M1: f64 = 1.0;
-    const M2: f64 = 10.0;
-    const M3: f64 = 2.0;
-    const M4: f64 = 20.0;
-
-    #[bench]
-    fn integrate_st_const(b: &mut Bencher) {
-        let m2 = |_, _| 1.0;
-        b.iter(|| test::black_box(super::integrate_st(m2, BETA, M1, M2, M3, M4)));
-    }
-
-    #[bench]
-    fn integrate_st_s_inv(b: &mut Bencher) {
-        let m2 = |s: f64, _| 1.0 / (s.powi(2) + 1.0);
-        b.iter(|| test::black_box(super::integrate_st(m2, BETA, M1, M2, M3, M4)));
-    }
-
-    #[bench]
-    fn integrate_st_t_inv(b: &mut Bencher) {
-        let m2 = |_, t: f64| 1.0 / (t.powi(2) + 1.0);
-        b.iter(|| test::black_box(super::integrate_st(m2, BETA, M1, M2, M3, M4)));
-    }
-
-    #[bench]
-    fn integrate_st_st(b: &mut Bencher) {
-        let m2 = |s: f64, t: f64| (s * t) / (s + 1.0) / (t + 1.0);
-        b.iter(|| test::black_box(super::integrate_st(m2, BETA, M1, M2, M3, M4)))
-    }
-}
