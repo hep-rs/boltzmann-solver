@@ -96,6 +96,8 @@ where
         let t_integrand = |t: f64| amplitude(s, t) * s_factors;
         clenshaw_curtis::integrate(&t_integrand, t_min, t_max, INTEGRATION_PRECISION).integral
     };
+    let integral_1 =
+        clenshaw_curtis::integrate(&s_integrand_0, s_min, s_med, INTEGRATION_PRECISION).integral;
 
     let s_integrand_1 = |ss: f64| {
         // Remap the interval [s_med, s_max] onto [0, 1].  The following
@@ -117,10 +119,10 @@ where
         let t_integrand = |t: f64| amplitude(s, t) * s_factors;
         clenshaw_curtis::integrate(&t_integrand, t_min, t_max, INTEGRATION_PRECISION).integral
     };
+    let integral_2 =
+        double_exponential::integrate(&s_integrand_1, 0.0, 1.0, INTEGRATION_PRECISION).integral;
 
-    (clenshaw_curtis::integrate(&s_integrand_0, s_min, s_med, INTEGRATION_PRECISION).integral
-        + double_exponential::integrate(&s_integrand_1, 0.0, 1.0, INTEGRATION_PRECISION).integral)
-        / (512.0 * PI_5 * beta)
+    (integral_1 + integral_2) / (512.0 * PI_5 * beta)
 }
 
 /// Create a recursively generated geometrically spaced interval between `start`
