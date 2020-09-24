@@ -213,14 +213,19 @@ where
         let ptcl = c.model.particles();
 
         // Get the *squared* masses
-        let m0 = ptcl[self.particles_idx.incoming[0]].mass2;
-        let m1 = ptcl[self.particles_idx.incoming[1]].mass2;
-        let m2 = ptcl[self.particles_idx.outgoing[0]].mass2;
-        let m3 = ptcl[self.particles_idx.outgoing[1]].mass2;
+        let m0 = ptcl[self.particles_idx.incoming[0]].mass;
+        let m1 = ptcl[self.particles_idx.incoming[1]].mass;
+        let m2 = ptcl[self.particles_idx.outgoing[0]].mass;
+        let m3 = ptcl[self.particles_idx.outgoing[1]].mass;
+
+        let m0_2 = ptcl[self.particles_idx.incoming[0]].mass2;
+        let m1_2 = ptcl[self.particles_idx.incoming[1]].mass2;
+        let m2_2 = ptcl[self.particles_idx.outgoing[0]].mass2;
+        let m3_2 = ptcl[self.particles_idx.outgoing[1]].mass2;
 
         let gamma = integrate_st(
             |s, t| {
-                let u = m0 + m1 + m2 + m3 - s - t;
+                let u = m0_2 + m1_2 + m2_2 + m3_2 - s - t;
                 (self.squared_amplitude)(&c.model, s, t, u).abs()
             },
             c.beta,
