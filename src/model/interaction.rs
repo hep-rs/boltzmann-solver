@@ -92,7 +92,7 @@ impl InteractionParticles {
     where
         M: Model,
     {
-        let mut s = String::new();
+        let mut s = String::with_capacity(3 * (self.incoming.len() + self.outgoing.len()) + 2);
 
         for &p in &self.incoming {
             s.push_str(&model.particle_name(p).map_err(|_| ())?);
