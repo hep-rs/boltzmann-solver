@@ -133,7 +133,7 @@
 //! The ratio of Bessel functions is generally referred to as the *time-dilation
 //! factor* for the decaying particle.  When `$m \beta \gg 1$`, the ratio of
 //! Bessel functions approaches 1, and when `$m \beta \ll 1$`, the ratio
-//! approaches `$0$`.
+//! approaches 0.
 //!
 //! If the final state particles are essentially massless in comparison to the
 //! decaying particle, then the decay rate in the rest frame of the particle of
