@@ -1,9 +1,6 @@
 use crate::{
     model::{
-        interaction::{
-            checked_div, Interaction, InteractionParticleIndices, InteractionParticleSigns,
-            InteractionParticles, PartialWidth, RateDensity,
-        },
+        interaction::{checked_div, Interaction, InteractionParticles, PartialWidth, RateDensity},
         Model,
     },
     solver::Context,
@@ -17,8 +14,6 @@ const M_BETA_THRESHOLD: f64 = 1e1;
 /// Three particle interaction, all determined from the underlying squared amplitude.
 pub struct ThreeParticle<M> {
     particles: InteractionParticles,
-    particles_idx: InteractionParticleIndices,
-    particles_sign: InteractionParticleSigns,
     /// Squared amplitude as a function of the model.
     squared_amplitude: Box<dyn Fn(&M) -> f64 + Sync>,
     /// Asymmetry between the amplitude and its `$\CP$` conjugate.
@@ -46,17 +41,10 @@ where
     where
         F: Fn(&M) -> f64 + Sync + 'static,
     {
-        let particles = InteractionParticles {
-            incoming: vec![p1],
-            outgoing: vec![p2, p3],
-        };
-        let particles_idx = particles.as_idx();
-        let particles_sign = particles.as_sign();
+        let particles = InteractionParticles::new(&[p1], &[p2, p3]);
 
         Self {
             particles,
-            particles_idx,
-            particles_sign,
             squared_amplitude: Box::new(squared_amplitude),
             asymmetry: None,
             width_enabled: true,
@@ -131,24 +119,20 @@ impl<M> fmt::Debug for ThreeParticle<M> {
                 f,
                 "ThreeParticle {{ \
                  particles: {:?}, \
-                 particles_idx: {:?}, \
-                 particles_sign: {:?}, \
                  squared_amplitude: Box<Fn>, \
                  asymmetric: Some(Box<Fn>) \
                  }}",
-                self.particles, self.particles_idx, self.particles_sign
+                self.particles,
             )
         } else {
             write!(
                 f,
                 "ThreeParticle {{ \
                  particles: {:?}, \
-                 particles_idx: {:?}, \
-                 particles_sign: {:?}, \
                  squared_amplitude: Box<Fn>, \
                  asymmetric: None \
                  }}",
-                self.particles, self.particles_idx, self.particles_sign
+                self.particles
             )
         }
     }
@@ -160,14 +144,6 @@ where
 {
     fn particles(&self) -> &InteractionParticles {
         &self.particles
-    }
-
-    fn particles_idx(&self) -> &InteractionParticleIndices {
-        &self.particles_idx
-    }
-
-    fn particles_sign(&self) -> &InteractionParticleSigns {
-        &self.particles_sign
     }
 
     fn width_enabled(&self) -> bool {
@@ -182,9 +158,9 @@ where
         let ptcl = c.model.particles();
 
         // Get the *squared* masses
-        let p1 = &ptcl[self.particles_idx.incoming[0]];
-        let p2 = &ptcl[self.particles_idx.outgoing[0]];
-        let p3 = &ptcl[self.particles_idx.outgoing[1]];
+        let p1 = &ptcl[self.particles.incoming_idx[0]];
+        let p2 = &ptcl[self.particles.outgoing_idx[0]];
+        let p3 = &ptcl[self.particles.outgoing_idx[1]];
 
         if p1.mass > p2.mass + p3.mass {
             let p = kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2) / (2.0 * p1.mass);
@@ -202,8 +178,8 @@ where
 
             Some(PartialWidth {
                 width,
-                parent: self.particles.incoming[0],
-                daughters: self.particles.outgoing.clone(),
+                parent: self.particles.incoming_signed[0],
+                daughters: self.particles.outgoing_signed.clone(),
             })
         } else {
             None
@@ -241,9 +217,9 @@ where
         let ptcl = c.model.particles();
 
         // Get the particles
-        let p1 = &ptcl[self.particles_idx.incoming[0]];
-        let p2 = &ptcl[self.particles_idx.outgoing[0]];
-        let p3 = &ptcl[self.particles_idx.outgoing[1]];
+        let p1 = &ptcl[self.particles.incoming_idx[0]];
+        let p2 = &ptcl[self.particles.outgoing_idx[0]];
+        let p3 = &ptcl[self.particles.outgoing_idx[1]];
 
         // If the decay is kinematically forbidden, return 0.
         if p1.mass < p2.mass + p3.mass {
@@ -288,9 +264,9 @@ where
         let ptcl = c.model.particles();
 
         // Get the particles
-        let p1 = &ptcl[self.particles_idx.incoming[0]];
-        let p2 = &ptcl[self.particles_idx.outgoing[0]];
-        let p3 = &ptcl[self.particles_idx.outgoing[1]];
+        let p1 = &ptcl[self.particles.incoming_idx[0]];
+        let p2 = &ptcl[self.particles.outgoing_idx[0]];
+        let p3 = &ptcl[self.particles.outgoing_idx[1]];
 
         // If the decay is kinematically forbidden, return 0.
         if p1.mass < p2.mass + p3.mass {
@@ -345,16 +321,16 @@ where
 
         // Get the various quantities associated with each particle.
         let [i0, i1, i2] = [
-            self.particles_idx.incoming[0],
-            self.particles_idx.outgoing[0],
-            self.particles_idx.outgoing[1],
+            self.particles.incoming_idx[0],
+            self.particles.outgoing_idx[0],
+            self.particles.outgoing_idx[1],
         ];
         let p1 = &ptcl[i0];
         let [n1, n2, n3] = [c.n[i0], c.n[i1], c.n[i2]];
         let [na1, na2, na3] = [
-            self.particles_sign.incoming[0] * c.na[i0],
-            self.particles_sign.outgoing[0] * c.na[i1],
-            self.particles_sign.outgoing[1] * c.na[i2],
+            self.particles.incoming_sign[0] * c.na[i0],
+            self.particles.outgoing_sign[0] * c.na[i1],
+            self.particles.outgoing_sign[1] * c.na[i2],
         ];
         let [eq1, eq2, eq3] = [c.eq[i0], c.eq[i1], c.eq[i2]];
 
@@ -372,9 +348,15 @@ where
             // Above the M_BETA_THRESHOLD, `gamma` is already divided by eq1, so
             // we need not divide by `eq1` to calculate the forward rates, and we
             // have to multiply by `eq1` to get the backward rate.
-            rate.symmetric = gamma * (n1 - eq1 * checked_div(n2, eq2) * checked_div(n3, eq3));
-            rate.asymmetric = asymmetry * (n1 + eq1 * checked_div(n2, eq2) * checked_div(n3, eq3))
-                + gamma * (na1 - eq1 * checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
+
+            if eq1 == 0.0 && eq2 * eq3 == 0.0 {
+                return None;
+            } else {
+                rate.symmetric = gamma * (n1 - eq1 * checked_div(n2, eq2) * checked_div(n3, eq3));
+                rate.asymmetric = asymmetry
+                    * (n1 + eq1 * checked_div(n2, eq2) * checked_div(n3, eq3))
+                    + gamma * (na1 - eq1 * checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
+            }
         }
 
         Some(rate * c.normalization)

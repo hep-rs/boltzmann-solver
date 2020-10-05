@@ -1,9 +1,11 @@
 //! Model information
 
+mod empty_model;
 pub mod interaction;
 mod particle;
 pub(crate) mod standard_model;
 
+pub use empty_model::EmptyModel;
 pub use particle::Particle;
 pub use standard_model::StandardModel;
 
@@ -85,6 +87,10 @@ where
     fn particles(&self) -> &[Particle];
 
     /// Return a mutable list of particles in the model.
+    ///
+    /// This is available to allow mutating particles within the model. This
+    /// should not change the ordering of the particles as these are assumed to
+    /// be fixed throughout the integration.
     fn particles_mut(&mut self) -> &mut [Particle];
 
     /// Return the index corresponding to a particle's name and generation
@@ -241,6 +247,7 @@ where
             n: Array1::ones(self.len_particles()),
             na: Array1::zeros(self.len_particles()),
             model: &self,
+            fast_interactions: RwLock::new(Vec::new()),
         }
     }
 }

@@ -1,8 +1,6 @@
 use crate::{
     model::{
-        interaction::{
-            Interaction, InteractionParticleIndices, InteractionParticleSigns, InteractionParticles,
-        },
+        interaction::{Interaction, InteractionParticles},
         Model,
     },
     solver::Context,
@@ -17,8 +15,6 @@ use std::{fmt, sync::RwLock};
 /// amplitude.
 pub struct FourParticle<M> {
     particles: InteractionParticles,
-    particles_idx: InteractionParticleIndices,
-    particles_sign: InteractionParticleSigns,
     /// Squared amplitude as a function of the model.
     squared_amplitude: Box<dyn Fn(&M, f64, f64, f64) -> f64 + Sync>,
     gamma_spline: RwLock<Spline>,
@@ -51,17 +47,10 @@ impl<M> FourParticle<M> {
     where
         F: Fn(&M, f64, f64, f64) -> f64 + Sync + 'static,
     {
-        let particles = InteractionParticles {
-            incoming: vec![p1, p2],
-            outgoing: vec![p3, p4],
-        };
-        let particles_idx = particles.as_idx();
-        let particles_sign = particles.as_sign();
+        let particles = InteractionParticles::new(&[p1, p2], &[p3, p4]);
 
         Self {
             particles,
-            particles_idx,
-            particles_sign,
             squared_amplitude: Box::new(squared_amplitude),
             gamma_spline: RwLock::new(Spline::empty()),
             asymmetry: None,
@@ -162,11 +151,9 @@ impl<M> fmt::Debug for FourParticle<M> {
             f,
             "FourParticle {{ \
              particles: {:?}, \
-             particles_idx: {:?}, \
-             particles_sign: {:?}, \
              squared_amplitude: Box<Fn>, \
              }}",
-            self.particles, self.particles_idx, self.particles_sign
+            self.particles
         )
     }
 }
@@ -177,14 +164,6 @@ where
 {
     fn particles(&self) -> &InteractionParticles {
         &self.particles
-    }
-
-    fn particles_idx(&self) -> &InteractionParticleIndices {
-        &self.particles_idx
-    }
-
-    fn particles_sign(&self) -> &InteractionParticleSigns {
-        &self.particles_sign
     }
 
     fn width_enabled(&self) -> bool {
@@ -213,26 +192,21 @@ where
         let ptcl = c.model.particles();
 
         // Get the *squared* masses
-        let m0 = ptcl[self.particles_idx.incoming[0]].mass;
-        let m1 = ptcl[self.particles_idx.incoming[1]].mass;
-        let m2 = ptcl[self.particles_idx.outgoing[0]].mass;
-        let m3 = ptcl[self.particles_idx.outgoing[1]].mass;
-
-        let m0_2 = ptcl[self.particles_idx.incoming[0]].mass2;
-        let m1_2 = ptcl[self.particles_idx.incoming[1]].mass2;
-        let m2_2 = ptcl[self.particles_idx.outgoing[0]].mass2;
-        let m3_2 = ptcl[self.particles_idx.outgoing[1]].mass2;
+        let p0 = &ptcl[self.particles.incoming_idx[0]];
+        let p1 = &ptcl[self.particles.incoming_idx[1]];
+        let p2 = &ptcl[self.particles.outgoing_idx[0]];
+        let p3 = &ptcl[self.particles.outgoing_idx[1]];
 
         let gamma = integrate_st(
             |s, t| {
-                let u = m0_2 + m1_2 + m2_2 + m3_2 - s - t;
+                let u = p0.mass2 + p1.mass2 + p2.mass2 + p3.mass2 - s - t;
                 (self.squared_amplitude)(&c.model, s, t, u).abs()
             },
             c.beta,
-            m0,
-            m1,
-            m2,
-            m3,
+            p0.mass,
+            p1.mass,
+            p2.mass,
+            p3.mass,
         )
         // FIXME: Should we take the absolute value?
         .abs();
@@ -264,21 +238,21 @@ where
         let ptcl = c.model.particles();
 
         // Get the *squared* masses
-        let m0 = ptcl[self.particles_idx.incoming[0]].mass2;
-        let m1 = ptcl[self.particles_idx.incoming[1]].mass2;
-        let m2 = ptcl[self.particles_idx.outgoing[0]].mass2;
-        let m3 = ptcl[self.particles_idx.outgoing[1]].mass2;
+        let p0 = &ptcl[self.particles.incoming_idx[0]];
+        let p1 = &ptcl[self.particles.incoming_idx[1]];
+        let p2 = &ptcl[self.particles.outgoing_idx[0]];
+        let p3 = &ptcl[self.particles.outgoing_idx[1]];
 
         let delta_gamma = integrate_st(
             |s, t| {
-                let u = m0 + m1 + m2 + m3 - s - t;
+                let u = p0.mass2 + p1.mass2 + p2.mass2 + p3.mass2 - s - t;
                 asymmetry(&c.model, s, t, u).abs()
             },
             c.beta,
-            m0,
-            m1,
-            m2,
-            m3,
+            p0.mass,
+            p1.mass,
+            p2.mass,
+            p3.mass,
         )
         // FIXME: Should we take the absolute value?
         .abs();
