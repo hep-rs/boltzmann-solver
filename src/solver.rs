@@ -325,14 +325,18 @@ pub use builder::SolverBuilder;
 pub use context::Context;
 
 use crate::{
-    model::{interaction::Interaction, Model, ModelInteractions, Particle},
+    model::interaction::InteractionParticles,
+    model::{
+        interaction::FastInteractionResult, interaction::Interaction, Model, ModelInteractions,
+        Particle,
+    },
     solver::options::StepPrecision,
     statistic::{Statistic, Statistics},
 };
 use ndarray::{prelude::*, Zip};
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
-use std::{error, fmt, mem, ptr};
+use std::{error, fmt, iter, mem, ops, ptr, sync::RwLock};
 
 /// Error type returned by the solver builder in case there is an error.
 #[derive(Debug)]
@@ -485,6 +489,13 @@ impl Workspace {
     }
 }
 
+impl ops::AddAssign<&FastInteractionResult> for Workspace {
+    fn add_assign(&mut self, rhs: &FastInteractionResult) {
+        self.dn += &rhs.dn;
+        self.dna += &rhs.dna;
+    }
+}
+
 /// Boltzmann solver
 pub struct Solver<M> {
     model: M,
@@ -515,8 +526,6 @@ where
     #[cfg(feature = "parallel")]
     fn compute_ki(&self, ki: &mut Array1<f64>, kai: &mut Array1<f64>, ci: &Context<M>) {
         let dim = ki.dim();
-        ki.fill(0.0);
-        kai.fill(0.0);
 
         let (new_ki, new_kai) = self
             .model
@@ -538,14 +547,72 @@ where
         *kai = new_kai;
     }
 
-    // Adjust dn and/or dna for those particles held in equilibrium and/or
-    // without asymmetry.
-    fn fix_equilibrium(&self, c: &Context<M>, workspace: &mut Workspace) {
-        for &eq in &self.in_equilibrium {
-            workspace.dn[eq] = c.eq[eq] - workspace.n[eq];
-        }
-        for &eq in &self.no_asymmetry {
-            workspace.dna[eq] = -workspace.na[eq];
+    /// Adjust `dn` and/or `dna` for to account for:
+    ///
+    /// - Particle which are held in equilibrium, irrespective if any
+    ///   interaction going on.
+    /// - Particles which have no asymmetry, irrespective if any interaction
+    ///   going on.
+    /// - Handle and equilibriate fast interaction.
+    ///
+    /// As the fast interaction handling is done only to linear order (see
+    /// [`InteractionParticles::fast_interaction`]), the changes have to be
+    /// applied continuous until the changes converge.
+    #[allow(clippy::similar_names)]
+    fn fix_equilibrium(
+        &self,
+        c: &Context<M>,
+        fast_interactions: &[InteractionParticles],
+        workspace: &mut Workspace,
+    ) {
+        let (mut ni, mut nai);
+
+        let mut delta_sums: Vec<_> = iter::repeat((0.0, 0.0))
+            .take(fast_interactions.len())
+            .collect();
+        let mut deltas: Vec<_>;
+
+        loop {
+            // Update the number densities with Runge-Kutta changes and the
+            // changes computed thus far from fast interactions.
+            ni = &c.n + &workspace.dn;
+            nai = &c.na + &workspace.dna;
+
+            // Compute all the deltas from the fast interactions, stored as
+            // tuples with the symmetric and asymmetric components.  Also keep
+            // track of cumulative changes.
+            deltas = fast_interactions
+                .iter()
+                .zip(&mut delta_sums)
+                .map(|(interaction, delta_sum)| {
+                    let result = interaction.fast_interaction(&ni, &nai, &c.eq);
+
+                    *workspace += &result;
+
+                    delta_sum.0 += result.symmetric_delta;
+                    delta_sum.1 += result.asymmetric_delta;
+
+                    (result.symmetric_delta, result.asymmetric_delta)
+                })
+                .collect();
+
+            // Fix equilibrium
+            for &eq in &self.in_equilibrium {
+                workspace.dn[eq] = c.eq[eq] - workspace.n[eq];
+            }
+            for &eq in &self.no_asymmetry {
+                workspace.dna[eq] = -workspace.na[eq];
+            }
+
+            let equilibrium = fast_interactions.is_empty()
+                || delta_sums.iter().zip(deltas).all(|(delta_sum, delta)| {
+                    // Either the most recent change is 0, or the incremental change is small.
+                    (delta.0.abs() == 0.0 || (delta.0 / delta_sum.0).abs() < 1e-8)
+                        && (delta.1.abs() == 0.0 || (delta.1 / delta_sum.1).abs() < 1e-8)
+                });
+            if equilibrium {
+                break;
+            }
         }
     }
 
@@ -605,7 +672,8 @@ where
             log::trace!("      n = {:<+10.3e}", workspace.n);
             log::trace!("     na = {:<+10.3e}", workspace.na);
 
-            for i in 0..RK_S {
+            let mut i = 0;
+            let fast_interactions = loop {
                 // DEBUG
                 // log::trace!("i = {}", i);
                 evals += 1;
@@ -625,13 +693,17 @@ where
                 // Compute k[i] and ka[i] from each interaction
                 self.compute_ki(&mut workspace.k[i], &mut workspace.ka[i], &ci);
 
-                workspace.compute_dn(i)
-            }
+                workspace.compute_dn(i);
+
+                i += 1;
+                if i >= RK_S {
+                    break ci.into_fast_interactions();
+                }
+            };
 
             self.model.set_beta(beta);
             let c = self.context(step, h, beta, &workspace.n, &workspace.na);
-
-            self.fix_equilibrium(&c, &mut workspace);
+            self.fix_equilibrium(&c, &fast_interactions, &mut workspace);
 
             let err = workspace.local_error();
 
@@ -639,8 +711,8 @@ where
             // iteration step
             if err < self.error_tolerance {
                 advance = true;
-                log::trace!(" dn = {:<+10.3e}", workspace.dn);
-                log::trace!("dna = {:<+10.3e}", workspace.dna);
+                log::trace!("     dn = {:<+10.3e}", workspace.dn);
+                log::trace!("    dna = {:<+10.3e}", workspace.dna);
             } else if log::log_enabled!(log::Level::Trace) {
                 log::trace!(
                     "Error is not within tolerance ({:e} > {:e}).",
@@ -854,6 +926,7 @@ where
             n: n.clone(),
             na: na.clone(),
             model: &self.model,
+            fast_interactions: RwLock::new(Vec::new()),
         }
     }
 }

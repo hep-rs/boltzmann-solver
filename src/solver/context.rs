@@ -1,5 +1,6 @@
+use crate::model::interaction::InteractionParticles;
 use ndarray::prelude::*;
-use std::fmt;
+use std::{fmt, sync::RwLock};
 
 /// Current context at a particular step in the numerical integration.
 #[derive(Debug)]
@@ -28,6 +29,10 @@ pub struct Context<'a, M> {
     pub na: Array1<f64>,
     /// Model data
     pub model: &'a M,
+    /// Keep track of which particles are in equilibrium with each other.
+    /// Within each HashMap, the particles are indicated using the keys, and the
+    /// sign and multiplicity is stored in the value.
+    pub(crate) fast_interactions: RwLock<Vec<InteractionParticles>>,
 }
 
 impl<'a, M> fmt::Display for Context<'a, M> {
@@ -37,5 +42,11 @@ impl<'a, M> fmt::Display for Context<'a, M> {
             "Context {{ step: {}, beta: {:e},\n  n: {:e},\n  na: {:e},\n  eq: {:e}\n}}",
             self.step, self.beta, self.n, self.na, self.eq
         )
+    }
+}
+
+impl<'a, M> Context<'a, M> {
+    pub(crate) fn into_fast_interactions(self) -> Vec<InteractionParticles> {
+        self.fast_interactions.into_inner().unwrap()
     }
 }
