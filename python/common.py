@@ -82,7 +82,10 @@ def plot_integration(data):
             )
         ],
         layout=go.Layout(
-            xaxis=go.layout.XAxis(title="Integration Step", type="linear",),
+            xaxis=go.layout.XAxis(
+                title="Integration Step",
+                type="linear",
+            ),
             yaxis=go.layout.YAxis(
                 title="Inverse Temperature [GeV⁻¹]", type="log", exponentformat="power"
             ),
@@ -189,7 +192,9 @@ def plot_density(data, ptcls):
                 title="Inverse Temperature [GeV⁻¹]", type="log", exponentformat="power"
             ),
             yaxis=go.layout.YAxis(
-                title="Number Density [Normalized]", type="linear", rangemode="tozero",
+                title="Number Density [Normalized]",
+                type="linear",
+                rangemode="tozero",
             ),
         ),
     )
@@ -209,7 +214,9 @@ def plot_gamma(data):
         return go.Figure(
             layout=go.Layout(
                 xaxis=go.layout.XAxis(
-                    title="Inverse Temperature", type="log", exponentformat="power",
+                    title="Inverse Temperature",
+                    type="log",
+                    exponentformat="power",
                 ),
                 yaxis=go.layout.YAxis(
                     title="Interaction Rate",
@@ -245,4 +252,3 @@ def plot_gamma(data):
             fig.add_trace(
                 go.Scatter(name=column, showlegend=True, x=data["beta"], y=data[column])
             )
-
