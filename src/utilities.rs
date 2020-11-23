@@ -33,13 +33,13 @@ const INTEGRATION_PRECISION: f64 = 1e-10;
 #[must_use]
 pub fn t_range(s: f64, m1: f64, m2: f64, m3: f64, m4: f64) -> (f64, f64) {
     debug_assert!(
-        s * (1.0 + 2.0 * f64::EPSILON) >= (m1 + m2).powi(2),
+        s * (1.0 + 10.0 * f64::EPSILON) >= (m1 + m2).powi(2),
         "s cannot be smaller than (m1 + m2)² (s = {:e}, (m1 + m2)² = {:e}).",
         s,
         (m1 + m2).powi(2)
     );
     debug_assert!(
-        s * (1.0 + 2.0 * f64::EPSILON) >= (m3 + m4).powi(2),
+        s * (1.0 + 10.0 * f64::EPSILON) >= (m3 + m4).powi(2),
         "s cannot be smaller than (m3 + m4)² (s = {:e}, (m3 + m4)² = {:e}).",
         s,
         (m3 + m4).powi(2)
