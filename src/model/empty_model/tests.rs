@@ -6,7 +6,6 @@ use crate::{
     },
     solver::{Context, SolverBuilder},
     utilities::test::approx_eq,
-    utilities::test::setup_logging,
 };
 use std::{env::temp_dir, error, fs, path::Path, sync::RwLock};
 
@@ -253,8 +252,6 @@ fn create_csv<P: AsRef<Path>>(
 
 #[test]
 fn no_interaction() -> Result<(), Box<dyn error::Error>> {
-    setup_logging(3);
-
     let mut model = EmptyModel::default();
     model.push_particle(Particle::new(0, 1e5, 1e1));
     model.push_particle(Particle::new(0, 1e3, 1e1));
@@ -280,8 +277,6 @@ fn no_interaction() -> Result<(), Box<dyn error::Error>> {
 /// Test a decay with a unit squared amplitude and the provided interaction.
 #[test]
 fn unit_amplitude() -> Result<(), Box<dyn error::Error>> {
-    setup_logging(1);
-
     let mut model = EmptyModel::default();
     model.extend_particles(
         [1e5, 1e2, 1e1]
@@ -330,8 +325,6 @@ fn unit_amplitude() -> Result<(), Box<dyn error::Error>> {
 /// Test a decay with a unit squared amplitude, with 1 -> 2, 3.
 #[test]
 fn unit_gamma() -> Result<(), Box<dyn error::Error>> {
-    setup_logging(1);
-
     let mut model = EmptyModel::default();
 
     model.extend_particles(
@@ -381,8 +374,6 @@ fn unit_gamma() -> Result<(), Box<dyn error::Error>> {
 /// Test a decay with a unit squared amplitude, with 1 -> 2, 3.
 #[test]
 fn unit_rate() -> Result<(), Box<dyn error::Error>> {
-    setup_logging(1);
-
     let mut model = EmptyModel::default();
 
     model.extend_particles(
@@ -410,9 +401,9 @@ fn unit_rate() -> Result<(), Box<dyn error::Error>> {
         .solve();
 
     // Check final number densities
-    approx_eq(n[1], 1.0 - (BETA_END - BETA_START), 8.0, 1e-10)?;
-    approx_eq(n[2], 1.0 + (BETA_END - BETA_START), 8.0, 1e-50)?;
-    approx_eq(n[3], 1.0 + (BETA_END - BETA_START), 8.0, 1e-50)?;
+    approx_eq(n[1], 0.0, 8.0, 1e-10)?;
+    approx_eq(n[2], 2.0, 8.0, 1e-50)?;
+    approx_eq(n[3], 2.0, 8.0, 1e-50)?;
 
     Ok(())
 }
