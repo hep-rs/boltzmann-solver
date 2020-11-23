@@ -1,16 +1,23 @@
 //! Utility function for testing
 
+use fern::colors;
 use num::Complex;
-use std::{convert, default, error, fmt};
+use std::{convert, default, error, fmt, io};
 
 pub(crate) struct FloatEqError {
     err: String,
+    pub a: f64,
+    pub b: f64,
+    pub precision: f64,
 }
 
 impl default::Default for FloatEqError {
     fn default() -> Self {
         FloatEqError {
             err: "Default error.".to_string(),
+            a: f64::NAN,
+            b: f64::NAN,
+            precision: f64::NAN,
         }
     }
 }
@@ -28,13 +35,30 @@ impl fmt::Display for FloatEqError {
 }
 impl error::Error for FloatEqError {}
 
-impl<T> convert::From<T> for FloatEqError
+impl<T> convert::From<(T, f64, f64)> for FloatEqError
 where
-    T: AsRef<str>,
+    T: Into<String>,
 {
-    fn from(s: T) -> Self {
+    fn from(s: (T, f64, f64)) -> Self {
         Self {
-            err: s.as_ref().to_string(),
+            err: s.0.into(),
+            a: s.1,
+            b: s.2,
+            precision: f64::NAN,
+        }
+    }
+}
+
+impl<T> convert::From<(T, f64, f64, f64)> for FloatEqError
+where
+    T: Into<String>,
+{
+    fn from(s: (T, f64, f64, f64)) -> Self {
+        Self {
+            err: s.0.into(),
+            a: s.1,
+            b: s.2,
+            precision: s.3,
         }
     }
 }
@@ -53,10 +77,10 @@ where
 pub(crate) fn approx_eq(a: f64, b: f64, eps_rel: f64, eps_abs: f64) -> Result<(), FloatEqError> {
     // If neither are numbers, they are not comparable
     if a.is_nan() {
-        return Err("a is NaN.".into());
+        return Err(("a is NaN.", a, b).into());
     }
     if b.is_nan() {
-        return Err("b is NaN.".into());
+        return Err(("b is NaN.", a, b).into());
     }
 
     // If they are already identical, return.  They could both be infinite
@@ -70,9 +94,9 @@ pub(crate) fn approx_eq(a: f64, b: f64, eps_rel: f64, eps_abs: f64) -> Result<()
     // must either be another infinity or be finite and therefore they are
     // not equal
     match (a.is_infinite(), b.is_infinite()) {
-        (true, true) => return Err("a and b are different infinities.".into()),
-        (true, false) => return Err("a is infinite while b is finite.".into()),
-        (false, true) => return Err("b is infinite while a is finite.".into()),
+        (true, true) => return Err(("a and b are different infinities.", a, b).into()),
+        (true, false) => return Err(("a is infinite while b is finite.", a, b).into()),
+        (false, true) => return Err(("b is infinite while a is finite.", a, b).into()),
         (false, false) => (),
     }
 
@@ -105,14 +129,17 @@ pub(crate) fn approx_eq(a: f64, b: f64, eps_rel: f64, eps_abs: f64) -> Result<()
         );
         Ok(())
     } else {
-        Err(format!(
-            "a ({:e}) and b ({:e}) do not have the necessary precision ({:.3} !≥ {:.3})",
+        let precision = -p.log10();
+        Err((
+            format!(
+                "a ({:e}) and b ({:e}) do not have the necessary precision (εᵣ: {:.3} v {:.3}, εₐ: {:.3e} v {:.3e})",
+                a, b, precision, eps_rel, (a-b).abs(), eps_abs
+            ),
             a,
             b,
-            -p.log10(),
-            eps_rel
+            precision,
         )
-        .into())
+            .into())
     }
 }
 
@@ -125,12 +152,62 @@ pub(crate) fn complex_approx_eq(
     eps_abs: f64,
 ) -> Result<(), FloatEqError> {
     if let Err(e) = approx_eq(a.re, b.re, eps_rel, eps_abs) {
-        return Err(format!("Real parts unequal: {}", e).into());
+        return Err((format!("Real parts unequal: {}", e), e.a, e.b, e.precision).into());
     }
     if let Err(e) = approx_eq(a.im, b.im, eps_rel, eps_abs) {
-        return Err(format!("Imag parts unequal: {}", e).into());
+        return Err((format!("Imag parts unequal: {}", e), e.a, e.b, e.precision).into());
     }
     Ok(())
+}
+
+/// Setup logging with the specified verbosity.  If unset, nothing is printed
+/// during tests.
+///
+/// The verbosity options are:
+/// - `0`: Warn level
+/// - `1`: Info level
+/// - `2`: Debug level
+/// - `3` and above: Trace level
+#[allow(dead_code)]
+pub(crate) fn setup_logging(verbosity: usize) {
+    let mut base_config = fern::Dispatch::new();
+
+    let colors = colors::ColoredLevelConfig::new()
+        .error(colors::Color::Red)
+        .warn(colors::Color::Yellow)
+        .info(colors::Color::Green)
+        .debug(colors::Color::White)
+        .trace(colors::Color::Black);
+
+    let lvl = match verbosity {
+        0 => log::LevelFilter::Warn,
+        1 => log::LevelFilter::Info,
+        2 => log::LevelFilter::Debug,
+        _3_or_more => log::LevelFilter::Trace,
+    };
+    base_config = base_config.level(lvl);
+
+    let stderr_config = fern::Dispatch::new()
+        .format(move |out, message, record| {
+            out.finish(format_args!(
+                "[{level}] {target} - {message}",
+                target = record.target(),
+                level = colors.color(record.level()),
+                message = message
+            ))
+        })
+        .chain(io::stderr());
+
+    base_config.chain(stderr_config).apply().unwrap_or(());
+
+    match verbosity {
+        0 => {
+            // log::warn!("Verbosity set to Warn")
+        }
+        1 => log::info!("Verbosity set to Info."),
+        2 => log::debug!("Verbosity set to Debug."),
+        _3_or_more => log::trace!("Verbosity set to Trace."),
+    }
 }
 
 #[cfg(test)]
