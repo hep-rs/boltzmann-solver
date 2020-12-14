@@ -4,24 +4,20 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-black = "==20.8b1"
-isort = "*"
-jupyterlab-code-formatter = "*"
+black = "*"
 data-science-types = "*"
+isort = "*"
 
 [packages]
 ipywidgets = "*"
-jupyterlab = "*"
-matplotlib = "*"
 numpy = "*"
 pandas = "*"
-plotly = "*"
 scipy = "*"
+bokeh = "*"
+plotly = "*"
 
 [requires]
 python_version = "3"
 
-[scripts]
-post-install = "pipenv run post-install-1 && pipenv run post-install-2"
-post-install-1 = "jupyter labextension install jupyterlab-plotly @jupyter-widgets/jupyterlab-manager plotlywidget @ryantam626/jupyterlab_code_formatter"
-post-install-2 = "jupyter serverextension enable --py jupyterlab_code_formatter"
+[pipenv]
+allow_prereleases = true
