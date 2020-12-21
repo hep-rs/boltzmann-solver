@@ -225,7 +225,7 @@ where
         Some(gamma)
     }
 
-    fn asymmetry(&self, c: &Context<M>, _real: bool) -> Option<f64> {
+    fn delta_gamma(&self, c: &Context<M>, _real: bool) -> Option<f64> {
         let asymmetry = self.asymmetry.as_ref()?;
 
         let ln_beta = c.beta.ln();
