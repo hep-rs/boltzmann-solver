@@ -1449,8 +1449,10 @@ mod tests {
             n += &result.dn;
             na += &result.dna;
 
+            #[allow(clippy::map_err_ignore)]
             approx_eq(n[1], 0.0, ZERO_EPS_REL, ZERO_EPS_ABS)
                 .map_err(|_| format!("Expected number density of 0, but got {}", n[1]))?;
+            #[allow(clippy::map_err_ignore)]
             approx_eq(na[1], 0.0, ZERO_EPS_REL, ZERO_EPS_ABS)
                 .map_err(|_| format!("Expected number density asymmetry of 0, gut go {}", na[1]))?;
         }
@@ -1476,6 +1478,7 @@ mod tests {
             n += &result.dn;
             na += &result.dna;
 
+            #[allow(clippy::map_err_ignore)]
             approx_eq(n[2], 0.0, ZERO_EPS_REL, ZERO_EPS_ABS)
                 .or_else(|_| approx_eq(n[3], 0.0, ZERO_EPS_REL, ZERO_EPS_ABS))
                 .map_err(|_| {
@@ -1484,6 +1487,7 @@ mod tests {
                         n[2], n[3]
                     )
                 })?;
+            #[allow(clippy::map_err_ignore)]
             approx_eq(na[2] * n[3] + na[3] * n[2], 0.0, ZERO_EPS_REL, ZERO_EPS_ABS)
                 .map_err(|e| format!("Number density asymmetry unequal: {}", e))?;
         }
@@ -1553,11 +1557,13 @@ mod tests {
             n += &result.dn;
             na += &result.dna;
 
+            #[allow(clippy::map_err_ignore)]
             approx_eq(n[1], 0.0, ZERO_EPS_REL, ZERO_EPS_ABS)
                 .or_else(|_| approx_eq(n[2], 0.0, ZERO_EPS_REL, ZERO_EPS_ABS))
                 .map_err(|_| {
                     format!("Expected a 0 number density, but got {} and {}", n[1], n[2])
                 })?;
+            #[allow(clippy::map_err_ignore)]
             approx_eq(na[1] * n[2] + na[2] * n[1], 0.0, ZERO_EPS_REL, ZERO_EPS_ABS)
                 .map_err(|e| format!("Asymmetric equality error: {}", e))?;
         }
@@ -1583,11 +1589,13 @@ mod tests {
             n += &result.dn;
             na += &result.dna;
 
+            #[allow(clippy::map_err_ignore)]
             approx_eq(n[3], 0.0, ZERO_EPS_REL, ZERO_EPS_ABS)
                 .or_else(|_| approx_eq(n[4], 0.0, ZERO_EPS_REL, ZERO_EPS_ABS))
                 .map_err(|_| {
                     format!("Expected a 0 number density, but got {} and {}", n[3], n[4])
                 })?;
+            #[allow(clippy::map_err_ignore)]
             approx_eq(na[3] * n[4] + na[4] * n[3], 0.0, ZERO_EPS_REL, ZERO_EPS_ABS)
                 .map_err(|e| format!("Asymmetric equality error: {}", e))?;
         }
@@ -1661,8 +1669,10 @@ mod tests {
             n += &result.dn;
             na += &result.dna;
 
+            #[allow(clippy::map_err_ignore)]
             approx_eq(n[1], 0.0, ZERO_EPS_REL, ZERO_EPS_ABS)
                 .map_err(|_| format!("Expected 0 number density but got {}", n[1]))?;
+            #[allow(clippy::map_err_ignore)]
             approx_eq(na[1], 0.0, ZERO_EPS_REL, ZERO_EPS_ABS)
                 .map_err(|_| format!("Expected 0 number density asymmetry, but got {}", na[1]))?;
         }
@@ -1689,6 +1699,7 @@ mod tests {
             n += &result.dn;
             na += &result.dna;
 
+            #[allow(clippy::map_err_ignore)]
             approx_eq(n[2], 0.0, ZERO_EPS_REL, ZERO_EPS_ABS)
                 .or_else(|_| approx_eq(n[3], 0.0, ZERO_EPS_REL, ZERO_EPS_ABS))
                 .or_else(|_| approx_eq(n[4], 0.0, ZERO_EPS_REL, ZERO_EPS_ABS))
