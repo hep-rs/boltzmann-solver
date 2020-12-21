@@ -78,6 +78,10 @@ pub struct SolverBuilder<M> {
     step_precision: StepPrecision,
     error_tolerance: f64,
     precompute: bool,
+    /// Whether fast interactions are enabled
+    fast_interactions: bool,
+    /// Whether to abort the integration if the step size becomes too small
+    abort_when_inaccurate: bool,
 }
 
 impl<M> SolverBuilder<M> {
@@ -113,6 +117,8 @@ impl<M> SolverBuilder<M> {
             step_precision: StepPrecision::default(),
             error_tolerance: 1e-4,
             precompute: true,
+            fast_interactions: false,
+            abort_when_inaccurate: false,
         }
     }
 
@@ -316,6 +322,27 @@ impl<M> SolverBuilder<M> {
         self
     }
 
+    /// Specify whether to use fast interactions.
+    ///
+    /// # Warning
+    ///
+    /// This feature is currently experimental and may not produce reliable results.
+    pub fn fast_interaction(mut self, v: bool) -> Self {
+        if v {
+            log::warn!(
+                "Fast interaction are currently experimental and may not produce reliable results."
+            );
+        }
+        self.fast_interactions = v;
+        self
+    }
+
+    /// Specify whether local inaccuracies cause the integration to abort.
+    pub fn abort_when_inaccurate(mut self, v: bool) -> Self {
+        self.abort_when_inaccurate = v;
+        self
+    }
+
     /// Check the validity of the initial densities, making sure we have the
     /// right number of initial conditions and they are all finite.
     fn generate_initial_densities<I>(
@@ -429,7 +456,7 @@ where
             let c = model.as_context();
 
             for interaction in model.interactions() {
-                interaction.gamma(&c);
+                interaction.gamma(&c, false);
             }
         }
     }
@@ -571,6 +598,8 @@ where
             logger: self.logger,
             step_precision: self.step_precision,
             error_tolerance: self.error_tolerance,
+            fast_interactions: self.fast_interactions,
+            abort_when_inaccurate: self.abort_when_inaccurate,
         })
     }
 }

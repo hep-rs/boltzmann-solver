@@ -32,7 +32,7 @@ pub struct Context<'a, M> {
     /// Keep track of which particles are in equilibrium with each other.
     /// Within each HashMap, the particles are indicated using the keys, and the
     /// sign and multiplicity is stored in the value.
-    pub(crate) fast_interactions: RwLock<Vec<InteractionParticles>>,
+    pub(crate) fast_interactions: Option<RwLock<Vec<InteractionParticles>>>,
 }
 
 impl<'a, M> fmt::Display for Context<'a, M> {
@@ -46,7 +46,11 @@ impl<'a, M> fmt::Display for Context<'a, M> {
 }
 
 impl<'a, M> Context<'a, M> {
+    /// Unwrap the context leaving only the fast interactions.
+    ///
+    /// If fast interactions are disabled, the result is an empty vectors.
     pub(crate) fn into_fast_interactions(self) -> Vec<InteractionParticles> {
-        self.fast_interactions.into_inner().unwrap()
+        self.fast_interactions
+            .map_or_else(Vec::new, |f| f.into_inner().unwrap())
     }
 }

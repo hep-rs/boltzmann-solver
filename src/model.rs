@@ -245,7 +245,7 @@ where
             n: Array1::ones(self.len_particles()),
             na: Array1::zeros(self.len_particles()),
             model: &self,
-            fast_interactions: RwLock::new(Vec::new()),
+            fast_interactions: None,
         }
     }
 }
