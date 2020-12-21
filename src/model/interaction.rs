@@ -831,6 +831,26 @@ impl InteractionParticles {
 
         Ok(s)
     }
+
+    /// Output a 'pretty' version of the interaction particles using the
+    /// particle indices.  This does not require the model and will always work.
+    pub fn short_display(&self) -> String {
+        let mut s = String::with_capacity(3 * (self.incoming_len() + self.outgoing_len()) + 2);
+
+        for &p in &self.incoming_signed {
+            s.push_str(&format!("{}", p));
+            s.push(' ');
+        }
+
+        s.push_str("↔");
+
+        for &p in &self.outgoing_signed {
+            s.push(' ');
+            s.push_str(&format!("{}", p));
+        }
+
+        s
+    }
 }
 
 impl fmt::Display for InteractionParticles {
@@ -852,7 +872,7 @@ impl fmt::Display for InteractionParticles {
 }
 
 /// Generic interaction between particles.
-pub trait Interaction<M> {
+pub trait Interaction<M: Model> {
     /// Return the particles involved in this interaction
     fn particles(&self) -> &InteractionParticles;
 
@@ -1071,17 +1091,21 @@ pub trait Interaction<M> {
         }
 
         debug_assert!(
-            !gamma.is_finite(),
-            "Non-finite interaction rate at step {} for interaction {:?}: {}",
+            gamma.is_finite(),
+            "Non-finite interaction rate at step {} for interaction {}: {}",
             c.step,
-            self.particles(),
+            self.particles()
+                .display(c.model)
+                .unwrap_or_else(|_| self.particles().short_display()),
             gamma
         );
         debug_assert!(
-            !asymmetry.is_finite(),
-            "Non-finite asymmetric interaction rate at step {} for interaction {:?}: {}",
+            asymmetry.is_finite(),
+            "Non-finite asymmetric interaction rate at step {} for interaction {}: {}",
             c.step,
-            self.particles(),
+            self.particles()
+                .display(c.model)
+                .unwrap_or_else(|_| self.particles().short_display()),
             asymmetry
         );
 
@@ -1130,17 +1154,21 @@ pub trait Interaction<M> {
         }
 
         debug_assert!(
-            !rate.symmetric.is_finite(),
-            "Non-finite interaction adjusted rate at step {} for interaction {:?}: {}",
+            rate.symmetric.is_finite(),
+            "Non-finite interaction adjusted rate at step {} for interaction {}: {}",
             c.step,
-            self.particles(),
+            self.particles()
+                .display(c.model)
+                .unwrap_or_else(|_| self.particles().short_display()),
             rate.symmetric
         );
         debug_assert!(
-            !rate.asymmetric.is_finite(),
-            "Non-finite asymmetric adjusted interaction rate at step {} for interaction {:?}: {}",
+            rate.asymmetric.is_finite(),
+            "Non-finite asymmetric adjusted interaction rate at step {} for interaction {}: {}",
             c.step,
-            self.particles(),
+            self.particles()
+                .display(c.model)
+                .unwrap_or_else(|_| self.particles().short_display()),
             rate.asymmetric
         );
 
