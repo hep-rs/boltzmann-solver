@@ -764,7 +764,7 @@ impl InteractionParticles {
                 prev_sign = delta.signum();
 
                 if sign_changes > 4 {
-                    delta = rng.gen();
+                    delta *= 0.5 + rng.gen::<f64>();
 
                     sign_changes = 0;
                     prev_sign = delta.signum();
