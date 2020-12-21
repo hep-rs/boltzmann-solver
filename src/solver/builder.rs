@@ -69,14 +69,23 @@ impl error::Error for Error {
 pub struct SolverBuilder<M> {
     /// Inner model
     pub model: Option<M>,
+    /// Initial number densities
     initial_densities: Vec<(usize, f64)>,
+    /// Initial number density asymmetries
     initial_asymmetries: Vec<(usize, f64)>,
+    /// Range of beta values to integrate over
     beta_range: (f64, f64),
+    /// Particles which are not allowed to deviate from equilibrium
     in_equilibrium: Vec<usize>,
+    /// Particles which are not allowed to have any asymmetry
     no_asymmetry: Vec<usize>,
+    /// Logger used at each step
     logger: Box<dyn Fn(&Context<M>)>,
+    /// Step precision (i.e. step size) allowed
     step_precision: StepPrecision,
+    /// Local error allowed to determine step size
     error_tolerance: f64,
+    /// Whether interactions are precomputed or not
     precompute: bool,
     /// Whether fast interactions are enabled
     fast_interactions: bool,
