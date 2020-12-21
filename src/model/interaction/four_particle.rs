@@ -213,9 +213,12 @@ where
 
         debug_assert!(
             gamma.is_finite(),
-            "Computed a non-finit value for γ at step {} in interaction {:?}",
+            "Computed a non-finit value for γ at step {} in interaction {}: {}",
             c.step,
-            self
+            self.particles()
+                .display(c.model)
+                .unwrap_or_else(|_| self.particles().short_display()),
+            gamma
         );
 
         if let Ok(mut gamma_spline) = self.gamma_spline.write() {
@@ -259,9 +262,12 @@ where
 
         debug_assert!(
             delta_gamma.is_finite(),
-            "Computed a non-finit value for δγ at step {} in interaction {:?}",
+            "Computed a non-finit value for δγ at step {} in interaction {}: {}",
             c.step,
-            self
+            self.particles()
+                .display(c.model)
+                .unwrap_or_else(|_| self.particles().short_display()),
+            delta_gamma
         );
 
         if let Ok(mut asymmetry_spline) = self.asymmetry_spline.write() {

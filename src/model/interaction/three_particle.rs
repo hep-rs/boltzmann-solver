@@ -171,9 +171,11 @@ where
 
             debug_assert!(
                 width.is_finite(),
-                "Computed a non-finit width at step {} in interaction {:?}: {}",
+                "Computed a non-finit width at step {} in interaction {}: {}",
                 c.step,
-                self,
+                self.particles()
+                    .display(c.model)
+                    .unwrap_or_else(|_| self.particles().short_display()),
                 width
             );
 
@@ -237,9 +239,11 @@ where
 
             debug_assert!(
                 gamma.is_finite(),
-                "Computed a non-finit value for γ at step {} in interaction {:?}: {}",
+                "Computed a non-finit value for γ at step {} in interaction {}: {}",
                 c.step,
-                self,
+                self.particles()
+                    .display(c.model)
+                    .unwrap_or_else(|_| self.particles().short_display()),
                 gamma
             );
 
@@ -255,9 +259,11 @@ where
 
             debug_assert!(
                 gamma.is_finite(),
-                "Computed a non-finit value for γ at step {} in interaction {:?}: {}",
+                "Computed a non-finit value for γ at step {} in interaction {}: {}",
                 c.step,
-                self,
+                self.particles()
+                    .display(c.model)
+                    .unwrap_or_else(|_| self.particles().short_display()),
                 gamma
             );
 
@@ -290,9 +296,11 @@ where
 
             debug_assert!(
                 delta_gamma.is_finite(),
-                "Computed a non-finite value for δγ at step {} in interaction {:?}: {}",
+                "Computed a non-finite value for δγ at step {} in interaction {}: {}",
                 c.step,
-                self,
+                self.particles()
+                    .display(c.model)
+                    .unwrap_or_else(|_| self.particles().short_display()),
                 delta_gamma
             );
 
@@ -308,9 +316,11 @@ where
 
             debug_assert!(
                 delta_gamma.is_finite(),
-                "Computed a non-finite value for δγ at step {} in interaction {:?}: {}",
+                "Computed a non-finite value for δγ at step {} in interaction {}: {}",
                 c.step,
-                self,
+                self.particles()
+                    .display(c.model)
+                    .unwrap_or_else(|_| self.particles().short_display()),
                 delta_gamma
             );
 
@@ -374,16 +384,20 @@ where
 
         debug_assert!(
             rate.symmetric.is_finite(),
-            "Computed non-finite interaction rate at step {} in interaction {:?}: {}",
+            "Computed non-finite interaction rate at step {} in interaction {}: {}",
             c.step,
-            self,
+            self.particles()
+                .display(c.model)
+                .unwrap_or_else(|_| self.particles().short_display()),
             rate,
         );
         debug_assert!(
             rate.asymmetric.is_finite(),
-            "Computed non-finite asymmetric interaction rate at step {} in interaction {:?}: {}",
+            "Computed non-finite asymmetric interaction rate at step {} in interaction {}: {}",
             c.step,
-            self,
+            self.particles()
+                .display(c.model)
+                .unwrap_or_else(|_| self.particles().short_display()),
             rate,
         );
 
