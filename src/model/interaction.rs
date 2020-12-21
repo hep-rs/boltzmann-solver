@@ -646,10 +646,6 @@ impl InteractionParticles {
     /// For a fast interaction, compute the change to each particle species such
     /// that equilibrium is established.
     ///
-    /// This functions returns the tuple of arrays `(dn, dna)` where the first
-    /// contains the change to the number densities and the second contains the
-    /// change to the number density asymmetries.
-    ///
     /// The computation in the symmetric case is described in
     /// [`symmetric_delta`], and the asymmetric case is described in [`asymmetric_delta`].
     #[must_use]

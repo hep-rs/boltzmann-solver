@@ -72,10 +72,12 @@ impl EmptyModel {
     {
         self.interactions.push(Box::new(interaction));
     }
+
+    /// Push the specified interaction into the model.
     #[cfg(not(feature = "parallel"))]
     pub fn push_interaction<I>(&mut self, interaction: I)
     where
-        I: Interaction<Self>,
+        I: Interaction<Self> + 'static,
     {
         self.interactions.push(Box::new(interaction));
     }
@@ -95,11 +97,16 @@ impl EmptyModel {
                 .map(|t| Box::new(t) as Box<dyn Interaction<Self> + Sync>),
         );
     }
+
+    /// Extend the particles within the model given the specified iterator.
+    ///
+    /// Note that the particle comes with a default `none` particle at index 0,
+    /// thus the index of particles added with this start from 1.
     #[cfg(not(feature = "parallel"))]
     pub fn extend_interactions<I>(&mut self, iter: I)
     where
         I: IntoIterator,
-        <I as IntoIterator>::Item: Interaction<Self>,
+        <I as IntoIterator>::Item: Interaction<Self> + 'static,
     {
         self.interactions.extend(
             iter.into_iter()
