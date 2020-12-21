@@ -265,7 +265,7 @@ where
         }
     }
 
-    fn asymmetry(&self, c: &Context<M>, real: bool) -> Option<f64> {
+    fn delta_gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
         let asymmetry = self.asymmetry.as_ref()?;
 
         let ptcl = c.model.particles();
@@ -322,7 +322,7 @@ where
     /// of the adjusted reaction rate density.
     fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
         let gamma = self.gamma(c, false).unwrap_or(0.0);
-        let asymmetry = self.asymmetry(c, false).unwrap_or(0.0);
+        let asymmetry = self.delta_gamma(c, false).unwrap_or(0.0);
 
         // If both rates are 0, there's no need to adjust it to the particles'
         // number densities.

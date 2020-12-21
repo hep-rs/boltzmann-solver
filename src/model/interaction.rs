@@ -936,7 +936,7 @@ pub trait Interaction<M> {
     /// 0` errors.  In order to get the real interaction rate, `real` should be
     /// set to true.
     #[allow(unused_variables)]
-    fn asymmetry(&self, c: &Context<M>, real: bool) -> Option<f64> {
+    fn delta_gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
         None
     }
 
@@ -1066,7 +1066,7 @@ pub trait Interaction<M> {
     /// [`Interaction::asymmetry`] in order to computer the actual rate.
     fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
         let gamma = self.gamma(c, false).unwrap_or(0.0);
-        let asymmetry = self.asymmetry(c, false).unwrap_or(0.0);
+        let asymmetry = self.delta_gamma(c, false).unwrap_or(0.0);
 
         // If both rates are 0, there's no need to adjust it to the particles'
         // number densities.
@@ -1230,8 +1230,8 @@ where
         (*self).gamma(c, real)
     }
 
-    fn asymmetry(&self, c: &Context<M>, real: bool) -> Option<f64> {
-        (*self).asymmetry(c, real)
+    fn delta_gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
+        (*self).delta_gamma(c, real)
     }
     fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
         (*self).rate(c)
@@ -1271,8 +1271,8 @@ where
         self.as_ref().gamma(c, real)
     }
 
-    fn asymmetry(&self, c: &Context<M>, real: bool) -> Option<f64> {
-        self.as_ref().asymmetry(c, real)
+    fn delta_gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
+        self.as_ref().delta_gamma(c, real)
     }
 
     fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
