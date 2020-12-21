@@ -15,7 +15,7 @@ use ndarray::prelude::*;
 use rand::prelude::*;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::{cmp::Ordering, collections::HashMap, convert::TryFrom, fmt, ops};
+use std::{cmp::Ordering, collections::HashMap, convert::TryFrom, error, fmt, ops};
 
 /// Result from a fast interaction.
 #[derive(Debug, Clone)]
@@ -811,14 +811,14 @@ impl InteractionParticles {
     ///
     /// If any particles can't be found in the model, this will produce an
     /// error.
-    pub fn display<M>(&self, model: &M) -> Result<String, ()>
+    pub fn display<M>(&self, model: &M) -> Result<String, DisplayError>
     where
         M: Model,
     {
         let mut s = String::with_capacity(3 * (self.incoming_len() + self.outgoing_len()) + 2);
 
         for &p in &self.incoming_signed {
-            s.push_str(&model.particle_name(p).map_err(|_| ())?);
+            s.push_str(&model.particle_name(p)?);
             s.push(' ');
         }
 
@@ -826,7 +826,7 @@ impl InteractionParticles {
 
         for &p in &self.outgoing_signed {
             s.push(' ');
-            s.push_str(&model.particle_name(p).map_err(|_| ())?);
+            s.push_str(&model.particle_name(p)?);
         }
 
         Ok(s)
@@ -1281,6 +1281,28 @@ where
 
     fn change(&self, dn: &mut Array1<f64>, dna: &mut Array1<f64>, c: &Context<M>) {
         self.as_ref().change(dn, dna, c)
+    }
+}
+
+/// Error used when failing to find the particle within the model.
+#[derive(Debug)]
+pub struct DisplayError(isize);
+
+impl fmt::Display for DisplayError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if self.0 >= 0 {
+            write!(f, "Unable to find particle {} in the model.", self.0)
+        } else {
+            write!(f, "Unable to find antiparticle {} in the model.", -self.0)
+        }
+    }
+}
+
+impl error::Error for DisplayError {}
+
+impl From<isize> for DisplayError {
+    fn from(p: isize) -> Self {
+        Self(p)
     }
 }
 
