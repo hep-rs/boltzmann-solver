@@ -1074,8 +1074,20 @@ pub trait Interaction<M> {
             return None;
         }
 
-        debug_assert!(!gamma.is_nan(), "Interaction rate is NaN");
-        debug_assert!(!asymmetry.is_nan(), "Asymmetric interaction rate is NaN");
+        debug_assert!(
+            !gamma.is_finite(),
+            "Non-finite interaction rate at step {} for interaction {:?}: {}",
+            c.step,
+            self.particles(),
+            gamma
+        );
+        debug_assert!(
+            !asymmetry.is_finite(),
+            "Non-finite asymmetric interaction rate at step {} for interaction {:?}: {}",
+            c.step,
+            self.particles(),
+            asymmetry
+        );
 
         let mut rate = RateDensity::zero();
         let symmetric_prefactor = self.symmetric_prefactor(c);
@@ -1118,6 +1130,21 @@ pub trait Interaction<M> {
             fast_interactions.push(self.particles().clone());
             return None;
         }
+
+        debug_assert!(
+            !rate.symmetric.is_finite(),
+            "Non-finite interaction adjusted rate at step {} for interaction {:?}: {}",
+            c.step,
+            self.particles(),
+            rate.symmetric
+        );
+        debug_assert!(
+            !rate.asymmetric.is_finite(),
+            "Non-finite asymmetric adjusted interaction rate at step {} for interaction {:?}: {}",
+            c.step,
+            self.particles(),
+            rate.asymmetric
+        );
 
         Some(rate)
     }

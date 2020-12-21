@@ -171,9 +171,10 @@ where
 
             debug_assert!(
                 width.is_finite(),
-                "Computed a non-finit width at step {} in interaction {:?}",
+                "Computed a non-finit width at step {} in interaction {:?}: {}",
                 c.step,
-                self
+                self,
+                width
             );
 
             Some(PartialWidth {
@@ -233,12 +234,15 @@ where
                 * (self.squared_amplitude)(&c.model).abs()
                 * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
                 * (bessel::k1(z) / z);
+
             debug_assert!(
                 gamma.is_finite(),
-                "Computed a non-finit value for γ at step {} in interaction {:?}",
+                "Computed a non-finit value for γ at step {} in interaction {:?}: {}",
                 c.step,
-                self
+                self,
+                gamma
             );
+
             Some(gamma)
         } else {
             // ζ(3) / 16 π³ ≅ 0.0024230112251823
@@ -248,12 +252,15 @@ where
                 * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
                 * (bessel::k1_on_k2(z) / z.powi(3))
                 / p1.degrees_of_freedom();
+
             debug_assert!(
                 gamma.is_finite(),
-                "Computed a non-finit value for γ at step {} in interaction {:?}",
+                "Computed a non-finit value for γ at step {} in interaction {:?}: {}",
                 c.step,
-                self
+                self,
+                gamma
             );
+
             Some(gamma)
         }
     }
@@ -280,12 +287,15 @@ where
                 * asymmetry(&c.model).abs()
                 * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
                 * (bessel::k1(z) / z);
+
             debug_assert!(
                 delta_gamma.is_finite(),
-                "Computed a non-finit value for δγ at step {} in interaction {:?}",
+                "Computed a non-finite value for δγ at step {} in interaction {:?}: {}",
                 c.step,
-                self
+                self,
+                delta_gamma
             );
+
             Some(delta_gamma)
         } else {
             // ζ(3) / 16 π³ ≅ 0.0024230112251823
@@ -295,12 +305,15 @@ where
                 * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
                 * (bessel::k1_on_k2(z) / z.powi(3))
                 / p1.degrees_of_freedom();
+
             debug_assert!(
                 delta_gamma.is_finite(),
-                "Computed a non-finit value for δγ at step {} in interaction {:?}",
+                "Computed a non-finite value for δγ at step {} in interaction {:?}: {}",
                 c.step,
-                self
+                self,
+                delta_gamma
             );
+
             Some(delta_gamma)
         }
     }
@@ -358,6 +371,21 @@ where
                     + gamma * (na1 - eq1 * checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
             }
         }
+
+        debug_assert!(
+            rate.symmetric.is_finite(),
+            "Computed non-finite interaction rate at step {} in interaction {:?}: {}",
+            c.step,
+            self,
+            rate,
+        );
+        debug_assert!(
+            rate.asymmetric.is_finite(),
+            "Computed non-finite asymmetric interaction rate at step {} in interaction {:?}: {}",
+            c.step,
+            self,
+            rate,
+        );
 
         Some(rate * c.normalization)
     }
