@@ -772,7 +772,7 @@ impl InteractionParticles {
                 }
             }
 
-            if cumulative_delta != 0.0 && (delta / cumulative_delta).abs() < 1e-10 {
+            if cumulative_delta != 0.0 && (delta / cumulative_delta).abs() < 1e-6 {
                 break;
             }
 
