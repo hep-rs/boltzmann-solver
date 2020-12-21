@@ -336,7 +336,7 @@ use crate::{
 use ndarray::{prelude::*, Zip};
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
-use std::{error, fmt, iter, mem, ops, ptr, sync::RwLock};
+use std::{error, fmt, mem, ops, ptr, sync::RwLock};
 
 /// Error type returned by the solver builder in case there is an error.
 #[derive(Debug)]
@@ -470,12 +470,19 @@ impl Workspace {
             });
     }
 
-    /// Get the local error using L∞-norm
+    /// Get the local error using L∞-norm.  Any NaN values in the changes result
+    /// in the local error also being NaN.
     fn local_error(&self) -> f64 {
         self.dn_err
             .iter()
             .chain(self.dna_err.iter())
-            .fold(0_f64, |e, v| e.max(v.abs()))
+            .fold(0_f64, |e, v| {
+                if e.is_nan() || v.is_nan() {
+                    e * v
+                } else {
+                    e.max(v.abs())
+                }
+            })
     }
 
     /// Advance the integration by apply the computed changes to far to the number densities.
@@ -507,6 +514,8 @@ pub struct Solver<M> {
     logger: Box<dyn Fn(&Context<M>)>,
     step_precision: StepPrecision,
     error_tolerance: f64,
+    fast_interactions: bool,
+    abort_when_inaccurate: bool,
 }
 
 impl<M> Solver<M>
@@ -553,11 +562,12 @@ where
     ///   interaction going on.
     /// - Particles which have no asymmetry, irrespective if any interaction
     ///   going on.
-    /// - Handle and equilibriate fast interaction.
+    /// - Handle and equilibriate fast interaction (if applicable).
     ///
     /// As the fast interaction handling is done only to linear order (see
     /// [`InteractionParticles::fast_interaction`]), the changes have to be
-    /// applied continuous until the changes converge.
+    /// applied repeatedly until the changes converge.  If there are no fast
+    /// interactions, then `fast_interactions` should be an empty slice.
     #[allow(clippy::similar_names)]
     fn fix_equilibrium(
         &self,
@@ -622,6 +632,7 @@ where
     /// into an ODE in time (or inverse temperature in this case), with the
     /// derivative in energy being calculated solely from the previous
     /// time-step.
+    #[allow(clippy::too_many_lines)]
     pub fn solve(&mut self) -> (Array1<f64>, Array1<f64>) {
         use tableau::{RK_A, RK_C, RK_ORDER, RK_S};
 
@@ -634,6 +645,7 @@ where
         let mut beta = self.beta_range.0;
         let mut h = beta * f64::sqrt(self.step_precision.min * self.step_precision.max);
         let mut advance;
+        let mut inaccurate_warned = false;
 
         // Run logger for 0th step
         {
@@ -656,9 +668,16 @@ where
                 h = beta * self.step_precision.min;
                 log::debug!("Step size too small, increased h to {:.3e}", h);
 
-                // Irrespective of the local error, if we're at the minimum step
-                // size we will be integrating this step.
-                advance = true;
+                // Stop integration or force going ahead if the local error is too large.
+                if self.abort_when_inaccurate {
+                    break;
+                } else {
+                    if !inaccurate_warned {
+                        log::warn!("Step size too small.  Result may not be accurate");
+                        inaccurate_warned = true;
+                    }
+                    advance = true;
+                }
             }
 
             // Log the progress of the integration
@@ -707,7 +726,7 @@ where
 
             let err = workspace.local_error();
 
-            // If the error is within the tolerance, we'll be advancing the
+            // If the error is[{}]  within the tolerance, we'll be advancing the
             // iteration step
             if err < self.error_tolerance {
                 advance = true;
@@ -723,10 +742,12 @@ where
                 log::trace!("na_err = {:<+10.3e}", workspace.dna_err);
             }
 
-            // Compute the change in step size based on the current error and
+            // Compute the change in step size based on the current error an[{}] d
             // correspondingly adjust the step size
             let delta = if err == 0.0 {
                 10.0
+            } else if err.is_nan() {
+                0.0
             } else {
                 0.9 * (self.error_tolerance / err).powf(1.0 / f64::from(RK_ORDER + 1))
             };
@@ -876,7 +897,7 @@ where
                 .map(|(j, interaction)| {
                     (
                         j,
-                        interaction.asymmetry(&c, true).map(|v| v * normalization),
+                        interaction.delta_gamma(&c, true).map(|v| v * normalization),
                     )
                 })
                 .collect();
@@ -926,7 +947,11 @@ where
             n: n.clone(),
             na: na.clone(),
             model: &self.model,
-            fast_interactions: RwLock::new(Vec::new()),
+            fast_interactions: if self.fast_interactions {
+                Some(RwLock::new(Vec::new()))
+            } else {
+                None
+            },
         }
     }
 }

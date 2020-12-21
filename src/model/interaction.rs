@@ -1121,10 +1121,12 @@ pub trait Interaction<M> {
 
         // If the rate is large, we add the interacting particles to the list of
         // fast interactions.
-        if rate.symmetric.abs() > 0.1 {
-            let mut fast_interactions = c.fast_interactions.write().unwrap();
-            fast_interactions.push(self.particles().clone());
-            return None;
+        if let Some(fast_interactions) = &c.fast_interactions {
+            if rate.symmetric.abs() > 0.1 {
+                let mut fast_interactions = fast_interactions.write().unwrap();
+                fast_interactions.push(self.particles().clone());
+                return None;
+            }
         }
 
         debug_assert!(
