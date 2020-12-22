@@ -503,6 +503,8 @@ impl ops::AddAssign<&FastInteractionResult> for Workspace {
     }
 }
 
+type LoggerFn<M> = Box<dyn Fn(&Context<M>, &Array1<f64>, &Array1<f64>)>;
+
 /// Boltzmann solver
 pub struct Solver<M> {
     model: M,
@@ -511,7 +513,7 @@ pub struct Solver<M> {
     beta_range: (f64, f64),
     in_equilibrium: Vec<usize>,
     no_asymmetry: Vec<usize>,
-    logger: Box<dyn Fn(&Context<M>)>,
+    logger: LoggerFn<M>,
     step_precision: StepPrecision,
     error_tolerance: f64,
     fast_interactions: bool,
@@ -651,7 +653,7 @@ where
         {
             self.model.set_beta(beta);
             let c = self.context(step, h, beta, &workspace.n, &workspace.na);
-            (*self.logger)(&c);
+            (*self.logger)(&c, &workspace.dn, &workspace.dna);
         }
 
         while beta < self.beta_range.1 {
@@ -759,7 +761,7 @@ where
                 workspace.advance();
                 beta += h;
 
-                (*self.logger)(&c);
+                (*self.logger)(&c, &workspace.dn, &workspace.dna);
             } else {
                 steps_discarded += 1;
                 log::trace!("Discarding integration step.");
