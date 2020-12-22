@@ -1,6 +1,6 @@
 use crate::{
     model::{interaction::Interaction, ModelInteractions, Particle},
-    solver::{options::StepPrecision, Context, Solver},
+    solver::{options::StepPrecision, Context, LoggerFn, Solver},
     utilities::rec_geomspace,
 };
 use ndarray::prelude::*;
@@ -80,7 +80,7 @@ pub struct SolverBuilder<M> {
     /// Particles which are not allowed to have any asymmetry
     no_asymmetry: Vec<usize>,
     /// Logger used at each step
-    logger: Box<dyn Fn(&Context<M>)>,
+    logger: LoggerFn<M>,
     /// Step precision (i.e. step size) allowed
     step_precision: StepPrecision,
     /// Local error allowed to determine step size
@@ -122,7 +122,7 @@ impl<M> SolverBuilder<M> {
             beta_range: (1e-20, 1e0),
             in_equilibrium: Vec::new(),
             no_asymmetry: Vec::new(),
-            logger: Box::new(|_| {}),
+            logger: Box::new(|_, _, _| {}),
             step_precision: StepPrecision::default(),
             error_tolerance: 1e-4,
             precompute: true,
@@ -267,7 +267,7 @@ impl<M> SolverBuilder<M> {
     /// log these in a CSV file.
     pub fn logger<F>(mut self, f: F) -> Self
     where
-        F: Fn(&Context<M>) + 'static,
+        F: Fn(&Context<M>, &Array1<f64>, &Array1<f64>) + 'static,
     {
         self.logger = Box::new(f);
         self
