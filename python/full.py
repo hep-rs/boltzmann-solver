@@ -6,11 +6,7 @@ from tempfile import gettempdir
 from python.common import *
 
 # Find the default output directory
-OUTPUT_DIR = Path(gettempdir()) / "boltzmann_solver" / "full"
-if not OUTPUT_DIR.is_dir():
-    OUTPUT_DIR = Path("/media/ssh/uni-josh/tmp/josh/boltzmann_solver/full")
-if not OUTPUT_DIR.is_dir():
-    OUTPUT_DIR = Path("/media/ssh/bakerlab11/tmp/jellis/boltzmann_solver/full")
+OUTPUT_DIR = Path(gettempdir()) / "boltzmann-solver" / "full"
 display(HTML(f"<p>Loading data from <code>{OUTPUT_DIR}</p>"))
 
 # %% [markdown]

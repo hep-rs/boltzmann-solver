@@ -10,14 +10,13 @@ from tempfile import gettempdir
 import numpy as np
 import pandas as pd
 import plotly
-from plotly import graph_objects as go
 import scipy as sp
 import scipy.constants
 from IPython.core.display import HTML, display
 from numpy import ma
+from plotly import graph_objects as go
 
 from common import *
-
 
 # %%
 # Setup plotting
@@ -27,11 +26,7 @@ COLORS = plotly.colors.DEFAULT_PLOTLY_COLORS
 
 # %%
 # Find the default output directory
-OUTPUT_DIR = Path(gettempdir()) / "boltzmann_solver" / "simple"
-if not OUTPUT_DIR.is_dir():
-    OUTPUT_DIR = Path("/media/ssh/uni-josh/tmp/josh/boltzmann_solver/simple")
-if not OUTPUT_DIR.is_dir():
-    OUTPUT_DIR = Path("/media/ssh/bakerlab11/tmp/jellis/boltzmann_solver/simple")
+OUTPUT_DIR = Path(gettempdir()) / "boltzmann-solver" / "simple"
 print(f"Loading data from {OUTPUT_DIR}")
 
 # %% [markdown]
