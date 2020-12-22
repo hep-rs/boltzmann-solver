@@ -885,7 +885,7 @@ where
                 .map(|(j, interaction)| {
                     (
                         j,
-                        interaction.asymmetry(&c, true).map(|v| v * normalization),
+                        interaction.delta_gamma(&c, true).map(|v| v * normalization),
                     )
                 })
                 .collect();
