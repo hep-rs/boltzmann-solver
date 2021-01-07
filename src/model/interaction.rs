@@ -151,23 +151,32 @@ impl InteractionParticles {
         result
     }
 
-    /// Create a reversed version of the InteractionParticles with the incoming
-    /// and outgoing particles reversed.  This assumes CPT symmetry, thus the
-    /// status if incoming/outgoing particles are swapped alongside with the
-    /// status as particle or antiparticle.
+    /// Create the CPT conjugate the InteractionParticles.  This interchanges
+    /// the incoming and outgoing particles, and particles with their
+    /// corresponding antiparticles.
     #[must_use]
-    pub fn reversed(&self) -> Self {
+    pub fn cpt(&self) -> Self {
         Self {
-            incoming_idx: self.outgoing_idx.clone(),
-            outgoing_idx: self.incoming_idx.clone(),
-            incoming_sign: self.outgoing_sign.iter().map(ops::Neg::neg).collect(),
-            outgoing_sign: self.incoming_sign.iter().map(ops::Neg::neg).collect(),
-            incoming_signed: self.outgoing_signed.iter().map(ops::Neg::neg).collect(),
-            outgoing_signed: self.incoming_signed.iter().map(ops::Neg::neg).collect(),
+            incoming_idx: self.outgoing_idx.iter().rev().cloned().collect(),
+            outgoing_idx: self.incoming_idx.iter().rev().cloned().collect(),
+            incoming_sign: self.outgoing_sign.iter().rev().map(ops::Neg::neg).collect(),
+            outgoing_sign: self.incoming_sign.iter().rev().map(ops::Neg::neg).collect(),
+            incoming_signed: self
+                .outgoing_signed
+                .iter()
+                .rev()
+                .map(ops::Neg::neg)
+                .collect(),
+            outgoing_signed: self
+                .incoming_signed
+                .iter()
+                .rev()
+                .map(ops::Neg::neg)
+                .collect(),
             particle_counts: self
                 .particle_counts
                 .iter()
-                .map(|(&p, &(c, ca))| (p, (-c, -ca)))
+                .map(|(&p, &(c, ca))| (p, (-c, ca)))
                 .collect(),
         }
     }
@@ -1393,6 +1402,40 @@ mod tests {
         }
 
         assert_eq!(0.0, super::checked_div(0.0, 0.0));
+    }
+
+    #[test]
+    fn cpt() -> Result<(), Box<dyn error::Error>> {
+        // Standard interaction
+        let forward = super::InteractionParticles::new(&[1, 2, 3], &[4, 5, 6]);
+        let backward = super::InteractionParticles::new(&[-4, -5, -6], &[-1, -2, -3]);
+        assert_eq!(forward.cpt(), backward);
+        assert_eq!(forward, backward.cpt());
+
+        // Multiplicity on each side
+        let forward = super::InteractionParticles::new(&[1, 1, 1], &[2, 2, 2]);
+        let backward = super::InteractionParticles::new(&[-2, -2, -2], &[-1, -1, -1]);
+        assert_eq!(forward.cpt(), backward);
+        assert_eq!(forward, backward.cpt());
+
+        // Multiplicity across sides
+        let forward = super::InteractionParticles::new(&[1, 2, 3], &[1, -2, 3, -3]);
+        let backward = super::InteractionParticles::new(&[-1, 2, 3, -3], &[-1, -2, -3]);
+        assert_eq!(forward.cpt(), backward);
+        assert_eq!(forward, backward.cpt());
+
+        // Check that order doesn't matter
+        let forward = super::InteractionParticles::new(&[1, 2, 3], &[1, -2, 2, 3, -3, 4]);
+        let backward = super::InteractionParticles::new(&[2, -2, -1, 3, -4, -3], &[-1, -2, -3]);
+        assert_eq!(forward.cpt(), backward);
+        assert_eq!(forward, backward.cpt());
+
+        // Symmetric under CPT
+        let symmetric = super::InteractionParticles::new(&[1, 2, 3], &[-1, -2, -3]);
+        assert_eq!(symmetric.cpt(), symmetric);
+        assert_eq!(symmetric, symmetric.cpt());
+
+        Ok(())
     }
 
     #[test]
