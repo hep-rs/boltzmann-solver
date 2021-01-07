@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["boltzmann_solver"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/std/error/trait.Error.html\" title=\"trait std::error::Error\">Error</a> for <a class=\"enum\" href=\"boltzmann_solver/solver/enum.Error.html\" title=\"enum boltzmann_solver::solver::Error\">Error</a>","synthetic":false,"types":["boltzmann_solver::solver::Error"]}];
+implementors["boltzmann_solver"] = [{"text":"impl Error for DisplayError","synthetic":false,"types":[]},{"text":"impl Error for Error","synthetic":false,"types":[]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

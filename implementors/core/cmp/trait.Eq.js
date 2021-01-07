@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["boltzmann_solver"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html\" title=\"trait core::cmp::Eq\">Eq</a> for <a class=\"struct\" href=\"boltzmann_solver/model/struct.Particle.html\" title=\"struct boltzmann_solver::model::Particle\">Particle</a>","synthetic":false,"types":["boltzmann_solver::model::particle::Particle"]}];
+implementors["boltzmann_solver"] = [{"text":"impl Eq for Particle","synthetic":false,"types":[]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

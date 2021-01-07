@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/model/standard_model/data.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>data.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><link
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/standard_model/data.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>data.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/katex@0.11/dist/katex.min.css"
   crossorigin="anonymous"
@@ -67,7 +69,8 @@
   });
 </script>
 
-<style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../boltzmann_solver/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../boltzmann_solver/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -1001,6 +1004,20 @@
 <span id="932">932</span>
 <span id="933">933</span>
 <span id="934">934</span>
+<span id="935">935</span>
+<span id="936">936</span>
+<span id="937">937</span>
+<span id="938">938</span>
+<span id="939">939</span>
+<span id="940">940</span>
+<span id="941">941</span>
+<span id="942">942</span>
+<span id="943">943</span>
+<span id="944">944</span>
+<span id="945">945</span>
+<span id="946">946</span>
+<span id="947">947</span>
+<span id="948">948</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Standard model data</span>
 <span class="doccomment">//!</span>
@@ -1035,6 +1052,11 @@
 <span class="doccomment">/// Top quark mass in GeV.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MASS_TO</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">172.76</span>;
 
+<span class="doccomment">/// Neutrino `$|\Delta m_{21}|$` in GeV</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DELTA_M21</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">8.61394e-12</span>;
+<span class="doccomment">/// Neutrino `$|\Delta m_{3\ell}|$` in GeV</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DELTA_M3L</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">5.01697e-11</span>;
+
 <span class="doccomment">/// Higgs boson VEV in GeV.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VEV</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">246.22</span>;
 
@@ -1046,6 +1068,15 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CKM_RHO</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.1569</span>;
 <span class="doccomment">/// CKM Wolfenstain `$\overline\eta$` parameter</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CKM_ETA</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.3499</span>;
+
+<span class="doccomment">/// PMNS `$\theta_{12}$` in radians</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PMNS_T12</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.583_638</span>;
+<span class="doccomment">/// PMNS `$\theta_{13}$` in radians</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PMNS_T13</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.149_575</span>;
+<span class="doccomment">/// PMNS `$\theta_{23}$` in radians</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PMNS_T23</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.858_702</span>;
+<span class="doccomment">/// PMNS `$\delta_{CP}$` in radians</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PMNS_DELTA</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">3.4383</span>;
 
 <span class="doccomment">/// Value of `$g_{*}$` for the Standard Model.</span>
 <span class="doccomment">///</span>
