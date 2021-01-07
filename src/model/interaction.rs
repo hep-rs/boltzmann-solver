@@ -111,6 +111,11 @@ impl InteractionParticles {
     /// indicating whether it is a particle or anti-particle involved.
     #[must_use]
     pub fn new(incoming: &[isize], outgoing: &[isize]) -> Self {
+        let mut incoming = incoming.to_vec();
+        incoming.sort_unstable();
+        let mut outgoing = outgoing.to_vec();
+        outgoing.sort_unstable();
+
         let mut result = Self {
             incoming_idx: incoming
                 .iter()
