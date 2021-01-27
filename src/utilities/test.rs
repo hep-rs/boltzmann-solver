@@ -164,10 +164,11 @@ pub(crate) fn complex_approx_eq(
 /// during tests.
 ///
 /// The verbosity options are:
-/// - `0`: Warn level
-/// - `1`: Info level
-/// - `2`: Debug level
-/// - `3` and above: Trace level
+/// - `0`: Errror level
+/// - `1`: Warn level
+/// - `2`: Info level
+/// - `3`: Debug level
+/// - `4`: Trace level
 #[allow(dead_code)]
 pub(crate) fn setup_logging(verbosity: usize) {
     let mut base_config = fern::Dispatch::new();
@@ -180,18 +181,20 @@ pub(crate) fn setup_logging(verbosity: usize) {
         .trace(colors::Color::Black);
 
     let lvl = match verbosity {
-        0 => log::LevelFilter::Warn,
-        1 => log::LevelFilter::Info,
-        2 => log::LevelFilter::Debug,
-        _3_or_more => log::LevelFilter::Trace,
+        0 => log::LevelFilter::Error,
+        1 => log::LevelFilter::Warn,
+        2 => log::LevelFilter::Info,
+        3 => log::LevelFilter::Debug,
+        _ => log::LevelFilter::Trace,
     };
     base_config = base_config.level(lvl);
 
     let stderr_config = fern::Dispatch::new()
         .format(move |out, message, record| {
             out.finish(format_args!(
-                "[{level}] {target} - {message}",
-                target = record.target(),
+                "{level} [{file}:{line:04}] - {message}",
+                file = record.file().unwrap(),
+                line = record.line().unwrap(),
                 level = colors.color(record.level()),
                 message = message
             ))
