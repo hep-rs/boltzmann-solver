@@ -925,7 +925,7 @@ impl cmp::Eq for InteractionParticles {}
 
 #[cfg(test)]
 mod tests {
-    use crate::utilities::test::{approx_eq, setup_logging};
+    use crate::utilities::test::approx_eq;
     use ndarray::prelude::*;
     use rand::prelude::Distribution;
     use serde::Deserialize;
