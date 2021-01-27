@@ -389,7 +389,7 @@ where
             self.particles()
                 .display(c.model)
                 .unwrap_or_else(|_| self.particles().short_display()),
-            rate,
+            rate.symmetric,
         );
         debug_assert!(
             rate.asymmetric.is_finite(),
@@ -398,7 +398,7 @@ where
             self.particles()
                 .display(c.model)
                 .unwrap_or_else(|_| self.particles().short_display()),
-            rate,
+            rate.asymmetric,
         );
 
         Some(rate * c.normalization)
