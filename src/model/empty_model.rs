@@ -7,7 +7,10 @@ use std::{f64, fmt};
 #[cfg(test)]
 mod tests;
 
-/// Empty model with no particles or interactions
+/// Empty model with no particles or interactions.
+///
+/// As the `0` index is reserved for a particle that is it's own antiparticle,
+/// this is the only 'particle' included within the model.
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct EmptyModel {
     /// Inverse temperature in GeV`$^{-1}$`
