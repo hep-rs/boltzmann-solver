@@ -178,7 +178,7 @@ where
         self.particles().get(idx).map_or(Err(i), |p| {
             let mut name = p.name.clone();
             if !p.own_antiparticle && sign < 0 {
-                name.insert(1, '\u{304}');
+                name.insert(0, '\u{304}');
             }
             Ok(name)
         })
