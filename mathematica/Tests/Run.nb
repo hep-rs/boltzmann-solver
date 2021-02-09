@@ -1,0 +1,199 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"PrependTo", "[",
+   RowBox[{"$Path", ",",
+    RowBox[{"FileNameJoin", "[",
+     RowBox[{"{",
+      RowBox[{
+       RowBox[{"NotebookDirectory", "[", "]"}], ",", "\"\<..\>\""}], "}"}],
+     "]"}]}], "]"}], ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{"PrependTo", "[",
+   RowBox[{"$Path", ",",
+    RowBox[{"FileNameJoin", "[",
+     RowBox[{"{",
+      RowBox[{
+       RowBox[{"NotebookDirectory", "[", "]"}], ",", "\"\<..\>\"", ",",
+       "\"\<Dependencies\>\""}], "}"}], "]"}]}], "]"}],
+  ";"}], "\[IndentingNewLine]",
+ RowBox[{"<<", "BoltzmannSolver`"}]}], "Input",
+ InitializationCell->True]
+}]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Block", "[", "\[IndentingNewLine]",
+   RowBox[{
+    RowBox[{"{", "\[IndentingNewLine]",
+     RowBox[{
+      RowBox[{"i", "=", "0"}], ",", "\[IndentingNewLine]", "file", ",",
+      "\[IndentingNewLine]",
+      RowBox[{"files", "=",
+       RowBox[{"FileNames", "[",
+        RowBox[{"FileNameJoin", "[",
+         RowBox[{"{",
+          RowBox[{
+           RowBox[{"NotebookDirectory", "[", "]"}], ",", "\"\<*.wlt\>\""}],
+          "}"}], "]"}], "]"}]}]}], "\[IndentingNewLine]", "}"}], ",",
+    "\[IndentingNewLine]",
+    RowBox[{"Monitor", "[", "\[IndentingNewLine]",
+     RowBox[{
+      RowBox[{
+       RowBox[{"PrintTemporary", "[",
+        RowBox[{"Dynamic", "@", "file"}], "]"}], ";", "\[IndentingNewLine]",
+       RowBox[{
+        RowBox[{
+         RowBox[{"(", "\[IndentingNewLine]",
+          RowBox[{
+           RowBox[{"i", "++"}], ";", "\[IndentingNewLine]",
+           RowBox[{"file", "=", "#"}], ";", "\[IndentingNewLine]",
+           RowBox[{"TestReport", "[", "#", "]"}]}], "\[IndentingNewLine]",
+          ")"}], "&"}], "/@", "files"}]}], "\[IndentingNewLine]", ",",
+      "\[IndentingNewLine]",
+      RowBox[{"ProgressIndicator", "[",
+       RowBox[{"i", ",",
+        RowBox[{"{",
+         RowBox[{"0", ",",
+          RowBox[{"Length", "@", "files"}]}], "}"}]}], "]"}]}],
+     "\[IndentingNewLine]", "]"}]}], "\[IndentingNewLine]", "]"}],
+  ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{
+   RowBox[{"Function", "[",
+    RowBox[{
+     RowBox[{"{", "report", "}"}], ",",
+     RowBox[{"Block", "[", "\[IndentingNewLine]",
+      RowBox[{
+       RowBox[{"{", "\[IndentingNewLine]",
+        RowBox[{"testsFailed", "=",
+         RowBox[{"report", "[", "\"\<TestsFailedIndices\>\"", "]"}]}],
+        "\[IndentingNewLine]", "}"}], ",", "\[IndentingNewLine]",
+       RowBox[{
+        RowBox[{"report", "[", "\"\<TestResults\>\"", "]"}],
+        "\[LeftDoubleBracket]", "testsFailed", "\[RightDoubleBracket]"}]}],
+      "\[IndentingNewLine]", "]"}]}], "\[IndentingNewLine]", "]"}], "/@",
+   "%"}], ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"Values", "/@", "%"}], "//",
+    RowBox[{"Select", "[",
+     RowBox[{
+      RowBox[{
+       RowBox[{"Length", "[", "#", "]"}], "\[NotEqual]", "0"}], "&"}],
+     "]"}]}], "//", "Flatten"}], ";"}], "\[IndentingNewLine]",
+ RowBox[{"If", "[",
+  RowBox[{
+   RowBox[{
+    RowBox[{"Length", "[", "%", "]"}], "\[Equal]", "0"}], ",",
+   "\[IndentingNewLine]",
+   RowBox[{"Print", "[",
+    RowBox[{"Style", "[",
+     RowBox[{"\"\<All tests passed.\>\"", ",", "\"\<Subsection\>\""}], "]"}],
+    "]"}], "\[IndentingNewLine]", ",", "\[IndentingNewLine]",
+   RowBox[{
+    RowBox[{"Print", "[",
+     RowBox[{"Style", "[",
+      RowBox[{"\"\<Failed tests:\>\"", ",", "\"\<Subsection\>\""}], "]"}],
+     "]"}], ";", "\[IndentingNewLine]",
+    RowBox[{"Print", "/@", "%"}], ";"}]}], "\[IndentingNewLine]",
+  "]"}]}], "Input"]
+}]],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"DefineParticle", "[",
+   RowBox[{"\"\<1\>\"", ",",
+    RowBox[{"Mass", "\[Rule]", "10"}]}], "]"}], ";"}], "\n",
+ RowBox[{
+  RowBox[{"DefineParticle", "[",
+   RowBox[{"\"\<2\>\"", ",",
+    RowBox[{"Mass", "\[Rule]", "2"}]}], "]"}], ";"}], "\n",
+ RowBox[{
+  RowBox[{"DefineParticle", "[",
+   RowBox[{"\"\<3\>\"", ",",
+    RowBox[{"Mass", "\[Rule]", "3"}]}], "]"}], ";"}], "\[IndentingNewLine]",
+ RowBox[{
+  RowBox[{"DefineParticle", "[",
+   RowBox[{"\"\<4\>\"", ",",
+    RowBox[{"Mass", "\[Rule]", "4"}]}], "]"}], ";"}]}], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"SquaredAmplitude", "[",
+   RowBox[{
+    RowBox[{"{",
+     RowBox[{"\"\<4\>\"", ",", "\"\<1\>\""}], "}"}], "\[Rule]",
+    RowBox[{"{",
+     RowBox[{"\"\<2\>\"", ",", "\"\<3\>\""}], "}"}]}], "]"}], "=",
+  "1"}]], "Input"]
+}]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{"List", "@@",
+  RowBox[{"SquaredAmplitude", "[",
+   RowBox[{
+    RowBox[{"{",
+     RowBox[{"\"\<4\>\"", ",", "\"\<1\>\""}], "}"}], "\[Rule]",
+    RowBox[{"{",
+     RowBox[{"\"\<2\>\"", ",", "\"\<3\>\""}], "}"}]}],
+   "]"}]}], "\[IndentingNewLine]",
+ RowBox[{"{",
+  RowBox[{
+   RowBox[{"{",
+    RowBox[{"\"\<4\>\"", ",", "\"\<1\>\""}], "}"}], "\[Rule]",
+   RowBox[{"{",
+    RowBox[{"\"\<2\>\"", ",", "\"\<3\>\""}], "}"}]}], "}"}]}], "Input"]
+}]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"SquaredAmplitude", "[",
+   RowBox[{
+    RowBox[{"{",
+     RowBox[{"\"\<4\>\"", ",", "\"\<1\>\""}], "}"}], "\[Rule]",
+    RowBox[{"{",
+     RowBox[{"\"\<2\>\"", ",", "\"\<3\>\""}], "}"}]}], "]"}], "=",
+  "1"}]], "Input"]
+}]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"SquaredAmplitude", "[",
+  RowBox[{
+   RowBox[{"{",
+    RowBox[{"\"\<1\>\"", ",", "\"\<4\>\""}], "}"}], "\[Rule]",
+   RowBox[{"{",
+    RowBox[{"\"\<3\>\"", ",", "\"\<2\>\""}], "}"}]}], "]"}]], "Input"]
+}]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"InteractionGamma", "[",
+    RowBox[{
+     RowBox[{"{",
+      RowBox[{"\"\<1\>\"", ",", "\"\<4\>\""}], "}"}], "\[Rule]",
+     RowBox[{"{",
+      RowBox[{"\"\<2\>\"", ",", "\"\<3\>\""}], "}"}]}], "]"}], "[", "1.0",
+   "]"}], "//", "N"}]], "Input"]
+}]]
+}]
+(* End of Notebook Content *)
