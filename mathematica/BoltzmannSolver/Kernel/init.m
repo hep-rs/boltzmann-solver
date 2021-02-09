@@ -1,3 +1,20 @@
 (* Wolfram Language Init File *)
 
-Get["BoltzmannSolver`BoltzmannSolver`"]
+(* Import Package-X under it's own namespace. *)
+Check[
+  Needs["X`"],
+  Abort[]
+];
+
+BeginPackage["BoltzmannSolver`"];
+
+Get["BoltzmannSolver`Extra`"];
+Get["BoltzmannSolver`Particle`"];
+
+Get["BoltzmannSolver`Statistics`"];
+Get["BoltzmannSolver`GStar`"];
+Get["BoltzmannSolver`Hubble`"];
+
+Get["BoltzmannSolver`Interaction`"];
+
+EndPackage[];
