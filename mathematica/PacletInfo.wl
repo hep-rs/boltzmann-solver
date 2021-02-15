@@ -30,7 +30,7 @@ Paclet[
         "PhaseSpace.wlt",
         "Planck.wlt",
         "SquaredAmplitude.wlt",
-        "TestCommon.wl"
+        "Common.wl"
       }
     }
     (* {
