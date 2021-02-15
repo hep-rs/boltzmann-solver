@@ -1,4 +1,4 @@
-Get[FileNameJoin[{DirectoryName[$TestFileName], "TestCommon.wl"}]];
+Get[FileNameJoin[{DirectoryName[$TestFileName], "Common.wl"}]];
 
 BeginTestSection["IntegrateST"];
 
