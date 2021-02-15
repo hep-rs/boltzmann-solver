@@ -34,8 +34,8 @@ fn create_csv<P: AsRef<Path>>(
 #[test]
 fn no_interaction() -> Result<(), Box<dyn error::Error>> {
     let mut model = EmptyModel::default();
-    model.push_particle(Particle::new(0, 1e5, 1e1));
-    model.push_particle(Particle::new(0, 1e3, 1e1));
+    model.push_particle(Particle::new(0, 1e5, 1e1).name("1"));
+    model.push_particle(Particle::new(0, 1e3, 1e1).name("2"));
 
     // Get the initial conditions
     model.set_beta(BETA_START);
@@ -48,7 +48,7 @@ fn no_interaction() -> Result<(), Box<dyn error::Error>> {
         .build()?
         .solve();
 
-    // Check that number densities have no changed.
+    // Check that number densities have not changed.
     assert_eq!(n0, n);
     assert_eq!(na0, na);
 
@@ -62,7 +62,8 @@ fn unit_amplitude() -> Result<(), Box<dyn error::Error>> {
     model.extend_particles(
         [1e5, 1e2, 1e1]
             .iter()
-            .map(|&m| Particle::new(0, m, m / 100.0)),
+            .enumerate()
+            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(interaction::ThreeParticle::new(|_m| 1.0, 1, 2, 3));
 
@@ -149,7 +150,8 @@ fn unit_gamma() -> Result<(), Box<dyn error::Error>> {
     model.extend_particles(
         [1e5, 1e2, 1e1]
             .iter()
-            .map(|&m| Particle::new(0, m, m / 100.0)),
+            .enumerate()
+            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(UnitGamma::new());
 
@@ -243,7 +245,8 @@ fn unit_rate() -> Result<(), Box<dyn error::Error>> {
     model.extend_particles(
         [1e5, 1e2, 1e1]
             .iter()
-            .map(|&m| Particle::new(0, m, m / 100.0)),
+            .enumerate()
+            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(UnitRate::new());
 
@@ -329,7 +332,8 @@ fn unit_adj_rate() -> Result<(), Box<dyn error::Error>> {
     model.extend_particles(
         [1e5, 1e2, 1e1]
             .iter()
-            .map(|&m| Particle::new(0, m, m / 100.0)),
+            .enumerate()
+            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(UnitAdjRate::new());
 
@@ -455,7 +459,8 @@ impl Interaction<EmptyModel> for SinCos2 {
 fn sin_cos() -> Result<(), Box<dyn error::Error>> {
     let mut model = EmptyModel::default();
 
-    model.extend_particles([1e5, 1e2].iter().map(|&m| Particle::new(0, m, m / 100.0)));
+    model.push_particle(Particle::new(0, 1.0, 1.0).name("1"));
+    model.push_particle(Particle::new(0, 1.0, 1.0).name("2"));
     model.push_interaction(SinCos1::new());
     model.push_interaction(SinCos2::new());
 
@@ -571,7 +576,8 @@ impl Interaction<EmptyModel> for BrusselatorStable2 {
 fn brusselator_stable() -> Result<(), Box<dyn error::Error>> {
     let mut model = EmptyModel::default();
 
-    model.extend_particles([1e5, 1e2].iter().map(|&m| Particle::new(0, m, m / 100.0)));
+    model.push_particle(Particle::new(0, 1.0, 1.0).name("1"));
+    model.push_particle(Particle::new(0, 1.0, 1.0).name("2"));
     model.push_interaction(BrusselatorStable1::new());
     model.push_interaction(BrusselatorStable2::new());
 
@@ -686,7 +692,8 @@ impl Interaction<EmptyModel> for BrusselatorUnstable2 {
 fn brusselator_unstable() -> Result<(), Box<dyn error::Error>> {
     let mut model = EmptyModel::default();
 
-    model.extend_particles([1e5, 1e2].iter().map(|&m| Particle::new(0, m, m / 100.0)));
+    model.push_particle(Particle::new(0, 1.0, 1.0).name("1"));
+    model.push_particle(Particle::new(0, 1.0, 1.0).name("2"));
     model.push_interaction(BrusselatorUnstable1::new());
     model.push_interaction(BrusselatorUnstable2::new());
 
