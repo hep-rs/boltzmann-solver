@@ -1023,7 +1023,7 @@ mod tests {
     }
 
     #[test]
-    fn cpt() -> Result<(), Box<dyn error::Error>> {
+    fn cpt() {
         // Standard interaction
         let forward = super::InteractionParticles::new(&[1, 2, 3], &[4, 5, 6]);
         let backward = super::InteractionParticles::new(&[-4, -5, -6], &[-1, -2, -3]);
@@ -1052,12 +1052,10 @@ mod tests {
         let symmetric = super::InteractionParticles::new(&[1, 2, 3], &[-1, -2, -3]);
         assert_eq!(symmetric.cpt(), symmetric);
         assert_eq!(symmetric, symmetric.cpt());
-
-        Ok(())
     }
 
     #[test]
-    fn iter() -> Result<(), Box<dyn error::Error>> {
+    fn iter() {
         let interaction = super::InteractionParticles::new(&[1, -2, 3], &[0, 1, -1]);
 
         // Particles are sorted from smallest to largest signed index.
@@ -1072,12 +1070,10 @@ mod tests {
         assert_eq!(outgoing.next(), Some((&0, &0.0)));
         assert_eq!(outgoing.next(), Some((&1, &1.0)));
         assert_eq!(outgoing.next(), None);
-
-        Ok(())
     }
 
     #[test]
-    fn len() -> Result<(), Box<dyn error::Error>> {
+    fn len() {
         for ni in 0..10 {
             for no in 0..10 {
                 let interaction = super::InteractionParticles::new(&vec![1; ni], &vec![1; no]);
@@ -1085,8 +1081,6 @@ mod tests {
                 assert_eq!(no, interaction.len_outgoing());
             }
         }
-
-        Ok(())
     }
 
     #[test]
@@ -1816,7 +1810,7 @@ mod tests {
     }
 
     #[test]
-    fn display() -> Result<(), Box<dyn error::Error>> {
+    fn display() {
         let mut model = crate::model::EmptyModel::default();
         model.push_particle(crate::prelude::Particle::new(0, 1.0, 1e-3).name("one"));
         model.push_particle(crate::prelude::Particle::new(0, 1.0, 1e-3).name("two"));
@@ -1864,7 +1858,5 @@ mod tests {
         assert_eq!(interaction.short_display(), "-5 1 3 ↔ 2");
         assert_eq!(interaction.short_display(), format!("{}", interaction));
         assert_eq!(interaction.display(&model), Err(super::DisplayError(-5)));
-
-        Ok(())
     }
 }
