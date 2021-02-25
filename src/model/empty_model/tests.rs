@@ -22,6 +22,7 @@ fn create_csv<P: AsRef<Path>>(
     fs::create_dir_all(&dir)?;
 
     let mut csv = csv::Writer::from_path(dir.join(p))?;
+    csv.write_field("step")?;
     csv.write_field("beta")?;
     for i in 1..=n {
         csv.write_field(format!("n-{}", i))?;
@@ -83,8 +84,10 @@ fn unit_amplitude() -> Result<(), Box<dyn error::Error>> {
                 csv.flush().unwrap();
                 panic!("NaN at step {}", c.step);
             };
-            csv.serialize([c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3]])
-                .unwrap();
+            csv.serialize((
+                c.step, c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3],
+            ))
+            .unwrap();
         })
         .build()?
         .solve();
@@ -171,8 +174,10 @@ fn unit_gamma() -> Result<(), Box<dyn error::Error>> {
                 csv.flush().unwrap();
                 panic!("NaN at step {}", c.step);
             };
-            csv.serialize([c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3]])
-                .unwrap();
+            csv.serialize((
+                c.step, c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3],
+            ))
+            .unwrap();
         })
         .build()?
         .solve();
@@ -261,8 +266,10 @@ fn unit_rate() -> Result<(), Box<dyn error::Error>> {
                 csv.flush().unwrap();
                 panic!("NaN at step {}", c.step);
             };
-            csv.serialize([c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3]])
-                .unwrap();
+            csv.serialize((
+                c.step, c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3],
+            ))
+            .unwrap();
         })
         .build()?
         .solve();
@@ -348,8 +355,10 @@ fn unit_adj_rate() -> Result<(), Box<dyn error::Error>> {
                 csv.flush().unwrap();
                 panic!("NaN at step {}", c.step);
             };
-            csv.serialize([c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3]])
-                .unwrap();
+            csv.serialize((
+                c.step, c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3],
+            ))
+            .unwrap();
         })
         .build()?
         .solve();
@@ -475,7 +484,7 @@ fn sin_cos() -> Result<(), Box<dyn error::Error>> {
                 csv.flush().unwrap();
                 panic!("NaN at step {}", c.step);
             };
-            csv.serialize([c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], 0.0, 0.0])
+            csv.serialize((c.step, c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], 0.0, 0.0))
                 .unwrap();
         })
         .initial_densities(vec![(1, 0.0), (2, 1.0)])
@@ -592,7 +601,7 @@ fn brusselator_stable() -> Result<(), Box<dyn error::Error>> {
                 csv.flush().unwrap();
                 panic!("NaN at step {}", c.step);
             };
-            csv.serialize([c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], 0.0, 0.0])
+            csv.serialize((c.step, c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], 0.0, 0.0))
                 .unwrap();
         })
         .initial_densities(vec![(1, 1.0), (2, 1.0)])
@@ -708,7 +717,7 @@ fn brusselator_unstable() -> Result<(), Box<dyn error::Error>> {
                 csv.flush().unwrap();
                 panic!("NaN at step {}", c.step);
             };
-            csv.serialize([c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], 0.0, 0.0])
+            csv.serialize((c.step, c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], 0.0, 0.0))
                 .unwrap();
         })
         .initial_densities(vec![(1, 1.0), (2, 1.0)])
