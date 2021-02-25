@@ -239,7 +239,7 @@ where
 
             debug_assert!(
                 gamma.is_finite(),
-                "Computed a non-finit value for γ at step {} in interaction {}: {}",
+                "Computed a non-finite value for γ at step {} in interaction {}: {}",
                 c.step,
                 self.particles()
                     .display(c.model)
@@ -259,7 +259,7 @@ where
 
             debug_assert!(
                 gamma.is_finite(),
-                "Computed a non-finit value for γ at step {} in interaction {}: {}",
+                "Computed a non-finite value for γ at step {} in interaction {}: {}",
                 c.step,
                 self.particles()
                     .display(c.model)
