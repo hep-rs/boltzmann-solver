@@ -15,6 +15,9 @@ Get["BoltzmannSolver`Statistics`"];
 Get["BoltzmannSolver`GStar`"];
 Get["BoltzmannSolver`Hubble`"];
 
-Get["BoltzmannSolver`Interaction`"];
+Get["BoltzmannSolver`Mandelstam`"];
+Get["BoltzmannSolver`NormalArgs`"];
+Get["BoltzmannSolver`SquaredAmplitude`"];
+Get["BoltzmannSolver`InteractionGamma`"];
 
 EndPackage[];

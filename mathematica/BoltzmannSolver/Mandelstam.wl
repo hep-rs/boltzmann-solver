@@ -4,12 +4,9 @@ the masses of the four particles.";
 IntegrateT::usage  = "Integrate a squared amplitude over the Mandelstam t variable.";
 IntegrateST::usage = "Integrate a squared amplitude over the Mandelstam s and t variables.";
 
-BesselK12::usage = "Ratio of Bessel function K1 / K2.";
-
-SquaredAmplitude::usage = "Squared Amplitude.";
-InteractionGamma::usage = "Interaction rate density.";
 
 Begin["`Private`"];
+
 
 (* Mandelstam T Range *)
 (* ****************** *)
@@ -28,7 +25,7 @@ MandelstamTRange[s_, m1_, m2_, m3_, p4_?ParticleQ] := MandelstamTRange[s, m1, m2
 (* Numerical expansion expands the arguments *)
 MandelstamTRange /: N[MandelstamTRange[s_, m1_, m2_, m3_, m4_], ___precision] := MandelstamTRange@@N[{s, m1, m2, m3, m4}, precision];
 
-MandelstamTRange[s_?NumericQ, m1_?NumericQ, m2_?NumericQ, m3_?NumericQ, m4_?NumericQ] := Module[
+MandelstamTRange[s_?InexactNumberQ, m1_?InexactNumberQ, m2_?InexactNumberQ, m3_?InexactNumberQ, m4_?InexactNumberQ] := Module[
   {
     baseline = 1/2 (m1^2 + m2^2 + m3^2 + m4^2 - s - (m1^2 - m2^2) (m3^2 - m4^2) / s),
     cosine = Sqrt[X`Kallen\[Lambda][s, m1^2, m2^2]] Sqrt[X`Kallen\[Lambda][s, m3^2, m4^2]] / (2 s)
@@ -70,7 +67,7 @@ IntegrateT /: MakeBoxes[IntegrateT[f_, s_, beta_, m1_, m2_, m3_, m4_], Tradition
 
 IntegrateT[f_?NumberQ, s_, beta_, m1_, m2_, m3_, m4_] := IntegrateT[Function[{t}, f], s, beta, m1, m2, m3, m4];
 IntegrateT[
-  f:(_?ValueQ | _Function), s_?NumericQ, beta_?NumericQ, m1_?NumericQ, m2_?NumericQ, m3_?NumericQ, m4_?NumericQ
+  f:(_?ValueQ | _Function), s_?InexactNumberQ, beta_?InexactNumberQ, m1_?InexactNumberQ, m2_?InexactNumberQ, m3_?InexactNumberQ, m4_?InexactNumberQ
 ] /; AnyInexactNumberQ[s, beta, m1, m2, m3, m4] := Block[
   {
     tMin, tMax
@@ -115,9 +112,9 @@ IntegrateST /: MakeBoxes[IntegrateST[f_, beta_, m1_, m2_, m3_, m4_], Traditional
   }]
 ];
 
-IntegrateST[f_?NumericQ, beta_, m1_, m2_, m3_, m4_] := IntegrateST[Function[{s, t}, f], beta, m1, m2, m3, m4];
+IntegrateST[f_?InexactNumberQ, beta_, m1_, m2_, m3_, m4_] := IntegrateST[Function[{s, t}, f], beta, m1, m2, m3, m4];
 IntegrateST[
-  f:(_?ValueQ | _Function), beta_?NumericQ, m1_?NumericQ, m2_?NumericQ, m3_?NumericQ, m4_?NumericQ
+  f:(_?ValueQ | _Function), beta_?InexactNumberQ, m1_?InexactNumberQ, m2_?InexactNumberQ, m3_?InexactNumberQ, m4_?InexactNumberQ
 ] /; AnyInexactNumberQ[beta, m1, m2, m3, m4] := Block[
   {
     sMin = Max[(m1 + m2)^2, (m3 + m4)^2]
@@ -134,93 +131,19 @@ IntegrateST[
 
 Protect[IntegrateST];
 
-(* Bessel K Ratio *)
-(* ************** *)
-
-Attributes[BesselK12] = {Listable, NumericFunction};
-BesselK12 /: MakeBoxes[BesselK12[x_], TraditionalForm] := FractionBox[MakeBoxes[BesselK[1, x], TraditionalForm], MakeBoxes[BesselK[2, x], TraditionalForm]];
-BesselK12[x_?InexactNumberQ] /; PossibleZeroQ[BesselK[1, x]] := With[
-  {
-    targetPrecision = Precision[x]
-  },
-  BesselK12[SetPrecision[x, 2 targetPrecision]]
-];
-BesselK12[x_?InexactNumberQ] := BesselK[1, x] / BesselK[2, x];
-
-Protect[BesselK12];
-
-(* SquaredAmplitude *)
-(* **************** *)
-
-(* For consistency, we wrap all inputs within Particle if the symbol is not
-explicitly a particle. *)
-SquaredAmplitude[pIn:{___} -> pOut:{___}] /; Or @@ Not @* ParticleQ /@ Join[pIn, pOut] := With[{
-    in = Replace[pIn, x_ ? (Not@*ParticleQ) :> Particle[x], {1}],
-    out = Replace[pOut, x_ ? (Not@*ParticleQ) :> Particle[x], {1}]
-  }
-  ,
-  SquaredAmplitude[in -> out]
-];
-SquaredAmplitude[pIn:{___} -> pOut:{___}] /; Or @@ Not @* MatchQ[Particle[_]] /@ Join[pIn, pOut] := With[{
-    in = Replace[pIn, x : Except[Particle[_]] :> Particle[x], {1}],
-    out = Replace[pOut, x : Except[Particle[_]] :> Particle[x], {1}]
-  }
-  ,
-  SquaredAmplitude[in -> out]
-];
-
-(* Squared Amplitude is agnostic of the order of particles *)
-SquaredAmplitude[pIn:{___?ParticleQ} -> pOut:{___?ParticleQ}] /; !OrderedQ[pIn] || !OrderedQ[pOut] := SquaredAmplitude[Sort[pIn] -> Sort[pOut]];
-
-(* Display a nice output *)
-SquaredAmplitude /: MakeBoxes[
-  SquaredAmplitude[pIn:{___?ParticleQ} -> pOut:{___?ParticleQ}],
-  TraditionalForm
-] := SuperscriptBox[
-  TemplateBox[
-    {
-      RowBox[{
-        "\[ScriptCapitalM](",
-        RowBox[Riffle[MakeBoxes[#, TraditionalForm] & /@ pIn, ","]],
-        "\[LeftRightArrow]",
-        RowBox[Riffle[MakeBoxes[#, TraditionalForm] & /@ pOut, ","]],
-        ")"
-      }]
-    },
-    "Abs"
-  ],
-  "2"
-];
-
-(* When defining a squared amplitude, make sure we define its canonical form *)
-SquaredAmplitude /: Set[SquaredAmplitude[args___], lhs_] /; {args} =!= List @@ SquaredAmplitude[args] := With[
-  {
-    rhs = SquaredAmplitude[args]
-  },
-  rhs = lhs
-];
-
 
 (* InteractionGamma *)
-
 (* **************** *)
-(* For consistency, we wrap all inputs within Particle *)
-InteractionGamma[pIn:{___} -> pOut:{___}] /; Or @@ Not @* ParticleQ /@ Join[pIn, pOut] := With[{
-    in = Replace[pIn, x_ ? (Not@*ParticleQ) :> Particle[x], {1}],
-    out = Replace[pOut, x_ ? (Not@*ParticleQ) :> Particle[x], {1}]
-  }
-  ,
+
+(* Use the same standardized arguments for the squared amplitude *)
+
+InteractionGamma[pIn:{___} -> pOut:{___}] /; Not@NormalArgs[pIn -> pOut] := With[
+  {
+    in = Sort[ Replace[x : Except[Particle[_]] :> Particle[x]] /@ pIn ],
+    out = Sort[ Replace[x : Except[Particle[_]] :> Particle[x]] /@ pOut ]
+  },
   InteractionGamma[in -> out]
 ];
-InteractionGamma[pIn:{___} -> pOut:{___}] /; Or @@ Not @* MatchQ[Particle[_]] /@ Join[pIn, pOut] := With[{
-    in = Replace[pIn, x : Except[Particle[_]] :> Particle[x], {1}],
-    out = Replace[pOut, x : Except[Particle[_]] :> Particle[x], {1}]
-  }
-  ,
-  InteractionGamma[in -> out]
-];
-(* Interaction rate is agnostic of the order of particles *)
-InteractionGamma[pIn:{__?ParticleQ} -> pOut:{__?ParticleQ}] /; ! OrderedQ[pIn] || ! OrderedQ[pOut] := InteractionGamma[Sort[pIn] -> Sort[pOut]];
 
 InteractionGamma /: MakeBoxes[
   InteractionGamma[pIn:{__?ParticleQ} -> pOut:{__?ParticleQ}],
@@ -272,6 +195,26 @@ InteractionGamma[
   p3, p4
 ];
 
+(* When defining a interactions, make sure we define its canonical form *)
+InteractionGamma /: Set[InteractionGamma[pIn:{___} -> pOut:{___}], lhs_] /; Not @ NormalArgs[pIn -> pOut] := With[
+  {
+    in = Sort[ Replace[x : Except[Particle[_]] :> Particle[x]] /@ pIn ],
+    out = Sort[ Replace[x : Except[Particle[_]] :> Particle[x]] /@ pOut ]
+  },
+  InteractionGamma[in -> out] = lhs
+];
+
+
+InteractionGamma /: Unset[InteractionGamma[pIn:{___} -> pOut:{___}]] /; Not @ NormalArgs[pIn -> pOut] := With[
+  {
+    in = Sort[ Replace[x : Except[Particle[_]] :> Particle[x]] /@ pIn ],
+    out = Sort[ Replace[x : Except[Particle[_]] :> Particle[x]] /@ pOut ]
+  },
+  Unset[InteractionGamma[in -> out]]
+];
+
 Protect[InteractionGamma];
+
+(* ScaledInteractionGamma *)
 
 End[];
