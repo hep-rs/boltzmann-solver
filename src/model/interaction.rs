@@ -216,11 +216,11 @@ pub trait Interaction<M: Model> {
     /// [`Interaction::asymmetry`] in order to computer the actual rate.
     fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
         let gamma = self.gamma(c, false).unwrap_or(0.0);
-        let asymmetry = self.delta_gamma(c, false).unwrap_or(0.0);
+        let delta_gamma = self.delta_gamma(c, false).unwrap_or(0.0);
 
         // If both rates are 0, there's no need to adjust it to the particles'
         // number densities.
-        if gamma == 0.0 && asymmetry == 0.0 {
+        if gamma == 0.0 && delta_gamma == 0.0 {
             return None;
         }
 
@@ -234,19 +234,23 @@ pub trait Interaction<M: Model> {
             gamma
         );
         debug_assert!(
-            asymmetry.is_finite(),
+            delta_gamma.is_finite(),
             "Non-finite asymmetric interaction rate at step {} for interaction {}: {}",
             c.step,
             self.particles()
                 .display(c.model)
                 .unwrap_or_else(|_| self.particles().short_display()),
-            asymmetry
+            delta_gamma
         );
 
         let mut rate = RateDensity::zero();
         let symmetric_prefactor = self.symmetric_prefactor(c);
         rate.symmetric = gamma * symmetric_prefactor;
-        rate.asymmetric = asymmetry * symmetric_prefactor + gamma * self.asymmetric_prefactor(c);
+        rate.asymmetric = if delta_gamma == 0.0 {
+            gamma * self.asymmetric_prefactor(c)
+        } else {
+            delta_gamma * symmetric_prefactor + gamma * self.asymmetric_prefactor(c)
+        };
 
         Some(rate * c.normalization)
     }
