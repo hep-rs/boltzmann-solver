@@ -374,12 +374,11 @@ where
 
             if eq1 == 0.0 && eq2 * eq3 == 0.0 {
                 return None;
-            } else {
-                rate.symmetric = gamma * (n1 - eq1 * checked_div(n2, eq2) * checked_div(n3, eq3));
-                rate.asymmetric = asymmetry
-                    * (n1 + eq1 * checked_div(n2, eq2) * checked_div(n3, eq3))
-                    + gamma * (na1 - eq1 * checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
             }
+
+            rate.symmetric = gamma * (n1 - eq1 * checked_div(n2, eq2) * checked_div(n3, eq3));
+            rate.asymmetric = asymmetry * (n1 + eq1 * checked_div(n2, eq2) * checked_div(n3, eq3))
+                + gamma * (na1 - eq1 * checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
         }
 
         debug_assert!(
