@@ -39,6 +39,16 @@ impl fmt::Display for RateDensity {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
+            "RateDensity {{ symmetric: {}, asymmetric: {} }}",
+            self.symmetric, self.asymmetric
+        )
+    }
+}
+
+impl fmt::LowerExp for RateDensity {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
             "RateDensity {{ symmetric: {:e}, asymmetric: {:e} }}",
             self.symmetric, self.asymmetric
         )
