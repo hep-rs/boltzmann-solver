@@ -91,26 +91,26 @@ DefineParticle[symbol_, opt : OptionsPattern[]] := With[{
 
     If[OptionValue[Mass] =!= Automatic,
       Mass /: N@Mass[p] = OptionValue[Mass];
-      Mass /: NumberQ@Mass[p] = NumberQ@OptionValue[Mass];
+      Mass /: InexactNumberQ@Mass[p] = InexactNumberQ@OptionValue[Mass];
       ,
       Mass /: N@Mass[p] =.;
-      Mass /: NumberQ@Mass[p] = False;
+      Mass /: InexactNumberQ@Mass[p] = False;
     ];
 
     If[OptionValue[Momentum] =!= Automatic,
       Momentum /: N@Momentum[p] = OptionValue[Momentum];
-      Momentum /: NumberQ@Momentum[p] = NumberQ@OptionValue[Momentum];
+      Momentum /: InexactNumberQ@Momentum[p] = InexactNumberQ@OptionValue[Momentum];
       ,
       Momentum /: N@Momentum[p] =.;
-      Momentum /: NumberQ@Momentum[p] = False;
+      Momentum /: InexactNumberQ@Momentum[p] = False;
     ];
 
     If[OptionValue[Width] =!= Automatic,
       Width /: N@Width[p] = OptionValue[Width];
-      Width /: NumberQ@Width[p] = NumberQ@OptionValue[Width];
+      Width /: InexactNumberQ@Width[p] = InexactNumberQ@OptionValue[Width];
       ,
       Width /: N@Width[p] =.;
-      Width /: NumberQ@Width[p] = False;
+      Width /: InexactNumberQ@Width[p] = False;
     ];
     ,
     {Unset::norep, TagUnset::norep}
