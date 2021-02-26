@@ -346,11 +346,11 @@ pub trait Interaction<M: Model> {
         //     // return None;
 
         //     // If we are using fast interactions, use that
-        //     // if let Some(fast_interactions) = &c.fast_interactions {
-        //     //     let mut fast_interactions = fast_interactions.write().unwrap();
-        //     //     fast_interactions.push(self.particles().clone());
-        //     //     return None;
-        //     // }
+        //     if let Some(fast_interactions) = &c.fast_interactions {
+        //         let mut fast_interactions = fast_interactions.write().unwrap();
+        //         fast_interactions.insert(self.particles().clone());
+        //         return None;
+        //     }
         // }
 
         debug_assert!(

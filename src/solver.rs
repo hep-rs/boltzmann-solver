@@ -336,7 +336,7 @@ use crate::{
 use ndarray::{prelude::*, Zip};
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
-use std::{error, fmt, mem, ops, ptr, sync::RwLock};
+use std::{collections::HashSet, convert::TryFrom, error, fmt, mem, ops, ptr, sync::RwLock};
 
 /// Error type returned by the solver builder in case there is an error.
 #[derive(Debug)]
