@@ -21,7 +21,8 @@ ndarray = "0.14"
 num = "0.3"
 quadrature = "0.1"
 special-functions = { git = "https://github.com/hep-rs/special-functions.git" }
-rand = "0.7"
+rand = "0.8"
+roots = "0.0.6"
 
 # Optional dependencies
 rayon = { optional = true, version = "1.5" }
@@ -31,13 +32,13 @@ serde = { optional = true, version = "1.0", features = ["derive"] }
 chrono = "0.4"
 csv = "1.1"
 fern = { version = "0.6", features = ["colored"] }
-itertools = "0.9"
+itertools = "0.10"
 num = "0.3"
 serde_json = "1.0"
 
 [features]
-default = ["rk87", "parallel", "serialization"]
-# default = ["rk87", "serialization"]
+# default = ["rk98", "parallel", "serialization"]
+default = ["rk98", "serialization"]
 
 nightly = []
 serialization = ["serde", "ndarray/serde", "num/serde"]
