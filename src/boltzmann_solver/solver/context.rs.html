@@ -126,16 +126,26 @@
 <span id="54">54</span>
 <span id="55">55</span>
 <span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">interaction</span>::<span class="ident">InteractionParticles</span>;
 <span class="kw">use</span> <span class="ident">ndarray</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">sync</span>::<span class="ident">RwLock</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections</span>::<span class="ident">HashSet</span>, <span class="ident">fmt</span>, <span class="ident">sync</span>::<span class="ident">RwLock</span>};
 
 <span class="doccomment">/// Current context at a particular step in the numerical integration.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Evaluation step</span>
     <span class="kw">pub</span> <span class="ident">step</span>: <span class="ident">u64</span>,
+    <span class="doccomment">/// Evaluation substep using within Runge-Kutta integration.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The substeps are numbered starting from 0.  If no substep is applicable,</span>
+    <span class="doccomment">/// the substep will be negative.</span>
+    <span class="kw">pub</span> <span class="ident">substep</span>: <span class="ident">i8</span>,
     <span class="doccomment">/// Step size</span>
     <span class="kw">pub</span> <span class="ident">step_size</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// Inverse temperature in GeV`$^{-1}$`</span>
@@ -161,7 +171,7 @@
     <span class="doccomment">/// Keep track of which particles are in equilibrium with each other.</span>
     <span class="doccomment">/// Within each HashMap, the particles are indicated using the keys, and the</span>
     <span class="doccomment">/// sign and multiplicity is stored in the value.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fast_interactions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InteractionParticles</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fast_interactions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">InteractionParticles</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span><span class="op">&gt;</span> {
@@ -180,8 +190,9 @@
     <span class="doccomment">/// If fast interactions are disabled, the result is an empty vectors.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_fast_interactions</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InteractionParticles</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fast_interactions</span>
-            .<span class="ident">map_or_else</span>(<span class="ident">Vec</span>::<span class="ident">new</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">into_inner</span>().<span class="ident">unwrap</span>())
+            .<span class="ident">map_or_else</span>(<span class="ident">Vec</span>::<span class="ident">new</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">into_inner</span>().<span class="ident">unwrap</span>().<span class="ident">drain</span>().<span class="ident">collect</span>())
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "boltzmann_solver";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="boltzmann_solver"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>

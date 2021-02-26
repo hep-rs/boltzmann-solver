@@ -475,7 +475,6 @@
 <span id="403">403</span>
 <span id="404">404</span>
 <span id="405">405</span>
-<span id="406">406</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">model</span>::{
@@ -718,7 +717,7 @@
 
             <span class="macro">debug_assert</span><span class="macro">!</span>(
                 <span class="ident">gamma</span>.<span class="ident">is_finite</span>(),
-                <span class="string">&quot;Computed a non-finit value for γ at step {} in interaction {}: {}&quot;</span>,
+                <span class="string">&quot;Computed a non-finite value for γ at step {} in interaction {}: {}&quot;</span>,
                 <span class="ident">c</span>.<span class="ident">step</span>,
                 <span class="self">self</span>.<span class="ident">particles</span>()
                     .<span class="ident">display</span>(<span class="ident">c</span>.<span class="ident">model</span>)
@@ -738,7 +737,7 @@
 
             <span class="macro">debug_assert</span><span class="macro">!</span>(
                 <span class="ident">gamma</span>.<span class="ident">is_finite</span>(),
-                <span class="string">&quot;Computed a non-finit value for γ at step {} in interaction {}: {}&quot;</span>,
+                <span class="string">&quot;Computed a non-finite value for γ at step {} in interaction {}: {}&quot;</span>,
                 <span class="ident">c</span>.<span class="ident">step</span>,
                 <span class="self">self</span>.<span class="ident">particles</span>()
                     .<span class="ident">display</span>(<span class="ident">c</span>.<span class="ident">model</span>)
@@ -853,12 +852,11 @@
 
             <span class="kw">if</span> <span class="ident">eq1</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">eq3</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
                 <span class="kw">return</span> <span class="prelude-val">None</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">gamma</span> <span class="op">*</span> (<span class="ident">n1</span> <span class="op">-</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n2</span>, <span class="ident">eq2</span>) <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n3</span>, <span class="ident">eq3</span>));
-                <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">asymmetry</span>
-                    <span class="op">*</span> (<span class="ident">n1</span> <span class="op">+</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n2</span>, <span class="ident">eq2</span>) <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n3</span>, <span class="ident">eq3</span>))
-                    <span class="op">+</span> <span class="ident">gamma</span> <span class="op">*</span> (<span class="ident">na1</span> <span class="op">-</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">na2</span> <span class="op">*</span> <span class="ident">n3</span> <span class="op">+</span> <span class="ident">na3</span> <span class="op">*</span> <span class="ident">n2</span>, <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">eq3</span>));
             }
+
+            <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">gamma</span> <span class="op">*</span> (<span class="ident">n1</span> <span class="op">-</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n2</span>, <span class="ident">eq2</span>) <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n3</span>, <span class="ident">eq3</span>));
+            <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">asymmetry</span> <span class="op">*</span> (<span class="ident">n1</span> <span class="op">+</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n2</span>, <span class="ident">eq2</span>) <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n3</span>, <span class="ident">eq3</span>))
+                <span class="op">+</span> <span class="ident">gamma</span> <span class="op">*</span> (<span class="ident">na1</span> <span class="op">-</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">na2</span> <span class="op">*</span> <span class="ident">n3</span> <span class="op">+</span> <span class="ident">na3</span> <span class="op">*</span> <span class="ident">n2</span>, <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">eq3</span>));
         }
 
         <span class="macro">debug_assert</span><span class="macro">!</span>(
@@ -868,7 +866,7 @@
             <span class="self">self</span>.<span class="ident">particles</span>()
                 .<span class="ident">display</span>(<span class="ident">c</span>.<span class="ident">model</span>)
                 .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">particles</span>().<span class="ident">short_display</span>()),
-            <span class="ident">rate</span>,
+            <span class="ident">rate</span>.<span class="ident">symmetric</span>,
         );
         <span class="macro">debug_assert</span><span class="macro">!</span>(
             <span class="ident">rate</span>.<span class="ident">asymmetric</span>.<span class="ident">is_finite</span>(),
@@ -877,11 +875,12 @@
             <span class="self">self</span>.<span class="ident">particles</span>()
                 .<span class="ident">display</span>(<span class="ident">c</span>.<span class="ident">model</span>)
                 .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">particles</span>().<span class="ident">short_display</span>()),
-            <span class="ident">rate</span>,
+            <span class="ident">rate</span>.<span class="ident">asymmetric</span>,
         );
 
         <span class="prelude-val">Some</span>(<span class="ident">rate</span> <span class="op">*</span> <span class="ident">c</span>.<span class="ident">normalization</span>)
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "boltzmann_solver";</script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="boltzmann_solver"></div>
+    <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>

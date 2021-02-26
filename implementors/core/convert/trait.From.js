@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["boltzmann_solver"] = [{"text":"impl From&lt;isize&gt; for DisplayError","synthetic":false,"types":[]}];
+implementors["boltzmann_solver"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/convert/trait.From.html\" title=\"trait core::convert::From\">From</a>&lt;<a class=\"primitive\" href=\"https://doc.rust-lang.org/nightly/std/primitive.isize.html\">isize</a>&gt; for <a class=\"struct\" href=\"boltzmann_solver/model/interaction/struct.DisplayError.html\" title=\"struct boltzmann_solver::model::interaction::DisplayError\">DisplayError</a>","synthetic":false,"types":["boltzmann_solver::model::interaction::interaction_particles::DisplayError"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
