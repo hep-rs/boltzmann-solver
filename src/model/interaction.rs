@@ -331,7 +331,7 @@ pub trait Interaction<M: Model> {
             return None;
         }
 
-        // self.adjust_overshoot(&mut rate, c);
+        self.adjust_overshoot(&mut rate, c);
 
         // To determine if the interaction is 'fast' we check this only at
         // sub-step 0.  All subsequent substeps are happen at a later stage.
