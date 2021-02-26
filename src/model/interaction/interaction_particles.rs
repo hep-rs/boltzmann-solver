@@ -5,7 +5,7 @@ use std::{
     cmp::{self, Ordering},
     collections::HashMap,
     convert::TryFrom,
-    error, fmt, ops,
+    error, fmt, hash, ops,
     sync::RwLock,
 };
 
@@ -94,7 +94,7 @@ impl roots::Convergency<f64> for AbsRelConvergency {
 
 /// List of particles involved in the interaction.
 #[allow(clippy::module_name_repetitions)]
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct InteractionParticles {
     /// Initial sate particle indices.
@@ -917,11 +917,24 @@ impl fmt::Display for InteractionParticles {
     }
 }
 
-// Although Eq generally cannot be implemented for data types which contain
-// floats, the only floats contained within `InteractionParticles` are signums,
-// and multiplicity counts which are at their theoretical maximum `u64::MAX`
-// (which is still a valid float).
+/// Implementation of PartialEq (and thus Eq) only needs to look at the
+/// `incoming_signed` and `outgoing_signed` attributes as all other properties
+/// are derived from this.
+impl cmp::PartialEq for InteractionParticles {
+    fn eq(&self, other: &Self) -> bool {
+        self.incoming_signed == other.incoming_signed
+            && self.outgoing_signed == other.outgoing_signed
+    }
+}
+
 impl cmp::Eq for InteractionParticles {}
+
+impl hash::Hash for InteractionParticles {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) {
+        hash::Hash::hash_slice(&self.incoming_signed, state);
+        hash::Hash::hash_slice(&self.outgoing_signed, state);
+    }
+}
 
 #[cfg(test)]
 mod tests {
