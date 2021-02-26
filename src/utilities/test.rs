@@ -220,33 +220,28 @@ mod tests {
     use std::{error, f64};
 
     #[test]
-    fn a_nan() -> Result<(), Box<dyn error::Error>> {
-        approx_eq(f64::NAN, 0.0, 10.0, 0.0).unwrap_err();
-        Ok(())
+    fn a_nan() {
+        assert!(approx_eq(f64::NAN, 0.0, 10.0, 0.0).is_err());
     }
 
     #[test]
-    fn b_nan() -> Result<(), Box<dyn error::Error>> {
-        approx_eq(1.0, f64::NAN, 10.0, 0.0).unwrap_err();
-        Ok(())
+    fn b_nan() {
+        assert!(approx_eq(1.0, f64::NAN, 10.0, 0.0).is_err());
     }
 
     #[test]
-    fn a_b_nan() -> Result<(), Box<dyn error::Error>> {
-        approx_eq(f64::NAN, f64::NAN, 10.0, 0.0).unwrap_err();
-        Ok(())
+    fn a_b_nan() {
+        assert!(approx_eq(f64::NAN, f64::NAN, 10.0, 0.0).is_err());
     }
 
     #[test]
-    fn a_infinite() -> Result<(), Box<dyn error::Error>> {
-        approx_eq(f64::INFINITY, 0.0, 10.0, 0.0).unwrap_err();
-        Ok(())
+    fn a_infinite() {
+        assert!(approx_eq(f64::INFINITY, 0.0, 10.0, 0.0).is_err());
     }
 
     #[test]
-    fn b_infinite() -> Result<(), Box<dyn error::Error>> {
-        approx_eq(0.0, f64::INFINITY, 10.0, 0.0).unwrap_err();
-        Ok(())
+    fn b_infinite() {
+        assert!(approx_eq(0.0, f64::INFINITY, 10.0, 0.0).is_err());
     }
 
     #[test]
@@ -257,9 +252,8 @@ mod tests {
     }
 
     #[test]
-    fn a_b_diff_infinite() -> Result<(), Box<dyn error::Error>> {
-        approx_eq(f64::INFINITY, f64::NEG_INFINITY, 10.0, 0.0).unwrap_err();
-        Ok(())
+    fn a_b_diff_infinite() {
+        assert!(approx_eq(f64::INFINITY, f64::NEG_INFINITY, 10.0, 0.0).is_err());
     }
 
     #[test]
@@ -272,9 +266,8 @@ mod tests {
     }
 
     #[test]
-    fn absolute_error_panic() -> Result<(), Box<dyn error::Error>> {
-        approx_eq(1e-20, 2e-20, 10.0, 1e-30).unwrap_err();
-        Ok(())
+    fn absolute_error_panic() {
+        assert!(approx_eq(1e-20, 2e-20, 10.0, 1e-30).is_err());
     }
 
     #[test]
@@ -300,9 +293,8 @@ mod tests {
     }
 
     #[test]
-    fn precision_panic() -> Result<(), Box<dyn error::Error>> {
-        approx_eq(1.0, 1.000_000_001, 10.0, 0.0).unwrap_err();
-        Ok(())
+    fn precision_panic() {
+        assert!(approx_eq(1.0, 1.000_000_001, 10.0, 0.0).is_err());
     }
 
     #[test]
