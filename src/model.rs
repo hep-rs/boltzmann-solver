@@ -233,6 +233,7 @@ where
 
         Context {
             step: 0,
+            substep: -1,
             step_size: 1.0,
             beta,
             hubble_rate,

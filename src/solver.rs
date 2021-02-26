@@ -652,7 +652,7 @@ where
         // Run logger for 0th step
         {
             self.model.set_beta(beta);
-            let c = self.context(step, h, beta, &workspace.n, &workspace.na);
+            let c = self.context(step, None, h, beta, &workspace.n, &workspace.na);
             (*self.logger)(&c, &workspace.dn, &workspace.dna);
         }
 
@@ -709,7 +709,7 @@ where
                     total + ai[j] * &workspace.ka[j]
                 });
                 self.model.set_beta(beta_i);
-                let ci = self.context(step, h, beta_i, &ni, &nai);
+                let ci = self.context(step, Some(i), h, beta_i, &ni, &nai);
 
                 // Compute k[i] and ka[i] from each interaction
                 self.compute_ki(&mut workspace.k[i], &mut workspace.ka[i], &ci);
@@ -723,7 +723,7 @@ where
             };
 
             self.model.set_beta(beta);
-            let c = self.context(step, h, beta, &workspace.n, &workspace.na);
+            let c = self.context(step, None, h, beta, &workspace.n, &workspace.na);
             self.fix_equilibrium(&c, &fast_interactions, &mut workspace);
 
             let err = workspace.local_error();
@@ -815,7 +815,7 @@ where
         {
             self.model.set_beta(beta);
             gammas[[i, 0]] = Some(beta);
-            let mut c = self.context(0, 1.0, beta, &n, &na);
+            let mut c = self.context(0, None, 1.0, beta, &n, &na);
             c.n = c.eq.clone();
             let normalization = if normalize { c.normalization } else { 1.0 };
 
@@ -872,7 +872,7 @@ where
         {
             self.model.set_beta(beta);
             gammas[[i, 0]] = Some(beta);
-            let mut c = self.context(0, 1.0, beta, &n, &na);
+            let mut c = self.context(0, None, 1.0, beta, &n, &na);
             c.n = c.eq.clone();
             let normalization = if normalize { c.normalization } else { 1.0 };
 
@@ -930,6 +930,7 @@ where
     fn context(
         &self,
         step: u64,
+        substep: Option<usize>,
         step_size: f64,
         beta: f64,
         n: &Array1<f64>,
@@ -941,6 +942,7 @@ where
                 .recip();
         Context {
             step,
+            substep: substep.map_or(-1, |v| TryFrom::try_from(v).unwrap()),
             step_size,
             beta,
             hubble_rate,
