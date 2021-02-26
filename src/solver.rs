@@ -475,12 +475,15 @@ impl Workspace {
     fn local_error(&self) -> f64 {
         self.dn_err
             .iter()
-            .chain(self.dna_err.iter())
-            .fold(0_f64, |e, v| {
-                if e.is_nan() || v.is_nan() {
-                    e * v
+            .chain(&self.dna_err)
+            .zip(self.dn.iter().chain(&self.dna))
+            .fold(0_f64, |result, (&error, &value)| {
+                if result.is_nan() || error.is_nan() {
+                    f64::NAN
+                } else if value == 0.0 {
+                    result.max(error.abs())
                 } else {
-                    e.max(v.abs())
+                    result.max((error / value).abs())
                 }
             })
     }
