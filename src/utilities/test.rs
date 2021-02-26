@@ -192,7 +192,7 @@ pub(crate) fn setup_logging(verbosity: usize) {
     let stderr_config = fern::Dispatch::new()
         .format(move |out, message, record| {
             out.finish(format_args!(
-                "{level} [{file}:{line:04}] - {message}",
+                "{level:<5} [{file}:{line:04}] - {message}",
                 file = record.file().unwrap(),
                 line = record.line().unwrap(),
                 level = colors.color(record.level()),
