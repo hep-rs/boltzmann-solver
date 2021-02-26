@@ -447,14 +447,8 @@ where
                     i - 3,
                     2_usize.pow(PRECOMPUTE_SUBDIV)
                 );
-            } else if i % 64 == 3 {
+            } else if i % 128 == 3 {
                 log::debug!(
-                    "Precomputing step {} / {}",
-                    i - 3,
-                    2_usize.pow(PRECOMPUTE_SUBDIV)
-                );
-            } else if i >= 3 {
-                log::trace!(
                     "Precomputing step {} / {}",
                     i - 3,
                     2_usize.pow(PRECOMPUTE_SUBDIV)

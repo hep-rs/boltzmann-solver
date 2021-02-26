@@ -125,6 +125,9 @@ pub trait Interaction<M: Model> {
     /// ```math
     /// \left( \prod_{i \in X} n_i \right) - \left( \prod_{i \in Y} n_i \right)
     /// ```
+    ///
+    /// This can produce a result which is infinite if some of the `$n_i^{(0)}`$
+    /// are identically 0 and thus care must be taken to handle these.
     fn symmetric_prefactor(&self, c: &Context<M>) -> f64 {
         let ((forward_numerator, forward_denominator), (backward_numerator, backward_denominator)) =
             self.particles().symmetric_prefactor(&c.n, &c.eq);
@@ -182,6 +185,9 @@ pub trait Interaction<M: Model> {
     /// ```math
     /// \frac{\Delta_1}{n_1^{(0)}} - \frac{\Delta_2 n_3 + \Delta_3 n_2}{n_2^{(0)} n_3^{(0)}}
     /// ```
+    ///
+    /// This can produce a result which is infinite if some of the `$n_i^{(0)}`$
+    /// are identically 0 and thus care must be taken to handle these.
     fn asymmetric_prefactor(&self, c: &Context<M>) -> f64 {
         let ((forward_numerator, forward_denominator), (backward_numerator, backward_denominator)) =
             self.particles().asymmetric_prefactor(&c.n, &c.na, &c.eq);
@@ -255,6 +261,50 @@ pub trait Interaction<M: Model> {
         Some(rate * c.normalization)
     }
 
+    /// Adjust the overshoot as calculated by the interaction.
+    fn adjust_overshoot(&self, rate: &mut RateDensity, c: &Context<M>) {
+        // Scaling factor.  A factor of 1 computes the exact change required to
+        // reach equilibrium.  The combination of Runge-Kutta steps requires
+        // this scaling factor to be slightly larger than 1 (but not too large).
+        const SCALING_FACTOR: f64 = 1.0;
+
+        let particles = self.particles();
+
+        for (&p, &(symmetric_count, asymmetric_count)) in &particles.particle_counts {
+            // In the rate adjustment, the division by the count should
+            // never be division by 0 as there should never be an overshoot
+            // if the multiplicity factor is 0.
+            if overshoots(c, p, symmetric_count, rate.symmetric) {
+                let new_rate = if rate.symmetric.is_finite() {
+                    SCALING_FACTOR
+                        * ((c.n[p] - c.eq[p]) / symmetric_count).abs()
+                        * rate.symmetric.signum()
+                } else {
+                    ((c.n[p] - c.eq[p]) / symmetric_count).abs() * rate.symmetric.signum()
+                };
+
+                // changed = changed
+                //     || (rate.symmetric - new_rate).abs() / (rate.symmetric.abs() + new_rate.abs())
+                //         > 1e-10;
+                rate.symmetric = new_rate;
+            }
+
+            if asymmetry_overshoots(c, p, asymmetric_count, rate.asymmetric) {
+                let new_rate = if rate.asymmetric.is_finite() {
+                    SCALING_FACTOR * (c.na[p] / asymmetric_count).abs() * rate.asymmetric.signum()
+                } else {
+                    (c.na[p] / asymmetric_count).abs() * rate.asymmetric.signum()
+                };
+
+                // changed = changed
+                //     || (rate.asymmetric - new_rate).abs()
+                //         / (rate.asymmetric.abs() + new_rate.abs())
+                //         > 1e-10;
+                rate.asymmetric = new_rate;
+            }
+        }
+    }
+
     /// Compute the adjusted rate to handle possible overshoots of the
     /// equilibrium number density.
     ///
@@ -281,45 +331,27 @@ pub trait Interaction<M: Model> {
             return None;
         }
 
-        // If the rate is large, we add the interacting particles to the list of
-        // fast interactions.
-        if let Some(fast_interactions) = &c.fast_interactions {
-            if rate.symmetric.abs() > 0.1 {
-                let mut fast_interactions = fast_interactions.write().unwrap();
-                fast_interactions.push(self.particles().clone());
-                return None;
-            }
-        }
+        // self.adjust_overshoot(&mut rate, c);
 
-        let particles = self.particles();
+        // To determine if the interaction is 'fast' we check this only at
+        // sub-step 0.  All subsequent substeps are happen at a later stage.
+        // if self.is_fast(&rate, c) {
+        //     log::trace!(
+        //         "Fast interaction at β = {:.3e}, γ = {:.3e}, γ h = {:.3e}",
+        //         c.beta,
+        //         rate.symmetric,
+        //         rate.symmetric * c.step_size,
+        //     );
 
-        let mut changed = true;
-        while changed {
-            changed = false;
+        //     // return None;
 
-            for (&p, &(symmetric_count, asymmetric_count)) in &particles.particle_counts {
-                // In the rate adjustment, the division by the count should
-                // never be division by 0 as there should never be an overshoot
-                // if the multiplicity factor is 0.
-                if overshoots(c, p, symmetric_count * rate.symmetric) {
-                    let new_rate =
-                        ((c.n[p] - c.eq[p]) / symmetric_count).abs() * rate.symmetric.signum();
-                    changed = changed
-                        || (rate.symmetric - new_rate).abs()
-                            / (rate.symmetric.abs() + new_rate.abs())
-                            > 1e-10;
-                    rate.symmetric = new_rate;
-                }
-                if asymmetry_overshoots(c, p, asymmetric_count * rate.asymmetric) {
-                    let new_rate = (c.na[p] / asymmetric_count).abs() * rate.asymmetric.signum();
-                    changed = changed
-                        || (rate.asymmetric - new_rate).abs()
-                            / (rate.asymmetric.abs() + new_rate.abs())
-                            > 1e-10;
-                    rate.asymmetric = new_rate;
-                }
-            }
-        }
+        //     // If we are using fast interactions, use that
+        //     // if let Some(fast_interactions) = &c.fast_interactions {
+        //     //     let mut fast_interactions = fast_interactions.write().unwrap();
+        //     //     fast_interactions.push(self.particles().clone());
+        //     //     return None;
+        //     // }
+        // }
 
         debug_assert!(
             rate.symmetric.is_finite(),
@@ -381,15 +413,26 @@ pub trait Interaction<M: Model> {
 /// Check whether particle `i` from the model with the given rate change will
 /// overshoot equilibrium.
 #[must_use]
-pub fn overshoots<M>(c: &Context<M>, i: usize, rate: f64) -> bool {
-    (c.n[i] > c.eq[i] && c.n[i] + rate < c.eq[i]) || (c.n[i] < c.eq[i] && c.n[i] + rate > c.eq[i])
+pub fn overshoots<M>(c: &Context<M>, i: usize, count: f64, mut rate: f64) -> bool {
+    if count == 0.0 {
+        false
+    } else {
+        rate *= count;
+        (c.n[i] > c.eq[i] && c.n[i] + rate < c.eq[i])
+            || (c.n[i] < c.eq[i] && c.n[i] + rate > c.eq[i])
+    }
 }
 
 /// Check whether particle asymmetry `i` from the model with the given rate
 /// change will overshoot 0.
 #[must_use]
-pub fn asymmetry_overshoots<M>(c: &Context<M>, i: usize, rate: f64) -> bool {
-    (c.na[i] > 0.0 && c.na[i] + rate < 0.0) || (c.na[i] < 0.0 && c.na[i] + rate > 0.0)
+pub fn asymmetry_overshoots<M>(c: &Context<M>, i: usize, count: f64, mut rate: f64) -> bool {
+    if count == 0.0 {
+        false
+    } else {
+        rate *= count;
+        (c.na[i] > 0.0 && c.na[i] + rate < 0.0) || (c.na[i] < 0.0 && c.na[i] + rate > 0.0)
+    }
 }
 
 /// Computes the ratio `$n / eq$` in a manner that never returns NaN.
