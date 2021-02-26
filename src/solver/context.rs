@@ -7,6 +7,11 @@ use std::{fmt, sync::RwLock};
 pub struct Context<'a, M> {
     /// Evaluation step
     pub step: u64,
+    /// Evaluation substep using within Runge-Kutta integration.
+    ///
+    /// The substeps are numbered starting from 0.  If no substep is applicable,
+    /// the substep will be negative.
+    pub substep: i8,
     /// Step size
     pub step_size: f64,
     /// Inverse temperature in GeV`$^{-1}$`
