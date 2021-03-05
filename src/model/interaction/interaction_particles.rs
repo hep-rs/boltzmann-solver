@@ -1028,11 +1028,55 @@ mod tests {
         super::InteractionParticles::new(&rand_particles(), &rand_particles())
     }
 
+    #[allow(clippy::float_cmp)]
     #[test]
-    fn interaction_particles() -> Result<(), Box<dyn error::Error>> {
-        // unimplemented!()
-        // Test new()
-        Ok(())
+    fn interaction_particles() {
+        let a = super::InteractionParticles::new(&[1, 2, 3], &[4, 5, 6]);
+        assert_eq!(&a.incoming_idx, &[1, 2, 3]);
+        assert_eq!(&a.incoming_sign, &[1.0, 1.0, 1.0]);
+        assert_eq!(&a.incoming_signed, &[1, 2, 3]);
+        assert_eq!(&a.outgoing_idx, &[4, 5, 6]);
+        assert_eq!(&a.outgoing_sign, &[1.0, 1.0, 1.0]);
+        assert_eq!(&a.outgoing_signed, &[4, 5, 6]);
+        assert_eq!(
+            a.particle_counts,
+            vec![
+                (1, (-1.0, -1.0)),
+                (2, (-1.0, -1.0)),
+                (3, (-1.0, -1.0)),
+                (4, (1.0, 1.0)),
+                (5, (1.0, 1.0)),
+                (6, (1.0, 1.0)),
+            ]
+            .drain(..)
+            .collect()
+        );
+
+        let b = super::InteractionParticles::new(&[2, 1, -1], &[3, 3, -3]);
+        assert_eq!(&b.incoming_idx, &[1, 1, 2]);
+        assert_eq!(&b.incoming_sign, &[-1.0, 1.0, 1.0]);
+        assert_eq!(&b.incoming_signed, &[-1, 1, 2]);
+        assert_eq!(&b.outgoing_idx, &[3, 3, 3]);
+        assert_eq!(&b.outgoing_sign, &[-1.0, 1.0, 1.0]);
+        assert_eq!(&b.outgoing_signed, &[-3, 3, 3]);
+        assert_eq!(
+            b.particle_counts,
+            vec![(1, (-2.0, 0.0)), (2, (-1.0, -1.0)), (3, (3.0, 1.0))]
+                .drain(..)
+                .collect()
+        );
+
+        let c = super::InteractionParticles::new(&[0, 1, -1], &[1, -1, 1]);
+        assert_eq!(&c.incoming_idx, &[1, 0, 1]);
+        assert_eq!(&c.incoming_sign, &[-1.0, 0.0, 1.0]);
+        assert_eq!(&c.incoming_signed, &[-1, 0, 1]);
+        assert_eq!(&c.outgoing_idx, &[1, 1, 1]);
+        assert_eq!(&c.outgoing_sign, &[-1.0, 1.0, 1.0]);
+        assert_eq!(&c.outgoing_signed, &[-1, 1, 1]);
+        assert_eq!(
+            c.particle_counts,
+            vec![(0, (-1.0, 0.0)), (1, (1.0, 1.0))].drain(..).collect()
+        );
     }
 
     #[test]
