@@ -122,8 +122,8 @@ impl<M> FourParticle<M> {
     ///   = \abs{\scM(p_1 p_2 \to p_3 p_4)}^2 - \abs{\scM(p_3 p_4 \to p_1 p_2)}^2
     /// ```
     ///
-    /// This asymmetry is subsequently used to compute the asymmetry in the
-    /// interaction rate given by [`Interaction::asymmetry`].
+    /// This asymmetry is subsequently used to compute the asymmetric
+    /// interaction rate given by [`Interaction::delta_gamma`].
     pub fn set_asymmetry<F>(&mut self, asymmetry: F) -> &Self
     where
         F: Fn(&M, f64, f64, f64) -> f64 + Sync + 'static,

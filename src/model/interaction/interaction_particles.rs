@@ -175,9 +175,9 @@ impl InteractionParticles {
         result
     }
 
-    /// Create the CPT conjugate the InteractionParticles.  This interchanges
-    /// the incoming and outgoing particles, and particles with their
-    /// corresponding antiparticles.
+    /// Create the CPT conjugate the [`InteractionParticles`].  This
+    /// interchanges the incoming and outgoing particles, and particles with
+    /// their corresponding antiparticles.
     #[must_use]
     pub fn cpt(&self) -> Self {
         Self {
@@ -794,8 +794,8 @@ impl InteractionParticles {
     /// that equilibrium is established.
     ///
     /// The computation in the symmetric case is described in
-    /// [`symmetric_delta`], and the asymmetric case is described in
-    /// [`asymmetric_delta`].
+    /// [`Self::symmetric_delta`], and the asymmetric case is described in
+    /// [`Self::asymmetric_delta`].
     #[must_use]
     pub fn fast_interaction(
         &self,
@@ -881,7 +881,7 @@ impl InteractionParticles {
     /// Output a 'pretty' version of the interaction particles using the
     /// particle indices.
     ///
-    /// Unlike [`display`], this does not require the model and will always
+    /// Unlike [`Self::display`], this does not require the model and will always
     /// work.
     #[must_use]
     pub fn short_display(&self) -> String {
@@ -917,7 +917,7 @@ impl fmt::Display for InteractionParticles {
     }
 }
 
-/// Implementation of PartialEq (and thus Eq) only needs to look at the
+/// Implementation of [`PartialEq`] (and thus [`Eq`]) only needs to look at the
 /// `incoming_signed` and `outgoing_signed` attributes as all other properties
 /// are derived from this.
 impl cmp::PartialEq for InteractionParticles {
@@ -1216,6 +1216,7 @@ mod tests {
             }
 
             let (forward, backward) = interaction.asymmetric_prefactor(&n, &na, &eq);
+            #[allow(clippy::suspicious_operation_groupings)]
             approx_eq(
                 forward.0 / forward.1,
                 (na[1] * n[2] + na[2] * n[1]) / (eq[1] * eq[2]),
@@ -1223,6 +1224,7 @@ mod tests {
                 EPS_ABS,
             )
             .map_err(err_line_print!())?;
+            #[allow(clippy::suspicious_operation_groupings)]
             approx_eq(
                 backward.0 / backward.1,
                 (na[3] * n[4] + na[4] * n[3]) / (eq[3] * eq[4]),
@@ -1312,6 +1314,7 @@ mod tests {
                 EPS_ABS,
             )
             .map_err(err_line_print!())?;
+            #[allow(clippy::suspicious_operation_groupings)]
             approx_eq(
                 backward.0 / backward.1,
                 (na[2] * n[3] - na[3] * n[2]) / (eq[2] * eq[3]),

@@ -219,7 +219,7 @@ pub trait Interaction<M: Model> {
     /// for final state particles is proportional to the rates themselves.
     ///
     /// The default implementation uses the output of [`Interaction::gamma`] and
-    /// [`Interaction::asymmetry`] in order to computer the actual rate.
+    /// [`Interaction::delta_gamma`] in order to computer the actual rate.
     fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
         let gamma = self.gamma(c, false).unwrap_or(0.0);
         let delta_gamma = self.delta_gamma(c, false).unwrap_or(0.0);

@@ -87,8 +87,8 @@ where
     ///   = \abs{\scM(p_1 \to p_2 p_3)}^2 - \abs{\scM(p_2 p_3 \to p_1)}^2
     /// ```
     ///
-    /// This asymmetry is subsequently used to compute the asymmetry in the
-    /// interaction rate given by [`Interaction::asymmetry`].
+    /// This asymmetry is subsequently used to compute the asymmetric
+    /// interaction rate given by [`Interaction::delta_gamma`].
     pub fn set_asymmetry<F>(&mut self, asymmetry: F) -> &Self
     where
         F: Fn(&M) -> f64 + Sync + 'static,
