@@ -12,6 +12,12 @@ use std::{default, fmt, ops};
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct RateDensity {
+    /// Interaction rate, without scaling
+    ///
+    /// This factor is `$\gamma$` *before* it is scaled by ratios of the number
+    /// densities of particles involved in the interaction.  This is used in
+    /// help determine whether an interaction rate is fast.
+    pub gamma: f64,
     /// Net symmetric rate
     pub symmetric: f64,
     /// Net asymmetric rate
@@ -23,6 +29,7 @@ impl RateDensity {
     #[must_use]
     pub fn zero() -> Self {
         RateDensity {
+            gamma: 0.0,
             symmetric: 0.0,
             asymmetric: 0.0,
         }
@@ -58,8 +65,10 @@ impl fmt::LowerExp for RateDensity {
 impl ops::Mul<f64> for RateDensity {
     type Output = Self;
 
+    /// Multiplies the symmetric and asymmetric rates, but leaves `gamma` unchanged.
     fn mul(self, rhs: f64) -> Self {
         Self {
+            gamma: self.gamma * rhs,
             symmetric: self.symmetric * rhs,
             asymmetric: self.asymmetric * rhs,
         }
@@ -76,6 +85,7 @@ impl ops::Mul<RateDensity> for f64 {
 
 impl ops::MulAssign<f64> for RateDensity {
     fn mul_assign(&mut self, rhs: f64) {
+        self.gamma *= rhs;
         self.symmetric *= rhs;
         self.asymmetric *= rhs;
     }
@@ -86,6 +96,7 @@ impl ops::Div<f64> for RateDensity {
 
     fn div(self, rhs: f64) -> Self {
         Self {
+            gamma: self.gamma / rhs,
             symmetric: self.symmetric / rhs,
             asymmetric: self.asymmetric / rhs,
         }
@@ -94,6 +105,7 @@ impl ops::Div<f64> for RateDensity {
 
 impl ops::DivAssign<f64> for RateDensity {
     fn div_assign(&mut self, rhs: f64) {
+        self.gamma /= rhs;
         self.symmetric /= rhs;
         self.asymmetric /= rhs;
     }
