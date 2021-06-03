@@ -4,9 +4,8 @@ use crate::{
         Model,
     },
     solver::Context,
-    utilities::kallen_lambda_sqrt,
 };
-use special_functions::bessel;
+use special_functions::{bessel, particle_physics::kallen_lambda_sqrt};
 use std::fmt;
 
 const M_BETA_THRESHOLD: f64 = 1e1;
@@ -171,8 +170,10 @@ where
 
             debug_assert!(
                 width.is_finite(),
-                "Computed a non-finit width at step {} in interaction {}: {}",
+                "[{}.{}|{:.3e}] Computed a non-finit width in interaction {}: {}",
                 c.step,
+                c.substep,
+                c.beta,
                 self.particles()
                     .display(c.model)
                     .unwrap_or_else(|_| self.particles().short_display()),
@@ -229,46 +230,35 @@ where
             return Some(0.0);
         }
 
-        if real || p1.mass * c.beta < M_BETA_THRESHOLD {
+        let z = p1.mass * c.beta;
+        let gamma = if real || z < M_BETA_THRESHOLD {
             // 1 / 32 π³ ≅ 0.001007860451037484
-            let z = p1.mass * c.beta;
-            let gamma = 0.001_007_860_451_037_484
+            0.001_007_860_451_037_484
                 * (self.squared_amplitude)(&c.model).abs()
                 * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
-                * (bessel::k1(z) / z);
-
-            debug_assert!(
-                gamma.is_finite(),
-                "Computed a non-finite value for γ at step {} in interaction {}: {}",
-                c.step,
-                self.particles()
-                    .display(c.model)
-                    .unwrap_or_else(|_| self.particles().short_display()),
-                gamma
-            );
-
-            Some(gamma)
+                * (bessel::k1(z) / z)
         } else {
             // ζ(3) / 16 π³ ≅ 0.0024230112251823
-            let z = p1.mass * c.beta;
-            let gamma = 0.002_423_011_225_182_3
+            0.002_423_011_225_182_3
                 * (self.squared_amplitude)(&c.model).abs()
                 * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
                 * (bessel::k1_on_k2(z) / z.powi(3))
-                / p1.degrees_of_freedom();
+                / p1.degrees_of_freedom()
+        };
 
-            debug_assert!(
-                gamma.is_finite(),
-                "Computed a non-finite value for γ at step {} in interaction {}: {}",
-                c.step,
-                self.particles()
-                    .display(c.model)
-                    .unwrap_or_else(|_| self.particles().short_display()),
-                gamma
-            );
+        debug_assert!(
+            gamma.is_finite(),
+            "[{}.{}|{:.3e}] Computed a non-finite value for γ in interaction {}: {}",
+            c.step,
+            c.substep,
+            c.beta,
+            self.particles()
+                .display(c.model)
+                .unwrap_or_else(|_| self.particles().short_display()),
+            gamma
+        );
 
-            Some(gamma)
-        }
+        Some(gamma)
     }
 
     fn delta_gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
@@ -286,46 +276,35 @@ where
             return Some(0.0);
         }
 
-        if real || p1.mass * c.beta < M_BETA_THRESHOLD {
+        let z = p1.mass * c.beta;
+        let delta_gamma = if real || z < M_BETA_THRESHOLD {
             // 1 / 32 π³ ≅ 0.001007860451037484
-            let z = p1.mass * c.beta;
-            let delta_gamma = 0.001_007_860_451_037_484
+            0.001_007_860_451_037_484
                 * asymmetry(&c.model).abs()
                 * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
-                * (bessel::k1(z) / z);
-
-            debug_assert!(
-                delta_gamma.is_finite(),
-                "Computed a non-finite value for δγ at step {} in interaction {}: {}",
-                c.step,
-                self.particles()
-                    .display(c.model)
-                    .unwrap_or_else(|_| self.particles().short_display()),
-                delta_gamma
-            );
-
-            Some(delta_gamma)
+                * (bessel::k1(z) / z)
         } else {
             // ζ(3) / 16 π³ ≅ 0.0024230112251823
-            let z = p1.mass * c.beta;
-            let delta_gamma = 0.002_423_011_225_182_3
+            0.002_423_011_225_182_3
                 * asymmetry(&c.model).abs()
                 * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
                 * (bessel::k1_on_k2(z) / z.powi(3))
-                / p1.degrees_of_freedom();
+                / p1.degrees_of_freedom()
+        };
 
-            debug_assert!(
-                delta_gamma.is_finite(),
-                "Computed a non-finite value for δγ at step {} in interaction {}: {}",
-                c.step,
-                self.particles()
-                    .display(c.model)
-                    .unwrap_or_else(|_| self.particles().short_display()),
-                delta_gamma
-            );
+        debug_assert!(
+            delta_gamma.is_finite(),
+            "[{}.{}|{:.3e}] Computed a non-finite value for δγ in interaction {}: {}",
+            c.step,
+            c.substep,
+            c.beta,
+            self.particles()
+                .display(c.model)
+                .unwrap_or_else(|_| self.particles().short_display()),
+            delta_gamma
+        );
 
-            Some(delta_gamma)
-        }
+        Some(delta_gamma)
     }
 
     /// Override the default implementation of [`Interaction::rate`] to make use
@@ -357,11 +336,16 @@ where
         ];
         let [eq1, eq2, eq3] = [c.eq[i0], c.eq[i1], c.eq[i2]];
 
+        if eq1 == 0.0 && eq2 * eq3 == 0.0 {
+            return None;
+        }
+
         let mut rate = RateDensity::zero();
         if p1.mass * c.beta < M_BETA_THRESHOLD {
             // Below the M_BETA_THRESHOLD, `gamma` is the usual rate which must
             // be scaled by factors of `n / eq` to get the actual forward and
             // backward rates.
+            rate.gamma = gamma;
             rate.symmetric =
                 gamma * (checked_div(n1, eq1) - checked_div(n2, eq2) * checked_div(n3, eq3));
             rate.asymmetric = asymmetry
@@ -371,20 +355,27 @@ where
             // Above the M_BETA_THRESHOLD, `gamma` is already divided by eq1, so
             // we need not divide by `eq1` to calculate the forward rates, and we
             // have to multiply by `eq1` to get the backward rate.
+            rate.gamma = gamma * eq1;
 
-            if eq1 == 0.0 && eq2 * eq3 == 0.0 {
-                return None;
+            // If eq1 is zero, the remaining n1 density is trying to decay and
+            // the inverse decay should be negligible.
+            if eq1 == 0.0 {
+                rate.symmetric = gamma * n1;
+                rate.asymmetric = asymmetry * n1 + gamma * na1;
+            } else {
+                rate.symmetric = gamma * (n1 - eq1 * checked_div(n2, eq2) * checked_div(n3, eq3));
+                rate.asymmetric = asymmetry
+                    * (n1 + eq1 * checked_div(n2, eq2) * checked_div(n3, eq3))
+                    + gamma * (na1 - eq1 * checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
             }
-
-            rate.symmetric = gamma * (n1 - eq1 * checked_div(n2, eq2) * checked_div(n3, eq3));
-            rate.asymmetric = asymmetry * (n1 + eq1 * checked_div(n2, eq2) * checked_div(n3, eq3))
-                + gamma * (na1 - eq1 * checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
         }
 
         debug_assert!(
             rate.symmetric.is_finite(),
-            "Computed non-finite interaction rate at step {} in interaction {}: {}",
+            "[{}.{}|{:.3e}] Computed non-finite interaction rate in interaction {}: {}",
             c.step,
+            c.substep,
+            c.beta,
             self.particles()
                 .display(c.model)
                 .unwrap_or_else(|_| self.particles().short_display()),
@@ -392,8 +383,10 @@ where
         );
         debug_assert!(
             rate.asymmetric.is_finite(),
-            "Computed non-finite asymmetric interaction rate at step {} in interaction {}: {}",
+            "[{}.{}|{:.3e}] Computed non-finite asymmetric rate in interaction {}: {}",
             c.step,
+            c.substep,
+            c.beta,
             self.particles()
                 .display(c.model)
                 .unwrap_or_else(|_| self.particles().short_display()),
@@ -401,5 +394,98 @@ where
         );
 
         Some(rate * c.normalization)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        model::{interaction, EmptyModel},
+        prelude::*,
+        statistic::Statistic,
+    };
+    use ndarray::prelude::*;
+    use serde::{Deserialize, Serialize};
+    use std::{env::temp_dir, error, fs, path::Path};
+
+    const BETA_START: f64 = 1e-20;
+    const BETA_END: f64 = 1e0;
+
+    #[derive(Debug, Serialize, Deserialize)]
+    struct CsvRow {
+        beta: f64,
+        hubble_rate: f64,
+        n1: f64,
+        eq1: f64,
+        eq2: f64,
+        eq3: f64,
+        width: Option<f64>,
+        gamma_true: Option<f64>,
+        gamma_false: Option<f64>,
+        delta_gamma_true: Option<f64>,
+        delta_gamma_false: Option<f64>,
+        symmetric_prefactor: f64,
+        asymmetric_prefactor: f64,
+        rate_symmetric: Option<f64>,
+        rate_asymmetric: Option<f64>,
+        adjusted_rate_symmetric: Option<f64>,
+        adjusted_rate_asymmetric: Option<f64>,
+    }
+
+    /// Shorthand to create the CSV file in the appropriate directory and with
+    /// headers.
+    fn create_csv<P: AsRef<Path>>(p: P) -> Result<csv::Writer<fs::File>, Box<dyn error::Error>> {
+        let dir = temp_dir()
+            .join("boltzmann-solver")
+            .join("interaction")
+            .join("three_particle");
+        fs::create_dir_all(&dir)?;
+
+        let csv = csv::Writer::from_path(dir.join(p))?;
+
+        Ok(csv)
+    }
+
+    /// Unit amplitude
+    #[test]
+    fn unit_amplitude() -> Result<(), Box<dyn error::Error>> {
+        let mut model = EmptyModel::default();
+        model.extend_particles(
+            [1e10, 1e5, 1e2]
+                .iter()
+                .enumerate()
+                .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+        );
+        let interaction = interaction::ThreeParticle::new(|_m| 1.0, 1, 2, 3);
+        let mut csv = create_csv("unit_amplitude.csv")?;
+
+        for &beta in &Array1::geomspace(BETA_START, BETA_END, 1000).unwrap() {
+            model.set_beta(beta);
+            let c = model.as_context();
+
+            csv.serialize(CsvRow {
+                beta,
+                hubble_rate: c.hubble_rate,
+                n1: Statistic::BoseEinstein.massless_number_density(0.0, beta),
+                eq1: c.eq[1],
+                eq2: c.eq[2],
+                eq3: c.eq[3],
+                width: interaction.width(&c).map(|w| w.width),
+                gamma_true: interaction.gamma(&c, true),
+                gamma_false: interaction.gamma(&c, false),
+                delta_gamma_true: interaction.delta_gamma(&c, true),
+                delta_gamma_false: interaction.delta_gamma(&c, false),
+                symmetric_prefactor: interaction.symmetric_prefactor(&c),
+                asymmetric_prefactor: interaction.asymmetric_prefactor(&c),
+                rate_symmetric: interaction.rate(&c).map(|r| r.symmetric),
+                rate_asymmetric: interaction.rate(&c).map(|r| r.asymmetric),
+                adjusted_rate_symmetric: interaction.adjusted_rate(&c).map(|r| r.symmetric),
+                adjusted_rate_asymmetric: interaction.adjusted_rate(&c).map(|r| r.asymmetric),
+            })?;
+
+            csv.flush()?;
+        }
+
+        Ok(())
     }
 }
