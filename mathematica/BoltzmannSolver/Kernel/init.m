@@ -2,9 +2,12 @@
 
 (* Import Package-X under it's own namespace. *)
 Check[
-  Needs["X`"],
+  Needs["X`"];
+  ,
   Abort[]
 ];
+(* $ContextPath = Cases[Except["X`"]][$ContextPath]; *)
+X`Utilities`DisableFancyIO[X`LDot, X`LTensor, X`LoopIntegrate, X`FermionLine, X`FermionLineProduct];
 
 BeginPackage["BoltzmannSolver`"];
 
