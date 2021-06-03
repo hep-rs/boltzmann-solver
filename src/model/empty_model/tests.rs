@@ -24,6 +24,7 @@ fn create_csv<P: AsRef<Path>>(
     let mut csv = csv::Writer::from_path(dir.join(p))?;
     csv.write_field("step")?;
     csv.write_field("beta")?;
+    csv.write_field("dn")?;
     for i in 1..=n {
         csv.write_field(format!("n-{}", i))?;
         csv.write_field(format!("eq-{}", i))?;
@@ -56,7 +57,6 @@ fn no_interaction() -> Result<(), Box<dyn error::Error>> {
     Ok(())
 }
 
-/// Test a decay with a unit squared amplitude and the provided interaction.
 #[test]
 fn unit_amplitude() -> Result<(), Box<dyn error::Error>> {
     let mut model = EmptyModel::default();
@@ -78,29 +78,30 @@ fn unit_amplitude() -> Result<(), Box<dyn error::Error>> {
     let (n, na) = SolverBuilder::new()
         .model(model)
         .beta_range(BETA_START, BETA_END)
-        .logger(move |c, _dn, _dna| {
+        .logger(move |c, dn, _dna| {
             let mut csv = csv.write().unwrap();
             if c.n.iter().any(|v| v.is_nan()) {
                 csv.flush().unwrap();
-                panic!("NaN at step {}", c.step);
+                panic!("NaN at step {}.{}", c.step, c.substep);
             };
             csv.serialize((
-                c.step, c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3],
+                c.step, c.beta, dn[1], c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3],
             ))
             .unwrap();
+            csv.flush().unwrap();
         })
         .build()?
         .solve();
 
     // Check initial number densities
-    approx_eq(n0[1], 1.0, 8.0, 1e-50)?;
-    approx_eq(n0[2], 1.0, 8.0, 1e-50)?;
-    approx_eq(n0[3], 1.0, 8.0, 1e-50)?;
+    approx_eq(n0[1], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[2], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[3], 1.0, 4.0, 1e-50)?;
 
     // Check final number densities
-    approx_eq(n[1], 0.0, 8.0, 1e-10)?;
-    approx_eq(n[2], 2.0, 8.0, 1e-50)?;
-    approx_eq(n[3], 2.0, 8.0, 1e-50)?;
+    approx_eq(n[1], 0.0, 4.0, 1e-10)?;
+    approx_eq(n[2], 2.0, 4.0, 1e-50)?;
+    approx_eq(n[3], 2.0, 4.0, 1e-50)?;
 
     assert_eq!(na0, na);
 
@@ -168,14 +169,14 @@ fn unit_gamma() -> Result<(), Box<dyn error::Error>> {
     let (n, na) = SolverBuilder::new()
         .model(model)
         .beta_range(BETA_START, BETA_END)
-        .logger(move |c, _dn, _dna| {
+        .logger(move |c, dn, _dna| {
             let mut csv = csv.write().unwrap();
             if c.n.iter().any(|v| v.is_nan()) {
                 csv.flush().unwrap();
-                panic!("NaN at step {}", c.step);
+                panic!("NaN at step {}.{}", c.step, c.substep);
             };
             csv.serialize((
-                c.step, c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3],
+                c.step, c.beta, dn[1], c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3],
             ))
             .unwrap();
         })
@@ -183,14 +184,14 @@ fn unit_gamma() -> Result<(), Box<dyn error::Error>> {
         .solve();
 
     // Check initial number densities
-    approx_eq(n0[1], 1.0, 8.0, 1e-50)?;
-    approx_eq(n0[2], 1.0, 8.0, 1e-50)?;
-    approx_eq(n0[3], 1.0, 8.0, 1e-50)?;
+    approx_eq(n0[1], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[2], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[3], 1.0, 4.0, 1e-50)?;
 
     // Check final number densities
-    approx_eq(n[1], 0.0, 8.0, 1e-9)?;
-    approx_eq(n[2], 2.0, 8.0, 1e-50)?;
-    approx_eq(n[3], 2.0, 8.0, 1e-50)?;
+    approx_eq(n[1], 0.0, 4.0, 1e-9)?;
+    approx_eq(n[2], 2.0, 4.0, 1e-50)?;
+    approx_eq(n[3], 2.0, 4.0, 1e-50)?;
 
     assert_eq!(na0, na);
 
@@ -260,14 +261,14 @@ fn unit_rate() -> Result<(), Box<dyn error::Error>> {
     let (n, _na) = SolverBuilder::new()
         .model(model)
         .beta_range(BETA_START, BETA_END)
-        .logger(move |c, _dn, _dna| {
+        .logger(move |c, dn, _dna| {
             let mut csv = csv.write().unwrap();
             if c.n.iter().any(|v| v.is_nan()) {
                 csv.flush().unwrap();
-                panic!("NaN at step {}", c.step);
+                panic!("NaN at step {}.{}", c.step, c.substep);
             };
             csv.serialize((
-                c.step, c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3],
+                c.step, c.beta, dn[1], c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3],
             ))
             .unwrap();
         })
@@ -275,9 +276,9 @@ fn unit_rate() -> Result<(), Box<dyn error::Error>> {
         .solve();
 
     // Check final number densities
-    approx_eq(n[1], 0.0, 8.0, 1e-10)?;
-    approx_eq(n[2], 2.0, 8.0, 1e-50)?;
-    approx_eq(n[3], 2.0, 8.0, 1e-50)?;
+    approx_eq(n[1], 0.0, 4.0, 1e-6)?;
+    approx_eq(n[2], 2.0, 4.0, 1e-50)?;
+    approx_eq(n[3], 2.0, 4.0, 1e-50)?;
 
     Ok(())
 }
@@ -349,14 +350,14 @@ fn unit_adj_rate() -> Result<(), Box<dyn error::Error>> {
     let (n, _na) = SolverBuilder::new()
         .model(model)
         .beta_range(BETA_START, BETA_END)
-        .logger(move |c, _dn, _dna| {
+        .logger(move |c, dn, _dna| {
             let mut csv = csv.write().unwrap();
             if c.n.iter().any(|v| v.is_nan()) {
                 csv.flush().unwrap();
-                panic!("NaN at step {}", c.step);
+                panic!("NaN at step {}.{}", c.step, c.substep);
             };
             csv.serialize((
-                c.step, c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3],
+                c.step, c.beta, dn[1], c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3],
             ))
             .unwrap();
         })
@@ -478,14 +479,16 @@ fn sin_cos() -> Result<(), Box<dyn error::Error>> {
     let (n, _na) = SolverBuilder::new()
         .model(model)
         .beta_range(BETA_START, BETA_END)
-        .logger(move |c, _dn, _dna| {
+        .logger(move |c, dn, _dna| {
             let mut csv = csv.write().unwrap();
             if c.n.iter().any(|v| v.is_nan()) {
                 csv.flush().unwrap();
-                panic!("NaN at step {}", c.step);
+                panic!("NaN at step {}.{}", c.step, c.substep);
             };
-            csv.serialize((c.step, c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], 0.0, 0.0))
-                .unwrap();
+            csv.serialize((
+                c.step, c.beta, dn[1], c.n[1], c.eq[1], c.n[2], c.eq[2], 0.0, 0.0,
+            ))
+            .unwrap();
         })
         .initial_densities(vec![(1, 0.0), (2, 1.0)])
         .build()?
@@ -595,14 +598,16 @@ fn brusselator_stable() -> Result<(), Box<dyn error::Error>> {
     let (n, _na) = SolverBuilder::new()
         .model(model)
         .beta_range(BETA_START, BETA_END)
-        .logger(move |c, _dn, _dna| {
+        .logger(move |c, dn, _dna| {
             let mut csv = csv.write().unwrap();
             if c.n.iter().any(|v| v.is_nan()) {
                 csv.flush().unwrap();
-                panic!("NaN at step {}", c.step);
+                panic!("NaN at step {}.{}", c.step, c.substep);
             };
-            csv.serialize((c.step, c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], 0.0, 0.0))
-                .unwrap();
+            csv.serialize((
+                c.step, c.beta, dn[1], c.n[1], c.eq[1], c.n[2], c.eq[2], 0.0, 0.0,
+            ))
+            .unwrap();
         })
         .initial_densities(vec![(1, 1.0), (2, 1.0)])
         .build()?
@@ -711,14 +716,16 @@ fn brusselator_unstable() -> Result<(), Box<dyn error::Error>> {
     let (n, _na) = SolverBuilder::new()
         .model(model)
         .beta_range(BETA_START, BETA_END)
-        .logger(move |c, _dn, _dna| {
+        .logger(move |c, dn, _dna| {
             let mut csv = csv.write().unwrap();
             if c.n.iter().any(|v| v.is_nan()) {
                 csv.flush().unwrap();
-                panic!("NaN at step {}", c.step);
+                panic!("NaN at step {}.{}", c.step, c.substep);
             };
-            csv.serialize((c.step, c.beta, c.n[1], c.eq[1], c.n[2], c.eq[2], 0.0, 0.0))
-                .unwrap();
+            csv.serialize((
+                c.step, c.beta, dn[1], c.n[1], c.eq[1], c.n[2], c.eq[2], 0.0, 0.0,
+            ))
+            .unwrap();
         })
         .initial_densities(vec![(1, 1.0), (2, 1.0)])
         .build()?
@@ -727,6 +734,404 @@ fn brusselator_unstable() -> Result<(), Box<dyn error::Error>> {
     // Check final number densities
     approx_eq(n[1], 0.373_265, 3.0, 1e-10)?;
     approx_eq(n[2], 3.36134, 3.0, 1e-10)?;
+
+    Ok(())
+}
+
+#[test]
+fn chain_decay() -> Result<(), Box<dyn error::Error>> {
+    let mut model = EmptyModel::default();
+    model.extend_particles(
+        [1e5, 1e2, 1e1, 1e7]
+            .iter()
+            .enumerate()
+            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+    );
+    model.push_interaction(interaction::ThreeParticle::new(|_m| 1.0, 1, 2, 3));
+    model.push_interaction(interaction::ThreeParticle::new(|_m| 1.0, 4, 1, 2));
+
+    // Get the initial conditions
+    model.set_beta(BETA_START);
+    let c = model.as_context();
+    let (n0, na0) = (c.eq, c.na);
+
+    // Run the solver
+    let csv = create_csv("chained_decay.csv", 4)?;
+    let (n, na) = SolverBuilder::new()
+        .model(model)
+        .beta_range(BETA_START, BETA_END)
+        .logger(move |c, dn, _dna| {
+            let mut csv = csv.write().unwrap();
+            if c.n.iter().any(|v| v.is_nan()) {
+                csv.flush().unwrap();
+                panic!("NaN at step {}.{}", c.step, c.substep);
+            };
+            csv.serialize((
+                c.step, c.beta, dn[1], c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3], c.n[4],
+                c.eq[4],
+            ))
+            .unwrap();
+            csv.flush().unwrap();
+        })
+        .build()?
+        .solve();
+
+    // Check initial number densities
+    approx_eq(n0[1], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[2], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[3], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[4], 1.0, 4.0, 1e-50)?;
+
+    // Check final number densities
+    approx_eq(n[1], 0.0, 4.0, 1e-10)?;
+    approx_eq(n[2], 4.0, 4.0, 1e-50)?;
+    approx_eq(n[3], 3.0, 4.0, 1e-50)?;
+    approx_eq(n[4], 0.0, 4.0, 1e-50)?;
+
+    assert_eq!(na0, na);
+
+    Ok(())
+}
+
+#[test]
+fn scattering_massless() -> Result<(), Box<dyn error::Error>> {
+    let mut model = EmptyModel::default();
+    model.extend_particles(
+        [0.0, 0.0, 0.0, 0.0]
+            .iter()
+            .enumerate()
+            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+    );
+    model.push_interaction(interaction::FourParticle::new(
+        |_m, _s, _t, _u| 1e-10,
+        1,
+        2,
+        3,
+        4,
+    ));
+
+    // Get the initial conditions
+    model.set_beta(BETA_START);
+    let c = model.as_context();
+    let (mut n0, na0) = (c.eq, c.na);
+    n0[1] = 0.4;
+    n0[2] = 0.8;
+    n0[3] = 1.3;
+    n0[4] = 1.8;
+
+    // Run the solver
+    let csv = create_csv("scattering_massless.csv", 4)?;
+    let (n, na) = SolverBuilder::new()
+        .model(model)
+        .beta_range(BETA_START, BETA_END)
+        .logger(move |c, dn, _dna| {
+            let mut csv = csv.write().unwrap();
+            if c.n.iter().any(|v| v.is_nan()) {
+                csv.flush().unwrap();
+                panic!("NaN at step {}.{}", c.step, c.substep);
+            };
+            csv.serialize((
+                c.step, c.beta, dn[1], c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3], c.n[4],
+                c.eq[4],
+            ))
+            .unwrap();
+            csv.flush().unwrap();
+        })
+        .initial_densities(vec![(1, n0[1]), (2, n0[2]), (3, n0[3]), (4, n0[4])])
+        .build()?
+        .solve();
+
+    approx_eq(n[1] * n[2], n[3] * n[4], 2.0, 0.0)?;
+
+    assert_eq!(na0, na);
+
+    Ok(())
+}
+
+#[test]
+fn scattering_m000() -> Result<(), Box<dyn error::Error>> {
+    let mut model = EmptyModel::default();
+    model.extend_particles(
+        [1e5, 0.0, 0.0, 0.0]
+            .iter()
+            .enumerate()
+            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+    );
+    model.push_interaction(interaction::FourParticle::new(
+        |_m, _s, _t, _u| 1e-10,
+        1,
+        2,
+        3,
+        4,
+    ));
+
+    // Get the initial conditions
+    model.set_beta(BETA_START);
+    let c = model.as_context();
+    let (n0, na0) = (c.eq, c.na);
+
+    // Run the solver
+    let csv = create_csv("scattering_m000.csv", 4)?;
+    let (_n, na) = SolverBuilder::new()
+        .model(model)
+        .beta_range(BETA_START, BETA_END)
+        .logger(move |c, dn, _dna| {
+            let mut csv = csv.write().unwrap();
+            if c.n.iter().any(|v| v.is_nan()) {
+                csv.flush().unwrap();
+                panic!("NaN at step {}.{}", c.step, c.substep);
+            };
+            csv.serialize((
+                c.step, c.beta, dn[1], c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3], c.n[4],
+                c.eq[4],
+            ))
+            .unwrap();
+            csv.flush().unwrap();
+        })
+        .build()?
+        .solve();
+
+    // Check initial number densities
+    approx_eq(n0[1], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[2], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[3], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[4], 1.0, 4.0, 1e-50)?;
+
+    // Check final number densities
+    // approx_eq(n[1] * n[2], n[3] * n[4], 4.0, 1e-10)?;
+
+    assert_eq!(na0, na);
+
+    Ok(())
+}
+
+#[test]
+fn scattering_m0m0() -> Result<(), Box<dyn error::Error>> {
+    let mut model = EmptyModel::default();
+    model.extend_particles(
+        [1e5, 0.0, 1e4, 0.0]
+            .iter()
+            .enumerate()
+            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+    );
+    model.push_interaction(interaction::FourParticle::new(
+        |_m, _s, _t, _u| 1e-10,
+        1,
+        2,
+        3,
+        4,
+    ));
+
+    // Get the initial conditions
+    model.set_beta(BETA_START);
+    let c = model.as_context();
+    let (n0, na0) = (c.eq, c.na);
+
+    // Run the solver
+    let csv = create_csv("scattering_m0m0.csv", 4)?;
+    let (n, na) = SolverBuilder::new()
+        .model(model)
+        .beta_range(BETA_START, BETA_END)
+        .logger(move |c, dn, _dna| {
+            let mut csv = csv.write().unwrap();
+            if c.n.iter().any(|v| v.is_nan()) {
+                csv.flush().unwrap();
+                panic!("NaN at step {}.{}", c.step, c.substep);
+            };
+            csv.serialize((
+                c.step, c.beta, dn[1], c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3], c.n[4],
+                c.eq[4],
+            ))
+            .unwrap();
+            csv.flush().unwrap();
+        })
+        .build()?
+        .solve();
+
+    // Check initial number densities
+    approx_eq(n0[1], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[2], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[3], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[4], 1.0, 4.0, 1e-50)?;
+
+    // Check final number densities
+    approx_eq(n[1], 0.035_114_6, 4.0, 1e-10)?;
+    approx_eq(n[1], n[2], 4.0, 1e-10)?;
+    approx_eq(n[3], 1.96489, 4.0, 1e-50)?;
+    approx_eq(n[3], n[4], 4.0, 1e-50)?;
+
+    assert_eq!(na0, na);
+
+    Ok(())
+}
+
+#[test]
+fn scattering_mm00() -> Result<(), Box<dyn error::Error>> {
+    let mut model = EmptyModel::default();
+    model.extend_particles(
+        [1e5, 1e5, 0.0, 0.0]
+            .iter()
+            .enumerate()
+            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+    );
+    model.push_interaction(interaction::FourParticle::new(
+        |_m, _s, _t, _u| 1e-10,
+        1,
+        2,
+        3,
+        4,
+    ));
+
+    // Get the initial conditions
+    model.set_beta(BETA_START);
+    let c = model.as_context();
+    let (n0, na0) = (c.eq, c.na);
+
+    // Run the solver
+    let csv = create_csv("scattering_mm00.csv", 4)?;
+    let (n, na) = SolverBuilder::new()
+        .model(model)
+        .beta_range(BETA_START, BETA_END)
+        .logger(move |c, dn, _dna| {
+            let mut csv = csv.write().unwrap();
+            if c.n.iter().any(|v| v.is_nan()) {
+                csv.flush().unwrap();
+                panic!("NaN at step {}.{}", c.step, c.substep);
+            };
+            csv.serialize((
+                c.step, c.beta, dn[1], c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3], c.n[4],
+                c.eq[4],
+            ))
+            .unwrap();
+            csv.flush().unwrap();
+        })
+        .build()?
+        .solve();
+
+    // Check initial number densities
+    approx_eq(n0[1], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[2], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[3], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[4], 1.0, 4.0, 1e-50)?;
+
+    // Check final number densities
+    approx_eq(n[1], 0.275_935, 4.0, 1e-10)?;
+    approx_eq(n[1], n[2], 4.0, 1e-10)?;
+    approx_eq(n[3], 1.72406, 4.0, 1e-50)?;
+    approx_eq(n[3], n[4], 4.0, 1e-50)?;
+
+    assert_eq!(na0, na);
+
+    Ok(())
+}
+
+#[test]
+fn scattering_mmmm() -> Result<(), Box<dyn error::Error>> {
+    let mut model = EmptyModel::default();
+    model.extend_particles(
+        [1e5, 1e5, 1e5, 1e5]
+            .iter()
+            .enumerate()
+            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+    );
+    model.push_interaction(interaction::FourParticle::new(
+        |_m, _s, _t, _u| 1e-10,
+        1,
+        2,
+        3,
+        4,
+    ));
+
+    // Get the initial conditions
+    model.set_beta(BETA_START);
+    let c = model.as_context();
+    let (_n0, na0) = (c.eq, c.na);
+
+    // Run the solver
+    let csv = create_csv("scattering_mmmm.csv", 4)?;
+    let (n, na) = SolverBuilder::new()
+        .model(model)
+        .beta_range(BETA_START, BETA_END)
+        .logger(move |c, dn, _dna| {
+            let mut csv = csv.write().unwrap();
+            if c.n.iter().any(|v| v.is_nan()) {
+                csv.flush().unwrap();
+                panic!("NaN at step {}.{}", c.step, c.substep);
+            };
+            csv.serialize((
+                c.step, c.beta, dn[1], c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3], c.n[4],
+                c.eq[4],
+            ))
+            .unwrap();
+            csv.flush().unwrap();
+        })
+        .initial_densities(vec![(1, 1.3), (2, 1.1), (3, 0.9), (4, 0.6)])
+        .build()?
+        .solve();
+
+    // Check final number densities
+    approx_eq(n[1] * n[2], n[3] * n[4], 4.0, 1e-10)?;
+
+    assert_eq!(na0, na);
+
+    Ok(())
+}
+
+#[test]
+fn scattering_mmmm_eq() -> Result<(), Box<dyn error::Error>> {
+    let mut model = EmptyModel::default();
+    model.extend_particles(
+        [1e5, 1e5, 1e5, 1e5]
+            .iter()
+            .enumerate()
+            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+    );
+    model.push_interaction(interaction::FourParticle::new(
+        |_m, _s, _t, _u| 1e-10,
+        1,
+        2,
+        3,
+        4,
+    ));
+
+    // Get the initial conditions
+    model.set_beta(BETA_START);
+    let c = model.as_context();
+    let (n0, na0) = (c.eq, c.na);
+
+    // Run the solver
+    let csv = create_csv("scattering_mmmm_eq.csv", 4)?;
+    let (n, na) = SolverBuilder::new()
+        .model(model)
+        .beta_range(BETA_START, BETA_END)
+        .logger(move |c, dn, _dna| {
+            let mut csv = csv.write().unwrap();
+            if c.n.iter().any(|v| v.is_nan()) {
+                csv.flush().unwrap();
+                panic!("NaN at step {}.{}", c.step, c.substep);
+            };
+            csv.serialize((
+                c.step, c.beta, dn[1], c.n[1], c.eq[1], c.n[2], c.eq[2], c.n[3], c.eq[3], c.n[4],
+                c.eq[4],
+            ))
+            .unwrap();
+            csv.flush().unwrap();
+        })
+        .initial_densities(vec![(1, 1.3), (2, 1.1)])
+        .in_equilibrium(vec![3, 4])
+        .build()?
+        .solve();
+
+    // Check initial number densities
+    approx_eq(n0[1], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[2], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[3], 1.0, 4.0, 1e-50)?;
+    approx_eq(n0[4], 1.0, 4.0, 1e-50)?;
+
+    // Check final number densities
+    approx_eq(n[1] * n[2], n[3] * n[4], 4.0, 1e-10)?;
+
+    assert_eq!(na0, na);
 
     Ok(())
 }
