@@ -230,19 +230,21 @@ where
         let beta = self.get_beta();
         let n = Statistic::BoseEinstein.massless_number_density(0.0, beta);
         let hubble_rate = self.hubble_rate(beta);
+        let eq: Array1<f64> = self
+            .particles()
+            .iter()
+            .map(|p| p.normalized_number_density(0.0, beta))
+            .collect();
 
         Context {
             step: 0,
             substep: -1,
-            step_size: 1.0,
             beta,
+            step_size: 1.0,
             hubble_rate,
             normalization: (hubble_rate * beta * n).recip(),
-            eq: self
-                .particles()
-                .iter()
-                .map(|p| p.normalized_number_density(0.0, beta))
-                .collect(),
+            eqn: eq.clone(),
+            eq,
             n: Array1::ones(self.len_particles()),
             na: Array1::zeros(self.len_particles()),
             model: &self,
