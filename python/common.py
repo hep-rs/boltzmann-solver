@@ -1,8 +1,7 @@
 import json
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
-import ipywidgets
 import numpy as np
 import pandas as pd
 import plotly
@@ -63,7 +62,9 @@ def get_continuous_color(colorscale, intermed):
     )
 
 
-def read_number_density(f: Path, size_threshold: int = 20_000) -> pd.DataFrame:
+def read_number_density(
+    f: Union[Path, str], size_threshold: int = 20_000, quiet: bool = False
+) -> pd.DataFrame:
     """Read number density CSV file.
 
     The data is expected to have the following columns:
@@ -91,8 +92,8 @@ def read_number_density(f: Path, size_threshold: int = 20_000) -> pd.DataFrame:
     """
     # Read CSV
     data = pd.read_csv(f)
-    if len(data.index) > 20_000:
-        data = data.sample(20_000)
+    if len(data.index) > size_threshold:
+        data = data.sample(size_threshold)
 
     data.sort_values("beta", inplace=True)
 
@@ -134,26 +135,27 @@ def read_number_density(f: Path, size_threshold: int = 20_000) -> pd.DataFrame:
         if col.startswith("na-"):
             data["-" + col] = np.negative(data[col])
 
-    display(
-        HTML(
-            f"""
-            <table>
-                <tr>
-                    <th>Integration Steps</th>
-                    <td>{data["step"].iloc[-1]}</td>
-                </tr>
-                <tr>
-                    <th>Plot Samples</th>
-                    <td>{len(data.index)}</td>
-                </tr>
-                <tr>
-                    <th>Final B-L</th>
-                    <td>{data["na-B-L"].iloc[-1]}</td>
-                </tr>
-            </table>
-            """
+    if not quiet:
+        display(
+            HTML(
+                f"""
+                <table>
+                    <tr>
+                        <th>Integration Steps</th>
+                        <td>{data["step"].iloc[-1]}</td>
+                    </tr>
+                    <tr>
+                        <th>Plot Samples</th>
+                        <td>{len(data.index)}</td>
+                    </tr>
+                    <tr>
+                        <th>Final B-L</th>
+                        <td>{data["na-B-L"].iloc[-1]}</td>
+                    </tr>
+                </table>
+                """
+            )
         )
-    )
 
     return data
 
@@ -296,7 +298,7 @@ def plot_densities(df: pd.DataFrame, ptcls: List[str]):
                 legendgroup="B-L",
                 showlegend=False,
                 x=df["beta"],
-                y=df["dna-B-L"],
+                y=df["dna-B-L"].abs(),
                 line=go.scatter.Line(width=3, color="black"),
             )
         ]
@@ -306,7 +308,7 @@ def plot_densities(df: pd.DataFrame, ptcls: List[str]):
                 legendgroup=ptcl,
                 showlegend=False,
                 x=df["beta"],
-                y=df[f"dna-{ptcl}"],
+                y=df[f"dna-{ptcl}"].abs(),
                 line=go.scatter.Line(color=color),
             )
             for ptcl, color in zip(ptcls, COLORS)
@@ -377,8 +379,8 @@ def plot_densities(df: pd.DataFrame, ptcls: List[str]):
     )
     fig.update_yaxes(
         title_text="Asymmetry Change [Normalized]",
-        type="linear",
-        # range=[-20, 1],
+        type="log",
+        range=[-20, 1],
         exponentformat="power",
         row=2,
         col=1,

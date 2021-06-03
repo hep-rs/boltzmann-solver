@@ -3,7 +3,7 @@ import glob
 from pathlib import Path
 from tempfile import gettempdir
 
-from python.common import *
+from common import *
 
 # Find the default output directory
 OUTPUT_DIR = Path(gettempdir()) / "boltzmann-solver" / "full"
@@ -35,37 +35,20 @@ display(plot_densities(data, ["H", "L1", "L2", "L3", "N1", "N2", "N3"]))
 # ## 1 Generation
 
 # %%
-data = read_csv(OUTPUT_DIR / "washout_1.csv")
+data = read_number_density(OUTPUT_DIR / "washout_1.csv")
 
-print("Integration steps:", len(data["n"].index))
-print("Final B-L:", data["n"]["ΔB-L"].iloc[-1])
-plot_integration(data)
+display(plot_integration(data))
+display(plot_densities(data, ["H", "L1", "N1"]))
 
-
-# %%
-plot_asymmetry(data, ["H", "L1", "N1"])
-
-
-# %%
-plot_density(data, ["H", "L1", "N1"])
 
 # %% [markdown]
 # ## 3 Generation
 
 # %%
-data = read_csv(OUTPUT_DIR / "washout_3.csv")
+data = read_number_density(OUTPUT_DIR / "washout_3.csv")
 
-print("Integration steps:", len(data["n"].index))
-print("Final B-L:", data["n"]["ΔB-L"].iloc[-1])
-plot_integration(data)
-
-
-# %%
-plot_asymmetry(data, ["H", "L1", "L2", "L3", "N1", "N2", "N3"])
-
-
-# %%
-plot_density(data, ["H", "L1", "L2", "L3", "N1", "N2", "N3"])
+display(plot_integration(data))
+display(plot_densities(data, ["H", "L1", "L2", "L3", "N1", "N2", "N3"]))
 
 # %% [markdown]
 # # Full
@@ -73,7 +56,7 @@ plot_density(data, ["H", "L1", "L2", "L3", "N1", "N2", "N3"])
 # ## 1 Generation
 
 # %%
-data = read_csv(OUTPUT_DIR / "full_1.csv")
+data = read_number_density(OUTPUT_DIR / "full_1.csv")
 
 print("Integration steps:", len(data["n"].index))
 print("Final B-L:", data["n"]["ΔB-L"].iloc[-1])
@@ -91,7 +74,7 @@ plot_density(data, ["H", "L1", "N1"])
 # ## 3 Generation
 
 # %%
-data = read_csv(OUTPUT_DIR / "full_3.csv")
+data = read_number_density(OUTPUT_DIR / "full_3.csv")
 
 print("Integration steps:", len(data["n"].index))
 print("Final B-L:", data["n"]["ΔB-L"].iloc[-1])
@@ -107,14 +90,12 @@ plot_density(data, ["H", "L1", "L2", "L3", "N1", "N2", "N3"])
 
 # %% [markdown]
 # # Miscellaneous
+
 # %% [markdown]
 # ## Evolution
 
-# %%
 data, ptcls = read_evolution(OUTPUT_DIR / "evolution.json")
 
-
-# %%
 go.Figure(
     data=[go.Scatter(name=p, x=data["beta"], y=data[p, "mass"]) for p in ptcls],
     layout=go.Layout(
@@ -127,8 +108,6 @@ go.Figure(
     ),
 )
 
-
-# %%
 go.Figure(
     data=[
         go.Scatter(name=p, x=data["beta"], y=data[p, "mass"] * data["beta"])
@@ -146,8 +125,6 @@ go.Figure(
     ),
 )
 
-
-# %%
 go.Figure(
     data=[
         go.Scatter(name=p, x=data["beta"], y=data[p, "width"] / data[p, "mass"])
@@ -167,32 +144,36 @@ go.Figure(
 # ## Higgs Equilibrium
 
 # %%
-datas = list(
-    map(read_csv, sorted(glob.glob(str(OUTPUT_DIR / "higgs_equilibrium" / "*.csv"))))
+data = list(
+    map(
+        lambda f: read_number_density(f, quiet=True),
+        sorted(glob.glob(str(OUTPUT_DIR / "higgs_equilibrium" / "*.csv"))),
+    )
 )
 
+viridis, _ = plotly.colors.convert_colors_to_same_type(plotly.colors.sequential.Viridis)
+viridis = plotly.colors.make_colorscale(viridis)
 
-# %%
 go.Figure(
     data=[
         go.Scatter(
-            x=data["n"]["beta"],
-            y=data["n"]["H"],
+            x=df["beta"],
+            y=df["n-H"],
             mode="lines",
-            line=go.scatter.Line(color=cmap("viridis", i / len(datas))),
+            line=go.scatter.Line(color=get_continuous_color(viridis, i / len(data))),
             showlegend=False,
         )
-        for i, data in enumerate(datas)
+        for i, df in enumerate(data)
     ]
     + [
         go.Scatter(
-            x=data["n"]["beta"],
-            y=data["n"]["(H)"],
+            x=df["beta"],
+            y=df["eq-H"],
             mode="lines",
             line=go.scatter.Line(color="black"),
             showlegend=False,
         )
-        for i, data in enumerate(datas)
+        for i, df in enumerate(data)
     ],
     layout=go.Layout(
         xaxis=go.layout.XAxis(
@@ -208,8 +189,11 @@ go.Figure(
 # ## Lepton Equilibrium
 
 # %%
-datas = list(
-    map(read_csv, sorted(glob.glob(str(OUTPUT_DIR / "lepton_equilibrium" / "*.csv"))))
+data = list(
+    map(
+        lambda f: read_number_density(f, quiet=True),
+        sorted(glob.glob(str(OUTPUT_DIR / "lepton_equilibrium" / "*.csv"))),
+    )
 )
 
 
@@ -217,23 +201,23 @@ datas = list(
 go.Figure(
     data=[
         go.Scatter(
-            x=data["n"]["beta"],
-            y=data["n"]["L1"],
+            x=df["n"]["beta"],
+            y=df["n"]["L1"],
             mode="lines",
-            line=go.scatter.Line(color=cmap("viridis", i / len(datas))),
+            line=go.scatter.Line(color=cmap("viridis", i / len(data))),
             showlegend=False,
         )
-        for i, data in enumerate(datas)
+        for i, df in enumerate(data)
     ]
     + [
         go.Scatter(
-            x=data["n"]["beta"],
-            y=data["n"]["(L1)"],
+            x=df["n"]["beta"],
+            y=df["n"]["(L1)"],
             mode="lines",
             line=go.scatter.Line(color="black"),
             showlegend=False,
         )
-        for i, data in enumerate(datas)
+        for i, df in enumerate(data)
     ],
     layout=go.Layout(
         xaxis=go.layout.XAxis(

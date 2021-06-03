@@ -1,9 +1,4 @@
 # %%
-import gc
-import glob
-import json
-import random
-from collections import defaultdict
 from pathlib import Path
 from tempfile import gettempdir
 
@@ -11,12 +6,10 @@ import numpy as np
 import pandas as pd
 import plotly
 import scipy as sp
-import scipy.constants
-from IPython.core.display import HTML, display
 from numpy import ma
 from plotly import graph_objects as go
 
-from common import *
+from python.common import *
 
 # %%
 # Setup plotting
@@ -34,7 +27,6 @@ print(f"Loading data from {OUTPUT_DIR}")
 
 # %%
 data = read_csv(OUTPUT_DIR / "n1f1.csv")
-# ul = pd.read_csv("/tmp/josh/ulysses/n1f1.csv")
 
 print("Integration steps:", len(data["n"].index))
 print("Final B-L:", data["n"]["ΔB-L"].iloc[-1])
