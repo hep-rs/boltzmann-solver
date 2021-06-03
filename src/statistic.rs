@@ -325,7 +325,7 @@ impl Statistics for Statistic {
 mod tests {
     use super::{Statistic, Statistics};
     use crate::utilities::test::approx_eq;
-    use std::{error, f64};
+    use std::{error, f64, fs, io::BufReader};
 
     type Row6 = (f64, f64, f64, f64, f64, f64);
     type Row7 = (f64, f64, f64, f64, f64, f64, f64);
@@ -339,7 +339,9 @@ mod tests {
         let mb = Statistic::MaxwellBoltzmann;
         let mj = Statistic::MaxwellJuttner;
 
-        let mut rdr = csv::Reader::from_path("tests/data/phase_space.csv").unwrap();
+        let mut rdr = csv::Reader::from_reader(zstd::Decoder::with_buffer(BufReader::new(
+            fs::File::open("tests/data/phase_space.csv.zst")?,
+        ))?);
 
         for result in rdr.deserialize() {
             let (e, m, mu, beta, f_fd, f_be, f_mb, f_mj): Row8 = result.unwrap();
@@ -374,7 +376,9 @@ mod tests {
         let mb = Statistic::MaxwellBoltzmann;
         let mj = Statistic::MaxwellJuttner;
 
-        let mut rdr = csv::Reader::from_path("tests/data/number_density_massive.csv").unwrap();
+        let mut rdr = csv::Reader::from_reader(zstd::Decoder::with_buffer(BufReader::new(
+            fs::File::open("tests/data/number_density_massive.csv.zst")?,
+        ))?);
 
         for result in rdr.deserialize() {
             let (m, mu, beta, n_fd, n_be, n_mb, n_mj): Row7 = result.unwrap();
@@ -414,7 +418,9 @@ mod tests {
         let mb = Statistic::MaxwellBoltzmann;
         let mj = Statistic::MaxwellJuttner;
 
-        let mut rdr = csv::Reader::from_path("tests/data/number_density_massless.csv").unwrap();
+        let mut rdr = csv::Reader::from_reader(zstd::Decoder::with_buffer(BufReader::new(
+            fs::File::open("tests/data/number_density_massless.csv.zst")?,
+        ))?);
 
         for result in rdr.deserialize() {
             let (mu, beta, n_fd, n_be, n_mb, n_mj): Row6 = result.unwrap();
