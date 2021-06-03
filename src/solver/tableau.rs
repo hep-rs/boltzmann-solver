@@ -1,8 +1,8 @@
 //! # Butcher tableaux
 //!
-//! A Butcher tableau is as described at
-//! https://en.wikipedia.org/wiki/Butcher_tableau.  Specifically, given `$y_n$`,
-//! the estimate for `$y_{n+1}$` is:
+//! A Butcher tableau is as described [on
+//! Wikipedia](https://en.wikipedia.org/wiki/Butcher_tableau).  Specifically,
+//! given `$y_n$`, the estimate for `$y_{n+1}$` is:
 //!
 //! ```math
 //! y_{n+1} = y_n + \sum_{i = 1}^{s} b_i k_i
