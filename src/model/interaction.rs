@@ -8,10 +8,11 @@ mod rate_density;
 mod three_particle;
 
 pub use fast_interaction_result::FastInteractionResult;
-pub use four_particle::FourParticle;
 pub use interaction_particles::{DisplayError, InteractionParticles};
 pub use partial_width::PartialWidth;
 pub use rate_density::RateDensity;
+
+pub use four_particle::FourParticle;
 pub use three_particle::ThreeParticle;
 
 use crate::{model::Model, solver::Context};

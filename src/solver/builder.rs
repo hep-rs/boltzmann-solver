@@ -6,7 +6,10 @@ use crate::{
 use ndarray::prelude::*;
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
-use std::{error, fmt};
+use std::{
+    collections::{HashMap, HashSet},
+    error, fmt,
+};
 
 // Number of recursive subdivisions in beta range (so there are 2^N
 // subdivisions).
@@ -15,12 +18,8 @@ const PRECOMPUTE_SUBDIV: u32 = 12;
 /// Error type returned by the solver builder in case there is an error.
 #[derive(Debug)]
 pub enum Error {
-    /// One or more initial density is specified multiple times.
-    DuplicateInitialDensities,
     /// The initial number densities are invalid.
     InvalidInitialDensities,
-    /// One or more initial density asymmetry is specified multiple times.
-    DuplicateInitialAsymmetries,
     /// The initial asymmetries are invalid.
     InvalidInitialAsymmetries,
     /// The number of particles held in equilibrium exceeds the number of
@@ -36,14 +35,7 @@ pub enum Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::DuplicateInitialDensities => {
-                write!(f, "one or more initial density is specified multiple times")
-            }
             Error::InvalidInitialDensities => write!(f, "initial number densities are invalid"),
-            Error::DuplicateInitialAsymmetries => write!(
-                f,
-                "one or more initial density asymmetry is specified multiple times"
-            ),
             Error::InvalidInitialAsymmetries => {
                 write!(f, "initial number density asymmetries are invalid")
             }
@@ -70,15 +62,15 @@ pub struct SolverBuilder<M> {
     /// Inner model
     pub model: Option<M>,
     /// Initial number densities
-    initial_densities: Vec<(usize, f64)>,
+    initial_densities: HashMap<usize, f64>,
     /// Initial number density asymmetries
-    initial_asymmetries: Vec<(usize, f64)>,
+    initial_asymmetries: HashMap<usize, f64>,
     /// Range of beta values to integrate over
     beta_range: (f64, f64),
     /// Particles which are not allowed to deviate from equilibrium
-    in_equilibrium: Vec<usize>,
+    in_equilibrium: HashSet<usize>,
     /// Particles which are not allowed to have any asymmetry
-    no_asymmetry: Vec<usize>,
+    no_asymmetry: HashSet<usize>,
     /// Logger used at each step
     logger: LoggerFn<M>,
     /// Step precision (i.e. step size) allowed
@@ -117,11 +109,11 @@ impl<M> SolverBuilder<M> {
     pub fn new() -> Self {
         Self {
             model: None,
-            initial_densities: Vec::new(),
-            initial_asymmetries: Vec::new(),
+            initial_densities: HashMap::new(),
+            initial_asymmetries: HashMap::new(),
             beta_range: (1e-20, 1e0),
-            in_equilibrium: Vec::new(),
-            no_asymmetry: Vec::new(),
+            in_equilibrium: HashSet::new(),
+            no_asymmetry: HashSet::new(),
             logger: Box::new(|_, _, _| {}),
             step_precision: StepPrecision::default(),
             error_tolerance: 1e-4,
@@ -150,7 +142,8 @@ impl<M> SolverBuilder<M> {
     /// If unspecified, all number densities are assumed to be in equilibrium to
     /// begin with.
     ///
-    /// Repeated initial conditions will result in an error.
+    /// Repeated initial conditions are combined together with any duplicates
+    /// overiding previous calls.
     pub fn initial_densities<I>(mut self, n: I) -> Self
     where
         I: IntoIterator<Item = (usize, f64)>,
@@ -167,8 +160,8 @@ impl<M> SolverBuilder<M> {
     ///
     /// If unspecified, all asymmetries are assumed to be 0 to begin with.
     ///
-    /// The list of number density asymmetries must be in the same order as the
-    /// particles in the model.
+    /// Repeated initial conditions are combined together with any duplicates
+    /// overiding previous calls.
     pub fn initial_asymmetries<I>(mut self, na: I) -> Self
     where
         I: IntoIterator<Item = (usize, f64)>,
@@ -226,8 +219,7 @@ impl<M> SolverBuilder<M> {
     ///
     /// These particles are specified by their index.
     ///
-    /// Multiple calls of this function will combine the results together, and
-    /// any (accidental) duplications are removed by [`SolverBuilder::build`].
+    /// Multiple calls of this function will combine the results together.
     pub fn in_equilibrium<I>(mut self, eq: I) -> Self
     where
         I: IntoIterator<Item = usize>,
@@ -244,8 +236,7 @@ impl<M> SolverBuilder<M> {
     ///
     /// These particles are specified by their index.
     ///
-    /// Multiple calls of this function will combine the results together, and
-    /// any (accidental) duplications are removed by [`SolverBuilder::build`].
+    /// Multiple calls of this function will combine the results together.
     pub fn no_asymmetry<I>(mut self, na: I) -> Self
     where
         I: IntoIterator<Item = usize>,
@@ -295,14 +286,16 @@ impl<M> SolverBuilder<M> {
     /// `$p_\text{min} \beta$` even if this results in a larger local error than
     /// desired.
     ///
-    /// # Panic
+    /// # Panics
     ///
-    /// This will panic if `$p_\text{min} \geq p_\text{max}$`.
+    /// This will panic if `$p_\text{min} \geq p_\text{max}$` or if
+    /// `$p_\text{min}$` is negative.
     pub fn step_precision(mut self, min: f64, max: f64) -> Self {
         assert!(
             min < max,
             "Minimum step precision must be smaller than the maximum step precision."
         );
+        assert!(min >= 0.0, "Minimum step precision cannot be negative.");
         self.step_precision = StepPrecision { min, max };
         self
     }
@@ -316,6 +309,10 @@ impl<M> SolverBuilder<M> {
     /// inaccurate.  Furthermore, the [`Solver::step_precision`] takes
     /// precedence and thus if a large minimum step precision is requested, the
     /// local error may be larger than the error tolerance.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the tolerance is less than or equal to 0.
     pub fn error_tolerance(mut self, tol: f64) -> Self {
         assert!(tol > 0.0, "The tolerance must be greater than 0.");
         self.error_tolerance = tol;
@@ -354,20 +351,20 @@ impl<M> SolverBuilder<M> {
 
     /// Check the validity of the initial densities, making sure we have the
     /// right number of initial conditions and they are all finite.
-    fn generate_initial_densities<I>(
+    fn generate_initial_densities<'a, I>(
         beta: f64,
         particles: &[Particle],
         initial_densities: I,
     ) -> Result<Array1<f64>, Error>
     where
-        I: IntoIterator<Item = (usize, f64)>,
+        I: IntoIterator<Item = (&'a usize, &'a f64)>,
     {
         let mut n: Array1<_> = particles
             .iter()
             .map(|p| p.normalized_number_density(0.0, beta))
             .collect();
 
-        for (i, ni) in initial_densities {
+        for (&i, &ni) in initial_densities {
             if let Some(v) = n.get_mut(i) {
                 *v = ni;
             } else {
@@ -389,16 +386,16 @@ impl<M> SolverBuilder<M> {
 
     /// Check the validity of the initial asymmetries, making sure we have the
     /// right number of initial conditions and they are all finite.
-    fn generate_initial_asymmetries<I>(
+    fn generate_initial_asymmetries<'a, I>(
         particles: &[Particle],
         initial_asymmetries: I,
     ) -> Result<Array1<f64>, Error>
     where
-        I: IntoIterator<Item = (usize, f64)>,
+        I: IntoIterator<Item = (&'a usize, &'a f64)>,
     {
         let mut na = Array1::zeros(particles.len());
 
-        for (i, nai) in initial_asymmetries {
+        for (&i, &nai) in initial_asymmetries {
             if let Some(v) = na.get_mut(i) {
                 *v = nai;
             } else {
@@ -434,11 +431,7 @@ where
             1.02 * beta_range.1,
         ]
         .iter()
-        .chain(&rec_geomspace(
-            beta_range.0,
-            beta_range.1,
-            PRECOMPUTE_SUBDIV,
-        ))
+        .chain(&ec_geomspace(beta_range.0, beta_range.1, PRECOMPUTE_SUBDIV))
         .enumerate()
         {
             if i % 1024 == 3 {
@@ -448,7 +441,7 @@ where
                     2_usize.pow(PRECOMPUTE_SUBDIV)
                 );
             } else if i % 128 == 3 {
-                log::debug!(
+                log::trace!(
                     "Precomputing step {} / {}",
                     i - 3,
                     2_usize.pow(PRECOMPUTE_SUBDIV)
@@ -458,7 +451,7 @@ where
             model.set_beta(beta);
             let c = model.as_context();
 
-            for interaction in model.interactions() {
+            for &interaction in model.interactions() {
                 interaction.gamma(&c, false);
             }
         }
@@ -488,14 +481,8 @@ where
                     i - 3,
                     2_usize.pow(PRECOMPUTE_SUBDIV)
                 );
-            } else if i % 64 == 3 {
+            } else if i % 128 == 3 {
                 log::debug!(
-                    "Precomputing step {} / {}",
-                    i - 3,
-                    2_usize.pow(PRECOMPUTE_SUBDIV)
-                );
-            } else if i >= 3 {
-                log::trace!(
                     "Precomputing step {} / {}",
                     i - 3,
                     2_usize.pow(PRECOMPUTE_SUBDIV)
@@ -525,40 +512,18 @@ where
 
         // If no initial densities were given, all particles are assumed to be
         // in equilibrium.
-
-        let initial_densities_len = self.initial_densities.len();
-        self.initial_densities.sort_unstable_by_key(|t| t.0);
-        self.initial_densities.dedup_by_key(|t| t.0);
-        if initial_densities_len != self.initial_densities.len() {
-            log::error!("At least one initial number density was specified twice.");
-            return Err(Error::DuplicateInitialDensities);
-        }
-        let initial_densities = Self::generate_initial_densities(
-            beta_range.0,
-            &particles,
-            self.initial_densities.iter().cloned(),
-        )?;
+        let initial_densities =
+            Self::generate_initial_densities(beta_range.0, &particles, &self.initial_densities)?;
 
         // If no initial asymmetries were given, all particles are assumed to be
         // in equilibrium with no asymmetry.
-        let initial_asymmetries_len = self.initial_asymmetries.len();
-        self.initial_asymmetries.sort_unstable_by_key(|t| t.0);
-        self.initial_asymmetries.dedup_by_key(|t| t.0);
-        if initial_asymmetries_len != self.initial_asymmetries.len() {
-            log::error!("At least one initial number density was specified twice.");
-            return Err(Error::DuplicateInitialAsymmetries);
-        }
-        let initial_asymmetries = Self::generate_initial_asymmetries(
-            &particles,
-            self.initial_asymmetries.iter().cloned(),
-        )?;
+        let initial_asymmetries =
+            Self::generate_initial_asymmetries(&particles, &self.initial_asymmetries)?;
 
         // Make sure that there aren't too many particles held in equilibrium or
         // forbidden from developing any asymmetry.  We also sort and remove
         // duplicates.  For the asymmetries, any particle which is its own
         // antiparticle is also prevented from developing an asymmetry.
-        self.in_equilibrium.sort_unstable();
-        self.in_equilibrium.dedup();
         if self.in_equilibrium.len() > particles.len() {
             log::error!("There are more particles held in equilibrium ({}) than particles in the model ({}).",
                         self.in_equilibrium.len(),
@@ -574,8 +539,6 @@ where
                     None
                 }
             }));
-        self.no_asymmetry.sort_unstable();
-        self.no_asymmetry.dedup();
         if self.no_asymmetry.len() > particles.len() {
             log::error!(
                 "There are more particles with 0 asymmetry ({}) than particles in the model ({}).",
@@ -587,9 +550,9 @@ where
 
         // Run the precomputations so that the solver can run multiple times
         // later.
-        if self.precompute {
-            Self::do_precompute(&mut model, beta_range);
-        }
+        // if self.precompute {
+        //     Self::do_precompute(&mut model, beta_range);
+        // }
 
         Ok(Solver {
             model,
@@ -602,7 +565,7 @@ where
             step_precision: self.step_precision,
             error_tolerance: self.error_tolerance,
             fast_interactions: self.fast_interactions,
-            abort_when_inaccurate: self.abort_when_inaccurate,
+            // abort_when_inaccurate: self.abort_when_inaccurate,
         })
     }
 }

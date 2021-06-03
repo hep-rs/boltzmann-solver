@@ -336,7 +336,9 @@ use crate::{
 use ndarray::{prelude::*, Zip};
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
-use std::{collections::HashSet, convert::TryFrom, error, fmt, mem, ops, ptr, sync::RwLock};
+use std::{
+    collections::HashSet, convert::TryFrom, error, fmt, io::Write, mem, ops, ptr, sync::RwLock,
+};
 
 /// Error type returned by the solver builder in case there is an error.
 #[derive(Debug)]
@@ -462,7 +464,7 @@ impl Workspace {
             .and(&mut self.dna)
             .and(&mut self.dna_err)
             .and(&self.ka[i])
-            .apply(|dn, dn_err, &ki, dna, dna_err, &kai| {
+            .for_each(|dn, dn_err, &ki, dna, dna_err, &kai| {
                 *dn += bi * ki;
                 *dn_err += ei * ki;
                 *dna += bi * kai;
@@ -476,14 +478,12 @@ impl Workspace {
         self.dn_err
             .iter()
             .chain(&self.dna_err)
-            .zip(self.dn.iter().chain(&self.dna))
-            .fold(0_f64, |result, (&error, &value)| {
+            // .zip(self.dn.iter().chain(&self.dna))
+            .fold(0_f64, |result, &error| {
                 if result.is_nan() || error.is_nan() {
                     f64::NAN
-                } else if value == 0.0 {
-                    result.max(error.abs())
                 } else {
-                    result.max((error / value).abs())
+                    result.max((error).abs())
                 }
             })
     }
@@ -514,13 +514,13 @@ pub struct Solver<M> {
     initial_densities: Array1<f64>,
     initial_asymmetries: Array1<f64>,
     beta_range: (f64, f64),
-    in_equilibrium: Vec<usize>,
-    no_asymmetry: Vec<usize>,
+    in_equilibrium: HashSet<usize>,
+    no_asymmetry: HashSet<usize>,
     logger: LoggerFn<M>,
     step_precision: StepPrecision,
     error_tolerance: f64,
     fast_interactions: bool,
-    abort_when_inaccurate: bool,
+    // abort_when_inaccurate: bool,
 }
 
 impl<M> Solver<M>
@@ -568,67 +568,172 @@ where
     /// - Particles which have no asymmetry, irrespective if any interaction
     ///   going on.
     /// - Handle and equilibriate fast interaction (if applicable).
-    ///
-    /// As the fast interaction handling is done only to linear order (see
-    /// [`InteractionParticles::fast_interaction`]), the changes have to be
-    /// applied repeatedly until the changes converge.  If there are no fast
-    /// interactions, then `fast_interactions` should be an empty slice.
     #[allow(clippy::similar_names)]
-    fn fix_equilibrium(
-        &self,
-        c: &Context<M>,
-        fast_interactions: &[InteractionParticles],
-        workspace: &mut Workspace,
-    ) {
-        let (mut ni, mut nai);
+    fn fix_equilibrium(&self, c: &Context<M>, workspace: &mut Workspace) {
+        // We cannot modify the values of n themselves, so we create local
+        // copies which are recomputed every time.  These begin by taking into
+        // account the Runge-Kutta changes and they will be continuously
+        // updated.  The final dn and dna will be then computed by comparing the
+        // converged local n and na to the original.
+        let (mut n, mut na) = (&c.n + &workspace.dn, &c.na + &workspace.dna);
 
-        let mut delta_sums: Vec<_> = iter::repeat((0.0, 0.0))
-            .take(fast_interactions.len())
-            .collect();
-        let mut deltas: Vec<_>;
-
+        // log::trace!(
+        //     "[{}.{}|{:.3e}] Fast Interactions: {}",
+        //     c.step,
+        //     c.substep,
+        //     c.beta,
+        //     c.fast_interactions
+        //         .as_ref()
+        //         .map_or(0, |fi| fi.read().unwrap().len())
+        // );
+        let mut count = 0_usize;
         loop {
-            // Update the number densities with Runge-Kutta changes and the
-            // changes computed thus far from fast interactions.
-            ni = &c.n + &workspace.dn;
-            nai = &c.na + &workspace.dna;
+            // Go through all fast interactions and apply the change to the
+            // number densities.  We also store the deltas applied to determine
+            // convergence.
+            let deltas = c
+                .fast_interactions
+                .as_ref()
+                .map_or_else(Vec::new, |fast_interactions| {
+                    fast_interactions
+                        .read()
+                        .unwrap()
+                        .iter()
+                        .map(|interaction| {
+                            // Fix equilibrium
+                            for &p in &self.in_equilibrium {
+                                n[p] = c.eqn[p];
+                            }
+                            for &p in &self.no_asymmetry {
+                                na[p] = 0.0;
+                            }
 
-            // Compute all the deltas from the fast interactions, stored as
-            // tuples with the symmetric and asymmetric components.  Also keep
-            // track of cumulative changes.
-            deltas = fast_interactions
-                .iter()
-                .zip(&mut delta_sums)
-                .map(|(interaction, delta_sum)| {
-                    let result = interaction.fast_interaction(&ni, &nai, &c.eq);
+                            let result = interaction.fast_interaction(&n, &na, &c.eqn);
 
-                    *workspace += &result;
+                            n += &result.dn;
+                            na += &result.dna;
 
-                    delta_sum.0 += result.symmetric_delta;
-                    delta_sum.1 += result.asymmetric_delta;
-
-                    (result.symmetric_delta, result.asymmetric_delta)
-                })
-                .collect();
+                            (result.symmetric_delta, result.asymmetric_delta)
+                        })
+                        .collect()
+                });
 
             // Fix equilibrium
-            for &eq in &self.in_equilibrium {
-                workspace.dn[eq] = c.eq[eq] - workspace.n[eq];
+            for &p in &self.in_equilibrium {
+                n[p] = c.eqn[p];
             }
-            for &eq in &self.no_asymmetry {
-                workspace.dna[eq] = -workspace.na[eq];
+            for &p in &self.no_asymmetry {
+                na[p] = 0.0;
             }
 
-            let equilibrium = fast_interactions.is_empty()
-                || delta_sums.iter().zip(deltas).all(|(delta_sum, delta)| {
-                    // Either the most recent change is 0, or the incremental change is small.
-                    (delta.0.abs() == 0.0 || (delta.0 / delta_sum.0).abs() < 1e-8)
-                        && (delta.1.abs() == 0.0 || (delta.1 / delta_sum.1).abs() < 1e-8)
+            let equilibrium = deltas.is_empty()
+                || deltas.iter().all(|(symmetric_delta, asymmetric_delta)| {
+                    symmetric_delta.abs() < 1e-8 && asymmetric_delta.abs() < 1e-12
                 });
             if equilibrium {
                 break;
             }
+
+            count += 1;
+            if count >= 30 {
+                // if count == 30 {
+                //     let mut s = String::new();
+                //     for interaction in fast_interactions {
+                //         s.push_str(&interaction.display(c.model).unwrap());
+                //         s.push('|');
+                //     }
+                //     s.pop();
+                //     log::error!("Interactions: {}", s);
+                // }
+                log::error!(
+                    "[{}.{}|{:.3e}] Local δ:\n[{:?}]",
+                    c.step,
+                    c.substep,
+                    c.beta,
+                    deltas
+                );
+                if count > 60 {
+                    log::error!(
+                        "[{}.{}|{:.3e}] Unable to converge fast interactions after 60 iterations.",
+                        c.step,
+                        c.substep,
+                        c.beta,
+                    );
+                    panic!();
+                    // break;
+                }
+            }
         }
+
+        workspace.dn = n - &c.n;
+        workspace.dna = na - &c.na;
+    }
+
+    /// Compute the adjustment to the step size based on the local error.
+    ///
+    /// Given a local error estimate of `$\tilde\varepsilon$` and target local
+    /// error `$\varepsilon$`, the new step size should be:
+    ///
+    /// ```math
+    /// h_{\text{new}} = h \times \underbrace{S \sqrt[p + 1]{\frac{\varepsilon}{\tilde \varepsilon}}}_{\Delta}
+    /// ```
+    ///
+    /// where `$S \in [0, 1]$` is a safety factor to purposefully underestimate
+    /// the result.  The values of `\Delta` are bounded so as to avoid too
+    /// step size adjustments.
+    fn delta(&self, err: f64) -> f64 {
+        use tableau::RK_ORDER;
+
+        let delta = 0.8 * (self.error_tolerance / err).powf(1.0 / f64::from(RK_ORDER + 1));
+
+        if delta.is_nan() {
+            0.1
+        } else {
+            delta.clamp(0.1, 2.0)
+        }
+
+        // Ensure that h is within the desired range of step sizes.
+        // let h_on_beta = h / beta;
+        // if h_on_beta > self.step_precision.max {
+        //     h = beta * self.step_precision.max;
+        //     log::info!(
+        //         "[{}|{:.3e}] Step size too large, decreased h to {:.3e}",
+        //         step,
+        //         beta,
+        //         h
+        //     );
+        // } else if h_on_beta < self.step_precision.min {
+        //     h = beta * self.step_precision.min;
+        //     log::info!(
+        //         "[{}|{:.3e}] Step size too small, increased h to {:.3e}",
+        //         step,
+        //         beta,
+        //         h
+        //     );
+
+        //     // Stop integration or force going ahead if the local error is too large.
+        //     if self.abort_when_inaccurate {
+        //         log::warn!(
+        //             "[{}|{:.3e}] Aborting integration due to inaccuracy.",
+        //             step,
+        //             beta,
+        //         );
+        //         break;
+        //     }
+        //     advance = true;
+
+        //     // Give a warning, but only do so once.
+        //     if !inaccurate_warned {
+        //         log::warn!(
+        //             "[{}|{:.3e}] Step size too small at β.  Result may not be accurate",
+        //             step,
+        //             beta,
+        //         );
+        //         inaccurate_warned = true;
+        //     }
+        // }
+
+        // h
     }
 
     /// Evolve the initial conditions by solving the PDEs.
@@ -639,7 +744,9 @@ where
     /// time-step.
     #[allow(clippy::too_many_lines)]
     pub fn solve(&mut self) -> (Array1<f64>, Array1<f64>) {
-        use tableau::{RK_A, RK_C, RK_ORDER, RK_S};
+        use tableau::{RK_A, RK_C, RK_S};
+
+        const BETA_LOG_STEP: f64 = 1.0;
 
         // Initialize all the variables that will be used in the integration
         let mut workspace = Workspace::new(&self.initial_densities, &self.initial_asymmetries);
@@ -649,57 +756,46 @@ where
         let mut evals = 0_u64;
         let mut beta = self.beta_range.0;
         let mut h = beta * f64::sqrt(self.step_precision.min * self.step_precision.max);
-        let mut advance;
-        let mut inaccurate_warned = false;
+        let mut beta_logging = beta * BETA_LOG_STEP;
 
         // Run logger for 0th step
         {
             self.model.set_beta(beta);
-            let c = self.context(step, None, h, beta, &workspace.n, &workspace.na);
+            let c = self.context(
+                step,
+                None,
+                h,
+                (beta, beta + h),
+                &workspace.n,
+                &workspace.na,
+                None,
+            );
             (*self.logger)(&c, &workspace.dn, &workspace.dna);
         }
 
         while beta < self.beta_range.1 {
             step += 1;
-            advance = false;
             workspace.clear_step();
-
-            // Ensure that h is within the desired range of step sizes.
-            let h_on_beta = h / beta;
-            if h_on_beta > self.step_precision.max {
-                h = beta * self.step_precision.max;
-                log::trace!("Step size too large, decreased h to {:.3e}", h);
-            } else if h_on_beta < self.step_precision.min {
-                h = beta * self.step_precision.min;
-                log::debug!("Step size too small, increased h to {:.3e}", h);
-
-                // Stop integration or force going ahead if the local error is too large.
-                if self.abort_when_inaccurate {
-                    break;
-                } else {
-                    if !inaccurate_warned {
-                        log::warn!("Step size too small.  Result may not be accurate");
-                        inaccurate_warned = true;
-                    }
-                    advance = true;
-                }
-            }
 
             // Log the progress of the integration
             if step % 100 == 0 {
-                log::info!("Step {}, β = {:.4e}", step, beta);
+                log::info!("Step {}, β = {:.4e}, h = {:.4e}", step, beta, h);
             } else if step % 10 == 0 {
-                log::debug!("Step {}, β = {:.4e}", step, beta);
+                log::debug!("Step {}, β = {:.4e}, h = {:.4e}", step, beta, h);
             } else {
                 log::trace!("Step {}, β = {:.4e}, h = {:.4e}", step, beta, h);
             }
-            log::trace!("      n = {:<+10.3e}", workspace.n);
-            log::trace!("     na = {:<+10.3e}", workspace.na);
+            // log::trace!("[{}|{:.3e}]       n = {:<+10.3e}", step, beta, workspace.n);
+            // log::trace!("[{}|{:.3e}]      na = {:<+10.3e}", step, beta, workspace.na);
 
-            let mut i = 0;
-            let fast_interactions = loop {
-                // DEBUG
-                // log::trace!("i = {}", i);
+            // Initialize the fast interactions if they are being used
+            let mut fast_interactions = if self.fast_interactions {
+                Some(RwLock::new(HashSet::new()))
+            } else {
+                None
+            };
+
+            for i in 0..RK_S {
                 evals += 1;
 
                 // Compute the sub-step values
@@ -712,71 +808,72 @@ where
                     total + ai[j] * &workspace.ka[j]
                 });
                 self.model.set_beta(beta_i);
-                let ci = self.context(step, Some(i), h, beta_i, &ni, &nai);
+                let ci = self.context(
+                    step,
+                    Some(i),
+                    h,
+                    (beta_i, beta + h),
+                    &ni,
+                    &nai,
+                    fast_interactions,
+                );
 
                 // Compute k[i] and ka[i] from each interaction
                 self.compute_ki(&mut workspace.k[i], &mut workspace.ka[i], &ci);
 
+                fast_interactions = ci.into_fast_interactions();
                 workspace.compute_dn(i);
-
-                i += 1;
-                if i >= RK_S {
-                    break ci.into_fast_interactions();
-                }
-            };
+            }
 
             self.model.set_beta(beta);
-            let c = self.context(step, None, h, beta, &workspace.n, &workspace.na);
-            self.fix_equilibrium(&c, &fast_interactions, &mut workspace);
+            let c = self.context(
+                step,
+                None,
+                h,
+                (beta, beta + h),
+                &workspace.n,
+                &workspace.na,
+                fast_interactions,
+            );
+            // log::trace!("[{}|{:.3e}]      eq = {:<+10.3e}", step, beta, c.eq);
+            self.fix_equilibrium(&c, &mut workspace);
 
             let err = workspace.local_error();
 
-            // If the error is[{}]  within the tolerance, we'll be advancing the
+            // If the error is within the tolerance, we'll be advancing the
             // iteration step
             if err < self.error_tolerance {
-                advance = true;
-                log::trace!("     dn = {:<+10.3e}", workspace.dn);
-                log::trace!("    dna = {:<+10.3e}", workspace.dna);
+                if beta > beta_logging || beta >= self.beta_range.1 {
+                    (*self.logger)(&c, &workspace.dn, &workspace.dna);
+                    beta_logging = beta * BETA_LOG_STEP;
+                }
+
+                workspace.advance();
+                beta += h;
             } else if log::log_enabled!(log::Level::Trace) {
                 log::trace!(
-                    "Error is not within tolerance ({:e} > {:e}).",
+                    "[{}|{:.3e}] Error is not within tolerance ({:e} > {:e}).",
+                    step,
+                    beta,
                     err,
                     self.error_tolerance
                 );
-                log::trace!(" n_err = {:<+10.3e}", workspace.dn_err);
-                log::trace!("na_err = {:<+10.3e}", workspace.dna_err);
-            }
-
-            // Compute the change in step size based on the current error an[{}] d
-            // correspondingly adjust the step size
-            let delta = if err == 0.0 {
-                10.0
-            } else if err.is_nan() {
-                0.0
-            } else {
-                0.9 * (self.error_tolerance / err).powf(1.0 / f64::from(RK_ORDER + 1))
-            };
-            let mut h_est = h * delta;
-
-            // Update n and beta
-            if advance {
-                // Advance n and beta
-                workspace.advance();
-                beta += h;
-
-                (*self.logger)(&c, &workspace.dn, &workspace.dna);
-            } else {
                 steps_discarded += 1;
-                log::trace!("Discarding integration step.");
+                log::trace!("[{}|{:.3e}] Discarding integration step.", step, beta);
             }
+
+            // Adjust the step size based on the error
+            h *= self.delta(err);
 
             // Adjust final integration step if needed
-            if beta + h_est > self.beta_range.1 {
-                log::trace!("Fixing overshoot of last integration step.");
-                h_est = self.beta_range.1 - beta;
+            if beta + h > self.beta_range.1 {
+                log::trace!(
+                    "[{}|{:.3e}] Fixing overshoot of last integration step.",
+                    step,
+                    beta
+                );
+                h = self.beta_range.1 - beta;
             }
-
-            h = h_est;
         }
 
         log::info!("Number of integration steps: {}", step);
@@ -812,13 +909,18 @@ where
         let na = Array1::zeros(n.dim());
 
         for (i, &beta) in Array1::geomspace(self.beta_range.0, self.beta_range.1, size)
-            .unwrap()
-            .into_iter()
+            .unwrap_or(ndarray::array![])
+            .iter()
             .enumerate()
         {
+            if log::log_enabled!(log::Level::Info) {
+                print!("Step {:>5} / {}", i, size);
+                std::io::stdout().flush().unwrap_or(());
+            }
+
             self.model.set_beta(beta);
             gammas[[i, 0]] = Some(beta);
-            let mut c = self.context(0, None, 1.0, beta, &n, &na);
+            let mut c = self.context(0, None, 1.0, (beta, beta), &n, &na, None);
             c.n = c.eq.clone();
             let normalization = if normalize { c.normalization } else { 1.0 };
 
@@ -869,13 +971,13 @@ where
         let na = Array1::zeros(n.dim());
 
         for (i, &beta) in Array1::geomspace(self.beta_range.0, self.beta_range.1, size)
-            .unwrap()
-            .into_iter()
+            .unwrap_or_else(|| Array1::zeros(10))
+            .iter()
             .enumerate()
         {
             self.model.set_beta(beta);
             gammas[[i, 0]] = Some(beta);
-            let mut c = self.context(0, None, 1.0, beta, &n, &na);
+            let mut c = self.context(0, None, 1.0, (beta, beta), &n, &na, None);
             c.n = c.eq.clone();
             let normalization = if normalize { c.normalization } else { 1.0 };
 
@@ -930,14 +1032,16 @@ where
 {
     /// Generate the context at a given beta to pass to the logger/interaction
     /// functions.
+    #[allow(clippy::too_many_arguments)]
     fn context(
         &self,
         step: u64,
         substep: Option<usize>,
         step_size: f64,
-        beta: f64,
+        (beta, next_beta): (f64, f64),
         n: &Array1<f64>,
         na: &Array1<f64>,
+        fast_interactions: Option<RwLock<HashSet<InteractionParticles>>>,
     ) -> Context<M> {
         let hubble_rate = self.model.hubble_rate(beta);
         let normalization =
@@ -951,14 +1055,11 @@ where
             hubble_rate,
             normalization,
             eq: equilibrium_number_densities(self.model.particles(), beta),
+            eqn: equilibrium_number_densities(self.model.particles(), next_beta),
             n: n.clone(),
             na: na.clone(),
             model: &self.model,
-            fast_interactions: if self.fast_interactions {
-                Some(RwLock::new(Vec::new()))
-            } else {
-                None
-            },
+            fast_interactions,
         }
     }
 }
