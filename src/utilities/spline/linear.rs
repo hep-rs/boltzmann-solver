@@ -19,6 +19,10 @@ impl ConstLinearSpline {
     ///
     /// For values of `x` outside of the domain of the underlying data, the
     /// boundary value is returned.
+    ///
+    /// # Panics
+    ///
+    /// The value of `x` cannot be NaN.
     #[must_use]
     pub fn sample(&self, x: f64) -> f64 {
         match self
@@ -117,6 +121,10 @@ impl LinearSpline {
     ///
     /// Any addition to the spline which extends the interval will result in the
     /// new interval being marked as inaccurate.
+    ///
+    /// # Panics
+    ///
+    /// The value of `x` cannot be NaN.
     pub fn add(&mut self, x: f64, y: f64) {
         match self.data.binary_search_by(|p| p.x.partial_cmp(&x).unwrap()) {
             Ok(_) => (),
@@ -148,6 +156,10 @@ impl LinearSpline {
     /// automatically determined to be false.  If the `x` value is a known
     /// control point, then `true` is returned even if the interval on either
     /// side might not be accurate.
+    ///
+    /// # Panics
+    ///
+    /// The value of `x` cannot be NaN.
     #[must_use]
     pub fn accurate(&self, x: f64) -> bool {
         match self.data.binary_search_by(|p| p.x.partial_cmp(&x).unwrap()) {
@@ -162,6 +174,10 @@ impl LinearSpline {
     ///
     /// For values of `x` outside of the domain of the underlying data, the
     /// boundary value is returned.
+    ///
+    /// # Panics
+    ///
+    /// The value of `x` cannot be NaN.
     #[must_use]
     pub fn sample(&self, x: f64) -> f64 {
         match self.data.binary_search_by(|p| p.x.partial_cmp(&x).unwrap()) {
