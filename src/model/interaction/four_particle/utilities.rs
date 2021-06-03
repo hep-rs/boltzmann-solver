@@ -685,7 +685,7 @@ mod tests {
     use crate::{prelude::Particle, utilities::test::approx_eq};
     use ndarray::Array1;
     use serde::{Deserialize, Serialize};
-    use std::{env::temp_dir, error, fs, path::Path};
+    use std::{env::temp_dir, error, fs, io::BufReader, path::Path};
 
     /// Shorthand to create the CSV file in the appropriate directory and with
     /// headers.
@@ -778,7 +778,9 @@ mod tests {
         }
 
         // Data generated randomly
-        let mut csv = csv::Reader::from_path("tests/data/t_range_random.csv")?;
+        let mut csv = csv::Reader::from_reader(zstd::Decoder::with_buffer(BufReader::new(
+            fs::File::open("tests/data/t_range_random.csv.zst")?,
+        ))?);
 
         for record in csv.deserialize() {
             let row: Row = record?;
