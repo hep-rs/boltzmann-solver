@@ -203,6 +203,10 @@ impl Particle {
     /// or more generally, for half-integer spins `n/2`, the degrees of freedom
     /// is `n + 1`; and for integer spin `n > 0`, the degrees of freedom are `2`
     /// for massless or `2n + 1` for massive.
+    ///
+    /// # Panics
+    ///
+    /// Panics if a particle with spin greater than 2 is given.
     #[must_use]
     pub fn degrees_of_freedom(&self) -> f64 {
         let dof = self.dof * if self.complex { 2.0 } else { 1.0 };
