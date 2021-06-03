@@ -9,10 +9,13 @@ Mass /: MakeBoxes[Mass[Planck], TraditionalForm] = SubscriptBox["M", "Pl"];
 Mass /: MakeBoxes[Mass[ReducedPlanck], TraditionalForm] = SubscriptBox["m", "Pl"];
 
 N[Mass[Planck], precision_:MachinePrecision] := N[
-  UnitConvert[Quantity["PlanckMass"], "Gigaelectronvolts" / "SpeedOfLight"^2] // QuantityMagnitude
+  SetPrecision[
+    UnitConvert[Quantity["PlanckMass"], "Gigaelectronvolts" / "SpeedOfLight"^2] // QuantityMagnitude,
+    Infinity
+  ]
   ,
   precision
-];
+]
 N[Mass[ReducedPlanck], precision_:MachinePrecision] := N[Mass[Planck]/Sqrt[8 Pi], precision];
 
 Mass /: NumberQ[Mass[m:(Planck|ReducedPlanck)]] = True;
