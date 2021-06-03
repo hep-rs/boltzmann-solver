@@ -6,4 +6,5 @@ pub use crate::{
         Particle, StandardModel,
     },
     solver::{Context, Solver, SolverBuilder},
+    statistic::Statistics,
 };
