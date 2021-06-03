@@ -138,9 +138,8 @@
 #![warn(missing_docs)]
 #![warn(clippy::all)]
 #![warn(clippy::pedantic)]
-#![allow(clippy::doc_markdown)]
 #![allow(clippy::non_ascii_literal)]
-#![allow(clippy::cast_precision_loss)] // Check this warning occasionally
+// #![allow(clippy::cast_precision_loss)] // Check this warning occasionally
 
 #[cfg(feature = "nightly")]
 extern crate test;
