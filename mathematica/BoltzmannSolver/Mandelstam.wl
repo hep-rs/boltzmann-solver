@@ -12,7 +12,7 @@ Begin["`Private`"];
 (* ****************** *)
 
 MandelstamTRange::invalids12 = "The Mandelstam s value must be larger than (m1 + m2)^2.";
-MandelstamTRange::invalids34 = "The Mandelstam s value must be larger than (m1 + m2)^2.";
+MandelstamTRange::invalids34 = "The Mandelstam s value must be larger than (m3 + m4)^2.";
 
 Attributes[MandelstamTRange] = {Listable, NumericFunction};
 
@@ -31,7 +31,7 @@ MandelstamTRange[s_?InexactNumberQ, m1_?InexactNumberQ, m2_?InexactNumberQ, m3_?
     cosine = Sqrt[X`Kallen\[Lambda][s, m1^2, m2^2]] Sqrt[X`Kallen\[Lambda][s, m3^2, m4^2]] / (2 s)
   },
   If[s < (m1 + m2)^2, Message[MandelstamTRange::invalids12] ];
-  If[s < (m3 + m4)^2, Message[MandelstamTRange::invalids12] ];
+  If[s < (m3 + m4)^2, Message[MandelstamTRange::invalids34] ];
   {baseline - cosine, baseline + cosine}
 ];
 
