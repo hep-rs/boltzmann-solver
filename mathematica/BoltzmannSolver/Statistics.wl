@@ -381,7 +381,7 @@ NormalizedNumberDensity /: MakeBoxes[NormalizedNumberDensity[s : (FermiDirac | B
   }
   ,
   RowBox[{
-    SubscriptBox["n", "FD"],
+    SubscriptBox["n", stat],
     "(",
     MakeBoxes[beta, TraditionalForm],
     ")"
@@ -399,7 +399,7 @@ NormalizedNumberDensity /: MakeBoxes[NormalizedNumberDensity[s : (FermiDirac | B
   }
   ,
   RowBox[{
-    SubscriptBox["n", "FD"],
+    SubscriptBox["n", stat],
     "(",
     MakeBoxes[beta, TraditionalForm],
     ";",
@@ -419,7 +419,7 @@ NormalizedNumberDensity /: MakeBoxes[NormalizedNumberDensity[s : (FermiDirac | B
   }
   ,
   RowBox[{
-    SubscriptBox["n", "FD"],
+    SubscriptBox["n", stat],
     "(",
     MakeBoxes[beta, TraditionalForm],
     ";",
