@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 use std::{
     cmp::{self, Ordering},
     collections::HashMap,
-    convert::TryFrom,
     error, fmt, hash, ops,
     sync::RwLock,
 };
@@ -60,33 +59,15 @@ impl AbsRelConvergency {
 
 impl roots::Convergency<f64> for AbsRelConvergency {
     fn is_root_found(&mut self, y: f64) -> bool {
-        // log::trace!(
-        //     "Iter {} - is root: {:e} < {:e}",
-        //     self.iter.read().unwrap(),
-        //     y.abs(),
-        //     self.abs
-        // );
         y.abs() < self.abs
     }
 
     fn is_converged(&mut self, x1: f64, x2: f64) -> bool {
         let delta = (x1 - x2).abs();
-        // log::trace!(
-        //     "Iter {} - is converged [{:e}, {:e}]: {:e} < {:e} || {:e} < {:e} = {}",
-        //     self.iter.read().unwrap(),
-        //     x1,
-        //     x2,
-        //     delta,
-        //     self.abs,
-        //     delta / (x1.abs() + x2.abs()),
-        //     self.rel,
-        //     delta < self.abs || delta / (x1.abs() + x2.abs()) < self.rel
-        // );
         delta < self.abs || delta / (x1.abs() + x2.abs()) < self.rel
     }
 
     fn is_iteration_limit_reached(&mut self, iter: usize) -> bool {
-        log::trace!("Iter {}", iter);
         *self.iter.write().unwrap() = iter;
         iter >= self.max_iter
     }
@@ -97,15 +78,15 @@ impl roots::Convergency<f64> for AbsRelConvergency {
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct InteractionParticles {
-    /// Initial sate particle indices.
+    /// Initial state particle indices.
     pub incoming_idx: Vec<usize>,
-    /// Final sate particle indices.
+    /// Final state particle indices.
     pub outgoing_idx: Vec<usize>,
-    /// Initial sate particle sign.  A positive sign indicates this is a
+    /// Initial state particle sign.  A positive sign indicates this is a
     /// particle, while a negative sign indicates it is an antiparticle.
     pub incoming_sign: Vec<f64>,
-    /// Final sate particle sign.  A positive sign indicates this is a particle,
-    /// while a negative sign indicates it is an antiparticle.
+    /// Final state particle sign.  A positive sign indicates this is a
+    /// particle, while a negative sign indicates it is an antiparticle.
     pub outgoing_sign: Vec<f64>,
     /// A combination of `incoming_idx` and `incoming_sign`.
     pub incoming_signed: Vec<isize>,
@@ -141,14 +122,8 @@ impl InteractionParticles {
         outgoing.sort_unstable();
 
         let mut result = Self {
-            incoming_idx: incoming
-                .iter()
-                .map(|p| usize::try_from(p.abs()).unwrap())
-                .collect(),
-            outgoing_idx: outgoing
-                .iter()
-                .map(|p| usize::try_from(p.abs()).unwrap())
-                .collect(),
+            incoming_idx: incoming.iter().map(|p| p.unsigned_abs()).collect(),
+            outgoing_idx: outgoing.iter().map(|p| p.unsigned_abs()).collect(),
             incoming_sign: incoming
                 .iter()
                 .map(|&p| match p.cmp(&0) {
@@ -165,8 +140,8 @@ impl InteractionParticles {
                     Ordering::Greater => 1.0,
                 })
                 .collect(),
-            incoming_signed: incoming.to_vec(),
-            outgoing_signed: outgoing.to_vec(),
+            incoming_signed: incoming.clone(),
+            outgoing_signed: outgoing.clone(),
 
             particle_counts: HashMap::new(),
         };
@@ -206,12 +181,12 @@ impl InteractionParticles {
     }
 
     /// Iterate over all incoming particle attributes, as a tuple `(idx, sign)`.
-    pub fn iter_incoming(&self) -> std::iter::Zip<std::slice::Iter<usize>, std::slice::Iter<f64>> {
+    pub fn iter_incoming(&self) -> impl Iterator<Item = (&usize, &f64)> {
         self.incoming_idx.iter().zip(&self.incoming_sign)
     }
 
     /// Iterate over all incoming particle attributes, as a tuple `(idx, sign)`.
-    pub fn iter_outgoing(&self) -> std::iter::Zip<std::slice::Iter<usize>, std::slice::Iter<f64>> {
+    pub fn iter_outgoing(&self) -> impl Iterator<Item = (&usize, &f64)> {
         self.outgoing_idx.iter().zip(&self.outgoing_sign)
     }
 
@@ -803,13 +778,8 @@ impl InteractionParticles {
         na: &Array1<f64>,
         eq: &Array1<f64>,
     ) -> FastInteractionResult {
-        debug_assert!(
-            n.dim() == na.dim() && n.dim() == eq.dim(),
-            "The number density, number density asymmetry and equilibrium number density array shapes must be all the same"
-        );
-
-        //         log::trace!(
-        //             r#"fast_interaction:
+        // log::trace!(
+        //     r#"fast_interaction:
         // {{
         //     "incoming": {:?},
         //     "outgoing": {:?},
@@ -817,12 +787,12 @@ impl InteractionParticles {
         //     "na": {},
         //     "eq": {}
         // }}"#,
-        //             self.incoming_signed,
-        //             self.outgoing_signed,
-        //             n,
-        //             na,
-        //             eq
-        //         );
+        //     self.incoming_signed,
+        //     self.outgoing_signed,
+        //     n,
+        //     na,
+        //     eq
+        // );
 
         let mut result = FastInteractionResult::zero(n.dim());
 
@@ -845,7 +815,7 @@ impl InteractionParticles {
             result.dna[p] += ca * result.asymmetric_delta;
         }
 
-        log::trace!("fast_interaction result: {}", result);
+        log::trace!("{}", result);
 
         result
     }
@@ -942,7 +912,13 @@ mod tests {
     use ndarray::prelude::*;
     use rand::prelude::Distribution;
     use serde::Deserialize;
-    use std::{collections::HashMap, error, f64, fs::File, io::BufReader, iter};
+    use std::{
+        collections::HashMap,
+        error, f64,
+        fs::{self, File},
+        io::BufReader,
+        iter,
+    };
 
     use super::InteractionParticles;
 
@@ -1460,7 +1436,9 @@ mod tests {
     #[test]
     fn fast_interaction_1_2() -> Result<(), Box<dyn error::Error>> {
         let interaction = super::InteractionParticles::new(&[1], &[2, 3]);
-        let mut csv = csv::Reader::from_path("tests/data/fast_interaction_1_2.csv")?;
+        let mut csv = csv::Reader::from_reader(zstd::Decoder::with_buffer(BufReader::new(
+            fs::File::open("tests/data/fast_interaction_1_2.csv.zst")?,
+        ))?);
 
         for result in csv.deserialize() {
             let data: HashMap<String, f64> = result?;
@@ -1533,7 +1511,9 @@ mod tests {
     #[test]
     fn fast_interaction_2_2() -> Result<(), Box<dyn error::Error>> {
         let interaction = super::InteractionParticles::new(&[1, 2], &[3, 4]);
-        let mut csv = csv::Reader::from_path("tests/data/fast_interaction_2_2.csv")?;
+        let mut csv = csv::Reader::from_reader(zstd::Decoder::with_buffer(BufReader::new(
+            fs::File::open("tests/data/fast_interaction_2_2.csv.zst")?,
+        ))?);
 
         for result in csv.deserialize() {
             let data: HashMap<String, f64> = result?;
@@ -1622,7 +1602,9 @@ mod tests {
     #[test]
     fn fast_interaction_1_3() -> Result<(), Box<dyn error::Error>> {
         let interaction = super::InteractionParticles::new(&[1], &[2, 3, 4]);
-        let mut csv = csv::Reader::from_path("tests/data/fast_interaction_1_3.csv")?;
+        let mut csv = csv::Reader::from_reader(zstd::Decoder::with_buffer(BufReader::new(
+            fs::File::open("tests/data/fast_interaction_1_3.csv.zst")?,
+        ))?);
 
         for result in csv.deserialize() {
             let data: HashMap<String, f64> = result?;
@@ -1722,11 +1704,11 @@ mod tests {
             eq: Vec<f64>,
             symmetric: Vec<f64>,
             asymmetric: f64,
-        };
+        }
 
-        // setup_logging(4);
-
-        let json = BufReader::new(File::open("tests/data/fast_interaction_random.json").unwrap());
+        let json = zstd::Decoder::with_buffer(BufReader::new(File::open(
+            "tests/data/fast_interaction_random.json.zst",
+        )?))?;
         let data: Vec<Entry> = serde_json::from_reader(json).unwrap();
 
         for (i, entry) in data.into_iter().enumerate() {
@@ -1760,23 +1742,6 @@ mod tests {
             }
             #[allow(clippy::cast_possible_truncation)]
             let interaction = InteractionParticles::new(&entry.incoming, &entry.outgoing);
-
-            log::trace!(
-                r#"fast_interaction {}:
-{{
-    "incoming": {:?},
-    "outgoing": {:?},
-    "n": {:?},
-    "na": {:?},
-    "eq": {:?}
-}}"#,
-                i,
-                interaction.incoming_signed,
-                interaction.outgoing_signed,
-                entry.n,
-                entry.na,
-                entry.eq
-            );
 
             let n = Array1::from(entry.n);
             let na = Array1::from(entry.na);
