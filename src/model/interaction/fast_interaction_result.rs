@@ -48,7 +48,7 @@ impl fmt::Display for FastInteractionResult {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "Fast Interaction Result: δ = {}, δ' = {}",
+            "Fast Interaction Result: δ = {:e}, δ' = {:e}",
             self.symmetric_delta, self.asymmetric_delta
         )
     }
