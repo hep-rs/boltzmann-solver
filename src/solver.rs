@@ -511,6 +511,7 @@ type LoggerFn<M> = Box<dyn Fn(&Context<M>, &Array1<f64>, &Array1<f64>)>;
 /// Boltzmann solver
 pub struct Solver<M> {
     model: M,
+    particles_next: Vec<Particle>,
     initial_densities: Array1<f64>,
     initial_asymmetries: Array1<f64>,
     beta_range: (f64, f64),
@@ -573,23 +574,12 @@ where
     ///   going on.
     /// - Handle and equilibriate fast interaction (if applicable).
     #[allow(clippy::similar_names)]
-    fn fix_equilibrium(&self, c: &Context<M>, workspace: &mut Workspace) {
-        // We cannot modify the values of n themselves, so we create local
-        // copies which are recomputed every time.  These begin by taking into
-        // account the Runge-Kutta changes and they will be continuously
-        // updated.  The final dn and dna will be then computed by comparing the
-        // converged local n and na to the original.
+    fn fix_change(&self, c: &Context<M>, workspace: &mut Workspace) {
+        // For the fast interaction to converge, we need local mutable copies of
+        // `n` and `na` which already incorporate the changes computed from the
+        // regular integration.
         let (mut n, mut na) = (&c.n + &workspace.dn, &c.na + &workspace.dna);
 
-        // log::trace!(
-        //     "[{}.{}|{:.3e}] Fast Interactions: {}",
-        //     c.step,
-        //     c.substep,
-        //     c.beta,
-        //     c.fast_interactions
-        //         .as_ref()
-        //         .map_or(0, |fi| fi.read().unwrap().len())
-        // );
         let mut count = 0_usize;
         loop {
             // Go through all fast interactions and apply the change to the
@@ -604,7 +594,7 @@ where
                         .unwrap()
                         .iter()
                         .map(|interaction| {
-                            // Fix equilibrium
+                            // Fix equilibrium before each fast interaction
                             for &p in &self.in_equilibrium {
                                 n[p] = c.eqn[p];
                             }
@@ -628,7 +618,7 @@ where
                         .collect()
                 });
 
-            // Fix equilibrium
+            // Fix equilibrium one last time
             for &p in &self.in_equilibrium {
                 n[p] = c.eqn[p];
             }
@@ -645,24 +635,7 @@ where
             }
 
             count += 1;
-            if count >= 30 {
-                // if count == 30 {
-                //     let mut s = String::new();
-                //     for interaction in fast_interactions {
-                //         s.push_str(&interaction.display(c.model).unwrap());
-                //         s.push('|');
-                //     }
-                //     s.pop();
-                //     log::error!("Interactions: {}", s);
-                // }
-                log::error!(
-                    "[{}.{}|{:.3e}] Local δ:\n[{:?}]",
-                    c.step,
-                    c.substep,
-                    c.beta,
-                    deltas
-                );
-                if count > 60 {
+            if count >= 50 {
                     log::error!(
                     "[{}.{:02}|{:>9.3e}] Unable to converge fast interactions after {} iterations.",
                         c.step,
@@ -671,8 +644,6 @@ where
                     count
                     );
                     panic!();
-                    // break;
-                }
             }
         }
 
@@ -788,6 +759,10 @@ where
             step += 1;
             workspace.clear_step();
 
+            // Compute next step particles
+            self.model.set_beta(beta + h);
+            self.particles_next = self.model.particles().to_vec();
+
             // Log the progress of the integration
             if step % 100 == 0 {
                 log::info!("Step {}, β = {:.4e}, h = {:.4e}", step, beta, h);
@@ -847,7 +822,7 @@ where
                 fast_interactions,
             );
             // log::trace!("[{}|{:.3e}]      eq = {:<+10.3e}", step, beta, c.eq);
-            self.fix_equilibrium(&c, &mut workspace);
+            self.fix_change(&c, &mut workspace);
 
             let err = workspace.local_error();
 
@@ -1066,7 +1041,7 @@ where
             hubble_rate,
             normalization,
             eq: equilibrium_number_densities(self.model.particles(), beta),
-            eqn: equilibrium_number_densities(self.model.particles(), next_beta),
+            eqn: equilibrium_number_densities(&self.particles_next, next_beta),
             n: n.clone(),
             na: na.clone(),
             model: &self.model,
