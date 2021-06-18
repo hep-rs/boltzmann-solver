@@ -422,6 +422,7 @@ where
 {
     /// Precompute the interaction rates.
     #[cfg(not(feature = "parallel"))]
+    #[allow(dead_code)]
     fn do_precompute(model: &mut M, beta_range: (f64, f64)) {
         log::info!("Pre-computing γ...");
         for (i, &beta) in vec![
@@ -431,7 +432,11 @@ where
             1.02 * beta_range.1,
         ]
         .iter()
-        .chain(&ec_geomspace(beta_range.0, beta_range.1, PRECOMPUTE_SUBDIV))
+        .chain(&rec_geomspace(
+            beta_range.0,
+            beta_range.1,
+            PRECOMPUTE_SUBDIV,
+        ))
         .enumerate()
         {
             if i % 1024 == 3 {
@@ -451,7 +456,7 @@ where
             model.set_beta(beta);
             let c = model.as_context();
 
-            for &interaction in model.interactions() {
+            for interaction in model.interactions() {
                 interaction.gamma(&c, false);
             }
         }
@@ -459,6 +464,7 @@ where
 
     /// Precompute the interaction rates.
     #[cfg(feature = "parallel")]
+    #[allow(dead_code)]
     fn do_precompute(model: &mut M, beta_range: (f64, f64)) {
         log::info!("Pre-computing γ...");
         for (i, &beta) in vec![
