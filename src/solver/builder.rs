@@ -530,6 +530,8 @@ where
                         particles.len());
             return Err(Error::TooManyInEquilibrium);
         }
+        let mut in_equilibrium: Vec<usize> = self.in_equilibrium.drain().collect();
+        in_equilibrium.sort_unstable();
 
         self.no_asymmetry
             .extend(model.particles().iter().enumerate().filter_map(|(i, p)| {
@@ -547,6 +549,8 @@ where
             );
             return Err(Error::TooManyNoAsymmetry);
         }
+        let mut no_asymmetry: Vec<usize> = self.no_asymmetry.drain().collect();
+        no_asymmetry.sort_unstable();
 
         // Run the precomputations so that the solver can run multiple times
         // later.
@@ -556,6 +560,7 @@ where
 
         Ok(Solver {
             model,
+            particles_next: Vec::new(),
             initial_densities,
             initial_asymmetries,
             beta_range,
