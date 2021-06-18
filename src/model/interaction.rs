@@ -131,7 +131,8 @@ pub trait Interaction<M: Model> {
     /// are identically 0 and thus care must be taken to handle these.
     fn symmetric_prefactor(&self, c: &Context<M>) -> f64 {
         let ((forward_numerator, forward_denominator), (backward_numerator, backward_denominator)) =
-            self.particles().symmetric_prefactor(&c.n, &c.eq);
+            self.particles()
+                .symmetric_prefactor(&c.n, &c.eq, &c.in_equilibrium);
 
         let forward_prefactor = checked_div(forward_numerator, forward_denominator);
         let backward_prefactor = checked_div(backward_numerator, backward_denominator);
@@ -191,7 +192,13 @@ pub trait Interaction<M: Model> {
     /// are identically 0 and thus care must be taken to handle these.
     fn asymmetric_prefactor(&self, c: &Context<M>) -> f64 {
         let ((forward_numerator, forward_denominator), (backward_numerator, backward_denominator)) =
-            self.particles().asymmetric_prefactor(&c.n, &c.na, &c.eq);
+            self.particles().asymmetric_prefactor(
+                &c.n,
+                &c.na,
+                &c.eq,
+                &c.in_equilibrium,
+                &c.no_asymmetry,
+            );
         let forward = checked_div(forward_numerator, forward_denominator);
         let backward = checked_div(backward_numerator, backward_denominator);
 
@@ -286,7 +293,7 @@ pub trait Interaction<M: Model> {
         let mut result = false;
 
         if overshoots(c, particles, rate) {
-            let delta = particles.symmetric_delta(&c.n, &c.eq);
+            let delta = particles.symmetric_delta(&c.n, &c.eqn, &c.in_equilibrium);
             rate.symmetric = if rate.symmetric.abs() < delta.abs() {
                 rate.symmetric
             } else {
@@ -296,7 +303,8 @@ pub trait Interaction<M: Model> {
         }
 
         if asymmetry_overshoots(c, particles, rate) {
-            let delta = particles.asymmetric_delta(&c.n, &c.na, &c.eq);
+            let delta =
+                particles.asymmetric_delta(&c.n, &c.na, &c.eqn, &c.in_equilibrium, &c.no_asymmetry);
             rate.asymmetric = if rate.asymmetric.abs() < delta.abs() {
                 rate.asymmetric
             } else {
@@ -419,7 +427,7 @@ pub trait Interaction<M: Model> {
 /// overshoot of equilibrium.
 #[must_use]
 pub fn overshoots<M>(c: &Context<M>, particles: &InteractionParticles, rate: &RateDensity) -> bool {
-    let f = particles.symmetric_prefactor_fn(&c.n, &c.eqn);
+    let f = particles.symmetric_prefactor_fn(&c.n, &c.eqn, &c.in_equilibrium);
     let a = f(0.0);
     if a.is_nan() {
         true
@@ -441,7 +449,8 @@ pub fn asymmetry_overshoots<M>(
     particles: &InteractionParticles,
     rate: &RateDensity,
 ) -> bool {
-    let f = particles.asymmetric_prefactor_fn(&c.n, &c.na, &c.eqn);
+    let f =
+        particles.asymmetric_prefactor_fn(&c.n, &c.na, &c.eqn, &c.in_equilibrium, &c.no_asymmetry);
     let a = f(0.0);
     if a.is_nan() {
         true

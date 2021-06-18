@@ -226,7 +226,7 @@ where
     /// - `na` is an array of `0.0`.
     ///
     /// All other attribute contexts will be as expected.
-    fn as_context(&self) -> Context<'_, Self> {
+    fn as_context(&self) -> Context<Self> {
         let beta = self.get_beta();
         let n = Statistic::BoseEinstein.massless_number_density(0.0, beta);
         let hubble_rate = self.hubble_rate(beta);
@@ -249,6 +249,8 @@ where
             na: Array1::zeros(self.len_particles()),
             model: &self,
             fast_interactions: None,
+            in_equilibrium: &[],
+            no_asymmetry: &[],
         }
     }
 }

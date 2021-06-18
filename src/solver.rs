@@ -514,8 +514,12 @@ pub struct Solver<M> {
     initial_densities: Array1<f64>,
     initial_asymmetries: Array1<f64>,
     beta_range: (f64, f64),
-    in_equilibrium: HashSet<usize>,
-    no_asymmetry: HashSet<usize>,
+    /// The indices of particles forced in equilibrium (irrespective of
+    /// interactions) **must** be ordered.
+    in_equilibrium: Vec<usize>,
+    /// The indices of particles forced to have no asymmetry (irrespective of
+    /// interactions) **must** be ordered.
+    no_asymmetry: Vec<usize>,
     logger: LoggerFn<M>,
     step_precision: StepPrecision,
     error_tolerance: f64,
@@ -608,7 +612,13 @@ where
                                 na[p] = 0.0;
                             }
 
-                            let result = interaction.fast_interaction(&n, &na, &c.eqn);
+                            let result = interaction.fast_interaction(
+                                &n,
+                                &na,
+                                &c.eqn,
+                                &c.in_equilibrium,
+                                &c.no_asymmetry,
+                            );
 
                             n += &result.dn;
                             na += &result.dna;
@@ -1061,6 +1071,8 @@ where
             na: na.clone(),
             model: &self.model,
             fast_interactions,
+            in_equilibrium: &self.in_equilibrium,
+            no_asymmetry: &self.no_asymmetry,
         }
     }
 }

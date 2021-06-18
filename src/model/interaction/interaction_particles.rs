@@ -203,40 +203,69 @@ impl InteractionParticles {
     }
 
     /// Compute the product of the relevant entries in the given array as
-    /// indexed by the incoming particles, excluding the `$i$`th incoming
-    /// particle.
+    /// indexed by the incoming particles.  This product will exclude the
+    /// incoming particle given by `pos` in the list of incoming particles and
+    /// will also ignore any particle whose index is contained in the `idx`
+    /// slice.
     ///
-    /// The array specified should be an array of number densities or
-    /// equilibrium number densities depending on context.  The index refers to
-    /// the position of the particle in the incoming array, not the index of the
-    /// particle itself.
+    /// For example, if the incoming particles are `[1, 3, 2, 1, 4, 2]`, then
+    /// the products are:
+    ///
+    /// | Result | `pos` | `idx` |
+    /// | ------ | ----- | ----- |
+    /// | `$n_3 n_2 n_1 n_4 n_2$` | `0` | `[]` |
+    /// | `$n_3 n_1 n_4$` | `0` | `[2]` |
+    /// | `$n_1 n_2 n_1 n_4 n_2$` | `1` | `[]` |
+    /// | `$n_4 n_2$` | `2` | `[1, 3]` |
+    /// # Warning
+    ///
+    /// The `idx` slice must be ordered or the result may be wrong.
     #[must_use]
-    pub fn product_except_incoming(&self, arr: &Array1<f64>, i: usize) -> f64 {
+    pub fn product_except_incoming(&self, arr: &Array1<f64>, pos: usize, idx: &[usize]) -> f64 {
         self.incoming_idx
             .iter()
             .enumerate()
-            .filter_map(|(j, &p)| if j == i { None } else { Some(arr[p]) })
+            .filter_map(|(j, &p)| {
+                if j == pos || idx.binary_search(&p).is_ok() {
+                    None
+                } else {
+                    Some(arr[p])
+                }
+            })
             .product()
     }
 
     /// Compute the product of the relevant entries in the given array as
-    /// indexed by the outgoing particles, excluding the `$i$`th outgoing
-    /// particle.
+    /// indexed by the outgoing particles.  This product will exclude the
+    /// outgoing particle given by `pos` in the list of outgoing particles and
+    /// will also ignore any particle whose index is contained in the `idx`
+    /// slice.
     ///
-    /// ```math
-    /// \prod_{j \neq i} arr[j]
-    /// ```
+    /// For example, if the outgoing particles are `[1, 3, 2, 1, 4, 2]`, then
+    /// the products are:
     ///
-    /// The array specified should be an array of number densities or
-    /// equilibrium number densities depending on context.  The index refers to
-    /// the position of the particle in the outgoing array, not the index of the
-    /// particle itself.
+    /// | Result | `pos` | `idx` |
+    /// | ------ | ----- | ----- |
+    /// | `$n_3 n_2 n_1 n_4 n_2$` | `0` | `[]` |
+    /// | `$n_3 n_1 n_4$` | `0` | `[2]` |
+    /// | `$n_1 n_2 n_1 n_4 n_2$` | `1` | `[]` |
+    /// | `$n_4 n_2$` | `2` | `[1, 3]` |
+    ///
+    /// # Warning
+    ///
+    /// The `idx` slice must be ordered or the result may be wrong.
     #[must_use]
-    pub fn product_except_outgoing(&self, arr: &Array1<f64>, i: usize) -> f64 {
+    pub fn product_except_outgoing(&self, arr: &Array1<f64>, i: usize, idx: &[usize]) -> f64 {
         self.outgoing_idx
             .iter()
             .enumerate()
-            .filter_map(|(j, &p)| if j == i { None } else { Some(arr[p]) })
+            .filter_map(|(j, &p)| {
+                if j == i || idx.binary_search(&p).is_ok() {
+                    None
+                } else {
+                    Some(arr[p])
+                }
+            })
             .product()
     }
 
@@ -295,19 +324,29 @@ impl InteractionParticles {
     ///
     /// The result is given as the pair of `(numerator, denominator)` for
     /// incoming and outgoing particles respectively.
+    ///
+    /// Particles which are fixed to be in equilibrium can be specified in the
+    /// ordered slice `in_equilibrium`.
+    ///
+    /// # Warning
+    ///
+    /// The `in_equilibrium` slice must be ordered or the result may be wrong.
     #[must_use]
     pub fn symmetric_prefactor(
         &self,
         n: &Array1<f64>,
         eq: &Array1<f64>,
+        in_equilibrium: &[usize],
     ) -> ((f64, f64), (f64, f64)) {
         let forward = self
             .incoming_idx
             .iter()
+            .filter(|p| in_equilibrium.binary_search(p).is_err())
             .fold((1.0, 1.0), |(num, den), &p| (num * n[p], den * eq[p]));
         let backward = self
             .outgoing_idx
             .iter()
+            .filter(|p| in_equilibrium.binary_search(p).is_err())
             .fold((1.0, 1.0), |(num, den), &p| (num * n[p], den * eq[p]));
         (forward, backward)
     }
@@ -318,27 +357,42 @@ impl InteractionParticles {
     /// The change is calculated by counting the number of times the particles
     /// interact and takes into account the multiplicity of the particles
     /// involved within the interaction.
+    ///
+    /// Particles which are fixed to be in equilibrium can be specified in the
+    /// ordered slice `in_equilibrium`.
+    ///
+    /// # Warning
+    ///
+    /// The `in_equilibrium` slice must be ordered or the result may be wrong.
     pub fn symmetric_prefactor_fn<'a>(
         &'a self,
         n: &'a Array1<f64>,
         eq: &'a Array1<f64>,
+        in_equilibrium: &'a [usize],
     ) -> impl Fn(f64) -> f64 + 'a {
         move |delta| {
-            let forward = self.incoming_idx.iter().fold((1.0, 1.0), |(num, den), &p| {
-                (
-                    num * (n[p] + self.particle_counts[&p].0 * delta),
-                    den * eq[p],
-                )
-            });
-            let backward = self.outgoing_idx.iter().fold((1.0, 1.0), |(num, den), &p| {
-                (
-                    num * (n[p] + self.particle_counts[&p].0 * delta),
-                    den * eq[p],
-                )
-            });
+            let forward = self
+                .incoming_idx
+                .iter()
+                .filter(|p| in_equilibrium.binary_search(p).is_err())
+                .fold((1.0, 1.0), |(num, den), &p| {
+                    (
+                        num * (n[p] + self.particle_counts[&p].0 * delta),
+                        den * eq[p],
+                    )
+                });
+            let backward = self
+                .outgoing_idx
+                .iter()
+                .filter(|p| in_equilibrium.binary_search(p).is_err())
+                .fold((1.0, 1.0), |(num, den), &p| {
+                    (
+                        num * (n[p] + self.particle_counts[&p].0 * delta),
+                        den * eq[p],
+                    )
+                });
 
             forward.0 / forward.1 - backward.0 / backward.1
-            // forward.0 * backward.1 - backward.0 * forward.1
         }
     }
 
@@ -349,9 +403,18 @@ impl InteractionParticles {
     /// is 0.  This will generally be a positive number as the interaction
     /// annihilates incoming particles.  The result may be negative in special
     /// cases such as `$a b \to a a b$`.
-    fn symmetric_minimum_change_incoming(&self, n: &Array1<f64>) -> f64 {
+    ///
+    /// Particles which are fixed to be in equilibrium can be specified in the
+    /// ordered slice `in_equilibrium` so they they are ignored for the purposes
+    /// of this function.
+    ///
+    /// # Warning
+    ///
+    /// The `in_equilibrium` slice must be ordered or the result may be wrong.
+    fn symmetric_minimum_change_incoming(&self, n: &Array1<f64>, in_equilibrium: &[usize]) -> f64 {
         self.incoming_idx
             .iter()
+            .filter(|p| in_equilibrium.binary_search(p).is_err())
             .filter_map(|&p| {
                 let count = self.particle_counts[&p].0;
                 if count == 0.0 {
@@ -360,6 +423,7 @@ impl InteractionParticles {
                     Some(-n[p] / count)
                 }
             })
+            .filter(|n| n.is_finite())
             .min_by(|x, y| x.abs().partial_cmp(&y.abs()).unwrap())
             .unwrap_or_default()
     }
@@ -371,9 +435,18 @@ impl InteractionParticles {
     /// is 0.  This will generally be a negative number as the interaction
     /// produces outgoing particles.  The result may be positive in special
     /// cases such as `$a a b \to a b$`.
-    fn symmetric_minimum_change_outgoing(&self, n: &Array1<f64>) -> f64 {
+    ///
+    /// Particles which are fixed to be in equilibrium can be specified in the
+    /// ordered slice `in_equilibrium` so they they are ignored for the purposes
+    /// of this function.
+    ///
+    /// # Warning
+    ///
+    /// The `in_equilibrium` slice must be ordered or the result may be wrong.
+    fn symmetric_minimum_change_outgoing(&self, n: &Array1<f64>, in_equilibrium: &[usize]) -> f64 {
         self.outgoing_idx
             .iter()
+            .filter(|p| in_equilibrium.binary_search(p).is_err())
             .filter_map(|&p| {
                 let count = self.particle_counts[&p].0;
                 if count == 0.0 {
@@ -382,6 +455,7 @@ impl InteractionParticles {
                     Some(-n[p] / count)
                 }
             })
+            .filter(|n| n.is_finite())
             .min_by(|x, y| x.abs().partial_cmp(&y.abs()).unwrap())
             .unwrap_or_default()
     }
@@ -401,17 +475,28 @@ impl InteractionParticles {
     /// +1 for annihilation and creation respectively).
     ///
     /// If one of the equilibrium number density of the incoming particles is 0
-    /// then `$\delta = \min_{i \in X}\{n_i / m_i\}$` as the interaction can only
-    /// proceed in one direction.  Similarly, if the 0 is on the outgoing side,
-    /// then `$\delta = \min_{i \in Y}\{n_i / m_i}$`.
+    /// then `$\delta = \min_{i \in X}\{n_i / m_i\}$` as the interaction can
+    /// only proceed in one direction.  Similarly, if the 0 is on the outgoing
+    /// side, then `$\delta = \min_{i \in Y}\{n_i / m_i}$`.
     ///
-    /// If there are zero equilibrium number densities on both sides, the number
-    /// of 0s is used to determine which direction the interaction proceeds, and
-    /// if equal then is taken to be the one with the smallest absolute value of
-    /// the two above.
+    /// If there are zero equilibrium number densities on both sides, the
+    /// minimum change required to reach equilibrium is used.
+    ///
+    /// Any particle which is forced to be in equilibrium can be specified in
+    /// the ordered slice `in_equilibrium`.  Any change to their number
+    /// densities is ignored (as it would be fixed anyway).
+    ///
+    /// # Warning
+    ///
+    /// The `in_equilibrium` slice must be ordered or the result may be wrong.
     #[allow(clippy::too_many_lines)]
     #[must_use]
-    pub fn symmetric_delta(&self, n: &Array1<f64>, eq: &Array1<f64>) -> f64 {
+    pub fn symmetric_delta(
+        &self,
+        n: &Array1<f64>,
+        eq: &Array1<f64>,
+        in_equilibrium: &[usize],
+    ) -> f64 {
         // If the interaction does not result in any number density change, then return 0.
         if self.particle_counts.values().all(|&(c, _)| c == 0.0) {
             return 0.0;
@@ -422,32 +507,21 @@ impl InteractionParticles {
 
         match (incoming_eq_prod == 0.0, outgoing_eq_prod == 0.0) {
             (true, true) => {
-                // If both sides are zero, use the number of zeros to determine
-                // which side is favored, and if they are equal, is the minimum
-                // in absolute value.
-                let incoming_zeros = self.incoming_idx.iter().filter(|&&p| eq[p] == 0.0).count();
-                let outgoing_zeros = self.outgoing_idx.iter().filter(|&&p| eq[p] == 0.0).count();
+                // If both sides are zero, use the minimum in absolute value change.
+                let delta_forward = self.symmetric_minimum_change_incoming(n, &in_equilibrium);
+                let delta_backward = self.symmetric_minimum_change_outgoing(n, &in_equilibrium);
 
-                match incoming_zeros.cmp(&outgoing_zeros) {
-                    Ordering::Less => self.symmetric_minimum_change_incoming(n),
-                    Ordering::Equal => {
-                        let delta_forward = self.symmetric_minimum_change_incoming(n);
-                        let delta_backward = self.symmetric_minimum_change_outgoing(n);
-
-                        if delta_forward.abs() > delta_backward.abs() {
-                            delta_forward
-                        } else {
-                            delta_backward
-                        }
-                    }
-                    Ordering::Greater => self.symmetric_minimum_change_outgoing(n),
+                if delta_forward.abs() < delta_backward.abs() {
+                    delta_forward
+                } else {
+                    delta_backward
                 }
             }
-            (true, false) => self.symmetric_minimum_change_incoming(n),
-            (false, true) => self.symmetric_minimum_change_outgoing(n),
+            (true, false) => self.symmetric_minimum_change_incoming(n, &in_equilibrium),
+            (false, true) => self.symmetric_minimum_change_outgoing(n, &in_equilibrium),
             (false, false) => {
                 // The prefactor function for which we will be finding the root.
-                let prefactor = &self.symmetric_prefactor_fn(n, eq);
+                let prefactor = &self.symmetric_prefactor_fn(n, eq, in_equilibrium);
 
                 // Check if we already have a root
                 if prefactor(0.0).abs() < 1e-30 {
@@ -457,8 +531,10 @@ impl InteractionParticles {
                 // Bound the search for roots based on the minimum changes that
                 // result in 0 density.
                 let (lower_limit, mut upper_limit) = (
-                    self.symmetric_minimum_change_outgoing(n).min(0.0),
-                    self.symmetric_minimum_change_incoming(n).max(0.0),
+                    self.symmetric_minimum_change_outgoing(n, &in_equilibrium)
+                        .min(0.0),
+                    self.symmetric_minimum_change_incoming(n, &in_equilibrium)
+                        .max(0.0),
                 );
 
                 // Algorithm doesn't work if bracket / initial points are
@@ -531,31 +607,51 @@ impl InteractionParticles {
     ///
     /// The result is given as the pair of `(numerator, denominator)` for
     /// incoming and outgoing particles respectively.
+    ///
+    /// Particles which are fixed to be in equilibrium can be specified in the
+    /// ordered slice `in_equilibrium`, and similarly for `no_asymmetry`.
+    ///
+    /// # Warning
+    ///
+    /// Both the `in_equilibrium` and `no_asymmetry` slices must be ordered or
+    /// the result may be wrong.
     #[must_use]
     pub fn asymmetric_prefactor(
         &self,
         n: &Array1<f64>,
         na: &Array1<f64>,
         eq: &Array1<f64>,
+        in_equilibrium: &[usize],
+        no_asymmetry: &[usize],
     ) -> ((f64, f64), (f64, f64)) {
-        let forward =
-            self.iter_incoming()
-                .enumerate()
-                .fold((0.0, 1.0), |(num, den), (i, (&p, &a))| {
-                    (
-                        num + a * na[p] * self.product_except_incoming(n, i),
-                        den * eq[p],
-                    )
-                });
-        let backward =
-            self.iter_outgoing()
-                .enumerate()
-                .fold((0.0, 1.0), |(num, den), (i, (&p, &a))| {
-                    (
-                        num + a * na[p] * self.product_except_outgoing(n, i),
-                        den * eq[p],
-                    )
-                });
+        let forward = self
+            .iter_incoming()
+            .filter(|(p, _)| no_asymmetry.binary_search(p).is_err())
+            .enumerate()
+            .fold((0.0, 1.0), |(num, den), (i, (&p, &a))| {
+                (
+                    num + a * na[p] * self.product_except_incoming(n, i, in_equilibrium),
+                    if in_equilibrium.binary_search(&p).is_ok() {
+                        den
+                    } else {
+                        den * eq[p]
+                    },
+                )
+            });
+        let backward = self
+            .iter_outgoing()
+            .filter(|(p, _)| no_asymmetry.binary_search(p).is_err())
+            .enumerate()
+            .fold((0.0, 1.0), |(num, den), (i, (&p, &a))| {
+                (
+                    num + a * na[p] * self.product_except_outgoing(n, i, in_equilibrium),
+                    if in_equilibrium.binary_search(&p).is_ok() {
+                        den
+                    } else {
+                        den * eq[p]
+                    },
+                )
+            });
 
         (forward, backward)
     }
@@ -566,35 +662,55 @@ impl InteractionParticles {
     /// The change is calculated by counting the number of times the particles
     /// interact and takes into account the multiplicity of the particles
     /// involved within the interaction.
+    ///
+    /// Particles which are fixed to be in equilibrium can be specified in the
+    /// ordered slice `in_equilibrium`, and similarly for `no_asymmetry`.
+    ///
+    /// # Warning
+    ///
+    /// Both the `in_equilibrium` and `no_asymmetry` slices must be ordered or
+    /// the result may be wrong.
     pub fn asymmetric_prefactor_fn<'a>(
         &'a self,
         n: &'a Array1<f64>,
         na: &'a Array1<f64>,
         eq: &'a Array1<f64>,
+        in_equilibrium: &'a [usize],
+        no_asymmetry: &'a [usize],
     ) -> impl Fn(f64) -> f64 + 'a {
         move |delta| {
-            let forward =
-                self.iter_incoming()
-                    .enumerate()
-                    .fold((0.0, 1.0), |(num, den), (i, (&p, &a))| {
-                        (
-                            num + a
-                                * (na[p] + self.particle_counts[&p].1 * delta)
-                                * self.product_except_incoming(n, i),
-                            den * eq[p],
-                        )
-                    });
-            let backward =
-                self.iter_outgoing()
-                    .enumerate()
-                    .fold((0.0, 1.0), |(num, den), (i, (&p, &a))| {
-                        (
-                            num + a
-                                * (na[p] + self.particle_counts[&p].1 * delta)
-                                * self.product_except_outgoing(n, i),
-                            den * eq[p],
-                        )
-                    });
+            let forward = self
+                .iter_incoming()
+                .filter(|(p, _)| no_asymmetry.binary_search(p).is_err())
+                .enumerate()
+                .fold((0.0, 1.0), |(num, den), (i, (&p, &a))| {
+                    (
+                        num + a
+                            * (na[p] + self.particle_counts[&p].1 * delta)
+                            * self.product_except_incoming(n, i, in_equilibrium),
+                        if in_equilibrium.binary_search(&p).is_ok() {
+                            den
+                        } else {
+                            den * eq[p]
+                        },
+                    )
+                });
+            let backward = self
+                .iter_outgoing()
+                .filter(|(p, _)| no_asymmetry.binary_search(p).is_err())
+                .enumerate()
+                .fold((0.0, 1.0), |(num, den), (i, (&p, &a))| {
+                    (
+                        num + a
+                            * (na[p] + self.particle_counts[&p].1 * delta)
+                            * self.product_except_outgoing(n, i, in_equilibrium),
+                        if in_equilibrium.binary_search(&p).is_ok() {
+                            den
+                        } else {
+                            den * eq[p]
+                        },
+                    )
+                });
 
             forward.0 / forward.1 - backward.0 / backward.1
             // forward.0 * backward.1 - backward.0 * forward.1
@@ -608,11 +724,27 @@ impl InteractionParticles {
     /// is 0.  This will generally be a positive number as the interaction
     /// annihilates incoming particles.  The result may be negative in special
     /// cases such as `$a b \to a a b$`.
-    fn asymmetric_minimum_change_incoming(&self, n: &Array1<f64>, na: &Array1<f64>) -> f64 {
+    ///
+    /// Particles which are fixed to never have any asymmetry can be specified
+    /// in the ordered slice `no_asymmetry` so they they are ignored for the
+    /// purposes of this function.
+    ///
+    /// # Warning
+    ///
+    /// The `no_asymmetry` slice must be ordered or the result may be wrong.
+    fn asymmetric_minimum_change_incoming(
+        &self,
+        n: &Array1<f64>,
+        na: &Array1<f64>,
+        no_asymmetry: &[usize],
+    ) -> f64 {
         let (mut numerator, mut denominator) = (0.0, 0.0);
         let mut min_zero = f64::INFINITY;
 
-        for (&p, &a) in self.iter_incoming() {
+        for (&p, &a) in self
+            .iter_incoming()
+            .filter(|(p, _)| no_asymmetry.binary_search(p).is_err())
+        {
             let count = a * self.particle_counts[&p].1;
             if count == 0.0 {
                 continue;
@@ -646,11 +778,27 @@ impl InteractionParticles {
     /// is 0.  This will generally be a positive number as the interaction
     /// annihilates incoming particles.  The result may be negative in special
     /// cases such as `$a a b \to a b$`.
-    fn asymmetric_minimum_change_outgoing(&self, n: &Array1<f64>, na: &Array1<f64>) -> f64 {
+    ///
+    /// Particles which are fixed to never have any asymmetry can be specified
+    /// in the ordered slice `no_asymmetry` so they they are ignored for the
+    /// purposes of this function.
+    ///
+    /// # Warning
+    ///
+    /// The `no_asymmetry` slice must be ordered or the result may be wrong.
+    fn asymmetric_minimum_change_outgoing(
+        &self,
+        n: &Array1<f64>,
+        na: &Array1<f64>,
+        no_asymmetry: &[usize],
+    ) -> f64 {
         let (mut numerator, mut denominator) = (0.0, 0.0);
         let mut min_zero = f64::INFINITY;
 
-        for (&p, &a) in self.iter_outgoing() {
+        for (&p, &a) in self
+            .iter_outgoing()
+            .filter(|(p, _)| no_asymmetry.binary_search(p).is_err())
+        {
             let count = a * self.particle_counts[&p].1;
             if count == 0.0 {
                 continue;
@@ -697,8 +845,31 @@ impl InteractionParticles {
     /// ```
     ///
     /// holds true.
+    ///
+    /// If there are zero equilibrium number densities on both sides, the
+    /// minimum change required to reach equilibrium is used.
+    ///
+    /// Any particle which is forced to be in equilibrium can be specified in
+    /// the ordered slice `in_equilibrium`.  Any change to their number
+    /// densities is ignored (as it would be fixed anyway).
+    ///
+    /// Particles which are fixed to never have any asymmetry can be specified
+    /// in the ordered slice `no_asymmetry` so they they are ignored for the
+    /// purposes of this function.
+    ///
+    /// # Warning
+    ///
+    /// Both the `in_equilibrium` and `no_asymmetry` slices must be ordered or
+    /// the result may be wrong.
     #[must_use]
-    pub fn asymmetric_delta(&self, n: &Array1<f64>, na: &Array1<f64>, eq: &Array1<f64>) -> f64 {
+    pub fn asymmetric_delta(
+        &self,
+        n: &Array1<f64>,
+        na: &Array1<f64>,
+        eq: &Array1<f64>,
+        in_equilibrium: &[usize],
+        no_asymmetry: &[usize],
+    ) -> f64 {
         // If the interaction does not result in any number density asymmetric change, then return 0.
         if self.particle_counts.values().all(|&(_, c)| c == 0.0) {
             return 0.0;
@@ -709,38 +880,27 @@ impl InteractionParticles {
 
         match (incoming_eq_prod == 0.0, outgoing_eq_prod == 0.0) {
             (true, true) => {
-                // If both sides are zero, use the number of zeros to determine
-                // which side is favored, and if they are equal, have delta = 0.
-                // If equal
-                let incoming_zeros = self.incoming_idx.iter().filter(|&&p| n[p] == 0.0).count();
-                let outgoing_zeros = self.outgoing_idx.iter().filter(|&&p| n[p] == 0.0).count();
+                let delta_forward = self.asymmetric_minimum_change_incoming(n, na, no_asymmetry);
+                let delta_backward = self.asymmetric_minimum_change_outgoing(n, na, no_asymmetry);
 
-                match incoming_zeros.cmp(&outgoing_zeros) {
-                    Ordering::Less => self.asymmetric_minimum_change_outgoing(n, na),
-                    Ordering::Equal => {
-                        let delta_forward = self.asymmetric_minimum_change_incoming(n, na);
-                        let delta_backward = self.asymmetric_minimum_change_outgoing(n, na);
-
-                        if delta_forward.abs() > delta_backward.abs() {
-                            delta_forward
-                        } else {
-                            delta_backward
-                        }
-                    }
-                    Ordering::Greater => self.asymmetric_minimum_change_incoming(n, na),
+                if delta_forward.abs() > delta_backward.abs() {
+                    delta_forward
+                } else {
+                    delta_backward
                 }
             }
-            (true, false) => self.asymmetric_minimum_change_incoming(n, na),
-            (false, true) => self.asymmetric_minimum_change_outgoing(n, na),
+            (true, false) => self.asymmetric_minimum_change_incoming(n, na, no_asymmetry),
+            (false, true) => self.asymmetric_minimum_change_outgoing(n, na, no_asymmetry),
             (false, false) => {
                 // The prefactor function for which we will be finding the root.
-                let prefactor = self.asymmetric_prefactor_fn(n, na, eq);
+                let prefactor =
+                    self.asymmetric_prefactor_fn(n, na, eq, in_equilibrium, no_asymmetry);
 
                 // The function should be linear, thus we just need two initial
                 // guesses to find the root.
                 let (incoming_guess, mut outgoing_guess) = (
-                    self.asymmetric_minimum_change_incoming(n, na),
-                    self.asymmetric_minimum_change_outgoing(n, na),
+                    self.asymmetric_minimum_change_incoming(n, na, no_asymmetry),
+                    self.asymmetric_minimum_change_outgoing(n, na, no_asymmetry),
                 );
 
                 // It is possible that both guesses are (nearly) identical, in
@@ -771,32 +931,39 @@ impl InteractionParticles {
     /// The computation in the symmetric case is described in
     /// [`Self::symmetric_delta`], and the asymmetric case is described in
     /// [`Self::asymmetric_delta`].
+    ///
+    /// # Warning
+    ///
+    /// Both the `in_equilibrium` and `no_asymmetry` slices must be ordered or
+    /// the result may be wrong.
     #[must_use]
     pub fn fast_interaction(
         &self,
         n: &Array1<f64>,
         na: &Array1<f64>,
         eq: &Array1<f64>,
+        in_equilibrium: &[usize],
+        no_asymmetry: &[usize],
     ) -> FastInteractionResult {
-        // log::trace!(
-        //     r#"fast_interaction:
-        // {{
-        //     "incoming": {:?},
-        //     "outgoing": {:?},
-        //     "n": {},
-        //     "na": {},
-        //     "eq": {}
-        // }}"#,
-        //     self.incoming_signed,
-        //     self.outgoing_signed,
-        //     n,
-        //     na,
-        //     eq
-        // );
+        log::trace!(
+            r#"fast_interaction:
+        {{
+            "incoming": {:?},
+            "outgoing": {:?},
+            "n": {:.5e},
+            "na": {:.5e},
+            "eq": {:.5e}
+        }}"#,
+            self.incoming_signed,
+            self.outgoing_signed,
+            n,
+            na,
+            eq
+        );
 
         let mut result = FastInteractionResult::zero(n.dim());
 
-        result.symmetric_delta = self.symmetric_delta(n, eq);
+        result.symmetric_delta = self.symmetric_delta(n, eq, in_equilibrium);
 
         let mut n = n.clone();
         for (&p, &(c, _)) in &self.particle_counts {
@@ -808,7 +975,7 @@ impl InteractionParticles {
             // change futile.
         }
 
-        result.asymmetric_delta = self.asymmetric_delta(&n, na, eq);
+        result.asymmetric_delta = self.asymmetric_delta(&n, na, eq, in_equilibrium, no_asymmetry);
 
         for (&p, &(c, ca)) in &self.particle_counts {
             result.dn[p] += c * result.symmetric_delta;
@@ -1126,20 +1293,73 @@ mod tests {
 
         for i in 0..4 {
             approx_eq(
-                interaction.product_except_incoming(&n, i),
+                interaction.product_except_incoming(&n, i, &[]),
                 prod_in / n[interaction.incoming_idx[i]],
                 15.0,
                 0.0,
             )
             .map_err(err_line_print!())?;
             approx_eq(
-                interaction.product_except_outgoing(&n, i),
+                interaction.product_except_outgoing(&n, i, &[]),
                 prod_out / n[interaction.outgoing_idx[i]],
                 15.0,
                 0.0,
             )
             .map_err(err_line_print!())?;
         }
+
+        Ok(())
+    }
+
+    #[test]
+    fn product_except_ignored() -> Result<(), Box<dyn error::Error>> {
+        let interaction = super::InteractionParticles::new(&[0, 1, 2, 3], &[4, 5, 6, 7]);
+
+        let n = array![2.0, 3.0, 5.0, 7.0, 11.0, 13.0, 17.0, 19.0];
+
+        approx_eq(
+            interaction.product_except_incoming(&n, 0, &[1, 2, 3]),
+            1.0,
+            15.0,
+            0.0,
+        )
+        .map_err(err_line_print!())?;
+        approx_eq(
+            interaction.product_except_incoming(&n, 0, &[4, 5, 6, 7]),
+            3.0 * 5.0 * 7.0,
+            15.0,
+            0.0,
+        )
+        .map_err(err_line_print!())?;
+        approx_eq(
+            interaction.product_except_incoming(&n, 0, &[2, 6]),
+            3.0 * 7.0,
+            15.0,
+            0.0,
+        )
+        .map_err(err_line_print!())?;
+
+        approx_eq(
+            interaction.product_except_outgoing(&n, 0, &[0, 1, 2, 3]),
+            13.0 * 17.0 * 19.0,
+            15.0,
+            0.0,
+        )
+        .map_err(err_line_print!())?;
+        approx_eq(
+            interaction.product_except_outgoing(&n, 0, &[5, 6, 7]),
+            1.0,
+            15.0,
+            0.0,
+        )
+        .map_err(err_line_print!())?;
+        approx_eq(
+            interaction.product_except_outgoing(&n, 0, &[2, 6]),
+            13.0 * 19.0,
+            15.0,
+            0.0,
+        )
+        .map_err(err_line_print!())?;
 
         Ok(())
     }
@@ -1155,7 +1375,7 @@ mod tests {
         for _ in 0..RUN_COUNT {
             let (n, na, eq) = rand_n_na_eq();
 
-            let (forward, backward) = interaction.symmetric_prefactor(&n, &eq);
+            let (forward, backward) = interaction.symmetric_prefactor(&n, &eq, &[]);
             approx_eq(
                 forward.0 / forward.1,
                 n[1] * n[2] / (eq[1] * eq[2]),
@@ -1171,7 +1391,7 @@ mod tests {
             )
             .map_err(err_line_print!())?;
 
-            let f = interaction.symmetric_prefactor_fn(&n, &eq);
+            let f = interaction.symmetric_prefactor_fn(&n, &eq, &[]);
             approx_eq(
                 forward.0 / forward.1 - backward.0 / backward.1,
                 f(0.0),
@@ -1191,7 +1411,7 @@ mod tests {
                 .map_err(err_line_print!())?;
             }
 
-            let (forward, backward) = interaction.asymmetric_prefactor(&n, &na, &eq);
+            let (forward, backward) = interaction.asymmetric_prefactor(&n, &na, &eq, &[], &[]);
             #[allow(clippy::suspicious_operation_groupings)]
             approx_eq(
                 forward.0 / forward.1,
@@ -1209,7 +1429,85 @@ mod tests {
             )
             .map_err(err_line_print!())?;
 
-            let f = interaction.asymmetric_prefactor_fn(&n, &na, &eq);
+            let f = interaction.asymmetric_prefactor_fn(&n, &na, &eq, &[], &[]);
+            approx_eq(
+                forward.0 / forward.1 - backward.0 / backward.1,
+                f(0.0),
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+
+            for &delta in &deltas {
+                approx_eq(
+                    ((na[1] - delta) * n[2] + (na[2] - delta) * n[1]) / (eq[1] * eq[2])
+                        - ((na[3] + delta) * n[4] + (na[4] + delta) * n[3]) / (eq[3] * eq[4]),
+                    f(delta),
+                    EPS_REL,
+                    EPS_ABS,
+                )
+                .map_err(err_line_print!())?;
+            }
+        }
+
+        Ok(())
+    }
+
+    // A simple interaction with all distinct particles
+    #[test]
+    fn prefactor_simple_ignore() -> Result<(), Box<dyn error::Error>> {
+        const EPS_REL: f64 = 1e-14;
+        const EPS_ABS: f64 = 1e-250;
+
+        let interaction = super::InteractionParticles::new(&[1, 2], &[3, 4]);
+        let deltas = Array1::linspace(-1.0, 1.0, RUN_COUNT / 100);
+        for _ in 0..RUN_COUNT {
+            let (n, na, eq) = rand_n_na_eq();
+
+            let (forward, backward) = interaction.symmetric_prefactor(&n, &eq, &[1, 4]);
+            approx_eq(forward.0 / forward.1, n[2] / eq[2], EPS_REL, EPS_ABS)
+                .map_err(err_line_print!())?;
+            approx_eq(backward.0 / backward.1, n[3] / eq[3], EPS_REL, EPS_ABS)
+                .map_err(err_line_print!())?;
+
+            let f = interaction.symmetric_prefactor_fn(&n, &eq, &[1, 4]);
+            approx_eq(
+                forward.0 / forward.1 - backward.0 / backward.1,
+                f(0.0),
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+
+            for &delta in &deltas {
+                approx_eq(
+                    (n[2] - delta) / (eq[2]) - (n[3] + delta) / (eq[3]),
+                    f(delta),
+                    EPS_REL,
+                    EPS_ABS,
+                )
+                .map_err(err_line_print!())?;
+            }
+
+            let (forward, backward) = interaction.asymmetric_prefactor(&n, &na, &eq, &[], &[]);
+            #[allow(clippy::suspicious_operation_groupings)]
+            approx_eq(
+                forward.0 / forward.1,
+                (na[1] * n[2] + na[2] * n[1]) / (eq[1] * eq[2]),
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+            #[allow(clippy::suspicious_operation_groupings)]
+            approx_eq(
+                backward.0 / backward.1,
+                (na[3] * n[4] + na[4] * n[3]) / (eq[3] * eq[4]),
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+
+            let f = interaction.asymmetric_prefactor_fn(&n, &na, &eq, &[], &[]);
             approx_eq(
                 forward.0 / forward.1 - backward.0 / backward.1,
                 f(0.0),
@@ -1245,7 +1543,7 @@ mod tests {
         for _ in 0..RUN_COUNT {
             let (n, na, eq) = rand_n_na_eq();
 
-            let (forward, backward) = interaction.symmetric_prefactor(&n, &eq);
+            let (forward, backward) = interaction.symmetric_prefactor(&n, &eq, &[]);
             approx_eq(
                 forward.0 / forward.1,
                 n[1] * n[1] * n[2] / (eq[1] * eq[1] * eq[2]),
@@ -1261,7 +1559,7 @@ mod tests {
             )
             .map_err(err_line_print!())?;
 
-            let f = interaction.symmetric_prefactor_fn(&n, &eq);
+            let f = interaction.symmetric_prefactor_fn(&n, &eq, &[]);
             approx_eq(
                 forward.0 / forward.1 - backward.0 / backward.1,
                 f(0.0),
@@ -1282,7 +1580,7 @@ mod tests {
                 .map_err(err_line_print!())?;
             }
 
-            let (forward, backward) = interaction.asymmetric_prefactor(&n, &na, &eq);
+            let (forward, backward) = interaction.asymmetric_prefactor(&n, &na, &eq, &[], &[]);
             approx_eq(
                 forward.0 / forward.1,
                 (na[2] * n[1] * n[1]) / (eq[1] * eq[1] * eq[2]),
@@ -1299,7 +1597,7 @@ mod tests {
             )
             .map_err(err_line_print!())?;
 
-            let f = interaction.asymmetric_prefactor_fn(&n, &na, &eq);
+            let f = interaction.asymmetric_prefactor_fn(&n, &na, &eq, &[], &[]);
             approx_eq(
                 forward.0 / forward.1 - backward.0 / backward.1,
                 f(0.0),
@@ -1332,14 +1630,14 @@ mod tests {
         for _ in 0..RUN_COUNT {
             let (n, na, _eq) = rand_n_na_eq();
             approx_eq(
-                interaction.symmetric_minimum_change_incoming(&n),
+                interaction.symmetric_minimum_change_incoming(&n, &[]),
                 n[1].min(n[2]).min(n[3]),
                 EPS_REL,
                 EPS_ABS,
             )
             .map_err(err_line_print!())?;
             approx_eq(
-                interaction.symmetric_minimum_change_outgoing(&n),
+                interaction.symmetric_minimum_change_outgoing(&n, &[]),
                 -n[3].min(n[4]).min(n[5]),
                 EPS_REL,
                 EPS_ABS,
@@ -1347,14 +1645,14 @@ mod tests {
             .map_err(err_line_print!())?;
 
             approx_eq(
-                interaction.asymmetric_minimum_change_incoming(&n, &na),
+                interaction.asymmetric_minimum_change_incoming(&n, &na, &[]),
                 na[1].min(na[2]).min(na[3]),
                 EPS_REL,
                 EPS_ABS,
             )
             .map_err(err_line_print!())?;
             approx_eq(
-                interaction.asymmetric_minimum_change_outgoing(&n, &na),
+                interaction.asymmetric_minimum_change_outgoing(&n, &na, &[]),
                 -na[4].min(na[5]).min(na[6]),
                 EPS_REL,
                 EPS_ABS,
@@ -1366,14 +1664,14 @@ mod tests {
         for _ in 0..RUN_COUNT {
             let (n, na, _eq) = rand_n_na_eq();
             approx_eq(
-                interaction.symmetric_minimum_change_incoming(&n),
+                interaction.symmetric_minimum_change_incoming(&n, &[]),
                 n[1] / 2.0,
                 EPS_REL,
                 EPS_ABS,
             )
             .map_err(err_line_print!())?;
             approx_eq(
-                interaction.symmetric_minimum_change_outgoing(&n),
+                interaction.symmetric_minimum_change_outgoing(&n, &[]),
                 -n[3] / 2.0,
                 EPS_REL,
                 EPS_ABS,
@@ -1381,14 +1679,14 @@ mod tests {
             .map_err(err_line_print!())?;
 
             approx_eq(
-                interaction.asymmetric_minimum_change_incoming(&n, &na),
+                interaction.asymmetric_minimum_change_incoming(&n, &na, &[]),
                 na[1] / 2.0,
                 EPS_REL,
                 EPS_ABS,
             )
             .map_err(err_line_print!())?;
             approx_eq(
-                interaction.asymmetric_minimum_change_outgoing(&n, &na),
+                interaction.asymmetric_minimum_change_outgoing(&n, &na, &[]),
                 0.0,
                 EPS_REL,
                 EPS_ABS,
@@ -1400,14 +1698,14 @@ mod tests {
         for _ in 0..RUN_COUNT {
             let (n, na, _eq) = rand_n_na_eq();
             approx_eq(
-                interaction.symmetric_minimum_change_incoming(&n),
+                interaction.symmetric_minimum_change_incoming(&n, &[]),
                 -n[2],
                 EPS_REL,
                 EPS_ABS,
             )
             .map_err(err_line_print!())?;
             approx_eq(
-                interaction.symmetric_minimum_change_outgoing(&n),
+                interaction.symmetric_minimum_change_outgoing(&n, &[]),
                 -n[2],
                 EPS_REL,
                 EPS_ABS,
@@ -1415,14 +1713,14 @@ mod tests {
             .map_err(err_line_print!())?;
 
             approx_eq(
-                interaction.asymmetric_minimum_change_incoming(&n, &na),
+                interaction.asymmetric_minimum_change_incoming(&n, &na, &[]),
                 -na[2],
                 EPS_REL,
                 EPS_ABS,
             )
             .map_err(err_line_print!())?;
             approx_eq(
-                interaction.asymmetric_minimum_change_outgoing(&n, &na),
+                interaction.asymmetric_minimum_change_outgoing(&n, &na, &[]),
                 -na[2],
                 EPS_REL,
                 EPS_ABS,
@@ -1449,14 +1747,14 @@ mod tests {
 
             approx_eq(
                 data["symmetric"],
-                interaction.symmetric_delta(&n, &eq),
+                interaction.symmetric_delta(&n, &eq, &[]),
                 EQUALITY_EPS_REL,
                 EQUALITY_EPS_ABS,
             )
             .map_err(err_line_print!())?;
             approx_eq(
                 data["asymmetric"],
-                interaction.asymmetric_delta(&n, &na, &eq),
+                interaction.asymmetric_delta(&n, &na, &eq, &[], &[]),
                 EQUALITY_EPS_REL,
                 EQUALITY_EPS_ABS,
             )
@@ -1474,7 +1772,7 @@ mod tests {
             let (mut n, mut na, mut eq) = rand_n_na_eq();
             eq[1] = 0.0;
 
-            let result = interaction.fast_interaction(&n, &na, &eq);
+            let result = interaction.fast_interaction(&n, &na, &eq, &[], &[]);
             n += &result.dn;
             na += &result.dna;
 
@@ -1494,7 +1792,7 @@ mod tests {
             eq[2] = 0.0;
             eq[3] = 0.0;
 
-            let result = interaction.fast_interaction(&n, &na, &eq);
+            let result = interaction.fast_interaction(&n, &na, &eq, &[], &[]);
             n += &result.dn;
             na += &result.dna;
 
@@ -1536,14 +1834,14 @@ mod tests {
 
             approx_eq(
                 data["symmetric"],
-                interaction.symmetric_delta(&n, &eq),
+                interaction.symmetric_delta(&n, &eq, &[]),
                 EQUALITY_EPS_REL,
                 EQUALITY_EPS_ABS,
             )
             .map_err(err_line_print!())?;
             approx_eq(
                 data["asymmetric"],
-                interaction.asymmetric_delta(&n, &na, &eq),
+                interaction.asymmetric_delta(&n, &na, &eq, &[], &[]),
                 EQUALITY_EPS_REL,
                 EQUALITY_EPS_ABS,
             )
@@ -1562,7 +1860,7 @@ mod tests {
             eq[1] = 0.0;
             eq[2] = 0.0;
 
-            let result = interaction.fast_interaction(&n, &na, &eq);
+            let result = interaction.fast_interaction(&n, &na, &eq, &[], &[]);
             n += &result.dn;
             na += &result.dna;
 
@@ -1585,7 +1883,7 @@ mod tests {
             eq[3] = 0.0;
             eq[4] = 0.0;
 
-            let result = interaction.fast_interaction(&n, &na, &eq);
+            let result = interaction.fast_interaction(&n, &na, &eq, &[], &[]);
             n += &result.dn;
             na += &result.dna;
 
@@ -1627,14 +1925,14 @@ mod tests {
 
             approx_eq(
                 data["symmetric"],
-                interaction.symmetric_delta(&n, &eq),
+                interaction.symmetric_delta(&n, &eq, &[]),
                 EQUALITY_EPS_REL,
                 EQUALITY_EPS_ABS,
             )
             .map_err(err_line_print!())?;
             approx_eq(
                 data["asymmetric"],
-                interaction.asymmetric_delta(&n, &na, &eq),
+                interaction.asymmetric_delta(&n, &na, &eq, &[], &[]),
                 EQUALITY_EPS_REL,
                 EQUALITY_EPS_ABS,
             )
@@ -1652,7 +1950,7 @@ mod tests {
             let (mut n, mut na, mut eq) = rand_n_na_eq();
             eq[1] = 0.0;
 
-            let result = interaction.fast_interaction(&n, &na, &eq);
+            let result = interaction.fast_interaction(&n, &na, &eq, &[], &[]);
             n += &result.dn;
             na += &result.dna;
 
@@ -1673,7 +1971,7 @@ mod tests {
             eq[3] = 0.0;
             eq[4] = 0.0;
 
-            let result = interaction.fast_interaction(&n, &na, &eq);
+            let result = interaction.fast_interaction(&n, &na, &eq, &[], &[]);
             n += &result.dn;
             na += &result.dna;
 
@@ -1747,7 +2045,7 @@ mod tests {
             let na = Array1::from(entry.na);
             let eq = Array1::from(entry.eq);
 
-            let symmetric = interaction.symmetric_delta(&n, &eq);
+            let symmetric = interaction.symmetric_delta(&n, &eq, &[]);
             assert!(
                 entry.symmetric.iter().any(|&sol| {
                     approx_eq(sol, symmetric, 1.0, 1e-50)
@@ -1765,7 +2063,7 @@ mod tests {
             if entry.asymmetric.abs() < 10.0 {
                 approx_eq(
                     entry.asymmetric,
-                    interaction.asymmetric_delta(&n, &na, &eq),
+                    interaction.asymmetric_delta(&n, &na, &eq, &[], &[]),
                     1.0,
                     1e-30,
                 )
@@ -1785,11 +2083,11 @@ mod tests {
                 eq[idx] = 0.0;
             }
 
-            let result = interaction.fast_interaction(&n, &na, &eq);
+            let result = interaction.fast_interaction(&n, &na, &eq, &[], &[]);
             n += &result.dn;
             na += &result.dna;
 
-            let (forward, backward) = interaction.symmetric_prefactor(&n, &eq);
+            let (forward, backward) = interaction.symmetric_prefactor(&n, &eq, &[]);
             approx_eq(
                 forward.0 * backward.1,
                 backward.0 * forward.1,
@@ -1797,7 +2095,7 @@ mod tests {
                 ZERO_EPS_ABS,
             )
             .map_err(err_line_print!())?;
-            let (forward, backward) = interaction.asymmetric_prefactor(&n, &na, &eq);
+            let (forward, backward) = interaction.asymmetric_prefactor(&n, &na, &eq, &[], &[]);
             approx_eq(
                 forward.0 * backward.1,
                 backward.0 * forward.1,
@@ -1819,14 +2117,14 @@ mod tests {
                 eq[idx] = 0.0;
             }
 
-            let result = interaction.fast_interaction(&n, &na, &eq);
+            let result = interaction.fast_interaction(&n, &na, &eq, &[], &[]);
             n += &result.dn;
             na += &result.dna;
 
-            let (forward, backward) = interaction.symmetric_prefactor(&n, &eq);
+            let (forward, backward) = interaction.symmetric_prefactor(&n, &eq, &[]);
             approx_eq(forward.0 * backward.1, backward.0 * forward.1, 8.0, 1e-15)
                 .map_err(err_line_print!())?;
-            let (forward, backward) = interaction.asymmetric_prefactor(&n, &na, &eq);
+            let (forward, backward) = interaction.asymmetric_prefactor(&n, &na, &eq, &[], &[]);
             approx_eq(forward.0 * backward.1, backward.0 * forward.1, 8.0, 1e-15)
                 .map_err(err_line_print!())?;
         }

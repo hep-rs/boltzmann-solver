@@ -49,6 +49,12 @@ pub struct Context<'a, M> {
     /// Within each HashMap, the particles are indicated using the keys, and the
     /// sign and multiplicity is stored in the value.
     pub(crate) fast_interactions: Option<RwLock<HashSet<InteractionParticles>>>,
+    /// List of particles which are forced in equilibrium.
+    ///
+    /// If the context
+    pub in_equilibrium: &'a [usize],
+    /// List of particles which are forced to never develop any asymmetry.
+    pub no_asymmetry: &'a [usize],
 }
 
 impl<'a, M> fmt::Display for Context<'a, M> {
