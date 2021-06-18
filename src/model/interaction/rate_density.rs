@@ -9,6 +9,9 @@ use std::{default, fmt, ops};
 /// state particles is proportional to the negative of the rates contained,
 /// while the change for final state particles is proportional to the rates
 /// themselves.
+///
+/// The rate density can be multiplied / divided by a float which will multiply
+/// / divide all three fields of the struct.
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct RateDensity {
