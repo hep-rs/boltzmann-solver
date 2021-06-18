@@ -231,29 +231,6 @@ pub trait Interaction<M: Model> {
             return None;
         }
 
-        debug_assert!(
-            gamma.is_finite(),
-            "[{}.{}|{:.3e}] Non-finite interaction rate for interaction {}: {}",
-            c.step,
-            c.substep,
-            c.beta,
-            self.particles()
-                .display(c.model)
-                .unwrap_or_else(|_| self.particles().short_display()),
-            gamma
-        );
-        debug_assert!(
-            delta_gamma.is_finite(),
-            "[{}.{}|{:.3e}] Non-finite asymmetric interaction rate for interaction {}: {}",
-            c.step,
-            c.substep,
-            c.beta,
-            self.particles()
-                .display(c.model)
-                .unwrap_or_else(|_| self.particles().short_display()),
-            delta_gamma
-        );
-
         let mut rate = RateDensity::zero();
         let symmetric_prefactor = self.symmetric_prefactor(c);
         rate.gamma = gamma;

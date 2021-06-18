@@ -705,29 +705,6 @@ where
             rate.asymmetric = 0.0;
         }
 
-        // debug_assert!(
-        //     rate.symmetric.is_finite(),
-        //     "[{}.{}|{:.3e}] Computed non-finite interaction rate in interaction {}: {}",
-        //     c.step,
-        //     c.substep,
-        //     c.beta,
-        //     self.particles()
-        //         .display(c.model)
-        //         .unwrap_or_else(|_| self.particles().short_display()),
-        //     rate.symmetric,
-        // );
-        // debug_assert!(
-        //     rate.asymmetric.is_finite(),
-        //     "[{}.{}|{:.3e}] Computed non-finite asymmetric rate in interaction {}: {}",
-        //     c.step,
-        //     c.substep,
-        //     c.beta,
-        //     self.particles()
-        //         .display(c.model)
-        //         .unwrap_or_else(|_| self.particles().short_display()),
-        //     rate.asymmetric,
-        // );
-
         Some(rate * c.normalization)
     }
 }
