@@ -69,8 +69,7 @@
   });
 </script>
 
-<style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../boltzmann_solver/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../boltzmann_solver/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1141,18 +1140,6 @@
 <span id="1069">1069</span>
 <span id="1070">1070</span>
 <span id="1071">1071</span>
-<span id="1072">1072</span>
-<span id="1073">1073</span>
-<span id="1074">1074</span>
-<span id="1075">1075</span>
-<span id="1076">1076</span>
-<span id="1077">1077</span>
-<span id="1078">1078</span>
-<span id="1079">1079</span>
-<span id="1080">1080</span>
-<span id="1081">1081</span>
-<span id="1082">1082</span>
-<span id="1083">1083</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Solver for the number density evolution given by integrating the Boltzmann</span>
 <span class="doccomment">//! equation.</span>
@@ -1667,11 +1654,16 @@
 <span class="doccomment">/// Boltzmann solver</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
     <span class="ident">model</span>: <span class="ident">M</span>,
+    <span class="ident">particles_next</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Particle</span><span class="op">&gt;</span>,
     <span class="ident">initial_densities</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
     <span class="ident">initial_asymmetries</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
     <span class="ident">beta_range</span>: (<span class="ident">f64</span>, <span class="ident">f64</span>),
-    <span class="ident">in_equilibrium</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">no_asymmetry</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The indices of particles forced in equilibrium (irrespective of</span>
+    <span class="doccomment">/// interactions) **must** be ordered.</span>
+    <span class="ident">in_equilibrium</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The indices of particles forced to have no asymmetry (irrespective of</span>
+    <span class="doccomment">/// interactions) **must** be ordered.</span>
+    <span class="ident">no_asymmetry</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
     <span class="ident">logger</span>: <span class="ident">LoggerFn</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
     <span class="ident">step_precision</span>: <span class="ident">StepPrecision</span>,
     <span class="ident">error_tolerance</span>: <span class="ident">f64</span>,
@@ -1725,23 +1717,12 @@
     <span class="doccomment">///   going on.</span>
     <span class="doccomment">/// - Handle and equilibriate fast interaction (if applicable).</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::similar_names</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fix_equilibrium</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">workspace</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Workspace</span>) {
-        <span class="comment">// We cannot modify the values of n themselves, so we create local</span>
-        <span class="comment">// copies which are recomputed every time.  These begin by taking into</span>
-        <span class="comment">// account the Runge-Kutta changes and they will be continuously</span>
-        <span class="comment">// updated.  The final dn and dna will be then computed by comparing the</span>
-        <span class="comment">// converged local n and na to the original.</span>
+    <span class="kw">fn</span> <span class="ident">fix_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">workspace</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Workspace</span>) {
+        <span class="comment">// For the fast interaction to converge, we need local mutable copies of</span>
+        <span class="comment">// `n` and `na` which already incorporate the changes computed from the</span>
+        <span class="comment">// regular integration.</span>
         <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">n</span>, <span class="kw-2">mut</span> <span class="ident">na</span>) <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">n</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">workspace</span>.<span class="ident">dn</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">na</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">workspace</span>.<span class="ident">dna</span>);
 
-        <span class="comment">// log::trace!(</span>
-        <span class="comment">//     &quot;[{}.{}|{:.3e}] Fast Interactions: {}&quot;,</span>
-        <span class="comment">//     c.step,</span>
-        <span class="comment">//     c.substep,</span>
-        <span class="comment">//     c.beta,</span>
-        <span class="comment">//     c.fast_interactions</span>
-        <span class="comment">//         .as_ref()</span>
-        <span class="comment">//         .map_or(0, |fi| fi.read().unwrap().len())</span>
-        <span class="comment">// );</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count</span> <span class="op">=</span> <span class="number">0_usize</span>;
         <span class="kw">loop</span> {
             <span class="comment">// Go through all fast interactions and apply the change to the</span>
@@ -1756,7 +1737,7 @@
                         .<span class="ident">unwrap</span>()
                         .<span class="ident">iter</span>()
                         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">interaction</span><span class="op">|</span> {
-                            <span class="comment">// Fix equilibrium</span>
+                            <span class="comment">// Fix equilibrium before each fast interaction</span>
                             <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">p</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">in_equilibrium</span> {
                                 <span class="ident">n</span>[<span class="ident">p</span>] <span class="op">=</span> <span class="ident">c</span>.<span class="ident">eqn</span>[<span class="ident">p</span>];
                             }
@@ -1764,7 +1745,13 @@
                                 <span class="ident">na</span>[<span class="ident">p</span>] <span class="op">=</span> <span class="number">0.0</span>;
                             }
 
-                            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">interaction</span>.<span class="ident">fast_interaction</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">na</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">eqn</span>);
+                            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">interaction</span>.<span class="ident">fast_interaction</span>(
+                                <span class="kw-2">&amp;</span><span class="ident">n</span>,
+                                <span class="kw-2">&amp;</span><span class="ident">na</span>,
+                                <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">eqn</span>,
+                                <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">in_equilibrium</span>,
+                                <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">no_asymmetry</span>,
+                            );
 
                             <span class="ident">n</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">result</span>.<span class="ident">dn</span>;
                             <span class="ident">na</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">result</span>.<span class="ident">dna</span>;
@@ -1774,7 +1761,7 @@
                         .<span class="ident">collect</span>()
                 });
 
-            <span class="comment">// Fix equilibrium</span>
+            <span class="comment">// Fix equilibrium one last time</span>
             <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">p</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">in_equilibrium</span> {
                 <span class="ident">n</span>[<span class="ident">p</span>] <span class="op">=</span> <span class="ident">c</span>.<span class="ident">eqn</span>[<span class="ident">p</span>];
             }
@@ -1791,33 +1778,15 @@
             }
 
             <span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="kw">if</span> <span class="ident">count</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">30</span> {
-                <span class="comment">// if count == 30 {</span>
-                <span class="comment">//     let mut s = String::new();</span>
-                <span class="comment">//     for interaction in fast_interactions {</span>
-                <span class="comment">//         s.push_str(&amp;interaction.display(c.model).unwrap());</span>
-                <span class="comment">//         s.push(&#39;|&#39;);</span>
-                <span class="comment">//     }</span>
-                <span class="comment">//     s.pop();</span>
-                <span class="comment">//     log::error!(&quot;Interactions: {}&quot;, s);</span>
-                <span class="comment">// }</span>
-                <span class="macro">log::error!</span>(
-                    <span class="string">&quot;[{}.{}|{:.3e}] Local δ:\n[{:?}]&quot;</span>,
-                    <span class="ident">c</span>.<span class="ident">step</span>,
-                    <span class="ident">c</span>.<span class="ident">substep</span>,
-                    <span class="ident">c</span>.<span class="ident">beta</span>,
-                    <span class="ident">deltas</span>
-                );
-                <span class="kw">if</span> <span class="ident">count</span> <span class="op">&gt;</span> <span class="number">60</span> {
+            <span class="kw">if</span> <span class="ident">count</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">50</span> {
                     <span class="macro">log::error!</span>(
-                        <span class="string">&quot;[{}.{}|{:.3e}] Unable to converge fast interactions after 60 iterations.&quot;</span>,
+                    <span class="string">&quot;[{}.{:02}|{:&gt;9.3e}] Unable to converge fast interactions after {} iterations.&quot;</span>,
                         <span class="ident">c</span>.<span class="ident">step</span>,
                         <span class="ident">c</span>.<span class="ident">substep</span>,
                         <span class="ident">c</span>.<span class="ident">beta</span>,
+                    <span class="ident">count</span>
                     );
                     <span class="macro">panic!</span>();
-                    <span class="comment">// break;</span>
-                }
             }
         }
 
@@ -1933,6 +1902,10 @@
             <span class="ident">step</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             <span class="ident">workspace</span>.<span class="ident">clear_step</span>();
 
+            <span class="comment">// Compute next step particles</span>
+            <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">set_beta</span>(<span class="ident">beta</span> <span class="op">+</span> <span class="ident">h</span>);
+            <span class="self">self</span>.<span class="ident">particles_next</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">particles</span>().<span class="ident">to_vec</span>();
+
             <span class="comment">// Log the progress of the integration</span>
             <span class="kw">if</span> <span class="ident">step</span> <span class="op">%</span> <span class="number">100</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
                 <span class="macro">log::info!</span>(<span class="string">&quot;Step {}, β = {:.4e}, h = {:.4e}&quot;</span>, <span class="ident">step</span>, <span class="ident">beta</span>, <span class="ident">h</span>);
@@ -1992,7 +1965,7 @@
                 <span class="ident">fast_interactions</span>,
             );
             <span class="comment">// log::trace!(&quot;[{}|{:.3e}]      eq = {:&lt;+10.3e}&quot;, step, beta, c.eq);</span>
-            <span class="self">self</span>.<span class="ident">fix_equilibrium</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">workspace</span>);
+            <span class="self">self</span>.<span class="ident">fix_change</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">workspace</span>);
 
             <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">workspace</span>.<span class="ident">local_error</span>();
 
@@ -2070,7 +2043,7 @@
             .<span class="ident">enumerate</span>()
         {
             <span class="kw">if</span> <span class="macro">log::log_enabled!</span>(<span class="ident">log::Level::Info</span>) {
-                <span class="macro">print!</span>(<span class="string">&quot;Step {:&gt;5} / {}&quot;</span>, <span class="ident">i</span>, <span class="ident">size</span>);
+                <span class="macro">print!</span>(<span class="string">&quot;Step {:&gt;5} / {}\r&quot;</span>, <span class="ident">i</span>, <span class="ident">size</span>);
                 <span class="ident">std::io::stdout</span>().<span class="ident">flush</span>().<span class="ident">unwrap_or</span>(());
             }
 
@@ -2211,11 +2184,13 @@
             <span class="ident">hubble_rate</span>,
             <span class="ident">normalization</span>,
             <span class="ident">eq</span>: <span class="ident">equilibrium_number_densities</span>(<span class="self">self</span>.<span class="ident">model</span>.<span class="ident">particles</span>(), <span class="ident">beta</span>),
-            <span class="ident">eqn</span>: <span class="ident">equilibrium_number_densities</span>(<span class="self">self</span>.<span class="ident">model</span>.<span class="ident">particles</span>(), <span class="ident">next_beta</span>),
+            <span class="ident">eqn</span>: <span class="ident">equilibrium_number_densities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">particles_next</span>, <span class="ident">next_beta</span>),
             <span class="ident">n</span>: <span class="ident">n</span>.<span class="ident">clone</span>(),
             <span class="ident">na</span>: <span class="ident">na</span>.<span class="ident">clone</span>(),
             <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model</span>,
             <span class="ident">fast_interactions</span>,
+            <span class="ident">in_equilibrium</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">in_equilibrium</span>,
+            <span class="ident">no_asymmetry</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">no_asymmetry</span>,
         }
     }
 }
@@ -2238,5 +2213,4 @@
         .<span class="ident">collect</span>()
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="boltzmann_solver" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="boltzmann_solver" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>
