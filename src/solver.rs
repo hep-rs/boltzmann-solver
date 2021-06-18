@@ -654,10 +654,11 @@ where
                 );
                 if count > 60 {
                     log::error!(
-                        "[{}.{}|{:.3e}] Unable to converge fast interactions after 60 iterations.",
+                    "[{}.{:02}|{:>9.3e}] Unable to converge fast interactions after {} iterations.",
                         c.step,
                         c.substep,
                         c.beta,
+                    count
                     );
                     panic!();
                     // break;
@@ -914,7 +915,7 @@ where
             .enumerate()
         {
             if log::log_enabled!(log::Level::Info) {
-                print!("Step {:>5} / {}", i, size);
+                print!("Step {:>5} / {}\r", i, size);
                 std::io::stdout().flush().unwrap_or(());
             }
 

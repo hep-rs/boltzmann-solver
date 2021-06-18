@@ -351,14 +351,14 @@ pub trait Interaction<M: Model> {
     /// size which is available in [`Context::step_size`].
     fn adjusted_rate(&self, c: &Context<M>) -> Option<RateDensity> {
         let mut rate = self.rate(c)?;
-        // log::trace!(
-        //     "[{}.{}|{:.3e}]          Rate: {:.5e}|{:.5e}",
-        //     c.step,
-        //     c.substep,
-        //     c.beta,
-        //     rate.gamma,
-        //     rate.symmetric
-        // );
+        log::trace!(
+            "[{}.{:02}|{:>9.3e}]          Rate: {:<12.5e}|{:<12.5e}",
+            c.step,
+            c.substep,
+            c.beta,
+            rate.gamma,
+            rate.symmetric
+        );
 
         // No need to do anything if the interaction rate is 0.
         if rate.gamma == 0.0 {
@@ -371,19 +371,19 @@ pub trait Interaction<M: Model> {
         rate *= c.step_size;
 
         if self.adjust_overshoot(&mut rate, c) {
-            // log::trace!(
-            //     "[{}.{}|{:.3e}] Adjusted Rate: {:.5e}|{:.5e}",
-            //     c.step,
-            //     c.substep,
-            //     c.beta,
-            //     rate.gamma / c.step_size,
-            //     rate.symmetric / c.step_size
-            // );
+            log::trace!(
+                "[{}.{:02}|{:>9.3e}] Adjusted Rate: {:<12.5e}|{:<12.5e}",
+                c.step,
+                c.substep,
+                c.beta,
+                rate.gamma / c.step_size,
+                rate.symmetric / c.step_size
+            );
         }
 
         debug_assert!(
             rate.symmetric.is_finite(),
-            "[{}.{}|{:.3e}] Non-finite interaction adjusted rate for interaction {}: {}",
+            "[{}.{:02}|{:>9.3e}] Non-finite adjusted interaction rate for interaction {}: {}",
             c.step,
             c.substep,
             c.beta,
@@ -394,7 +394,7 @@ pub trait Interaction<M: Model> {
         );
         debug_assert!(
             rate.asymmetric.is_finite(),
-            "[{}.{}|{:.3e}] Non-finite asymmetric adjusted interaction rate for interaction {}: {}",
+            "[{}.{:02}|{:>9.3e}] Non-finite asymmetric adjusted interaction rate for interaction {}: {}",
             c.step,
             c.substep,
             c.beta,

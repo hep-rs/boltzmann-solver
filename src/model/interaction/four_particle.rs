@@ -221,7 +221,7 @@ where
 
         // debug_assert!(
         //     gamma.is_finite(),
-        //     "[{}.{}|{:.3e}] Computed a non-finit value for γ in interaction {}: {}",
+        //     "[{}.{:02}|{:>9.3e}] Computed a non-finit value for γ in interaction {}: {}",
         //     c.step,
         //     c.substep,
         //     c.beta,
@@ -275,7 +275,7 @@ where
 
         // debug_assert!(
         //     delta_gamma.is_finite(),
-        //     "[{}.{}|{:.3e}] Computed a non-finit value for δγ in interaction {}: {}",
+        //     "[{}.{:02}|{:>9.3e}] Computed a non-finit value for δγ in interaction {}: {}",
         //     c.step,
         //     c.substep,
         //     c.beta,
