@@ -251,11 +251,36 @@ pub trait Interaction<M: Model> {
         Some(rate * c.normalization)
     }
 
-    /// Check if the interaction is determined as 'fast', meaning that it skips
-    /// Runge-Kutta integration and is instead handled separately.
+    /// Checks whether the interaction has already been deemed fast.
+    ///
+    /// On substep 0, this will always return `false` even is [`is_fast`] will
+    /// return `true`.  This will also only work is [`is_fast`] was checked at
+    /// substep 0.
+    ///
+    /// If fast interactions are disabled, this always returns `false`.
+    fn is_fast_check(&self, c: &Context<M>) -> bool {
+        c.fast_interactions
+            .as_ref()
+            .map_or(false, |fast_interactions| {
+                let fast_interactions = fast_interactions.read().unwrap();
+                fast_interactions.contains(self.particles())
+            })
+    }
+
+    /// Check if the interaction is determined as 'fast'.
+    ///
+    /// Physically, this occurs when `$\ddfrac{N}{t} \propto \gamma / H \gg 1$`,
+    /// or  `$\ddfrac{n}{\beta} \propto \gamma / H N \gg 1$`.
+    ///
+    /// Note that the comparison is only done on the first substep and the
+    /// result is stored for subsequent substeps in order to avoid unecessarily
+    /// compute the interaction rate.  This means that if the interaction is
+    /// initially slow and becomes fast at a subsequent substep, this will still
+    /// return `false`.  For subsequent substeps, this returns the same result
+    /// as [`is_fast_check`].
     ///
     /// A `true` result must mean that we are using fast interactions.  If fast
-    /// interare disabled, this always returns `false`.
+    /// interactions are disabled, this always returns `false`.
     fn is_fast(&self, rate: &RateDensity, c: &Context<M>) -> bool {
         const FAST_THRESHOLD: f64 = 1e1;
 
@@ -263,15 +288,17 @@ pub trait Interaction<M: Model> {
             .as_ref()
             .map_or(false, |fast_interactions| {
                 if c.substep == 0 {
-                    log::trace!("γ: {:.4e}", rate.gamma);
-                    if rate.gamma.abs() > FAST_THRESHOLD / c.beta {
-                        // log::warn!(
-                        //     "[{}.{}|{:.3e}] Fast interaction γ = {:.3e}",
-                        //     c.step,
-                        //     c.substep,
-                        //     c.beta,
-                        //     rate.gamma,
-                        // );
+                    // We have to multiply by beta as gamma is normalized by `$1
+                    // / H N \beta$`, but we must check whether `$\gamma / H N$`
+                    // is larger.
+                    if rate.gamma.abs() * c.beta > FAST_THRESHOLD {
+                        log::debug!(
+                            "[{}.{:02}|{:>9.3e}] Fast interaction γ = {:.3e}",
+                            c.step,
+                            c.substep,
+                            c.beta,
+                            rate.gamma,
+                        );
                         let mut fast_interactions = fast_interactions.write().unwrap();
                         fast_interactions.insert(self.particles().clone());
                         true
@@ -289,6 +316,13 @@ pub trait Interaction<M: Model> {
     ///
     /// Returns `true` if any adjustments were made, and `false` otherwise.
     fn adjust_overshoot(&self, rate: &mut RateDensity, c: &Context<M>) -> bool {
+        // Although an overshoot factor results in the exact solution in a
+        // single step, when this is incorporated into the Runge-Kutta method it
+        // tends to undershoot the result.  As a result, an overshoot factor is
+        // introduced to balance this.  This *must* be in the range [0, 2], with
+        // values greater than 2 causing the results to diverge.
+        // const OVERSHOOT_FACTOR: f64 = 1.693_147;
+        const OVERSHOOT_FACTOR: f64 = 1.5;
         let particles = self.particles();
         let mut result = false;
 
@@ -297,7 +331,7 @@ pub trait Interaction<M: Model> {
             rate.symmetric = if rate.symmetric.abs() < delta.abs() {
                 rate.symmetric
             } else {
-                delta
+                OVERSHOOT_FACTOR * delta
             };
             result = true;
         }
@@ -308,7 +342,7 @@ pub trait Interaction<M: Model> {
             rate.asymmetric = if rate.asymmetric.abs() < delta.abs() {
                 rate.asymmetric
             } else {
-                delta
+                OVERSHOOT_FACTOR * delta
             };
             result = true;
         }
@@ -335,6 +369,10 @@ pub trait Interaction<M: Model> {
     /// separately, one must take care to take into account the integration step
     /// size which is available in [`Context::step_size`].
     fn adjusted_rate(&self, c: &Context<M>) -> Option<RateDensity> {
+        if self.is_fast_check(c) {
+            return None;
+        }
+
         let mut rate = self.rate(c)?;
         log::trace!(
             "[{}.{:02}|{:>9.3e}]          Rate: {:<12.5e}|{:<12.5e}",
