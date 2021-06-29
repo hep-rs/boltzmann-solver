@@ -331,6 +331,7 @@ where
         // have to check if the equilibrium number density of the heavy
         // particle(s) is exactly 0 as it may result in NaN appearing if one of
         // the other divisors is also 0.
+        #[allow(clippy::unnested_or_patterns)]
         match (
             p1.mass * c.beta > M_BETA_THRESHOLD,
             p2.mass * c.beta > M_BETA_THRESHOLD,
