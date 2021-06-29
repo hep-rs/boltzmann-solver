@@ -334,11 +334,6 @@ impl<M> SolverBuilder<M> {
     ///
     /// This feature is currently experimental and may not produce reliable results.
     pub fn fast_interaction(mut self, v: bool) -> Self {
-        if v {
-            log::warn!(
-                "Fast interaction are currently experimental and may not produce reliable results."
-            );
-        }
         self.fast_interactions = v;
         self
     }
