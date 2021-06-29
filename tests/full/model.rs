@@ -249,7 +249,7 @@ impl Model for LeptogenesisModel {
         self.sm.entropy_dof(beta)
             + self.particles()[20..]
                 .iter()
-                .map(|p| p.entropy_dof(self.sm.beta))
+                .map(|p| p.entropy_dof(self.get_beta()))
                 .sum::<f64>()
     }
 
