@@ -159,11 +159,11 @@ impl LeptogenesisModel {
             .dot(&m_heavy)
             / (VEV / consts::SQRT_2);
 
-        log::info!("PMNS:\n{:.2}", self.sm.pmns.dot(&alpha));
-        log::info!("mν:\n{:.2}", m_light);
-        log::info!("R:\n{:.2}", r);
-        log::info!("mN:\n{:.3}", m_heavy);
-        log::info!("Yν:\n{:.2}", self.yv);
+        log::info!("PMNS:\n{:.3e}", self.sm.pmns.dot(&alpha));
+        log::info!("mν:\n{:.3e}", m_light);
+        log::info!("R:\n{:.3e}", r);
+        log::info!("mN:\n{:.3e}", m_heavy);
+        log::info!("Yν:\n{:.3e}", self.yv);
     }
 }
 
