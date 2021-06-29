@@ -492,7 +492,7 @@ fn sin_cos() -> Result<(), Box<dyn error::Error>> {
             ))
             .unwrap();
         })
-        .initial_densities(vec![(1, 0.0), (2, 1.0)])
+        .initial_densities([(1, 0.0), (2, 1.0)])
         .fast_interaction(true)
         .build()?
         .solve()?;
@@ -611,7 +611,7 @@ fn brusselator_stable() -> Result<(), Box<dyn error::Error>> {
             ))
             .unwrap();
         })
-        .initial_densities(vec![(1, 1.0), (2, 1.0)])
+        .initial_densities([(1, 1.0), (2, 1.0)])
         .fast_interaction(true)
         .build()?
         .solve()?;
@@ -729,7 +729,7 @@ fn brusselator_unstable() -> Result<(), Box<dyn error::Error>> {
             ))
             .unwrap();
         })
-        .initial_densities(vec![(1, 1.0), (2, 1.0)])
+        .initial_densities([(1, 1.0), (2, 1.0)])
         .fast_interaction(true)
         .build()?
         .solve()?;
@@ -841,7 +841,7 @@ fn scattering_massless() -> Result<(), Box<dyn error::Error>> {
             .unwrap();
             csv.flush().unwrap();
         })
-        .initial_densities(vec![(1, n0[1]), (2, n0[2]), (3, n0[3]), (4, n0[4])])
+        .initial_densities([(1, n0[1]), (2, n0[2]), (3, n0[3]), (4, n0[4])])
         .fast_interaction(true)
         .build()?
         .solve()?;
@@ -894,8 +894,8 @@ fn scattering_massless_eq_1122() -> Result<(), Box<dyn error::Error>> {
             .unwrap();
             csv.flush().unwrap();
         })
-        .initial_densities(vec![(1, n0[1]), (2, n0[2]), (3, n0[3]), (4, n0[4])])
-        .in_equilibrium(vec![2])
+        .initial_densities([(1, n0[1]), (2, n0[2]), (3, n0[3]), (4, n0[4])])
+        .in_equilibrium([2])
         .fast_interaction(true)
         .build()?
         .solve()?;
@@ -949,8 +949,8 @@ fn scattering_massless_eq_1234() -> Result<(), Box<dyn error::Error>> {
             .unwrap();
             csv.flush().unwrap();
         })
-        .initial_densities(vec![(1, n0[1]), (2, n0[2]), (3, n0[3]), (4, n0[4])])
-        .in_equilibrium(vec![3, 4])
+        .initial_densities([(1, n0[1]), (2, n0[2]), (3, n0[3]), (4, n0[4])])
+        .in_equilibrium([3, 4])
         .fast_interaction(true)
         .build()?
         .solve()?;
@@ -1182,7 +1182,7 @@ fn scattering_mmmm() -> Result<(), Box<dyn error::Error>> {
             .unwrap();
             csv.flush().unwrap();
         })
-        .initial_densities(vec![(1, 1.3), (2, 1.1), (3, 0.9), (4, 0.6)])
+        .initial_densities([(1, 1.3), (2, 1.1), (3, 0.9), (4, 0.6)])
         .fast_interaction(true)
         .build()?
         .solve()?;
@@ -1235,8 +1235,8 @@ fn scattering_mm00_eq() -> Result<(), Box<dyn error::Error>> {
             .unwrap();
             csv.flush().unwrap();
         })
-        .initial_densities(vec![(1, 1.3), (2, 1.1)])
-        .in_equilibrium(vec![3, 4])
+        .initial_densities([(1, 1.3), (2, 1.1)])
+        .in_equilibrium([3, 4])
         .fast_interaction(true)
         .build()?
         .solve()?;
