@@ -108,6 +108,10 @@ pub struct InteractionParticles {
     /// equal.  This is evidently not true for the asymmetric rate as it
     /// fundamentally assumes that the CP rate is different.
     pub particle_counts: HashMap<usize, (f64, f64)>,
+
+    /// Ratio of the original interactions [`Interaction::delta_gamma`] to
+    /// [`Interaction::gamma`] if defined.
+    pub gamma_ratio: Option<f64>,
 }
 
 impl InteractionParticles {
@@ -144,6 +148,8 @@ impl InteractionParticles {
             outgoing_signed: outgoing.clone(),
 
             particle_counts: HashMap::new(),
+
+            gamma_ratio: None,
         };
 
         result.calculate_particle_counts();
@@ -156,8 +162,8 @@ impl InteractionParticles {
     #[must_use]
     pub fn cpt(&self) -> Self {
         Self {
-            incoming_idx: self.outgoing_idx.iter().rev().cloned().collect(),
-            outgoing_idx: self.incoming_idx.iter().rev().cloned().collect(),
+            incoming_idx: self.outgoing_idx.iter().rev().copied().collect(),
+            outgoing_idx: self.incoming_idx.iter().rev().copied().collect(),
             incoming_sign: self.outgoing_sign.iter().rev().map(ops::Neg::neg).collect(),
             outgoing_sign: self.incoming_sign.iter().rev().map(ops::Neg::neg).collect(),
             incoming_signed: self
@@ -177,6 +183,7 @@ impl InteractionParticles {
                 .iter()
                 .map(|(&p, &(c, ca))| (p, (-c, ca)))
                 .collect(),
+            gamma_ratio: self.gamma_ratio,
         }
     }
 

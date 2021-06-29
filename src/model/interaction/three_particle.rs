@@ -311,11 +311,11 @@ where
     /// of the adjusted reaction rate density.
     fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
         let gamma = self.gamma(c, false).unwrap_or(0.0);
-        let asymmetry = self.delta_gamma(c, false).unwrap_or(0.0);
+        let delta_gamma = self.delta_gamma(c, false);
 
         // If both rates are 0, there's no need to adjust it to the particles'
         // number densities.
-        if gamma == 0.0 && asymmetry == 0.0 {
+        if gamma == 0.0 && (delta_gamma.is_none() || delta_gamma.unwrap() == 0.0) {
             return None;
         }
 
@@ -346,9 +346,12 @@ where
             // be scaled by factors of `n / eq` to get the actual forward and
             // backward rates.
             rate.gamma = gamma;
+            rate.delta_gamma = delta_gamma;
+
+            let delta_gamma = delta_gamma.unwrap_or_default();
             rate.symmetric =
                 gamma * (checked_div(n1, eq1) - checked_div(n2, eq2) * checked_div(n3, eq3));
-            rate.asymmetric = asymmetry
+            rate.asymmetric = delta_gamma
                 * (checked_div(n1, eq1) + checked_div(n2, eq2) * checked_div(n3, eq3))
                 + gamma * (checked_div(na1, eq1) - checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
         } else {
@@ -356,15 +359,17 @@ where
             // we need not divide by `eq1` to calculate the forward rates, and we
             // have to multiply by `eq1` to get the backward rate.
             rate.gamma = gamma * eq1;
+            rate.delta_gamma = delta_gamma.map(|v| v * eq1);
 
             // If eq1 is zero, the remaining n1 density is trying to decay and
             // the inverse decay should be negligible.
+            let delta_gamma = delta_gamma.unwrap_or_default();
             if eq1 == 0.0 {
                 rate.symmetric = gamma * n1;
-                rate.asymmetric = asymmetry * n1 + gamma * na1;
+                rate.asymmetric = delta_gamma * n1 + gamma * na1;
             } else {
                 rate.symmetric = gamma * (n1 - eq1 * checked_div(n2, eq2) * checked_div(n3, eq3));
-                rate.asymmetric = asymmetry
+                rate.asymmetric = delta_gamma
                     * (n1 + eq1 * checked_div(n2, eq2) * checked_div(n3, eq3))
                     + gamma * (na1 - eq1 * checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
             }

@@ -229,12 +229,12 @@ pub trait Interaction<M: Model> {
     /// The default implementation uses the output of [`Interaction::gamma`] and
     /// [`Interaction::delta_gamma`] in order to computer the actual rate.
     fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
-        let gamma = self.gamma(c, false).unwrap_or(0.0);
-        let delta_gamma = self.delta_gamma(c, false).unwrap_or(0.0);
+        let gamma = self.gamma(c, false).unwrap_or_default();
+        let delta_gamma = self.delta_gamma(c, false);
 
         // If both rates are 0, there's no need to adjust it to the particles'
         // number densities.
-        if gamma == 0.0 && delta_gamma == 0.0 {
+        if gamma == 0.0 && (delta_gamma.is_none() || delta_gamma.unwrap() == 0.0) {
             return None;
         }
 
@@ -242,11 +242,9 @@ pub trait Interaction<M: Model> {
         let symmetric_prefactor = self.symmetric_prefactor(c);
         rate.gamma = gamma;
         rate.symmetric = gamma * symmetric_prefactor;
-        rate.asymmetric = if delta_gamma == 0.0 {
-            gamma * self.asymmetric_prefactor(c)
-        } else {
-            delta_gamma * symmetric_prefactor + gamma * self.asymmetric_prefactor(c)
-        };
+        rate.delta_gamma = delta_gamma;
+        let delta_gamma = delta_gamma.unwrap_or_default();
+        rate.asymmetric = delta_gamma * symmetric_prefactor + gamma * self.asymmetric_prefactor(c);
 
         Some(rate * c.normalization)
     }
@@ -299,8 +297,12 @@ pub trait Interaction<M: Model> {
                             c.beta,
                             rate.gamma,
                         );
+
                         let mut fast_interactions = fast_interactions.write().unwrap();
-                        fast_interactions.insert(self.particles().clone());
+                        let mut interaction = self.particles().clone();
+                        interaction.gamma_ratio = rate.gamma_ratio();
+                        fast_interactions.insert(interaction);
+
                         true
                     } else {
                         false
@@ -382,11 +384,6 @@ pub trait Interaction<M: Model> {
             rate.gamma,
             rate.symmetric
         );
-
-        // No need to do anything if the interaction rate is 0.
-        if rate.gamma == 0.0 {
-            return None;
-        }
 
         if self.is_fast(&rate, c) {
             return None;

@@ -298,12 +298,12 @@ where
 
     #[allow(clippy::too_many_lines)]
     fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
-        let gamma = self.gamma(c, false).unwrap_or(0.0);
-        let asymmetry = self.delta_gamma(c, false).unwrap_or(0.0);
+        let gamma = self.gamma(c, false).unwrap_or_default();
+        let delta_gamma = self.delta_gamma(c, false);
 
         // If both rates are 0, there's no need to adjust it to the particles'
         // number densities.
-        if gamma == 0.0 && asymmetry == 0.0 {
+        if gamma == 0.0 && (delta_gamma.is_none() || delta_gamma.unwrap() == 0.0) {
             return None;
         }
 
@@ -341,10 +341,12 @@ where
             // No heavy particle
             (false, false, false, false) => {
                 rate.gamma = gamma;
+                rate.delta_gamma = delta_gamma;
+                let delta_gamma = delta_gamma.unwrap_or_default();
                 rate.symmetric = gamma
                     * (checked_div(n1, eq1) * checked_div(n2, eq2)
                         - checked_div(n3, eq3) * checked_div(n4, eq4));
-                rate.asymmetric = asymmetry
+                rate.asymmetric = delta_gamma
                     * (checked_div(n1, eq1) * checked_div(n2, eq2)
                         + checked_div(n3, eq3) * checked_div(n4, eq4))
                     + gamma
@@ -355,15 +357,17 @@ where
             // One heavy particles
             (true, false, false, false) => {
                 rate.gamma = gamma * eq1;
+                rate.delta_gamma = delta_gamma.map(|v| v * eq1);
+                let delta_gamma = delta_gamma.unwrap_or_default();
                 if eq1 == 0.0 {
                     rate.symmetric = gamma * (n1 * checked_div(n2, eq2));
-                    rate.asymmetric = asymmetry * (n1 * checked_div(n2, eq2))
+                    rate.asymmetric = delta_gamma * (n1 * checked_div(n2, eq2))
                         + gamma * (checked_div(na1 * n2 + na2 * n1, eq2));
                 } else {
                     rate.symmetric = gamma
                         * (n1 * checked_div(n2, eq2)
                             - eq1 * checked_div(n3, eq3) * checked_div(n4, eq4));
-                    rate.asymmetric = asymmetry
+                    rate.asymmetric = delta_gamma
                         * (n1 * checked_div(n2, eq2)
                             + eq1 * checked_div(n3, eq3) * checked_div(n4, eq4))
                         + gamma
@@ -373,15 +377,17 @@ where
             }
             (false, true, false, false) => {
                 rate.gamma = gamma * eq2;
+                rate.delta_gamma = delta_gamma.map(|v| v * eq2);
+                let delta_gamma = delta_gamma.unwrap_or_default();
                 if eq2 == 0.0 {
                     rate.symmetric = gamma * checked_div(n1, eq1) * n2;
-                    rate.asymmetric = asymmetry * checked_div(n1, eq1) * n2
+                    rate.asymmetric = delta_gamma * checked_div(n1, eq1) * n2
                         + gamma * checked_div(na1 * n2 + na2 * n1, eq1);
                 } else {
                     rate.symmetric = gamma
                         * (checked_div(n1, eq1) * n2
                             - eq2 * checked_div(n3, eq3) * checked_div(n4, eq4));
-                    rate.asymmetric = asymmetry
+                    rate.asymmetric = delta_gamma
                         * (checked_div(n1, eq1) * n2
                             + eq2 * checked_div(n3, eq3) * checked_div(n4, eq4))
                         + gamma
@@ -391,15 +397,17 @@ where
             }
             (false, false, true, false) => {
                 rate.gamma = gamma * eq3;
+                rate.delta_gamma = delta_gamma.map(|v| v * eq3);
+                let delta_gamma = delta_gamma.unwrap_or_default();
                 if eq3 == 0.0 {
                     rate.symmetric = -gamma * n3 * checked_div(n4, eq4);
-                    rate.asymmetric = asymmetry * n3 * checked_div(n4, eq4)
+                    rate.asymmetric = delta_gamma * n3 * checked_div(n4, eq4)
                         - gamma * checked_div(na3 * n4 + na4 * n3, eq4);
                 } else {
                     rate.symmetric = gamma
                         * (eq3 * checked_div(n1, eq1) * checked_div(n2, eq2)
                             - n3 * checked_div(n4, eq4));
-                    rate.asymmetric = asymmetry
+                    rate.asymmetric = delta_gamma
                         * (eq3 * checked_div(n1, eq1) * checked_div(n2, eq2)
                             + n3 * checked_div(n4, eq4))
                         + gamma
@@ -409,15 +417,17 @@ where
             }
             (false, false, false, true) => {
                 rate.gamma = gamma * eq4;
+                rate.delta_gamma = delta_gamma.map(|v| v * eq4);
+                let delta_gamma = delta_gamma.unwrap_or_default();
                 if eq4 == 0.0 {
                     rate.symmetric = -gamma * checked_div(n3, eq3) * n4;
-                    rate.asymmetric = asymmetry * checked_div(n3, eq3) * n4
+                    rate.asymmetric = delta_gamma * checked_div(n3, eq3) * n4
                         - gamma * checked_div(na3 * n4 + na4 * n3, eq3);
                 } else {
                     rate.symmetric = gamma
                         * (eq4 * checked_div(n1, eq1) * checked_div(n2, eq2)
                             - checked_div(n3, eq3) * n4);
-                    rate.asymmetric = asymmetry
+                    rate.asymmetric = delta_gamma
                         * (eq4 * checked_div(n1, eq1) * checked_div(n2, eq2)
                             + checked_div(n3, eq3) * n4)
                         + gamma
@@ -429,13 +439,15 @@ where
             // Two heavy particles
             (true, true, false, false) => {
                 rate.gamma = gamma * eq1 * eq2;
+                rate.delta_gamma = delta_gamma.map(|v| v * eq1 * eq2);
+                let delta_gamma = delta_gamma.unwrap_or_default();
                 if eq1 * eq2 == 0.0 {
                     rate.symmetric = gamma * n1 * n2;
-                    rate.asymmetric = asymmetry * n1 * n2 + gamma * (na1 * n2 + na2 * n1);
+                    rate.asymmetric = delta_gamma * n1 * n2 + gamma * (na1 * n2 + na2 * n1);
                 } else {
                     rate.symmetric =
                         gamma * (n1 * n2 - eq1 * eq2 * checked_div(n3, eq3) * checked_div(n4, eq4));
-                    rate.asymmetric = asymmetry
+                    rate.asymmetric = delta_gamma
                         * (n1 * n2 + eq1 * eq2 * checked_div(n3, eq3) * checked_div(n4, eq4))
                         + gamma
                             * ((na1 * n2 + na2 * n1)
@@ -444,6 +456,8 @@ where
             }
             (true, false, true, false) => {
                 rate.gamma = gamma * eq1 * eq3;
+                rate.delta_gamma = delta_gamma.map(|v| v * eq1 * eq3);
+                let delta_gamma = delta_gamma.unwrap_or_default();
                 match (eq1 == 0.0, eq3 == 0.0) {
                     (true, true) => {
                         rate.symmetric = 0.0;
@@ -451,18 +465,18 @@ where
                     }
                     (true, false) => {
                         rate.symmetric = gamma * eq3 * n1 * checked_div(n2, eq2);
-                        rate.asymmetric = asymmetry * eq3 * n1 * checked_div(n2, eq2)
+                        rate.asymmetric = delta_gamma * eq3 * n1 * checked_div(n2, eq2)
                             + gamma * eq3 * checked_div(na1 * n2 + na2 * n1, eq2);
                     }
                     (false, true) => {
                         rate.symmetric = -gamma * eq1 * n3 * checked_div(n4, eq4);
-                        rate.asymmetric = asymmetry * eq1 * n3 * checked_div(n4, eq4)
+                        rate.asymmetric = delta_gamma * eq1 * n3 * checked_div(n4, eq4)
                             - gamma * eq1 * checked_div(na3 * n4 + na4 * n3, eq4);
                     }
                     (false, false) => {
                         rate.symmetric = gamma
                             * (eq3 * n1 * checked_div(n2, eq2) - eq1 * n3 * checked_div(n4, eq4));
-                        rate.asymmetric = asymmetry
+                        rate.asymmetric = delta_gamma
                             * (eq3 * n1 * checked_div(n2, eq2) + eq1 * n3 * checked_div(n4, eq4))
                             + gamma
                                 * (eq3 * checked_div(na1 * n2 + na2 * n1, eq2)
@@ -472,6 +486,8 @@ where
             }
             (true, false, false, true) => {
                 rate.gamma = gamma * eq1 * eq4;
+                rate.delta_gamma = delta_gamma.map(|v| v * eq1 * eq4);
+                let delta_gamma = delta_gamma.unwrap_or_default();
                 match (eq1 == 0.0, eq4 == 0.0) {
                     (true, true) => {
                         rate.symmetric = 0.0;
@@ -479,18 +495,18 @@ where
                     }
                     (true, false) => {
                         rate.symmetric = gamma * eq4 * n1 * checked_div(n2, eq2);
-                        rate.asymmetric = asymmetry * eq4 * n1 * checked_div(n2, eq2)
+                        rate.asymmetric = delta_gamma * eq4 * n1 * checked_div(n2, eq2)
                             + gamma * eq4 * checked_div(na1 * n2 + na2 * n1, eq2);
                     }
                     (false, true) => {
                         rate.symmetric = -gamma * eq1 * checked_div(n3, eq3) * n4;
-                        rate.asymmetric = asymmetry * eq1 * checked_div(n3, eq3) * n4
+                        rate.asymmetric = delta_gamma * eq1 * checked_div(n3, eq3) * n4
                             - gamma * eq1 * checked_div(na3 * n4 + na4 * n3, eq3);
                     }
                     (false, false) => {
                         rate.symmetric = gamma
                             * (eq4 * n1 * checked_div(n2, eq2) - eq1 * checked_div(n3, eq3) * n4);
-                        rate.asymmetric = asymmetry
+                        rate.asymmetric = delta_gamma
                             * (eq4 * n1 * checked_div(n2, eq2) + eq1 * checked_div(n3, eq3) * n4)
                             + gamma
                                 * (eq4 * checked_div(na1 * n2 + na2 * n1, eq2)
@@ -500,6 +516,8 @@ where
             }
             (false, true, true, false) => {
                 rate.gamma = gamma * eq2 * eq3;
+                rate.delta_gamma = delta_gamma.map(|v| v * eq2 * eq3);
+                let delta_gamma = delta_gamma.unwrap_or_default();
                 match (eq2 == 0.0, eq3 == 0.0) {
                     (true, true) => {
                         rate.symmetric = 0.0;
@@ -507,18 +525,18 @@ where
                     }
                     (true, false) => {
                         rate.symmetric = gamma * eq3 * checked_div(n1, eq1) * n2;
-                        rate.asymmetric = asymmetry * eq3 * checked_div(n1, eq1) * n2
+                        rate.asymmetric = delta_gamma * eq3 * checked_div(n1, eq1) * n2
                             + gamma * eq3 * checked_div(na1 * n2 + na2 * n1, eq1);
                     }
                     (false, true) => {
                         rate.symmetric = -gamma * eq2 * n3 * checked_div(n4, eq4);
-                        rate.asymmetric = asymmetry * eq2 * n3 * checked_div(n4, eq4)
+                        rate.asymmetric = delta_gamma * eq2 * n3 * checked_div(n4, eq4)
                             - gamma * eq2 * checked_div(na3 * n4 + na4 * n3, eq4);
                     }
                     (false, false) => {
                         rate.symmetric = gamma
                             * (eq3 * checked_div(n1, eq1) * n2 - eq2 * n3 * checked_div(n4, eq4));
-                        rate.asymmetric = asymmetry
+                        rate.asymmetric = delta_gamma
                             * (eq3 * checked_div(n1, eq1) * n2 + eq2 * n3 * checked_div(n4, eq4))
                             + gamma
                                 * (eq3 * checked_div(na1 * n2 + na2 * n1, eq1)
@@ -528,6 +546,8 @@ where
             }
             (false, true, false, true) => {
                 rate.gamma = gamma * eq2 * eq4;
+                rate.delta_gamma = delta_gamma.map(|v| v * eq2 * eq4);
+                let delta_gamma = delta_gamma.unwrap_or_default();
                 match (eq2 == 0.0, eq4 == 0.0) {
                     (true, true) => {
                         rate.symmetric = 0.0;
@@ -535,18 +555,18 @@ where
                     }
                     (true, false) => {
                         rate.symmetric = gamma * eq4 * checked_div(n1, eq1) * n2;
-                        rate.asymmetric = asymmetry * eq4 * checked_div(n1, eq1) * n2
+                        rate.asymmetric = delta_gamma * eq4 * checked_div(n1, eq1) * n2
                             + gamma * eq4 * checked_div(na1 * n2 + na2 * n1, eq1);
                     }
                     (false, true) => {
                         rate.symmetric = -gamma * eq2 * checked_div(n3, eq3) * n4;
-                        rate.asymmetric = asymmetry * eq2 * checked_div(n3, eq3) * n4
+                        rate.asymmetric = delta_gamma * eq2 * checked_div(n3, eq3) * n4
                             - gamma * eq2 * checked_div(na3 * n4 + na4 * n3, eq3);
                     }
                     (false, false) => {
                         rate.symmetric = gamma
                             * (eq4 * checked_div(n1, eq1) * n2 - eq2 * checked_div(n3, eq3) * n4);
-                        rate.asymmetric = asymmetry
+                        rate.asymmetric = delta_gamma
                             * (eq4 * checked_div(n1, eq1) * n2 + eq2 * checked_div(n3, eq3) * n4)
                             + gamma
                                 * (eq4 * checked_div(na1 * n2 + na2 * n1, eq1)
@@ -556,13 +576,15 @@ where
             }
             (false, false, true, true) => {
                 rate.gamma = gamma * eq3 * eq4;
+                rate.delta_gamma = delta_gamma.map(|v| v * eq3 * eq4);
+                let delta_gamma = delta_gamma.unwrap_or_default();
                 if eq3 * eq4 == 0.0 {
                     rate.symmetric = -gamma * n3 * n4;
-                    rate.asymmetric = asymmetry * n3 * n4 - gamma * (na3 * n4 + na4 * n3);
+                    rate.asymmetric = delta_gamma * n3 * n4 - gamma * (na3 * n4 + na4 * n3);
                 } else {
                     rate.symmetric =
                         gamma * (eq3 * eq4 * checked_div(n1, eq1) * checked_div(n2, eq2) - n3 * n4);
-                    rate.asymmetric = asymmetry
+                    rate.asymmetric = delta_gamma
                         * (eq3 * eq4 * checked_div(n1, eq1) * checked_div(n2, eq2) + n3 * n4)
                         + gamma
                             * (eq3 * eq4 * checked_div(na1 * n2 + na2 * n1, eq1 * eq2)
@@ -573,6 +595,8 @@ where
             // Three heaving particles
             (true, true, true, false) => {
                 rate.gamma = gamma * eq1 * eq2 * eq3;
+                rate.delta_gamma = delta_gamma.map(|v| v * eq1 * eq2 * eq3);
+                let delta_gamma = delta_gamma.unwrap_or_default();
                 match (eq1 == 0.0, eq2 == 0.0, eq3 == 0.0) {
                     (true, true, true) | (true, false, true) | (false, true, true) => {
                         rate.symmetric = 0.0;
@@ -581,17 +605,17 @@ where
                     (true, true, false) | (true, false, false) | (false, true, false) => {
                         rate.symmetric = gamma * (eq3 * n1 * n2);
                         rate.asymmetric =
-                            asymmetry * (eq3 * n1 * n2) + gamma * (eq3 * (na1 * n2 + na2 * n1));
+                            delta_gamma * (eq3 * n1 * n2) + gamma * (eq3 * (na1 * n2 + na2 * n1));
                     }
                     (false, false, true) => {
                         rate.symmetric = gamma * eq1 * eq2 * n3 * checked_div(n4, eq4);
-                        rate.asymmetric = asymmetry * eq1 * eq2 * n3 * checked_div(n4, eq4)
+                        rate.asymmetric = delta_gamma * eq1 * eq2 * n3 * checked_div(n4, eq4)
                             + gamma * eq1 * eq2 * checked_div(na3 * n4 + na4 * n3, eq4);
                     }
                     (false, false, false) => {
                         rate.symmetric =
                             gamma * (eq3 * n1 * n2 - eq1 * eq2 * n3 * checked_div(n4, eq4));
-                        rate.asymmetric = asymmetry
+                        rate.asymmetric = delta_gamma
                             * (eq3 * n1 * n2 + eq1 * eq2 * n3 * checked_div(n4, eq4))
                             + gamma
                                 * (eq3 * (na1 * n2 + na2 * n1)
@@ -601,6 +625,8 @@ where
             }
             (true, true, false, true) => {
                 rate.gamma = gamma * eq1 * eq2 * eq4;
+                rate.delta_gamma = delta_gamma.map(|v| v * eq1 * eq2 * eq4);
+                let delta_gamma = delta_gamma.unwrap_or_default();
                 match (eq1 == 0.0, eq2 == 0.0, eq4 == 0.0) {
                     (true, true, true) | (true, false, true) | (false, true, true) => {
                         rate.symmetric = 0.0;
@@ -609,17 +635,17 @@ where
                     (true, true, false) | (true, false, false) | (false, true, false) => {
                         rate.symmetric = gamma * eq4 * n1 * n2;
                         rate.asymmetric =
-                            asymmetry * eq4 * n1 * n2 + gamma * eq4 * (na1 * n2 + na2 * n1);
+                            delta_gamma * eq4 * n1 * n2 + gamma * eq4 * (na1 * n2 + na2 * n1);
                     }
                     (false, false, true) => {
                         rate.symmetric = -gamma * eq1 * eq2 * checked_div(n3, eq3) * n4;
-                        rate.asymmetric = asymmetry * eq1 * eq2 * checked_div(n3, eq3) * n4
+                        rate.asymmetric = delta_gamma * eq1 * eq2 * checked_div(n3, eq3) * n4
                             - gamma * eq1 * eq2 * checked_div(na3 * n4 + na4 * n3, eq3);
                     }
                     (false, false, false) => {
                         rate.symmetric =
                             gamma * (eq4 * n1 * n2 - eq1 * eq2 * checked_div(n3, eq3) * n4);
-                        rate.asymmetric = asymmetry
+                        rate.asymmetric = delta_gamma
                             * (eq4 * n1 * n2 + eq1 * eq2 * checked_div(n3, eq3) * n4)
                             + gamma
                                 * (eq4 * (na1 * n2 + na2 * n1)
@@ -629,6 +655,8 @@ where
             }
             (true, false, true, true) => {
                 rate.gamma = gamma * eq1 * eq3 * eq4;
+                rate.delta_gamma = delta_gamma.map(|v| v * eq1 * eq3 * eq4);
+                let delta_gamma = delta_gamma.unwrap_or_default();
                 match (eq1 == 0.0, eq3 == 0.0, eq4 == 0.0) {
                     (true, true, true) | (true, true, false) | (true, false, true) => {
                         rate.symmetric = 0.0;
@@ -637,17 +665,17 @@ where
                     (false, true, true) | (false, true, false) | (false, false, true) => {
                         rate.symmetric = -gamma * eq1 * n3 * n4;
                         rate.asymmetric =
-                            asymmetry * eq1 * n3 * n4 - gamma * eq1 * (na3 * n4 + na4 * n3);
+                            delta_gamma * eq1 * n3 * n4 - gamma * eq1 * (na3 * n4 + na4 * n3);
                     }
                     (true, false, false) => {
                         rate.symmetric = gamma * eq3 * eq4 * n1 * checked_div(n2, eq2);
-                        rate.asymmetric = asymmetry * eq3 * eq4 * n1 * checked_div(n2, eq2)
+                        rate.asymmetric = delta_gamma * eq3 * eq4 * n1 * checked_div(n2, eq2)
                             + gamma * eq3 * eq4 * checked_div(na1 * n2 + na2 * n1, eq2);
                     }
                     (false, false, false) => {
                         rate.symmetric =
                             gamma * (eq3 * eq4 * n1 * checked_div(n2, eq2) - eq1 * n3 * n4);
-                        rate.asymmetric = asymmetry
+                        rate.asymmetric = delta_gamma
                             * (eq3 * eq4 * n1 * checked_div(n2, eq2) + eq1 * n3 * n4)
                             + gamma
                                 * (eq3 * eq4 * checked_div(na1 * n2 + na2 * n1, eq2)
@@ -657,6 +685,8 @@ where
             }
             (false, true, true, true) => {
                 rate.gamma = gamma * eq2 * eq3 * eq4;
+                rate.delta_gamma = delta_gamma.map(|v| v * eq2 * eq3 * eq4);
+                let delta_gamma = delta_gamma.unwrap_or_default();
                 match (eq2 == 0.0, eq3 == 0.0, eq4 == 0.0) {
                     (true, true, true) | (true, true, false) | (true, false, true) => {
                         rate.symmetric = 0.0;
@@ -665,17 +695,17 @@ where
                     (false, true, true) | (false, true, false) | (false, false, true) => {
                         rate.symmetric = -gamma * eq2 * n3 * n4;
                         rate.asymmetric =
-                            asymmetry * eq2 * n3 * n4 - gamma * eq2 * (na3 * n4 + na4 * n3);
+                            delta_gamma * eq2 * n3 * n4 - gamma * eq2 * (na3 * n4 + na4 * n3);
                     }
                     (true, false, false) => {
                         rate.symmetric = gamma * (eq3 * eq4 * checked_div(n1, eq1) * n2);
-                        rate.asymmetric = asymmetry * (eq3 * eq4 * checked_div(n1, eq1) * n2)
+                        rate.asymmetric = delta_gamma * (eq3 * eq4 * checked_div(n1, eq1) * n2)
                             + gamma * (eq3 * eq4 * checked_div(na1 * n2 + na2 * n1, eq2));
                     }
                     (false, false, false) => {
                         rate.symmetric =
                             gamma * (eq3 * eq4 * checked_div(n1, eq1) * n2 - eq2 * n3 * n4);
-                        rate.asymmetric = asymmetry
+                        rate.asymmetric = delta_gamma
                             * (eq3 * eq4 * checked_div(n1, eq1) * n2 + eq2 * n3 * n4)
                             + gamma
                                 * (eq3 * eq4 * checked_div(na1 * n2 + na2 * n1, eq2)
@@ -686,12 +716,14 @@ where
             // Four heavy particles
             (true, true, true, true) => {
                 rate.gamma = gamma * eq1 * eq2 * eq3 * eq4;
+                rate.delta_gamma = delta_gamma.map(|v| v * eq1 * eq2 * eq3 * eq4);
+                let delta_gamma = delta_gamma.unwrap_or_default();
                 if rate.gamma == 0.0 {
                     rate.symmetric = 0.0;
                     rate.asymmetric = 0.0;
                 } else {
                     rate.symmetric = gamma * (eq3 * eq4 * n1 * n2 - eq1 * eq2 * n3 * n4);
-                    rate.asymmetric = asymmetry * (eq3 * eq4 * n1 * n2 + eq1 * eq2 * n3 * n4)
+                    rate.asymmetric = delta_gamma * (eq3 * eq4 * n1 * n2 + eq1 * eq2 * n3 * n4)
                         + gamma
                             * (eq3 * eq4 * (na1 * n2 + na2 * n1)
                                 - eq1 * eq2 * (na3 * n4 + na4 * n3));
