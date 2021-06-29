@@ -102,14 +102,41 @@ where
 
 /// Filter interactions based whether they involve first-generation particles
 /// only or not.
-pub fn one_generation<I, M>(interaction: &I) -> bool
+#[allow(dead_code)]
+pub fn n1f1<I, M>(interaction: &I) -> bool
 where
     I: Interaction<M>,
     M: Model,
 {
-    let ptcl = interaction.particles_idx();
-    ptcl.incoming.iter().chain(&ptcl.outgoing).all(|i| match i {
-        1 | 2 | 3 | 4 | 5 | 8 | 11 | 14 | 17 | 20 => true,
-        _ => false,
-    })
+    let ptcl = interaction.particles();
+    ptcl.incoming_idx
+        .iter()
+        .chain(&ptcl.outgoing_idx)
+        .all(|i| matches!(i, 1 | 2 | 3 | 4 | 5 | 8 | 11 | 14 | 17 | 20))
+}
+
+/// Filter interactions based whether they involve first-generation particles
+/// only or not.
+#[allow(dead_code)]
+pub fn n3f1<I, M>(interaction: &I) -> bool
+where
+    I: Interaction<M>,
+    M: Model,
+{
+    let ptcl = interaction.particles();
+    ptcl.incoming_idx
+        .iter()
+        .chain(&ptcl.outgoing_idx)
+        .all(|i| matches!(i, 1 | 2 | 3 | 4 | 5 | 8 | 11 | 14 | 17 | 20 | 21 | 22))
+}
+
+/// Filter interactions based whether they involve first-generation particles
+/// only or not.
+#[allow(dead_code)]
+pub fn n3f3<I, M>(_interaction: &I) -> bool
+where
+    I: Interaction<M>,
+    M: Model,
+{
+    true
 }
