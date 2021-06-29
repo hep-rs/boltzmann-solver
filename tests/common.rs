@@ -59,11 +59,11 @@ pub fn setup_logging(verbosity: usize) {
 /// Setup an output directory and return the corresponding [`PathBuf`].
 ///
 /// The output directory is created in the system's temporary directory and
-/// named `"boltzmann_solver"`, and the relevant `subdir` is dreated within
+/// named `"boltzmann-solver"`, and the relevant `subdir` is dreated within
 /// that.
 pub fn output_dir<P: AsRef<Path>>(subdir: P) -> PathBuf {
     let mut dir = temp_dir();
-    dir.push("boltzmann_solver");
+    dir.push("boltzmann-solver");
     dir.push(subdir);
     if !dir.is_dir() {
         log::info!("Creating output directory: {}", dir.display());
