@@ -464,12 +464,16 @@ pub trait Interaction<M: Model> {
 pub fn overshoots<M>(c: &Context<M>, particles: &InteractionParticles, rate: &RateDensity) -> bool {
     let f = particles.symmetric_prefactor_fn(&c.n, &c.eqn, &c.in_equilibrium);
     let a = f(0.0);
-    if a.is_nan() {
+    if !a.is_finite() {
         true
+    } else if a == 0.0 {
+        false
     } else {
         let b = f(rate.symmetric);
-        if b.is_nan() {
+        if !b.is_finite() {
             true
+        } else if b == 0.0 {
+            false
         } else {
             a.signum() != b.signum()
         }
@@ -487,12 +491,16 @@ pub fn asymmetry_overshoots<M>(
     let f =
         particles.asymmetric_prefactor_fn(&c.n, &c.na, &c.eqn, &c.in_equilibrium, &c.no_asymmetry);
     let a = f(0.0);
-    if a.is_nan() {
+    if !a.is_finite() {
         true
+    } else if a == 0.0 {
+        false
     } else {
         let b = f(rate.asymmetric);
-        if b.is_nan() {
+        if !b.is_finite() {
             true
+        } else if b == 0.0 {
+            false
         } else {
             a.signum() != b.signum()
         }
