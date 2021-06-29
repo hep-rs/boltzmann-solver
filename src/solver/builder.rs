@@ -416,11 +416,11 @@ where
     M: ModelInteractions,
 {
     /// Precompute the interaction rates.
-    #[cfg(not(feature = "parallel"))]
     #[allow(dead_code)]
+    #[cfg(not(feature = "parallel"))]
     fn do_precompute(model: &mut M, beta_range: (f64, f64)) {
         log::info!("Pre-computing γ...");
-        for (i, &beta) in vec![
+        for (i, &beta) in [
             0.98 * beta_range.0,
             0.99 * beta_range.0,
             1.01 * beta_range.1,
@@ -458,11 +458,11 @@ where
     }
 
     /// Precompute the interaction rates.
-    #[cfg(feature = "parallel")]
     #[allow(dead_code)]
+    #[cfg(feature = "parallel")]
     fn do_precompute(model: &mut M, beta_range: (f64, f64)) {
         log::info!("Pre-computing γ...");
-        for (i, &beta) in vec![
+        for (i, &beta) in [
             0.98 * beta_range.0,
             0.99 * beta_range.0,
             1.01 * beta_range.1,
