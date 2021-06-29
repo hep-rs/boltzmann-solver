@@ -515,7 +515,8 @@ pub struct Solver<M> {
     step_precision: StepPrecision,
     error_tolerance: f64,
     fast_interactions: bool,
-    // abort_when_inaccurate: bool,
+    inaccurate: bool,
+    abort_when_inaccurate: bool,
 }
 
 impl<M> Solver<M>
@@ -570,7 +571,7 @@ where
         // regular integration.
         let (mut n, mut na) = (&c.n + &workspace.dn, &c.na + &workspace.dna);
 
-        let mut count = 0_usize;
+        let mut iterations = 0_usize;
         loop {
             // Go through all fast interactions and apply the change to the
             // number densities.  We also store the deltas applied to determine
@@ -608,6 +609,8 @@ where
                         .collect()
                 });
 
+            log::trace!("Iteration {}:\nδ = {:?}", iterations, deltas);
+
             // Fix equilibrium one last time
             for &p in &self.in_equilibrium {
                 n[p] = c.eqn[p];
@@ -624,14 +627,14 @@ where
                 break;
             }
 
-            count += 1;
-            if count >= 50 {
+            iterations += 1;
+            if iterations >= 50 {
                     log::error!(
                     "[{}.{:02}|{:>9.3e}] Unable to converge fast interactions after {} iterations.",
                         c.step,
                         c.substep,
                         c.beta,
-                    count
+                    iterations
                     );
                     panic!();
             }
@@ -837,7 +840,8 @@ where
             // log::trace!("[{}|{:.3e}]      eq = {:<+10.3e}", step, beta, c.eq);
             self.fix_change(&c, &mut workspace);
 
-            let err = workspace.local_error();
+            #[allow(clippy::cast_precision_loss)]
+            let err = workspace.local_error() / self.model.interactions().len() as f64;
 
             // If the error is within the tolerance, we'll be advancing the
             // iteration step
@@ -858,7 +862,6 @@ where
                     self.error_tolerance
                 );
                 steps_discarded += 1;
-                log::trace!("[{}|{:.3e}] Discarding integration step.", step, beta);
             } else {
                 steps_discarded += 1;
             }

@@ -571,7 +571,8 @@ where
             step_precision: self.step_precision,
             error_tolerance: self.error_tolerance,
             fast_interactions: self.fast_interactions,
-            // abort_when_inaccurate: self.abort_when_inaccurate,
+            inaccurate: false,
+            abort_when_inaccurate: self.abort_when_inaccurate,
         })
     }
 }
