@@ -49,7 +49,7 @@ fn no_interaction() -> Result<(), Box<dyn error::Error>> {
         .beta_range(BETA_START, 1e1)
         .fast_interaction(true)
         .build()?
-        .solve();
+        .solve()?;
 
     // Check that number densities have not changed.
     assert_eq!(n0, n);
@@ -93,7 +93,7 @@ fn unit_amplitude() -> Result<(), Box<dyn error::Error>> {
         })
         .fast_interaction(true)
         .build()?
-        .solve();
+        .solve()?;
 
     // Check initial number densities
     approx_eq(n0[1], 1.0, 4.0, 1e-50)?;
@@ -183,7 +183,7 @@ fn unit_gamma() -> Result<(), Box<dyn error::Error>> {
         })
         .fast_interaction(true)
         .build()?
-        .solve();
+        .solve()?;
 
     // Check initial number densities
     approx_eq(n0[1], 1.0, 4.0, 1e-50)?;
@@ -276,7 +276,7 @@ fn unit_rate() -> Result<(), Box<dyn error::Error>> {
         })
         .fast_interaction(true)
         .build()?
-        .solve();
+        .solve()?;
 
     // Check final number densities
     approx_eq(n[1], 0.0, 4.0, 1e-4)?;
@@ -365,7 +365,7 @@ fn unit_adj_rate() -> Result<(), Box<dyn error::Error>> {
         })
         .fast_interaction(true)
         .build()?
-        .solve();
+        .solve()?;
 
     // Check final number densities
     approx_eq(n[1], 1.0 - BETA_END, 4.0, 1e-9)?;
@@ -495,7 +495,7 @@ fn sin_cos() -> Result<(), Box<dyn error::Error>> {
         .initial_densities(vec![(1, 0.0), (2, 1.0)])
         .fast_interaction(true)
         .build()?
-        .solve();
+        .solve()?;
 
     // Check final number densities
     approx_eq(n[1], BETA_END.sin(), 3.0, 1e-10)?;
@@ -614,7 +614,7 @@ fn brusselator_stable() -> Result<(), Box<dyn error::Error>> {
         .initial_densities(vec![(1, 1.0), (2, 1.0)])
         .fast_interaction(true)
         .build()?
-        .solve();
+        .solve()?;
 
     // Check final number densities
     approx_eq(n[1], 0.972_098, 3.0, 1e-10)?;
@@ -732,7 +732,7 @@ fn brusselator_unstable() -> Result<(), Box<dyn error::Error>> {
         .initial_densities(vec![(1, 1.0), (2, 1.0)])
         .fast_interaction(true)
         .build()?
-        .solve();
+        .solve()?;
 
     // Check final number densities
     approx_eq(n[1], 0.373_265, 3.0, 1e-10)?;
@@ -778,7 +778,7 @@ fn chained_decay() -> Result<(), Box<dyn error::Error>> {
         })
         .fast_interaction(true)
         .build()?
-        .solve();
+        .solve()?;
 
     // Check initial number densities
     approx_eq(n0[1], 1.0, 4.0, 1e-50)?;
@@ -844,7 +844,7 @@ fn scattering_massless() -> Result<(), Box<dyn error::Error>> {
         .initial_densities(vec![(1, n0[1]), (2, n0[2]), (3, n0[3]), (4, n0[4])])
         .fast_interaction(true)
         .build()?
-        .solve();
+        .solve()?;
 
     approx_eq(n[1] * n[2], n[3] * n[4], 2.0, 0.0)?;
 
@@ -898,7 +898,7 @@ fn scattering_massless_eq_1122() -> Result<(), Box<dyn error::Error>> {
         .in_equilibrium(vec![2])
         .fast_interaction(true)
         .build()?
-        .solve();
+        .solve()?;
 
     approx_eq(n[1] * n[2], n[3] * n[4], 2.0, 0.0)?;
 
@@ -953,7 +953,7 @@ fn scattering_massless_eq_1234() -> Result<(), Box<dyn error::Error>> {
         .in_equilibrium(vec![3, 4])
         .fast_interaction(true)
         .build()?
-        .solve();
+        .solve()?;
 
     approx_eq(n[1] * n[2], n[3] * n[4], 2.0, 0.0)?;
 
@@ -1004,7 +1004,7 @@ fn scattering_m000() -> Result<(), Box<dyn error::Error>> {
         })
         .fast_interaction(true)
         .build()?
-        .solve();
+        .solve()?;
 
     // Check initial number densities
     approx_eq(n0[1], 1.0, 4.0, 1e-50)?;
@@ -1062,7 +1062,7 @@ fn scattering_m0m0() -> Result<(), Box<dyn error::Error>> {
         })
         .fast_interaction(true)
         .build()?
-        .solve();
+        .solve()?;
 
     // Check initial number densities
     approx_eq(n0[1], 1.0, 4.0, 1e-50)?;
@@ -1123,7 +1123,7 @@ fn scattering_mm00() -> Result<(), Box<dyn error::Error>> {
         })
         .fast_interaction(true)
         .build()?
-        .solve();
+        .solve()?;
 
     // Check initial number densities
     approx_eq(n0[1], 1.0, 4.0, 1e-50)?;
@@ -1185,7 +1185,7 @@ fn scattering_mmmm() -> Result<(), Box<dyn error::Error>> {
         .initial_densities(vec![(1, 1.3), (2, 1.1), (3, 0.9), (4, 0.6)])
         .fast_interaction(true)
         .build()?
-        .solve();
+        .solve()?;
 
     // Check final number densities
     approx_eq(n[1] * n[2], n[3] * n[4], 2.0, 1e-5)?;
@@ -1239,7 +1239,7 @@ fn scattering_mm00_eq() -> Result<(), Box<dyn error::Error>> {
         .in_equilibrium(vec![3, 4])
         .fast_interaction(true)
         .build()?
-        .solve();
+        .solve()?;
 
     // Check initial number densities
     approx_eq(n0[1], 1.0, 4.0, 1e-50)?;

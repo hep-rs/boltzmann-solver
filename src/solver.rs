@@ -340,48 +340,27 @@ use std::{
     collections::HashSet, convert::TryFrom, error, fmt, io::Write, mem, ops, ptr, sync::RwLock,
 };
 
-/// Error type returned by the solver builder in case there is an error.
+/// Error type returned by the solver in case there is an error during
+/// integration.
+///
+/// The underlying number density and number density asymmetry arrays can be
+/// obtained with [`Error::into_inner`].
 #[derive(Debug)]
 pub enum Error {
-    /// One or more initial density is specified multiple times.
-    DuplicateInitialDensities,
-    /// The initial number densities are invalid.
-    InvalidInitialDensities,
-    /// One or more initial density asymmetry is specified multiple times.
-    DuplicateInitialAsymmetries,
-    /// The initial asymmetries are invalid.
-    InvalidInitialAsymmetries,
-    /// The number of particles held in equilibrium exceeds the number of
-    /// particles in the model.
-    TooManyInEquilibrium,
-    /// The number of particles with no asymmetry exceeds the number of
-    /// particles in the model.
-    TooManyNoAsymmetry,
-    /// The underlying model has not been specified
-    UndefinedModel,
+    /// Result is inaccurate.
+    ///
+    /// If [`SolverBuilder::abort_when_inaccurate`] was set to true, the number
+    /// densities returned
+    Inaccurate((Array1<f64>, Array1<f64>)),
+    /// One of more number density was NAN.
+    NAN((Array1<f64>, Array1<f64>)),
 }
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::DuplicateInitialDensities => {
-                write!(f, "one or more initial density is specified multiple times")
-            }
-            Error::InvalidInitialDensities => write!(f, "initial number densities are invalid"),
-            Error::DuplicateInitialAsymmetries => write!(
-                f,
-                "one or more initial density asymmetry is specified multiple times"
-            ),
-            Error::InvalidInitialAsymmetries => {
-                write!(f, "initial number density asymmetries are invalid")
-            }
-            Error::TooManyInEquilibrium => {
-                write!(f, "too many particles held in equilibrium for the model")
-            }
-            Error::TooManyNoAsymmetry => {
-                write!(f, "too many particles without asymmetry for the model")
-            }
-            Error::UndefinedModel => write!(f, "underlying model is not defined"),
+            Error::Inaccurate(_) => write!(f, "Result my be inaccurate"),
+            Error::NAN(_) => write!(f, "NAN number density encountered"),
         }
     }
 }
@@ -389,6 +368,17 @@ impl fmt::Display for Error {
 impl error::Error for Error {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         None
+    }
+}
+
+impl Error {
+    /// Unwrap the error and return the underlying number density and number
+    /// density asymmetry arrays respectively.
+    #[must_use]
+    pub fn into_inner(self) -> (Array1<f64>, Array1<f64>) {
+        match self {
+            Error::Inaccurate(v) | Error::NAN(v) => v,
+        }
     }
 }
 
@@ -673,49 +663,65 @@ where
         } else {
             delta.clamp(0.1, 2.0)
         }
+    }
 
-        // Ensure that h is within the desired range of step sizes.
-        // let h_on_beta = h / beta;
-        // if h_on_beta > self.step_precision.max {
-        //     h = beta * self.step_precision.max;
-        //     log::info!(
-        //         "[{}|{:.3e}] Step size too large, decreased h to {:.3e}",
+    /// Ensure that h is within the desired range of step sizes.
+    ///
+    /// This function returns a [`Result`] with:
+    ///
+    /// - `Ok(h)` indicating that the step size was either unchanged or made
+    ///   smaller and integration can proceed with no worry about the error
+    ///   estimate.
+    /// - `Err(h)` indicating that the step size was increased.  The local error
+    ///   estimate requires a smaller step size than the minimal value allowed
+    ///   and thus the result of the integration may be inaccurate.
+    fn adjust_h(&mut self, step: usize, mut h: f64, beta: f64) -> Result<f64, f64> {
+        let h_on_beta = h / beta;
+
+        if h_on_beta > self.step_precision.max {
+            h = beta * self.step_precision.max;
+            log::trace!(
+                "[{}|{:.3e}] Step size too large, decreased h to {:.3e}",
+                step,
+                beta,
+                h
+            );
+
+            Ok(h)
+        } else if h_on_beta < self.step_precision.min {
+            h = beta * self.step_precision.min;
+            log::debug!(
+                "[{}|{:.3e}] Step size too small, increased h to {:.3e}",
+                step,
+                beta,
+                h
+            );
+
+            // Give a warning (if not done already).
+            if !self.inaccurate {
+                log::warn!(
+                    "[{}|{:.3e}] Step size too small at β.  Result may not be accurate",
+                    step,
+                    beta,
+                );
+                self.inaccurate = true;
+            }
+
+            Err(h)
+
+            // // Stop integration or force going ahead if the local error is too large.
+            // if self.abort_when_inaccurate {
+            //     log::warn!(
+            //         "[{}|{:.3e}] Aborting integration due to inaccuracy.",
         //         step,
         //         beta,
-        //         h
         //     );
-        // } else if h_on_beta < self.step_precision.min {
-        //     h = beta * self.step_precision.min;
-        //     log::info!(
-        //         "[{}|{:.3e}] Step size too small, increased h to {:.3e}",
-        //         step,
-        //         beta,
-        //         h
-        //     );
-
-        //     // Stop integration or force going ahead if the local error is too large.
-        //     if self.abort_when_inaccurate {
-        //         log::warn!(
-        //             "[{}|{:.3e}] Aborting integration due to inaccuracy.",
-        //             step,
-        //             beta,
-        //         );
-        //         break;
-        //     }
-        //     advance = true;
-
-        //     // Give a warning, but only do so once.
-        //     if !inaccurate_warned {
-        //         log::warn!(
-        //             "[{}|{:.3e}] Step size too small at β.  Result may not be accurate",
-        //             step,
-        //             beta,
-        //         );
-        //         inaccurate_warned = true;
-        //     }
+            //     break;
         // }
-
-        // h
+            // advance = true;
+        } else {
+            Ok(h)
+        }
     }
 
     /// Evolve the initial conditions by solving the PDEs.
@@ -724,8 +730,15 @@ where
     /// into an ODE in time (or inverse temperature in this case), with the
     /// derivative in energy being calculated solely from the previous
     /// time-step.
+    ///
+    /// # Errors
+    ///
+    /// If the time evolution encounters an error, the function returns an
+    /// error.  The final number density (despite the error) can still be
+    /// obtained by using [`Error::into_inner`], though this may not be at the
+    /// expected final temperature as some errors abort the integration.
     #[allow(clippy::too_many_lines)]
-    pub fn solve(&mut self) -> (Array1<f64>, Array1<f64>) {
+    pub fn solve(&mut self) -> Result<(Array1<f64>, Array1<f64>), Error> {
         use tableau::{RK_A, RK_C, RK_S};
 
         const BETA_LOG_STEP: f64 = 1.0;
@@ -733,9 +746,9 @@ where
         // Initialize all the variables that will be used in the integration
         let mut workspace = Workspace::new(&self.initial_densities, &self.initial_asymmetries);
 
-        let mut step = 0;
-        let mut steps_discarded = 0_u64;
-        let mut evals = 0_u64;
+        let mut step = 0_usize;
+        let mut steps_discarded = 0_usize;
+        let mut evals = 0_usize;
         let mut beta = self.beta_range.0;
         let mut h = beta * f64::sqrt(self.step_precision.min * self.step_precision.max);
         let mut beta_logging = beta * BETA_LOG_STEP;
@@ -846,10 +859,25 @@ where
                 );
                 steps_discarded += 1;
                 log::trace!("[{}|{:.3e}] Discarding integration step.", step, beta);
+            } else {
+                steps_discarded += 1;
             }
 
             // Adjust the step size based on the error
             h *= self.delta(err);
+            h = match self.adjust_h(step, h, beta) {
+                Ok(h) => h,
+                Err(h) => {
+                    if self.abort_when_inaccurate {
+                        return Err(Error::Inaccurate(workspace.result()));
+                    }
+
+                    workspace.advance();
+                    beta += h;
+
+                    h
+                }
+            };
 
             // Adjust final integration step if needed
             if beta + h > self.beta_range.1 {
@@ -866,7 +894,11 @@ where
         log::info!("Number of integration steps discarded: {}", steps_discarded);
         log::info!("Number of evaluations: {}", evals);
 
-        workspace.result()
+        if self.inaccurate {
+            Err(Error::Inaccurate(workspace.result()))
+        } else {
+            Ok(workspace.result())
+        }
     }
 
     /// Compute the interaction rates.
@@ -1021,7 +1053,7 @@ where
     #[allow(clippy::too_many_arguments)]
     fn context(
         &self,
-        step: u64,
+        step: usize,
         substep: Option<usize>,
         step_size: f64,
         (beta, next_beta): (f64, f64),
