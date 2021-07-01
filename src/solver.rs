@@ -410,6 +410,8 @@ impl Workspace {
 
         let mut k: [Array1<f64>; tableau::RK_S];
         let mut ka: [Array1<f64>; tableau::RK_S];
+
+        #[allow(clippy::uninit_assumed_init)]
         unsafe {
             k = mem::MaybeUninit::uninit().assume_init();
             for ki in &mut k[..] {
@@ -629,14 +631,14 @@ where
 
             iterations += 1;
             if iterations >= 50 {
-                    log::error!(
+                log::error!(
                     "[{}.{:02}|{:>9.3e}] Unable to converge fast interactions after {} iterations.",
-                        c.step,
-                        c.substep,
-                        c.beta,
+                    c.step,
+                    c.substep,
+                    c.beta,
                     iterations
-                    );
-                    panic!();
+                );
+                panic!();
             }
         }
 
@@ -716,11 +718,11 @@ where
             // if self.abort_when_inaccurate {
             //     log::warn!(
             //         "[{}|{:.3e}] Aborting integration due to inaccuracy.",
-        //         step,
-        //         beta,
-        //     );
+            //         step,
+            //         beta,
+            //     );
             //     break;
-        // }
+            // }
             // advance = true;
         } else {
             Ok(h)
