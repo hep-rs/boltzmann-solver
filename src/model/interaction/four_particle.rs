@@ -343,12 +343,10 @@ where
                 rate.gamma = gamma;
                 rate.delta_gamma = delta_gamma;
                 let delta_gamma = delta_gamma.unwrap_or_default();
-                rate.symmetric = gamma
-                    * (checked_div(n1, eq1) * checked_div(n2, eq2)
-                        - checked_div(n3, eq3) * checked_div(n4, eq4));
-                rate.asymmetric = delta_gamma
-                    * (checked_div(n1, eq1) * checked_div(n2, eq2)
-                        + checked_div(n3, eq3) * checked_div(n4, eq4))
+                let symmetric_prefactor = checked_div(n1, eq1) * checked_div(n2, eq2)
+                    - checked_div(n3, eq3) * checked_div(n4, eq4);
+                rate.symmetric = gamma * symmetric_prefactor;
+                rate.asymmetric = delta_gamma * symmetric_prefactor
                     + gamma
                         * (checked_div(na1 * n2 + na2 * n1, eq1 * eq2)
                             - checked_div(na3 * n4 + na4 * n3, eq3 * eq4));
@@ -360,8 +358,9 @@ where
                 rate.delta_gamma = delta_gamma.map(|v| v * eq1);
                 let delta_gamma = delta_gamma.unwrap_or_default();
                 if eq1 == 0.0 {
-                    rate.symmetric = gamma * (n1 * checked_div(n2, eq2));
-                    rate.asymmetric = delta_gamma * (n1 * checked_div(n2, eq2))
+                    let symmetric_prefactor = n1 * checked_div(n2, eq2);
+                    rate.symmetric = gamma * symmetric_prefactor;
+                    rate.asymmetric = delta_gamma * symmetric_prefactor
                         + gamma * (checked_div(na1 * n2 + na2 * n1, eq2));
                 } else {
                     rate.symmetric = gamma
@@ -380,16 +379,15 @@ where
                 rate.delta_gamma = delta_gamma.map(|v| v * eq2);
                 let delta_gamma = delta_gamma.unwrap_or_default();
                 if eq2 == 0.0 {
-                    rate.symmetric = gamma * checked_div(n1, eq1) * n2;
-                    rate.asymmetric = delta_gamma * checked_div(n1, eq1) * n2
+                    let symmetric_prefactor = checked_div(n1, eq1) * n2;
+                    rate.symmetric = gamma * symmetric_prefactor;
+                    rate.asymmetric = delta_gamma * symmetric_prefactor
                         + gamma * checked_div(na1 * n2 + na2 * n1, eq1);
                 } else {
-                    rate.symmetric = gamma
-                        * (checked_div(n1, eq1) * n2
-                            - eq2 * checked_div(n3, eq3) * checked_div(n4, eq4));
-                    rate.asymmetric = delta_gamma
-                        * (checked_div(n1, eq1) * n2
-                            + eq2 * checked_div(n3, eq3) * checked_div(n4, eq4))
+                    let symmetric_prefactor = checked_div(n1, eq1) * n2
+                        - eq2 * checked_div(n3, eq3) * checked_div(n4, eq4);
+                    rate.symmetric = gamma * symmetric_prefactor;
+                    rate.asymmetric = delta_gamma * symmetric_prefactor
                         + gamma
                             * (checked_div(na1 * n2 + na2 * n1, eq1)
                                 - eq2 * checked_div(na3 * n4 + na4 * n3, eq3 * eq4));
@@ -400,16 +398,15 @@ where
                 rate.delta_gamma = delta_gamma.map(|v| v * eq3);
                 let delta_gamma = delta_gamma.unwrap_or_default();
                 if eq3 == 0.0 {
-                    rate.symmetric = -gamma * n3 * checked_div(n4, eq4);
-                    rate.asymmetric = delta_gamma * n3 * checked_div(n4, eq4)
+                    let symmetric_prefactor = -n3 * checked_div(n4, eq4);
+                    rate.symmetric = gamma * symmetric_prefactor;
+                    rate.asymmetric = delta_gamma * symmetric_prefactor
                         - gamma * checked_div(na3 * n4 + na4 * n3, eq4);
                 } else {
-                    rate.symmetric = gamma
-                        * (eq3 * checked_div(n1, eq1) * checked_div(n2, eq2)
-                            - n3 * checked_div(n4, eq4));
-                    rate.asymmetric = delta_gamma
-                        * (eq3 * checked_div(n1, eq1) * checked_div(n2, eq2)
-                            + n3 * checked_div(n4, eq4))
+                    let symmetric_prefactor = eq3 * checked_div(n1, eq1) * checked_div(n2, eq2)
+                        - n3 * checked_div(n4, eq4);
+                    rate.symmetric = gamma * symmetric_prefactor;
+                    rate.asymmetric = delta_gamma * symmetric_prefactor
                         + gamma
                             * (eq3 * checked_div(na1 * n2 + na2 * n1, eq1 * eq2)
                                 - checked_div(na3 * n4 + na4 * n3, eq4))
@@ -420,16 +417,15 @@ where
                 rate.delta_gamma = delta_gamma.map(|v| v * eq4);
                 let delta_gamma = delta_gamma.unwrap_or_default();
                 if eq4 == 0.0 {
-                    rate.symmetric = -gamma * checked_div(n3, eq3) * n4;
-                    rate.asymmetric = delta_gamma * checked_div(n3, eq3) * n4
+                    let symmetric_prefactor = -checked_div(n3, eq3) * n4;
+                    rate.symmetric = gamma;
+                    rate.asymmetric = delta_gamma * symmetric_prefactor
                         - gamma * checked_div(na3 * n4 + na4 * n3, eq3);
                 } else {
-                    rate.symmetric = gamma
-                        * (eq4 * checked_div(n1, eq1) * checked_div(n2, eq2)
-                            - checked_div(n3, eq3) * n4);
-                    rate.asymmetric = delta_gamma
-                        * (eq4 * checked_div(n1, eq1) * checked_div(n2, eq2)
-                            + checked_div(n3, eq3) * n4)
+                    let symmetric_prefactor = eq4 * checked_div(n1, eq1) * checked_div(n2, eq2)
+                        - checked_div(n3, eq3) * n4;
+                    rate.symmetric = gamma * symmetric_prefactor;
+                    rate.asymmetric = delta_gamma * symmetric_prefactor
                         + gamma
                             * (eq4 * checked_div(na1 * n2 + na2 * n1, eq1 * eq2)
                                 - checked_div(na3 * n4 + na4 * n3, eq3));
@@ -442,13 +438,15 @@ where
                 rate.delta_gamma = delta_gamma.map(|v| v * eq1 * eq2);
                 let delta_gamma = delta_gamma.unwrap_or_default();
                 if eq1 * eq2 == 0.0 {
-                    rate.symmetric = gamma * n1 * n2;
-                    rate.asymmetric = delta_gamma * n1 * n2 + gamma * (na1 * n2 + na2 * n1);
+                    let symmetric_prefactor = n1 * n2;
+                    rate.symmetric = gamma * symmetric_prefactor;
+                    rate.asymmetric =
+                        delta_gamma * symmetric_prefactor + gamma * (na1 * n2 + na2 * n1);
                 } else {
-                    rate.symmetric =
-                        gamma * (n1 * n2 - eq1 * eq2 * checked_div(n3, eq3) * checked_div(n4, eq4));
-                    rate.asymmetric = delta_gamma
-                        * (n1 * n2 + eq1 * eq2 * checked_div(n3, eq3) * checked_div(n4, eq4))
+                    let symmetric_prefactor =
+                        n1 * n2 - eq1 * eq2 * checked_div(n3, eq3) * checked_div(n4, eq4);
+                    rate.symmetric = gamma * symmetric_prefactor;
+                    rate.asymmetric = delta_gamma * symmetric_prefactor
                         + gamma
                             * ((na1 * n2 + na2 * n1)
                                 - eq1 * eq2 * checked_div(na3 * n4 + na4 * n3, eq3 * eq4));
@@ -464,20 +462,22 @@ where
                         rate.asymmetric = 0.0;
                     }
                     (true, false) => {
-                        rate.symmetric = gamma * eq3 * n1 * checked_div(n2, eq2);
-                        rate.asymmetric = delta_gamma * eq3 * n1 * checked_div(n2, eq2)
+                        let symmetric_prefactor = eq3 * n1 * checked_div(n2, eq2);
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             + gamma * eq3 * checked_div(na1 * n2 + na2 * n1, eq2);
                     }
                     (false, true) => {
-                        rate.symmetric = -gamma * eq1 * n3 * checked_div(n4, eq4);
-                        rate.asymmetric = delta_gamma * eq1 * n3 * checked_div(n4, eq4)
+                        let symmetric_prefactor = -eq1 * n3 * checked_div(n4, eq4);
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             - gamma * eq1 * checked_div(na3 * n4 + na4 * n3, eq4);
                     }
                     (false, false) => {
-                        rate.symmetric = gamma
-                            * (eq3 * n1 * checked_div(n2, eq2) - eq1 * n3 * checked_div(n4, eq4));
-                        rate.asymmetric = delta_gamma
-                            * (eq3 * n1 * checked_div(n2, eq2) + eq1 * n3 * checked_div(n4, eq4))
+                        let symmetric_prefactor =
+                            eq3 * n1 * checked_div(n2, eq2) - eq1 * n3 * checked_div(n4, eq4);
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             + gamma
                                 * (eq3 * checked_div(na1 * n2 + na2 * n1, eq2)
                                     - eq1 * checked_div(na3 * n4 + na4 * n3, eq4));
@@ -494,20 +494,22 @@ where
                         rate.asymmetric = 0.0;
                     }
                     (true, false) => {
-                        rate.symmetric = gamma * eq4 * n1 * checked_div(n2, eq2);
-                        rate.asymmetric = delta_gamma * eq4 * n1 * checked_div(n2, eq2)
+                        let symmetric_prefactor = eq4 * n1 * checked_div(n2, eq2);
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             + gamma * eq4 * checked_div(na1 * n2 + na2 * n1, eq2);
                     }
                     (false, true) => {
-                        rate.symmetric = -gamma * eq1 * checked_div(n3, eq3) * n4;
-                        rate.asymmetric = delta_gamma * eq1 * checked_div(n3, eq3) * n4
+                        let symmetric_prefactor = -eq1 * checked_div(n3, eq3) * n4;
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             - gamma * eq1 * checked_div(na3 * n4 + na4 * n3, eq3);
                     }
                     (false, false) => {
-                        rate.symmetric = gamma
-                            * (eq4 * n1 * checked_div(n2, eq2) - eq1 * checked_div(n3, eq3) * n4);
-                        rate.asymmetric = delta_gamma
-                            * (eq4 * n1 * checked_div(n2, eq2) + eq1 * checked_div(n3, eq3) * n4)
+                        let symmetric_prefactor =
+                            eq4 * n1 * checked_div(n2, eq2) - eq1 * checked_div(n3, eq3) * n4;
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             + gamma
                                 * (eq4 * checked_div(na1 * n2 + na2 * n1, eq2)
                                     - eq1 * checked_div(na3 * n4 + na4 * n3, eq3));
@@ -524,20 +526,22 @@ where
                         rate.asymmetric = 0.0;
                     }
                     (true, false) => {
-                        rate.symmetric = gamma * eq3 * checked_div(n1, eq1) * n2;
-                        rate.asymmetric = delta_gamma * eq3 * checked_div(n1, eq1) * n2
+                        let symmetric_prefactor = eq3 * checked_div(n1, eq1) * n2;
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             + gamma * eq3 * checked_div(na1 * n2 + na2 * n1, eq1);
                     }
                     (false, true) => {
-                        rate.symmetric = -gamma * eq2 * n3 * checked_div(n4, eq4);
-                        rate.asymmetric = delta_gamma * eq2 * n3 * checked_div(n4, eq4)
+                        let symmetric_prefactor = -eq2 * n3 * checked_div(n4, eq4);
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             - gamma * eq2 * checked_div(na3 * n4 + na4 * n3, eq4);
                     }
                     (false, false) => {
-                        rate.symmetric = gamma
-                            * (eq3 * checked_div(n1, eq1) * n2 - eq2 * n3 * checked_div(n4, eq4));
-                        rate.asymmetric = delta_gamma
-                            * (eq3 * checked_div(n1, eq1) * n2 + eq2 * n3 * checked_div(n4, eq4))
+                        let symmetric_prefactor =
+                            eq3 * checked_div(n1, eq1) * n2 - eq2 * n3 * checked_div(n4, eq4);
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             + gamma
                                 * (eq3 * checked_div(na1 * n2 + na2 * n1, eq1)
                                     - eq2 * checked_div(na3 * n4 + na4 * n3, eq4));
@@ -554,20 +558,22 @@ where
                         rate.asymmetric = 0.0;
                     }
                     (true, false) => {
-                        rate.symmetric = gamma * eq4 * checked_div(n1, eq1) * n2;
-                        rate.asymmetric = delta_gamma * eq4 * checked_div(n1, eq1) * n2
+                        let symmetric_prefactor = eq4 * checked_div(n1, eq1) * n2;
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             + gamma * eq4 * checked_div(na1 * n2 + na2 * n1, eq1);
                     }
                     (false, true) => {
-                        rate.symmetric = -gamma * eq2 * checked_div(n3, eq3) * n4;
-                        rate.asymmetric = delta_gamma * eq2 * checked_div(n3, eq3) * n4
+                        let symmetric_prefactor = -eq2 * checked_div(n3, eq3) * n4;
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             - gamma * eq2 * checked_div(na3 * n4 + na4 * n3, eq3);
                     }
                     (false, false) => {
-                        rate.symmetric = gamma
-                            * (eq4 * checked_div(n1, eq1) * n2 - eq2 * checked_div(n3, eq3) * n4);
-                        rate.asymmetric = delta_gamma
-                            * (eq4 * checked_div(n1, eq1) * n2 + eq2 * checked_div(n3, eq3) * n4)
+                        let symmetric_prefactor =
+                            eq4 * checked_div(n1, eq1) * n2 - eq2 * checked_div(n3, eq3) * n4;
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             + gamma
                                 * (eq4 * checked_div(na1 * n2 + na2 * n1, eq1)
                                     - eq2 * checked_div(na3 * n4 + na4 * n3, eq3));
@@ -579,13 +585,15 @@ where
                 rate.delta_gamma = delta_gamma.map(|v| v * eq3 * eq4);
                 let delta_gamma = delta_gamma.unwrap_or_default();
                 if eq3 * eq4 == 0.0 {
-                    rate.symmetric = -gamma * n3 * n4;
-                    rate.asymmetric = delta_gamma * n3 * n4 - gamma * (na3 * n4 + na4 * n3);
+                    let symmetric_prefactor = -n3 * n4;
+                    rate.symmetric = gamma * symmetric_prefactor;
+                    rate.asymmetric =
+                        delta_gamma * symmetric_prefactor - gamma * (na3 * n4 + na4 * n3);
                 } else {
-                    rate.symmetric =
-                        gamma * (eq3 * eq4 * checked_div(n1, eq1) * checked_div(n2, eq2) - n3 * n4);
-                    rate.asymmetric = delta_gamma
-                        * (eq3 * eq4 * checked_div(n1, eq1) * checked_div(n2, eq2) + n3 * n4)
+                    let symmetric_prefactor =
+                        eq3 * eq4 * checked_div(n1, eq1) * checked_div(n2, eq2) - n3 * n4;
+                    rate.symmetric = gamma * symmetric_prefactor;
+                    rate.asymmetric = delta_gamma * symmetric_prefactor
                         + gamma
                             * (eq3 * eq4 * checked_div(na1 * n2 + na2 * n1, eq1 * eq2)
                                 - (na3 * n4 + na4 * n3));
@@ -603,20 +611,22 @@ where
                         rate.asymmetric = 0.0;
                     }
                     (true, true, false) | (true, false, false) | (false, true, false) => {
-                        rate.symmetric = gamma * (eq3 * n1 * n2);
-                        rate.asymmetric =
-                            delta_gamma * (eq3 * n1 * n2) + gamma * (eq3 * (na1 * n2 + na2 * n1));
+                        let symmetric_prefactor = eq3 * n1 * n2;
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
+                            + gamma * (eq3 * (na1 * n2 + na2 * n1));
                     }
                     (false, false, true) => {
-                        rate.symmetric = gamma * eq1 * eq2 * n3 * checked_div(n4, eq4);
-                        rate.asymmetric = delta_gamma * eq1 * eq2 * n3 * checked_div(n4, eq4)
+                        let symmetric_prefactor = eq1 * eq2 * n3 * checked_div(n4, eq4);
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             + gamma * eq1 * eq2 * checked_div(na3 * n4 + na4 * n3, eq4);
                     }
                     (false, false, false) => {
-                        rate.symmetric =
-                            gamma * (eq3 * n1 * n2 - eq1 * eq2 * n3 * checked_div(n4, eq4));
-                        rate.asymmetric = delta_gamma
-                            * (eq3 * n1 * n2 + eq1 * eq2 * n3 * checked_div(n4, eq4))
+                        let symmetric_prefactor =
+                            eq3 * n1 * n2 - eq1 * eq2 * n3 * checked_div(n4, eq4);
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             + gamma
                                 * (eq3 * (na1 * n2 + na2 * n1)
                                     - eq1 * eq2 * checked_div(na3 * n4 + na4 * n3, eq4));
@@ -633,20 +643,22 @@ where
                         rate.asymmetric = 0.0;
                     }
                     (true, true, false) | (true, false, false) | (false, true, false) => {
-                        rate.symmetric = gamma * eq4 * n1 * n2;
+                        let symmetric_prefactor = eq4 * n1 * n2;
+                        rate.symmetric = gamma * symmetric_prefactor;
                         rate.asymmetric =
-                            delta_gamma * eq4 * n1 * n2 + gamma * eq4 * (na1 * n2 + na2 * n1);
+                            delta_gamma * symmetric_prefactor + gamma * eq4 * (na1 * n2 + na2 * n1);
                     }
                     (false, false, true) => {
-                        rate.symmetric = -gamma * eq1 * eq2 * checked_div(n3, eq3) * n4;
-                        rate.asymmetric = delta_gamma * eq1 * eq2 * checked_div(n3, eq3) * n4
+                        let symmetric_prefactor = eq1 * eq2 * checked_div(n3, eq3) * n4;
+                        rate.symmetric = -gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             - gamma * eq1 * eq2 * checked_div(na3 * n4 + na4 * n3, eq3);
                     }
                     (false, false, false) => {
-                        rate.symmetric =
-                            gamma * (eq4 * n1 * n2 - eq1 * eq2 * checked_div(n3, eq3) * n4);
-                        rate.asymmetric = delta_gamma
-                            * (eq4 * n1 * n2 + eq1 * eq2 * checked_div(n3, eq3) * n4)
+                        let symmetric_prefactor =
+                            eq4 * n1 * n2 - eq1 * eq2 * checked_div(n3, eq3) * n4;
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             + gamma
                                 * (eq4 * (na1 * n2 + na2 * n1)
                                     - eq1 * eq2 * checked_div(na3 * n4 + na4 * n3, eq3));
@@ -663,20 +675,22 @@ where
                         rate.asymmetric = 0.0;
                     }
                     (false, true, true) | (false, true, false) | (false, false, true) => {
-                        rate.symmetric = -gamma * eq1 * n3 * n4;
+                        let symmetric_prefactor = -eq1 * n3 * n4;
+                        rate.symmetric = gamma * symmetric_prefactor;
                         rate.asymmetric =
-                            delta_gamma * eq1 * n3 * n4 - gamma * eq1 * (na3 * n4 + na4 * n3);
+                            delta_gamma * symmetric_prefactor - gamma * eq1 * (na3 * n4 + na4 * n3);
                     }
                     (true, false, false) => {
-                        rate.symmetric = gamma * eq3 * eq4 * n1 * checked_div(n2, eq2);
-                        rate.asymmetric = delta_gamma * eq3 * eq4 * n1 * checked_div(n2, eq2)
+                        let symmetric_prefactor = eq3 * eq4 * n1 * checked_div(n2, eq2);
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             + gamma * eq3 * eq4 * checked_div(na1 * n2 + na2 * n1, eq2);
                     }
                     (false, false, false) => {
-                        rate.symmetric =
-                            gamma * (eq3 * eq4 * n1 * checked_div(n2, eq2) - eq1 * n3 * n4);
-                        rate.asymmetric = delta_gamma
-                            * (eq3 * eq4 * n1 * checked_div(n2, eq2) + eq1 * n3 * n4)
+                        let symmetric_prefactor =
+                            eq3 * eq4 * n1 * checked_div(n2, eq2) - eq1 * n3 * n4;
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             + gamma
                                 * (eq3 * eq4 * checked_div(na1 * n2 + na2 * n1, eq2)
                                     - eq1 * (na3 * n4 + na4 * n3));
@@ -693,20 +707,22 @@ where
                         rate.asymmetric = 0.0;
                     }
                     (false, true, true) | (false, true, false) | (false, false, true) => {
-                        rate.symmetric = -gamma * eq2 * n3 * n4;
+                        let symmetric_prefactor = -eq2 * n3 * n4;
+                        rate.symmetric = gamma * symmetric_prefactor;
                         rate.asymmetric =
-                            delta_gamma * eq2 * n3 * n4 - gamma * eq2 * (na3 * n4 + na4 * n3);
+                            delta_gamma * symmetric_prefactor - gamma * eq2 * (na3 * n4 + na4 * n3);
                     }
                     (true, false, false) => {
-                        rate.symmetric = gamma * (eq3 * eq4 * checked_div(n1, eq1) * n2);
-                        rate.asymmetric = delta_gamma * (eq3 * eq4 * checked_div(n1, eq1) * n2)
+                        let symmetric_prefactor = eq3 * eq4 * checked_div(n1, eq1) * n2;
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             + gamma * (eq3 * eq4 * checked_div(na1 * n2 + na2 * n1, eq2));
                     }
                     (false, false, false) => {
-                        rate.symmetric =
-                            gamma * (eq3 * eq4 * checked_div(n1, eq1) * n2 - eq2 * n3 * n4);
-                        rate.asymmetric = delta_gamma
-                            * (eq3 * eq4 * checked_div(n1, eq1) * n2 + eq2 * n3 * n4)
+                        let symmetric_prefactor =
+                            eq3 * eq4 * checked_div(n1, eq1) * n2 - eq2 * n3 * n4;
+                        rate.symmetric = gamma * symmetric_prefactor;
+                        rate.asymmetric = delta_gamma * symmetric_prefactor
                             + gamma
                                 * (eq3 * eq4 * checked_div(na1 * n2 + na2 * n1, eq2)
                                     - eq2 * (na3 * n4 + na4 * n3));
@@ -722,8 +738,9 @@ where
                     rate.symmetric = 0.0;
                     rate.asymmetric = 0.0;
                 } else {
-                    rate.symmetric = gamma * (eq3 * eq4 * n1 * n2 - eq1 * eq2 * n3 * n4);
-                    rate.asymmetric = delta_gamma * (eq3 * eq4 * n1 * n2 + eq1 * eq2 * n3 * n4)
+                    let symmetric_prefactor = eq3 * eq4 * n1 * n2 - eq1 * eq2 * n3 * n4;
+                    rate.symmetric = gamma * symmetric_prefactor;
+                    rate.asymmetric = delta_gamma * symmetric_prefactor
                         + gamma
                             * (eq3 * eq4 * (na1 * n2 + na2 * n1)
                                 - eq1 * eq2 * (na3 * n4 + na4 * n3));

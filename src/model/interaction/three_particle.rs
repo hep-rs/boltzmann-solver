@@ -349,10 +349,10 @@ where
             rate.delta_gamma = delta_gamma;
 
             let delta_gamma = delta_gamma.unwrap_or_default();
-            rate.symmetric =
-                gamma * (checked_div(n1, eq1) - checked_div(n2, eq2) * checked_div(n3, eq3));
-            rate.asymmetric = delta_gamma
-                * (checked_div(n1, eq1) + checked_div(n2, eq2) * checked_div(n3, eq3))
+            let symmetric_prefactor =
+                checked_div(n1, eq1) - checked_div(n2, eq2) * checked_div(n3, eq3);
+            rate.symmetric = gamma * symmetric_prefactor;
+            rate.asymmetric = delta_gamma * symmetric_prefactor
                 + gamma * (checked_div(na1, eq1) - checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
         } else {
             // Above the M_BETA_THRESHOLD, `gamma` is already divided by eq1, so
@@ -368,9 +368,9 @@ where
                 rate.symmetric = gamma * n1;
                 rate.asymmetric = delta_gamma * n1 + gamma * na1;
             } else {
-                rate.symmetric = gamma * (n1 - eq1 * checked_div(n2, eq2) * checked_div(n3, eq3));
-                rate.asymmetric = delta_gamma
-                    * (n1 + eq1 * checked_div(n2, eq2) * checked_div(n3, eq3))
+                let symmetric_prefactor = n1 - eq1 * checked_div(n2, eq2) * checked_div(n3, eq3);
+                rate.symmetric = gamma * symmetric_prefactor;
+                rate.asymmetric = delta_gamma * symmetric_prefactor
                     + gamma * (na1 - eq1 * checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
             }
         }
