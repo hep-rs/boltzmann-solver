@@ -755,7 +755,11 @@ where
         let mut steps_discarded = 0_usize;
         let mut evals = 0_usize;
         let mut beta = self.beta_range.0;
-        let mut h = beta * f64::sqrt(self.step_precision.min * self.step_precision.max);
+        let mut h = beta
+            * f64::sqrt(
+                self.step_precision.min.max(self.step_precision.max / 1e6)
+                    * self.step_precision.max,
+            );
         let mut beta_logging = beta * BETA_LOG_STEP;
 
         // Run logger for 0th step
