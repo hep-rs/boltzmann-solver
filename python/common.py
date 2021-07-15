@@ -83,7 +83,7 @@ def read_number_density(
     ].sum(axis=1)
 
     for col in data.columns:
-        if col.startswith("na-"):
+        if col.startswith("na-") or col.startswith("d"):
             data["-" + col] = np.negative(data[col])
 
     if not quiet:
@@ -249,9 +249,17 @@ def plot_densities(df: pd.DataFrame, ptcls: List[str]):
                 legendgroup="B-L",
                 showlegend=False,
                 x=df["beta"],
-                y=df["dna-B-L"].abs(),
+                y=df["dna-B-L"],
                 line=go.scatter.Line(width=3, color="black"),
-            )
+            ),
+            go.Scatter(
+                name="B-L",
+                legendgroup="B-L",
+                showlegend=False,
+                x=df["beta"],
+                y=df["-dna-B-L"],
+                line=go.scatter.Line(width=3, color="black", dash="dash"),
+            ),
         ]
         + [
             go.Scatter(
@@ -259,8 +267,19 @@ def plot_densities(df: pd.DataFrame, ptcls: List[str]):
                 legendgroup=ptcl,
                 showlegend=False,
                 x=df["beta"],
-                y=df[f"dna-{ptcl}"].abs(),
+                y=df[f"dna-{ptcl}"],
                 line=go.scatter.Line(color=color),
+            )
+            for ptcl, color in zip(ptcls, COLORS)
+        ]
+        + [
+            go.Scatter(
+                name=f"{ptcl}",
+                legendgroup=ptcl,
+                showlegend=False,
+                x=df["beta"],
+                y=df[f"-dna-{ptcl}"],
+                line=go.scatter.Line(color=color, dash="dash"),
             )
             for ptcl, color in zip(ptcls, COLORS)
         ],
