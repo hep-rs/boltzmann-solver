@@ -666,7 +666,7 @@
     <span class="doccomment">/// All other attribute contexts will be as expected.</span>
     <span class="kw">fn</span> <span class="ident">as_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">beta</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_beta</span>();
-        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">Statistic::BoseEinstein</span>.<span class="ident">massless_number_density</span>(<span class="number">0.0</span>, <span class="ident">beta</span>);
+        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">Statistic::BoseEinstein</span>.<span class="ident">number_density</span>(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="ident">beta</span>);
         <span class="kw">let</span> <span class="ident">hubble_rate</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">hubble_rate</span>(<span class="ident">beta</span>);
         <span class="kw">let</span> <span class="ident">eq</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">particles</span>()

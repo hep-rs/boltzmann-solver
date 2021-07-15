@@ -1173,6 +1173,11 @@
 <span id="1104">1104</span>
 <span id="1105">1105</span>
 <span id="1106">1106</span>
+<span id="1107">1107</span>
+<span id="1108">1108</span>
+<span id="1109">1109</span>
+<span id="1110">1110</span>
+<span id="1111">1111</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Solver for the number density evolution given by integrating the Boltzmann</span>
 <span class="doccomment">//! equation.</span>
@@ -1586,6 +1591,8 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k</span>: [<span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>; <span class="ident">tableau::RK_S</span>];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ka</span>: [<span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>; <span class="ident">tableau::RK_S</span>];
+
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::uninit_assumed_init</span>)]</span>
         <span class="kw">unsafe</span> {
             <span class="ident">k</span> <span class="op">=</span> <span class="ident">mem::MaybeUninit::uninit</span>().<span class="ident">assume_init</span>();
             <span class="kw">for</span> <span class="ident">ki</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">k</span>[..] {
@@ -1805,14 +1812,14 @@
 
             <span class="ident">iterations</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             <span class="kw">if</span> <span class="ident">iterations</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">50</span> {
-                    <span class="macro">log::error!</span>(
+                <span class="macro">log::error!</span>(
                     <span class="string">&quot;[{}.{:02}|{:&gt;9.3e}] Unable to converge fast interactions after {} iterations.&quot;</span>,
-                        <span class="ident">c</span>.<span class="ident">step</span>,
-                        <span class="ident">c</span>.<span class="ident">substep</span>,
-                        <span class="ident">c</span>.<span class="ident">beta</span>,
+                    <span class="ident">c</span>.<span class="ident">step</span>,
+                    <span class="ident">c</span>.<span class="ident">substep</span>,
+                    <span class="ident">c</span>.<span class="ident">beta</span>,
                     <span class="ident">iterations</span>
-                    );
-                    <span class="macro">panic!</span>();
+                );
+                <span class="macro">panic!</span>();
             }
         }
 
@@ -1892,11 +1899,11 @@
             <span class="comment">// if self.abort_when_inaccurate {</span>
             <span class="comment">//     log::warn!(</span>
             <span class="comment">//         &quot;[{}|{:.3e}] Aborting integration due to inaccuracy.&quot;,</span>
-        <span class="comment">//         step,</span>
-        <span class="comment">//         beta,</span>
-        <span class="comment">//     );</span>
+            <span class="comment">//         step,</span>
+            <span class="comment">//         beta,</span>
+            <span class="comment">//     );</span>
             <span class="comment">//     break;</span>
-        <span class="comment">// }</span>
+            <span class="comment">// }</span>
             <span class="comment">// advance = true;</span>
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">h</span>)
@@ -1929,7 +1936,11 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">steps_discarded</span> <span class="op">=</span> <span class="number">0_usize</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">evals</span> <span class="op">=</span> <span class="number">0_usize</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">beta</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="ident">f64::sqrt</span>(<span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">max</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">beta</span>
+            <span class="op">*</span> <span class="ident">f64::sqrt</span>(
+                <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">min</span>.<span class="ident">max</span>(<span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">max</span> <span class="op">/</span> <span class="number">1e6</span>)
+                    <span class="op">*</span> <span class="self">self</span>.<span class="ident">step_precision</span>.<span class="ident">max</span>,
+            );
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">beta_logging</span> <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="ident">BETA_LOG_STEP</span>;
 
         <span class="comment">// Run logger for 0th step</span>
@@ -2242,8 +2253,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">hubble_rate</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">hubble_rate</span>(<span class="ident">beta</span>);
         <span class="kw">let</span> <span class="ident">normalization</span> <span class="op">=</span>
-            (<span class="ident">hubble_rate</span> <span class="op">*</span> <span class="ident">beta</span> <span class="op">*</span> <span class="ident">Statistic::BoseEinstein</span>.<span class="ident">massless_number_density</span>(<span class="number">0.0</span>, <span class="ident">beta</span>))
-                .<span class="ident">recip</span>();
+            (<span class="ident">hubble_rate</span> <span class="op">*</span> <span class="ident">beta</span> <span class="op">*</span> <span class="ident">Statistic::BoseEinstein</span>.<span class="ident">number_density</span>(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="ident">beta</span>)).<span class="ident">recip</span>();
         <span class="ident">Context</span> {
             <span class="ident">step</span>,
             <span class="ident">substep</span>: <span class="ident">substep</span>.<span class="ident">map_or</span>(<span class="op">-</span><span class="number">1</span>, <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">TryFrom::try_from</span>(<span class="ident">v</span>).<span class="ident">unwrap</span>()),

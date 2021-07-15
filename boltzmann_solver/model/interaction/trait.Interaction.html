@@ -99,10 +99,9 @@ is not kinematically allowed.</p>
 or other factors related to the number densities of particles involved.
 It also must <em>not</em> be normalized to the integration step size.
 Specifically, this corresponds to <code>$\gamma$</code> in the following expression:</p>
-<pre><code class="language-math">H \beta n_1 \pfrac{n_a}{\beta} =
+<div class="example-wrap"><pre class="language-math">H \beta n_1 \pfrac{n_a}{\beta} =
   - \left( \frac{n_a}{n_a^{(0)}} \prod_{i \in X} \frac{n_i}{n_i^{(0)}} \right) \gamma(a X \to Y)
-  + \left( \prod_{i \in Y} \frac{n_i}{n_i^{(0)}} \right) \gamma(Y \to a X)
-</code></pre>
+  + \left( \prod_{i \in Y} \frac{n_i}{n_i^{(0)}} \right) \gamma(Y \to a X)</pre></div>
 <p>Care must be taken to obey <a href="trait.Interaction.html#tymethod.gamma_enabled" title="Interaction::gamma_enabled"><code>Interaction::gamma_enabled</code></a> in order to
 avoid unnecessary computations.  Specifically, this should always return
 <code>None</code> when <code>self.gamma_enabled() == true</code>.</p>
@@ -120,10 +119,9 @@ manually.  Care must be taken to obey <a href="trait.Interaction.html#tymethod.w
 order to avoid unnecessary computation (though the incorrect
 implementation will not be detrimental other than in performance).</p>
 </div></details><details class="rustdoc-toggle" open><summary><div id="method.delta_gamma" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/boltzmann_solver/model/interaction.rs.html#104-106" title="goto source code">[src]</a></div><code>fn <a href="#method.delta_gamma" class="fnname">delta_gamma</a>(&amp;self, c: &amp;<a class="struct" href="../../prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;'_, M&gt;, real: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a>&gt;</code></div></summary><div class="docblock"><p>Asymmetry between the interaction and its <code>$\CP$</code> conjugate:</p>
-<pre><code class="language-math">\delta\gamma
+<div class="example-wrap"><pre class="language-math">\delta\gamma
   \defeq \gamma(\vt a \to \vt b) - \gamma(\overline{\vt a} \to \overline{\vt b})
-  = \gamma(\vt a \to \vt b) - \gamma(\vt b \to \vt a)
-</code></pre>
+  = \gamma(\vt a \to \vt b) - \gamma(\vt b \to \vt a)</pre></div>
 <p>If there is no (relevant) asymmetry, then this should return <code>None</code>.</p>
 <p>Note that his is not the same as the asymmetry specified in creating the
 interaction, with the latter being defined as the asymmetry in the
@@ -136,9 +134,8 @@ number density of the decaying particle in order to avoid possible <code>0 / 0</
 set to true.</p>
 </div></details><details class="rustdoc-toggle" open><summary><div id="method.symmetric_prefactor" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/boltzmann_solver/model/interaction.rs.html#132-169" title="goto source code">[src]</a></div><code>fn <a href="#method.symmetric_prefactor" class="fnname">symmetric_prefactor</a>(&amp;self, c: &amp;<a class="struct" href="../../prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;'_, M&gt;) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></div></summary><div class="docblock"><p>Net prefactor scaling the interaction rate.</p>
 <p>This is defined for a particle <code>$X \to Y$</code> as</p>
-<pre><code class="language-math">\left( \prod_{i \in X} \frac{n_i}{n_i^{(0)}} \right)
-- \left( \prod_{i \in Y} \frac{n_i}{n_i^{(0)}} \right)
-</code></pre>
+<div class="example-wrap"><pre class="language-math">\left( \prod_{i \in X} \frac{n_i}{n_i^{(0)}} \right)
+- \left( \prod_{i \in Y} \frac{n_i}{n_i^{(0)}} \right)</pre></div>
 <p>If there are some <code>$n_i^{(0)}$</code> which are zero, then the prefactor will
 be infinite as the interaction will try and get rid of the particle in
 question.</p>
@@ -146,23 +143,20 @@ question.</p>
 on both sides, then the direction of the interaction is first determined
 by the side which contains the most zero equilibrium number densities.
 If these are also equal, then the result is 0.</p>
-<pre><code class="language-math">\left( \prod_{i \in X} n_i \right) - \left( \prod_{i \in Y} n_i \right)
-</code></pre>
+<div class="example-wrap"><pre class="language-math">\left( \prod_{i \in X} n_i \right) - \left( \prod_{i \in Y} n_i \right)</pre></div>
 <p>This can produce a result which is infinite if some of the <code>$n_i^{(0)}</code>$
 are identically 0 and thus care must be taken to handle these.</p>
 </div></details><details class="rustdoc-toggle" open><summary><div id="method.asymmetric_prefactor" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/boltzmann_solver/model/interaction.rs.html#193-206" title="goto source code">[src]</a></div><code>fn <a href="#method.asymmetric_prefactor" class="fnname">asymmetric_prefactor</a>(&amp;self, c: &amp;<a class="struct" href="../../prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;'_, M&gt;) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f64.html">f64</a></code></div></summary><div class="docblock"><p>Compute the prefactor to the symmetric interaction rate which alters the
 number density asymmetries.</p>
 <p>In the forward direction, this is calculated by</p>
-<pre><code class="language-math">\frac{
+<div class="example-wrap"><pre class="language-math">\frac{
   \sum_{i \in X} \Delta_i \prod_{j \neq i} n_j
 }{
   \prod_{i \in X} n_i^{(0)}
-}
-</code></pre>
+}</pre></div>
 <p>and similarly for the backward rate.  An example of a <code>$1 \to 2, 3$</code>
 rate is:</p>
-<pre><code class="language-math">\frac{\Delta_1}{n_1^{(0)}} - \frac{\Delta_2 n_3 + \Delta_3 n_2}{n_2^{(0)} n_3^{(0)}}
-</code></pre>
+<div class="example-wrap"><pre class="language-math">\frac{\Delta_1}{n_1^{(0)}} - \frac{\Delta_2 n_3 + \Delta_3 n_2}{n_2^{(0)} n_3^{(0)}}</pre></div>
 <p>This can produce a result which is infinite if some of the <code>$n_i^{(0)}</code>$
 are identically 0 and thus care must be taken to handle these.</p>
 </div></details><details class="rustdoc-toggle" open><summary><div id="method.rate" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/boltzmann_solver/model/interaction.rs.html#231-250" title="goto source code">[src]</a></div><code>fn <a href="#method.rate" class="fnname">rate</a>(&amp;self, c: &amp;<a class="struct" href="../../prelude/struct.Context.html" title="struct boltzmann_solver::prelude::Context">Context</a>&lt;'_, M&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="struct.RateDensity.html" title="struct boltzmann_solver::model::interaction::RateDensity">RateDensity</a>&gt;</code></div></summary><div class="docblock"><p>Calculate the actual interaction rates density taking into account
@@ -170,11 +164,10 @@ factors related to the number densities of particles involved.</p>
 <p>The result is normalized by the Hubble rate, but does not include
 factors relating to the integration step size.  Specifically, it
 corresponds to the right hand side of the equation:</p>
-<pre><code class="language-math">\pfrac{n_a}{\beta} = \frac{1}{H \beta n_1} \left[
+<div class="example-wrap"><pre class="language-math">\pfrac{n_a}{\beta} = \frac{1}{H \beta n_1} \left[
   - \left( \frac{n_a}{n_a^{(0)}} \prod_{i \in X} \frac{n_i}{n_i^{(0)}} \right) \gamma(a X \to Y)
   + \left( \prod_{i \in Y} \frac{n_i}{n_i^{(0)}} \right) \gamma(Y \to a X)
-\right].
-</code></pre>
+\right].</pre></div>
 <p>The normalization factor <code>$(H \beta n_1)^{-1}$</code> is accessible within the
 current context through <a href="../../prelude/struct.Context.html#structfield.normalization" title="Context::normalization"><code>Context::normalization</code></a>.</p>
 <p>The rate density is defined such that the change initial state particles
@@ -206,8 +199,7 @@ equilibrium number density.</p>
 <a href="trait.Interaction.html#method.rate" title="Interaction::rate"><code>Interaction::rate</code></a>, but may be smaller if the interaction rate would
 overshoot an equilibrium number density.  Furthermore, it is scale by
 the current integration step size <code>$h$</code>:</p>
-<pre><code class="language-math">\Delta n = \pfrac{n}{\beta} h.
-</code></pre>
+<div class="example-wrap"><pre class="language-math">\Delta n = \pfrac{n}{\beta} h.</pre></div>
 <p>The default implementation uses the output of <a href="trait.Interaction.html#method.rate" title="Interaction::rate"><code>Interaction::rate</code></a> in
 order to computer the actual rate.</p>
 <p>This method should generally not be implemented.  If it is implemented

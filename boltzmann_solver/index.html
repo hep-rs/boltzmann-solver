@@ -82,8 +82,7 @@ more general when multiple species are all out of equilibrium.</p>
 <p>Within the context of cosmology, the Boltzmann equation is a differential
 equation which describes the evolution of the phase-space distribution of a
 species of particles.  In full generality, it is given by</p>
-<pre><code class="language-math">\vt L[f] = \vt C[f]
-</code></pre>
+<div class="example-wrap"><pre class="language-math">\vt L[f] = \vt C[f]</pre></div>
 <p>where <code>$\vt L$</code> is the Liouville operator and <code>$\vt C$</code> is the collision
 operator.</p>
 <h3 id="liouville-operator" class="section-header"><a href="#liouville-operator">Liouville Operator</a></h3>
@@ -92,9 +91,8 @@ time <code>$f(\vt x, \vt p, t)$</code>; however, assuming the early Universe to 
 isotropic and homogeneous it can be expressed as a function of just energy
 and time, <code>$f(E, t)$</code>.  In the FLRW metric, the Liouville operator
 simplifies to only be dependent the time-like derivatives:</p>
-<pre><code class="language-math">\vt L[f] \stackrel{\mathrm{\tiny FLRW}}{=}
-\left[ E \pfrac{}{t} - H (E^2 - m^2) \pfrac{}{E} \right] f,
-</code></pre>
+<div class="example-wrap"><pre class="language-math">\vt L[f] \stackrel{\mathrm{\tiny FLRW}}{=}
+\left[ E \pfrac{}{t} - H (E^2 - m^2) \pfrac{}{E} \right] f,</pre></div>
 <p>where <code>$H \defeq \dot a / a$</code> is Hubble’s constant.  Unless there is a
 sudden increase in entropy due to the out-of-equilibrium decay of a
 particle, the entropy per comoving volume remains constant: <code>$\dd(s a^3) = 0$</code>.  Furthermore,</p>
@@ -103,13 +101,11 @@ phase space distribution is conserved.  This implies that after integrating
 the phase space, the number density per comoving volume remains constant if
 there are no collisions.  This is evident after integrating the Liouville
 operator over the phase space:</p>
-<pre><code class="language-math">g \int \vt L[f] \frac{\dd^3 \vt p}{(2 \pi)^3}
-= \pfrac{n}{t} + 3 H n = \frac{1}{a^3} \pfrac{(n a^3)}{t}.
-</code></pre>
+<div class="example-wrap"><pre class="language-math">g \int \vt L[f] \frac{\dd^3 \vt p}{(2 \pi)^3}
+= \pfrac{n}{t} + 3 H n = \frac{1}{a^3} \pfrac{(n a^3)}{t}.</pre></div>
 <p>The number density is related to the phase space distribution through</p>
-<pre><code class="language-math">  n \defeq g \int f \frac{\dd^3 \vt p}{(2 \pi)^3}
-  = \frac{g}{2 \pi^2} \int_m^\infty f \sqrt{E^2 - m^2} E \dd E,
-</code></pre>
+<div class="example-wrap"><pre class="language-math">  n \defeq g \int f \frac{\dd^3 \vt p}{(2 \pi)^3}
+  = \frac{g}{2 \pi^2} \int_m^\infty f \sqrt{E^2 - m^2} E \dd E,</pre></div>
 <p>where <code>$g$</code> is the number of internal degrees of freedom of the particle.</p>
 <h3 id="collision-operator" class="section-header"><a href="#collision-operator">Collision Operator</a></h3>
 <p>The collision term in the Boltzmann equation describes the changes to the
@@ -117,24 +113,21 @@ phase space distribution that arise from collisions—either through the
 scattering of other particles, or creation/annihilation of the species in
 question.  The integrated collision term for a particular process <code>$a_1 + \cdots + a_n \leftrightarrow b_1 + \cdots + b_m$</code> (which we will denote as
 <code>$\vt a \leftrightarrow \vt b$</code>) is:</p>
-<pre><code class="language-math">\begin{aligned}
+<div class="example-wrap"><pre class="language-math">\begin{aligned}
   g_{a_1} \int \vt C[f_{a_1}] \frac{\dd^3 \vt p_{a_1}}{(2\pi)^3}
   &amp;= - \int_{\vt a}^{\vt b}
      \abs{\scM(\vt a | \vt b)}^2 \left( \prod_{\vt a} f_i \right) \left(\prod_{\vt b} 1 \pm f_i \right)
      - \abs{\scM(\vt b | \vt a)}^2 \left( \prod_{\vt b} f_i \right) \left(\prod_{\vt a} 1 \pm f_i \right),
-\end{aligned}
-</code></pre>
+\end{aligned}</pre></div>
 <p>where <code>$\abs{\scM(\vt a | \vt b)}^2$</code> is the squared amplitude going
 from initial state <code>$\vt a$</code> to <code>$\vt b$</code> and is <em>averaged over</em> all
 <em>internal degrees of freedom</em>, and the integration is done of the
 Lorentz-invariant phase space</p>
-<pre><code class="language-math">\int_{\vt a}^{\vt b} \defeq
+<div class="example-wrap"><pre class="language-math">\int_{\vt a}^{\vt b} \defeq
      \int \dd \Pi_{a_1} \dots \dd \Pi_{a_n} \dd \Pi_{b_1} \dots \dd \Pi_{b_m}
-     (2 \pi)^4 \delta^4(p_{a_1} + \cdots + p_{a_n} - p_{b_1} - \cdots - p_{b_m})
-</code></pre>
+     (2 \pi)^4 \delta^4(p_{a_1} + \cdots + p_{a_n} - p_{b_1} - \cdots - p_{b_m})</pre></div>
 <p>in which</p>
-<pre><code class="language-math">  \dd \Pi_i \defeq \frac{g_i \dd^3 \vt p_i}{(2 \pi)^3 2 E_i}.
-</code></pre>
+<div class="example-wrap"><pre class="language-math">  \dd \Pi_i \defeq \frac{g_i \dd^3 \vt p_i}{(2 \pi)^3 2 E_i}.</pre></div>
 <p>Note that as the squared amplitude is averaged over all internal degrees of
 freedom, they will cancel out with the <code>$g_i$</code> factors in each <code>$\dd \Pi_i$</code>
 term; as a result, some authors omit <code>$g_i$</code> from the definition of <code>$\dd \Pi_i$</code>.</p>
