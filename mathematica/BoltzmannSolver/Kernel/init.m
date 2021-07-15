@@ -23,4 +23,6 @@ Get["BoltzmannSolver`NormalArgs`"];
 Get["BoltzmannSolver`SquaredAmplitude`"];
 Get["BoltzmannSolver`InteractionGamma`"];
 
+Protect[ExpandValues];
+
 EndPackage[];

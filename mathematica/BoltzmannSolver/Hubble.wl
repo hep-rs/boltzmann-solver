@@ -26,5 +26,6 @@ HubbleRate /: MakeBoxes[HubbleRate, TraditionalForm] = "H";
 
 Attributes[HubbleRate] = {Listable, NumericFunction};
 HubbleRate[beta_?InexactNumberQ] := Sqrt[Pi^2/90] Sqrt[GStar[beta]] / (Mass[ReducedPlanck] beta^2);
+ExpandValues[HubbleRate] := {HubbleRate[beta_] :> Sqrt[Pi^2/90] Sqrt[GStar[beta]] / (Mass[ReducedPlanck] beta^2)};
 
 End[]; (* End Private *)

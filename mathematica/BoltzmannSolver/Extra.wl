@@ -28,7 +28,7 @@ ExpandValues[symbol_] := Join @@ Through[
 
 ExpandValues[symbol_, symbols__] := Join[ExpandValues[symbol], ExpandValues[symbols]];
 
-Protect[ExpandValues];
+(* Protect[ExpandValues]; *)
 
 
 (* Bessel K Ratio *)

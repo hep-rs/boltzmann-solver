@@ -40,7 +40,7 @@ PhaseSpace::chemicalPotentialFermiDirac = "Chemical potential for fermions must 
 PhaseSpace::chemicalPotentialBoseEinstein = "Chemical potential for bosons must be non-positive."
 
 (* Formats *)
-PhaseSpace /: MakeBoxes[PhaseSpace[s : (FermiDirac | BoseEinstein | MaxwellBoltzmann), beta_, e_], TraditionalForm] := Block[
+PhaseSpace /: MakeBoxes[PhaseSpace[s_ : StatisticPattern, beta_, e_], TraditionalForm] := Block[
   {
     stat = Switch[
       s,
@@ -60,7 +60,7 @@ PhaseSpace /: MakeBoxes[PhaseSpace[s : (FermiDirac | BoseEinstein | MaxwellBoltz
   }]
 ];
 
-PhaseSpace /: MakeBoxes[PhaseSpace[s : (FermiDirac | BoseEinstein | MaxwellBoltzmann), beta_, e_, m_], TraditionalForm] := Block[
+PhaseSpace /: MakeBoxes[PhaseSpace[s_ : StatisticPattern, beta_, e_, m_], TraditionalForm] := Block[
   {
     stat = Switch[
       s,
@@ -80,7 +80,7 @@ PhaseSpace /: MakeBoxes[PhaseSpace[s : (FermiDirac | BoseEinstein | MaxwellBoltz
   }]
 ];
 
-PhaseSpace /: MakeBoxes[PhaseSpace[s : (FermiDirac | BoseEinstein | MaxwellBoltzmann), beta_, e_, m_, mu_], TraditionalForm] := Block[
+PhaseSpace /: MakeBoxes[PhaseSpace[s_ : StatisticPattern, beta_, e_, m_, mu_], TraditionalForm] := Block[
   {
     stat = Switch[
       s,
@@ -126,10 +126,10 @@ PhaseSpace /: MakeBoxes[PhaseSpace[p_?ParticleQ, beta_, e_, mu_], TraditionalFor
 (* Definitions *)
 PhaseSpace[
   FermiDirac,
-  beta_?InexactNumberQ,
-  e_?InexactNumberQ,
-  m:(_?InexactNumberQ):0,
-  mu:(_?InexactNumberQ):0
+  beta_,
+  e_,
+  m_:0,
+  mu_:0
 ] /; AnyInexactNumberQ[beta, e, m, mu] := Block[{},
   If[mu < 0, Message[PhaseSpace::chemicalPotentialFermiDirac]];
 
@@ -139,10 +139,10 @@ PhaseSpace[
 
 PhaseSpace[
   BoseEinstein,
-  beta_?InexactNumberQ,
-  e_?InexactNumberQ,
-  m:(_?InexactNumberQ):0,
-  mu:(_?InexactNumberQ):0
+  beta_,
+  e_,
+  m_:0,
+  mu_:0
 ] /; AnyInexactNumberQ[beta, e, m, mu] = Block[{},
   If[mu > 0, Message[PhaseSpace::chemicalPotentialBoseEinstein]];
 
@@ -152,19 +152,26 @@ PhaseSpace[
 
 PhaseSpace[
   MaxwellBoltzmann,
-  beta_?InexactNumberQ,
-  e_?InexactNumberQ,
-  m:(_?InexactNumberQ):0,
-  mu:(_?InexactNumberQ):0
+  beta_,
+  e_,
+  m_:0,
+  mu_:0
 ] /; AnyInexactNumberQ[beta, e, m, mu] = Exp[-(e - mu) beta];
 
 
 PhaseSpace[
   p_?ParticleQ,
-  e_?InexactNumberQ,
-  mu:(_?InexactNumberQ):0
+  e_,
+  mu_:0
 ] /; AnyInexactNumberQ[beta, e, mu] := PhaseSpace[Statistic[p]][beta, e, Mass[p], mu];
 
+
+(* ExpandValues *)
+PhaseSpace /: ExpandValues[PhaseSpace] := {
+  PhaseSpace[FermiDirac, beta_, e_, m_:0, mu_:0] :> 1/(Exp[(e - mu) beta] + 1),
+  PhaseSpace[BoseEinstein, beta_, e_, m_:0, mu_:0] :> 1/(Exp[(e - mu) beta] - 1),
+  PhaseSpace[MaxwellBoltzmann, beta_, e_, m_:0, mu_:0] :> Exp[-(e - mu) beta]
+};
 
 Protect[PhaseSpace];
 
@@ -178,7 +185,7 @@ NumberDensity::chemicalPotentialBoseEinstein = "Chemical potential for bosons mu
 Attributes[NumberDensity] = {NumericFunction, Listable};
 
 (* Formats *)
-NumberDensity /: MakeBoxes[NumberDensity[s : (FermiDirac | BoseEinstein | MaxwellBoltzmann), beta_], TraditionalForm] := Block[
+NumberDensity /: MakeBoxes[NumberDensity[s_ : StatisticPattern, beta_], TraditionalForm] := Block[
   {
     stat = Switch[
       s,
@@ -196,7 +203,7 @@ NumberDensity /: MakeBoxes[NumberDensity[s : (FermiDirac | BoseEinstein | Maxwel
   }]
 ];
 
-NumberDensity /: MakeBoxes[NumberDensity[s : (FermiDirac | BoseEinstein | MaxwellBoltzmann), beta_, m_], TraditionalForm] := Block[
+NumberDensity /: MakeBoxes[NumberDensity[s_ : StatisticPattern, beta_, m_], TraditionalForm] := Block[
   {
     stat = Switch[
       s,
@@ -216,7 +223,7 @@ NumberDensity /: MakeBoxes[NumberDensity[s : (FermiDirac | BoseEinstein | Maxwel
   }]
 ];
 
-NumberDensity /: MakeBoxes[NumberDensity[s : (FermiDirac | BoseEinstein | MaxwellBoltzmann), beta_, m_, mu_], TraditionalForm] := Block[
+NumberDensity /: MakeBoxes[NumberDensity[s_ : StatisticPattern, beta_, m_, mu_], TraditionalForm] := Block[
   {
     stat = Switch[
       s,
@@ -259,9 +266,9 @@ NumberDensity /: MakeBoxes[NumberDensity[p_?ParticleQ, beta_, mu_], TraditionalF
 (* Massive Fermi-Dirac case *)
 NumberDensity[
   FermiDirac,
-  beta_?InexactNumberQ,
-  m_?(Not@PossibleZeroQ[#] && InexactNumberQ[#] &),
-  mu:(_?InexactNumberQ):0
+  beta_,
+  m_?(Not@*PossibleZeroQ),
+  mu_:0
 ] /; AnyInexactNumberQ[beta, m, mu] := Block[{},
   If[mu < 0, Message[NumberDensity::chemicalPotentialFermiDirac]];
 
@@ -279,9 +286,9 @@ NumberDensity[
 (* Massless Fermi-Dirac case *)
 NumberDensity[
   FermiDirac,
-  beta_?InexactNumberQ,
+  beta_,
   m:(_?PossibleZeroQ):0,
-  mu:(_?InexactNumberQ):0
+  mu_:0
 ] /; AnyInexactNumberQ[beta, m, mu] = Block[{},
   If[mu < 0, Message[NumberDensity::chemicalPotentialFermiDirac]];
 
@@ -296,9 +303,9 @@ NumberDensity[
 (* Massive Bose-Einstein case *)
 NumberDensity[
   BoseEinstein,
-  beta_?InexactNumberQ,
-  m_?(Not@PossibleZeroQ[#] && InexactNumberQ[#] &),
-  mu:(_?InexactNumberQ):0
+  beta_,
+  m_?(Not@*PossibleZeroQ),
+  mu_:0
 ] /; AnyInexactNumberQ[beta, m, mu] := Block[{},
   If[mu > 0, Message[NumberDensity::chemicalPotentialBoseEinstein]];
 
@@ -316,9 +323,9 @@ NumberDensity[
 (* Massless Bose-Einstein case *)
 NumberDensity[
   BoseEinstein,
-  beta_?InexactNumberQ,
+  beta_,
   m:(_?PossibleZeroQ):0,
-  mu:(_?InexactNumberQ):0
+  mu_:0
 ] /; AnyInexactNumberQ[beta, m, mu] = Block[{},
   If[mu > 0, Message[NumberDensity::chemicalPotentialBoseEinstein]];
 
@@ -333,9 +340,9 @@ NumberDensity[
 (* Massive Maxwell-Boltzmann case *)
 NumberDensity[
   MaxwellBoltzmann,
-  beta_?InexactNumberQ,
-  m_?(Not@PossibleZeroQ[#] && InexactNumberQ[#] &),
-  mu:(_?InexactNumberQ):0
+  beta_,
+  m_?(Not@*PossibleZeroQ),
+  mu_:0
 ] /; AnyInexactNumberQ[beta, m, mu] = 1 / (2 Pi^2) Integrate[
   Exp[-(u - mu) beta] u Sqrt[u^2 - m^2],
   {u, m, Infinity},
@@ -347,7 +354,7 @@ NumberDensity[
   MaxwellBoltzmann,
   beta_?NumberQ,
   m:(_?PossibleZeroQ):0,
-  mu:(_?InexactNumberQ):0
+  mu_:0
 ] /; AnyInexactNumberQ[beta, m, mu] = 1 / (2 Pi^2) Integrate[
   Exp[-(u - mu) beta] u^2,
   {u, 0, Infinity},
@@ -361,6 +368,33 @@ NumberDensity[p_?ParticleQ, beta_, mu_:0] /; AnyInexactNumberQ[beta, mu] := Bolt
 NumberDensity[Particle[p_?ParticleQ]] := \[FormalN][p];
 NumberDensity[p_?ParticleQ] := \[FormalN][p];
 
+
+(* ExpandValues *)
+NumberDensity /: ExpandValues[NumberDensity] = {
+  NumberDensity[FermiDirac, beta_, m:(_?PossibleZeroQ):0, mu_:0] :> 1 / (2 Pi^2) Integrate[
+    u^2 / (Exp[(u - mu) beta] + 1),
+    {u, 0, Infinity},
+    Assumptions -> m >= 0 && beta > 0 && Element[mu, Reals]
+  ]
+  ,
+  NumberDensity[BoseEinstein, beta_, m:(_?PossibleZeroQ):0, mu_:0] :> 1 / (2 Pi^2) Integrate[
+    u^2 / (Exp[(u - mu) beta] - 1),
+    {u, 0, Infinity},
+    Assumptions -> m >= 0 && beta > 0 && Element[mu, Reals]
+  ]
+  ,
+  NumberDensity[MaxwellBoltzmann, beta_, m_:0, mu_:0] :> 1 / (2 Pi^2) Integrate[
+    (u Sqrt[u^2 - m^2])/Exp[(u - mu) beta],
+    {u, m, Infinity},
+    Assumptions -> m >= 0 && beta > 0 && Element[mu, Reals]
+  ]
+  ,
+  NumberDensity[stat:StatisticPattern, beta_, m_, mu_] :> 1 / (2 Pi^2) Inactive[NIntegrate][
+    PhaseSpace[stat, beta, u, m, mu] u Sqrt[u^2 - m^2] /. ExpandValues[PhaseSpace],
+    {u, m, Infinity}
+  ]
+};
+
 Protect[NumberDensity];
 
 
@@ -370,7 +404,7 @@ Protect[NumberDensity];
 Attributes[NormalizedNumberDensity] = {Listable, NumericFunction};
 
 (* Formats *)
-NormalizedNumberDensity /: MakeBoxes[NormalizedNumberDensity[s : (FermiDirac | BoseEinstein | MaxwellBoltzmann), beta_], TraditionalForm] := Block[
+NormalizedNumberDensity /: MakeBoxes[NormalizedNumberDensity[s_ : StatisticPattern, beta_], TraditionalForm] := Block[
   {
     stat = Switch[
       s,
@@ -388,7 +422,7 @@ NormalizedNumberDensity /: MakeBoxes[NormalizedNumberDensity[s : (FermiDirac | B
   }]
 ];
 
-NormalizedNumberDensity /: MakeBoxes[NormalizedNumberDensity[s : (FermiDirac | BoseEinstein | MaxwellBoltzmann), beta_, m_], TraditionalForm] := Block[
+NormalizedNumberDensity /: MakeBoxes[NormalizedNumberDensity[s_ : StatisticPattern, beta_, m_], TraditionalForm] := Block[
   {
     stat = Switch[
       s,
@@ -408,7 +442,7 @@ NormalizedNumberDensity /: MakeBoxes[NormalizedNumberDensity[s : (FermiDirac | B
   }]
 ];
 
-NormalizedNumberDensity /: MakeBoxes[NormalizedNumberDensity[s : (FermiDirac | BoseEinstein | MaxwellBoltzmann), beta_, m_, mu_], TraditionalForm] := Block[
+NormalizedNumberDensity /: MakeBoxes[NormalizedNumberDensity[s_ : StatisticPattern, beta_, m_, mu_], TraditionalForm] := Block[
   {
     stat = Switch[
       s,
@@ -461,21 +495,26 @@ NormalizedNumberDensity /: MakeBoxes[NormalizedNumberDensity[p_?ParticleQ, beta_
 (* Definitions *)
 NormalizedNumberDensity[
   stat : StatisticPattern,
-  beta_?InexactNumberQ,
-  m:(_?InexactNumberQ):0,
-  mu:(_?InexactNumberQ):0
+  beta_,
+  m_:0,
+  mu_:0
 ] /; AnyInexactNumberQ[beta, m, mu] := NumberDensity[stat, beta, m, mu] / NumberDensity[BoseEinstein, beta];
 
 
 NormalizedNumberDensity[
   p_?ParticleQ,
-  beta_?InexactNumberQ,
-  mu:(_?InexactNumberQ):0
+  beta_,
+  mu_:0
 ] /; AnyInexactNumberQ[beta, mu] := NumberDensity[p, beta, mu] / NumberDensity[BoseEinstein, beta];
 
 
 NormalizedNumberDensity[Particle[p_?ParticleQ]] := \[FormalN][p];
 NormalizedNumberDensity[p_?ParticleQ] := \[FormalN][p];
+
+(* ExpandValues *)
+NormalizedNumberDensity /: ExpandValues[NormalizedNumberDensity] := {
+  NormalizedNumberDensity[stat:StatisticPattern, beta_, m_:0, mu_:0] :> NumberDensity[stat, beta, m, mu] / NumberDensity[BoseEinstein, beta]
+};
 
 Protect[NormalizedNumberDensity];
 

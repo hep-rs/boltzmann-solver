@@ -185,6 +185,27 @@ InteractionGamma[
   ]
 ];
 
+ExpandValues[InteractionGamma] := {
+  InteractionGamma[
+    {p1_} -> {p2_, p3_}
+  ][beta_] 
+  :> 
+  Block[
+    {
+      z = Mass[p1] beta,
+      ampSq = SquaredAmplitude[{p1} -> {p2, p3}]
+    },
+    Times[
+      1 / (32 Pi^3),
+      ampSq,
+      Sqrt[X`Kallen\[Lambda][Mass2[p1], Mass2[p2], Mass2[p3]]],
+      BesselK[1, z] / z
+    ]
+  ]
+};
+
+ExpandValues[X`Kallen\[Lambda]] := {X`Kallen\[Lambda][x___]:> X`KallenExpand[X`Kallen\[Lambda][x]]};
+
 (* 2 <-> 2 Interaction *)
 InteractionGamma[
   {p1_?ParticleQ, p2_?ParticleQ} -> {p3_?ParticleQ, p4_?ParticleQ}
