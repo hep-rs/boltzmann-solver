@@ -830,7 +830,7 @@ mod tests {
             csv.serialize(CsvRow {
                 beta,
                 hubble_rate: c.hubble_rate,
-                be_n: Statistic::BoseEinstein.massless_number_density(0.0, beta),
+                be_n: Statistic::BoseEinstein.number_density(0.0, 0.0, beta),
                 eq1: c.eq[1],
                 eq2: c.eq[2],
                 eq3: c.eq[3],
@@ -874,7 +874,7 @@ mod tests {
             csv.serialize(CsvRow {
                 beta,
                 hubble_rate: c.hubble_rate,
-                be_n: Statistic::BoseEinstein.massless_number_density(0.0, beta),
+                be_n: Statistic::BoseEinstein.number_density(0.0, 0.0, beta),
                 eq1: c.eq[1],
                 eq2: c.eq[2],
                 eq3: c.eq[3],
@@ -918,7 +918,7 @@ mod tests {
             csv.serialize(CsvRow {
                 beta,
                 hubble_rate: c.hubble_rate,
-                be_n: Statistic::BoseEinstein.massless_number_density(0.0, beta),
+                be_n: Statistic::BoseEinstein.number_density(0.0, 0.0, beta),
                 eq1: c.eq[1],
                 eq2: c.eq[2],
                 eq3: c.eq[3],
@@ -962,7 +962,7 @@ mod tests {
             csv.serialize(CsvRow {
                 beta,
                 hubble_rate: c.hubble_rate,
-                be_n: Statistic::BoseEinstein.massless_number_density(0.0, beta),
+                be_n: Statistic::BoseEinstein.number_density(0.0, 0.0, beta),
                 eq1: c.eq[1],
                 eq2: c.eq[2],
                 eq3: c.eq[3],
@@ -1007,7 +1007,7 @@ mod tests {
             csv.serialize(CsvRow {
                 beta,
                 hubble_rate: c.hubble_rate,
-                be_n: Statistic::BoseEinstein.massless_number_density(0.0, beta),
+                be_n: Statistic::BoseEinstein.number_density(0.0, 0.0, beta),
                 eq1: c.eq[1],
                 eq2: c.eq[2],
                 eq3: c.eq[3],

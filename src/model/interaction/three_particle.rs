@@ -448,7 +448,7 @@ mod tests {
             csv.serialize(CsvRow {
                 beta,
                 hubble_rate: c.hubble_rate,
-                n1: Statistic::BoseEinstein.massless_number_density(0.0, beta),
+                n1: Statistic::BoseEinstein.number_density(0.0, 0.0, beta),
                 eq1: c.eq[1],
                 eq2: c.eq[2],
                 eq3: c.eq[3],

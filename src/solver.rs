@@ -1072,8 +1072,7 @@ where
     ) -> Context<M> {
         let hubble_rate = self.model.hubble_rate(beta);
         let normalization =
-            (hubble_rate * beta * Statistic::BoseEinstein.massless_number_density(0.0, beta))
-                .recip();
+            (hubble_rate * beta * Statistic::BoseEinstein.number_density(0.0, 0.0, beta)).recip();
         Context {
             step,
             substep: substep.map_or(-1, |v| TryFrom::try_from(v).unwrap()),

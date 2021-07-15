@@ -11,7 +11,6 @@
 //! The statistics are implemented, as well as calculations of the number
 //! density.
 
-use crate::constants::PI_N2;
 use quadrature::integrate;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -51,12 +50,6 @@ pub enum Statistic {
     /// f_{\text{MB}} = \exp[-(E - \mu) \beta].
     /// ```
     MaxwellBoltzmann,
-    /// Maxwell–Jüttner statistic describing relativistic classical particles:
-    ///
-    /// ```math
-    /// f_{\text{MJ}} = \frac{E \beta \sqrt{E^2 - m^2}}{m K_2(m \beta)} \exp[- E \beta].
-    /// ```
-    MaxwellJuttner,
 }
 
 impl fmt::Display for Statistic {
@@ -65,7 +58,6 @@ impl fmt::Display for Statistic {
             Self::FermiDirac => write!(f, "Statistic::FermiDirac"),
             Self::BoseEinstein => write!(f, "Statistic::BoseEinstein"),
             Self::MaxwellBoltzmann => write!(f, "Statistic::MaxwellBoltzmann"),
-            Self::MaxwellJuttner => write!(f, "Statistic::MaxwellJuttner"),
         }
     }
 }
@@ -110,35 +102,65 @@ pub trait Statistics {
         0.050_660_591_821_168_89 * integral.integral
     }
 
-    /// Return number density for a particle following the specified statistic,
-    /// normalized to the number density of a massless boson with a single
-    /// degree of freedom.
-    fn normalized_number_density(&self, mass: f64, mu: f64, beta: f64) -> f64;
-
-    /// Return number density for a massless particle following the specified
+    /// Return number density asymmetry for a particle following the specified
     /// statistic.
     ///
     /// ```math
-    /// n = \frac{1}{2 \pi^2} \int_{0}^{\infty} f_{i} u^2 \dd u
+    /// n = \frac{1}{2 \pi^2} \int_{m}^{\infty} [f_{i}(\mu) - f_{i}(-\mu)] u \sqrt{u^2 - m^2} \dd u.
     /// ```
     ///
-    /// The naïve implementation simply calls [`Statistics::number_density`]
-    /// setting `mass = 0.0` and then uses numerical integration.
+    /// The naïve implementation will perform a numerical integration.
     ///
     /// # Note to Implementors
     ///
     /// If an analytic closed form is available for the integral, it should be
     /// preferred over the numerical integration.
-    fn massless_number_density(&self, mu: f64, beta: f64) -> f64 {
-        self.number_density(0.0, mu, beta)
+    fn number_density_asymmetry(&self, mass: f64, mu: f64, beta: f64) -> f64 {
+        let integral = integrate(
+            |t| {
+                let u = mass + t / (1.0 - t);
+                let dudt = (t - 1.0).powi(-2);
+
+                (self.phase_space(u, mass, mu, beta) - self.phase_space(u, mass, -mu, beta))
+                    * u
+                    * f64::sqrt(u.powi(2) - mass.powi(2))
+                    * dudt
+            },
+            0.0,
+            1.0,
+            1e-12,
+        );
+        log::debug!(
+            "Phase space integral: {:e} ± {:e} ({} function evaluations)",
+            integral.integral,
+            integral.error_estimate,
+            integral.num_function_evaluations
+        );
+        // 1/(2 π²) ≅ 0.050_660_591_821_168_89
+        0.050_660_591_821_168_89 * integral.integral
+    }
+
+    /// Return number density for a particle following the specified statistic,
+    /// normalized to the number density of a massless boson with a single
+    /// degree of freedom.
+    fn normalized_number_density(&self, mass: f64, mu: f64, beta: f64) -> f64 {
+        self.number_density(mass, mu, beta) / Statistic::BoseEinstein.number_density(0.0, 0.0, beta)
+    }
+
+    /// Return number density for a particle following the specified statistic,
+    /// normalized to the number density of a massless boson with a single
+    /// degree of freedom.
+    fn normalized_number_density_asymmetry(&self, mass: f64, mu: f64, beta: f64) -> f64 {
+        self.number_density_asymmetry(mass, mu, beta)
+            / Statistic::BoseEinstein.number_density(0.0, 0.0, beta)
     }
 }
 
 impl Statistics for Statistic {
     /// Evaluate the phase space distribution, `$f$` as defined above for the
     /// four statistics.
-    fn phase_space(&self, e: f64, m: f64, mu: f64, beta: f64) -> f64 {
-        match *self {
+    fn phase_space(&self, e: f64, _m: f64, mu: f64, beta: f64) -> f64 {
+        match self {
             Statistic::FermiDirac => (f64::exp((e - mu) * beta) + 1.0).recip(),
             Statistic::BoseEinstein => {
                 let exponent = (e - mu) * beta;
@@ -149,18 +171,6 @@ impl Statistics for Statistic {
                 }
             }
             Statistic::MaxwellBoltzmann => f64::exp(-(e - mu) * beta),
-            Statistic::MaxwellJuttner => {
-                // Check whether we'll likely have zero or not
-                if ((m / e).powi(2) - 1.0).abs() < f64::EPSILON || e * beta > 700.0 {
-                    0.0
-                } else {
-                    // Note that instead of `f64::sqrt(e.powi(2) - m.powi(2))`
-                    // we use the more precise (but equivalent) form: `e *
-                    // f64::sqrt(1.0 - (m / e).powi(2))`.
-                    beta * e.powi(2) * f64::sqrt(1.0 - (m / e).powi(2))
-                        / (f64::exp(e * beta) * m * bessel::k2(m * beta))
-                }
-            }
         }
     }
 
@@ -180,52 +190,151 @@ impl Statistics for Statistic {
         debug_assert!(mass >= 0.0, "mass must be positive.");
         debug_assert!(beta >= 0.0, "β must be positive.");
 
-        match *self {
-            Statistic::FermiDirac => {
-                if mu == 0.0 {
-                    statistics::fermi_dirac_massive(mass, beta)
-                } else {
-                    let integral = integrate(
-                        |t| {
-                            let u = mass + t / (1.0 - t);
-                            let dudt = (t - 1.0).powi(-2);
+        match (self, mu == 0.0, mass == 0.0) {
+            (Statistic::FermiDirac, true, _) => statistics::fermi_dirac_massive(mass, beta),
+            (Statistic::FermiDirac, _, true) => statistics::fermi_dirac_massless(mu, beta),
+            (Statistic::FermiDirac, false, false) => {
+                let integral = integrate(
+                    |t| {
+                        let u = mass + t / (1.0 - t);
+                        let dudt = (t - 1.0).powi(-2);
 
-                            self.phase_space(u, mass, mu, beta)
-                                * u
-                                * f64::sqrt(u.powi(2) - mass.powi(2))
-                                * dudt
-                        },
-                        0.0,
-                        1.0,
-                        1e-12,
+                        self.phase_space(u, mass, mu, beta)
+                            * u
+                            * f64::sqrt(u.powi(2) - mass.powi(2))
+                            * dudt
+                    },
+                    0.0,
+                    1.0,
+                    1e-12,
+                );
+                log::debug!(
+                    "Fermi–Dirac integral: {:e} ± {:e} ({} function evaluations)",
+                    integral.integral,
+                    integral.error_estimate,
+                    integral.num_function_evaluations
+                );
+                if cfg!(debug_assertions) && integral.error_estimate > 0.01 * integral.integral {
+                    log::warn!(
+                        "Fermi–Dirac integral has a relative error of {:0.2}%",
+                        integral.error_estimate / integral.integral.abs()
                     );
-                    log::debug!(
-                        "Fermi–Dirac integral: {:e} ± {:e} ({} function evaluations)",
-                        integral.integral,
-                        integral.error_estimate,
-                        integral.num_function_evaluations
-                    );
-                    if cfg!(debug_assertions) && integral.error_estimate > 0.01 * integral.integral
-                    {
-                        log::warn!(
-                            "Fermi–Dirac integral has a relative error of {:0.2}%",
-                            integral.error_estimate / integral.integral.abs()
-                        );
-                    }
-                    // 1/(2 π²) ≅ 0.050_660_591_821_168_89
-                    0.050_660_591_821_168_89 * integral.integral
                 }
+                // 1/(2 π²) ≅ 0.050_660_591_821_168_89
+                0.050_660_591_821_168_89 * integral.integral
             }
-            Statistic::BoseEinstein => {
-                if mu == 0.0 {
-                    statistics::bose_einstein_massive(mass, beta)
-                } else {
+            (Statistic::BoseEinstein, true, _) => statistics::bose_einstein_massive(mass, beta),
+            (Statistic::BoseEinstein, _, true) => statistics::bose_einstein_massless(mu, beta),
+            (Statistic::BoseEinstein, false, false) => {
+                let integral = integrate(
+                    |t| {
+                        let u = mass + t / (1.0 - t);
+                        let dudt = (t - 1.0).powi(-2);
+
+                        self.phase_space(u, mass, mu, beta)
+                            * u
+                            * f64::sqrt(u.powi(2) - mass.powi(2))
+                            * dudt
+                    },
+                    0.0,
+                    1.0,
+                    1e-12,
+                );
+                log::debug!(
+                    "Bose–Einstein integral: {:e} ± {:e} ({} function evaluations)",
+                    integral.integral,
+                    integral.error_estimate,
+                    integral.num_function_evaluations
+                );
+                if cfg!(debug_assertions) && integral.error_estimate > 0.01 * integral.integral {
+                    log::warn!(
+                        "Bose–Einstein integral has a relative error of {:0.2}%",
+                        integral.error_estimate / integral.integral.abs()
+                    );
+                }
+                // 1/(2 π²) ≅ 0.050_660_591_821_168_89
+                0.050_660_591_821_168_89 * integral.integral
+            }
+            (Statistic::MaxwellBoltzmann, _, true) => {
+                // 1 / π² ≅ 0.101_321_183_642_337_78
+                0.101_321_183_642_337_78 * f64::exp(mu * beta) / beta.powi(3)
+            }
+            (Statistic::MaxwellBoltzmann, _, _) => {
+                // 1/(2 π²) ≅ 0.050_660_591_821_168_89
+                0.050_660_591_821_168_89
+                    * mass.powi(2)
+                    * bessel::k2(mass * beta)
+                    * f64::exp(mu * beta)
+                    / beta
+            }
+        }
+    }
+
+    /// Return number density for a particle following the specified statistic.
+    ///
+    /// ```math
+    /// n = \frac{1}{2 \pi^2} \int_{m}^{\infty} f_{i} u \sqrt{u^2 - m^2} \dd u
+    /// ```
+    ///
+    /// # Implementation Details
+    ///
+    /// Both the Fermi–Dirac and Bose–Einstein statistic rely on numerical
+    /// integration and thus are fairly slow and are prone to errors in certain
+    /// regimes.  The Maxwell–Boltzmann and Maxwell–Jüttner distributions offer
+    /// exact implementations.
+    fn number_density_asymmetry(&self, mass: f64, mu: f64, beta: f64) -> f64 {
+        debug_assert!(mass >= 0.0, "mass must be positive.");
+        debug_assert!(beta >= 0.0, "β must be positive.");
+
+        match (self, mu == 0.0, mass == 0.0) {
+            (_, true, _) => 0.0,
+            (Statistic::FermiDirac, false, true) => {
+                statistics::fermi_dirac_massless(mu, beta)
+                    - statistics::fermi_dirac_massless(-mu, beta)
+            }
+            (Statistic::FermiDirac, false, false) => {
+                let integral = integrate(
+                    |t| {
+                        let u = mass + t / (1.0 - t);
+                        let dudt = (t - 1.0).powi(-2);
+
+                        (self.phase_space(u, mass, mu, beta) - self.phase_space(u, mass, -mu, beta))
+                            * u
+                            * f64::sqrt(u.powi(2) - mass.powi(2))
+                            * dudt
+                    },
+                    0.0,
+                    1.0,
+                    1e-12,
+                );
+                log::debug!(
+                    "Fermi–Dirac integral: {:e} ± {:e} ({} function evaluations)",
+                    integral.integral,
+                    integral.error_estimate,
+                    integral.num_function_evaluations
+                );
+                if cfg!(debug_assertions) && integral.error_estimate > 0.01 * integral.integral {
+                    log::warn!(
+                        "Fermi–Dirac integral has a relative error of {:0.2}%",
+                        integral.error_estimate / integral.integral.abs()
+                    );
+                }
+                // 1/(2 π²) ≅ 0.050_660_591_821_168_89
+                0.050_660_591_821_168_89 * integral.integral
+            }
+            (Statistic::BoseEinstein, false, true) => {
+                statistics::bose_einstein_massless(mu, beta)
+                    - statistics::bose_einstein_massless(-mu, beta)
+            }
+            (Statistic::BoseEinstein, false, false) => {
+                {
                     let integral = integrate(
                         |t| {
                             let u = mass + t / (1.0 - t);
                             let dudt = (t - 1.0).powi(-2);
 
-                            self.phase_space(u, mass, mu, beta)
+                            (self.phase_space(u, mass, mu, beta)
+                                - self.phase_space(u, mass, -mu, beta))
                                 * u
                                 * f64::sqrt(u.powi(2) - mass.powi(2))
                                 * dudt
@@ -251,18 +360,17 @@ impl Statistics for Statistic {
                     0.050_660_591_821_168_89 * integral.integral
                 }
             }
-            Statistic::MaxwellBoltzmann => {
-                // 1/(2 π²) ≅ 0.050_660_591_821_168_89
-                0.050_660_591_821_168_89
+            (Statistic::MaxwellBoltzmann, false, true) => {
+                // 2 / π² ≅ 0.202_642_367_284_675_55
+                0.202_642_367_284_675_55 * f64::sinh(mu * beta) / beta.powi(3)
+            }
+            (Statistic::MaxwellBoltzmann, false, false) => {
+                // 1/(π²) ≅ 0.101_321_183_642_337_78
+                0.101_321_183_642_337_78
                     * mass.powi(2)
                     * bessel::k2(mass * beta)
-                    * f64::exp(mu * beta)
+                    * f64::sinh(mu * beta)
                     / beta
-            }
-            Statistic::MaxwellJuttner => {
-                let m_beta = mass * beta;
-                PI_N2 * (m_beta + 2.0) * (m_beta * (m_beta + 3.0) + 6.0)
-                    / (beta.powi(4) * mass * f64::exp(m_beta) * bessel::k2(m_beta))
             }
         }
     }
@@ -277,46 +385,14 @@ impl Statistics for Statistic {
     fn normalized_number_density(&self, mass: f64, mu: f64, beta: f64) -> f64 {
         debug_assert!(mass >= 0.0, "mass must be positive.");
         debug_assert!(beta >= 0.0, "β must be positive.");
-        if mu == 0.0 {
-            match *self {
-                Statistic::BoseEinstein => statistics::bose_einstein_normalized(mass, beta),
-                Statistic::FermiDirac => statistics::fermi_dirac_normalized(mass, beta),
-                Statistic::MaxwellBoltzmann | Statistic::MaxwellJuttner => {
-                    self.number_density(mass, mu, beta)
-                        / Statistic::BoseEinstein.massless_number_density(0.0, beta)
-                }
-            }
-        } else {
-            self.number_density(mass, mu, beta)
-                / Statistic::BoseEinstein.massless_number_density(0.0, beta)
-        }
-    }
 
-    /// Return number density for a massless particle following the specified
-    /// statistic.
-    ///
-    /// ```math
-    /// n = \frac{1}{2 \pi^2} \int_{0}^{\infty} f_{i} u^2 \dd u
-    /// ```
-    ///
-    /// # Implementation Details
-    ///
-    /// All four statistics have exact implementations and do not rely on any
-    /// numerical integration.
-    fn massless_number_density(&self, mu: f64, beta: f64) -> f64 {
-        debug_assert!(beta >= 0.0, "β must be positive.");
-
-        match *self {
-            Statistic::FermiDirac => statistics::fermi_dirac_massless(mu, beta),
-            Statistic::BoseEinstein => {
-                debug_assert!(
-                    mu <= 0.0,
-                    "Bose–Einstein condensates (μ > 0) are not supported."
-                );
-                statistics::bose_einstein_massless(mu, beta)
+        match (self, mu == 0.0) {
+            (Statistic::FermiDirac, true) => statistics::fermi_dirac_normalized(mass, beta),
+            (Statistic::BoseEinstein, true) => statistics::bose_einstein_normalized(mass, beta),
+            _ => {
+                self.number_density(mass, mu, beta)
+                    / Statistic::BoseEinstein.number_density(0.0, 0.0, beta)
             }
-            Statistic::MaxwellBoltzmann => PI_N2 * f64::exp(mu * beta) * beta.powi(-3),
-            Statistic::MaxwellJuttner => 0.0,
         }
     }
 }
@@ -337,14 +413,13 @@ mod tests {
         let fd = Statistic::FermiDirac;
         let be = Statistic::BoseEinstein;
         let mb = Statistic::MaxwellBoltzmann;
-        let mj = Statistic::MaxwellJuttner;
 
         let mut rdr = csv::Reader::from_reader(zstd::Decoder::with_buffer(BufReader::new(
             fs::File::open("tests/data/phase_space.csv.zst")?,
         ))?);
 
         for result in rdr.deserialize() {
-            let (e, m, mu, beta, f_fd, f_be, f_mb, f_mj): Row8 = result.unwrap();
+            let (e, m, mu, beta, f_fd, f_be, f_mb, _f_mj): Row8 = result.unwrap();
             // println!("(e, m, μ, β) = ({:e}, {:e}, {:e}, {:e})", e, m, mu, beta);
 
             if !f_fd.is_nan() {
@@ -359,10 +434,6 @@ mod tests {
                 let f = mb.phase_space(e, m, mu, beta);
                 approx_eq(f_mb, f, 10.0, 0.0)?;
             }
-            if !f_mj.is_nan() {
-                let f = mj.phase_space(e, m, mu, beta);
-                approx_eq(f_mj, f, 10.0, 0.0)?;
-            }
         }
 
         Ok(())
@@ -374,14 +445,13 @@ mod tests {
         let fd = Statistic::FermiDirac;
         let be = Statistic::BoseEinstein;
         let mb = Statistic::MaxwellBoltzmann;
-        let mj = Statistic::MaxwellJuttner;
 
         let mut rdr = csv::Reader::from_reader(zstd::Decoder::with_buffer(BufReader::new(
             fs::File::open("tests/data/number_density_massive.csv.zst")?,
         ))?);
 
         for result in rdr.deserialize() {
-            let (m, mu, beta, n_fd, n_be, n_mb, n_mj): Row7 = result.unwrap();
+            let (m, mu, beta, n_fd, n_be, n_mb, _n_mj): Row7 = result.unwrap();
             // println!("(m, μ, β) = ({:e}, {:e}, {:e})", m, mu, beta);
 
             if !n_fd.is_nan() {
@@ -399,12 +469,6 @@ mod tests {
                     approx_eq(n_mb, n, 7.0, 1e-100)?;
                 }
             }
-            if !n_mj.is_nan() {
-                let n = mj.number_density(m, mu, beta);
-                if !n.is_nan() {
-                    approx_eq(n_mj, n, 10.0, 1e-100)?;
-                }
-            }
         }
 
         Ok(())
@@ -416,32 +480,27 @@ mod tests {
         let fd = Statistic::FermiDirac;
         let be = Statistic::BoseEinstein;
         let mb = Statistic::MaxwellBoltzmann;
-        let mj = Statistic::MaxwellJuttner;
 
         let mut rdr = csv::Reader::from_reader(zstd::Decoder::with_buffer(BufReader::new(
             fs::File::open("tests/data/number_density_massless.csv.zst")?,
         ))?);
 
         for result in rdr.deserialize() {
-            let (mu, beta, n_fd, n_be, n_mb, n_mj): Row6 = result.unwrap();
+            let (mu, beta, n_fd, n_be, n_mb, _n_mj): Row6 = result.unwrap();
             // println!("(μ, β) = ({:e}, {:e})", mu, beta);
 
             if !n_fd.is_nan() {
-                let n = fd.massless_number_density(mu, beta);
+                let n = fd.number_density(0.0, mu, beta);
                 approx_eq(n_fd, n, 10.0, 1e-100)?;
             }
             if !n_be.is_nan() {
-                let n = be.massless_number_density(mu, beta);
+                let n = be.number_density(0.0, mu, beta);
                 println!("μ = {:e}, β = {:e}, n = {:e}", mu, beta, n);
                 approx_eq(n_be, n, 10.0, 1e-100)?;
             }
             if !n_mb.is_nan() {
-                let n = mb.massless_number_density(mu, beta);
+                let n = mb.number_density(0.0, mu, beta);
                 approx_eq(n_mb, n, 10.0, 1e-100)?;
-            }
-            if !n_mj.is_nan() {
-                let n = mj.massless_number_density(mu, beta);
-                approx_eq(n_mj, n, 10.0, 1e-100)?;
             }
         }
 
