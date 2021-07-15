@@ -13,55 +13,6 @@ from ipywidgets import interact, widgets
 COLORS = plotly.colors.DEFAULT_PLOTLY_COLORS
 
 
-def get_continuous_color(colorscale, intermed):
-    """
-    Plotly continuous colorscales assign colors to the range [0, 1]. This function computes the intermediate
-    color for any value in that range.
-
-    Plotly doesn't make the colorscales directly accessible in a common format.
-    Some are ready to use:
-
-        colorscale = plotly.colors.PLOTLY_SCALES["Greens"]
-
-    Others are just swatches that need to be constructed into a colorscale:
-
-        viridis_colors, scale = plotly.colors.convert_colors_to_same_type(plotly.colors.sequential.Viridis)
-        colorscale = plotly.colors.make_colorscale(viridis_colors, scale=scale)
-
-    :param colorscale: A plotly continuous colorscale defined with RGB string colors.
-    :param intermed: value in the range [0, 1]
-    :return: color in rgb string format
-    :rtype: str
-
-    Obtained from https://stackoverflow.com/a/64655638/1573761
-    """
-    if len(colorscale) < 1:
-        raise ValueError("colorscale must have at least one color")
-
-    if intermed <= 0 or len(colorscale) == 1:
-        return colorscale[0][1]
-    if intermed >= 1:
-        return colorscale[-1][1]
-
-    low_color = (0, 0, 0)
-    high_color = (0, 0, 0)
-    low_cutoff = 0
-    high_cutoff = 1
-    for cutoff, color in colorscale:
-        if intermed > cutoff:
-            low_cutoff, low_color = cutoff, color
-        else:
-            high_cutoff, high_color = cutoff, color
-            break
-
-    return plotly.colors.find_intermediate_color(
-        lowcolor=low_color,
-        highcolor=high_color,
-        intermed=((intermed - low_cutoff) / (high_cutoff - low_cutoff)),
-        colortype="rgb",
-    )
-
-
 def read_number_density(
     f: Union[Path, str], size_threshold: int = 20_000, quiet: bool = False
 ) -> pd.DataFrame:
