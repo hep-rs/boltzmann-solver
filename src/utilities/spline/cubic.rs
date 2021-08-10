@@ -6,7 +6,7 @@ use std::f64;
 
 /// Cubic Hermite spline interpolator using a constant data array
 #[allow(clippy::module_name_repetitions)]
-pub struct ConstCubicHermiteSpline {
+pub struct ConstCubicHermite {
     /// Data array arranged in triples of `(xi, yi, mi)` where `xi`, `yi` are x
     /// and y values of a particular point, and `mi` is the gradient for that
     /// point.
@@ -15,7 +15,7 @@ pub struct ConstCubicHermiteSpline {
     pub data: &'static [(f64, f64, f64)],
 }
 
-impl ConstCubicHermiteSpline {
+impl ConstCubicHermite {
     /// Sample the spline at the specific `x` value.
     ///
     /// For values of `x` outside of the domain of the underlying data, the
@@ -84,7 +84,7 @@ impl CubicHermiteSplinePoint {
 #[derive(Debug)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[allow(clippy::module_name_repetitions)]
-pub struct CubicHermiteSpline {
+pub struct CubicHermite {
     // `(x, y, m, accurate)` tuples through which the spline goes through, with
     // gradient `m`.  The accurate flag determines whether the interval between
     // it and the next value is accurate or not.
@@ -94,11 +94,11 @@ pub struct CubicHermiteSpline {
     min_points: usize,
 }
 
-impl CubicHermiteSpline {
+impl CubicHermite {
     /// Create a new empty cubic Hermite Spline.
     #[must_use]
     pub fn empty() -> Self {
-        CubicHermiteSpline {
+        CubicHermite {
             data: Vec::new(),
             min_points: 64,
         }
@@ -260,7 +260,7 @@ mod test {
 
     #[test]
     fn spline() -> Result<(), Box<dyn error::Error>> {
-        let mut spline = super::CubicHermiteSpline::empty();
+        let mut spline = super::CubicHermite::empty();
 
         let mut path = env::temp_dir();
         path.push("sampled.csv");

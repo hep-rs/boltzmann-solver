@@ -187,7 +187,7 @@ where
     let mut t_divs = vec![ta, tb];
 
     for m_squared in [p1, p2, p3, p4].iter().map(|p| p.mass2) {
-        t_divs.extend(&[m_squared * 0.98, m_squared * 1.02])
+        t_divs.extend(&[m_squared * 0.98, m_squared * 1.02]);
     }
     t_divs.sort_unstable_by(|a, b| a.partial_cmp(b).unwrap());
     t_divs.dedup();
@@ -196,7 +196,7 @@ where
     let mut integral = 0.0;
 
     for (&t1, &t2) in t_divs[..t_divs.len() - 1].iter().zip(&t_divs[1..]) {
-        integral += clenshaw_curtis::integrate(&integrand, t1, t2, INTEGRATION_PRECISION).integral
+        integral += clenshaw_curtis::integrate(&integrand, t1, t2, INTEGRATION_PRECISION).integral;
     }
 
     integral

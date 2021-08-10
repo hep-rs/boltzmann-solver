@@ -530,7 +530,7 @@ where
         ki.fill(0.0);
         kai.fill(0.0);
         for interaction in self.model.interactions() {
-            interaction.change(ki, kai, &ci);
+            interaction.change(ki, kai, ci);
         }
     }
 
@@ -546,7 +546,7 @@ where
             .fold(
                 || (Array1::zeros(dim), Array1::zeros(dim)),
                 |(mut dn, mut dna), interaction| {
-                    interaction.change(&mut dn, &mut dna, &ci);
+                    interaction.change(&mut dn, &mut dna, ci);
                     (dn, dna)
                 },
             )
@@ -567,11 +567,11 @@ where
     ///   going on.
     /// - Handle and equilibriate fast interaction (if applicable).
     #[allow(clippy::similar_names)]
-    fn fix_change(&self, c: &Context<M>, workspace: &mut Workspace) {
+    fn fix_change(&self, c: &Context<M>, dn: &mut Array1<f64>, dna: &mut Array1<f64>) {
         // For the fast interaction to converge, we need local mutable copies of
         // `n` and `na` which already incorporate the changes computed from the
         // regular integration.
-        let (mut n, mut na) = (&c.n + &workspace.dn, &c.na + &workspace.dna);
+        let (mut n, mut na) = (&c.n + &*dn, &c.na + &*dna);
 
         let mut iterations = 0_usize;
         loop {
@@ -599,8 +599,8 @@ where
                                 &n,
                                 &na,
                                 &c.eqn,
-                                &c.in_equilibrium,
-                                &c.no_asymmetry,
+                                c.in_equilibrium,
+                                c.no_asymmetry,
                             );
 
                             n += &result.dn;
@@ -642,8 +642,8 @@ where
             }
         }
 
-        workspace.dn = n - &c.n;
-        workspace.dna = na - &c.na;
+        *dn = n - &c.n;
+        *dna = na - &c.na;
     }
 
     /// Compute the adjustment to the step size based on the local error.
@@ -844,7 +844,7 @@ where
                 fast_interactions,
             );
             // log::trace!("[{}|{:.3e}]      eq = {:<+10.3e}", step, beta, c.eq);
-            self.fix_change(&c, &mut workspace);
+            self.fix_change(&c, &mut workspace.dn, &mut workspace.dna);
 
             #[allow(clippy::cast_precision_loss)]
             let err = workspace.local_error() / self.model.interactions().len() as f64;

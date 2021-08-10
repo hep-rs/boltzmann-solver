@@ -514,12 +514,12 @@ where
         // If no initial densities were given, all particles are assumed to be
         // in equilibrium.
         let initial_densities =
-            Self::generate_initial_densities(beta_range.0, &particles, &self.initial_densities)?;
+            Self::generate_initial_densities(beta_range.0, particles, &self.initial_densities)?;
 
         // If no initial asymmetries were given, all particles are assumed to be
         // in equilibrium with no asymmetry.
         let initial_asymmetries =
-            Self::generate_initial_asymmetries(&particles, &self.initial_asymmetries)?;
+            Self::generate_initial_asymmetries(particles, &self.initial_asymmetries)?;
 
         // Make sure that there aren't too many particles held in equilibrium or
         // forbidden from developing any asymmetry.  We also sort and remove

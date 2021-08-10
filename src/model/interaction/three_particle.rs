@@ -234,13 +234,13 @@ where
         let gamma = if real || z < M_BETA_THRESHOLD {
             // 1 / 32 π³ ≅ 0.001007860451037484
             0.001_007_860_451_037_484
-                * (self.squared_amplitude)(&c.model).abs()
+                * (self.squared_amplitude)(c.model).abs()
                 * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
                 * (bessel::k1(z) / z)
         } else {
             // ζ(3) / 16 π³ ≅ 0.0024230112251823
             0.002_423_011_225_182_3
-                * (self.squared_amplitude)(&c.model).abs()
+                * (self.squared_amplitude)(c.model).abs()
                 * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
                 * (bessel::k1_on_k2(z) / z.powi(3))
                 / p1.degrees_of_freedom()
@@ -280,13 +280,13 @@ where
         let delta_gamma = if real || z < M_BETA_THRESHOLD {
             // 1 / 32 π³ ≅ 0.001007860451037484
             0.001_007_860_451_037_484
-                * asymmetry(&c.model).abs()
+                * asymmetry(c.model).abs()
                 * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
                 * (bessel::k1(z) / z)
         } else {
             // ζ(3) / 16 π³ ≅ 0.0024230112251823
             0.002_423_011_225_182_3
-                * asymmetry(&c.model).abs()
+                * asymmetry(c.model).abs()
                 * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
                 * (bessel::k1_on_k2(z) / z.powi(3))
                 / p1.degrees_of_freedom()

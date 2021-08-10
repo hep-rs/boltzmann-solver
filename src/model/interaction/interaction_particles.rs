@@ -515,8 +515,8 @@ impl InteractionParticles {
         match (incoming_eq_prod == 0.0, outgoing_eq_prod == 0.0) {
             (true, true) => {
                 // If both sides are zero, use the minimum in absolute value change.
-                let delta_forward = self.symmetric_minimum_change_incoming(n, &in_equilibrium);
-                let delta_backward = self.symmetric_minimum_change_outgoing(n, &in_equilibrium);
+                let delta_forward = self.symmetric_minimum_change_incoming(n, in_equilibrium);
+                let delta_backward = self.symmetric_minimum_change_outgoing(n, in_equilibrium);
 
                 if delta_forward.abs() < delta_backward.abs() {
                     delta_forward
@@ -524,8 +524,8 @@ impl InteractionParticles {
                     delta_backward
                 }
             }
-            (true, false) => self.symmetric_minimum_change_incoming(n, &in_equilibrium),
-            (false, true) => self.symmetric_minimum_change_outgoing(n, &in_equilibrium),
+            (true, false) => self.symmetric_minimum_change_incoming(n, in_equilibrium),
+            (false, true) => self.symmetric_minimum_change_outgoing(n, in_equilibrium),
             (false, false) => {
                 // The prefactor function for which we will be finding the root.
                 let prefactor = &self.symmetric_prefactor_fn(n, eq, in_equilibrium);
@@ -538,9 +538,9 @@ impl InteractionParticles {
                 // Bound the search for roots based on the minimum changes that
                 // result in 0 density.
                 let (lower_limit, mut upper_limit) = (
-                    self.symmetric_minimum_change_outgoing(n, &in_equilibrium)
+                    self.symmetric_minimum_change_outgoing(n, in_equilibrium)
                         .min(0.0),
-                    self.symmetric_minimum_change_incoming(n, &in_equilibrium)
+                    self.symmetric_minimum_change_incoming(n, in_equilibrium)
                         .max(0.0),
                 );
 
@@ -973,7 +973,7 @@ impl InteractionParticles {
         result.symmetric_delta = self.symmetric_delta(n, eq, in_equilibrium);
 
         let mut n = n.clone();
-        for (&p, &(c, _)) in &self.particle_counts {
+        for (&p, &(c, _ca)) in &self.particle_counts {
             n[p] += c * result.symmetric_delta;
 
             // Although equilibrating the symmetric part of the interaction

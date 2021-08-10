@@ -197,7 +197,7 @@ pub(crate) fn setup_logging(verbosity: usize) {
                 line = record.line().unwrap(),
                 level = colors.color(record.level()),
                 message = message
-            ))
+            ));
         })
         .chain(io::stderr());
 

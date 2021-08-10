@@ -113,7 +113,7 @@ impl<M> FourParticle<M> {
                 -p4,
                 p3,
                 -p2,
-            ))
+            ));
         }
 
         v
@@ -211,7 +211,7 @@ where
 
         let integrand = |s, t| {
             let u = p1.mass2 + p2.mass2 + p3.mass2 + p4.mass2 - s - t;
-            (self.squared_amplitude)(&c.model, s, t, u).abs()
+            (self.squared_amplitude)(c.model, s, t, u).abs()
         };
         let gamma = if real {
             utilities::integrate_st(integrand, c.beta, p1, p2, p3, p4)
@@ -265,7 +265,7 @@ where
 
         let integrand = |s, t| {
             let u = p1.mass2 + p2.mass2 + p3.mass2 + p4.mass2 - s - t;
-            asymmetry(&c.model, s, t, u).abs()
+            asymmetry(c.model, s, t, u).abs()
         };
         let delta_gamma = if real {
             utilities::integrate_st(integrand, c.beta, p1, p2, p3, p4)

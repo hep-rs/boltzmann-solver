@@ -34,7 +34,7 @@ pub fn rec_geomspace(start: f64, end: f64, recursions: u32) -> Vec<f64> {
         let b = 2.0 * i - base - 1.0;
         let a = base - b;
 
-        v.push(((a * start + b * end) / base).exp())
+        v.push(((a * start + b * end) / base).exp());
     }
     v
 }
@@ -74,7 +74,7 @@ pub fn rec_linspace(start: f64, end: f64, recursions: u32) -> Vec<f64> {
         let b = 2.0 * i - base - 1.0;
         let a = base - b;
 
-        v.push((a * start + b * end) / base)
+        v.push((a * start + b * end) / base);
     }
     v
 }

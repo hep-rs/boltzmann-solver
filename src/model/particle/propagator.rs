@@ -179,7 +179,7 @@ impl<'a> Propagator<'a> {
         for pi in &self.propagators {
             for pj in &self.propagators {
                 let mut pj = *pj;
-                result += pi * pj.conj()
+                result += pi * pj.conj();
             }
         }
 
@@ -264,7 +264,7 @@ impl<'a> ops::Mul<Propagator<'a>> for Propagator<'a> {
 
         for pi in &self.propagators {
             for pj in &other.propagators {
-                result += pi * pj
+                result += pi * pj;
             }
         }
 
@@ -357,7 +357,7 @@ mod tests {
             let m = (p1.propagator(s) + p2.propagator(s))
                 * (p1.propagator(s) + p2.propagator(s)).conj();
 
-            complex_approx_eq(m11 + m12 + m21 + m22, m, 8.0, 1e-200)?
+            complex_approx_eq(m11 + m12 + m21 + m22, m, 8.0, 1e-200)?;
         }
 
         Ok(())

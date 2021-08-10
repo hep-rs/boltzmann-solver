@@ -6,7 +6,7 @@ use std::f64;
 
 /// Linear spline interpolator using a constant data array
 #[allow(clippy::module_name_repetitions)]
-pub struct ConstLinearSpline {
+pub struct ConstLinear {
     /// Data array arranged in tuples of `(xi, yi)` where `xi`, `yi` are x
     /// and y values of a particular point.
     ///
@@ -14,7 +14,7 @@ pub struct ConstLinearSpline {
     pub data: &'static [(f64, f64)],
 }
 
-impl ConstLinearSpline {
+impl ConstLinear {
     /// Sample the spline at the specific `x` value.
     ///
     /// For values of `x` outside of the domain of the underlying data, the
@@ -72,7 +72,7 @@ impl LinearSplinePoint {
 #[derive(Debug)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[allow(clippy::module_name_repetitions)]
-pub struct LinearSpline {
+pub struct Linear {
     // `(x, y, m, accurate)` tuples through which the spline goes through, with
     // gradient `m`.  The accurate flag determines whether the interval between
     // it and the next value is accurate or not.
@@ -82,11 +82,11 @@ pub struct LinearSpline {
     min_points: usize,
 }
 
-impl LinearSpline {
+impl Linear {
     /// Create a new empty linear Spline.
     #[must_use]
     pub fn empty() -> Self {
-        LinearSpline {
+        Linear {
             data: Vec::new(),
             min_points: 64,
         }
@@ -209,7 +209,7 @@ mod test {
 
     #[test]
     fn spline() -> Result<(), Box<dyn error::Error>> {
-        let mut spline = super::LinearSpline::empty();
+        let mut spline = super::Linear::empty();
 
         let mut path = env::temp_dir();
         path.push("sampled.csv");

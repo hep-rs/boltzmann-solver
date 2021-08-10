@@ -5,8 +5,8 @@
 mod cubic;
 mod linear;
 
-pub use cubic::{ConstCubicHermiteSpline, CubicHermiteSpline};
-pub use linear::{ConstLinearSpline, LinearSpline};
+pub use cubic::{ConstCubicHermite, CubicHermite};
+pub use linear::{ConstLinear, Linear};
 
-pub use linear::LinearSpline as Spline;
+pub use linear::Linear as Spline;
 // pub use cubic::CubicHermiteSpline as Spline;

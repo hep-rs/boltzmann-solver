@@ -6,7 +6,7 @@ use std::{collections::HashSet, fmt, sync::RwLock};
 #[derive(Debug)]
 pub struct Context<'a, M> {
     /// Evaluation step.
-    pub step: u64,
+    pub step: usize,
     /// The substep apply within Runge-Kutta integration and are numbered
     /// starting from 0.  If no substep is applicable, a negative number
     /// (typically -1) is used.

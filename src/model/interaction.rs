@@ -17,7 +17,6 @@ pub use three_particle::ThreeParticle;
 
 use crate::{model::Model, solver::Context};
 use ndarray::prelude::*;
-#[cfg(feature = "serde")]
 use std::cmp::Ordering;
 
 /// Generic interaction between particles.
@@ -132,7 +131,7 @@ pub trait Interaction<M: Model> {
     fn symmetric_prefactor(&self, c: &Context<M>) -> f64 {
         let ((forward_numerator, forward_denominator), (backward_numerator, backward_denominator)) =
             self.particles()
-                .symmetric_prefactor(&c.n, &c.eq, &c.in_equilibrium);
+                .symmetric_prefactor(&c.n, &c.eq, c.in_equilibrium);
 
         let forward_prefactor = checked_div(forward_numerator, forward_denominator);
         let backward_prefactor = checked_div(backward_numerator, backward_denominator);
@@ -196,8 +195,8 @@ pub trait Interaction<M: Model> {
                 &c.n,
                 &c.na,
                 &c.eq,
-                &c.in_equilibrium,
-                &c.no_asymmetry,
+                c.in_equilibrium,
+                c.no_asymmetry,
             );
         let forward = checked_div(forward_numerator, forward_denominator);
         let backward = checked_div(backward_numerator, backward_denominator);
@@ -329,7 +328,7 @@ pub trait Interaction<M: Model> {
         let mut result = false;
 
         if overshoots(c, particles, rate) {
-            let delta = particles.symmetric_delta(&c.n, &c.eqn, &c.in_equilibrium);
+            let delta = particles.symmetric_delta(&c.n, &c.eqn, c.in_equilibrium);
             rate.symmetric = if rate.symmetric.abs() < delta.abs() {
                 rate.symmetric
             } else {
@@ -340,7 +339,7 @@ pub trait Interaction<M: Model> {
 
         if asymmetry_overshoots(c, particles, rate) {
             let delta =
-                particles.asymmetric_delta(&c.n, &c.na, &c.eqn, &c.in_equilibrium, &c.no_asymmetry);
+                particles.asymmetric_delta(&c.n, &c.na, &c.eq, c.in_equilibrium, c.no_asymmetry);
             rate.asymmetric = if rate.asymmetric.abs() < delta.abs() {
                 rate.asymmetric
             } else {
@@ -462,7 +461,7 @@ pub trait Interaction<M: Model> {
 /// overshoot of equilibrium.
 #[must_use]
 pub fn overshoots<M>(c: &Context<M>, particles: &InteractionParticles, rate: &RateDensity) -> bool {
-    let f = particles.symmetric_prefactor_fn(&c.n, &c.eqn, &c.in_equilibrium);
+    let f = particles.symmetric_prefactor_fn(&c.n, &c.eqn, c.in_equilibrium);
     let a = f(0.0);
     if !a.is_finite() {
         true
@@ -489,7 +488,7 @@ pub fn asymmetry_overshoots<M>(
     rate: &RateDensity,
 ) -> bool {
     let f =
-        particles.asymmetric_prefactor_fn(&c.n, &c.na, &c.eqn, &c.in_equilibrium, &c.no_asymmetry);
+        particles.asymmetric_prefactor_fn(&c.n, &c.na, &c.eqn, c.in_equilibrium, c.no_asymmetry);
     let a = f(0.0);
     if !a.is_finite() {
         true
@@ -565,7 +564,7 @@ where
     }
 
     fn change(&self, dn: &mut Array1<f64>, dna: &mut Array1<f64>, c: &Context<M>) {
-        (*self).change(dn, dna, c)
+        (*self).change(dn, dna, c);
     }
 }
 
@@ -607,7 +606,7 @@ where
     }
 
     fn change(&self, dn: &mut Array1<f64>, dna: &mut Array1<f64>, c: &Context<M>) {
-        self.as_ref().change(dn, dna, c)
+        self.as_ref().change(dn, dna, c);
     }
 }
 

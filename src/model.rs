@@ -247,7 +247,7 @@ where
             eq,
             n: Array1::ones(self.len_particles()),
             na: Array1::zeros(self.len_particles()),
-            model: &self,
+            model: self,
             fast_interactions: None,
             in_equilibrium: &[],
             no_asymmetry: &[],
