@@ -12,7 +12,7 @@ mod tests;
 /// As the `0` index is reserved for a particle that is it's own antiparticle,
 /// this is the only 'particle' included within the model.
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-pub struct EmptyModel {
+pub struct Empty {
     /// Inverse temperature in GeV`$^{-1}$`
     beta: f64,
 
@@ -28,7 +28,7 @@ pub struct EmptyModel {
     interactions: Vec<Box<dyn Interaction<Self>>>,
 }
 
-impl fmt::Debug for EmptyModel {
+impl fmt::Debug for Empty {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
@@ -40,13 +40,13 @@ impl fmt::Debug for EmptyModel {
     }
 }
 
-impl Default for EmptyModel {
+impl Default for Empty {
     fn default() -> Self {
         Self::zero()
     }
 }
 
-impl EmptyModel {
+impl Empty {
     /// Push the specified particle to the end of the list of particles within
     /// the model.
     ///
@@ -118,7 +118,7 @@ impl EmptyModel {
     }
 }
 
-impl Model for EmptyModel {
+impl Model for Empty {
     fn zero() -> Self {
         Self {
             beta: f64::INFINITY,
@@ -167,7 +167,7 @@ impl Model for EmptyModel {
 }
 
 #[cfg(feature = "parallel")]
-impl ModelInteractions for EmptyModel {
+impl ModelInteractions for Empty {
     type Item = Box<dyn Interaction<Self> + Sync>;
 
     fn interactions(&self) -> &[Self::Item] {
@@ -176,7 +176,7 @@ impl ModelInteractions for EmptyModel {
 }
 
 #[cfg(not(feature = "parallel"))]
-impl ModelInteractions for EmptyModel {
+impl ModelInteractions for Empty {
     type Item = Box<dyn Interaction<Self>>;
 
     fn interactions(&self) -> &[Self::Item] {

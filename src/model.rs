@@ -1,13 +1,13 @@
 //! Model information
 
-mod empty_model;
+mod empty;
 pub mod interaction;
 mod particle;
-pub(crate) mod standard_model;
+pub(crate) mod standard;
 
-pub use empty_model::EmptyModel;
+pub use empty::Empty;
 pub use particle::Particle;
-pub use standard_model::StandardModel;
+pub use standard::Standard;
 
 use crate::{
     model::interaction::Interaction,

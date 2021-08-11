@@ -10,7 +10,7 @@ use std::{f64, f64::consts::SQRT_2};
 /// The Standard Model of particle physics.
 #[derive(Debug)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-pub struct StandardModel {
+pub struct Standard {
     /// Inverse temperature in GeV`$^{-1}$`
     pub beta: f64,
 
@@ -48,7 +48,7 @@ pub struct StandardModel {
     pub lambda: f64,
 }
 
-impl Model for StandardModel {
+impl Model for Standard {
     fn zero() -> Self {
         let particles = vec![
             Particle::new(0, 0.0, 0.0)
@@ -87,7 +87,7 @@ impl Model for StandardModel {
         let mu2 = -mh.powi(2) / 2.0;
         let lambda = (mu2 / (2.0 * vev)).powi(2);
 
-        StandardModel {
+        Standard {
             beta: f64::INFINITY,
             g1: 3.585e-01,
             g2: 6.476e-01,
@@ -214,7 +214,7 @@ impl Model for StandardModel {
 }
 
 fn generate_ckm() -> Array2<Complex<f64>> {
-    use crate::model::standard_model::data::{CKM_A, CKM_ETA, CKM_LAMBDA, CKM_RHO};
+    use crate::model::standard::data::{CKM_A, CKM_ETA, CKM_LAMBDA, CKM_RHO};
 
     let a_2 = CKM_A.powi(2);
     let lambda_2 = CKM_LAMBDA.powi(2);
@@ -280,7 +280,7 @@ fn generate_ckm() -> Array2<Complex<f64>> {
 }
 
 fn generate_pmns() -> Array2<Complex<f64>> {
-    use crate::model::standard_model::data::{PMNS_DELTA, PMNS_T12, PMNS_T13, PMNS_T23};
+    use crate::model::standard::data::{PMNS_DELTA, PMNS_T12, PMNS_T13, PMNS_T23};
 
     let r23 = {
         let (sin, cos) = PMNS_T23.sin_cos();
@@ -336,7 +336,7 @@ fn generate_pmns() -> Array2<Complex<f64>> {
 
 #[cfg(test)]
 mod tests {
-    use super::StandardModel;
+    use super::Standard;
     use crate::{model::Model, utilities::test::complex_approx_eq};
     use num::Complex;
     use std::error;
@@ -345,21 +345,18 @@ mod tests {
     /// particle.
     #[test]
     fn particle_indices() {
-        let model = StandardModel::zero();
+        let model = Standard::zero();
 
         for (i, p) in model.particles().iter().enumerate() {
             let name = &p.name;
             if name.len() == 1 {
-                assert_eq!(Ok(i), StandardModel::static_particle_idx(name, 0));
+                assert_eq!(Ok(i), Standard::static_particle_idx(name, 0));
                 assert_eq!(Ok(i), model.particle_idx(name, 0));
             } else if name.len() == 2 {
                 let mut chars = name.chars();
                 let head = chars.next().unwrap();
                 let idx = chars.next().unwrap() as usize - 49;
-                assert_eq!(
-                    Ok(i),
-                    StandardModel::static_particle_idx(&head.to_string(), idx)
-                );
+                assert_eq!(Ok(i), Standard::static_particle_idx(&head.to_string(), idx));
                 assert_eq!(Ok(i), model.particle_idx(&head.to_string(), idx));
             }
         }

@@ -2,7 +2,7 @@
 //!
 //! All values are taken from the PDG unless otherwise stated.
 
-use crate::utilities::spline::ConstCubicHermiteSpline;
+use crate::utilities::spline::ConstCubicHermite;
 
 /// Z boson mass in GeV.
 pub const MASS_Z: f64 = 91.187_6;
@@ -67,7 +67,7 @@ pub const PMNS_DELTA: f64 = 3.4383;
 ///
 /// Data is sourced from [`arXiv:1609.049_79`](https://arxiv.org/abs/1609.049_79).
 #[allow(clippy::approx_constant)]
-pub(crate) const STANDARD_MODEL_GSTAR: ConstCubicHermiteSpline = ConstCubicHermiteSpline {
+pub(crate) const STANDARD_MODEL_GSTAR: ConstCubicHermite = ConstCubicHermite {
     data: &[
         (-9.210_340_371_976_184, 106.75, 0.),
         (-8.517_193_191_416_238, 106.75, -0.005_000_000_000_002_558),
@@ -119,7 +119,7 @@ pub(crate) const STANDARD_MODEL_GSTAR: ConstCubicHermiteSpline = ConstCubicHermi
 ///
 /// Data is sourced from [`arXiv:1609.049_79`](https://arxiv.org/abs/1609.049_79).
 #[allow(clippy::approx_constant)]
-pub(crate) const FERMION_GSTAR: ConstCubicHermiteSpline = ConstCubicHermiteSpline {
+pub(crate) const FERMION_GSTAR: ConstCubicHermite = ConstCubicHermite {
     #[rustfmt::skip]
     data: &[
         (-2.302_585_092_994_046, -0.133_531_392_624_522_63, -0.001_143_510_702_078_964_8),
@@ -156,7 +156,7 @@ pub(crate) const FERMION_GSTAR: ConstCubicHermiteSpline = ConstCubicHermiteSplin
 ///
 /// Data is sourced from [`arXiv:1609.049_79`](https://arxiv.org/abs/1609.049_79).
 #[allow(clippy::approx_constant)]
-pub(crate) const BOSON_GSTAR: ConstCubicHermiteSpline = ConstCubicHermiteSpline {
+pub(crate) const BOSON_GSTAR: ConstCubicHermite = ConstCubicHermite {
     #[rustfmt::skip]
     data: &[
         (-2.302_585_092_994_046, 0., -0.002_002_002_670_673_079_3),
@@ -183,7 +183,7 @@ pub(crate) const BOSON_GSTAR: ConstCubicHermiteSpline = ConstCubicHermiteSpline 
     ],
 };
 
-pub(crate) const G1_RUNNING: ConstCubicHermiteSpline = ConstCubicHermiteSpline {
+pub(crate) const G1_RUNNING: ConstCubicHermite = ConstCubicHermite {
     data: &[
         (1e-17, 0.588_709, -0.003_659_000_000_000_079),
         (
@@ -439,7 +439,7 @@ pub(crate) const G1_RUNNING: ConstCubicHermiteSpline = ConstCubicHermiteSpline {
     ],
 };
 
-pub(crate) const G2_RUNNING: ConstCubicHermiteSpline = ConstCubicHermiteSpline {
+pub(crate) const G2_RUNNING: ConstCubicHermite = ConstCubicHermite {
     data: &[
         (1e-17, 0.518_173, 0.001_924_000_000_000_036_8),
         (
@@ -695,7 +695,7 @@ pub(crate) const G2_RUNNING: ConstCubicHermiteSpline = ConstCubicHermiteSpline {
     ],
 };
 
-pub(crate) const G3_RUNNING: ConstCubicHermiteSpline = ConstCubicHermiteSpline {
+pub(crate) const G3_RUNNING: ConstCubicHermite = ConstCubicHermite {
     data: &[
         (1e-17, 0.513_992, 0.004_241_999_999_999_968),
         (
