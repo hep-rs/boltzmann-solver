@@ -685,7 +685,7 @@ mod tests {
     use crate::{prelude::Particle, utilities::test::approx_eq};
     use ndarray::Array1;
     use serde::{Deserialize, Serialize};
-    use std::{env::temp_dir, error, fs, io::BufReader, path::Path};
+    use std::{env::temp_dir, error, fs, path::Path};
 
     /// Shorthand to create the CSV file in the appropriate directory and with
     /// headers.
@@ -778,9 +778,9 @@ mod tests {
         }
 
         // Data generated randomly
-        let mut csv = csv::Reader::from_reader(zstd::Decoder::with_buffer(BufReader::new(
-            fs::File::open("tests/data/t_range_random.csv.zst")?,
-        ))?);
+        let mut csv = csv::Reader::from_reader(zstd::Decoder::new(fs::File::open(
+            "tests/data/t_range_random.csv.zst",
+        )?)?);
 
         for record in csv.deserialize() {
             let row: Row = record?;
@@ -942,7 +942,7 @@ mod tests {
 
         let m2 = |_, _| 1.0;
         for &beta in &Array1::geomspace(1e-12, 1e-6, 1000).unwrap() {
-            let n = pm.normalized_number_density(0.0, beta);
+            let n = pm.normalized_number_density(beta, 0.0);
             let gamma = super::integrate_st(m2, beta, &pm, &p0, &p0, &p0);
             let row = Row {
                 beta,
@@ -978,7 +978,7 @@ mod tests {
 
         let m2 = |_, _| 1.0;
         for &beta in &Array1::geomspace(1e-12, 1e-6, 1000).unwrap() {
-            let n = pm.normalized_number_density(0.0, beta);
+            let n = pm.normalized_number_density(beta, 0.0);
             let gamma = super::integrate_st(m2, beta, &pm, &pm, &p0, &p0);
             let row = Row {
                 beta,
@@ -1014,7 +1014,7 @@ mod tests {
 
         let m2 = |_, _| 1.0;
         for &beta in &Array1::geomspace(1e-12, 1e-6, 1000).unwrap() {
-            let n = pm.normalized_number_density(0.0, beta);
+            let n = pm.normalized_number_density(beta, 0.0);
             let gamma = super::integrate_st(m2, beta, &pm, &pm, &pm, &p0);
             let row = Row {
                 beta,
@@ -1049,7 +1049,7 @@ mod tests {
 
         let m2 = |_, _| 1.0;
         for &beta in &Array1::geomspace(1e-12, 1e-6, 1000).unwrap() {
-            let n = pm.normalized_number_density(0.0, beta);
+            let n = pm.normalized_number_density(beta, 0.0);
             let gamma = super::integrate_st(m2, beta, &pm, &pm, &pm, &pm);
             let row = Row {
                 beta,

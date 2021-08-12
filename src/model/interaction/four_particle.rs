@@ -298,12 +298,12 @@ where
 
     #[allow(clippy::too_many_lines)]
     fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
-        let gamma = self.gamma(c, false).unwrap_or_default();
+        let gamma = self.gamma(c, false)?;
         let delta_gamma = self.delta_gamma(c, false);
 
         // If both rates are 0, there's no need to adjust it to the particles'
         // number densities.
-        if gamma == 0.0 && (delta_gamma.is_none() || delta_gamma.unwrap() == 0.0) {
+        if gamma == 0.0 && delta_gamma.unwrap_or_default() == 0.0 {
             return None;
         }
 
@@ -409,7 +409,7 @@ where
                     rate.asymmetric = delta_gamma * symmetric_prefactor
                         + gamma
                             * (eq3 * checked_div(na1 * n2 + na2 * n1, eq1 * eq2)
-                                - checked_div(na3 * n4 + na4 * n3, eq4))
+                                - checked_div(na3 * n4 + na4 * n3, eq4));
                 };
             }
             (false, false, false, true) => {
@@ -762,7 +762,7 @@ where
 #[cfg(test)]
 mod tests {
     use crate::{
-        model::{interaction, EmptyModel},
+        model::{interaction, Empty},
         prelude::*,
         statistic::Statistic,
     };
@@ -811,7 +811,7 @@ mod tests {
 
     #[test]
     fn massless() -> Result<(), Box<dyn error::Error>> {
-        let mut model = EmptyModel::default();
+        let mut model = Empty::default();
         model.extend_particles(
             [0.0, 0.0, 0.0, 0.0]
                 .iter()
@@ -830,7 +830,7 @@ mod tests {
             csv.serialize(CsvRow {
                 beta,
                 hubble_rate: c.hubble_rate,
-                be_n: Statistic::BoseEinstein.number_density(0.0, 0.0, beta),
+                be_n: Statistic::BoseEinstein.number_density(beta, 0.0, 0.0),
                 eq1: c.eq[1],
                 eq2: c.eq[2],
                 eq3: c.eq[3],
@@ -856,7 +856,7 @@ mod tests {
 
     #[test]
     fn massive_m000() -> Result<(), Box<dyn error::Error>> {
-        let mut model = EmptyModel::default();
+        let mut model = Empty::default();
         model.extend_particles(
             [1e10, 0.0, 0.0, 0.0]
                 .iter()
@@ -874,7 +874,7 @@ mod tests {
             csv.serialize(CsvRow {
                 beta,
                 hubble_rate: c.hubble_rate,
-                be_n: Statistic::BoseEinstein.number_density(0.0, 0.0, beta),
+                be_n: Statistic::BoseEinstein.number_density(beta, 0.0, 0.0),
                 eq1: c.eq[1],
                 eq2: c.eq[2],
                 eq3: c.eq[3],
@@ -900,7 +900,7 @@ mod tests {
 
     #[test]
     fn massive_m0m0() -> Result<(), Box<dyn error::Error>> {
-        let mut model = EmptyModel::default();
+        let mut model = Empty::default();
         model.extend_particles(
             [1e10, 0.0, 1e10, 0.0]
                 .iter()
@@ -918,7 +918,7 @@ mod tests {
             csv.serialize(CsvRow {
                 beta,
                 hubble_rate: c.hubble_rate,
-                be_n: Statistic::BoseEinstein.number_density(0.0, 0.0, beta),
+                be_n: Statistic::BoseEinstein.number_density(beta, 0.0, 0.0),
                 eq1: c.eq[1],
                 eq2: c.eq[2],
                 eq3: c.eq[3],
@@ -944,7 +944,7 @@ mod tests {
 
     #[test]
     fn massive_mm00() -> Result<(), Box<dyn error::Error>> {
-        let mut model = EmptyModel::default();
+        let mut model = Empty::default();
         model.extend_particles(
             [1e10, 1e10, 0.0, 0.0]
                 .iter()
@@ -962,7 +962,7 @@ mod tests {
             csv.serialize(CsvRow {
                 beta,
                 hubble_rate: c.hubble_rate,
-                be_n: Statistic::BoseEinstein.number_density(0.0, 0.0, beta),
+                be_n: Statistic::BoseEinstein.number_density(beta, 0.0, 0.0),
                 eq1: c.eq[1],
                 eq2: c.eq[2],
                 eq3: c.eq[3],
@@ -989,7 +989,7 @@ mod tests {
     /// Unit amplitude
     #[test]
     fn massive_mmmm() -> Result<(), Box<dyn error::Error>> {
-        let mut model = EmptyModel::default();
+        let mut model = Empty::default();
         model.extend_particles(
             [1e10, 1e10, 1e10, 1e10]
                 .iter()
@@ -1007,7 +1007,7 @@ mod tests {
             csv.serialize(CsvRow {
                 beta,
                 hubble_rate: c.hubble_rate,
-                be_n: Statistic::BoseEinstein.number_density(0.0, 0.0, beta),
+                be_n: Statistic::BoseEinstein.number_density(beta, 0.0, 0.0),
                 eq1: c.eq[1],
                 eq2: c.eq[2],
                 eq3: c.eq[3],

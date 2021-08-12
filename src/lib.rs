@@ -159,5 +159,5 @@ pub mod solver;
 pub mod statistic;
 pub mod utilities;
 
-pub use crate::model::standard_model::data as sm_data;
+pub use crate::model::standard::data as sm_data;
 pub use special_functions::particle_physics::pave_absorptive as pave;

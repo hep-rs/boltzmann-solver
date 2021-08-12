@@ -96,9 +96,9 @@ impl<M> SolverBuilder<M> {
     ///
     /// ```rust
     /// use boltzmann_solver::prelude::*;
-    /// use boltzmann_solver::model::StandardModel;
+    /// use boltzmann_solver::model::Standard;
     ///
-    /// let mut solver_builder: SolverBuilder<StandardModel> = SolverBuilder::new()
+    /// let mut solver_builder: SolverBuilder<Standard> = SolverBuilder::new()
     ///     // .logger(..)
     ///     // .initial_densities(..)
     ///     .beta_range(1e-10, 1e-6);
@@ -118,7 +118,7 @@ impl<M> SolverBuilder<M> {
             step_precision: StepPrecision::default(),
             error_tolerance: 1e-4,
             precompute: true,
-            fast_interactions: false,
+            fast_interactions: true,
             abort_when_inaccurate: false,
         }
     }
@@ -356,7 +356,7 @@ impl<M> SolverBuilder<M> {
     {
         let mut n: Array1<_> = particles
             .iter()
-            .map(|p| p.normalized_number_density(0.0, beta))
+            .map(|p| p.normalized_number_density(beta, 0.0))
             .collect();
 
         for (&i, &ni) in initial_densities {

@@ -957,15 +957,21 @@ impl InteractionParticles {
         {{
             "incoming": {:?},
             "outgoing": {:?},
-            "n": {:.5e},
-            "na": {:.5e},
-            "eq": {:.5e}
+            "n": {:.e},
+            "na": {:.e},
+            "eq": {:.e},
+            "in_equilibrium": {:?},
+            "no_asymmetry": {:?},
+            "gamma_ratio": {:.e}
         }}"#,
             self.incoming_signed,
             self.outgoing_signed,
             n,
             na,
-            eq
+            eq,
+            in_equilibrium,
+            no_asymmetry,
+            self.gamma_ratio.unwrap_or_default()
         );
 
         let mut result = FastInteractionResult::zero(n.dim());
@@ -1090,7 +1096,6 @@ mod tests {
         collections::HashMap,
         error, f64,
         fs::{self, File},
-        io::BufReader,
         iter,
     };
 
@@ -1741,9 +1746,9 @@ mod tests {
     #[test]
     fn fast_interaction_1_2() -> Result<(), Box<dyn error::Error>> {
         let interaction = super::InteractionParticles::new(&[1], &[2, 3]);
-        let mut csv = csv::Reader::from_reader(zstd::Decoder::with_buffer(BufReader::new(
-            fs::File::open("tests/data/fast_interaction_1_2.csv.zst")?,
-        ))?);
+        let mut csv = csv::Reader::from_reader(zstd::Decoder::new(fs::File::open(
+            "tests/data/fast_interaction_1_2.csv.zst",
+        )?)?);
 
         for result in csv.deserialize() {
             let data: HashMap<String, f64> = result?;
@@ -1816,9 +1821,9 @@ mod tests {
     #[test]
     fn fast_interaction_2_2() -> Result<(), Box<dyn error::Error>> {
         let interaction = super::InteractionParticles::new(&[1, 2], &[3, 4]);
-        let mut csv = csv::Reader::from_reader(zstd::Decoder::with_buffer(BufReader::new(
-            fs::File::open("tests/data/fast_interaction_2_2.csv.zst")?,
-        ))?);
+        let mut csv = csv::Reader::from_reader(zstd::Decoder::new(fs::File::open(
+            "tests/data/fast_interaction_2_2.csv.zst",
+        )?)?);
 
         for result in csv.deserialize() {
             let data: HashMap<String, f64> = result?;
@@ -1907,9 +1912,9 @@ mod tests {
     #[test]
     fn fast_interaction_1_3() -> Result<(), Box<dyn error::Error>> {
         let interaction = super::InteractionParticles::new(&[1], &[2, 3, 4]);
-        let mut csv = csv::Reader::from_reader(zstd::Decoder::with_buffer(BufReader::new(
-            fs::File::open("tests/data/fast_interaction_1_3.csv.zst")?,
-        ))?);
+        let mut csv = csv::Reader::from_reader(zstd::Decoder::new(fs::File::open(
+            "tests/data/fast_interaction_1_3.csv.zst",
+        )?)?);
 
         for result in csv.deserialize() {
             let data: HashMap<String, f64> = result?;
@@ -2011,9 +2016,7 @@ mod tests {
             asymmetric: f64,
         }
 
-        let json = zstd::Decoder::with_buffer(BufReader::new(File::open(
-            "tests/data/fast_interaction_random.json.zst",
-        )?))?;
+        let json = zstd::Decoder::new(File::open("tests/data/fast_interaction_random.json.zst")?)?;
         let data: Vec<Entry> = serde_json::from_reader(json).unwrap();
 
         for (i, entry) in data.into_iter().enumerate() {
@@ -2141,7 +2144,7 @@ mod tests {
 
     #[test]
     fn display() {
-        let mut model = crate::model::EmptyModel::default();
+        let mut model = crate::model::Empty::default();
         model.push_particle(crate::prelude::Particle::new(0, 1.0, 1e-3).name("one"));
         model.push_particle(crate::prelude::Particle::new(0, 1.0, 1e-3).name("two"));
         model.push_particle(crate::prelude::Particle::new(0, 1.0, 1e-3).name("three"));

@@ -228,12 +228,12 @@ where
     /// All other attribute contexts will be as expected.
     fn as_context(&self) -> Context<Self> {
         let beta = self.get_beta();
-        let n = Statistic::BoseEinstein.number_density(0.0, 0.0, beta);
+        let n = Statistic::BoseEinstein.number_density(beta, 0.0, 0.0);
         let hubble_rate = self.hubble_rate(beta);
         let eq: Array1<f64> = self
             .particles()
             .iter()
-            .map(|p| p.normalized_number_density(0.0, beta))
+            .map(|p| p.normalized_number_density(beta, 0.0))
             .collect();
 
         Context {

@@ -8,6 +8,7 @@ mod rate_density;
 mod three_particle;
 
 pub use fast_interaction_result::FastInteractionResult;
+#[allow(clippy::module_name_repetitions)]
 pub use interaction_particles::{DisplayError, InteractionParticles};
 pub use partial_width::PartialWidth;
 pub use rate_density::RateDensity;
@@ -228,12 +229,12 @@ pub trait Interaction<M: Model> {
     /// The default implementation uses the output of [`Interaction::gamma`] and
     /// [`Interaction::delta_gamma`] in order to computer the actual rate.
     fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
-        let gamma = self.gamma(c, false).unwrap_or_default();
-        let delta_gamma = self.delta_gamma(c, false);
+        let gamma = self.gamma(c, true)?;
+        let delta_gamma = self.delta_gamma(c, true);
 
         // If both rates are 0, there's no need to adjust it to the particles'
         // number densities.
-        if gamma == 0.0 && (delta_gamma.is_none() || delta_gamma.unwrap() == 0.0) {
+        if gamma == 0.0 && delta_gamma.unwrap_or_default() == 0.0 {
             return None;
         }
 
@@ -242,6 +243,8 @@ pub trait Interaction<M: Model> {
         rate.gamma = gamma;
         rate.symmetric = gamma * symmetric_prefactor;
         rate.delta_gamma = delta_gamma;
+        rate.asymmetric = delta_gamma.unwrap_or_default() * symmetric_prefactor
+            + gamma * self.asymmetric_prefactor(c);
         let delta_gamma = delta_gamma.unwrap_or_default();
         rate.asymmetric = delta_gamma * symmetric_prefactor + gamma * self.asymmetric_prefactor(c);
 
@@ -298,9 +301,7 @@ pub trait Interaction<M: Model> {
                         );
 
                         let mut fast_interactions = fast_interactions.write().unwrap();
-                        let mut interaction = self.particles().clone();
-                        interaction.gamma_ratio = rate.gamma_ratio();
-                        fast_interactions.insert(interaction);
+                        fast_interactions.insert(self.particles().clone());
 
                         true
                     } else {
@@ -436,7 +437,7 @@ pub trait Interaction<M: Model> {
     /// [`Interaction::adjusted_rate`] in order to computer the actual rate.
     ///
     /// This method should generally not be implemented.
-    fn change(&self, dn: &mut Array1<f64>, dna: &mut Array1<f64>, c: &Context<M>) {
+    fn change(&self, dn: &mut ArrayViewMut1<f64>, dna: &mut ArrayViewMut1<f64>, c: &Context<M>) {
         if let Some(rate) = self.adjusted_rate(c) {
             let particles = self.particles();
 
@@ -605,7 +606,7 @@ where
         self.as_ref().adjusted_rate(c)
     }
 
-    fn change(&self, dn: &mut Array1<f64>, dna: &mut Array1<f64>, c: &Context<M>) {
+    fn change(&self, dn: &mut ArrayViewMut1<f64>, dna: &mut ArrayViewMut1<f64>, c: &Context<M>) {
         self.as_ref().change(dn, dna, c);
     }
 }

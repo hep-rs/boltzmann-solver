@@ -3,7 +3,7 @@
 mod propagator;
 
 use crate::{
-    model::standard_model::data,
+    model::standard::data,
     statistic::{Statistic, Statistics},
 };
 #[cfg(feature = "serde")]
@@ -237,21 +237,21 @@ impl Particle {
     /// Return the equilibrium phase space occupation of the particle.
     #[must_use]
     pub fn phase_space(&self, e: f64, mu: f64, beta: f64) -> f64 {
-        self.statistic().phase_space(e, self.mass, mu, beta) * self.degrees_of_freedom()
+        self.statistic().phase_space(beta, e, self.mass, mu) * self.degrees_of_freedom()
     }
 
     /// Return the equilibrium number density of the particle.
     #[must_use]
-    pub fn number_density(&self, mu: f64, beta: f64) -> f64 {
-        self.statistic().number_density(self.mass, mu, beta) * self.degrees_of_freedom()
+    pub fn number_density(&self, beta: f64, mu: f64) -> f64 {
+        self.statistic().number_density(beta, self.mass, mu) * self.degrees_of_freedom()
     }
 
     /// Return the equilibrium number density of the particle, normalized to the
     /// number density of a massless boson with one degree of freedom.
     #[must_use]
-    pub fn normalized_number_density(&self, mu: f64, beta: f64) -> f64 {
+    pub fn normalized_number_density(&self, beta: f64, mu: f64) -> f64 {
         self.statistic()
-            .normalized_number_density(self.mass, mu, beta)
+            .normalized_number_density(beta, self.mass, mu)
             * self.degrees_of_freedom()
     }
 
@@ -268,7 +268,7 @@ impl Particle {
     /// Return the propagator denominator for the particle.
     #[must_use]
     pub fn propagator(&self, s: f64) -> Propagator {
-        Propagator::new(&self, s)
+        Propagator::new(self, s)
     }
 }
 
@@ -306,7 +306,7 @@ mod tests {
         approx_eq(particle.entropy_dof(1e-10), 1.0, 8.0, 0.0)?;
         assert!(particle.entropy_dof(1e10) < 1e-30);
         approx_eq(
-            particle.normalized_number_density(0.0, 1e-10),
+            particle.normalized_number_density(1e-10, 0.0),
             1.0,
             8.0,
             0.0,
@@ -320,7 +320,7 @@ mod tests {
             0.0,
         )?;
         approx_eq(
-            particle.normalized_number_density(0.0, 1e-10),
+            particle.normalized_number_density(1e-10, 0.0),
             1.0,
             8.0,
             0.0,
@@ -341,7 +341,7 @@ mod tests {
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
-            particle.normalized_number_density(0.0, 1e-10),
+            particle.normalized_number_density(1e-10, 0.0),
             2.0,
             8.0,
             0.0,
@@ -362,7 +362,7 @@ mod tests {
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
-            particle.normalized_number_density(0.0, 1e-10),
+            particle.normalized_number_density(1e-10, 0.0),
             1.5,
             8.0,
             0.0,
@@ -383,7 +383,7 @@ mod tests {
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
-            particle.normalized_number_density(0.0, 1e-10),
+            particle.normalized_number_density(1e-10, 0.0),
             3.0,
             8.0,
             0.0,
@@ -404,7 +404,7 @@ mod tests {
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
-            particle.normalized_number_density(0.0, 1e-10),
+            particle.normalized_number_density(1e-10, 0.0),
             5.0,
             8.0,
             0.0,
@@ -425,7 +425,7 @@ mod tests {
         assert!(particle.entropy_dof(1e10) < 1e-30);
 
         approx_eq(
-            particle.normalized_number_density(0.0, 1e-10),
+            particle.normalized_number_density(1e-10, 0.0),
             2.0 * 1.2 * 0.75,
             8.0,
             0.0,

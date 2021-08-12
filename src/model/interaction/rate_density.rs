@@ -51,13 +51,6 @@ impl RateDensity {
             asymmetric: 0.0,
         }
     }
-
-    /// Compute the ratio of the asymmetric interaction rate to the symmetric
-    /// interaction rate.
-    #[must_use]
-    pub fn gamma_ratio(&self) -> Option<f64> {
-        self.delta_gamma.map(|delta_gamma| delta_gamma / self.gamma)
-    }
 }
 
 impl default::Default for RateDensity {
