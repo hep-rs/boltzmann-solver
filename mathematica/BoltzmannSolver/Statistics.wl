@@ -36,8 +36,7 @@ StatisticPattern = FermiDirac | BoseEinstein | MaxwellBoltzmann;
 
 Attributes[PhaseSpace] = {NumericFunction, Listable};
 
-PhaseSpace::chemicalPotentialFermiDirac = "Chemical potential for fermions must be non-negative."
-PhaseSpace::chemicalPotentialBoseEinstein = "Chemical potential for bosons must be non-positive."
+PhaseSpace::chemicalPotentialBoseEinstein = "Chemical potential for bosons must be less than the mass."
 
 (* Formats *)
 PhaseSpace /: MakeBoxes[PhaseSpace[s_ : StatisticPattern, beta_, e_], TraditionalForm] := Block[
@@ -131,8 +130,6 @@ PhaseSpace[
   m_:0,
   mu_:0
 ] /; AnyInexactNumberQ[beta, e, m, mu] := Block[{},
-  If[mu < 0, Message[PhaseSpace::chemicalPotentialFermiDirac]];
-
   1/(Exp[(e - mu) beta] + 1)
 ];
 
@@ -144,7 +141,7 @@ PhaseSpace[
   m_:0,
   mu_:0
 ] /; AnyInexactNumberQ[beta, e, m, mu] = Block[{},
-  If[mu > 0, Message[PhaseSpace::chemicalPotentialBoseEinstein]];
+  If[mu > m, Message[PhaseSpace::chemicalPotentialBoseEinstein]];
 
   1/(Exp[(e - mu) beta] - 1)
 ];
@@ -179,8 +176,7 @@ Protect[PhaseSpace];
 (* Number Density *)
 (* ************** *)
 
-NumberDensity::chemicalPotentialFermiDirac = "Chemical potential for fermions must be non-negative."
-NumberDensity::chemicalPotentialBoseEinstein = "Chemical potential for bosons must be non-positive."
+NumberDensity::chemicalPotentialBoseEinstein = "Chemical potential for bosons must be less than the mass."
 
 Attributes[NumberDensity] = {NumericFunction, Listable};
 
@@ -270,8 +266,6 @@ NumberDensity[
   m_?(Not@*PossibleZeroQ),
   mu_:0
 ] /; AnyInexactNumberQ[beta, m, mu] := Block[{},
-  If[mu < 0, Message[NumberDensity::chemicalPotentialFermiDirac]];
-
   1 / (2 Pi^2) NIntegrate[
     1/(Exp[(u - mu) beta] + 1) u Sqrt[u^2 - m^2],
     {u, m, Infinity},
@@ -290,8 +284,6 @@ NumberDensity[
   m:(_?PossibleZeroQ):0,
   mu_:0
 ] /; AnyInexactNumberQ[beta, m, mu] = Block[{},
-  If[mu < 0, Message[NumberDensity::chemicalPotentialFermiDirac]];
-
   1 / (2 Pi^2) Integrate[
     1/(Exp[(u - mu) beta] + 1) u^2,
     {u, 0, Infinity},
@@ -307,7 +299,7 @@ NumberDensity[
   m_?(Not@*PossibleZeroQ),
   mu_:0
 ] /; AnyInexactNumberQ[beta, m, mu] := Block[{},
-  If[mu > 0, Message[NumberDensity::chemicalPotentialBoseEinstein]];
+  If[mu > m, Message[NumberDensity::chemicalPotentialBoseEinstein]];
 
   1 / (2 Pi^2) NIntegrate[
     1/(Exp[(u - mu) beta] - 1) u Sqrt[u^2 - m^2],
@@ -327,7 +319,7 @@ NumberDensity[
   m:(_?PossibleZeroQ):0,
   mu_:0
 ] /; AnyInexactNumberQ[beta, m, mu] = Block[{},
-  If[mu > 0, Message[NumberDensity::chemicalPotentialBoseEinstein]];
+  If[mu > m, Message[NumberDensity::chemicalPotentialBoseEinstein]];
 
   1 / (2 Pi^2) Integrate[
     1/(Exp[(u - mu) beta] - 1) u^2,
@@ -363,7 +355,7 @@ NumberDensity[
 
 
 (* Particle *)
-NumberDensity[p_?ParticleQ, beta_, mu_:0] /; AnyInexactNumberQ[beta, mu] := BoltzmannSolver`DoF[p] NumberDensity[BoltzmannSolver`Statistic[p], beta, Mass[p], mu];
+NumberDensity[p_?ParticleQ, beta_, mu_:0] /; AnyInexactNumberQ[beta, mu] := N@BoltzmannSolver`DoF[p] NumberDensity[BoltzmannSolver`Statistic[p], beta, N@Mass[p], mu];
 
 NumberDensity[Particle[p_?ParticleQ]] := \[FormalN][p];
 NumberDensity[p_?ParticleQ] := \[FormalN][p];
