@@ -27,6 +27,8 @@ roots = "0.0.7"
 # Optional dependencies
 rayon = { optional = true, version = "1.5" }
 serde = { optional = true, version = "1.0", features = ["derive"] }
+serde_json = { optional = true, version = "1.0"}
+
 
 [dev-dependencies]
 chrono = "0.4"
@@ -38,11 +40,12 @@ zstd = "0.9"
 
 [features]
 default = ["rk98", "parallel", "serialization"]
-# default = ["rk98", "serialization"]
+# default = ["rk98", "serialization", "debug"]
 
 nightly = []
 serialization = ["serde", "ndarray/serde", "num/serde"]
 parallel = ["rayon", "ndarray/rayon"]
+debug = ["serde_json"]
 
 rk21 = []
 rk32 = []
@@ -53,10 +56,11 @@ rk76 = []
 rk87 = []
 rk98 = []
 
-[profile.dev]
+# Use slightly more optimized builds when running tests, and fully optimized
+# dependencies.
+[profile.test]
 opt-level = 1
-
-[profile.dev.package."*"]
+[profile.test.package."*"]
 opt-level = 3
 
 [package.metadata.docs.rs]
