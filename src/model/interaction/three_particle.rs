@@ -1,6 +1,9 @@
 use crate::{
     model::{
-        interaction::{checked_div, Interaction, InteractionParticles, PartialWidth, RateDensity},
+        interaction::{
+            checked_div, checked_mul, Interaction, PartialWidth, Particles, RateDensity,
+            M_BETA_THRESHOLD,
+        },
         Model,
     },
     solver::Context,
@@ -8,11 +11,9 @@ use crate::{
 use special_functions::{bessel, particle_physics::kallen_lambda_sqrt};
 use std::fmt;
 
-const M_BETA_THRESHOLD: f64 = 1e1;
-
 /// Three particle interaction, all determined from the underlying squared amplitude.
 pub struct ThreeParticle<M> {
-    particles: InteractionParticles,
+    particles: Particles,
     /// Squared amplitude as a function of the model.
     squared_amplitude: Box<dyn Fn(&M) -> f64 + Sync>,
     /// Asymmetry between the amplitude and its `$\CP$` conjugate.
@@ -40,7 +41,7 @@ where
     where
         F: Fn(&M) -> f64 + Sync + 'static,
     {
-        let particles = InteractionParticles::new(&[p1], &[p2, p3]);
+        let particles = Particles::new(&[p1], &[p2, p3]);
 
         Self {
             particles,
@@ -83,11 +84,19 @@ where
     /// ```math
     /// \delta \abs{\scM}^2
     ///   \defeq \abs{\scM(p_1 \to p_2 p_3)}^2 - \abs{\scM(\overline{p_1} \to \overline{p_2} \overline{p_3})}^2
-    ///   = \abs{\scM(p_1 \to p_2 p_3)}^2 - \abs{\scM(p_2 p_3 \to p_1)}^2
     /// ```
     ///
     /// This asymmetry is subsequently used to compute the asymmetric
     /// interaction rate given by [`Interaction::delta_gamma`].
+    pub fn asymmetry<F>(mut self, asymmetry: F) -> Self
+    where
+        F: Fn(&M) -> f64 + Sync + 'static,
+    {
+        self.set_asymmetry(asymmetry);
+        self
+    }
+
+    /// Same as [`ThreeParticle::asymmetry`] but modifies the interaction by reference.
     pub fn set_asymmetry<F>(&mut self, asymmetry: F) -> &Self
     where
         F: Fn(&M) -> f64 + Sync + 'static,
@@ -141,7 +150,7 @@ impl<M> Interaction<M> for ThreeParticle<M>
 where
     M: Model,
 {
-    fn particles(&self) -> &InteractionParticles {
+    fn particles(&self) -> &Particles {
         &self.particles
     }
 
@@ -170,7 +179,7 @@ where
 
             debug_assert!(
                 width.is_finite(),
-                "[{}.{:02}|{:>9.3e}] Computed a non-finit width in interaction {}: {}",
+                "[{}.{:02}|{:>10.4e}] Computed a non-finit width in interaction {}: {}",
                 c.step,
                 c.substep,
                 c.beta,
@@ -248,7 +257,7 @@ where
 
         debug_assert!(
             gamma.is_finite(),
-            "[{}.{:02}|{:>9.3e}] Computed a non-finite value for γ in interaction {}: {}",
+            "[{}.{:02}|{:>10.4e}] Computed a non-finite value for γ in interaction {}: {}",
             c.step,
             c.substep,
             c.beta,
@@ -294,7 +303,7 @@ where
 
         debug_assert!(
             delta_gamma.is_finite(),
-            "[{}.{:02}|{:>9.3e}] Computed a non-finite value for δγ in interaction {}: {}",
+            "[{}.{:02}|{:>10.4e}] Computed a non-finite value for δγ in interaction {}: {}",
             c.step,
             c.substep,
             c.beta,
@@ -310,12 +319,12 @@ where
     /// Override the default implementation of [`Interaction::rate`] to make use
     /// of the adjusted reaction rate density.
     fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
-        let gamma = self.gamma(c, false).unwrap_or(0.0);
+        let gamma = self.gamma(c, false)?;
         let delta_gamma = self.delta_gamma(c, false);
 
         // If both rates are 0, there's no need to adjust it to the particles'
         // number densities.
-        if gamma == 0.0 && (delta_gamma.is_none() || delta_gamma.unwrap() == 0.0) {
+        if gamma == 0.0 && delta_gamma.unwrap_or_default() == 0.0 {
             return None;
         }
 
@@ -341,37 +350,49 @@ where
         }
 
         let mut rate = RateDensity::zero();
+
+        // Since we get the 'false' interaction rate, we can always store that
+        // in the rate density now.
+        rate.gamma_tilde = gamma;
+        rate.delta_gamma_tilde = delta_gamma;
+
         if p1.mass * c.beta < M_BETA_THRESHOLD {
             // Below the M_BETA_THRESHOLD, `gamma` is the usual rate which must
             // be scaled by factors of `n / eq` to get the actual forward and
             // backward rates.
             rate.gamma = gamma;
             rate.delta_gamma = delta_gamma;
-
             let delta_gamma = delta_gamma.unwrap_or_default();
+
             let symmetric_prefactor =
                 checked_div(n1, eq1) - checked_div(n2, eq2) * checked_div(n3, eq3);
-            rate.symmetric = gamma * symmetric_prefactor;
-            rate.asymmetric = delta_gamma * symmetric_prefactor
-                + gamma * (checked_div(na1, eq1) - checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
+            rate.symmetric = checked_mul(gamma, symmetric_prefactor);
+            rate.asymmetric = checked_mul(delta_gamma, symmetric_prefactor)
+                + checked_mul(
+                    gamma,
+                    checked_div(na1, eq1) - checked_div(na2 * n3 + na3 * n2, eq2 * eq3),
+                );
         } else {
             // Above the M_BETA_THRESHOLD, `gamma` is already divided by eq1, so
             // we need not divide by `eq1` to calculate the forward rates, and we
             // have to multiply by `eq1` to get the backward rate.
             rate.gamma = gamma * eq1;
             rate.delta_gamma = delta_gamma.map(|v| v * eq1);
+            let delta_gamma = delta_gamma.unwrap_or_default();
 
             // If eq1 is zero, the remaining n1 density is trying to decay and
             // the inverse decay should be negligible.
-            let delta_gamma = delta_gamma.unwrap_or_default();
             if eq1 == 0.0 {
-                rate.symmetric = gamma * n1;
-                rate.asymmetric = delta_gamma * n1 + gamma * na1;
+                rate.symmetric = checked_mul(gamma, n1);
+                rate.asymmetric = checked_mul(delta_gamma, n1) + checked_mul(gamma, na1);
             } else {
                 let symmetric_prefactor = n1 - eq1 * checked_div(n2, eq2) * checked_div(n3, eq3);
-                rate.symmetric = gamma * symmetric_prefactor;
-                rate.asymmetric = delta_gamma * symmetric_prefactor
-                    + gamma * (na1 - eq1 * checked_div(na2 * n3 + na3 * n2, eq2 * eq3));
+                rate.symmetric = checked_mul(gamma, symmetric_prefactor);
+                rate.asymmetric = checked_mul(delta_gamma, symmetric_prefactor)
+                    + checked_mul(
+                        gamma,
+                        na1 - eq1 * checked_div(na2 * n3 + na3 * n2, eq2 * eq3),
+                    );
             }
         }
 
@@ -382,7 +403,7 @@ where
 #[cfg(test)]
 mod tests {
     use crate::{
-        model::{interaction, EmptyModel},
+        model::{interaction, Empty},
         prelude::*,
         statistic::Statistic,
     };
@@ -431,7 +452,7 @@ mod tests {
     /// Unit amplitude
     #[test]
     fn unit_amplitude() -> Result<(), Box<dyn error::Error>> {
-        let mut model = EmptyModel::default();
+        let mut model = Empty::default();
         model.extend_particles(
             [1e10, 1e5, 1e2]
                 .iter()
@@ -448,7 +469,7 @@ mod tests {
             csv.serialize(CsvRow {
                 beta,
                 hubble_rate: c.hubble_rate,
-                n1: Statistic::BoseEinstein.number_density(0.0, 0.0, beta),
+                n1: Statistic::BoseEinstein.number_density(beta, 0.0, 0.0),
                 eq1: c.eq[1],
                 eq2: c.eq[2],
                 eq3: c.eq[3],

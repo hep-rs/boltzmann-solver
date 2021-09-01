@@ -139,6 +139,8 @@
 #![warn(clippy::all)]
 #![warn(clippy::pedantic)]
 #![allow(clippy::non_ascii_literal)]
+#![allow(clippy::similar_names)]
+#![allow(clippy::many_single_char_names)]
 // #![allow(clippy::cast_precision_loss)] // Check this warning occasionally
 
 #[cfg(feature = "nightly")]

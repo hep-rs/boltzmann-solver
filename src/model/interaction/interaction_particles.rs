@@ -1,3 +1,7 @@
+use crate::{
+    model::interaction::{checked_div, fix_equilibrium, FastInteractionResult},
+    prelude::{Context, Model},
+};
 use ndarray::prelude::*;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -7,10 +11,6 @@ use std::{
     error, fmt, hash, ops,
     sync::RwLock,
 };
-
-use crate::prelude::Model;
-
-use super::FastInteractionResult;
 
 struct AbsRelConvergency {
     abs: f64,
@@ -75,9 +75,10 @@ impl roots::Convergency<f64> for AbsRelConvergency {
 
 /// List of particles involved in the interaction.
 #[allow(clippy::module_name_repetitions)]
+#[allow(clippy::unsafe_derive_deserialize)]
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-pub struct InteractionParticles {
+pub struct Particles {
     /// Initial state particle indices.
     pub incoming_idx: Vec<usize>,
     /// Final state particle indices.
@@ -109,12 +110,24 @@ pub struct InteractionParticles {
     /// fundamentally assumes that the CP rate is different.
     pub particle_counts: HashMap<usize, (f64, f64)>,
 
-    /// Ratio of the original interactions [`Interaction::delta_gamma`] to
-    /// [`Interaction::gamma`] if defined.
-    pub gamma_ratio: Option<f64>,
+    /// The interaction rate for the underlying interaction.
+    ///
+    /// This is used during fast interactions to solve the differential
+    /// equations for the interaction.
+    pub gamma_tilde: Option<f64>,
+    /// The asymmetric interaction rate for the underlying interaction.
+    ///
+    /// This is used during fast interactions to solve the differential
+    /// equations for the interaction.
+    pub delta_gamma_tilde: Option<f64>,
+    /// List of particles which are deemed heavy.
+    ///
+    /// This must be ordered and any particle that is not present in this list
+    /// is 'light'.
+    pub heavy: Vec<usize>,
 }
 
-impl InteractionParticles {
+impl Particles {
     /// Create a new set of interaction particles.  The absolute value of the
     /// numbers indicate the corresponding index for the particle, with the sign
     /// indicating whether it is a particle or anti-particle involved.
@@ -149,11 +162,44 @@ impl InteractionParticles {
 
             particle_counts: HashMap::new(),
 
-            gamma_ratio: None,
+            gamma_tilde: None,
+            delta_gamma_tilde: None,
+            heavy: Vec::with_capacity(incoming.len() + outgoing.len()),
         };
 
         result.calculate_particle_counts();
         result
+    }
+
+    /// Aggregate the particles to take into account multiplicities.
+    ///
+    /// Incoming particles are taken to have a negative multiplicity (as they
+    /// are being annihilated) while outgoing particles have a positive
+    /// multiplicity.
+    ///
+    /// For each particle (indicated by the key), the multiplicity is given ins
+    /// the tuple for the symmetric and asymmetric rates respectively.
+    ///
+    /// The two counts differ for the symmetric and asymmetric rates because the
+    /// symmetric rate does not take into account whether it is a particle or
+    /// antiparticle as both it and its CP-conjugate rate are assumed to be
+    /// equal.  This is evidently not true for the asymmetric rate as it
+    /// fundamentally assumes that the CP rate is different.
+    pub fn calculate_particle_counts(&mut self) {
+        let mut particle_counts = HashMap::with_capacity(self.len_incoming() + self.len_outgoing());
+
+        for (&p, &a) in self.iter_incoming() {
+            let entry = particle_counts.entry(p).or_insert((0.0, 0.0));
+            (*entry).0 -= 1.0;
+            (*entry).1 -= a;
+        }
+        for (&p, &a) in self.iter_outgoing() {
+            let entry = particle_counts.entry(p).or_insert((0.0, 0.0));
+            (*entry).0 += 1.0;
+            (*entry).1 += a;
+        }
+
+        self.particle_counts = particle_counts;
     }
 
     /// Create the CPT conjugate the [`InteractionParticles`].  This
@@ -183,7 +229,31 @@ impl InteractionParticles {
                 .iter()
                 .map(|(&p, &(c, ca))| (p, (-c, ca)))
                 .collect(),
-            gamma_ratio: self.gamma_ratio,
+            gamma_tilde: self.gamma_tilde,
+            delta_gamma_tilde: self.delta_gamma_tilde,
+            heavy: self.heavy.clone(),
+        }
+    }
+
+    /// Create the CP conjugate the [`InteractionParticles`].  This interchanges
+    /// particles with their corresponding antiparticles.
+    #[must_use]
+    pub fn cp(&self) -> Self {
+        Self {
+            incoming_idx: self.outgoing_idx.iter().copied().collect(),
+            outgoing_idx: self.incoming_idx.iter().copied().collect(),
+            incoming_sign: self.outgoing_sign.iter().map(ops::Neg::neg).collect(),
+            outgoing_sign: self.incoming_sign.iter().map(ops::Neg::neg).collect(),
+            incoming_signed: self.outgoing_signed.iter().map(ops::Neg::neg).collect(),
+            outgoing_signed: self.incoming_signed.iter().map(ops::Neg::neg).collect(),
+            particle_counts: self
+                .particle_counts
+                .iter()
+                .map(|(&p, &(c, ca))| (p, (-c, ca)))
+                .collect(),
+            gamma_tilde: self.gamma_tilde,
+            delta_gamma_tilde: self.delta_gamma_tilde.map(ops::Neg::neg),
+            heavy: self.heavy.clone(),
         }
     }
 
@@ -224,6 +294,7 @@ impl InteractionParticles {
     /// | `$n_3 n_1 n_4$` | `0` | `[2]` |
     /// | `$n_1 n_2 n_1 n_4 n_2$` | `1` | `[]` |
     /// | `$n_4 n_2$` | `2` | `[1, 3]` |
+    ///
     /// # Warning
     ///
     /// The `idx` slice must be ordered or the result may be wrong.
@@ -232,12 +303,9 @@ impl InteractionParticles {
         self.incoming_idx
             .iter()
             .enumerate()
-            .filter_map(|(j, &p)| {
-                if j == pos || idx.binary_search(&p).is_ok() {
-                    None
-                } else {
-                    Some(arr[p])
-                }
+            .filter_map(|(i, &p)| match (i == pos, idx.binary_search(&p)) {
+                (true, _) | (_, Ok(_)) => None,
+                (false, Err(_)) => Some(arr[p]),
             })
             .product()
     }
@@ -262,49 +330,104 @@ impl InteractionParticles {
     ///
     /// The `idx` slice must be ordered or the result may be wrong.
     #[must_use]
-    pub fn product_except_outgoing(&self, arr: &Array1<f64>, i: usize, idx: &[usize]) -> f64 {
+    pub fn product_except_outgoing(&self, arr: &Array1<f64>, pos: usize, idx: &[usize]) -> f64 {
         self.outgoing_idx
             .iter()
             .enumerate()
-            .filter_map(|(j, &p)| {
-                if j == i || idx.binary_search(&p).is_ok() {
-                    None
-                } else {
-                    Some(arr[p])
-                }
+            .filter_map(|(i, &p)| match (i == pos, idx.binary_search(&p)) {
+                (true, _) | (_, Ok(_)) => None,
+                (false, Err(_)) => Some(arr[p]),
             })
             .product()
     }
 
-    /// Aggregate the particles to take into account multiplicities.
-    ///
-    /// Incoming particles are taken to have a negative multiplicity (as they
-    /// are being annihilated) while outgoing particles have a positive
-    /// multiplicity.
-    ///
-    /// For each particle (indicated by the key), the multiplicity is given ins
-    /// the tuple for the symmetric and asymmetric rates respectively.
-    ///
-    /// The two counts differ for the symmetric and asymmetric rates because the
-    /// symmetric rate does not take into account whether it is a particle or
-    /// antiparticle as both it and its CP-conjugate rate are assumed to be
-    /// equal.  This is evidently not true for the asymmetric rate as it
-    /// fundamentally assumes that the CP rate is different.
-    pub fn calculate_particle_counts(&mut self) {
-        let mut particle_counts = HashMap::with_capacity(self.len_incoming() + self.len_outgoing());
-
-        for (&p, &a) in self.iter_incoming() {
-            let entry = particle_counts.entry(p).or_insert((0.0, 0.0));
-            (*entry).0 -= 1.0;
-            (*entry).1 -= a;
+    /// Check whether the computed change in particle number density will cause an
+    /// overshoot of equilibrium.
+    #[must_use]
+    pub fn symmetric_overshoots<M>(&self, c: &Context<M>, change: f64) -> bool {
+        let f = self.symmetric_prefactor_fn(&c.n, &c.eqn, c.in_equilibrium);
+        let a = f(0.0);
+        if !a.is_finite() {
+            true
+        } else if a == 0.0 {
+            false
+        } else {
+            let b = f(change);
+            if !b.is_finite() {
+                true
+            } else if b == 0.0 {
+                false
+            } else {
+                a.signum() != b.signum()
+            }
         }
-        for (&p, &a) in self.iter_outgoing() {
-            let entry = particle_counts.entry(p).or_insert((0.0, 0.0));
-            (*entry).0 += 1.0;
-            (*entry).1 += a;
+    }
+
+    /// Check whether the computed change in particle number density asymmetry will
+    /// caan overshoot of equilibrium.
+    #[must_use]
+    pub fn asymmetric_overshoots<M>(&self, c: &Context<M>, change: f64) -> bool {
+        let f = self.asymmetric_prefactor_fn(&c.n, &c.na, &c.eqn, c.in_equilibrium, c.no_asymmetry);
+        let a = f(0.0);
+        if !a.is_finite() {
+            true
+        } else if a == 0.0 {
+            false
+        } else {
+            let b = f(change);
+            if !b.is_finite() {
+                true
+            } else if b == 0.0 {
+                false
+            } else {
+                a.signum() != b.signum()
+            }
+        }
+    }
+
+    /// Adjust the overshoot as calculated by the interaction.
+    ///
+    /// Returns `true` if any adjustments were made, and `false` otherwise.
+    ///
+    /// The overshoot is comparing the evaluated change with the change required
+    /// to reach equilibrium.  Explicitly, equilibrium is reached when
+    ///
+    /// ```math
+    /// \left( \prod_{i \in \text{in}} \frac{n_i}{n^{(0)}_i}
+    /// - \prod_{i \in \text{out}} \frac{n_i}{n^{(0)}_i} \right)
+    /// = 0
+    /// ```
+    pub fn adjust_overshoot<M>(
+        &self,
+        symmetric: &mut f64,
+        asymmetric: &mut f64,
+        c: &Context<M>,
+    ) -> bool {
+        // Although an overshoot factor results in the exact solution in a
+        // single step, when this is incorporated into the Runge-Kutta method it
+        // undershoots the result.
+        const OVERSHOOT_FACTOR: f64 = 1.0;
+        let mut result = false;
+
+        if self.symmetric_overshoots(c, *symmetric) {
+            let bound =
+                OVERSHOOT_FACTOR * self.symmetric_delta(&c.n, &c.eqn, c.in_equilibrium).abs();
+            *symmetric = symmetric.clamp(-bound, bound);
+
+            result = true;
         }
 
-        self.particle_counts = particle_counts;
+        if self.asymmetric_overshoots(c, *asymmetric) {
+            let bound = OVERSHOOT_FACTOR
+                * self
+                    .asymmetric_delta(&c.n, &c.na, &c.eqn, c.in_equilibrium, c.no_asymmetry)
+                    .abs();
+            *asymmetric = asymmetric.clamp(-bound, bound);
+
+            result = true;
+        }
+
+        result
     }
 
     /// Net prefactor scaling the interaction rate.
@@ -335,6 +458,18 @@ impl InteractionParticles {
     /// Particles which are fixed to be in equilibrium can be specified in the
     /// ordered slice `in_equilibrium`.
     ///
+    /// This function does takes into account simplifications which might occur
+    /// due to heavy particles.  Specifically, for all particles which are
+    /// heavy, this computes the simplified form of:
+    ///
+    /// ```math
+    /// \left[
+    ///   \left( \prod_{i \in X} \frac{n_i}{n_i^{(0)}} \right)
+    ///   - \left( \prod_{i \in Y} \frac{n_i}{n_i^{(0)}} \right)
+    /// \right]
+    /// \prod_{i \in \text{heavy}} n_i^{(0)}
+    /// ```
+    ///
     /// # Warning
     ///
     /// The `in_equilibrium` slice must be ordered or the result may be wrong.
@@ -349,13 +484,28 @@ impl InteractionParticles {
             .incoming_idx
             .iter()
             .filter(|p| in_equilibrium.binary_search(p).is_err())
-            .fold((1.0, 1.0), |(num, den), &p| (num * n[p], den * eq[p]));
+            .fold((1.0, 1.0, 1.0), |(num, den, ignored), &p| {
+                match self.heavy.binary_search(&p) {
+                    Ok(_) => (num * n[p], den, ignored * eq[p]),
+                    Err(_) => (num * n[p], den * eq[p], ignored),
+                }
+            });
+
         let backward = self
             .outgoing_idx
             .iter()
             .filter(|p| in_equilibrium.binary_search(p).is_err())
-            .fold((1.0, 1.0), |(num, den), &p| (num * n[p], den * eq[p]));
-        (forward, backward)
+            .fold((1.0, 1.0, 1.0), |(num, den, ignored), &p| {
+                match self.heavy.binary_search(&p) {
+                    Ok(_) => (num * n[p], den, ignored * eq[p]),
+                    Err(_) => (num * n[p], den * eq[p], ignored),
+                }
+            });
+
+        (
+            (backward.2 * forward.0, forward.1),
+            (forward.2 * backward.0, backward.1),
+        )
     }
 
     /// Net prefactor scaling the interaction rate with a specified change
@@ -382,24 +532,40 @@ impl InteractionParticles {
                 .incoming_idx
                 .iter()
                 .filter(|p| in_equilibrium.binary_search(p).is_err())
-                .fold((1.0, 1.0), |(num, den), &p| {
-                    (
-                        num * (n[p] + self.particle_counts[&p].0 * delta),
-                        den * eq[p],
-                    )
+                .fold((1.0, 1.0, 1.0), |(num, den, ignored), &p| {
+                    match self.heavy.binary_search(&p) {
+                        Ok(_) => (
+                            num * (n[p] + self.particle_counts[&p].0 * delta),
+                            den,
+                            ignored * eq[p],
+                        ),
+                        Err(_) => (
+                            num * (n[p] + self.particle_counts[&p].0 * delta),
+                            den * eq[p],
+                            ignored,
+                        ),
+                    }
                 });
             let backward = self
                 .outgoing_idx
                 .iter()
                 .filter(|p| in_equilibrium.binary_search(p).is_err())
-                .fold((1.0, 1.0), |(num, den), &p| {
-                    (
-                        num * (n[p] + self.particle_counts[&p].0 * delta),
-                        den * eq[p],
-                    )
+                .fold((1.0, 1.0, 1.0), |(num, den, ignored), &p| {
+                    match self.heavy.binary_search(&p) {
+                        Ok(_) => (
+                            num * (n[p] + self.particle_counts[&p].0 * delta),
+                            den,
+                            ignored * eq[p],
+                        ),
+                        Err(_) => (
+                            num * (n[p] + self.particle_counts[&p].0 * delta),
+                            den * eq[p],
+                            ignored,
+                        ),
+                    }
                 });
 
-            forward.0 / forward.1 - backward.0 / backward.1
+            backward.2 * forward.0 / forward.1 - forward.2 * backward.0 / backward.1
         }
     }
 
@@ -618,6 +784,13 @@ impl InteractionParticles {
     /// Particles which are fixed to be in equilibrium can be specified in the
     /// ordered slice `in_equilibrium`, and similarly for `no_asymmetry`.
     ///
+    /// This function does takes into account simplifications which might occur
+    /// due to heavy particles.  Specifically, for all particles which are
+    /// heavy, the overall result is multiplied by `$\prod_{i \in \text{heavy}}
+    /// n_i^{(0)}$`, though this is computed by cancelling out factors of
+    /// `$n_i^{(0)}$` on the denominators to ensure that the result is
+    /// numerically stable.
+    ///
     /// # Warning
     ///
     /// Both the `in_equilibrium` and `no_asymmetry` slices must be ordered or
@@ -633,34 +806,40 @@ impl InteractionParticles {
     ) -> ((f64, f64), (f64, f64)) {
         let forward = self
             .iter_incoming()
+            // Particles prevented from developing asymmetries can be safely ignored
             .filter(|(p, _)| no_asymmetry.binary_search(p).is_err())
             .enumerate()
-            .fold((0.0, 1.0), |(num, den), (i, (&p, &a))| {
-                (
-                    num + a * na[p] * self.product_except_incoming(n, i, in_equilibrium),
-                    if in_equilibrium.binary_search(&p).is_ok() {
-                        den
-                    } else {
-                        den * eq[p]
-                    },
-                )
+            .fold((0.0, 1.0, 1.0), |(num, den, ignored), (i, (&p, &a))| {
+                let num = num + a * na[p] * self.product_except_incoming(n, i, in_equilibrium);
+                match (
+                    in_equilibrium.binary_search(&p),
+                    self.heavy.binary_search(&p),
+                ) {
+                    (_, Ok(_)) => (num, den, ignored * eq[p]),
+                    (Ok(_), Err(_)) => (num, den, ignored),
+                    (Err(_), Err(_)) => (num, den * eq[p], ignored),
+                }
             });
         let backward = self
             .iter_outgoing()
             .filter(|(p, _)| no_asymmetry.binary_search(p).is_err())
             .enumerate()
-            .fold((0.0, 1.0), |(num, den), (i, (&p, &a))| {
-                (
-                    num + a * na[p] * self.product_except_outgoing(n, i, in_equilibrium),
-                    if in_equilibrium.binary_search(&p).is_ok() {
-                        den
-                    } else {
-                        den * eq[p]
-                    },
-                )
+            .fold((0.0, 1.0, 1.0), |(num, den, ignored), (i, (&p, &a))| {
+                let num = num + a * na[p] * self.product_except_outgoing(n, i, in_equilibrium);
+                match (
+                    in_equilibrium.binary_search(&p),
+                    self.heavy.binary_search(&p),
+                ) {
+                    (_, Ok(_)) => (num, den, ignored * eq[p]),
+                    (Ok(_), Err(_)) => (num, den, ignored),
+                    (Err(_), Err(_)) => (num, den * eq[p], ignored),
+                }
             });
 
-        (forward, backward)
+        (
+            (backward.2 * forward.0, forward.1),
+            (forward.2 * backward.0, backward.1),
+        )
     }
 
     /// Net asymmetric prefactor scaling the interaction rate with a specified
@@ -690,37 +869,38 @@ impl InteractionParticles {
                 .iter_incoming()
                 .filter(|(p, _)| no_asymmetry.binary_search(p).is_err())
                 .enumerate()
-                .fold((0.0, 1.0), |(num, den), (i, (&p, &a))| {
-                    (
-                        num + a
-                            * (na[p] + self.particle_counts[&p].1 * delta)
-                            * self.product_except_incoming(n, i, in_equilibrium),
-                        if in_equilibrium.binary_search(&p).is_ok() {
-                            den
-                        } else {
-                            den * eq[p]
-                        },
-                    )
+                .fold((0.0, 1.0, 1.0), |(num, den, ignored), (i, (&p, &a))| {
+                    let num = num
+                        + a * (na[p] + self.particle_counts[&p].1 * delta)
+                            * self.product_except_incoming(n, i, in_equilibrium);
+                    match (
+                        in_equilibrium.binary_search(&p),
+                        self.heavy.binary_search(&p),
+                    ) {
+                        (_, Ok(_)) => (num, den, ignored * eq[p]),
+                        (Ok(_), Err(_)) => (num, den, ignored),
+                        (Err(_), Err(_)) => (num, den * eq[p], ignored),
+                    }
                 });
             let backward = self
                 .iter_outgoing()
                 .filter(|(p, _)| no_asymmetry.binary_search(p).is_err())
                 .enumerate()
-                .fold((0.0, 1.0), |(num, den), (i, (&p, &a))| {
-                    (
-                        num + a
-                            * (na[p] + self.particle_counts[&p].1 * delta)
-                            * self.product_except_outgoing(n, i, in_equilibrium),
-                        if in_equilibrium.binary_search(&p).is_ok() {
-                            den
-                        } else {
-                            den * eq[p]
-                        },
-                    )
+                .fold((0.0, 1.0, 1.0), |(num, den, ignored), (i, (&p, &a))| {
+                    let num = num
+                        + a * (na[p] + self.particle_counts[&p].1 * delta)
+                            * self.product_except_outgoing(n, i, in_equilibrium);
+                    match (
+                        in_equilibrium.binary_search(&p),
+                        self.heavy.binary_search(&p),
+                    ) {
+                        (_, Ok(_)) => (num, den, ignored * eq[p]),
+                        (Ok(_), Err(_)) => (num, den, ignored),
+                        (Err(_), Err(_)) => (num, den * eq[p], ignored),
+                    }
                 });
 
-            forward.0 / forward.1 - backward.0 / backward.1
-            // forward.0 * backward.1 - backward.0 * forward.1
+            backward.2 * forward.0 / forward.1 - forward.2 * backward.0 / backward.1
         }
     }
 
@@ -944,7 +1124,7 @@ impl InteractionParticles {
     /// Both the `in_equilibrium` and `no_asymmetry` slices must be ordered or
     /// the result may be wrong.
     #[must_use]
-    pub fn fast_interaction(
+    pub fn fast_interaction_algebraic(
         &self,
         n: &Array1<f64>,
         na: &Array1<f64>,
@@ -952,35 +1132,17 @@ impl InteractionParticles {
         in_equilibrium: &[usize],
         no_asymmetry: &[usize],
     ) -> FastInteractionResult {
-        log::trace!(
-            r#"fast_interaction:
-        {{
-            "incoming": {:?},
-            "outgoing": {:?},
-            "n": {:.e},
-            "na": {:.e},
-            "eq": {:.e},
-            "in_equilibrium": {:?},
-            "no_asymmetry": {:?},
-            "gamma_ratio": {:.e}
-        }}"#,
-            self.incoming_signed,
-            self.outgoing_signed,
-            n,
-            na,
-            eq,
-            in_equilibrium,
-            no_asymmetry,
-            self.gamma_ratio.unwrap_or_default()
-        );
-
         let mut result = FastInteractionResult::zero(n.dim());
 
-        result.symmetric_delta = self.symmetric_delta(n, eq, in_equilibrium);
+        let symmetric_delta = self.symmetric_delta(n, eq, in_equilibrium);
 
+        // We need to adjust the number densities as we need to adjusted rate to
+        // compute the asymmetric delta.
         let mut n = n.clone();
         for (&p, &(c, _ca)) in &self.particle_counts {
-            n[p] += c * result.symmetric_delta;
+            if in_equilibrium.binary_search(&p).is_err() {
+                n[p] += c * symmetric_delta;
+            }
 
             // Although equilibrating the symmetric part of the interaction
             // impacts the number density asymmetries, we need not worry about
@@ -988,14 +1150,203 @@ impl InteractionParticles {
             // change futile.
         }
 
-        result.asymmetric_delta = self.asymmetric_delta(&n, na, eq, in_equilibrium, no_asymmetry);
-
-        for (&p, &(c, ca)) in &self.particle_counts {
-            result.dn[p] += c * result.symmetric_delta;
-            result.dna[p] += ca * result.asymmetric_delta;
+        let asymmetric_delta = self.asymmetric_delta(&n, na, eq, in_equilibrium, no_asymmetry);
+        for (&p, &(c, ac)) in &self.particle_counts {
+            if in_equilibrium.binary_search(&p).is_err() {
+                result.dn[p] += c * symmetric_delta;
+            }
+            if no_asymmetry.binary_search(&p).is_err() {
+                result.dna[p] += ac * asymmetric_delta;
+            }
         }
 
-        log::trace!("{}", result);
+        result
+    }
+
+    /// Compute the solution for the fast interaction by solving the
+    /// differential equation over the interval [β, β + h].
+    #[allow(clippy::too_many_lines)]
+    #[must_use]
+    pub fn fast_interaction_de<M: Model>(
+        &self,
+        c: &Context<M>,
+        eq0: &Array2<f64>,
+    ) -> FastInteractionResult {
+        use crate::solver::tableau::{self, RK_A, RK_B, RK_C, RK_E, RK_S};
+        #[cfg(not(feature = "parallel"))]
+        use ndarray::azip as zip;
+        #[cfg(feature = "parallel")]
+        use ndarray::par_azip as zip;
+
+        let mut result = FastInteractionResult::zero(c.n.dim());
+
+        if self.gamma_tilde.is_none() && self.delta_gamma_tilde.is_none() {
+            log::warn!(
+                "[{}.{:02}|{:>10.4e}] Attempted to solve a fast interactions but neither γ̃ nor δγ̃ where set; result is trivially 0.", c.step, 
+                c.substep, c.beta);
+            return result;
+        }
+
+        // To avoid the need to compute the equilibrium number density for all
+        // particles, we use the values that were already computed in the main
+        // Runge-Kutta routine and interpolate in between.
+        let mut eq = Array1::from_shape_simple_fn(c.n.dim(), || {
+            crate::utilities::spline::CubicHermite::empty()
+        });
+        for ((i, p), &v) in eq0.indexed_iter() {
+            eq[p].add(c.beta + RK_C[i] * c.step_size, v);
+        }
+
+        let gamma_tilde = self.gamma_tilde.unwrap_or_default();
+        let delta_gamma_tilde = self.delta_gamma_tilde.unwrap_or_default();
+
+        let mut beta = c.beta;
+        let mut h = c.step_size;
+        let mut n = c.n.clone();
+        let mut na = c.na.clone();
+        let mut n_err = Array1::zeros(c.n.dim());
+        let mut na_err = Array1::zeros(c.na.dim());
+        let mut dn = Array1::zeros(n.dim());
+        let mut dna = Array1::zeros(na.dim());
+        let mut dn_err = Array1::zeros(n.dim());
+        let mut dna_err = Array1::zeros(na.dim());
+        let mut k = Array2::zeros((RK_S, n.dim()));
+        let mut ka = Array2::zeros((RK_S, na.dim()));
+
+        let error_tolerance = crate::solver::options::ErrorTolerance::default() / 1e2;
+
+        let mut step = 0_usize;
+        let mut steps_discarded = 0_usize;
+        while beta < c.beta + c.step_size {
+            step += 1;
+
+            k.fill(0.0);
+            ka.fill(0.0);
+            dn.fill(0.0);
+            dna.fill(0.0);
+            dn_err.fill(0.0);
+            dna_err.fill(0.0);
+
+            for i in 0..RK_S {
+                let beta_i = beta + RK_C[i] * h;
+
+                let ai = RK_A[i];
+                let ni = (0..i).fold(n.clone(), |total, j| {
+                    total + ai[j] * &k.slice(ndarray::s![j, ..])
+                });
+                let nai = (0..i).fold(na.clone(), |total, j| {
+                    total + ai[j] * &ka.slice(ndarray::s![j, ..])
+                });
+                let eqi = eq.map(|eq| eq.sample(beta_i));
+
+                let v = self.symmetric_prefactor(&ni, &eqi, c.in_equilibrium);
+                let symmetric_prefactor = checked_div(v.0 .0, v.0 .1) - checked_div(v.1 .0, v.1 .1);
+                let v =
+                    self.asymmetric_prefactor(&ni, &nai, &eqi, c.in_equilibrium, c.no_asymmetry);
+                let asymmetric_prefactor =
+                    checked_div(v.0 .0, v.0 .1) - checked_div(v.1 .0, v.1 .1);
+
+                let mut symmetric_delta = h * gamma_tilde * symmetric_prefactor;
+                let mut asymmetric_delta = h
+                    * (gamma_tilde * asymmetric_prefactor
+                        + delta_gamma_tilde * symmetric_prefactor);
+
+                self.adjust_overshoot(&mut symmetric_delta, &mut asymmetric_delta, c);
+
+                let mut ki = k.slice_mut(ndarray::s![i, ..]);
+                let mut kai = ka.slice_mut(ndarray::s![i, ..]);
+                fix_equilibrium(c, &mut ki, &mut kai);
+
+                for (&p, &(c, ca)) in &self.particle_counts {
+                    ki[p] = c * symmetric_delta;
+                    kai[p] = ca * asymmetric_delta;
+                }
+
+                let bi = RK_B[i];
+                let ei = RK_E[i];
+                zip!(
+                    (
+                        dn in &mut dn,
+                        dn_err in &mut dn_err,
+                        &ki in &ki,
+                        dna in &mut dna,
+                        dna_err in &mut dna_err,
+                        &kai in &kai
+                    ) {
+                        *dn += bi * ki;
+                        *dn_err += ei * ki;
+                        *dna += bi * kai;
+                        *dna_err += ei * kai;
+                    }
+                );
+            }
+
+            let ratio = dn_err
+                .iter()
+                .chain(&dna_err)
+                .map(|err| err.abs())
+                .zip(n.iter().chain(&na))
+                .fold(f64::INFINITY, |min, (err, &n)| {
+                    let max_tolerance = error_tolerance.max_tolerance(n);
+                    min.min(if err == 0.0 {
+                        f64::MAX
+                    } else {
+                        max_tolerance / err
+                    })
+                });
+            let delta = 0.8 * ratio.powf(1.0 / f64::from(tableau::RK_ORDER + 1));
+            let delta = if delta.is_nan() || delta.is_infinite() {
+                0.1
+            } else {
+                delta.clamp(0.1, 2.0)
+            };
+
+            if ratio.is_finite() && ratio > 1.0 {
+                beta += h;
+
+                n += &dn;
+                na += &dna;
+
+                dn_err.mapv_inplace(|v| v.abs());
+                dna_err.mapv_inplace(|v| v.abs());
+                n_err += &dn_err;
+                na_err += &dna_err;
+            } else {
+                steps_discarded += 1;
+            }
+
+            h *= delta;
+            if beta + h > c.beta + c.step_size {
+                h = (c.beta - beta) + c.step_size;
+            }
+        }
+
+        log::trace!(
+            "[{}.{:02}|{:>10.4e}] (Fast Interaction {}) Number of integration steps: {}",
+            c.step,
+            c.substep,
+            c.beta,
+            self.display(c.model)
+                .unwrap_or_else(|_| self.short_display()),
+            step - steps_discarded
+        );
+        log::trace!(
+            "[{}.{:02}|{:>10.4e}] (Fast Interaction)  Number of integration steps discarded: {}",
+            c.step,
+            c.substep,
+            c.beta,
+            steps_discarded
+        );
+
+        result.dn = n - &c.n;
+        result.dna = na - &c.na;
+
+        #[allow(clippy::cast_precision_loss)]
+        let scaling = f64::sqrt(step as f64);
+        n_err.mapv_inplace(|v| v / scaling);
+        na_err.mapv_inplace(|v| v / scaling);
+        result.dn_error = n_err;
+        result.dna_error = na_err;
 
         result
     }
@@ -1051,7 +1402,7 @@ impl InteractionParticles {
     }
 }
 
-impl fmt::Display for InteractionParticles {
+impl fmt::Display for Particles {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for &p in &self.incoming_signed {
             write!(f, "{} ", p)?;
@@ -1070,16 +1421,16 @@ impl fmt::Display for InteractionParticles {
 /// Implementation of [`PartialEq`] (and thus [`Eq`]) only needs to look at the
 /// `incoming_signed` and `outgoing_signed` attributes as all other properties
 /// are derived from this.
-impl cmp::PartialEq for InteractionParticles {
+impl cmp::PartialEq for Particles {
     fn eq(&self, other: &Self) -> bool {
         self.incoming_signed == other.incoming_signed
             && self.outgoing_signed == other.outgoing_signed
     }
 }
 
-impl cmp::Eq for InteractionParticles {}
+impl cmp::Eq for Particles {}
 
-impl hash::Hash for InteractionParticles {
+impl hash::Hash for Particles {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
         hash::Hash::hash_slice(&self.incoming_signed, state);
         hash::Hash::hash_slice(&self.outgoing_signed, state);
@@ -1099,7 +1450,7 @@ mod tests {
         iter,
     };
 
-    use super::InteractionParticles;
+    use super::Particles;
 
     const RUN_COUNT: usize = 10_000;
 
@@ -1179,14 +1530,14 @@ mod tests {
 
     /// Generate a random interaction with random incoming and outgoing
     /// particles.
-    fn rand_interaction() -> super::InteractionParticles {
-        super::InteractionParticles::new(&rand_particles(), &rand_particles())
+    fn rand_interaction() -> super::Particles {
+        super::Particles::new(&rand_particles(), &rand_particles())
     }
 
     #[allow(clippy::float_cmp)]
     #[test]
     fn interaction_particles() {
-        let a = super::InteractionParticles::new(&[1, 2, 3], &[4, 5, 6]);
+        let a = super::Particles::new(&[1, 2, 3], &[4, 5, 6]);
         assert_eq!(&a.incoming_idx, &[1, 2, 3]);
         assert_eq!(&a.incoming_sign, &[1.0, 1.0, 1.0]);
         assert_eq!(&a.incoming_signed, &[1, 2, 3]);
@@ -1207,7 +1558,7 @@ mod tests {
             .collect()
         );
 
-        let b = super::InteractionParticles::new(&[2, 1, -1], &[3, 3, -3]);
+        let b = super::Particles::new(&[2, 1, -1], &[3, 3, -3]);
         assert_eq!(&b.incoming_idx, &[1, 1, 2]);
         assert_eq!(&b.incoming_sign, &[-1.0, 1.0, 1.0]);
         assert_eq!(&b.incoming_signed, &[-1, 1, 2]);
@@ -1221,7 +1572,7 @@ mod tests {
                 .collect()
         );
 
-        let c = super::InteractionParticles::new(&[0, 1, -1], &[1, -1, 1]);
+        let c = super::Particles::new(&[0, 1, -1], &[1, -1, 1]);
         assert_eq!(&c.incoming_idx, &[1, 0, 1]);
         assert_eq!(&c.incoming_sign, &[-1.0, 0.0, 1.0]);
         assert_eq!(&c.incoming_signed, &[-1, 0, 1]);
@@ -1237,38 +1588,38 @@ mod tests {
     #[test]
     fn cpt() {
         // Standard interaction
-        let forward = super::InteractionParticles::new(&[1, 2, 3], &[4, 5, 6]);
-        let backward = super::InteractionParticles::new(&[-4, -5, -6], &[-1, -2, -3]);
+        let forward = super::Particles::new(&[1, 2, 3], &[4, 5, 6]);
+        let backward = super::Particles::new(&[-4, -5, -6], &[-1, -2, -3]);
         assert_eq!(forward.cpt(), backward);
         assert_eq!(forward, backward.cpt());
 
         // Multiplicity on each side
-        let forward = super::InteractionParticles::new(&[1, 1, 1], &[2, 2, 2]);
-        let backward = super::InteractionParticles::new(&[-2, -2, -2], &[-1, -1, -1]);
+        let forward = super::Particles::new(&[1, 1, 1], &[2, 2, 2]);
+        let backward = super::Particles::new(&[-2, -2, -2], &[-1, -1, -1]);
         assert_eq!(forward.cpt(), backward);
         assert_eq!(forward, backward.cpt());
 
         // Multiplicity across sides
-        let forward = super::InteractionParticles::new(&[1, 2, 3], &[1, -2, 3, -3]);
-        let backward = super::InteractionParticles::new(&[-1, 2, 3, -3], &[-1, -2, -3]);
+        let forward = super::Particles::new(&[1, 2, 3], &[1, -2, 3, -3]);
+        let backward = super::Particles::new(&[-1, 2, 3, -3], &[-1, -2, -3]);
         assert_eq!(forward.cpt(), backward);
         assert_eq!(forward, backward.cpt());
 
         // Check that order doesn't matter
-        let forward = super::InteractionParticles::new(&[1, 2, 3], &[1, -2, 2, 3, -3, 4]);
-        let backward = super::InteractionParticles::new(&[2, -2, -1, 3, -4, -3], &[-1, -2, -3]);
+        let forward = super::Particles::new(&[1, 2, 3], &[1, -2, 2, 3, -3, 4]);
+        let backward = super::Particles::new(&[2, -2, -1, 3, -4, -3], &[-1, -2, -3]);
         assert_eq!(forward.cpt(), backward);
         assert_eq!(forward, backward.cpt());
 
         // Symmetric under CPT
-        let symmetric = super::InteractionParticles::new(&[1, 2, 3], &[-1, -2, -3]);
+        let symmetric = super::Particles::new(&[1, 2, 3], &[-1, -2, -3]);
         assert_eq!(symmetric.cpt(), symmetric);
         assert_eq!(symmetric, symmetric.cpt());
     }
 
     #[test]
     fn iter() {
-        let interaction = super::InteractionParticles::new(&[1, -2, 3], &[0, 1, -1]);
+        let interaction = super::Particles::new(&[1, -2, 3], &[0, 1, -1]);
 
         // Particles are sorted from smallest to largest signed index.
         let mut incoming = interaction.iter_incoming();
@@ -1288,7 +1639,7 @@ mod tests {
     fn len() {
         for ni in 0..10 {
             for no in 0..10 {
-                let interaction = super::InteractionParticles::new(&vec![1; ni], &vec![1; no]);
+                let interaction = super::Particles::new(&vec![1; ni], &vec![1; no]);
                 assert_eq!(ni, interaction.len_incoming());
                 assert_eq!(no, interaction.len_outgoing());
             }
@@ -1297,7 +1648,7 @@ mod tests {
 
     #[test]
     fn product_except() -> Result<(), Box<dyn error::Error>> {
-        let interaction = super::InteractionParticles::new(&[0, 1, 2, 3], &[4, 5, 6, 7]);
+        let interaction = super::Particles::new(&[0, 1, 2, 3], &[4, 5, 6, 7]);
 
         let n = array![2.0, 3.0, 5.0, 7.0, 11.0, 13.0, 17.0, 19.0];
         let prod_in = n.iter().take(4).product::<f64>();
@@ -1325,7 +1676,7 @@ mod tests {
 
     #[test]
     fn product_except_ignored() -> Result<(), Box<dyn error::Error>> {
-        let interaction = super::InteractionParticles::new(&[0, 1, 2, 3], &[4, 5, 6, 7]);
+        let interaction = super::Particles::new(&[0, 1, 2, 3], &[4, 5, 6, 7]);
 
         let n = array![2.0, 3.0, 5.0, 7.0, 11.0, 13.0, 17.0, 19.0];
 
@@ -1382,7 +1733,7 @@ mod tests {
         const EPS_REL: f64 = 1e-14;
         const EPS_ABS: f64 = 1e-250;
 
-        let interaction = super::InteractionParticles::new(&[1, 2], &[3, 4]);
+        let interaction = super::Particles::new(&[1, 2], &[3, 4]);
         let deltas = Array1::linspace(-1.0, 1.0, RUN_COUNT / 100);
         for _ in 0..RUN_COUNT {
             let (n, na, eq) = rand_n_na_eq();
@@ -1471,7 +1822,7 @@ mod tests {
         const EPS_REL: f64 = 1e-14;
         const EPS_ABS: f64 = 1e-250;
 
-        let interaction = super::InteractionParticles::new(&[1, 2], &[3, 4]);
+        let interaction = super::Particles::new(&[1, 2], &[3, 4]);
         let deltas = Array1::linspace(-1.0, 1.0, RUN_COUNT / 100);
         for _ in 0..RUN_COUNT {
             let (n, na, eq) = rand_n_na_eq();
@@ -1549,7 +1900,7 @@ mod tests {
         const EPS_REL: f64 = 1e-14;
         const EPS_ABS: f64 = 1e-250;
 
-        let interaction = super::InteractionParticles::new(&[1, -1, 2], &[2, -3]);
+        let interaction = super::Particles::new(&[1, -1, 2], &[2, -3]);
         let deltas = Array1::linspace(-1.0, 1.0, RUN_COUNT / 100);
 
         for _ in 0..RUN_COUNT {
@@ -1638,7 +1989,7 @@ mod tests {
         const EPS_REL: f64 = -14.0;
         const EPS_ABS: f64 = 1e-200;
 
-        let interaction = super::InteractionParticles::new(&[1, 2, 3], &[4, 5, 6]);
+        let interaction = super::Particles::new(&[1, 2, 3], &[4, 5, 6]);
         for _ in 0..RUN_COUNT {
             let (n, na, _eq) = rand_n_na_eq();
             approx_eq(
@@ -1672,7 +2023,7 @@ mod tests {
             .map_err(err_line_print!())?;
         }
 
-        let interaction = super::InteractionParticles::new(&[1, 1, 2], &[2, 3, -3]);
+        let interaction = super::Particles::new(&[1, 1, 2], &[2, 3, -3]);
         for _ in 0..RUN_COUNT {
             let (n, na, _eq) = rand_n_na_eq();
             approx_eq(
@@ -1706,7 +2057,7 @@ mod tests {
             .map_err(err_line_print!())?;
         }
 
-        let interaction = super::InteractionParticles::new(&[1, 2], &[1, 2, 2]);
+        let interaction = super::Particles::new(&[1, 2], &[1, 2, 2]);
         for _ in 0..RUN_COUNT {
             let (n, na, _eq) = rand_n_na_eq();
             approx_eq(
@@ -1745,7 +2096,7 @@ mod tests {
 
     #[test]
     fn fast_interaction_1_2() -> Result<(), Box<dyn error::Error>> {
-        let interaction = super::InteractionParticles::new(&[1], &[2, 3]);
+        let interaction = super::Particles::new(&[1], &[2, 3]);
         let mut csv = csv::Reader::from_reader(zstd::Decoder::new(fs::File::open(
             "tests/data/fast_interaction_1_2.csv.zst",
         )?)?);
@@ -1778,13 +2129,13 @@ mod tests {
 
     #[test]
     fn fast_interaction_1_2_zero_incoming() -> Result<(), Box<dyn error::Error>> {
-        let interaction = super::InteractionParticles::new(&[1], &[2, 3]);
+        let interaction = super::Particles::new(&[1], &[2, 3]);
 
         for _ in 0..RUN_COUNT {
             let (mut n, mut na, mut eq) = rand_n_na_eq();
             eq[1] = 0.0;
 
-            let result = interaction.fast_interaction(&n, &na, &eq, &[], &[]);
+            let result = interaction.fast_interaction_algebraic(&n, &na, &eq, &[], &[]);
             n += &result.dn;
             na += &result.dna;
 
@@ -1797,14 +2148,14 @@ mod tests {
 
     #[test]
     fn fast_interaction_1_2_zero_outgoing() -> Result<(), Box<dyn error::Error>> {
-        let interaction = super::InteractionParticles::new(&[1], &[2, 3]);
+        let interaction = super::Particles::new(&[1], &[2, 3]);
 
         for _ in 0..RUN_COUNT {
             let (mut n, mut na, mut eq) = rand_n_na_eq();
             eq[2] = 0.0;
             eq[3] = 0.0;
 
-            let result = interaction.fast_interaction(&n, &na, &eq, &[], &[]);
+            let result = interaction.fast_interaction_algebraic(&n, &na, &eq, &[], &[]);
             n += &result.dn;
             na += &result.dna;
 
@@ -1820,7 +2171,7 @@ mod tests {
 
     #[test]
     fn fast_interaction_2_2() -> Result<(), Box<dyn error::Error>> {
-        let interaction = super::InteractionParticles::new(&[1, 2], &[3, 4]);
+        let interaction = super::Particles::new(&[1, 2], &[3, 4]);
         let mut csv = csv::Reader::from_reader(zstd::Decoder::new(fs::File::open(
             "tests/data/fast_interaction_2_2.csv.zst",
         )?)?);
@@ -1865,14 +2216,14 @@ mod tests {
 
     #[test]
     fn fast_interaction_2_2_zero_incoming() -> Result<(), Box<dyn error::Error>> {
-        let interaction = super::InteractionParticles::new(&[1, 2], &[3, 4]);
+        let interaction = super::Particles::new(&[1, 2], &[3, 4]);
 
         for _ in 0..RUN_COUNT {
             let (mut n, mut na, mut eq) = rand_n_na_eq();
             eq[1] = 0.0;
             eq[2] = 0.0;
 
-            let result = interaction.fast_interaction(&n, &na, &eq, &[], &[]);
+            let result = interaction.fast_interaction_algebraic(&n, &na, &eq, &[], &[]);
             n += &result.dn;
             na += &result.dna;
 
@@ -1888,14 +2239,14 @@ mod tests {
 
     #[test]
     fn fast_interaction_2_2_zero_outgoing() -> Result<(), Box<dyn error::Error>> {
-        let interaction = super::InteractionParticles::new(&[1, 2], &[3, 4]);
+        let interaction = super::Particles::new(&[1, 2], &[3, 4]);
 
         for _ in 0..RUN_COUNT {
             let (mut n, mut na, mut eq) = rand_n_na_eq();
             eq[3] = 0.0;
             eq[4] = 0.0;
 
-            let result = interaction.fast_interaction(&n, &na, &eq, &[], &[]);
+            let result = interaction.fast_interaction_algebraic(&n, &na, &eq, &[], &[]);
             n += &result.dn;
             na += &result.dna;
 
@@ -1911,7 +2262,7 @@ mod tests {
 
     #[test]
     fn fast_interaction_1_3() -> Result<(), Box<dyn error::Error>> {
-        let interaction = super::InteractionParticles::new(&[1], &[2, 3, 4]);
+        let interaction = super::Particles::new(&[1], &[2, 3, 4]);
         let mut csv = csv::Reader::from_reader(zstd::Decoder::new(fs::File::open(
             "tests/data/fast_interaction_1_3.csv.zst",
         )?)?);
@@ -1956,13 +2307,13 @@ mod tests {
 
     #[test]
     fn fast_interaction_1_3_zero_incoming() -> Result<(), Box<dyn error::Error>> {
-        let interaction = super::InteractionParticles::new(&[1], &[2, 3, 4]);
+        let interaction = super::Particles::new(&[1], &[2, 3, 4]);
 
         for _ in 0..RUN_COUNT {
             let (mut n, mut na, mut eq) = rand_n_na_eq();
             eq[1] = 0.0;
 
-            let result = interaction.fast_interaction(&n, &na, &eq, &[], &[]);
+            let result = interaction.fast_interaction_algebraic(&n, &na, &eq, &[], &[]);
             n += &result.dn;
             na += &result.dna;
 
@@ -1975,7 +2326,7 @@ mod tests {
 
     #[test]
     fn fast_interaction_1_3_zero_outgoing() -> Result<(), Box<dyn error::Error>> {
-        let interaction = super::InteractionParticles::new(&[1], &[2, 3, 4]);
+        let interaction = super::Particles::new(&[1], &[2, 3, 4]);
 
         for _ in 0..RUN_COUNT {
             let (mut n, mut na, mut eq) = rand_n_na_eq();
@@ -1983,7 +2334,7 @@ mod tests {
             eq[3] = 0.0;
             eq[4] = 0.0;
 
-            let result = interaction.fast_interaction(&n, &na, &eq, &[], &[]);
+            let result = interaction.fast_interaction_algebraic(&n, &na, &eq, &[], &[]);
             n += &result.dn;
             na += &result.dna;
 
@@ -2049,7 +2400,7 @@ mod tests {
                 continue;
             }
             #[allow(clippy::cast_possible_truncation)]
-            let interaction = InteractionParticles::new(&entry.incoming, &entry.outgoing);
+            let interaction = Particles::new(&entry.incoming, &entry.outgoing);
 
             let n = Array1::from(entry.n);
             let na = Array1::from(entry.na);
@@ -2067,9 +2418,8 @@ mod tests {
                 entry.symmetric
             );
 
-            // FIXME:
-            // Some solutions have *very* large solutions for the asymmetric,
-            // which is clearly wrong
+            // FIXME: Some solutions have *very* large solutions for the
+            // asymmetric, which is clearly wrong
             if entry.asymmetric.abs() < 10.0 {
                 approx_eq(
                     entry.asymmetric,
@@ -2093,7 +2443,7 @@ mod tests {
                 eq[idx] = 0.0;
             }
 
-            let result = interaction.fast_interaction(&n, &na, &eq, &[], &[]);
+            let result = interaction.fast_interaction_algebraic(&n, &na, &eq, &[], &[]);
             n += &result.dn;
             na += &result.dna;
 
@@ -2127,7 +2477,7 @@ mod tests {
                 eq[idx] = 0.0;
             }
 
-            let result = interaction.fast_interaction(&n, &na, &eq, &[], &[]);
+            let result = interaction.fast_interaction_algebraic(&n, &na, &eq, &[], &[]);
             n += &result.dn;
             na += &result.dna;
 
@@ -2150,7 +2500,7 @@ mod tests {
         model.push_particle(crate::prelude::Particle::new(0, 1.0, 1e-3).name("three"));
         model.push_particle(crate::prelude::Particle::new(0, 1.0, 1e-3).name("four"));
 
-        let interaction = super::InteractionParticles::new(&[0, 1], &[1, 2]);
+        let interaction = super::Particles::new(&[0, 1], &[1, 2]);
         assert_eq!(interaction.short_display(), "0 1 ↔ 1 2");
         assert_eq!(interaction.short_display(), format!("{}", interaction));
         assert_eq!(
@@ -2158,7 +2508,7 @@ mod tests {
             Ok("none one ↔ one two".to_string())
         );
 
-        let interaction = super::InteractionParticles::new(&[-1, 2], &[2, -3]);
+        let interaction = super::Particles::new(&[-1, 2], &[2, -3]);
         assert_eq!(interaction.short_display(), "-1 2 ↔ -3 2");
         assert_eq!(interaction.short_display(), format!("{}", interaction));
         assert_eq!(
@@ -2166,7 +2516,7 @@ mod tests {
             Ok("\u{304}one two ↔ \u{304}three two".to_string())
         );
 
-        let interaction = super::InteractionParticles::new(&[], &[1, 2, 3]);
+        let interaction = super::Particles::new(&[], &[1, 2, 3]);
         assert_eq!(interaction.short_display(), "↔ 1 2 3");
         assert_eq!(interaction.short_display(), format!("{}", interaction));
         assert_eq!(
@@ -2174,7 +2524,7 @@ mod tests {
             Ok("↔ one two three".to_string())
         );
 
-        let interaction = super::InteractionParticles::new(&[1, -2, 3], &[]);
+        let interaction = super::Particles::new(&[1, -2, 3], &[]);
         assert_eq!(interaction.short_display(), "-2 1 3 ↔");
         assert_eq!(interaction.short_display(), format!("{}", interaction));
         assert_eq!(
@@ -2182,12 +2532,12 @@ mod tests {
             Ok("\u{304}two one three ↔".to_string())
         );
 
-        let interaction = super::InteractionParticles::new(&[1, 2, 3], &[5]);
+        let interaction = super::Particles::new(&[1, 2, 3], &[5]);
         assert_eq!(interaction.short_display(), "1 2 3 ↔ 5");
         assert_eq!(interaction.short_display(), format!("{}", interaction));
         assert_eq!(interaction.display(&model), Err(super::DisplayError(5)));
 
-        let interaction = super::InteractionParticles::new(&[1, -5, 3], &[2]);
+        let interaction = super::Particles::new(&[1, -5, 3], &[2]);
         assert_eq!(interaction.short_display(), "-5 1 3 ↔ 2");
         assert_eq!(interaction.short_display(), format!("{}", interaction));
         assert_eq!(interaction.display(&model), Err(super::DisplayError(-5)));

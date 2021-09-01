@@ -8,8 +8,7 @@ mod rate_density;
 mod three_particle;
 
 pub use fast_interaction_result::FastInteractionResult;
-#[allow(clippy::module_name_repetitions)]
-pub use interaction_particles::{DisplayError, InteractionParticles};
+pub use interaction_particles::{DisplayError, Particles};
 pub use partial_width::PartialWidth;
 pub use rate_density::RateDensity;
 
@@ -20,10 +19,19 @@ use crate::{model::Model, solver::Context};
 use ndarray::prelude::*;
 use std::cmp::Ordering;
 
+/// Threshold value of `$\gamma / H N$` which is used to determine when an
+/// interaction is fast.
+const FAST_THRESHOLD: f64 = 1e0;
+
+/// Threshold value of `$m \beta$` above which particle's equilibrium number
+/// density is deemed to be too small which might lead to inaccurate results if
+/// `$\gamma$` is also very small.
+const M_BETA_THRESHOLD: f64 = 1e1;
+
 /// Generic interaction between particles.
 pub trait Interaction<M: Model> {
     /// Return the particles involved in this interaction
-    fn particles(&self) -> &InteractionParticles;
+    fn particles(&self) -> &Particles;
 
     /// Whether this interaction is to be used to determine decays.
     ///
@@ -241,12 +249,10 @@ pub trait Interaction<M: Model> {
         let mut rate = RateDensity::zero();
         let symmetric_prefactor = self.symmetric_prefactor(c);
         rate.gamma = gamma;
-        rate.symmetric = gamma * symmetric_prefactor;
+        rate.symmetric = checked_mul(gamma, symmetric_prefactor);
         rate.delta_gamma = delta_gamma;
-        rate.asymmetric = delta_gamma.unwrap_or_default() * symmetric_prefactor
-            + gamma * self.asymmetric_prefactor(c);
-        let delta_gamma = delta_gamma.unwrap_or_default();
-        rate.asymmetric = delta_gamma * symmetric_prefactor + gamma * self.asymmetric_prefactor(c);
+        rate.asymmetric = checked_mul(delta_gamma.unwrap_or_default(), symmetric_prefactor)
+            + checked_mul(gamma, self.asymmetric_prefactor(c));
 
         Some(rate * c.normalization)
     }
@@ -282,8 +288,6 @@ pub trait Interaction<M: Model> {
     /// A `true` result must mean that we are using fast interactions.  If fast
     /// interactions are disabled, this always returns `false`.
     fn is_fast(&self, rate: &RateDensity, c: &Context<M>) -> bool {
-        const FAST_THRESHOLD: f64 = 1e1;
-
         c.fast_interactions
             .as_ref()
             .map_or(false, |fast_interactions| {
@@ -291,17 +295,36 @@ pub trait Interaction<M: Model> {
                     // We have to multiply by beta as gamma is normalized by `$1
                     // / H N \beta$`, but we must check whether `$\gamma / H N$`
                     // is larger.
-                    if rate.gamma.abs() * c.beta > FAST_THRESHOLD {
+                    if rate.gamma_tilde.abs() * c.beta > FAST_THRESHOLD {
                         log::debug!(
-                            "[{}.{:02}|{:>9.3e}] Fast interaction γ = {:.3e}",
+                            "[{}.{:02}|{:>10.4e}] Detected fast interaction {} with γ̃ = {:.3e}",
                             c.step,
                             c.substep,
                             c.beta,
-                            rate.gamma,
+                            self.particles()
+                                .display(c.model)
+                                .unwrap_or_else(|_| self.particles().short_display()),
+                            rate.gamma_tilde,
                         );
 
                         let mut fast_interactions = fast_interactions.write().unwrap();
-                        fast_interactions.insert(self.particles().clone());
+                        let mut particles = self.particles().clone();
+                        particles.gamma_tilde = Some(rate.gamma_tilde);
+                        particles.delta_gamma_tilde = rate.delta_gamma_tilde;
+                        particles.heavy = c
+                            .model
+                            .particles()
+                            .iter()
+                            .enumerate()
+                            .filter_map(|(i, p)| {
+                                if p.mass * c.beta > M_BETA_THRESHOLD {
+                                    Some(i)
+                                } else {
+                                    None
+                                }
+                            })
+                            .collect();
+                        fast_interactions.insert(particles);
 
                         true
                     } else {
@@ -312,44 +335,6 @@ pub trait Interaction<M: Model> {
                     fast_interactions.contains(self.particles())
                 }
             })
-    }
-
-    /// Adjust the overshoot as calculated by the interaction.
-    ///
-    /// Returns `true` if any adjustments were made, and `false` otherwise.
-    fn adjust_overshoot(&self, rate: &mut RateDensity, c: &Context<M>) -> bool {
-        // Although an overshoot factor results in the exact solution in a
-        // single step, when this is incorporated into the Runge-Kutta method it
-        // tends to undershoot the result.  As a result, an overshoot factor is
-        // introduced to balance this.  This *must* be in the range [0, 2], with
-        // values greater than 2 causing the results to diverge.
-        // const OVERSHOOT_FACTOR: f64 = 1.693_147;
-        const OVERSHOOT_FACTOR: f64 = 1.5;
-        let particles = self.particles();
-        let mut result = false;
-
-        if overshoots(c, particles, rate) {
-            let delta = particles.symmetric_delta(&c.n, &c.eqn, c.in_equilibrium);
-            rate.symmetric = if rate.symmetric.abs() < delta.abs() {
-                rate.symmetric
-            } else {
-                OVERSHOOT_FACTOR * delta
-            };
-            result = true;
-        }
-
-        if asymmetry_overshoots(c, particles, rate) {
-            let delta =
-                particles.asymmetric_delta(&c.n, &c.na, &c.eq, c.in_equilibrium, c.no_asymmetry);
-            rate.asymmetric = if rate.asymmetric.abs() < delta.abs() {
-                rate.asymmetric
-            } else {
-                OVERSHOOT_FACTOR * delta
-            };
-            result = true;
-        }
-
-        result
     }
 
     /// Compute the adjusted rate to handle possible overshoots of the
@@ -370,59 +355,40 @@ pub trait Interaction<M: Model> {
     /// This method should generally not be implemented.  If it is implemented
     /// separately, one must take care to take into account the integration step
     /// size which is available in [`Context::step_size`].
+    ///
+    /// If an interaction is deeemed to be too fast for the main runge-Kutta
+    /// routine to provide an accurate result, `None` is returned and the
+    /// particle's [`interaction::Particles`] should be added to the context's
+    /// list of fast interactions (if being used).  This allows for the fast
+    /// interaction to be handled separated.
     fn adjusted_rate(&self, c: &Context<M>) -> Option<RateDensity> {
+        // If the interaction was already deemed to be fast (from a previous
+        // substep), bypass any computation and return None.
         if self.is_fast_check(c) {
             return None;
         }
 
         let mut rate = self.rate(c)?;
-        log::trace!(
-            "[{}.{:02}|{:>9.3e}]          Rate: {:<12.5e}|{:<12.5e}",
-            c.step,
-            c.substep,
-            c.beta,
-            rate.gamma,
-            rate.symmetric
-        );
 
         if self.is_fast(&rate, c) {
             return None;
         }
+
         rate *= c.step_size;
 
-        if self.adjust_overshoot(&mut rate, c) {
-            log::trace!(
-                "[{}.{:02}|{:>9.3e}] Adjusted Rate: {:<12.5e}|{:<12.5e}",
-                c.step,
-                c.substep,
-                c.beta,
-                rate.gamma / c.step_size,
-                rate.symmetric / c.step_size
-            );
+        if self
+            .particles()
+            .adjust_overshoot(&mut rate.symmetric, &mut rate.asymmetric, c)
+        {
+            // log::trace!(
+            //     "[{}.{:02}|{:>10.4e}] Adjusted Rate: {:<12.5e}|{:<12.5e}",
+            //     c.step,
+            //     c.substep,
+            //     c.beta,
+            //     rate.gamma / c.step_size,
+            //     rate.symmetric / c.step_size
+            // );
         }
-
-        debug_assert!(
-            rate.symmetric.is_finite(),
-            "[{}.{:02}|{:>9.3e}] Non-finite adjusted interaction rate for interaction {}: {}",
-            c.step,
-            c.substep,
-            c.beta,
-            self.particles()
-                .display(c.model)
-                .unwrap_or_else(|_| self.particles().short_display()),
-            rate.symmetric
-        );
-        debug_assert!(
-            rate.asymmetric.is_finite(),
-            "[{}.{:02}|{:>9.3e}] Non-finite asymmetric adjusted interaction rate for interaction {}: {}",
-            c.step,
-            c.substep,
-            c.beta,
-            self.particles()
-                .display(c.model)
-                .unwrap_or_else(|_| self.particles().short_display()),
-            rate.asymmetric
-        );
 
         Some(rate)
     }
@@ -437,7 +403,12 @@ pub trait Interaction<M: Model> {
     /// [`Interaction::adjusted_rate`] in order to computer the actual rate.
     ///
     /// This method should generally not be implemented.
-    fn change(&self, dn: &mut ArrayViewMut1<f64>, dna: &mut ArrayViewMut1<f64>, c: &Context<M>) {
+    fn apply_change(
+        &self,
+        dn: &mut ArrayViewMut1<f64>,
+        dna: &mut ArrayViewMut1<f64>,
+        c: &Context<M>,
+    ) {
         if let Some(rate) = self.adjusted_rate(c) {
             let particles = self.particles();
 
@@ -458,73 +429,62 @@ pub trait Interaction<M: Model> {
     }
 }
 
-/// Check whether the computed change in particle number density will cause an
-/// overshoot of equilibrium.
-#[must_use]
-pub fn overshoots<M>(c: &Context<M>, particles: &InteractionParticles, rate: &RateDensity) -> bool {
-    let f = particles.symmetric_prefactor_fn(&c.n, &c.eqn, c.in_equilibrium);
-    let a = f(0.0);
-    if !a.is_finite() {
-        true
-    } else if a == 0.0 {
-        false
-    } else {
-        let b = f(rate.symmetric);
-        if !b.is_finite() {
-            true
-        } else if b == 0.0 {
-            false
-        } else {
-            a.signum() != b.signum()
-        }
-    }
-}
-
-/// Check whether the computed change in particle number density asymmetry will
-/// caan overshoot of equilibrium.
-#[must_use]
-pub fn asymmetry_overshoots<M>(
-    c: &Context<M>,
-    particles: &InteractionParticles,
-    rate: &RateDensity,
-) -> bool {
-    let f =
-        particles.asymmetric_prefactor_fn(&c.n, &c.na, &c.eqn, c.in_equilibrium, c.no_asymmetry);
-    let a = f(0.0);
-    if !a.is_finite() {
-        true
-    } else if a == 0.0 {
-        false
-    } else {
-        let b = f(rate.asymmetric);
-        if !b.is_finite() {
-            true
-        } else if b == 0.0 {
-            false
-        } else {
-            a.signum() != b.signum()
-        }
-    }
-}
-
-/// Computes the ratio `$n / eq$` in a manner that never returns NaN.
+/// Computes the ratio `$a / b$` such that if `$a = 0$` the result is 0.
 ///
 /// This is to be used in the context of calculating the scaling of the
-/// interaction density by the number density ratios `$n / eq$`.
+/// interaction density by the number density ratios `$n / n^{(0)}$`.  Provided
+/// the both inputs are numbers, then a NaN can only arise from `$n = eq = 0$`,
+/// in which case the actual answer should really be 0 as there are no particles
+/// to interaction.
 ///
-/// Provided the both inputs are numbers, then a NaN can only arise from `$n =
-/// eq = 0$`, in which case the actual answer should really be 0 as there are no
-/// particles to interaction.
-///
-/// Note that if `$eq = 0$` and `$n \neq 0$`, then the result will be infinite.
+/// Note that if `$b = 0$` and `$a \neq 0$`, then the result will be infinite.
 #[must_use]
 #[inline]
-pub(crate) fn checked_div(n: f64, eq: f64) -> f64 {
-    let v = n / eq;
-    if v.is_nan() {
+pub(crate) fn checked_div(a: f64, b: f64) -> f64 {
+    if a == 0.0 {
         0.0
     } else {
-        v
+        a / b
+    }
+}
+
+/// Computes the product `$a \cdot b$` such that if either is 0, the result is
+/// 0.
+///
+/// This is used in the context of scaling `$\gamma$` by the prefactor of `$n /
+/// n^{(0)}$`.  If either is exactly 0, the result is assumed to be 0 even if
+/// the other is infinite.
+///
+/// If either inputs are NaN, then the result will be NaN irrespective of the
+/// other.
+#[must_use]
+#[inline]
+pub(crate) fn checked_mul(a: f64, b: f64) -> f64 {
+    if a.is_nan() || b.is_nan() {
+        f64::NAN
+    } else if a == 0.0 || b == 0.0 {
+        0.0
+    } else {
+        a * b
+    }
+}
+
+/// Adjust `dn` and/or `dna` for to account for:
+///
+/// - Particle which are held in equilibrium, irrespective if any
+///   interaction going on.
+/// - Particles which have no asymmetry, irrespective if any interaction
+///   going on.
+pub fn fix_equilibrium<M>(
+    c: &Context<M>,
+    dn: &mut ArrayViewMut1<f64>,
+    dna: &mut ArrayViewMut1<f64>,
+) {
+    for &p in c.in_equilibrium {
+        dn[p] = c.n[p] - c.eqn[p];
+    }
+    for &p in c.no_asymmetry {
+        dna[p] = -c.na[p];
     }
 }
 
@@ -533,7 +493,7 @@ where
     I: Interaction<M>,
     M: Model,
 {
-    fn particles(&self) -> &InteractionParticles {
+    fn particles(&self) -> &Particles {
         (*self).particles()
     }
 
@@ -564,8 +524,13 @@ where
         (*self).adjusted_rate(c)
     }
 
-    fn change(&self, dn: &mut Array1<f64>, dna: &mut Array1<f64>, c: &Context<M>) {
-        (*self).change(dn, dna, c);
+    fn apply_change(
+        &self,
+        dn: &mut ArrayViewMut1<f64>,
+        dna: &mut ArrayViewMut1<f64>,
+        c: &Context<M>,
+    ) {
+        (*self).apply_change(dn, dna, c);
     }
 }
 
@@ -574,7 +539,7 @@ where
     I: Interaction<M>,
     M: Model,
 {
-    fn particles(&self) -> &InteractionParticles {
+    fn particles(&self) -> &Particles {
         self.as_ref().particles()
     }
 
@@ -606,8 +571,13 @@ where
         self.as_ref().adjusted_rate(c)
     }
 
-    fn change(&self, dn: &mut ArrayViewMut1<f64>, dna: &mut ArrayViewMut1<f64>, c: &Context<M>) {
-        self.as_ref().change(dn, dna, c);
+    fn apply_change(
+        &self,
+        dn: &mut ArrayViewMut1<f64>,
+        dna: &mut ArrayViewMut1<f64>,
+        c: &Context<M>,
+    ) {
+        self.as_ref().apply_change(dn, dna, c);
     }
 }
 

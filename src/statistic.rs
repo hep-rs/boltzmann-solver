@@ -614,7 +614,6 @@ mod tests {
     use std::{error, f64, fs};
 
     #[test]
-    #[allow(clippy::similar_names)]
     fn phase_space() -> Result<(), Box<dyn error::Error>> {
         let mut rdr = csv::Reader::from_reader(zstd::Decoder::new(fs::File::open(
             "tests/data/phase_space.csv.zst",
@@ -654,7 +653,6 @@ mod tests {
     }
 
     #[test]
-    #[allow(clippy::similar_names)]
     fn number_density() -> Result<(), Box<dyn error::Error>> {
         let mut rdr = csv::Reader::from_reader(zstd::Decoder::new(fs::File::open(
             "tests/data/number_density.csv.zst",
@@ -710,7 +708,6 @@ mod tests {
     }
 
     #[test]
-    #[allow(clippy::similar_names)]
     fn number_density_asymmetry() -> Result<(), Box<dyn error::Error>> {
         let mut rdr = csv::Reader::from_reader(zstd::Decoder::new(fs::File::open(
             "tests/data/number_density_asymmetry.csv.zst",

@@ -761,7 +761,7 @@ where
         (beta, next_beta): (f64, f64),
         n: &Array1<f64>,
         na: &Array1<f64>,
-        fast_interactions: Option<RwLock<HashSet<InteractionParticles>>>,
+        fast_interactions: Option<RwLock<HashSet<interaction::Particles>>>,
     ) -> Context<M> {
         let hubble_rate = self.model.hubble_rate(beta);
         let normalization =

@@ -1,6 +1,9 @@
 use crate::{
     model::{interaction::Interaction, ModelInteractions, Particle},
-    solver::{options::StepPrecision, Context, LoggerFn, Solver},
+    solver::{
+        options::{ErrorTolerance, StepPrecision},
+        Context, LoggerFn, Solver,
+    },
     utilities::rec_geomspace,
 };
 use ndarray::prelude::*;
