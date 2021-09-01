@@ -202,6 +202,7 @@ where
     integral
 }
 
+#[must_use]
 fn s_divisions(beta: f64, p1: &Particle, p2: &Particle, p3: &Particle, p4: &Particle) -> Vec<f64> {
     // The weighing by the bessel function means  that most of the integral's
     // non-zero values are near the lower bound of the s domain.  We use
@@ -361,6 +362,7 @@ where
 /// = \left( \sqrt{\frac{8}{\pi}} \zeta(3) \right) \frac{\sqrt{\pi / 2}}{g_a}
 ///   \frac{e^{\beta (m_a - \sqrt{s})}}{(\sqrt{m_a} \sqrt[4]{s} \beta)^3}
 /// ```
+#[must_use]
 fn integrate_st_on_n1<F>(
     amplitude: F,
     beta: f64,
@@ -437,6 +439,7 @@ where
 ///   \frac{e^{\beta (m_a + m_b - \sqrt{s})}}{\left(\sqrt{m_a m_b} \sqrt[4]{s} \beta^\frac{3}{2}\right)^3} \\
 /// ```
 #[allow(clippy::too_many_arguments)]
+#[must_use]
 fn integrate_st_on_n2<F>(
     amplitude: F,
     beta: f64,
@@ -517,6 +520,7 @@ where
 ///   \frac{e^{\beta (m_a + m_b + m_c - \sqrt{s})}}{\left(\sqrt{m_a m_b m_c} \sqrt[4]{s} \beta^2\right)^3} \\
 /// ```
 #[allow(clippy::too_many_arguments)]
+#[must_use]
 fn integrate_st_on_n3<F>(
     amplitude: F,
     beta: f64,
@@ -598,6 +602,7 @@ where
 /// = \left( \sqrt{\frac{8}{\pi}} \zeta(3) \right)^4 \frac{\sqrt{\pi / 2}}{g_a g_b g_c g_d}
 ///   \frac{e^{\beta (m_a + m_b + m_c + m_d - \sqrt{s})}}{\left(\sqrt{m_a m_b m_c m_d} \sqrt[4]{s} \beta^\frac{5}{2} \right)^3}
 /// ```
+#[must_use]
 fn integrate_st_on_n4<F>(
     amplitude: F,
     beta: f64,
