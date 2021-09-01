@@ -2,20 +2,19 @@
 
 mod builder;
 mod context;
-mod options;
-mod tableau;
+pub(crate) mod options;
+pub(crate) mod tableau;
 
 #[allow(clippy::module_name_repetitions)]
 pub use builder::SolverBuilder;
 pub use context::Context;
 
 use crate::{
-    model::interaction::InteractionParticles,
     model::{
-        interaction::FastInteractionResult, interaction::Interaction, Model, ModelInteractions,
-        Particle,
+        interaction::{self, fix_equilibrium, FastInteractionResult, Interaction},
+        Model, ModelInteractions, Particle,
     },
-    solver::options::StepPrecision,
+    solver::options::{ErrorTolerance, StepPrecision},
     statistic::{Statistic, Statistics},
 };
 use ndarray::prelude::*;
@@ -24,6 +23,9 @@ use rayon::prelude::*;
 #[cfg(feature = "serde")]
 use serde::Serialize;
 use std::{collections::HashSet, convert::TryFrom, error, fmt, io::Write, ops, sync::RwLock};
+
+/// The minimum multiplicative step size between two consecutive calls of the logger.
+const BETA_LOG_STEP: f64 = 1.1;
 
 /// Error type returned by the solver in case there is an error during
 /// integration.
@@ -68,27 +70,27 @@ impl Error {
 }
 
 /// Workspace of functions to reuse during the integration
+#[cfg(feature = "serde")]
+#[derive(Serialize)]
 struct Workspace {
     /// Number density
     n: Array1<f64>,
     /// Number density change
     dn: Array1<f64>,
     /// Number density local error estimate
-    dn_err: Array1<f64>,
+    dn_error: Array1<f64>,
     /// Number density asymmetry
     na: Array1<f64>,
     /// Number density asymmetry change
     dna: Array1<f64>,
     /// Number density asymmetry local error estimate
-    dna_err: Array1<f64>,
+    dna_error: Array1<f64>,
 
     /// k array for the number density of shape `RK_S × p` where `p` is the
     /// number of particles (including the 0-index particle).
-    // k: [Array1<f64>; tableau::RK_S],
     k: Array2<f64>,
     /// k array for the number density asymmetry of shape `RK_S × p` where `p`
     /// is the number of particles (including the 0-index particle).
-    // ka: [Array1<f64>; tableau::RK_S],
     ka: Array2<f64>,
 }
 
@@ -103,10 +105,11 @@ impl Workspace {
         Self {
             n: initial_densities.clone(),
             dn: Array1::zeros(dim),
-            dn_err: Array1::zeros(dim),
+            dn_error: Array1::zeros(dim),
+
             na: initial_asymmetries.clone(),
             dna: Array1::zeros(dim),
-            dna_err: Array1::zeros(dim),
+            dna_error: Array1::zeros(dim),
 
             k,
             ka,
@@ -117,9 +120,9 @@ impl Workspace {
     /// error estimates to 0.
     fn clear_step(&mut self) {
         self.dn.fill(0.0);
-        self.dn_err.fill(0.0);
         self.dna.fill(0.0);
-        self.dna_err.fill(0.0);
+        self.dn_error.fill(0.0);
+        self.dna_error.fill(0.0);
     }
 
     /// Compute and update the changes to number density from k and a given step
@@ -136,10 +139,10 @@ impl Workspace {
         zip!(
             (
                 dn in &mut self.dn,
-                dn_err in &mut self.dn_err,
+                dn_err in &mut self.dn_error,
                 &ki in &self.k.slice(ndarray::s![i, ..]),
                 dna in &mut self.dna,
-                dna_err in &mut self.dna_err,
+                dna_err in &mut self.dna_error,
                 &kai in &self.ka.slice(ndarray::s![i, ..])
             ) {
                 *dn += bi * ki;
@@ -150,28 +153,14 @@ impl Workspace {
         );
     }
 
-    /// Get the local error using L∞-norm.  Any NaN values in the changes result
-    /// in the local error also being NaN.
-    fn local_error(&self) -> f64 {
-        self.dn_err
-            .iter()
-            .chain(&self.dna_err)
-            // .zip(self.dn.iter().chain(&self.dna))
-            .fold(0_f64, |result, &error| {
-                if result.is_nan() || error.is_nan() {
-                    f64::NAN
-                } else {
-                    result.max((error).abs())
-                }
-            })
-    }
-
     /// Advance the integration by apply the computed changes to far to the number densities.
     fn advance(&mut self) {
         self.n += &self.dn;
         self.na += &self.dna;
     }
 
+    /// Unwrap the workspace and return the number density and number density
+    /// asymmetry.
     fn result(self) -> (Array1<f64>, Array1<f64>) {
         (self.n, self.na)
     }
@@ -181,6 +170,17 @@ impl ops::AddAssign<&FastInteractionResult> for Workspace {
     fn add_assign(&mut self, rhs: &FastInteractionResult) {
         self.dn += &rhs.dn;
         self.dna += &rhs.dna;
+        self.dn_error += &rhs.dn_error;
+        self.dna_error += &rhs.dna_error;
+    }
+}
+
+impl ops::AddAssign<FastInteractionResult> for Workspace {
+    fn add_assign(&mut self, rhs: FastInteractionResult) {
+        self.dn += &rhs.dn;
+        self.dna += &rhs.dna;
+        self.dn_error += &rhs.dn_error;
+        self.dna_error += &rhs.dna_error;
     }
 }
 
@@ -201,7 +201,8 @@ pub struct Solver<M> {
     no_asymmetry: Vec<usize>,
     logger: LoggerFn<M>,
     step_precision: StepPrecision,
-    error_tolerance: f64,
+    /// The absolute and relative error tolerances for the integration.
+    error_tolerance: ErrorTolerance,
     fast_interactions: bool,
     inaccurate: bool,
     abort_when_inaccurate: bool,
@@ -221,11 +222,10 @@ where
         ki.fill(0.0);
         kai.fill(0.0);
         for interaction in self.model.interactions() {
-            interaction.change(ki, kai, ci);
+            interaction.apply_change(ki, kai, ci);
         }
     }
 
-    #[allow(clippy::similar_names)]
     #[cfg(feature = "parallel")]
     fn compute_ki(
         &self,
@@ -242,7 +242,7 @@ where
             .fold(
                 || (Array1::zeros(dim), Array1::zeros(dim)),
                 |(mut dn, mut dna), interaction| {
-                    interaction.change(&mut dn, &mut dna, ci);
+                    interaction.change(&mut dn.view_mut(), &mut dna.view_mut(), ci);
                     (dn, dna)
                 },
             )
@@ -255,120 +255,83 @@ where
         new_kai.move_into(kai);
     }
 
-    /// Adjust `dn` and/or `dna` for to account for:
-    ///
-    /// - Particle which are held in equilibrium, irrespective if any
-    ///   interaction going on.
-    /// - Particles which have no asymmetry, irrespective if any interaction
-    ///   going on.
-    /// - Handle and equilibriate fast interaction (if applicable).
-    #[allow(clippy::similar_names)]
-    fn fix_change(
-        &self,
-        c: &Context<M>,
-        dn: &mut ArrayViewMut1<f64>,
-        dna: &mut ArrayViewMut1<f64>,
-    ) {
-        // For the fast interaction to converge, we need local mutable copies of
-        // `n` and `na` which already incorporate the changes computed from the
-        // regular integration.
-        let (mut n, mut na) = (&c.n + &*dn, &c.na + &*dna);
+    /// Adjust `dn` and/or `dna` for fast interaction (if applicable).
+    fn fix_fast_interactions(c: &Context<M>, ws: &mut Workspace, eq: &Array2<f64>) -> Option<()> {
+        #[cfg(not(feature = "parallel"))]
+        let result = c.fast_interactions.as_ref()?.read().ok()?.iter().fold(
+            FastInteractionResult::zero(c.n.dim()),
+            |mut acc, fi| {
+                acc += fi.fast_interaction_de(c, eq);
+                acc
+            },
+        );
 
-        let mut iterations = 0_usize;
-        loop {
-            // Go through all fast interactions and apply the change to the
-            // number densities.  We also store the deltas applied to determine
-            // convergence.
-            let deltas = c
-                .fast_interactions
-                .as_ref()
-                .map_or_else(Vec::new, |fast_interactions| {
-                    fast_interactions
-                        .read()
-                        .unwrap()
-                        .iter()
-                        .map(|interaction| {
-                            // Fix equilibrium before each fast interaction
-                            for &p in &self.in_equilibrium {
-                                n[p] = c.eqn[p];
-                            }
-                            for &p in &self.no_asymmetry {
-                                na[p] = 0.0;
-                            }
+        #[cfg(feature = "parallel")]
+        let result = c
+            .fast_interactions
+            .as_ref()?
+            .read()
+            .ok()?
+            .par_iter()
+            .map(|fi| fi.fast_interaction_de(c, eq))
+            .reduce(
+                || FastInteractionResult::zero(c.n.dim()),
+                |mut acc, fi| {
+                    acc += fi;
+                    acc
+                },
+            );
 
-                            let result = interaction.fast_interaction(
-                                &n,
-                                &na,
-                                &c.eqn,
-                                c.in_equilibrium,
-                                c.no_asymmetry,
-                            );
-
-                            n += &result.dn;
-                            na += &result.dna;
-
-                            (result.symmetric_delta, result.asymmetric_delta)
-                        })
-                        .collect()
-                });
-
-            log::trace!("Iteration {}:\nδ = {:?}", iterations, deltas);
-
-            // Fix equilibrium one last time
-            for &p in &self.in_equilibrium {
-                n[p] = c.eqn[p];
-            }
-            for &p in &self.no_asymmetry {
-                na[p] = 0.0;
-            }
-
-            let equilibrium = deltas.is_empty()
-                || deltas.iter().all(|(symmetric_delta, asymmetric_delta)| {
-                    symmetric_delta.abs() < 1e-8 && asymmetric_delta.abs() < 1e-12
-                });
-            if equilibrium {
-                break;
-            }
-
-            iterations += 1;
-            if iterations >= 50 {
-                log::error!(
-                    "[{}.{:02}|{:>9.3e}] Unable to converge fast interactions after {} iterations.",
-                    c.step,
-                    c.substep,
-                    c.beta,
-                    iterations
-                );
-                panic!();
-            }
-        }
-
-        (n - &c.na).move_into(dn);
-        (na - &c.na).move_into(dna);
+        *ws += result;
+        Some(())
     }
 
-    /// Compute the adjustment to the step size based on the local error.
+    /// Check if the local error is within the tolerance and compute the
+    /// adjustment to the step size based on the local error.
     ///
     /// Given a local error estimate of `$\tilde\varepsilon$` and target local
-    /// error `$\varepsilon$`, the new step size should be:
+    /// error `$\varepsilon_\text{abs}$` and `$\varepsilon_\text{rel}$`, the new
+    /// step size should be:
     ///
     /// ```math
-    /// h_{\text{new}} = h \times \underbrace{S \sqrt[p + 1]{\frac{\varepsilon}{\tilde \varepsilon}}}_{\Delta}
+    /// h_{\text{new}} = h \times \underbrace{S \sqrt[p + 1]{\frac{\max[\varepsilon_\text{abs}, \varepsilon_\text{rel} n]}{\tilde \varepsilon}}}_{\Delta}
     /// ```
     ///
     /// where `$S \in [0, 1]$` is a safety factor to purposefully underestimate
-    /// the result.  The values of `\Delta` are bounded so as to avoid too
+    /// the result.  The values of `\Delta` are bounded so as to avoid too large
     /// step size adjustments.
-    fn delta(&self, err: f64) -> f64 {
-        use tableau::RK_ORDER;
+    ///
+    /// This function returns three values:
+    /// - Whether the local error was within the tolerance;
+    /// - The ratio of the target error to the local error; and,
+    /// - The value of delta.
+    fn delta(&self, ws: &Workspace, n: &Array1<f64>, na: &Array1<f64>) -> (bool, f64, f64) {
+        const MIN_DELTA: f64 = 0.1;
+        const MAX_DELTA: f64 = 2.0;
 
-        let delta = 0.8 * (self.error_tolerance / err).powf(1.0 / f64::from(RK_ORDER + 1));
+        let ratio = ws
+            .dn_error
+            .iter()
+            .chain(&ws.dna_error)
+            .map(|err| err.abs())
+            .zip(n.iter().chain(na))
+            .fold(f64::INFINITY, |min, (err, &n)| {
+                let max_tolerance = self.error_tolerance.max_tolerance(n);
+                min.min(if err == 0.0 {
+                    f64::MAX
+                } else {
+                    max_tolerance / err
+                })
+            });
 
-        if delta.is_nan() {
-            0.1
-        } else {
-            delta.clamp(0.1, 2.0)
-        }
+        (ratio.is_finite() && ratio > 1.0, ratio, {
+            let delta = 0.8 * ratio.powf(1.0 / f64::from(tableau::RK_ORDER + 1));
+            if delta.is_nan() {
+                MIN_DELTA
+            } else {
+                delta.clamp(MIN_DELTA, MAX_DELTA)
+            }
+        })
     }
 
     /// Ensure that h is within the desired range of step sizes.
@@ -387,7 +350,7 @@ where
         if h_on_beta > self.step_precision.max {
             h = beta * self.step_precision.max;
             log::trace!(
-                "[{}|{:.3e}] Step size too large, decreased h to {:.3e}",
+                "[{}|{:>10.4e}] Step size too large, decreased h to {:.3e}",
                 step,
                 beta,
                 h
@@ -397,7 +360,7 @@ where
         } else if h_on_beta < self.step_precision.min {
             h = beta * self.step_precision.min;
             log::debug!(
-                "[{}|{:.3e}] Step size too small, increased h to {:.3e}",
+                "[{}|{:>10.4e}] Step size too small, increased h to {:.3e}",
                 step,
                 beta,
                 h
@@ -432,11 +395,10 @@ where
     /// error.  The final number density (despite the error) can still be
     /// obtained by using [`Error::into_inner`], though this may not be at the
     /// expected final temperature as some errors abort the integration.
+    #[allow(clippy::missing_panics_doc)]
     #[allow(clippy::too_many_lines)]
     pub fn solve(&mut self) -> Result<(Array1<f64>, Array1<f64>), Error> {
         use tableau::{RK_A, RK_C, RK_S};
-
-        const BETA_LOG_STEP: f64 = 1.1;
 
         // Initialize all the variables that will be used in the integration
         let mut workspace = Workspace::new(&self.initial_densities, &self.initial_asymmetries);
@@ -471,20 +433,18 @@ where
             step += 1;
             workspace.clear_step();
 
+            // Log the progress of the integration
+            if step % 100 == 0 {
+                log::info!("Step {}, β = {:>10.4e}, Δβ = {:.4e}", step, beta, h);
+            } else if step % 10 == 0 {
+                log::debug!("Step {}, β = {:>10.4e}, Δβ = {:.4e}", step, beta, h);
+            } else {
+                log::trace!("Step {}, β = {:>10.4e}, Δβ = {:.4e}", step, beta, h);
+            }
+
             // Compute next step particles
             self.model.set_beta(beta + h);
             self.particles_next = self.model.particles().to_vec();
-
-            // Log the progress of the integration
-            if step % 100 == 0 {
-                log::info!("Step {}, β = {:.4e}, h = {:.4e}", step, beta, h);
-            } else if step % 10 == 0 {
-                log::debug!("Step {}, β = {:.4e}, h = {:.4e}", step, beta, h);
-            } else {
-                log::trace!("Step {}, β = {:.4e}, h = {:.4e}", step, beta, h);
-            }
-            // log::trace!("[{}|{:.3e}]       n = {:<+10.3e}", step, beta, workspace.n);
-            // log::trace!("[{}|{:.3e}]      na = {:<+10.3e}", step, beta, workspace.na);
 
             // Initialize the fast interactions if they are being used
             let mut fast_interactions = if self.fast_interactions {
@@ -492,6 +452,11 @@ where
             } else {
                 None
             };
+
+            // For fast interactions, we need to know the equilibrium number
+            // densities over the step interval.  Instead of recomputing them,
+            // we collect them during the Runge-Kutta integration.
+            let mut eq = Array2::zeros((RK_S, workspace.n.dim()));
 
             for i in 0..RK_S {
                 evals += 1;
@@ -516,12 +481,15 @@ where
                     fast_interactions,
                 );
 
+                // Collect the equilibrium number densities for this substep.
+                eq.slice_mut(ndarray::s![i, ..]).assign(&ci.eq);
+
+                let mut ki = workspace.k.slice_mut(ndarray::s![i, ..]);
+                let mut kai = workspace.ka.slice_mut(ndarray::s![i, ..]);
+
                 // Compute k[i] and ka[i] from each interaction
-                self.compute_ki(
-                    &mut workspace.k.slice_mut(ndarray::s![i, ..]),
-                    &mut workspace.ka.slice_mut(ndarray::s![i, ..]),
-                    &ci,
-                );
+                self.compute_ki(&mut ki, &mut kai, &ci);
+                fix_equilibrium(&ci, &mut ki, &mut kai);
                 fast_interactions = ci.into_fast_interactions();
                 workspace.compute_dn(i);
             }
@@ -536,15 +504,20 @@ where
                 &workspace.na,
                 fast_interactions,
             );
-            // log::trace!("[{}|{:.3e}]      eq = {:<+10.3e}", step, beta, c.eq);
-            self.fix_change(&c, &mut workspace.dn, &mut workspace.dna);
+
+            Self::fix_fast_interactions(&c, &mut workspace, &eq);
+            fix_equilibrium(
+                &c,
+                &mut workspace.dn.view_mut(),
+                &mut workspace.dna.view_mut(),
+            );
 
             #[allow(clippy::cast_precision_loss)]
-            let err = workspace.local_error() / self.model.interactions().len() as f64;
+            let (within_tolerance, error_ratio, delta) = self.delta(&workspace, &c.n, &c.na);
 
             // If the error is within the tolerance, we'll be advancing the
             // iteration step
-            if err < self.error_tolerance {
+            if within_tolerance {
                 if beta > beta_logging || beta >= self.beta_range.1 {
                     (*self.logger)(&c, &workspace.dn, &workspace.dna);
                     beta_logging = beta * BETA_LOG_STEP;
@@ -552,13 +525,12 @@ where
 
                 workspace.advance();
                 beta += h;
-            } else if log::log_enabled!(log::Level::Trace) {
+            } else if log::log_enabled!(log::Level::Debug) {
                 log::trace!(
-                    "[{}|{:.3e}] Error is not within tolerance ({:e} > {:e}).",
+                    "[{}|{:>10.4e}] Error is not within tolerance (error ratio: {:e}).",
                     step,
                     beta,
-                    err,
-                    self.error_tolerance
+                    error_ratio
                 );
                 steps_discarded += 1;
             } else {
@@ -566,7 +538,7 @@ where
             }
 
             // Adjust the step size based on the error
-            h *= self.delta(err);
+            h *= delta;
             h = match self.adjust_h(step, h, beta) {
                 Ok(h) => h,
                 Err(h) => {
@@ -584,7 +556,7 @@ where
             // Adjust final integration step if needed
             if beta + h > self.beta_range.1 {
                 log::trace!(
-                    "[{}|{:.3e}] Fixing overshoot of last integration step.",
+                    "[{}|{:>10.4e}] Fixing overshoot of last integration step.",
                     step,
                     beta
                 );
@@ -592,7 +564,7 @@ where
             }
         }
 
-        log::info!("Number of integration steps: {}", step);
+        log::info!("Number of integration steps: {}", step - steps_discarded);
         log::info!("Number of integration steps discarded: {}", steps_discarded);
         log::info!("Number of evaluations: {}", evals);
 

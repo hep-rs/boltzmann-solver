@@ -78,8 +78,8 @@ pub struct SolverBuilder<M> {
     logger: LoggerFn<M>,
     /// Step precision (i.e. step size) allowed
     step_precision: StepPrecision,
-    /// Local error allowed to determine step size
-    error_tolerance: f64,
+    /// Local error allowed to determine step size as absolute and relative.
+    error_tolerance: ErrorTolerance,
     /// Whether interactions are precomputed or not
     precompute: bool,
     /// Whether fast interactions are enabled
@@ -119,7 +119,7 @@ impl<M> SolverBuilder<M> {
             no_asymmetry: HashSet::new(),
             logger: Box::new(|_, _, _| {}),
             step_precision: StepPrecision::default(),
-            error_tolerance: 1e-4,
+            error_tolerance: ErrorTolerance::default(),
             precompute: true,
             fast_interactions: true,
             abort_when_inaccurate: false,
@@ -306,7 +306,15 @@ impl<M> SolverBuilder<M> {
     /// Specify the local error tolerance.
     ///
     /// The algorithm will adjust the evolution step size such that the local
-    /// error remains less than the specified the error tolerance.
+    /// error remains less than the specified the error tolerance. Specifically,
+    /// given absolute and relative tolerances `$\varepsilon_\text{abs}$` and
+    /// `$\varepsilon_\text{rel}$`, the local error be less than
+    ///
+    /// ```math
+    /// \text{error} \leq \varepsilon_\text{abs} + \varepsilon_\text{rel} \cdot y
+    /// ```
+    ///
+    /// where `$y$` is the relevant value that is being adjusted.
     ///
     /// Note that the error is only ever estimated and thus may occasionally be
     /// inaccurate.  Furthermore, the [`Solver::step_precision`] takes
@@ -316,9 +324,10 @@ impl<M> SolverBuilder<M> {
     /// # Panics
     ///
     /// Panics if the tolerance is less than or equal to 0.
-    pub fn error_tolerance(mut self, tol: f64) -> Self {
-        assert!(tol > 0.0, "The tolerance must be greater than 0.");
-        self.error_tolerance = tol;
+    pub fn error_tolerance(mut self, abs: f64, rel: f64) -> Self {
+        assert!(abs > 0.0, "The absolute tolerance must be greater than 0.");
+        assert!(rel > 0.0, "The relative tolerance must be greater than 0.");
+        self.error_tolerance = ErrorTolerance { abs, rel };
         self
     }
 
@@ -372,10 +381,7 @@ impl<M> SolverBuilder<M> {
         }
 
         if n.iter().any(|v| !v.is_finite() || v.is_nan()) {
-            log::error!(
-                "Some of initial densities are not finite or NaN:\n{:.3e}",
-                n
-            );
+            log::error!("Some of initial densities are infinite or NaN:\n{:.3e}", n);
             return Err(Error::InvalidInitialDensities);
         }
 
@@ -403,10 +409,7 @@ impl<M> SolverBuilder<M> {
         }
 
         if na.iter().any(|v| !v.is_finite() || v.is_nan()) {
-            log::error!(
-                "Some of initial densities are not finite or NaN:\n{:.3e}",
-                na
-            );
+            log::error!("Some of initial densities are infinite or NaN:\n{:.3e}", na);
             return Err(Error::InvalidInitialAsymmetries);
         }
 
@@ -547,7 +550,7 @@ where
             }));
         if self.no_asymmetry.len() > particles.len() {
             log::error!(
-                "There are more particles with 0 asymmetry ({}) than particles in the model ({}).",
+                "There are more particles with no asymmetry ({}) than particles in the model ({}).",
                 self.no_asymmetry.len(),
                 particles.len()
             );
