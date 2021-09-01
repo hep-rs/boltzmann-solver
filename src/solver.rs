@@ -69,6 +69,21 @@ impl Error {
     }
 }
 
+#[cfg(all(feature = "debug", debug_assertions))]
+#[derive(Serialize)]
+struct Debug<'a> {
+    step: usize,
+    beta: f64,
+    h: f64,
+    normalizations: &'a Array1<f64>,
+    eq: &'a Array2<f64>,
+    eqn: &'a Array2<f64>,
+    workspace: &'a Workspace,
+    gammas: &'a Array2<f64>,
+    delta_gammas: &'a Array2<f64>,
+    fast: bool,
+}
+
 /// Workspace of functions to reuse during the integration
 #[cfg(feature = "serde")]
 #[derive(Serialize)]
@@ -242,7 +257,7 @@ where
             .fold(
                 || (Array1::zeros(dim), Array1::zeros(dim)),
                 |(mut dn, mut dna), interaction| {
-                    interaction.change(&mut dn.view_mut(), &mut dna.view_mut(), ci);
+                    interaction.apply_change(&mut dn.view_mut(), &mut dna.view_mut(), ci);
                     (dn, dna)
                 },
             )
@@ -400,6 +415,24 @@ where
     pub fn solve(&mut self) -> Result<(Array1<f64>, Array1<f64>), Error> {
         use tableau::{RK_A, RK_C, RK_S};
 
+        // Debug information to show the full step information.
+        #[cfg(all(feature = "debug", debug_assertions))]
+        let (debug_dir, mut gammas, mut delta_gammas, mut normalizations, mut eqn) = {
+            let mut temp_dir = std::env::temp_dir();
+            temp_dir.push("boltzmann-solver");
+            temp_dir.push("debug");
+            std::fs::remove_dir_all(&temp_dir).unwrap_or_default();
+            std::fs::create_dir_all(&temp_dir).unwrap_or_default();
+
+            (
+                temp_dir,
+                Array2::zeros((RK_S, self.model.interactions().len())),
+                Array2::zeros((RK_S, self.model.interactions().len())),
+                Array1::zeros(RK_S),
+                Array2::zeros((RK_S, workspace.n.dim())),
+            )
+        };
+
         // Initialize all the variables that will be used in the integration
         let mut workspace = Workspace::new(&self.initial_densities, &self.initial_asymmetries);
 
@@ -484,6 +517,17 @@ where
                 // Collect the equilibrium number densities for this substep.
                 eq.slice_mut(ndarray::s![i, ..]).assign(&ci.eq);
 
+                #[cfg(all(feature = "debug", debug_assertions))]
+                {
+                    for (j, interaction) in self.model.interactions().iter().enumerate() {
+                        gammas[[i, j]] = interaction.gamma(&ci, true).unwrap_or_default();
+                        delta_gammas[[i, j]] =
+                            interaction.delta_gamma(&ci, true).unwrap_or_default();
+                    }
+                    normalizations[i] = ci.normalization;
+                    eqn.slice_mut(ndarray::s![i, ..]).assign(&ci.eqn);
+                }
+
                 let mut ki = workspace.k.slice_mut(ndarray::s![i, ..]);
                 let mut kai = workspace.ka.slice_mut(ndarray::s![i, ..]);
 
@@ -512,7 +556,28 @@ where
                 &mut workspace.dna.view_mut(),
             );
 
-            #[allow(clippy::cast_precision_loss)]
+            #[cfg(all(feature = "debug", debug_assertions))]
+            serde_json::to_writer(
+                std::fs::File::create({ debug_dir.join(format!("{}.json", step)) }).unwrap(),
+                &Debug {
+                    step,
+                    beta,
+                    h,
+                    workspace: &workspace,
+                    eq: &eq,
+                    eqn: &eqn,
+                    normalizations: &normalizations,
+                    gammas: &gammas,
+                    delta_gammas: &delta_gammas,
+                    fast: c
+                        .fast_interactions
+                        .as_ref()
+                        .and_then(|v| v.read().ok())
+                        .map_or(false, |v| !v.is_empty()),
+                },
+            )
+            .unwrap();
+
             let (within_tolerance, error_ratio, delta) = self.delta(&workspace, &c.n, &c.na);
 
             // If the error is within the tolerance, we'll be advancing the
