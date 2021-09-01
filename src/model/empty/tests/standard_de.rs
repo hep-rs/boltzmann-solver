@@ -3,10 +3,7 @@
 
 use super::{solve, BETA_END};
 use crate::{
-    model::{
-        interaction::{InteractionParticles, RateDensity},
-        Empty, Interaction, Particle,
-    },
+    model::{interaction, interaction::RateDensity, Empty, Interaction, Particle},
     solver::{Context, SolverBuilder},
     utilities::test::approx_eq,
 };
@@ -20,18 +17,18 @@ use std::error;
 /// ```
 #[derive(Debug)]
 pub struct SinCos1 {
-    particles: InteractionParticles,
+    particles: interaction::Particles,
 }
 
 impl SinCos1 {
     pub fn new() -> Self {
-        let particles = InteractionParticles::new(&[], &[1]);
+        let particles = interaction::Particles::new(&[], &[1]);
         Self { particles }
     }
 }
 
 impl Interaction<Empty> for SinCos1 {
-    fn particles(&self) -> &InteractionParticles {
+    fn particles(&self) -> &interaction::Particles {
         &self.particles
     }
 
@@ -66,18 +63,18 @@ impl Interaction<Empty> for SinCos1 {
 /// ```
 #[derive(Debug)]
 pub struct SinCos2 {
-    particles: InteractionParticles,
+    particles: interaction::Particles,
 }
 
 impl SinCos2 {
     pub fn new() -> Self {
-        let particles = InteractionParticles::new(&[], &[2]);
+        let particles = interaction::Particles::new(&[], &[2]);
         Self { particles }
     }
 }
 
 impl Interaction<Empty> for SinCos2 {
-    fn particles(&self) -> &InteractionParticles {
+    fn particles(&self) -> &interaction::Particles {
         &self.particles
     }
 
@@ -107,7 +104,7 @@ impl Interaction<Empty> for SinCos2 {
 /// Coupled rate to produce sin and cosine
 #[test]
 fn sin_cos() -> Result<(), Box<dyn error::Error>> {
-    // crate::utilities::test::setup_logging(2);
+    // crate::utilities::test::setup_logging(4);
 
     let mut model = Empty::default();
     model.push_particle(Particle::new(0, 1.0, 1.0).name("1"));
@@ -133,18 +130,18 @@ fn sin_cos() -> Result<(), Box<dyn error::Error>> {
 /// Stable brusselator
 #[derive(Debug)]
 pub struct BrusselatorStable1 {
-    particles: InteractionParticles,
+    particles: interaction::Particles,
 }
 
 impl BrusselatorStable1 {
     pub fn new() -> Self {
-        let particles = InteractionParticles::new(&[], &[1]);
+        let particles = interaction::Particles::new(&[], &[1]);
         Self { particles }
     }
 }
 
 impl Interaction<Empty> for BrusselatorStable1 {
-    fn particles(&self) -> &InteractionParticles {
+    fn particles(&self) -> &interaction::Particles {
         &self.particles
     }
 
@@ -174,18 +171,18 @@ impl Interaction<Empty> for BrusselatorStable1 {
 /// Stable brusselatorStable
 #[derive(Debug)]
 pub struct BrusselatorStable2 {
-    particles: InteractionParticles,
+    particles: interaction::Particles,
 }
 
 impl BrusselatorStable2 {
     pub fn new() -> Self {
-        let particles = InteractionParticles::new(&[], &[2]);
+        let particles = interaction::Particles::new(&[], &[2]);
         Self { particles }
     }
 }
 
 impl Interaction<Empty> for BrusselatorStable2 {
-    fn particles(&self) -> &InteractionParticles {
+    fn particles(&self) -> &interaction::Particles {
         &self.particles
     }
 
@@ -215,7 +212,7 @@ impl Interaction<Empty> for BrusselatorStable2 {
 /// Coupled rate to produce sin and cosine
 #[test]
 fn brusselator_stable() -> Result<(), Box<dyn error::Error>> {
-    // crate::utilities::test::setup_logging(2);
+    // crate::utilities::test::setup_logging(4);
 
     let mut model = Empty::default();
     model.push_particle(Particle::new(0, 1.0, 1.0).name("1"));
@@ -240,18 +237,18 @@ fn brusselator_stable() -> Result<(), Box<dyn error::Error>> {
 /// Stable brusselator
 #[derive(Debug)]
 pub struct BrusselatorUnstable1 {
-    particles: InteractionParticles,
+    particles: interaction::Particles,
 }
 
 impl BrusselatorUnstable1 {
     pub fn new() -> Self {
-        let particles = InteractionParticles::new(&[], &[1]);
+        let particles = interaction::Particles::new(&[], &[1]);
         Self { particles }
     }
 }
 
 impl Interaction<Empty> for BrusselatorUnstable1 {
-    fn particles(&self) -> &InteractionParticles {
+    fn particles(&self) -> &interaction::Particles {
         &self.particles
     }
 
@@ -281,18 +278,18 @@ impl Interaction<Empty> for BrusselatorUnstable1 {
 /// Unstable brusselator
 #[derive(Debug)]
 pub struct BrusselatorUnstable2 {
-    particles: InteractionParticles,
+    particles: interaction::Particles,
 }
 
 impl BrusselatorUnstable2 {
     pub fn new() -> Self {
-        let particles = InteractionParticles::new(&[], &[2]);
+        let particles = interaction::Particles::new(&[], &[2]);
         Self { particles }
     }
 }
 
 impl Interaction<Empty> for BrusselatorUnstable2 {
-    fn particles(&self) -> &InteractionParticles {
+    fn particles(&self) -> &interaction::Particles {
         &self.particles
     }
 
@@ -322,7 +319,7 @@ impl Interaction<Empty> for BrusselatorUnstable2 {
 /// Coupled rate to produce sin and cosine
 #[test]
 fn brusselator_unstable() -> Result<(), Box<dyn error::Error>> {
-    // crate::utilities::test::setup_logging(2);
+    // crate::utilities::test::setup_logging(4);
 
     let mut model = Empty::default();
     model.push_particle(Particle::new(0, 1.0, 1.0).name("1"));

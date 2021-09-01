@@ -14,7 +14,15 @@ mod unit;
 const BETA_START: f64 = 1e-10;
 const BETA_END: f64 = 1e1;
 
+/// Solve the specified model using logging.
 ///
+/// The evolution is written into a csv file specified by `name` with the the
+/// number density, number density asymmetry and equilibrium densities all
+/// recorded.
+///
+/// The result is `Ok` if the model was solved successfully, and `Err` if there
+/// was any error (e.g. if any of the outputs could not be created, or if the
+/// model could not solve to the end).
 fn solve<P, M>(
     name: P,
     builder: SolverBuilder<M>,
@@ -73,7 +81,7 @@ where
 
 #[test]
 fn no_interaction() -> Result<(), Box<dyn error::Error>> {
-    // crate::utilities::test::setup_logging(2);
+    // crate::utilities::test::setup_logging(4);
 
     let mut model = Empty::default();
     model.push_particle(Particle::new(0, 1e5, 1e1).name("1"));

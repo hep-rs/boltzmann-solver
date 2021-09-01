@@ -10,7 +10,7 @@ use std::error;
 
 #[test]
 fn symmetric() -> Result<(), Box<dyn error::Error>> {
-    // crate::utilities::test::setup_logging(2);
+    // crate::utilities::test::setup_logging(4);
 
     let mut model = Empty::default();
     model.extend_particles(
@@ -64,10 +64,7 @@ fn asymmetric() -> Result<(), Box<dyn error::Error>> {
     let (n0, _na0) = (c.eq, c.na);
 
     // Run the solver
-    let (n, _na) = solve(
-        "asymmetric.csv",
-        SolverBuilder::new().model(model).fast_interaction(false),
-    )?;
+    let (n, _na) = solve("asymmetric.csv", SolverBuilder::new().model(model))?;
 
     // Check initial number densities
     approx_eq(n0[1], 1.0, 4.0, 1e-50)?;
@@ -86,7 +83,7 @@ fn asymmetric() -> Result<(), Box<dyn error::Error>> {
 
 #[test]
 fn chained_decay() -> Result<(), Box<dyn error::Error>> {
-    // crate::utilities::test::setup_logging(2);
+    // crate::utilities::test::setup_logging(4);
 
     let mut model = Empty::default();
     model.extend_particles(
