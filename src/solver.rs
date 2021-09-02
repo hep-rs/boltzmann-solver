@@ -429,7 +429,7 @@ where
                 Array2::zeros((RK_S, self.model.interactions().len())),
                 Array2::zeros((RK_S, self.model.interactions().len())),
                 Array1::zeros(RK_S),
-                Array2::zeros((RK_S, workspace.n.dim())),
+                Array2::zeros((RK_S, self.model.len_particles())),
             )
         };
 
