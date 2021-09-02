@@ -908,7 +908,6 @@
 <span id="839">839</span>
 <span id="840">840</span>
 <span id="841">841</span>
-<span id="842">842</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;solver.md&quot;</span>)]</span>
 
 <span class="kw">mod</span> <span class="ident">builder</span>;
@@ -997,8 +996,7 @@
 }
 
 <span class="doccomment">/// Workspace of functions to reuse during the integration</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">struct</span> <span class="ident">Workspace</span> {
     <span class="doccomment">/// Number density</span>
     <span class="ident">n</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
@@ -1341,7 +1339,7 @@
                 <span class="ident">Array2::zeros</span>((<span class="ident">RK_S</span>, <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">interactions</span>().<span class="ident">len</span>())),
                 <span class="ident">Array2::zeros</span>((<span class="ident">RK_S</span>, <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">interactions</span>().<span class="ident">len</span>())),
                 <span class="ident">Array1::zeros</span>(<span class="ident">RK_S</span>),
-                <span class="ident">Array2::zeros</span>((<span class="ident">RK_S</span>, <span class="ident">workspace</span>.<span class="ident">n</span>.<span class="ident">dim</span>())),
+                <span class="ident">Array2::zeros</span>((<span class="ident">RK_S</span>, <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">len_particles</span>())),
             )
         };
 
