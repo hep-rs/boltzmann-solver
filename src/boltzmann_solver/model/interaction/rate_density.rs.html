@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;model&#x2F;interaction&#x2F;rate_density.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rate_density.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;model&#x2F;interaction&#x2F;rate_density.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rate_density.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><link
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/katex@0.11/dist/katex.min.css"
   crossorigin="anonymous"
@@ -67,7 +67,7 @@
   });
 </script>
 
-<style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../boltzmann_solver/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../boltzmann_solver/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -207,8 +207,27 @@
 <span id="138">138</span>
 <span id="139">139</span>
 <span id="140">140</span>
-</pre><pre class="rust">
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">default</span>, <span class="ident">fmt</span>, <span class="ident">ops</span>};
 
@@ -227,23 +246,38 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RateDensity</span> {
     <span class="doccomment">/// Interaction rate</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is the rate as returned by [`Interaction::gamma`], which may be</span>
-    <span class="doccomment">/// scaled by the normalization factor and/or integration step size.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is used to help determine whether the interaction rate is deemed</span>
-    <span class="doccomment">/// fast or not.</span>
+    <span class="doccomment">/// This is the rate as returned by [`Interaction::gamma`], before it is</span>
+    <span class="doccomment">/// scaled by the normalization factor or integration step size.  This is</span>
+    <span class="doccomment">/// used to help determine whether the interaction rate is deemed fast or</span>
+    <span class="doccomment">/// not.</span>
     <span class="kw">pub</span> <span class="ident">gamma</span>: <span class="ident">f64</span>,
-    <span class="doccomment">/// Interaction rate</span>
+    <span class="doccomment">/// Interaction rate divided by number densities of particles deemed heavy.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is the rate as returned by [`Interaction::delta_gamma`], which may</span>
-    <span class="doccomment">/// be scaled by the normalization factor and/or integration step size.</span>
+    <span class="doccomment">/// This is the rate as returned by [`Interaction::gamma`], before it is</span>
+    <span class="doccomment">/// scaled by the normalization factor or integration step size.  This is</span>
+    <span class="doccomment">/// used to help determine whether the interaction rate is deemed fast or</span>
+    <span class="doccomment">/// not.</span>
+    <span class="kw">pub</span> <span class="ident">gamma_tilde</span>: <span class="ident">f64</span>,
+    <span class="doccomment">/// Asymmetric interaction rate</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is used to help determine whether the interaction rate is deemed</span>
-    <span class="doccomment">/// fast or not.</span>
+    <span class="doccomment">/// This is the rate as returned by [`Interaction::delta_gamma`], before it</span>
+    <span class="doccomment">/// is scaled by the normalization factor or integration step size.  This is</span>
+    <span class="doccomment">/// used to help determine whether the interaction rate is deemed fast or</span>
+    <span class="doccomment">/// not.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A value of `None` indicates that the interaction has no CP asymmetry,</span>
     <span class="doccomment">/// whereas a value of `0` indicates that there is no change.</span>
     <span class="kw">pub</span> <span class="ident">delta_gamma</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Asymmetric interaction rate divided by number densities of particles deemed heavy.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is the rate as returned by [`Interaction::delta_gamma`], before it</span>
+    <span class="doccomment">/// is scaled by the normalization factor or integration step size.  This is</span>
+    <span class="doccomment">/// used to help determine whether the interaction rate is deemed fast or</span>
+    <span class="doccomment">/// not.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A value of `None` indicates that the interaction has no CP asymmetry,</span>
+    <span class="doccomment">/// whereas a value of `0` indicates that there is no change.</span>
+    <span class="kw">pub</span> <span class="ident">delta_gamma_tilde</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Net symmetric rate</span>
     <span class="kw">pub</span> <span class="ident">symmetric</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// Net asymmetric rate</span>
@@ -256,23 +290,18 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zero</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">RateDensity</span> {
             <span class="ident">gamma</span>: <span class="number">0.0</span>,
+            <span class="ident">gamma_tilde</span>: <span class="number">0.0</span>,
             <span class="ident">delta_gamma</span>: <span class="prelude-val">None</span>,
+            <span class="ident">delta_gamma_tilde</span>: <span class="prelude-val">None</span>,
             <span class="ident">symmetric</span>: <span class="number">0.0</span>,
             <span class="ident">asymmetric</span>: <span class="number">0.0</span>,
         }
-    }
-
-    <span class="doccomment">/// Compute the ratio of the asymmetric interaction rate to the symmetric</span>
-    <span class="doccomment">/// interaction rate.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gamma_ratio</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">delta_gamma</span><span class="op">|</span> <span class="ident">delta_gamma</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">gamma</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">default::Default</span> <span class="kw">for</span> <span class="ident">RateDensity</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::zero</span>()
+        <span class="ident"><span class="self">Self</span>::zero</span>()
     }
 }
 
@@ -280,8 +309,9 @@
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(
             <span class="ident">f</span>,
-            <span class="string">&quot;RateDensity {{ symmetric: {}, asymmetric: {} }}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">symmetric</span>, <span class="self">self</span>.<span class="ident">asymmetric</span>
+            <span class="string">&quot;RateDensity {{ γ: {}, δγ: {} }}&quot;</span>,
+            <span class="self">self</span>.<span class="ident">gamma</span>,
+            <span class="self">self</span>.<span class="ident">delta_gamma</span>.<span class="ident">unwrap_or</span>(<span class="number">0.0</span>)
         )
     }
 }
@@ -290,8 +320,9 @@
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(
             <span class="ident">f</span>,
-            <span class="string">&quot;RateDensity {{ symmetric: {:e}, asymmetric: {:e} }}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">symmetric</span>, <span class="self">self</span>.<span class="ident">asymmetric</span>
+            <span class="string">&quot;RateDensity {{ γ: {:e}, δγ: {:e} }}&quot;</span>,
+            <span class="self">self</span>.<span class="ident">gamma</span>,
+            <span class="self">self</span>.<span class="ident">delta_gamma</span>.<span class="ident">unwrap_or</span>(<span class="number">0.0</span>)
         )
     }
 }
@@ -303,7 +334,9 @@
     <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">gamma</span>: <span class="self">self</span>.<span class="ident">gamma</span> <span class="op">*</span> <span class="ident">rhs</span>,
+            <span class="ident">gamma_tilde</span>: <span class="self">self</span>.<span class="ident">gamma_tilde</span> <span class="op">*</span> <span class="ident">rhs</span>,
             <span class="ident">delta_gamma</span>: <span class="self">self</span>.<span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">rhs</span>),
+            <span class="ident">delta_gamma_tilde</span>: <span class="self">self</span>.<span class="ident">delta_gamma_tilde</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">rhs</span>),
             <span class="ident">symmetric</span>: <span class="self">self</span>.<span class="ident">symmetric</span> <span class="op">*</span> <span class="ident">rhs</span>,
             <span class="ident">asymmetric</span>: <span class="self">self</span>.<span class="ident">asymmetric</span> <span class="op">*</span> <span class="ident">rhs</span>,
         }
@@ -321,7 +354,9 @@
 <span class="kw">impl</span> <span class="ident">ops::MulAssign</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RateDensity</span> {
     <span class="kw">fn</span> <span class="ident">mul_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">f64</span>) {
         <span class="self">self</span>.<span class="ident">gamma</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">rhs</span>;
+        <span class="self">self</span>.<span class="ident">gamma_tilde</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">rhs</span>;
         <span class="self">self</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">rhs</span>);
+        <span class="self">self</span>.<span class="ident">delta_gamma_tilde</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">delta_gamma_tilde</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">rhs</span>);
         <span class="self">self</span>.<span class="ident">symmetric</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">rhs</span>;
         <span class="self">self</span>.<span class="ident">asymmetric</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">rhs</span>;
     }
@@ -333,7 +368,9 @@
     <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">gamma</span>: <span class="self">self</span>.<span class="ident">gamma</span> <span class="op">/</span> <span class="ident">rhs</span>,
+            <span class="ident">gamma_tilde</span>: <span class="self">self</span>.<span class="ident">gamma_tilde</span> <span class="op">/</span> <span class="ident">rhs</span>,
             <span class="ident">delta_gamma</span>: <span class="self">self</span>.<span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">/</span> <span class="ident">rhs</span>),
+            <span class="ident">delta_gamma_tilde</span>: <span class="self">self</span>.<span class="ident">delta_gamma_tilde</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">/</span> <span class="ident">rhs</span>),
             <span class="ident">symmetric</span>: <span class="self">self</span>.<span class="ident">symmetric</span> <span class="op">/</span> <span class="ident">rhs</span>,
             <span class="ident">asymmetric</span>: <span class="self">self</span>.<span class="ident">asymmetric</span> <span class="op">/</span> <span class="ident">rhs</span>,
         }
@@ -343,12 +380,14 @@
 <span class="kw">impl</span> <span class="ident">ops::DivAssign</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RateDensity</span> {
     <span class="kw">fn</span> <span class="ident">div_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">f64</span>) {
         <span class="self">self</span>.<span class="ident">gamma</span> <span class="op">/</span><span class="op">=</span> <span class="ident">rhs</span>;
+        <span class="self">self</span>.<span class="ident">gamma_tilde</span> <span class="op">/</span><span class="op">=</span> <span class="ident">rhs</span>;
         <span class="self">self</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">/</span> <span class="ident">rhs</span>);
+        <span class="self">self</span>.<span class="ident">delta_gamma_tilde</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">delta_gamma_tilde</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">/</span> <span class="ident">rhs</span>);
         <span class="self">self</span>.<span class="ident">symmetric</span> <span class="op">/</span><span class="op">=</span> <span class="ident">rhs</span>;
         <span class="self">self</span>.<span class="ident">asymmetric</span> <span class="op">/</span><span class="op">=</span> <span class="ident">rhs</span>;
     }
 }
-</pre></div>
+</code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="boltzmann_solver" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
     <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script>
 </body></html>

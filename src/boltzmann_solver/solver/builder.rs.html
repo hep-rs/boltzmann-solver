@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;solver&#x2F;builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;solver&#x2F;builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><link
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/katex@0.11/dist/katex.min.css"
   crossorigin="anonymous"
@@ -67,7 +67,7 @@
   });
 </script>
 
-<style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../boltzmann_solver/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../boltzmann_solver/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -651,10 +651,18 @@
 <span id="582">582</span>
 <span id="583">583</span>
 <span id="584">584</span>
-</pre><pre class="rust">
-<span class="kw">use</span> <span class="kw">crate</span>::{
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">model</span>::{<span class="ident">interaction::Interaction</span>, <span class="ident">ModelInteractions</span>, <span class="ident">Particle</span>},
-    <span class="ident">solver</span>::{<span class="ident">options::StepPrecision</span>, <span class="ident">Context</span>, <span class="ident">LoggerFn</span>, <span class="ident">Solver</span>},
+    <span class="ident">solver</span>::{
+        <span class="ident">options</span>::{<span class="ident">ErrorTolerance</span>, <span class="ident">StepPrecision</span>},
+        <span class="ident">Context</span>, <span class="ident">LoggerFn</span>, <span class="ident">Solver</span>,
+    },
     <span class="ident">utilities::rec_geomspace</span>,
 };
 <span class="kw">use</span> <span class="ident">ndarray::prelude</span>::<span class="kw-2">*</span>;
@@ -729,8 +737,8 @@
     <span class="ident">logger</span>: <span class="ident">LoggerFn</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Step precision (i.e. step size) allowed</span>
     <span class="ident">step_precision</span>: <span class="ident">StepPrecision</span>,
-    <span class="doccomment">/// Local error allowed to determine step size</span>
-    <span class="ident">error_tolerance</span>: <span class="ident">f64</span>,
+    <span class="doccomment">/// Local error allowed to determine step size as absolute and relative.</span>
+    <span class="ident">error_tolerance</span>: <span class="ident">ErrorTolerance</span>,
     <span class="doccomment">/// Whether interactions are precomputed or not</span>
     <span class="ident">precompute</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Whether fast interactions are enabled</span>
@@ -750,9 +758,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
     <span class="doccomment">/// use boltzmann_solver::prelude::*;</span>
-    <span class="doccomment">/// use boltzmann_solver::model::StandardModel;</span>
+    <span class="doccomment">/// use boltzmann_solver::model::Standard;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut solver_builder: SolverBuilder&lt;StandardModel&gt; = SolverBuilder::new()</span>
+    <span class="doccomment">/// let mut solver_builder: SolverBuilder&lt;Standard&gt; = SolverBuilder::new()</span>
     <span class="doccomment">///     // .logger(..)</span>
     <span class="doccomment">///     // .initial_densities(..)</span>
     <span class="doccomment">///     .beta_range(1e-10, 1e-6);</span>
@@ -770,9 +778,9 @@
             <span class="ident">no_asymmetry</span>: <span class="ident">HashSet::new</span>(),
             <span class="ident">logger</span>: <span class="ident">Box::new</span>(<span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {}),
             <span class="ident">step_precision</span>: <span class="ident">StepPrecision::default</span>(),
-            <span class="ident">error_tolerance</span>: <span class="number">1e-4</span>,
+            <span class="ident">error_tolerance</span>: <span class="ident">ErrorTolerance::default</span>(),
             <span class="ident">precompute</span>: <span class="bool-val">true</span>,
-            <span class="ident">fast_interactions</span>: <span class="bool-val">false</span>,
+            <span class="ident">fast_interactions</span>: <span class="bool-val">true</span>,
             <span class="ident">abort_when_inaccurate</span>: <span class="bool-val">false</span>,
         }
     }
@@ -957,7 +965,15 @@
     <span class="doccomment">/// Specify the local error tolerance.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The algorithm will adjust the evolution step size such that the local</span>
-    <span class="doccomment">/// error remains less than the specified the error tolerance.</span>
+    <span class="doccomment">/// error remains less than the specified the error tolerance. Specifically,</span>
+    <span class="doccomment">/// given absolute and relative tolerances `$\varepsilon_\text{abs}$` and</span>
+    <span class="doccomment">/// `$\varepsilon_\text{rel}$`, the local error be less than</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```math</span>
+    <span class="doccomment">/// \text{error} \leq \varepsilon_\text{abs} + \varepsilon_\text{rel} \cdot y</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// where `$y$` is the relevant value that is being adjusted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note that the error is only ever estimated and thus may occasionally be</span>
     <span class="doccomment">/// inaccurate.  Furthermore, the [`Solver::step_precision`] takes</span>
@@ -967,9 +983,10 @@
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if the tolerance is less than or equal to 0.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_tolerance</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tol</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="macro">assert!</span>(<span class="ident">tol</span> <span class="op">&gt;</span> <span class="number">0.0</span>, <span class="string">&quot;The tolerance must be greater than 0.&quot;</span>);
-        <span class="self">self</span>.<span class="ident">error_tolerance</span> <span class="op">=</span> <span class="ident">tol</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_tolerance</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">abs</span>: <span class="ident">f64</span>, <span class="ident">rel</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="macro">assert!</span>(<span class="ident">abs</span> <span class="op">&gt;</span> <span class="number">0.0</span>, <span class="string">&quot;The absolute tolerance must be greater than 0.&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">rel</span> <span class="op">&gt;</span> <span class="number">0.0</span>, <span class="string">&quot;The relative tolerance must be greater than 0.&quot;</span>);
+        <span class="self">self</span>.<span class="ident">error_tolerance</span> <span class="op">=</span> <span class="ident">ErrorTolerance</span> { <span class="ident">abs</span>, <span class="ident">rel</span> };
         <span class="self">self</span>
     }
 
@@ -1010,7 +1027,7 @@
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">particles</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">normalized_number_density</span>(<span class="number">0.0</span>, <span class="ident">beta</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">normalized_number_density</span>(<span class="ident">beta</span>, <span class="number">0.0</span>))
             .<span class="ident">collect</span>();
 
         <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="ident">ni</span>) <span class="kw">in</span> <span class="ident">initial_densities</span> {
@@ -1023,10 +1040,7 @@
         }
 
         <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="op">!</span><span class="ident">v</span>.<span class="ident">is_finite</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">is_nan</span>()) {
-            <span class="macro">log::error!</span>(
-                <span class="string">&quot;Some of initial densities are not finite or NaN:\n{:.3e}&quot;</span>,
-                <span class="ident">n</span>
-            );
+            <span class="macro">log::error!</span>(<span class="string">&quot;Some of initial densities are infinite or NaN:\n{:.3e}&quot;</span>, <span class="ident">n</span>);
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidInitialDensities</span>);
         }
 
@@ -1054,10 +1068,7 @@
         }
 
         <span class="kw">if</span> <span class="ident">na</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="op">!</span><span class="ident">v</span>.<span class="ident">is_finite</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">is_nan</span>()) {
-            <span class="macro">log::error!</span>(
-                <span class="string">&quot;Some of initial densities are not finite or NaN:\n{:.3e}&quot;</span>,
-                <span class="ident">na</span>
-            );
+            <span class="macro">log::error!</span>(<span class="string">&quot;Some of initial densities are infinite or NaN:\n{:.3e}&quot;</span>, <span class="ident">na</span>);
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidInitialAsymmetries</span>);
         }
 
@@ -1168,12 +1179,12 @@
         <span class="comment">// If no initial densities were given, all particles are assumed to be</span>
         <span class="comment">// in equilibrium.</span>
         <span class="kw">let</span> <span class="ident">initial_densities</span> <span class="op">=</span>
-            <span class="self">Self</span><span class="ident">::generate_initial_densities</span>(<span class="ident">beta_range</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">particles</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">initial_densities</span>)<span class="question-mark">?</span>;
+            <span class="ident"><span class="self">Self</span>::generate_initial_densities</span>(<span class="ident">beta_range</span>.<span class="number">0</span>, <span class="ident">particles</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">initial_densities</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// If no initial asymmetries were given, all particles are assumed to be</span>
         <span class="comment">// in equilibrium with no asymmetry.</span>
         <span class="kw">let</span> <span class="ident">initial_asymmetries</span> <span class="op">=</span>
-            <span class="self">Self</span><span class="ident">::generate_initial_asymmetries</span>(<span class="kw-2">&amp;</span><span class="ident">particles</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">initial_asymmetries</span>)<span class="question-mark">?</span>;
+            <span class="ident"><span class="self">Self</span>::generate_initial_asymmetries</span>(<span class="ident">particles</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">initial_asymmetries</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// Make sure that there aren&#39;t too many particles held in equilibrium or</span>
         <span class="comment">// forbidden from developing any asymmetry.  We also sort and remove</span>
@@ -1198,7 +1209,7 @@
             }));
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">no_asymmetry</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">particles</span>.<span class="ident">len</span>() {
             <span class="macro">log::error!</span>(
-                <span class="string">&quot;There are more particles with 0 asymmetry ({}) than particles in the model ({}).&quot;</span>,
+                <span class="string">&quot;There are more particles with no asymmetry ({}) than particles in the model ({}).&quot;</span>,
                 <span class="self">self</span>.<span class="ident">no_asymmetry</span>.<span class="ident">len</span>(),
                 <span class="ident">particles</span>.<span class="ident">len</span>()
             );
@@ -1233,10 +1244,10 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SolverBuilder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::new</span>()
+        <span class="ident"><span class="self">Self</span>::new</span>()
     }
 }
-</pre></div>
+</code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="boltzmann_solver" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>
