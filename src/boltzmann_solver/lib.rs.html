@@ -232,6 +232,7 @@
 <span id="163">163</span>
 <span id="164">164</span>
 <span id="165">165</span>
+<span id="166">166</span>
 </pre><pre class="rust"><code><span class="comment">// Boltzmann-solver</span>
 <span class="comment">// Copyright (C) 2020  JP-Ellis &lt;josh@jpells.me&gt;</span>
 
@@ -375,7 +376,8 @@
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::non_ascii_literal</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::similar_names</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::many_single_char_names</span>)]</span>
-<span class="comment">// #![allow(clippy::cast_precision_loss)] // Check this warning occasionally</span>
+<span class="comment">// #![allow(clippy::cast_precision_loss)] // Check this swarning occasionally</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::doc_markdown</span>)]</span> <span class="comment">// Clippy incorrectly thinkgs that &#39;GeV&#39; refers to code.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">test</span>;
