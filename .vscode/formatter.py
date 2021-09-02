@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Formatting of Rust NDarray and particles.
+Formatting of Rust NDarray and types from the Boltzmann-Solver.
 
 To use this, add the following to your workspace settings:
 
@@ -18,6 +18,7 @@ import lldb
 import sys
 import logging
 import weakref
+from functools import reduce
 
 
 log = logging.getLogger(__name__)
@@ -183,12 +184,21 @@ def particle_summary_provider(obj, dict={}):
 class ArrayBaseSynthProvider:
     def __init__(self, valobj: lldb.SBValue, dict={}):
         self.valobj = valobj
-        self.ptr = gcm(self.valobj, "data", "ptr", "pointer")
-        self.len = gcm(self.valobj, "data", "len").GetValueAsUnsigned()
-        self.capacity = gcm(self.valobj, "data", "capacity").GetValueAsUnsigned()
+        self.ptr = gcm(self.valobj, "ptr", "pointer")
         self.item_type = self.ptr.GetType().GetPointeeType()
         self.item_size = self.item_type.GetByteSize()
-        # print(f"ptr = {self.ptr}; len = {self.len}")
+
+        # The dim and strides requires more processing
+        self.dim = [
+            v.GetValueAsUnsigned()
+            for v in gcm(self.valobj, "dim", "index").get_value_child_list()
+        ]
+        self.strides = [
+            v.GetValueAsUnsigned()
+            for v in gcm(self.valobj, "strides", "index").get_value_child_list()
+        ]
+        self.len = reduce(lambda p, i: p * i, self.dim, 1)
+
         synth_by_id[valobj.GetID()] = self
 
     def update(self):
@@ -202,10 +212,16 @@ class ArrayBaseSynthProvider:
 
     def get_child_at_index(self, index):
         try:
-            if not 0 <= index < self.len:
+            if not 0 <= index < self.num_children():
                 return None
             offset = index * self.item_size
-            return self.ptr.CreateChildAtOffset("[%s]" % index, offset, self.item_type)
+            index_list = []
+            for stride in self.strides:
+                index_list.append(index // stride)
+                index = index % stride
+            return self.ptr.CreateChildAtOffset(
+                "%s" % index_list, offset, self.item_type
+            )
         except Exception as e:
             log.error("%s", e)
             raise
