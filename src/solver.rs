@@ -86,8 +86,7 @@ struct Debug<'a> {
 }
 
 /// Workspace of functions to reuse during the integration
-#[cfg(feature = "serde")]
-#[derive(Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 struct Workspace {
     /// Number density
     n: Array1<f64>,
