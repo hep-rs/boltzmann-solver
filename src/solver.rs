@@ -5,6 +5,7 @@ mod context;
 pub(crate) mod options;
 pub(crate) mod tableau;
 
+#[allow(clippy::useless_attribute)] // Waiting on rust-lang/rust-clippy#7511
 #[allow(clippy::module_name_repetitions)]
 pub use builder::SolverBuilder;
 pub use context::Context;

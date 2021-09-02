@@ -141,7 +141,8 @@
 #![allow(clippy::non_ascii_literal)]
 #![allow(clippy::similar_names)]
 #![allow(clippy::many_single_char_names)]
-// #![allow(clippy::cast_precision_loss)] // Check this warning occasionally
+// #![allow(clippy::cast_precision_loss)] // Check this swarning occasionally
+#![allow(clippy::doc_markdown)] // Clippy incorrectly thinkgs that 'GeV' refers to code.
 
 #[cfg(feature = "nightly")]
 extern crate test;
