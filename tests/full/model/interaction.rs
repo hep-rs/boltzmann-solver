@@ -102,15 +102,12 @@ pub fn hln() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
             2.0 * m.yv[[i3, i2]].norm_sqr() * (p1.mass2 - p2.mass2 - p3.mass2).abs()
         };
 
-        interactions.extend(
-            interaction::ThreeParticle::new_all(
-                squared_amplitude,
-                LeptogenesisModel::static_particle_num("H", i1).unwrap(),
-                -LeptogenesisModel::static_particle_num("L", i2).unwrap(),
-                LeptogenesisModel::static_particle_num("N", i3).unwrap(),
-            )
-            .drain(..),
-        );
+        interactions.append(&mut interaction::ThreeParticle::new_all(
+            squared_amplitude,
+            LeptogenesisModel::static_particle_num("H", i1).unwrap(),
+            -LeptogenesisModel::static_particle_num("L", i2).unwrap(),
+            LeptogenesisModel::static_particle_num("N", i3).unwrap(),
+        ));
 
         let len = interactions.len();
         interactions[len - 3..].iter_mut().for_each(|i| {
