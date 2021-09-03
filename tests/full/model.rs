@@ -28,7 +28,7 @@ pub struct LeptogenesisModel {
     ///
     /// We could (re)define all the parameters of the Standard Model, but it is
     /// easier declare it as sub-struct of our model.
-    pub sm: Standard,
+    pub sm: StandardModel,
     /// Lightest SM neutrino mass in GeV.
     pub m1: f64,
     /// Heavy neutrino masses.
@@ -169,7 +169,7 @@ impl LeptogenesisModel {
 
 impl Model for LeptogenesisModel {
     fn zero() -> Self {
-        let mut sm = Standard::zero();
+        let mut sm = StandardModel::zero();
 
         let mn = array![1e6, 1e8, 1e10];
         sm.particles
@@ -267,7 +267,7 @@ impl Model for LeptogenesisModel {
             (_, i) => Err((name, i)),
         };
 
-        idx.or_else(|(name, i)| Standard::static_particle_idx(name, i))
+        idx.or_else(|(name, i)| StandardModel::static_particle_idx(name, i))
     }
 }
 
