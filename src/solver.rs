@@ -82,7 +82,7 @@ struct Debug<'a> {
     workspace: &'a Workspace,
     gammas: &'a Array2<f64>,
     delta_gammas: &'a Array2<f64>,
-    fast: bool,
+    fast: Vec<bool>,
 }
 
 /// Workspace of functions to reuse during the integration
@@ -533,7 +533,6 @@ where
 
                 // Compute k[i] and ka[i] from each interaction
                 self.compute_ki(&mut ki, &mut kai, &ci);
-                fix_equilibrium(&ci, &mut ki, &mut kai);
                 fast_interactions = ci.into_fast_interactions();
                 workspace.compute_dn(i);
             }
@@ -550,15 +549,11 @@ where
             );
 
             Self::fix_fast_interactions(&c, &mut workspace, &eq);
-            fix_equilibrium(
-                &c,
-                &mut workspace.dn.view_mut(),
-                &mut workspace.dna.view_mut(),
-            );
+            fix_equilibrium(&c, &mut workspace.dn, &mut workspace.dna);
 
             #[cfg(all(feature = "debug", debug_assertions))]
             serde_json::to_writer(
-                std::fs::File::create({ debug_dir.join(format!("{}.json", step)) }).unwrap(),
+                std::fs::File::create(debug_dir.join(format!("{}.json", step))).unwrap(),
                 &Debug {
                     step,
                     beta,
@@ -569,11 +564,18 @@ where
                     normalizations: &normalizations,
                     gammas: &gammas,
                     delta_gammas: &delta_gammas,
-                    fast: c
-                        .fast_interactions
-                        .as_ref()
-                        .and_then(|v| v.read().ok())
-                        .map_or(false, |v| !v.is_empty()),
+                    fast: self
+                        .model
+                        .interactions()
+                        .iter()
+                        .map(|i| i.particles())
+                        .map(|p| {
+                            c.fast_interactions
+                                .as_ref()
+                                .and_then(|f| f.read().ok())
+                                .map_or(false, |f| f.contains(p))
+                        })
+                        .collect(),
                 },
             )
             .unwrap();
