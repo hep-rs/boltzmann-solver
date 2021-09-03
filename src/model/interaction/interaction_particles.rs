@@ -1,5 +1,5 @@
 use crate::{
-    model::interaction::{checked_div, fix_equilibrium, FastInteractionResult},
+    model::interaction::{checked_div, FastInteractionResult},
     prelude::{Context, Model},
 };
 use ndarray::prelude::*;
@@ -1169,7 +1169,7 @@ impl Particles {
     #[must_use]
     pub fn fast_interaction_de<M: Model>(
         &self,
-        c: &Context<M>,
+        context: &Context<M>,
         eq0: &Array2<f64>,
     ) -> FastInteractionResult {
         use crate::solver::tableau::{self, RK_A, RK_B, RK_C, RK_E, RK_S};
@@ -1178,34 +1178,34 @@ impl Particles {
         #[cfg(feature = "parallel")]
         use ndarray::par_azip as zip;
 
-        let mut result = FastInteractionResult::zero(c.n.dim());
+        let mut result = FastInteractionResult::zero(context.n.dim());
 
         if self.gamma_tilde.is_none() && self.delta_gamma_tilde.is_none() {
             log::warn!(
-                "[{}.{:02}|{:>10.4e}] Attempted to solve a fast interactions but neither γ̃ nor δγ̃ where set; result is trivially 0.", c.step, 
-                c.substep, c.beta);
+                "[{}.{:02}|{:>10.4e}] Attempted to solve a fast interactions but neither γ̃ nor δγ̃ where set; result is trivially 0.", context.step, 
+                context.substep, context.beta);
             return result;
         }
 
         // To avoid the need to compute the equilibrium number density for all
         // particles, we use the values that were already computed in the main
         // Runge-Kutta routine and interpolate in between.
-        let mut eq = Array1::from_shape_simple_fn(c.n.dim(), || {
+        let mut eq = Array1::from_shape_simple_fn(context.n.dim(), || {
             crate::utilities::spline::CubicHermite::empty()
         });
         for ((i, p), &v) in eq0.indexed_iter() {
-            eq[p].add(c.beta + RK_C[i] * c.step_size, v);
+            eq[p].add(context.beta + RK_C[i] * context.step_size, v);
         }
 
         let gamma_tilde = self.gamma_tilde.unwrap_or_default();
         let delta_gamma_tilde = self.delta_gamma_tilde.unwrap_or_default();
 
-        let mut beta = c.beta;
-        let mut h = c.step_size;
-        let mut n = c.n.clone();
-        let mut na = c.na.clone();
-        let mut n_err = Array1::zeros(c.n.dim());
-        let mut na_err = Array1::zeros(c.na.dim());
+        let mut beta = context.beta;
+        let mut h = context.step_size;
+        let mut n = context.n.clone();
+        let mut na = context.na.clone();
+        let mut n_err = Array1::zeros(context.n.dim());
+        let mut na_err = Array1::zeros(context.na.dim());
         let mut dn = Array1::zeros(n.dim());
         let mut dna = Array1::zeros(na.dim());
         let mut dn_err = Array1::zeros(n.dim());
@@ -1217,7 +1217,7 @@ impl Particles {
 
         let mut step = 0_usize;
         let mut steps_discarded = 0_usize;
-        while beta < c.beta + c.step_size {
+        while beta < context.beta + context.step_size {
             step += 1;
 
             k.fill(0.0);
@@ -1230,6 +1230,7 @@ impl Particles {
             for i in 0..RK_S {
                 let beta_i = beta + RK_C[i] * h;
 
+                // Get the inputs to buld the sub-steps
                 let ai = RK_A[i];
                 let ni = (0..i).fold(n.clone(), |total, j| {
                     total + ai[j] * &k.slice(ndarray::s![j, ..])
@@ -1239,27 +1240,38 @@ impl Particles {
                 });
                 let eqi = eq.map(|eq| eq.sample(beta_i));
 
-                let v = self.symmetric_prefactor(&ni, &eqi, c.in_equilibrium);
+                // Compute the prefactors
+                let v = self.symmetric_prefactor(&ni, &eqi, context.in_equilibrium);
                 let symmetric_prefactor = checked_div(v.0 .0, v.0 .1) - checked_div(v.1 .0, v.1 .1);
-                let v =
-                    self.asymmetric_prefactor(&ni, &nai, &eqi, c.in_equilibrium, c.no_asymmetry);
+                let v = self.asymmetric_prefactor(
+                    &ni,
+                    &nai,
+                    &eqi,
+                    context.in_equilibrium,
+                    context.no_asymmetry,
+                );
                 let asymmetric_prefactor =
                     checked_div(v.0 .0, v.0 .1) - checked_div(v.1 .0, v.1 .1);
 
+                // Compute the changes
                 let mut symmetric_delta = h * gamma_tilde * symmetric_prefactor;
                 let mut asymmetric_delta = h
                     * (gamma_tilde * asymmetric_prefactor
                         + delta_gamma_tilde * symmetric_prefactor);
 
-                self.adjust_overshoot(&mut symmetric_delta, &mut asymmetric_delta, c);
+                // Adjust for possible overshoots
+                self.adjust_overshoot(&mut symmetric_delta, &mut asymmetric_delta, context);
 
                 let mut ki = k.slice_mut(ndarray::s![i, ..]);
                 let mut kai = ka.slice_mut(ndarray::s![i, ..]);
-                fix_equilibrium(c, &mut ki, &mut kai);
 
                 for (&p, &(c, ca)) in &self.particle_counts {
-                    ki[p] = c * symmetric_delta;
-                    kai[p] = ca * asymmetric_delta;
+                    if context.in_equilibrium.binary_search(&p).is_err() {
+                        ki[p] = c * symmetric_delta;
+                    }
+                    if context.no_asymmetry.binary_search(&p).is_err() {
+                        kai[p] = ca * asymmetric_delta;
+                    }
                 }
 
                 let bi = RK_B[i];
@@ -1316,30 +1328,32 @@ impl Particles {
             }
 
             h *= delta;
-            if beta + h > c.beta + c.step_size {
-                h = (c.beta - beta) + c.step_size;
+            if beta + h > context.beta + context.step_size {
+                h = (context.beta - beta) + context.step_size;
             }
         }
 
         log::trace!(
             "[{}.{:02}|{:>10.4e}] (Fast Interaction {}) Number of integration steps: {}",
-            c.step,
-            c.substep,
-            c.beta,
-            self.display(c.model)
+            context.step,
+            context.substep,
+            context.beta,
+            self.display(context.model)
                 .unwrap_or_else(|_| self.short_display()),
             step - steps_discarded
         );
         log::trace!(
-            "[{}.{:02}|{:>10.4e}] (Fast Interaction)  Number of integration steps discarded: {}",
-            c.step,
-            c.substep,
-            c.beta,
+            "[{}.{:02}|{:>10.4e}] (Fast Interaction {})  Number of integration steps discarded: {}",
+            context.step,
+            context.substep,
+            context.beta,
+            self.display(context.model)
+                .unwrap_or_else(|_| self.short_display()),
             steps_discarded
         );
 
-        result.dn = n - &c.n;
-        result.dna = na - &c.na;
+        result.dn = n - &context.n;
+        result.dna = na - &context.na;
 
         #[allow(clippy::cast_precision_loss)]
         let scaling = f64::sqrt(step as f64);
@@ -2541,5 +2555,40 @@ mod tests {
         assert_eq!(interaction.short_display(), "-5 1 3 ↔ 2");
         assert_eq!(interaction.short_display(), format!("{}", interaction));
         assert_eq!(interaction.display(&model), Err(super::DisplayError(-5)));
+    }
+
+    #[test]
+    #[ignore]
+    #[allow(unused_variables)]
+    fn custom() -> Result<(), Box<dyn error::Error>> {
+        // crate::utilities::test::setup_logging(4);
+
+        let json: serde_json::Value = serde_json::from_str(
+            r#"{
+            "incoming": [-1],
+            "outgoing": [-8, 8],
+            "n": [0e0, 2.731170122794779e0, 7.894600157535281e0, 1.6e1, 3.505596731253524e0, 2.9758927832169597e0, 2.9782647739662647e0, 2.9781824734365943e0, 1.491409864202531e0, 1.4897755109189428e0, 1.489773681007985e0, 8.873264896398966e0, 8.873259343930801e0, 8.772384088247565e0, 4.445806934182702e0, 4.448057006224749e0, 4.397343483428915e0, 4.447770899514355e0, 4.458083563050498e0, 4.458053295312409e0, 1.4625225531011217e0, 1.4998479640881337e0, 1.4996319827140796e0],
+            "na": [0e0, 0e0, 0e0, 0e0, 0e0, 0e0, 0e0, 0e0, 0e0, 0e0, 0e0, 0e0, 0e0, 0e0, 0e0, 0e0, 0e0, 0e0, 0e0, 0e0, 0e0, 0e0, 0e0],
+            "eq": [0e0, 2.731170122794779e0, 7.894600157535281e0, 1.6e1, 3.505017646844825e0, 2.975739851330491e0, 2.9759780274355996e0, 2.97589589779806e0, 1.491483724947275e0, 1.4914837184332563e0, 1.4914818826617582e0, 8.806656758326614e0, 8.806651304262218e0, 8.707477376124054e0, 4.421202048497358e0, 4.421199310184246e0, 4.371191174797107e0, 4.429408461543472e0, 4.429408446831298e0, 4.429378665682162e0, 1.3717587275217438e0, 3.692705742853413e-27, 0e0],
+            "in_equilibrium": [1, 2, 3],
+            "no_asymmetry": [0, 1, 2, 3, 20, 21, 22]
+        }"#,
+        )?;
+        let interaction = Particles::new(
+            &serde_json::from_value::<Vec<_>>(json["incoming"].clone())?,
+            &serde_json::from_value::<Vec<_>>(json["outgoing"].clone())?,
+        );
+        // interaction.gamma_ratio()
+
+        let n: Array1<f64> = serde_json::from_value(json["n"].clone())?;
+        let na: Array1<f64> = serde_json::from_value(json["na"].clone())?;
+        let eq: Array1<f64> = serde_json::from_value(json["eq"].clone())?;
+
+        let in_equilibrium: Vec<usize> = serde_json::from_value(json["in_equilibrium"].clone())?;
+        let no_asymmetry: Vec<usize> = serde_json::from_value(json["no_asymmetry"].clone())?;
+
+        log::info!("{}", interaction);
+
+        Ok(())
     }
 }
