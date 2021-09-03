@@ -375,14 +375,11 @@ pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
     let iter = v.into_iter().enumerate();
 
     iter.for_each(|(i, beta)| {
+        log::debug!("[β = {:.3e}, i = {}]", beta, i);
+
         let csv = csv::Writer::from_path(output_dir.join(format!("{:03}.csv", i))).unwrap();
 
         let mut model = LeptogenesisModel::zero();
-        // for i in &[interaction::hha, interaction::hhw] {
-        //     model
-        //         .interactions
-        //         .extend(i().drain(..).map(into_interaction_box));
-        // }
         for i in &[interaction::hhaa, interaction::hhww, interaction::hhaw] {
             model
                 .interactions
@@ -390,7 +387,7 @@ pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
         }
 
         let p_h = model.particle_idx("H", 0).unwrap();
-        let n_eq = model.particles()[p_h].normalized_number_density(0.0, beta);
+        let n_eq = model.particles()[p_h].normalized_number_density(beta, 0.0);
 
         // Collect the names now as SolverBuilder takes ownership of the model
         // later.
@@ -399,8 +396,7 @@ pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
         let builder = SolverBuilder::new()
             .model(model)
             .beta_range(beta, beta * 1e3)
-            .initial_densities([(p_h, 1.1 * n_eq)])
-            .fast_interaction(true);
+            .initial_densities([(p_h, 1.1 * n_eq)]);
 
         solve(builder, &names, Some(csv)).unwrap();
     });
@@ -423,6 +419,8 @@ pub fn lepton_equilibrium() -> Result<(), Box<dyn error::Error>> {
     let iter = v.into_iter().enumerate();
 
     iter.for_each(|(i, beta)| {
+        log::debug!("[β = {:.3e}, i = {}]", beta, i);
+
         let csv = csv::Writer::from_path(output_dir.join(format!("{:03}.csv", i))).unwrap();
 
         let mut model = LeptogenesisModel::zero();
@@ -437,7 +435,7 @@ pub fn lepton_equilibrium() -> Result<(), Box<dyn error::Error>> {
         }
 
         let p_l = model.particle_idx("L", 0).unwrap();
-        let n_eq = model.particles()[p_l].normalized_number_density(0.0, beta);
+        let n_eq = model.particles()[p_l].normalized_number_density(beta, 0.0);
 
         // Collect the names now as SolverBuilder takes ownership of the model
         // later.
