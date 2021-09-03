@@ -407,14 +407,18 @@ pub trait Interaction<M: Model> {
         &self,
         dn: &mut ArrayViewMut1<f64>,
         dna: &mut ArrayViewMut1<f64>,
-        c: &Context<M>,
+        context: &Context<M>,
     ) {
-        if let Some(rate) = self.adjusted_rate(c) {
+        if let Some(rate) = self.adjusted_rate(context) {
             let particles = self.particles();
 
             for (&p, &(c, ca)) in &particles.particle_counts {
-                dn[p] += c * rate.symmetric;
-                dna[p] += ca * rate.asymmetric;
+                if context.in_equilibrium.binary_search(&p).is_err() {
+                    dn[p] += c * rate.symmetric;
+                }
+                if context.no_asymmetry.binary_search(&p).is_err() {
+                    dna[p] += ca * rate.asymmetric;
+                }
             }
         }
     }
@@ -475,13 +479,9 @@ pub(crate) fn checked_mul(a: f64, b: f64) -> f64 {
 ///   interaction going on.
 /// - Particles which have no asymmetry, irrespective if any interaction
 ///   going on.
-pub fn fix_equilibrium<M>(
-    c: &Context<M>,
-    dn: &mut ArrayViewMut1<f64>,
-    dna: &mut ArrayViewMut1<f64>,
-) {
+pub fn fix_equilibrium<M>(c: &Context<M>, dn: &mut Array1<f64>, dna: &mut Array1<f64>) {
     for &p in c.in_equilibrium {
-        dn[p] = c.n[p] - c.eqn[p];
+        dn[p] = c.eqn[p] - c.n[p];
     }
     for &p in c.no_asymmetry {
         dna[p] = -c.na[p];
