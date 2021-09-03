@@ -7,7 +7,6 @@ use crate::{
         Model,
     },
     solver::Context,
-    utilities::spline::Spline,
 };
 use std::{fmt, sync::RwLock};
 
@@ -18,16 +17,19 @@ use std::{fmt, sync::RwLock};
 /// amplitude.
 pub struct FourParticle<M> {
     particles: interaction::Particles,
+
     /// Squared amplitude as a function of the model.
     squared_amplitude: Box<dyn Fn(&M, f64, f64, f64) -> f64 + Sync>,
-    // gamma_spline_real: RwLock<Spline>,
-    // gamma_spline_on_n: RwLock<Spline>,
     #[allow(clippy::type_complexity)]
     asymmetry: Option<Box<dyn Fn(&M, f64, f64, f64) -> f64 + Sync>>,
-    asymmetry_spline_true: RwLock<Spline>,
-    asymmetry_spline_false: RwLock<Spline>,
+
     gamma_enabled: bool,
     width_enabled: bool,
+
+    gamma: RwLock<f64>,
+    gamma_tilde: RwLock<f64>,
+    delta_gamma: RwLock<f64>,
+    delta_gamma_tilde: RwLock<f64>,
 }
 
 impl<M> FourParticle<M> {
@@ -57,13 +59,13 @@ impl<M> FourParticle<M> {
         Self {
             particles,
             squared_amplitude: Box::new(squared_amplitude),
-            // gamma_spline_real: RwLock::new(Spline::empty()),
-            // gamma_spline_on_n: RwLock::new(Spline::empty()),
             asymmetry: None,
-            asymmetry_spline_true: RwLock::new(Spline::empty()),
-            asymmetry_spline_false: RwLock::new(Spline::empty()),
             width_enabled: false,
             gamma_enabled: true,
+            gamma: RwLock::new(0.0),
+            gamma_tilde: RwLock::new(0.0),
+            delta_gamma: RwLock::new(0.0),
+            delta_gamma_tilde: RwLock::new(0.0),
         }
     }
 
@@ -189,16 +191,20 @@ where
             return None;
         }
 
-        // let ln_beta = c.beta.ln();
-        // if let Ok(spline) = if real {
-        //     self.gamma_spline_real.read()
-        // } else {
-        //     self.gamma_spline_on_n.read()
-        // } {
-        //     if spline.accurate(ln_beta) {
-        //         return Some(spline.sample(ln_beta));
-        //     }
-        // }
+        // If we aren't in the first substep, we use the precomputed value.
+        match (c.substep > 0, real) {
+            (false, _) => (),
+            (true, true) => {
+                if let Ok(gamma) = self.gamma.read() {
+                    return Some(*gamma);
+                }
+            }
+            (true, false) => {
+                if let Ok(gamma_tilde) = self.gamma_tilde.read() {
+                    return Some(*gamma_tilde);
+                }
+            }
+        }
 
         let ptcl = c.model.particles();
 
@@ -212,31 +218,20 @@ where
             let u = p1.mass2 + p2.mass2 + p3.mass2 + p4.mass2 - s - t;
             (self.squared_amplitude)(c.model, s, t, u).abs()
         };
+
         let gamma = if real {
-            utilities::integrate_st(integrand, c.beta, p1, p2, p3, p4)
+            let gamma = utilities::integrate_st(integrand, c.beta, p1, p2, p3, p4);
+            if let Ok(mut lock) = self.gamma.write() {
+                *lock = gamma;
+            }
+            gamma
         } else {
-            utilities::integrate_st_on_n(integrand, c.beta, p1, p2, p3, p4)
+            let gamma_tilde = utilities::integrate_st_on_n(integrand, c.beta, p1, p2, p3, p4);
+            if let Ok(mut lock) = self.gamma_tilde.write() {
+                *lock = gamma_tilde;
+            }
+            gamma_tilde
         };
-
-        // debug_assert!(
-        //     gamma.is_finite(),
-        //     "[{}.{:02}|{:>10.4e}] Computed a non-finit value for γ in interaction {}: {}",
-        //     c.step,
-        //     c.substep,
-        //     c.beta,
-        //     self.particles()
-        //         .display(c.model)
-        //         .unwrap_or_else(|_| self.particles().short_display()),
-        //     gamma
-        // );
-
-        // if let Ok(mut spline) = if real {
-        //     self.gamma_spline_real.write()
-        // } else {
-        //     self.gamma_spline_on_n.write()
-        // } {
-        //     spline.add(ln_beta, gamma);
-        // }
 
         Some(gamma)
     }
@@ -244,14 +239,18 @@ where
     fn delta_gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
         let asymmetry = self.asymmetry.as_ref()?;
 
-        let ln_beta = c.beta.ln();
-        if let Ok(spline) = if real {
-            self.asymmetry_spline_true.read()
-        } else {
-            self.asymmetry_spline_false.read()
-        } {
-            if spline.accurate(ln_beta) {
-                return Some(spline.sample(ln_beta));
+        // If we aren't in the first substep, we use the precomputed value.
+        match (c.substep > 0, real) {
+            (false, _) => (),
+            (true, true) => {
+                if let Ok(gamma) = self.delta_gamma.read() {
+                    return Some(*gamma);
+                }
+            }
+            (true, false) => {
+                if let Ok(gamma_tilde) = self.delta_gamma_tilde.read() {
+                    return Some(*gamma_tilde);
+                }
             }
         }
 
@@ -266,31 +265,20 @@ where
             let u = p1.mass2 + p2.mass2 + p3.mass2 + p4.mass2 - s - t;
             asymmetry(c.model, s, t, u).abs()
         };
+
         let delta_gamma = if real {
-            utilities::integrate_st(integrand, c.beta, p1, p2, p3, p4)
+            let gamma = utilities::integrate_st(integrand, c.beta, p1, p2, p3, p4);
+            if let Ok(mut lock) = self.delta_gamma.write() {
+                *lock = gamma;
+            }
+            gamma
         } else {
-            utilities::integrate_st_on_n(integrand, c.beta, p1, p2, p3, p4)
+            let gamma_tilde = utilities::integrate_st_on_n(integrand, c.beta, p1, p2, p3, p4);
+            if let Ok(mut lock) = self.delta_gamma_tilde.write() {
+                *lock = gamma_tilde;
+            }
+            gamma_tilde
         };
-
-        // debug_assert!(
-        //     delta_gamma.is_finite(),
-        //     "[{}.{:02}|{:>10.4e}] Computed a non-finit value for δγ in interaction {}: {}",
-        //     c.step,
-        //     c.substep,
-        //     c.beta,
-        //     self.particles()
-        //         .display(c.model)
-        //         .unwrap_or_else(|_| self.particles().short_display()),
-        //     delta_gamma
-        // );
-
-        if let Ok(mut spline) = if real {
-            self.asymmetry_spline_true.write()
-        } else {
-            self.asymmetry_spline_false.write()
-        } {
-            spline.add(ln_beta, delta_gamma);
-        }
 
         Some(delta_gamma)
     }
