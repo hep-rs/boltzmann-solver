@@ -368,19 +368,11 @@ pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
     // Create the CSV file
     let output_dir = common::output_dir("full/higgs_equilibrium");
 
-    let v: Vec<(usize, f64)> = Array1::geomspace(1e-20, 1e-0, 100)
-        .unwrap()
-        .iter()
-        .cloned()
-        .enumerate()
-        .collect();
-
-    // let v: Vec<(usize, f64)> = [1e-10].iter().cloned().enumerate().collect();
-
+    let v = Array1::geomspace(1e-20, 1e-0, 100).unwrap().to_vec();
     #[cfg(feature = "parallel")]
-    let iter = v.into_par_iter();
+    let iter = v.into_par_iter().enumerate();
     #[cfg(not(feature = "parallel"))]
-    let iter = v.into_iter();
+    let iter = v.into_iter().enumerate();
 
     iter.for_each(|(i, beta)| {
         let csv = csv::Writer::from_path(output_dir.join(format!("{:03}.csv", i))).unwrap();
@@ -424,17 +416,11 @@ pub fn lepton_equilibrium() -> Result<(), Box<dyn error::Error>> {
     // Create the CSV file
     let output_dir = common::output_dir("full/lepton_equilibrium");
 
-    let v: Vec<(usize, f64)> = Array1::geomspace(1e-20, 1e-0, 100)
-        .unwrap()
-        .iter()
-        .cloned()
-        .enumerate()
-        .collect();
-
+    let v = Array1::geomspace(1e-20, 1e-0, 100).unwrap().to_vec();
     #[cfg(feature = "parallel")]
-    let iter = v.into_par_iter();
+    let iter = v.into_par_iter().enumerate();
     #[cfg(not(feature = "parallel"))]
-    let iter = v.into_iter();
+    let iter = v.into_iter().enumerate();
 
     iter.for_each(|(i, beta)| {
         let csv = csv::Writer::from_path(output_dir.join(format!("{:03}.csv", i))).unwrap();
