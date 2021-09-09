@@ -33,6 +33,8 @@ pub enum Error {
     TooManyNoAsymmetry,
     /// The underlying model has not been specified
     UndefinedModel,
+    /// Duplicate itneraction
+    DuplicateInteractions,
 }
 
 impl fmt::Display for Error {
@@ -49,6 +51,7 @@ impl fmt::Display for Error {
                 write!(f, "too many particles without asymmetry for the model")
             }
             Error::UndefinedModel => write!(f, "underlying model is not defined"),
+            Error::DuplicateInteractions => write!(f, "duplicate interaction"),
         }
     }
 }
@@ -558,6 +561,12 @@ where
         }
         let mut no_asymmetry: Vec<usize> = self.no_asymmetry.drain().collect();
         no_asymmetry.sort_unstable();
+
+        // Collect the number of interactions within the model.
+        let interactions: HashSet<_> = model.interactions().iter().map(|i| i.particles()).collect();
+        if interactions.len() != model.interactions().len() {
+            return Err(Error::DuplicateInteractions);
+        }
 
         // Run the precomputations so that the solver can run multiple times
         // later.
