@@ -276,31 +276,24 @@ where
     }
 
     /// Adjust `dn` and/or `dna` for fast interaction (if applicable).
-    fn fix_fast_interactions(c: &Context<M>, ws: &mut Workspace, eq: &Array2<f64>) -> Option<()> {
-        #[cfg(not(feature = "parallel"))]
+    fn fix_fast_interactions(
+        c: &mut Context<M>,
+        ws: &mut Workspace,
+        eq: &Array2<f64>,
+    ) -> Option<()> {
+        let mut n = &c.n + &ws.dn;
+        let mut na = &c.na + &ws.dna;
+
         let result = c.fast_interactions.as_ref()?.read().ok()?.iter().fold(
             FastInteractionResult::zero(c.n.dim()),
             |mut acc, fi| {
-                acc += fi.fast_interaction_de(c, eq);
+                let result = fi.fast_interaction_de(c, &n, &na, eq);
+                n += &result.dn;
+                na += &result.dna;
+                acc += result;
                 acc
             },
         );
-
-        #[cfg(feature = "parallel")]
-        let result = c
-            .fast_interactions
-            .as_ref()?
-            .read()
-            .ok()?
-            .par_iter()
-            .map(|fi| fi.fast_interaction_de(c, eq))
-            .reduce(
-                || FastInteractionResult::zero(c.n.dim()),
-                |mut acc, fi| {
-                    acc += fi;
-                    acc
-                },
-            );
 
         *ws += result;
         Some(())
