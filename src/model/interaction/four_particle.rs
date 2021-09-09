@@ -142,12 +142,14 @@ impl<M> FourParticle<M> {
     }
 
     /// Adjust whether this interaction will calculate decay widths.
+    #[must_use]
     pub fn enable_width(mut self, v: bool) -> Self {
         self.width_enabled = v;
         self
     }
 
     /// Adjust whether this interaction will calculate decay widths.
+    #[must_use]
     pub fn enable_gamma(mut self, v: bool) -> Self {
         self.gamma_enabled = v;
         self
