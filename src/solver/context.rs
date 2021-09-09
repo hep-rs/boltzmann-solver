@@ -50,8 +50,6 @@ pub struct Context<'a, M> {
     /// sign and multiplicity is stored in the value.
     pub(crate) fast_interactions: Option<RwLock<HashSet<Particles>>>,
     /// List of particles which are forced in equilibrium.
-    ///
-    /// If the context
     pub in_equilibrium: &'a [usize],
     /// List of particles which are forced to never develop any asymmetry.
     pub no_asymmetry: &'a [usize],
