@@ -1182,12 +1182,22 @@ impl Particles {
 
     /// Compute the solution for the fast interaction by solving the
     /// differential equation over the interval [β, β + h].
+    ///
+    /// The provided `n` and `na` arrays are used instead of the ones in the
+    /// context in order to allow for changes from multiple fast interactions to
+    /// be combined.
+    ///
+    /// The `eq_input` array should be a size `(RK_S, N)` array of equilibrium
+    /// number densities as evaluated in the main Runge-Kutta loop at the
+    /// specified sub-quadrature steps.
     #[allow(clippy::too_many_lines)]
     #[must_use]
     pub fn fast_interaction_de<M: Model>(
         &self,
         context: &Context<M>,
-        eq0: &Array2<f64>,
+        n_input: &Array1<f64>,
+        na_input: &Array1<f64>,
+        eq_input: &Array2<f64>,
     ) -> FastInteractionResult {
         use crate::solver::tableau::{self, RK_A, RK_B, RK_C, RK_E, RK_S};
         #[cfg(not(feature = "parallel"))]
@@ -1195,7 +1205,7 @@ impl Particles {
         #[cfg(feature = "parallel")]
         use ndarray::par_azip as zip;
 
-        let mut result = FastInteractionResult::zero(context.n.dim());
+        let mut result = FastInteractionResult::zero(n_input.dim());
 
         if self.gamma_tilde.is_none() && self.delta_gamma_tilde.is_none() {
             log::warn!(
@@ -1210,19 +1220,16 @@ impl Particles {
         let mut eq = Array1::from_shape_simple_fn(context.n.dim(), || {
             crate::utilities::spline::CubicHermite::empty()
         });
-        for ((i, p), &v) in eq0.indexed_iter() {
+        for ((i, p), &v) in eq_input.indexed_iter() {
             eq[p].add(context.beta + RK_C[i] * context.step_size, v);
         }
 
-        let gamma_tilde = self.gamma_tilde.unwrap_or_default();
-        let delta_gamma_tilde = self.delta_gamma_tilde.unwrap_or_default();
-
         let mut beta = context.beta;
         let mut h = context.step_size;
-        let mut n = context.n.clone();
-        let mut na = context.na.clone();
-        let mut n_err = Array1::zeros(context.n.dim());
-        let mut na_err = Array1::zeros(context.na.dim());
+        let mut n = n_input.clone();
+        let mut na = na_input.clone();
+        let mut n_err = Array1::zeros(n.dim());
+        let mut na_err = Array1::zeros(na.dim());
         let mut dn = Array1::zeros(n.dim());
         let mut dna = Array1::zeros(na.dim());
         let mut dn_err = Array1::zeros(n.dim());
@@ -1230,6 +1237,20 @@ impl Particles {
         let mut k = Array2::zeros((RK_S, n.dim()));
         let mut ka = Array2::zeros((RK_S, na.dim()));
 
+        // let gamma_tilde = self.gamma_tilde.unwrap_or_default();
+        // let delta_gamma_tilde = self.delta_gamma_tilde.unwrap_or_default();
+
+        // To help improve convergence, we scale back any 'enormous' values to improve convergence.
+        let gamma_tilde = self
+            .gamma_tilde
+            .unwrap_or_default()
+            .clamp(-1e3 / h, 1e3 / h);
+        let delta_gamma_tilde = self
+            .delta_gamma_tilde
+            .unwrap_or_default()
+            .clamp(-1e3 / h, 1e3 / h);
+
+        // We use the default error tolerance, scaling it down to be more precise.
         let error_tolerance = crate::solver::options::ErrorTolerance::default() / 1e2;
 
         let mut step = 0_usize;
@@ -1369,9 +1390,23 @@ impl Particles {
             steps_discarded
         );
 
-        result.dn = n - &context.n;
-        result.dna = na - &context.na;
+        // The final change in number density can be computed by adding the
+        // changes from each step of the RK integration, but we may as well
+        // compute the change between the final value and the input values to
+        // avoid the repeated computation.
+        result.dn = n - n_input;
+        result.dna = na - na_input;
 
+        // The global error estimate is difficult to compute.  Typically, one
+        // would have to perform the integration twice using two different order
+        // methods by this is computationally expensive.
+        //
+        // Instead, we use the sum of the absolute values of the local error
+        // estimates.  This provides an over-estimate of the global error, with
+        // the over-estimation getting only larger as the number of steps
+        // increase.  It seems reasonable that taking this estimate and scaling
+        // it down by something proportional to the number of steps might give a
+        // 'good enough' estimate of the global error.
         #[allow(clippy::cast_precision_loss)]
         let scaling = f64::sqrt(step as f64);
         n_err.mapv_inplace(|v| v / scaling);
