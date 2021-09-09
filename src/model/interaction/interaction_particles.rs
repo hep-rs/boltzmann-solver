@@ -344,8 +344,14 @@ impl Particles {
     /// Check whether the computed change in particle number density will cause an
     /// overshoot of equilibrium.
     #[must_use]
-    pub fn symmetric_overshoots<M>(&self, c: &Context<M>, change: f64) -> bool {
-        let f = self.symmetric_prefactor_fn(&c.n, &c.eqn, c.in_equilibrium);
+    pub fn symmetric_overshoots(
+        &self,
+        change: f64,
+        n: &Array1<f64>,
+        eq: &Array1<f64>,
+        in_equilibrium: &[usize],
+    ) -> bool {
+        let f = self.symmetric_prefactor_fn(n, eq, in_equilibrium);
         let a = f(0.0);
         if !a.is_finite() {
             true
@@ -366,8 +372,16 @@ impl Particles {
     /// Check whether the computed change in particle number density asymmetry will
     /// caan overshoot of equilibrium.
     #[must_use]
-    pub fn asymmetric_overshoots<M>(&self, c: &Context<M>, change: f64) -> bool {
-        let f = self.asymmetric_prefactor_fn(&c.n, &c.na, &c.eqn, c.in_equilibrium, c.no_asymmetry);
+    pub fn asymmetric_overshoots(
+        &self,
+        change: f64,
+        n: &Array1<f64>,
+        na: &Array1<f64>,
+        eq: &Array1<f64>,
+        in_equilibrium: &[usize],
+        no_asymmetry: &[usize],
+    ) -> bool {
+        let f = self.asymmetric_prefactor_fn(n, na, eq, in_equilibrium, no_asymmetry);
         let a = f(0.0);
         if !a.is_finite() {
             true
@@ -397,32 +411,35 @@ impl Particles {
     /// - \prod_{i \in \text{out}} \frac{n_i}{n^{(0)}_i} \right)
     /// = 0
     /// ```
-    pub fn adjust_overshoot<M>(
+    pub fn adjust_overshoot(
         &self,
-        symmetric: &mut f64,
-        asymmetric: &mut f64,
-        c: &Context<M>,
+        symmetric_change: &mut f64,
+        asymmetric_change: &mut f64,
+        n: &Array1<f64>,
+        na: &Array1<f64>,
+        eq: &Array1<f64>,
+        in_equilibrium: &[usize],
+        no_asymmetry: &[usize],
     ) -> bool {
         // Although an overshoot factor results in the exact solution in a
         // single step, when this is incorporated into the Runge-Kutta method it
         // undershoots the result.
-        const OVERSHOOT_FACTOR: f64 = 1.0;
+        const OVERSHOOT_FACTOR: f64 = 1.5;
         let mut result = false;
 
-        if self.symmetric_overshoots(c, *symmetric) {
-            let bound =
-                OVERSHOOT_FACTOR * self.symmetric_delta(&c.n, &c.eqn, c.in_equilibrium).abs();
-            *symmetric = symmetric.clamp(-bound, bound);
+        if self.symmetric_overshoots(*symmetric_change, n, eq, in_equilibrium) {
+            let bound = OVERSHOOT_FACTOR * self.symmetric_delta(n, eq, in_equilibrium).abs();
+            *symmetric_change = symmetric_change.clamp(-bound, bound);
 
             result = true;
         }
 
-        if self.asymmetric_overshoots(c, *asymmetric) {
+        if self.asymmetric_overshoots(*asymmetric_change, n, na, eq, in_equilibrium, no_asymmetry) {
             let bound = OVERSHOOT_FACTOR
                 * self
-                    .asymmetric_delta(&c.n, &c.na, &c.eqn, c.in_equilibrium, c.no_asymmetry)
+                    .asymmetric_delta(n, na, eq, in_equilibrium, no_asymmetry)
                     .abs();
-            *asymmetric = asymmetric.clamp(-bound, bound);
+            *asymmetric_change = asymmetric_change.clamp(-bound, bound);
 
             result = true;
         }
@@ -1260,7 +1277,15 @@ impl Particles {
                         + delta_gamma_tilde * symmetric_prefactor);
 
                 // Adjust for possible overshoots
-                self.adjust_overshoot(&mut symmetric_delta, &mut asymmetric_delta, context);
+                self.adjust_overshoot(
+                    &mut symmetric_delta,
+                    &mut asymmetric_delta,
+                    &ni,
+                    &nai,
+                    &eqi,
+                    context.in_equilibrium,
+                    context.no_asymmetry,
+                );
 
                 let mut ki = k.slice_mut(ndarray::s![i, ..]);
                 let mut kai = ka.slice_mut(ndarray::s![i, ..]);

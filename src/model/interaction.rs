@@ -376,10 +376,15 @@ pub trait Interaction<M: Model> {
 
         rate *= c.step_size;
 
-        if self
-            .particles()
-            .adjust_overshoot(&mut rate.symmetric, &mut rate.asymmetric, c)
-        {
+        if self.particles().adjust_overshoot(
+            &mut rate.symmetric,
+            &mut rate.asymmetric,
+            &c.n,
+            &c.na,
+            &c.eq,
+            c.in_equilibrium,
+            c.no_asymmetry,
+        ) {
             // log::trace!(
             //     "[{}.{:02}|{:>10.4e}] Adjusted Rate: {:<12.5e}|{:<12.5e}",
             //     c.step,
