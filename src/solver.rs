@@ -26,6 +26,11 @@ use serde::Serialize;
 use std::{collections::HashSet, convert::TryFrom, error, fmt, io::Write, ops, sync::RwLock};
 
 /// The minimum multiplicative step size between two consecutive calls of the logger.
+///
+/// For debug builds, this is set to `1.0` so that the logger is called every time.  Otherwise
+#[cfg(any(feature = "debug", debug_assertions))]
+const BETA_LOG_STEP: f64 = 1.0;
+#[cfg(not(any(feature = "debug", debug_assertions)))]
 const BETA_LOG_STEP: f64 = 1.1;
 
 /// Error type returned by the solver in case there is an error during
