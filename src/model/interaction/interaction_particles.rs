@@ -2560,6 +2560,7 @@ mod tests {
     #[test]
     #[ignore]
     #[allow(unused_variables)]
+    #[cfg(feature = "serialization")]
     fn custom() -> Result<(), Box<dyn error::Error>> {
         // crate::utilities::test::setup_logging(4);
 
