@@ -1333,22 +1333,14 @@ impl Particles {
             }
         }
 
-        log::trace!(
-            "[{}.{:02}|{:>10.4e}] (Fast Interaction {}) Number of integration steps: {}",
+        log::debug!(
+            "[{}.{:02}|{:>10.4e}] (Fast Interaction {}) Number of integration steps: {} ({} discarded)",
             context.step,
             context.substep,
             context.beta,
             self.display(context.model)
                 .unwrap_or_else(|_| self.short_display()),
-            step - steps_discarded
-        );
-        log::trace!(
-            "[{}.{:02}|{:>10.4e}] (Fast Interaction {})  Number of integration steps discarded: {}",
-            context.step,
-            context.substep,
-            context.beta,
-            self.display(context.model)
-                .unwrap_or_else(|_| self.short_display()),
+            step - steps_discarded,
             steps_discarded
         );
 

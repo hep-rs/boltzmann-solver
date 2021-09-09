@@ -296,7 +296,7 @@ pub trait Interaction<M: Model> {
                     // / H N \beta$`, but we must check whether `$\gamma / H N$`
                     // is larger.
                     if rate.gamma_tilde.abs() * c.beta > FAST_THRESHOLD {
-                        log::debug!(
+                        log::trace!(
                             "[{}.{:02}|{:>10.4e}] Detected fast interaction {} with γ̃ = {:.3e}",
                             c.step,
                             c.substep,
