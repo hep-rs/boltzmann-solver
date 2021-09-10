@@ -411,6 +411,11 @@ impl Particles {
     /// - \prod_{i \in \text{out}} \frac{n_i}{n^{(0)}_i} \right)
     /// = 0
     /// ```
+    ///
+    /// For the symmetric case, the equilibrium number densities evaluated at
+    /// the *next* step is required otherwise the function will estimate
+    /// overshoots too often.
+    #[allow(clippy::too_many_arguments)]
     pub fn adjust_overshoot(
         &self,
         symmetric_change: &mut f64,
@@ -418,17 +423,18 @@ impl Particles {
         n: &Array1<f64>,
         na: &Array1<f64>,
         eq: &Array1<f64>,
+        eqn: &Array1<f64>,
         in_equilibrium: &[usize],
         no_asymmetry: &[usize],
     ) -> bool {
         // Although an overshoot factor results in the exact solution in a
         // single step, when this is incorporated into the Runge-Kutta method it
         // undershoots the result.
-        const OVERSHOOT_FACTOR: f64 = 1.5;
+        const OVERSHOOT_FACTOR: f64 = 1.0;
         let mut result = false;
 
-        if self.symmetric_overshoots(*symmetric_change, n, eq, in_equilibrium) {
-            let bound = OVERSHOOT_FACTOR * self.symmetric_delta(n, eq, in_equilibrium).abs();
+        if self.symmetric_overshoots(*symmetric_change, n, eqn, in_equilibrium) {
+            let bound = OVERSHOOT_FACTOR * self.symmetric_delta(n, eqn, in_equilibrium).abs();
             *symmetric_change = symmetric_change.clamp(-bound, bound);
 
             result = true;
@@ -1297,13 +1303,16 @@ impl Particles {
                     * (gamma_tilde * asymmetric_prefactor
                         + delta_gamma_tilde * symmetric_prefactor);
 
-                // Adjust for possible overshoots
+                // Adjust for possible overshoots.  In this case, we use the
+                // original context to determine the overshoot as this seems to
+                // work best.
                 self.adjust_overshoot(
                     &mut symmetric_delta,
                     &mut asymmetric_delta,
-                    &ni,
-                    &nai,
-                    &eqi,
+                    &context.n,
+                    &context.na,
+                    &context.eq,
+                    &context.eqn,
                     context.in_equilibrium,
                     context.no_asymmetry,
                 );
