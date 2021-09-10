@@ -1211,7 +1211,8 @@ impl Particles {
         #[cfg(feature = "parallel")]
         use ndarray::par_azip as zip;
 
-        let mut result = FastInteractionResult::zero(n_input.dim());
+        let dim = n_input.dim();
+        let mut result = FastInteractionResult::zero(dim);
 
         if self.gamma_tilde.is_none() && self.delta_gamma_tilde.is_none() {
             log::warn!(
@@ -1230,18 +1231,27 @@ impl Particles {
             eq[p].add(context.beta + RK_C[i] * context.step_size, v);
         }
 
+        // Local value of β and Δβ for the local Runge-Kutta loop.
         let mut beta = context.beta;
         let mut h = context.step_size;
+
+        // The number density that we are evolving using the local Runge-Kutta loop
         let mut n = n_input.clone();
         let mut na = na_input.clone();
-        let mut n_err = Array1::zeros(n.dim());
-        let mut na_err = Array1::zeros(na.dim());
-        let mut dn = Array1::zeros(n.dim());
-        let mut dna = Array1::zeros(na.dim());
-        let mut dn_err = Array1::zeros(n.dim());
-        let mut dna_err = Array1::zeros(na.dim());
-        let mut k = Array2::zeros((RK_S, n.dim()));
-        let mut ka = Array2::zeros((RK_S, na.dim()));
+
+        // Global error estimate
+        let mut n_err = Array1::zeros(dim);
+        let mut na_err = Array1::zeros(dim);
+
+        // Local change and error estiamte for each step step of the Runge-Kutta loop
+        let mut dn = Array1::zeros(dim);
+        let mut dna = Array1::zeros(dim);
+        let mut dn_err = Array1::zeros(dim);
+        let mut dna_err = Array1::zeros(dim);
+
+        // The sub-quadrature changes.
+        let mut k = Array2::zeros((RK_S, dim));
+        let mut ka = Array2::zeros((RK_S, dim));
 
         // let gamma_tilde = self.gamma_tilde.unwrap_or_default();
         // let delta_gamma_tilde = self.delta_gamma_tilde.unwrap_or_default();
@@ -1264,6 +1274,7 @@ impl Particles {
         while beta < context.beta + context.step_size {
             step += 1;
 
+            // Reset all changes computed so far
             k.fill(0.0);
             ka.fill(0.0);
             dn.fill(0.0);
@@ -1285,9 +1296,11 @@ impl Particles {
                 let eqi = eq.map(|eq| eq.sample(beta_i));
 
                 // Compute the prefactors
-                let v = self.symmetric_prefactor(&ni, &eqi, context.in_equilibrium);
-                let symmetric_prefactor = checked_div(v.0 .0, v.0 .1) - checked_div(v.1 .0, v.1 .1);
-                let v = self.asymmetric_prefactor(
+                let (forward, backward) =
+                    self.symmetric_prefactor(&ni, &eqi, context.in_equilibrium);
+                let symmetric_prefactor =
+                    checked_div(forward.0, forward.1) - checked_div(backward.0, backward.1);
+                let (forward, backward) = self.asymmetric_prefactor(
                     &ni,
                     &nai,
                     &eqi,
@@ -1295,7 +1308,7 @@ impl Particles {
                     context.no_asymmetry,
                 );
                 let asymmetric_prefactor =
-                    checked_div(v.0 .0, v.0 .1) - checked_div(v.1 .0, v.1 .1);
+                    checked_div(forward.0, forward.1) - checked_div(backward.0, backward.1);
 
                 // Compute the changes
                 let mut symmetric_delta = h * gamma_tilde * symmetric_prefactor;
