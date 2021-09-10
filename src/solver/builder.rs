@@ -14,10 +14,6 @@ use std::{
     error, fmt,
 };
 
-// Number of recursive subdivisions in beta range (so there are 2^N
-// subdivisions).
-const PRECOMPUTE_SUBDIV: u32 = 12;
-
 /// Error type returned by the solver builder in case there is an error.
 #[derive(Debug)]
 pub enum Error {
@@ -425,10 +421,13 @@ where
     M: ModelInteractions,
 {
     /// Precompute the interaction rates.
-    #[allow(dead_code)]
     #[cfg(not(feature = "parallel"))]
     fn do_precompute(model: &mut M, beta_range: (f64, f64)) {
-        log::info!("Pre-computing γ...");
+        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+        let subdivs = f64::log2(f64::log2(beta_range.1 / beta_range.0).ceil())
+            .ceil()
+            .max(4.0) as u32;
+
         for (i, &beta) in [
             0.98 * beta_range.0,
             0.99 * beta_range.0,
@@ -436,25 +435,13 @@ where
             1.02 * beta_range.1,
         ]
         .iter()
-        .chain(&rec_geomspace(
-            beta_range.0,
-            beta_range.1,
-            PRECOMPUTE_SUBDIV,
-        ))
+        .chain(&rec_geomspace(beta_range.0, beta_range.1, subdivs))
         .enumerate()
         {
             if i % 1024 == 3 {
-                log::info!(
-                    "Precomputing step {} / {}",
-                    i - 3,
-                    2_usize.pow(PRECOMPUTE_SUBDIV)
-                );
+                log::info!("Precomputing step {:>5} / {}", i - 3, 2_usize.pow(subdivs));
             } else if i % 128 == 3 {
-                log::trace!(
-                    "Precomputing step {} / {}",
-                    i - 3,
-                    2_usize.pow(PRECOMPUTE_SUBDIV)
-                );
+                log::trace!("Precomputing step {:>5} / {}", i - 3, 2_usize.pow(subdivs));
             }
 
             model.set_beta(beta);
@@ -464,13 +451,17 @@ where
                 interaction.gamma(&c, false);
             }
         }
+        log::info!("Precomputation complete");
     }
 
     /// Precompute the interaction rates.
-    #[allow(dead_code)]
     #[cfg(feature = "parallel")]
     fn do_precompute(model: &mut M, beta_range: (f64, f64)) {
-        log::info!("Pre-computing γ...");
+        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+        let subdivs = f64::log2(f64::log2(beta_range.1 / beta_range.0).ceil())
+            .ceil()
+            .max(4.0) as u32;
+
         for (i, &beta) in [
             0.98 * beta_range.0,
             0.99 * beta_range.0,
@@ -478,25 +469,13 @@ where
             1.02 * beta_range.1,
         ]
         .iter()
-        .chain(&rec_geomspace(
-            beta_range.0,
-            beta_range.1,
-            PRECOMPUTE_SUBDIV,
-        ))
+        .chain(&rec_geomspace(beta_range.0, beta_range.1, subdivs))
         .enumerate()
         {
             if i % 1024 == 3 {
-                log::info!(
-                    "Precomputing step {} / {}",
-                    i - 3,
-                    2_usize.pow(PRECOMPUTE_SUBDIV)
-                );
+                log::info!("Precomputing step {:>5} / {}", i - 3, 2_usize.pow(subdivs));
             } else if i % 128 == 3 {
-                log::debug!(
-                    "Precomputing step {} / {}",
-                    i - 3,
-                    2_usize.pow(PRECOMPUTE_SUBDIV)
-                );
+                log::debug!("Precomputing step {:>5} / {}", i - 3, 2_usize.pow(subdivs));
             }
 
             model.set_beta(beta);
@@ -506,6 +485,8 @@ where
                 interaction.gamma(&c, false);
             });
         }
+
+        log::info!("Precomputation complete");
     }
 
     /// Build the Boltzmann solver.
@@ -570,9 +551,9 @@ where
 
         // Run the precomputations so that the solver can run multiple times
         // later.
-        // if self.precompute {
-        //     Self::do_precompute(&mut model, beta_range);
-        // }
+        if self.precompute {
+            Self::do_precompute(&mut model, beta_range);
+        }
 
         Ok(Solver {
             model,

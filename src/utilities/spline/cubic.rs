@@ -100,7 +100,7 @@ impl CubicHermite {
     pub fn empty() -> Self {
         CubicHermite {
             data: Vec::new(),
-            min_points: 64,
+            min_points: 2,
         }
     }
 

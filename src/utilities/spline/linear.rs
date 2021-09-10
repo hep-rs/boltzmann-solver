@@ -88,7 +88,7 @@ impl Linear {
     pub fn empty() -> Self {
         Linear {
             data: Vec::new(),
-            min_points: 64,
+            min_points: 2,
         }
     }
 
