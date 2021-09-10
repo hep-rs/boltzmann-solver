@@ -211,9 +211,9 @@ fn m0m0() -> Result<(), Box<dyn error::Error>> {
     approx_eq(n[1] - n0[1], n0[3] - n[3], 8.0, 1e-50)?;
 
     // Check final number densities
-    approx_eq(n[1], 5.658e-2, 4.0, 1e-4)?;
+    approx_eq(n[1], 5.866e-2, 4.0, 1e-4)?;
     approx_eq(n[1], n[2], 4.0, 1e-10)?;
-    approx_eq(n[3], 1.9434, 4.0, 1e-4)?;
+    approx_eq(n[3], 1.9413, 4.0, 1e-4)?;
     approx_eq(n[3], n[4], 4.0, 1e-50)?;
 
     assert_eq!(na0, na);
