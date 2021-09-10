@@ -158,12 +158,12 @@ where
         self.width_enabled
     }
 
-    fn width(&self, c: &Context<M>) -> Option<PartialWidth> {
+    fn width(&self, context: &Context<M>) -> Option<PartialWidth> {
         if !self.width_enabled() {
             return None;
         }
 
-        let ptcl = c.model.particles();
+        let ptcl = context.model.particles();
 
         // Get the *squared* masses
         let p1 = &ptcl[self.particles.incoming_idx[0]];
@@ -174,17 +174,17 @@ where
             let p = kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2) / (2.0 * p1.mass);
 
             // 1 / 8 π ≅ 0.039788735772973836
-            let width =
-                0.039_788_735_772_973_836 * p / p1.mass2 * (self.squared_amplitude)(c.model).abs();
+            let width = 0.039_788_735_772_973_836 * p / p1.mass2
+                * (self.squared_amplitude)(context.model).abs();
 
             debug_assert!(
                 width.is_finite(),
                 "[{}.{:02}|{:>10.4e}] Computed a non-finit width in interaction {}: {}",
-                c.step,
-                c.substep,
-                c.beta,
+                context.step,
+                context.substep,
+                context.beta,
                 self.particles()
-                    .display(c.model)
+                    .display(context.model)
                     .unwrap_or_else(|_| self.particles().short_display()),
                 width
             );
@@ -222,12 +222,12 @@ where
     /// density approximates a Maxwell--Boltzmann distribution (irrespective of
     /// the original statistic), hence why we must use a threshold to switch
     /// between the two methods.
-    fn gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
+    fn gamma(&self, context: &Context<M>, real: bool) -> Option<f64> {
         if !self.gamma_enabled() {
             return None;
         }
 
-        let ptcl = c.model.particles();
+        let ptcl = context.model.particles();
 
         // Get the particles
         let p1 = &ptcl[self.particles.incoming_idx[0]];
@@ -239,17 +239,17 @@ where
             return Some(0.0);
         }
 
-        let z = p1.mass * c.beta;
+        let z = p1.mass * context.beta;
         let gamma = if real || z < M_BETA_THRESHOLD {
             // 1 / 32 π³ ≅ 0.001007860451037484
             0.001_007_860_451_037_484
-                * (self.squared_amplitude)(c.model).abs()
+                * (self.squared_amplitude)(context.model).abs()
                 * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
                 * (bessel::k1(z) / z)
         } else {
             // ζ(3) / 16 π³ ≅ 0.0024230112251823
             0.002_423_011_225_182_3
-                * (self.squared_amplitude)(c.model).abs()
+                * (self.squared_amplitude)(context.model).abs()
                 * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
                 * (bessel::k1_on_k2(z) / z.powi(3))
                 / p1.degrees_of_freedom()
@@ -258,11 +258,11 @@ where
         debug_assert!(
             gamma.is_finite(),
             "[{}.{:02}|{:>10.4e}] Computed a non-finite value for γ in interaction {}: {}",
-            c.step,
-            c.substep,
-            c.beta,
+            context.step,
+            context.substep,
+            context.beta,
             self.particles()
-                .display(c.model)
+                .display(context.model)
                 .unwrap_or_else(|_| self.particles().short_display()),
             gamma
         );
@@ -270,10 +270,10 @@ where
         Some(gamma)
     }
 
-    fn delta_gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
+    fn delta_gamma(&self, context: &Context<M>, real: bool) -> Option<f64> {
         let asymmetry = self.asymmetry.as_ref()?;
 
-        let ptcl = c.model.particles();
+        let ptcl = context.model.particles();
 
         // Get the particles
         let p1 = &ptcl[self.particles.incoming_idx[0]];
@@ -285,17 +285,17 @@ where
             return Some(0.0);
         }
 
-        let z = p1.mass * c.beta;
+        let z = p1.mass * context.beta;
         let delta_gamma = if real || z < M_BETA_THRESHOLD {
             // 1 / 32 π³ ≅ 0.001007860451037484
             0.001_007_860_451_037_484
-                * asymmetry(c.model).abs()
+                * asymmetry(context.model).abs()
                 * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
                 * (bessel::k1(z) / z)
         } else {
             // ζ(3) / 16 π³ ≅ 0.0024230112251823
             0.002_423_011_225_182_3
-                * asymmetry(c.model).abs()
+                * asymmetry(context.model).abs()
                 * kallen_lambda_sqrt(p1.mass2, p2.mass2, p3.mass2)
                 * (bessel::k1_on_k2(z) / z.powi(3))
                 / p1.degrees_of_freedom()
@@ -304,11 +304,11 @@ where
         debug_assert!(
             delta_gamma.is_finite(),
             "[{}.{:02}|{:>10.4e}] Computed a non-finite value for δγ in interaction {}: {}",
-            c.step,
-            c.substep,
-            c.beta,
+            context.step,
+            context.substep,
+            context.beta,
             self.particles()
-                .display(c.model)
+                .display(context.model)
                 .unwrap_or_else(|_| self.particles().short_display()),
             delta_gamma
         );
@@ -318,9 +318,9 @@ where
 
     /// Override the default implementation of [`Interaction::rate`] to make use
     /// of the adjusted reaction rate density.
-    fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
-        let gamma = self.gamma(c, false)?;
-        let delta_gamma = self.delta_gamma(c, false);
+    fn rate(&self, context: &Context<M>) -> Option<RateDensity> {
+        let gamma = self.gamma(context, false)?;
+        let delta_gamma = self.delta_gamma(context, false);
 
         // If both rates are 0, there's no need to adjust it to the particles'
         // number densities.
@@ -328,7 +328,7 @@ where
             return None;
         }
 
-        let ptcl = c.model.particles();
+        let ptcl = context.model.particles();
 
         // Get the various quantities associated with each particle.
         let [i0, i1, i2] = [
@@ -337,13 +337,13 @@ where
             self.particles.outgoing_idx[1],
         ];
         let p1 = &ptcl[i0];
-        let [n1, n2, n3] = [c.n[i0], c.n[i1], c.n[i2]];
+        let [n1, n2, n3] = [context.n[i0], context.n[i1], context.n[i2]];
         let [na1, na2, na3] = [
-            self.particles.incoming_sign[0] * c.na[i0],
-            self.particles.outgoing_sign[0] * c.na[i1],
-            self.particles.outgoing_sign[1] * c.na[i2],
+            self.particles.incoming_sign[0] * context.na[i0],
+            self.particles.outgoing_sign[0] * context.na[i1],
+            self.particles.outgoing_sign[1] * context.na[i2],
         ];
-        let [eq1, eq2, eq3] = [c.eq[i0], c.eq[i1], c.eq[i2]];
+        let [eq1, eq2, eq3] = [context.eq[i0], context.eq[i1], context.eq[i2]];
 
         if eq1 == 0.0 && eq2 * eq3 == 0.0 {
             return None;
@@ -356,7 +356,7 @@ where
         rate.gamma_tilde = gamma;
         rate.delta_gamma_tilde = delta_gamma;
 
-        if p1.mass * c.beta < M_BETA_THRESHOLD {
+        if p1.mass * context.beta < M_BETA_THRESHOLD {
             // Below the M_BETA_THRESHOLD, `gamma` is the usual rate which must
             // be scaled by factors of `n / eq` to get the actual forward and
             // backward rates.
@@ -396,7 +396,7 @@ where
             }
         }
 
-        Some(rate * c.normalization)
+        Some(rate * context.normalization)
     }
 }
 

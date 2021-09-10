@@ -448,7 +448,7 @@ where
         // Run logger for 0th step
         {
             self.model.set_beta(beta);
-            let c = self.context(
+            let context = self.context(
                 step,
                 None,
                 h,
@@ -457,7 +457,7 @@ where
                 &workspace.na,
                 None,
             );
-            (*self.logger)(&c, &workspace.dn, &workspace.dna);
+            (*self.logger)(&context, &workspace.dn, &workspace.dna);
         }
 
         while beta < self.beta_range.1 {
@@ -502,7 +502,7 @@ where
                     total + ai[j] * &workspace.ka.slice(ndarray::s![j, ..])
                 });
                 self.model.set_beta(beta_i);
-                let ci = self.context(
+                let context_i = self.context(
                     step,
                     Some(i),
                     h,
@@ -513,30 +513,31 @@ where
                 );
 
                 // Collect the equilibrium number densities for this substep.
-                eq.slice_mut(ndarray::s![i, ..]).assign(&ci.eq);
+                eq.slice_mut(ndarray::s![i, ..]).assign(&context_i.eq);
 
                 #[cfg(all(feature = "debug", debug_assertions))]
                 {
                     for (j, interaction) in self.model.interactions().iter().enumerate() {
-                        gammas[[i, j]] = interaction.gamma(&ci, true).unwrap_or_default();
-                        delta_gammas[[i, j]] =
-                            interaction.delta_gamma(&ci, true).unwrap_or_default();
+                        gammas[[i, j]] = interaction.gamma(&context_i, true).unwrap_or_default();
+                        delta_gammas[[i, j]] = interaction
+                            .delta_gamma(&context_i, true)
+                            .unwrap_or_default();
                     }
-                    normalizations[i] = ci.normalization;
-                    eqn.slice_mut(ndarray::s![i, ..]).assign(&ci.eqn);
+                    normalizations[i] = context_i.normalization;
+                    eqn.slice_mut(ndarray::s![i, ..]).assign(&context_i.eqn);
                 }
 
                 let mut ki = workspace.k.slice_mut(ndarray::s![i, ..]);
                 let mut kai = workspace.ka.slice_mut(ndarray::s![i, ..]);
 
                 // Compute k[i] and ka[i] from each interaction
-                self.compute_ki(&mut ki, &mut kai, &ci);
-                fast_interactions = ci.into_fast_interactions();
+                self.compute_ki(&mut ki, &mut kai, &context_i);
+                fast_interactions = context_i.into_fast_interactions();
                 workspace.compute_dn(i);
             }
 
             self.model.set_beta(beta);
-            let c = self.context(
+            let mut context = self.context(
                 step,
                 None,
                 h,
@@ -546,8 +547,8 @@ where
                 fast_interactions,
             );
 
-            Self::fix_fast_interactions(&c, &mut workspace, &eq);
-            fix_equilibrium(&c, &mut workspace.dn, &mut workspace.dna);
+            Self::fix_fast_interactions(&mut context, &mut workspace, &eq);
+            fix_equilibrium(&context, &mut workspace.dn, &mut workspace.dna);
 
             #[cfg(all(feature = "debug", debug_assertions))]
             serde_json::to_writer(
@@ -568,7 +569,8 @@ where
                         .iter()
                         .map(|i| i.particles())
                         .map(|p| {
-                            c.fast_interactions
+                            context
+                                .fast_interactions
                                 .as_ref()
                                 .and_then(|f| f.read().ok())
                                 .map_or(false, |f| f.contains(p))
@@ -578,13 +580,14 @@ where
             )
             .unwrap();
 
-            let (within_tolerance, error_ratio, delta) = self.delta(&workspace, &c.n, &c.na);
+            let (within_tolerance, error_ratio, delta) =
+                self.delta(&workspace, &context.n, &context.na);
 
             // If the error is within the tolerance, we'll be advancing the
             // iteration step
             if within_tolerance {
                 if beta > beta_logging || beta >= self.beta_range.1 {
-                    (*self.logger)(&c, &workspace.dn, &workspace.dna);
+                    (*self.logger)(&context, &workspace.dn, &workspace.dna);
                     beta_logging = beta * BETA_LOG_STEP;
                 }
 

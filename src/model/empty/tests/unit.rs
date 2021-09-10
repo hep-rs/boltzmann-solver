@@ -77,14 +77,12 @@ impl Interaction<Empty> for Gamma {
         true
     }
 
-    fn gamma(&self, _c: &Context<Empty>, _real: bool) -> Option<f64> {
+    fn gamma(&self, _context: &Context<Empty>, _real: bool) -> Option<f64> {
         Some(1.0)
     }
 }
 
 /// Test a decay with a unit squared amplitude, with 1 -> 2, 3.
-///
-/// TODO: Fix this test.
 #[test]
 fn gamma() -> Result<(), Box<dyn error::Error>> {
     // crate::utilities::test::setup_logging(4);
@@ -155,11 +153,11 @@ impl Interaction<Empty> for Rate {
         true
     }
 
-    fn gamma(&self, _c: &Context<Empty>, _real: bool) -> Option<f64> {
+    fn gamma(&self, _context: &Context<Empty>, _real: bool) -> Option<f64> {
         None
     }
 
-    fn rate(&self, _c: &Context<Empty>) -> Option<RateDensity> {
+    fn rate(&self, _context: &Context<Empty>) -> Option<RateDensity> {
         let mut rate = RateDensity::zero();
         rate.gamma = 1.0;
         rate.symmetric = 1.0;
@@ -226,18 +224,18 @@ impl Interaction<Empty> for AdjustedRate {
         true
     }
 
-    fn gamma(&self, _c: &Context<Empty>, _real: bool) -> Option<f64> {
+    fn gamma(&self, _context: &Context<Empty>, _real: bool) -> Option<f64> {
         None
     }
 
-    fn rate(&self, _c: &Context<Empty>) -> Option<RateDensity> {
+    fn rate(&self, _context: &Context<Empty>) -> Option<RateDensity> {
         unimplemented!()
     }
 
-    fn adjusted_rate(&self, c: &Context<Empty>) -> Option<RateDensity> {
+    fn adjusted_rate(&self, context: &Context<Empty>) -> Option<RateDensity> {
         let mut rate = RateDensity::zero();
         rate.symmetric = 1.0;
-        Some(rate * c.step_size)
+        Some(rate * context.step_size)
     }
 }
 

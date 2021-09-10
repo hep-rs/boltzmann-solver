@@ -40,18 +40,18 @@ impl Interaction<Empty> for SinCos1 {
         true
     }
 
-    fn gamma(&self, _c: &Context<Empty>, _real: bool) -> Option<f64> {
+    fn gamma(&self, _context: &Context<Empty>, _real: bool) -> Option<f64> {
         None
     }
 
-    fn rate(&self, _c: &Context<Empty>) -> Option<RateDensity> {
+    fn rate(&self, _context: &Context<Empty>) -> Option<RateDensity> {
         unimplemented!()
     }
 
-    fn adjusted_rate(&self, c: &Context<Empty>) -> Option<RateDensity> {
+    fn adjusted_rate(&self, context: &Context<Empty>) -> Option<RateDensity> {
         let mut rate = RateDensity::zero();
-        rate.symmetric = c.n[2];
-        Some(rate * c.step_size)
+        rate.symmetric = context.n[2];
+        Some(rate * context.step_size)
     }
 }
 
@@ -86,18 +86,18 @@ impl Interaction<Empty> for SinCos2 {
         true
     }
 
-    fn gamma(&self, _c: &Context<Empty>, _real: bool) -> Option<f64> {
+    fn gamma(&self, _context: &Context<Empty>, _real: bool) -> Option<f64> {
         None
     }
 
-    fn rate(&self, _c: &Context<Empty>) -> Option<RateDensity> {
+    fn rate(&self, _context: &Context<Empty>) -> Option<RateDensity> {
         unimplemented!()
     }
 
-    fn adjusted_rate(&self, c: &Context<Empty>) -> Option<RateDensity> {
+    fn adjusted_rate(&self, context: &Context<Empty>) -> Option<RateDensity> {
         let mut rate = RateDensity::zero();
-        rate.symmetric -= c.n[1];
-        Some(rate * c.step_size)
+        rate.symmetric -= context.n[1];
+        Some(rate * context.step_size)
     }
 }
 
@@ -153,18 +153,19 @@ impl Interaction<Empty> for BrusselatorStable1 {
         true
     }
 
-    fn gamma(&self, _c: &Context<Empty>, _real: bool) -> Option<f64> {
+    fn gamma(&self, _context: &Context<Empty>, _real: bool) -> Option<f64> {
         None
     }
 
-    fn rate(&self, _c: &Context<Empty>) -> Option<RateDensity> {
+    fn rate(&self, _context: &Context<Empty>) -> Option<RateDensity> {
         unimplemented!()
     }
 
-    fn adjusted_rate(&self, c: &Context<Empty>) -> Option<RateDensity> {
+    fn adjusted_rate(&self, context: &Context<Empty>) -> Option<RateDensity> {
         let mut rate = RateDensity::zero();
-        rate.symmetric = 1.0 + c.n[1].powi(2) * c.n[2] - 1.7 * c.n[1] - c.n[1];
-        Some(rate * c.step_size)
+        rate.symmetric =
+            1.0 + context.n[1].powi(2) * context.n[2] - 1.7 * context.n[1] - context.n[1];
+        Some(rate * context.step_size)
     }
 }
 
@@ -194,18 +195,18 @@ impl Interaction<Empty> for BrusselatorStable2 {
         true
     }
 
-    fn gamma(&self, _c: &Context<Empty>, _real: bool) -> Option<f64> {
+    fn gamma(&self, _context: &Context<Empty>, _real: bool) -> Option<f64> {
         None
     }
 
-    fn rate(&self, _c: &Context<Empty>) -> Option<RateDensity> {
+    fn rate(&self, _context: &Context<Empty>) -> Option<RateDensity> {
         unimplemented!()
     }
 
-    fn adjusted_rate(&self, c: &Context<Empty>) -> Option<RateDensity> {
+    fn adjusted_rate(&self, context: &Context<Empty>) -> Option<RateDensity> {
         let mut rate = RateDensity::zero();
-        rate.symmetric = 1.7 * c.n[1] - c.n[1].powi(2) * c.n[2];
-        Some(rate * c.step_size)
+        rate.symmetric = 1.7 * context.n[1] - context.n[1].powi(2) * context.n[2];
+        Some(rate * context.step_size)
     }
 }
 
@@ -260,18 +261,19 @@ impl Interaction<Empty> for BrusselatorUnstable1 {
         true
     }
 
-    fn gamma(&self, _c: &Context<Empty>, _real: bool) -> Option<f64> {
+    fn gamma(&self, _context: &Context<Empty>, _real: bool) -> Option<f64> {
         None
     }
 
-    fn rate(&self, _c: &Context<Empty>) -> Option<RateDensity> {
+    fn rate(&self, _context: &Context<Empty>) -> Option<RateDensity> {
         unimplemented!()
     }
 
-    fn adjusted_rate(&self, c: &Context<Empty>) -> Option<RateDensity> {
+    fn adjusted_rate(&self, context: &Context<Empty>) -> Option<RateDensity> {
         let mut rate = RateDensity::zero();
-        rate.symmetric = 1.0 + c.n[1].powi(2) * c.n[2] - 3.0 * c.n[1] - c.n[1];
-        Some(rate * c.step_size)
+        rate.symmetric =
+            1.0 + context.n[1].powi(2) * context.n[2] - 3.0 * context.n[1] - context.n[1];
+        Some(rate * context.step_size)
     }
 }
 
@@ -301,18 +303,18 @@ impl Interaction<Empty> for BrusselatorUnstable2 {
         true
     }
 
-    fn gamma(&self, _c: &Context<Empty>, _real: bool) -> Option<f64> {
+    fn gamma(&self, _context: &Context<Empty>, _real: bool) -> Option<f64> {
         None
     }
 
-    fn rate(&self, _c: &Context<Empty>) -> Option<RateDensity> {
+    fn rate(&self, _context: &Context<Empty>) -> Option<RateDensity> {
         unimplemented!()
     }
 
-    fn adjusted_rate(&self, c: &Context<Empty>) -> Option<RateDensity> {
+    fn adjusted_rate(&self, context: &Context<Empty>) -> Option<RateDensity> {
         let mut rate = RateDensity::zero();
-        rate.symmetric = 3.0 * c.n[1] - c.n[1].powi(2) * c.n[2];
-        Some(rate * c.step_size)
+        rate.symmetric = 3.0 * context.n[1] - context.n[1].powi(2) * context.n[2];
+        Some(rate * context.step_size)
     }
 }
 

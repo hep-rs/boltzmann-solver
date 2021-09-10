@@ -51,7 +51,7 @@ pub trait Interaction<M: Model> {
     /// order to avoid unnecessary computation (though the incorrect
     /// implementation will not be detrimental other than in performance).
     #[allow(unused_variables)]
-    fn width(&self, c: &Context<M>) -> Option<PartialWidth> {
+    fn width(&self, context: &Context<M>) -> Option<PartialWidth> {
         None
     }
 
@@ -85,7 +85,7 @@ pub trait Interaction<M: Model> {
     /// number density of the decaying particle in order to avoid possible `0 /
     /// 0` errors.  In order to get the real interaction rate, `real` should be
     /// set to true.
-    fn gamma(&self, c: &Context<M>, real: bool) -> Option<f64>;
+    fn gamma(&self, context: &Context<M>, real: bool) -> Option<f64>;
 
     /// Asymmetry between the interaction and its `$\CP$` conjugate:
     ///
@@ -109,7 +109,7 @@ pub trait Interaction<M: Model> {
     /// 0` errors.  In order to get the real interaction rate, `real` should be
     /// set to true.
     #[allow(unused_variables)]
-    fn delta_gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
+    fn delta_gamma(&self, context: &Context<M>, real: bool) -> Option<f64> {
         None
     }
 
@@ -137,10 +137,10 @@ pub trait Interaction<M: Model> {
     ///
     /// This can produce a result which is infinite if some of the `$n_i^{(0)}`$
     /// are identically 0 and thus care must be taken to handle these.
-    fn symmetric_prefactor(&self, c: &Context<M>) -> f64 {
+    fn symmetric_prefactor(&self, context: &Context<M>) -> f64 {
         let ((forward_numerator, forward_denominator), (backward_numerator, backward_denominator)) =
             self.particles()
-                .symmetric_prefactor(&c.n, &c.eq, c.in_equilibrium);
+                .symmetric_prefactor(&context.n, &context.eq, context.in_equilibrium);
 
         let forward_prefactor = checked_div(forward_numerator, forward_denominator);
         let backward_prefactor = checked_div(backward_numerator, backward_denominator);
@@ -160,12 +160,12 @@ pub trait Interaction<M: Model> {
             let forward_zeros = particles
                 .incoming_idx
                 .iter()
-                .filter(|&&p| c.eq[p] == 0.0)
+                .filter(|&&p| context.eq[p] == 0.0)
                 .count();
             let backward_zeros = particles
                 .outgoing_idx
                 .iter()
-                .filter(|&&p| c.eq[p] == 0.0)
+                .filter(|&&p| context.eq[p] == 0.0)
                 .count();
 
             match forward_zeros.cmp(&backward_zeros) {
@@ -198,14 +198,14 @@ pub trait Interaction<M: Model> {
     ///
     /// This can produce a result which is infinite if some of the `$n_i^{(0)}`$
     /// are identically 0 and thus care must be taken to handle these.
-    fn asymmetric_prefactor(&self, c: &Context<M>) -> f64 {
+    fn asymmetric_prefactor(&self, context: &Context<M>) -> f64 {
         let ((forward_numerator, forward_denominator), (backward_numerator, backward_denominator)) =
             self.particles().asymmetric_prefactor(
-                &c.n,
-                &c.na,
-                &c.eq,
-                c.in_equilibrium,
-                c.no_asymmetry,
+                &context.n,
+                &context.na,
+                &context.eq,
+                context.in_equilibrium,
+                context.no_asymmetry,
             );
         let forward = checked_div(forward_numerator, forward_denominator);
         let backward = checked_div(backward_numerator, backward_denominator);
@@ -236,9 +236,9 @@ pub trait Interaction<M: Model> {
     ///
     /// The default implementation uses the output of [`Interaction::gamma`] and
     /// [`Interaction::delta_gamma`] in order to computer the actual rate.
-    fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
-        let gamma = self.gamma(c, true)?;
-        let delta_gamma = self.delta_gamma(c, true);
+    fn rate(&self, context: &Context<M>) -> Option<RateDensity> {
+        let gamma = self.gamma(context, true)?;
+        let delta_gamma = self.delta_gamma(context, true);
 
         // If both rates are 0, there's no need to adjust it to the particles'
         // number densities.
@@ -247,14 +247,14 @@ pub trait Interaction<M: Model> {
         }
 
         let mut rate = RateDensity::zero();
-        let symmetric_prefactor = self.symmetric_prefactor(c);
+        let symmetric_prefactor = self.symmetric_prefactor(context);
         rate.gamma = gamma;
         rate.symmetric = checked_mul(gamma, symmetric_prefactor);
         rate.delta_gamma = delta_gamma;
         rate.asymmetric = checked_mul(delta_gamma.unwrap_or_default(), symmetric_prefactor)
-            + checked_mul(gamma, self.asymmetric_prefactor(c));
+            + checked_mul(gamma, self.asymmetric_prefactor(context));
 
-        Some(rate * c.normalization)
+        Some(rate * context.normalization)
     }
 
     /// Checks whether the interaction has already been deemed fast.
@@ -264,8 +264,9 @@ pub trait Interaction<M: Model> {
     /// substep 0.
     ///
     /// If fast interactions are disabled, this always returns `false`.
-    fn is_fast_check(&self, c: &Context<M>) -> bool {
-        c.fast_interactions
+    fn is_fast_check(&self, context: &Context<M>) -> bool {
+        context
+            .fast_interactions
             .as_ref()
             .map_or(false, |fast_interactions| {
                 let fast_interactions = fast_interactions.read().unwrap();
@@ -287,22 +288,23 @@ pub trait Interaction<M: Model> {
     ///
     /// A `true` result must mean that we are using fast interactions.  If fast
     /// interactions are disabled, this always returns `false`.
-    fn is_fast(&self, rate: &RateDensity, c: &Context<M>) -> bool {
-        c.fast_interactions
+    fn is_fast(&self, rate: &RateDensity, context: &Context<M>) -> bool {
+        context
+            .fast_interactions
             .as_ref()
             .map_or(false, |fast_interactions| {
-                if c.substep == 0 {
+                if context.substep == 0 {
                     // We have to multiply by beta as gamma is normalized by `$1
                     // / H N \beta$`, but we must check whether `$\gamma / H N$`
                     // is larger.
-                    if rate.gamma_tilde.abs() * c.beta > FAST_THRESHOLD {
+                    if rate.gamma_tilde.abs() * context.beta > FAST_THRESHOLD {
                         log::trace!(
                             "[{}.{:02}|{:>10.4e}] Detected fast interaction {} with γ̃ = {:.3e}",
-                            c.step,
-                            c.substep,
-                            c.beta,
+                            context.step,
+                            context.substep,
+                            context.beta,
                             self.particles()
-                                .display(c.model)
+                                .display(context.model)
                                 .unwrap_or_else(|_| self.particles().short_display()),
                             rate.gamma_tilde,
                         );
@@ -311,13 +313,13 @@ pub trait Interaction<M: Model> {
                         let mut particles = self.particles().clone();
                         particles.gamma_tilde = Some(rate.gamma_tilde);
                         particles.delta_gamma_tilde = rate.delta_gamma_tilde;
-                        particles.heavy = c
+                        particles.heavy = context
                             .model
                             .particles()
                             .iter()
                             .enumerate()
                             .filter_map(|(i, p)| {
-                                if p.mass * c.beta > M_BETA_THRESHOLD {
+                                if p.mass * context.beta > M_BETA_THRESHOLD {
                                     Some(i)
                                 } else {
                                     None
@@ -361,29 +363,30 @@ pub trait Interaction<M: Model> {
     /// particle's [`interaction::Particles`] should be added to the context's
     /// list of fast interactions (if being used).  This allows for the fast
     /// interaction to be handled separated.
-    fn adjusted_rate(&self, c: &Context<M>) -> Option<RateDensity> {
+    fn adjusted_rate(&self, context: &Context<M>) -> Option<RateDensity> {
         // If the interaction was already deemed to be fast (from a previous
         // substep), bypass any computation and return None.
-        if self.is_fast_check(c) {
+        if self.is_fast_check(context) {
             return None;
         }
 
-        let mut rate = self.rate(c)?;
+        let mut rate = self.rate(context)?;
 
-        if self.is_fast(&rate, c) {
+        if self.is_fast(&rate, context) {
             return None;
         }
 
-        rate *= c.step_size;
+        rate *= context.step_size;
 
         if self.particles().adjust_overshoot(
             &mut rate.symmetric,
             &mut rate.asymmetric,
-            &c.n,
-            &c.na,
-            &c.eq,
-            c.in_equilibrium,
-            c.no_asymmetry,
+            &context.n,
+            &context.na,
+            &context.eq,
+            &context.eqn,
+            context.in_equilibrium,
+            context.no_asymmetry,
         ) {
             // log::trace!(
             //     "[{}.{:02}|{:>10.4e}] Adjusted Rate: {:<12.5e}|{:<12.5e}",
@@ -484,12 +487,12 @@ pub(crate) fn checked_mul(a: f64, b: f64) -> f64 {
 ///   interaction going on.
 /// - Particles which have no asymmetry, irrespective if any interaction
 ///   going on.
-pub fn fix_equilibrium<M>(c: &Context<M>, dn: &mut Array1<f64>, dna: &mut Array1<f64>) {
-    for &p in c.in_equilibrium {
-        dn[p] = c.eqn[p] - c.n[p];
+pub fn fix_equilibrium<M>(context: &Context<M>, dn: &mut Array1<f64>, dna: &mut Array1<f64>) {
+    for &p in context.in_equilibrium {
+        dn[p] = context.eqn[p] - context.n[p];
     }
-    for &p in c.no_asymmetry {
-        dna[p] = -c.na[p];
+    for &p in context.no_asymmetry {
+        dna[p] = -context.na[p];
     }
 }
 
@@ -506,36 +509,36 @@ where
         (*self).width_enabled()
     }
 
-    fn width(&self, c: &Context<M>) -> Option<PartialWidth> {
-        (*self).width(c)
+    fn width(&self, context: &Context<M>) -> Option<PartialWidth> {
+        (*self).width(context)
     }
 
     fn gamma_enabled(&self) -> bool {
         (*self).gamma_enabled()
     }
 
-    fn gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
-        (*self).gamma(c, real)
+    fn gamma(&self, context: &Context<M>, real: bool) -> Option<f64> {
+        (*self).gamma(context, real)
     }
 
-    fn delta_gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
-        (*self).delta_gamma(c, real)
+    fn delta_gamma(&self, context: &Context<M>, real: bool) -> Option<f64> {
+        (*self).delta_gamma(context, real)
     }
-    fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
-        (*self).rate(c)
+    fn rate(&self, context: &Context<M>) -> Option<RateDensity> {
+        (*self).rate(context)
     }
 
-    fn adjusted_rate(&self, c: &Context<M>) -> Option<RateDensity> {
-        (*self).adjusted_rate(c)
+    fn adjusted_rate(&self, context: &Context<M>) -> Option<RateDensity> {
+        (*self).adjusted_rate(context)
     }
 
     fn apply_change(
         &self,
         dn: &mut ArrayViewMut1<f64>,
         dna: &mut ArrayViewMut1<f64>,
-        c: &Context<M>,
+        context: &Context<M>,
     ) {
-        (*self).apply_change(dn, dna, c);
+        (*self).apply_change(dn, dna, context);
     }
 }
 
@@ -552,37 +555,37 @@ where
         self.as_ref().width_enabled()
     }
 
-    fn width(&self, c: &Context<M>) -> Option<PartialWidth> {
-        self.as_ref().width(c)
+    fn width(&self, context: &Context<M>) -> Option<PartialWidth> {
+        self.as_ref().width(context)
     }
 
     fn gamma_enabled(&self) -> bool {
         self.as_ref().gamma_enabled()
     }
 
-    fn gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
-        self.as_ref().gamma(c, real)
+    fn gamma(&self, context: &Context<M>, real: bool) -> Option<f64> {
+        self.as_ref().gamma(context, real)
     }
 
-    fn delta_gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
-        self.as_ref().delta_gamma(c, real)
+    fn delta_gamma(&self, context: &Context<M>, real: bool) -> Option<f64> {
+        self.as_ref().delta_gamma(context, real)
     }
 
-    fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
-        self.as_ref().rate(c)
+    fn rate(&self, context: &Context<M>) -> Option<RateDensity> {
+        self.as_ref().rate(context)
     }
 
-    fn adjusted_rate(&self, c: &Context<M>) -> Option<RateDensity> {
-        self.as_ref().adjusted_rate(c)
+    fn adjusted_rate(&self, context: &Context<M>) -> Option<RateDensity> {
+        self.as_ref().adjusted_rate(context)
     }
 
     fn apply_change(
         &self,
         dn: &mut ArrayViewMut1<f64>,
         dna: &mut ArrayViewMut1<f64>,
-        c: &Context<M>,
+        context: &Context<M>,
     ) {
-        self.as_ref().apply_change(dn, dna, c);
+        self.as_ref().apply_change(dn, dna, context);
     }
 }
 

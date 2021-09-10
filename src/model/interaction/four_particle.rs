@@ -3,12 +3,14 @@ mod utilities;
 use crate::{
     model::{
         interaction,
-        interaction::{checked_div, checked_mul, Interaction, RateDensity, M_BETA_THRESHOLD},
+        interaction::{
+            checked_div, checked_mul, Interaction, PartialWidth, RateDensity, M_BETA_THRESHOLD,
+        },
         Model,
     },
     solver::Context,
 };
-use std::{fmt, sync::RwLock};
+use std::fmt;
 
 // TODO: Define a trait alias for MandelstamFn once it is stabilised
 // (https://github.com/rust-lang/rust/issues/41517)
@@ -25,11 +27,10 @@ pub struct FourParticle<M> {
 
     gamma_enabled: bool,
     width_enabled: bool,
-
-    gamma: RwLock<f64>,
-    gamma_tilde: RwLock<f64>,
-    delta_gamma: RwLock<f64>,
-    delta_gamma_tilde: RwLock<f64>,
+    // gamma: RwLock<f64>,
+    // gamma_tilde: RwLock<f64>,
+    // delta_gamma: RwLock<f64>,
+    // delta_gamma_tilde: RwLock<f64>,
 }
 
 impl<M> FourParticle<M> {
@@ -62,10 +63,10 @@ impl<M> FourParticle<M> {
             asymmetry: None,
             width_enabled: false,
             gamma_enabled: true,
-            gamma: RwLock::new(0.0),
-            gamma_tilde: RwLock::new(0.0),
-            delta_gamma: RwLock::new(0.0),
-            delta_gamma_tilde: RwLock::new(0.0),
+            // gamma: RwLock::new(0.0),
+            // gamma_tilde: RwLock::new(0.0),
+            // delta_gamma: RwLock::new(0.0),
+            // delta_gamma_tilde: RwLock::new(0.0),
         }
     }
 
@@ -181,34 +182,27 @@ where
         self.width_enabled
     }
 
-    // TODO: Implement three-body decays
-    // fn width(&self, c: &Context<M>) -> Option<PartialWidth> {}
+    fn width(&self, _context: &Context<M>) -> Option<PartialWidth> {
+        // TODO: Implement three-body decays
+        None
+    }
 
     fn gamma_enabled(&self) -> bool {
         self.gamma_enabled
     }
 
-    fn gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
+    fn gamma(&self, context: &Context<M>, real: bool) -> Option<f64> {
         if !self.gamma_enabled {
             return None;
         }
 
-        // If we aren't in the first substep, we use the precomputed value.
-        match (c.substep > 0, real) {
-            (false, _) => (),
-            (true, true) => {
-                if let Ok(gamma) = self.gamma.read() {
-                    return Some(*gamma);
-                }
-            }
-            (true, false) => {
-                if let Ok(gamma_tilde) = self.gamma_tilde.read() {
-                    return Some(*gamma_tilde);
-                }
-            }
-        }
+        // If we are not in the first substep and we need the 'false' gamma
+        // (i.e. γ̃), then we use the precomputed value.
+        // if let (true, false, Ok(gamma_tilde)) = (c.substep > 0, real, self.gamma_tilde.read()) {
+        //     return Some(*gamma_tilde);
+        // }
 
-        let ptcl = c.model.particles();
+        let ptcl = context.model.particles();
 
         // Get the particles involved
         let p1 = &ptcl[self.particles.incoming_idx[0]];
@@ -218,45 +212,39 @@ where
 
         let integrand = |s, t| {
             let u = p1.mass2 + p2.mass2 + p3.mass2 + p4.mass2 - s - t;
-            (self.squared_amplitude)(c.model, s, t, u).abs()
+            (self.squared_amplitude)(context.model, s, t, u).abs()
         };
 
-        let gamma = if real {
-            let gamma = utilities::integrate_st(integrand, c.beta, p1, p2, p3, p4);
-            if let Ok(mut lock) = self.gamma.write() {
-                *lock = gamma;
-            }
-            gamma
+        if real {
+            Some(utilities::integrate_st(
+                integrand,
+                context.beta,
+                p1,
+                p2,
+                p3,
+                p4,
+            ))
         } else {
-            let gamma_tilde = utilities::integrate_st_on_n(integrand, c.beta, p1, p2, p3, p4);
-            if let Ok(mut lock) = self.gamma_tilde.write() {
-                *lock = gamma_tilde;
-            }
-            gamma_tilde
-        };
-
-        Some(gamma)
+            let gamma_tilde = utilities::integrate_st_on_n(integrand, context.beta, p1, p2, p3, p4);
+            // if let Ok(mut lock) = self.gamma_tilde.write() {
+            //     *lock = gamma_tilde;
+            // }
+            Some(gamma_tilde)
+        }
     }
 
-    fn delta_gamma(&self, c: &Context<M>, real: bool) -> Option<f64> {
+    fn delta_gamma(&self, context: &Context<M>, real: bool) -> Option<f64> {
         let asymmetry = self.asymmetry.as_ref()?;
 
-        // If we aren't in the first substep, we use the precomputed value.
-        match (c.substep > 0, real) {
-            (false, _) => (),
-            (true, true) => {
-                if let Ok(gamma) = self.delta_gamma.read() {
-                    return Some(*gamma);
-                }
-            }
-            (true, false) => {
-                if let Ok(gamma_tilde) = self.delta_gamma_tilde.read() {
-                    return Some(*gamma_tilde);
-                }
-            }
-        }
+        // If we are not in the first substep and we need the 'false' gamma
+        // (i.e. γ̃), then we use the precomputed value.
+        // if let (true, false, Ok(delta_gamma_tilde)) =
+        //     (c.substep > 0, real, self.delta_gamma_tilde.read())
+        // {
+        //     return Some(*delta_gamma_tilde);
+        // }
 
-        let ptcl = c.model.particles();
+        let ptcl = context.model.particles();
 
         let p1 = &ptcl[self.particles.incoming_idx[0]];
         let p2 = &ptcl[self.particles.incoming_idx[1]];
@@ -265,30 +253,32 @@ where
 
         let integrand = |s, t| {
             let u = p1.mass2 + p2.mass2 + p3.mass2 + p4.mass2 - s - t;
-            asymmetry(c.model, s, t, u).abs()
+            asymmetry(context.model, s, t, u).abs()
         };
 
-        let delta_gamma = if real {
-            let gamma = utilities::integrate_st(integrand, c.beta, p1, p2, p3, p4);
-            if let Ok(mut lock) = self.delta_gamma.write() {
-                *lock = gamma;
-            }
-            gamma
+        if real {
+            Some(utilities::integrate_st(
+                integrand,
+                context.beta,
+                p1,
+                p2,
+                p3,
+                p4,
+            ))
         } else {
-            let gamma_tilde = utilities::integrate_st_on_n(integrand, c.beta, p1, p2, p3, p4);
-            if let Ok(mut lock) = self.delta_gamma_tilde.write() {
-                *lock = gamma_tilde;
-            }
-            gamma_tilde
-        };
-
-        Some(delta_gamma)
+            let delta_gamma_tilde =
+                utilities::integrate_st_on_n(integrand, context.beta, p1, p2, p3, p4);
+            // if let Ok(mut lock) = self.delta_gamma_tilde.write() {
+            //     *lock = delta_gamma_tilde;
+            // }
+            Some(delta_gamma_tilde)
+        }
     }
 
     #[allow(clippy::too_many_lines)]
-    fn rate(&self, c: &Context<M>) -> Option<RateDensity> {
-        let gamma = self.gamma(c, false)?;
-        let delta_gamma = self.delta_gamma(c, false);
+    fn rate(&self, context: &Context<M>) -> Option<RateDensity> {
+        let gamma = self.gamma(context, false)?;
+        let delta_gamma = self.delta_gamma(context, false);
 
         // If both rates are 0, there's no need to adjust it to the particles'
         // number densities.
@@ -296,7 +286,7 @@ where
             return None;
         }
 
-        let ptcl = c.model.particles();
+        let ptcl = context.model.particles();
 
         let [i1, i2, i3, i4] = [
             self.particles.incoming_idx[0],
@@ -305,14 +295,19 @@ where
             self.particles.outgoing_idx[1],
         ];
         let [p1, p2, p3, p4] = [&ptcl[i1], &ptcl[i2], &ptcl[i3], &ptcl[i4]];
-        let [n1, n2, n3, n4] = [c.n[i1], c.n[i2], c.n[i3], c.n[i4]];
+        let [n1, n2, n3, n4] = [context.n[i1], context.n[i2], context.n[i3], context.n[i4]];
         let [na1, na2, na3, na4] = [
-            self.particles.incoming_sign[0] * c.na[i1],
-            self.particles.incoming_sign[1] * c.na[i2],
-            self.particles.outgoing_sign[0] * c.na[i3],
-            self.particles.outgoing_sign[1] * c.na[i4],
+            self.particles.incoming_sign[0] * context.na[i1],
+            self.particles.incoming_sign[1] * context.na[i2],
+            self.particles.outgoing_sign[0] * context.na[i3],
+            self.particles.outgoing_sign[1] * context.na[i4],
         ];
-        let [eq1, eq2, eq3, eq4] = [c.eq[i1], c.eq[i2], c.eq[i3], c.eq[i4]];
+        let [eq1, eq2, eq3, eq4] = [
+            context.eq[i1],
+            context.eq[i2],
+            context.eq[i3],
+            context.eq[i4],
+        ];
 
         let mut rate = RateDensity::zero();
 
@@ -327,10 +322,10 @@ where
         // the other divisors is also 0.
         #[allow(clippy::unnested_or_patterns)]
         match (
-            p1.mass * c.beta > M_BETA_THRESHOLD,
-            p2.mass * c.beta > M_BETA_THRESHOLD,
-            p3.mass * c.beta > M_BETA_THRESHOLD,
-            p4.mass * c.beta > M_BETA_THRESHOLD,
+            p1.mass * context.beta > M_BETA_THRESHOLD,
+            p2.mass * context.beta > M_BETA_THRESHOLD,
+            p3.mass * context.beta > M_BETA_THRESHOLD,
+            p4.mass * context.beta > M_BETA_THRESHOLD,
         ) {
             // No heavy particle
             (false, false, false, false) => {
@@ -776,7 +771,7 @@ where
             }
         };
 
-        Some(rate * c.normalization)
+        Some(rate * context.normalization)
     }
 }
 
