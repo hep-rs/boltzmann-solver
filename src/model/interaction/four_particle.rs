@@ -9,8 +9,9 @@ use crate::{
         Model,
     },
     solver::Context,
+    utilities::spline::Linear as Spline,
 };
-use std::fmt;
+use std::{fmt, sync::RwLock};
 
 // TODO: Define a trait alias for MandelstamFn once it is stabilised
 // (https://github.com/rust-lang/rust/issues/41517)
@@ -27,10 +28,8 @@ pub struct FourParticle<M> {
 
     gamma_enabled: bool,
     width_enabled: bool,
-    // gamma: RwLock<f64>,
-    // gamma_tilde: RwLock<f64>,
-    // delta_gamma: RwLock<f64>,
-    // delta_gamma_tilde: RwLock<f64>,
+    gamma_tilde: RwLock<Spline>,
+    delta_gamma_tilde: RwLock<Spline>,
 }
 
 impl<M> FourParticle<M> {
@@ -63,10 +62,8 @@ impl<M> FourParticle<M> {
             asymmetry: None,
             width_enabled: false,
             gamma_enabled: true,
-            // gamma: RwLock::new(0.0),
-            // gamma_tilde: RwLock::new(0.0),
-            // delta_gamma: RwLock::new(0.0),
-            // delta_gamma_tilde: RwLock::new(0.0),
+            gamma_tilde: RwLock::new(Spline::empty()),
+            delta_gamma_tilde: RwLock::new(Spline::empty()),
         }
     }
 
@@ -196,11 +193,13 @@ where
             return None;
         }
 
-        // If we are not in the first substep and we need the 'false' gamma
-        // (i.e. γ̃), then we use the precomputed value.
-        // if let (true, false, Ok(gamma_tilde)) = (c.substep > 0, real, self.gamma_tilde.read()) {
-        //     return Some(*gamma_tilde);
-        // }
+        // If we need the 'false' gamma (i.e. γ̃), then we use the precomputed
+        // value provided the interval is deemed to be accurate.
+        if let (false, Ok(spline)) = (real, self.gamma_tilde.read()) {
+            if spline.accurate(context.beta) {
+                return Some(spline.sample(context.beta));
+            }
+        }
 
         let ptcl = context.model.particles();
 
@@ -226,9 +225,9 @@ where
             ))
         } else {
             let gamma_tilde = utilities::integrate_st_on_n(integrand, context.beta, p1, p2, p3, p4);
-            // if let Ok(mut lock) = self.gamma_tilde.write() {
-            //     *lock = gamma_tilde;
-            // }
+            if let Ok(mut spline) = self.gamma_tilde.write() {
+                spline.add(context.beta, gamma_tilde);
+            }
             Some(gamma_tilde)
         }
     }
@@ -236,13 +235,13 @@ where
     fn delta_gamma(&self, context: &Context<M>, real: bool) -> Option<f64> {
         let asymmetry = self.asymmetry.as_ref()?;
 
-        // If we are not in the first substep and we need the 'false' gamma
-        // (i.e. γ̃), then we use the precomputed value.
-        // if let (true, false, Ok(delta_gamma_tilde)) =
-        //     (c.substep > 0, real, self.delta_gamma_tilde.read())
-        // {
-        //     return Some(*delta_gamma_tilde);
-        // }
+        // If we need the 'false' gamma (i.e. γ̃), then we use the precomputed
+        // value provided the interval is deemed to be accurate.
+        if let (false, Ok(spline)) = (real, self.delta_gamma_tilde.read()) {
+            if spline.accurate(context.beta) {
+                return Some(spline.sample(context.beta));
+            }
+        }
 
         let ptcl = context.model.particles();
 
@@ -268,9 +267,9 @@ where
         } else {
             let delta_gamma_tilde =
                 utilities::integrate_st_on_n(integrand, context.beta, p1, p2, p3, p4);
-            // if let Ok(mut lock) = self.delta_gamma_tilde.write() {
-            //     *lock = delta_gamma_tilde;
-            // }
+            if let Ok(mut spline) = self.delta_gamma_tilde.write() {
+                spline.add(context.beta, delta_gamma_tilde);
+            }
             Some(delta_gamma_tilde)
         }
     }
