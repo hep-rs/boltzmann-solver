@@ -1,7 +1,7 @@
 //! Define the various interactions involved in leptogenesis.
 
 use super::LeptogenesisModel;
-use boltzmann_solver::{constants::PI_2, model::interaction, pave, prelude::*};
+use boltzmann_solver::{constants::PI_2, pave, prelude::*};
 use itertools::iproduct;
 use num::{Complex, Zero};
 
@@ -429,7 +429,7 @@ pub fn hhaw() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
 pub fn hhll1() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     let mut interactions = Vec::new();
 
-    for (i1, i2, i3, i4) in iproduct!(0..1, 0..1, 0..3, 0..3) {
+    for (i1, i2, i3, i4) in iproduct!(0..1, 0..1, 0..3, 0..3).filter(|(_, _, i3, i4)| i4 >= i3) {
         let squared_amplitude = move |m: &LeptogenesisModel, s, t, u| {
             // let p1 = m.particle("H", i1);
             // let p2 = m.particle("H", i2);

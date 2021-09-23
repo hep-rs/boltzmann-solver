@@ -16,7 +16,54 @@ use common::{into_interaction_box, n1f1, n3f1, n3f3};
 use ndarray::prelude::*;
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
-use std::{error, fmt, fs, io, sync::RwLock};
+#[cfg(feature = "serde")]
+use std::fs;
+use std::{env, error, fmt, io, sync::RwLock};
+
+fn main() -> Result<(), Box<dyn error::Error>> {
+    common::setup_logging(4);
+
+    let args = env::args();
+    if args.len() == 1 {
+        log::warn!("No arguments provided.  This will not run anything.");
+        return Ok(());
+    }
+
+    for arg in args.skip(1) {
+        match arg.as_str() {
+            "particle_indices" => particle_indices(),
+            "decay::n1f1" => decay::n1f1(),
+            "decay::n1f3" => decay::n1f3(),
+            "decay::n3f1" => decay::n3f1(),
+            "decay::n3f3" => decay::n3f3(),
+            "washout::n1f1" => washout::n1f1(),
+            "washout::n1f3" => washout::n1f3(),
+            "washout::n3f1" => washout::n3f1(),
+            "washout::n3f3" => washout::n3f3(),
+            #[cfg(not(debug_assertions))]
+            "full::n1f1" => full::n1f1(),
+            #[cfg(not(debug_assertions))]
+            "full::n1f3" => full::n1f3(),
+            #[cfg(not(debug_assertions))]
+            "full::n3f1" => full::n3f1(),
+            #[cfg(not(debug_assertions))]
+            "full::n3f3" => full::n3f3(),
+            #[cfg(feature = "serde")]
+            "evolution" => evolution(),
+            "higgs_equilibrium" => higgs_equilibrium(),
+            "lepton_equilibrium" => lepton_equilibrium(),
+            "gammas" => gammas(),
+            "custom" => custom(),
+            x => panic!("Unknown argument: {}", x),
+        }
+        .or_else(|e| {
+            log::error!("Error: {}", e);
+            Result::<(), Box<dyn error::Error>>::Ok(())
+        })?
+    }
+
+    Ok(())
+}
 
 /// Solve the Boltzmann equations and return the final values.
 ///
@@ -79,6 +126,7 @@ where
                 csv.write_field(format!("{:e}", c.eq[i])).unwrap();
             }
             csv.write_record(None::<&[u8]>).unwrap();
+            csv.flush().unwrap();
 
             if c.n.iter().chain(c.na.iter()).any(|n| !n.is_finite()) {
                 csv.flush().unwrap();
@@ -104,10 +152,7 @@ where
     Ok(solver.solve()?)
 }
 
-#[test]
-fn particle_indices() {
-    common::setup_logging(1);
-
+fn particle_indices() -> Result<(), Box<dyn error::Error>> {
     let model = LeptogenesisModel::zero();
 
     for (i, p) in model.particles().iter().enumerate() {
@@ -126,6 +171,8 @@ fn particle_indices() {
             assert_eq!(Ok(i), model.particle_idx(&head.to_string(), idx));
         }
     }
+
+    Ok(())
 }
 
 /// Run a particular interaction with the specified `$name` and outputting data
@@ -138,19 +185,16 @@ fn particle_indices() {
 /// A pre-function that takes in and returns the [`ModelBuilder`] instance can
 /// be given in `$pre` to modify initial conditions.  A check on the final
 /// number densities can done in the function `$post`.
-macro_rules! run {
+macro_rules! define {
     {$name:ident, $csv:expr, $filter:expr, $interactions3:expr, $interactions4:expr} => {
-        run!{$name, $csv,$filter, $interactions3, $interactions4, std::convert::identity, |_n, _na| {}}
+        define!{$name, $csv,$filter, $interactions3, $interactions4, std::convert::identity, |_n, _na| {}}
     };
     {$name:ident, $csv:expr, $filter:expr, $interactions3:expr, $interactions4:expr, $post:expr} => {
-        run!{$name, $csv,$filter, $interactions3, $interactions4, std::convert::identity, $post}
+        define!{$name, $csv,$filter, $interactions3, $interactions4, std::convert::identity, $post}
     };
     {$name:ident, $csv:expr, $filter:expr, $interactions3:expr, $interactions4:expr, $pre:expr, $post:expr} => {
-        #[test]
-        #[allow(unused_variables)]
+        #[allow(unused_variables, dead_code)]
         pub fn $name() -> Result<(), Box<dyn error::Error>> {
-            common::setup_logging(2);
-
             // Create the CSV file
             let output_dir = common::output_dir("full");
             let csv = csv::Writer::from_path(output_dir.join(concat!($csv, ".", "csv")))?;
@@ -190,127 +234,185 @@ macro_rules! run {
     };
 }
 
-/// Runs the same as the [`run!`] macro with the three filters: [`n1f1`],
+/// Runs the same as the [`define!`] macro with the three filters: [`n1f1`],
 /// [`n3f1`], [`n3f3`].
-macro_rules! run_all {
+macro_rules! define_all {
     {$name:ident, $interactions3:expr, $interactions4:expr} => {
-        run_all!{$name, $interactions3, $interactions4, std::convert::identity, |_n, _na| {}}
+        define_all!{$name, $interactions3, $interactions4, std::convert::identity, |_n, _na| {}}
     };
     {$name:ident, $interactions3:expr, $interactions4:expr, $post:expr} => {
-        run_all!{$name, $interactions3, $interactions4, std::convert::identity, $post}
+        define_all!{$name, $interactions3, $interactions4, std::convert::identity, $post}
     };
     {$name:ident, $interactions3:expr, $interactions4:expr, $pre:expr, $post:expr} => {
         mod $name {
             use super::*;
 
-            run! {
+            define! {
                 n1f1,
                 concat!(stringify!($name), "_n1f1"),
                 super::n1f1,
                 $interactions3,
-                $interactions4, $pre, $post
+                $interactions4,
+                $pre,
+                $post
             }
-            run! {
+            define! {
+                n1f3,
+                concat!(stringify!($name), "_n1f3"),
+                super::n3f1,
+                $interactions3,
+                $interactions4,
+                $pre,
+                $post
+            }
+            define! {
                 n3f1,
                 concat!(stringify!($name), "_n3f1"),
                 super::n3f1,
                 $interactions3,
-                $interactions4, $pre, $post
+                $interactions4,
+                $pre,
+                $post
             }
-            run! {
+            define! {
                 n3f3,
                 concat!(stringify!($name), "_n3f3"),
                 super::n3f3,
                 $interactions3,
-                $interactions4, $pre, $post
+                $interactions4,
+                $pre,
+                $post
             }
         }
     };
 }
 
-run_all! {
-    decay,
+// {$name:ident, $csv:expr, $filter:expr, $interactions3:expr, $interactions4:expr, $pre:expr, $post:expr}
+define! {
+    custom,
+    "custom",
+    n1f1,
     [
+        interaction::hqu,
+        interaction::hqd,
+        interaction::hle,
         interaction::hln,
-        // interaction::ffa,
-        // interaction::ffw,
-        // interaction::ffg,
+        interaction::hhw,
+        interaction::hha,
+        interaction::ffa,
+        interaction::ffw,
+        interaction::ffg,
     ],
-    // [
-    //     interaction::hhww,
-    //     interaction::hhaa,
-    //     interaction::hhaw,
-    // ]
-    std::iter::empty::<&dyn Fn() -> Vec<FourParticle<LeptogenesisModel>>>()
+    [
+        interaction::hhww,
+        interaction::hhaa,
+        interaction::hhaw,
+        interaction::hhll1,
+        interaction::hhll2,
+        interaction::hhen,
+        interaction::nhla,
+        interaction::nhlw,
+        interaction::quln,
+        interaction::qdln,
+        interaction::leln,
+        interaction::lnln,
+    ],
+    |builder: SolverBuilder<_>| {
+        builder
+        .precompute(0)
+
+    },
+    |n, na| (n, na)
 }
 
-// #[cfg(not(debug_assertions))]
-run_all! {
+define_all! {
+    decay,
+    [
+        interaction::hqu,
+        interaction::hqd,
+        interaction::hle,
+        interaction::hln,
+        interaction::hhw,
+        interaction::hha,
+        interaction::ffa,
+        interaction::ffw,
+        interaction::ffg,
+    ],
+    [
+        interaction::hhww,
+        interaction::hhaa,
+        interaction::hhaw,
+    ]
+    // std::iter::empty::<&dyn Fn() -> Vec<FourParticle<LeptogenesisModel>>>()
+}
+
+define_all! {
     washout,
     [
         interaction::ffa,
-        // interaction::ffw,
-        // interaction::ffg,
+        interaction::ffw,
+        interaction::ffg,
     ],
     [
-        // interaction::hhww,
-        // interaction::hhaa,
-        // interaction::hhaw,
+        interaction::hhww,
+        interaction::hhaa,
+        interaction::hhaw,
         interaction::hhll1,
-        // interaction::hhll2,
-        // interaction::hhen,
-        // interaction::nhla,
+        interaction::hhll2,
+        interaction::hhen,
+        interaction::nhla,
         interaction::nhlw,
-        // interaction::quln,
-        // interaction::qdln,
-        // interaction::leln,
-        // interaction::lnln,
+        interaction::quln,
+        interaction::qdln,
+        interaction::leln,
+        interaction::lnln,
     ],
     |builder: SolverBuilder<LeptogenesisModel>| {
         builder.initial_asymmetries([
-            (LeptogenesisModel::static_particle_idx("N", 0).unwrap(), 1e-2),
-            (LeptogenesisModel::static_particle_idx("N", 1).unwrap(), 1e-3),
-            (LeptogenesisModel::static_particle_idx("N", 2).unwrap(), 1e-4),
+            (LeptogenesisModel::static_particle_idx("L", 0).unwrap(), 1e-2),
+            (LeptogenesisModel::static_particle_idx("L", 1).unwrap(), 1e-3),
+            (LeptogenesisModel::static_particle_idx("L", 2).unwrap(), 1e-4),
+        ]).in_equilibrium([
+            LeptogenesisModel::static_particle_idx("H", 0).unwrap()
+        ]).no_asymmetry([
+            LeptogenesisModel::static_particle_idx("N", 0).unwrap()
         ])
     },
     |_n, _na| {}
 }
 
 #[cfg(not(debug_assertions))]
-run_all! {
+define_all! {
     full,
     [
         interaction::hqu,
         interaction::hqd,
         interaction::hle,
         interaction::hln,
-        // interaction::hhw,
-        // interaction::hha,
+        interaction::hhw,
+        interaction::hha,
         interaction::ffa,
-        // interaction::ffw,
-        // interaction::ffg,
+        interaction::ffw,
+        interaction::ffg,
     ],
     [
-        // interaction::hhww,
-        // interaction::hhaa,
+        interaction::hhww,
+        interaction::hhaa,
         interaction::hhaw,
         interaction::hhll1,
-        // interaction::hhll2,
-        // interaction::hhen,
-        // interaction::nhla,
+        interaction::hhll2,
+        interaction::hhen,
+        interaction::nhla,
         interaction::nhlw,
-        // interaction::quln,
-        // interaction::qdln,
-        // interaction::leln,
-        // interaction::lnln,
+        interaction::quln,
+        interaction::qdln,
+        interaction::leln,
+        interaction::lnln,
     ]
 }
 
 #[cfg(feature = "serde")]
-#[test]
 fn evolution() -> Result<(), Box<dyn error::Error>> {
-    common::setup_logging(1);
-
     // Create the CSV files
     let output_dir = common::output_dir("full");
 
@@ -361,10 +463,7 @@ fn evolution() -> Result<(), Box<dyn error::Error>> {
 }
 
 /// Test that gauge couplings keep the Higgs in equilibrium
-#[test]
 pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
-    common::setup_logging(1);
-
     // Create the CSV file
     let output_dir = common::output_dir("full/higgs_equilibrium");
 
@@ -375,7 +474,7 @@ pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
     let iter = v.into_iter().enumerate();
 
     iter.for_each(|(i, beta)| {
-        log::debug!("[β = {:.3e}, i = {}]", beta, i);
+        log::info!("[{:03}] Initial β = {:.3e}", i, beta);
 
         let csv = csv::Writer::from_path(output_dir.join(format!("{:03}.csv", i))).unwrap();
 
@@ -405,10 +504,7 @@ pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
 }
 
 /// Test that gauge couplings keep the lepton doublets in equilibrium
-#[test]
 pub fn lepton_equilibrium() -> Result<(), Box<dyn error::Error>> {
-    common::setup_logging(1);
-
     // Create the CSV file
     let output_dir = common::output_dir("full/lepton_equilibrium");
 
@@ -419,16 +515,12 @@ pub fn lepton_equilibrium() -> Result<(), Box<dyn error::Error>> {
     let iter = v.into_iter().enumerate();
 
     iter.for_each(|(i, beta)| {
-        log::debug!("[β = {:.3e}, i = {}]", beta, i);
+        log::info!("[{:03}] Initial β = {:.3e}", i, beta);
 
         let csv = csv::Writer::from_path(output_dir.join(format!("{:03}.csv", i))).unwrap();
 
         let mut model = LeptogenesisModel::zero();
-        for i in &[
-            interaction::ffa,
-            interaction::ffw,
-            // interaction::ffg,
-        ] {
+        for i in &[interaction::ffa, interaction::ffw, interaction::ffg] {
             model
                 .interactions
                 .extend(i().drain(..).filter(n1f1).map(into_interaction_box));
@@ -453,13 +545,9 @@ pub fn lepton_equilibrium() -> Result<(), Box<dyn error::Error>> {
     Ok(())
 }
 
-#[test]
 fn gammas() -> Result<(), Box<dyn error::Error>> {
-    common::setup_logging(2);
-
     let output_dir = common::output_dir("full");
 
-    // Create two copies of the model for both solvers
     let mut model = LeptogenesisModel::zero();
     for i in &[
         interaction::hle,
@@ -499,7 +587,7 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
 
     let mut solver = SolverBuilder::new()
         .model(model)
-        .beta_range(1e-14, 1e0)
+        .beta_range(1e-20, 1e0)
         .build()
         .unwrap();
 
