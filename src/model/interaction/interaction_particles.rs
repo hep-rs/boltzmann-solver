@@ -1,6 +1,7 @@
 use crate::{
     model::interaction::{checked_div, FastInteractionResult},
     prelude::{Context, Model},
+    utilities::spline::Linear as Spline,
 };
 use ndarray::prelude::*;
 #[cfg(feature = "serde")]
@@ -8,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use std::{
     cmp::{self, Ordering},
     collections::HashMap,
-    error, fmt, hash, ops,
+    error, fmt, hash, iter, ops,
     sync::RwLock,
 };
 
@@ -257,12 +258,16 @@ impl Particles {
         }
     }
 
-    /// Iterate over all incoming particle attributes, as a tuple `(idx, sign)`.
+    /// Iterate over all incoming particle, providing them as a tuple `(idx,
+    /// sign)` where a positive / negative sign indicates a particle /
+    /// anti-particle.
     pub fn iter_incoming(&self) -> impl Iterator<Item = (&usize, &f64)> {
         self.incoming_idx.iter().zip(&self.incoming_sign)
     }
 
-    /// Iterate over all incoming particle attributes, as a tuple `(idx, sign)`.
+    /// Iterate over all outgoing particle, providing them as a tuple `(idx,
+    /// sign)` where a positive / negative sign indicates a particle /
+    /// anti-particle.
     pub fn iter_outgoing(&self) -> impl Iterator<Item = (&usize, &f64)> {
         self.outgoing_idx.iter().zip(&self.outgoing_sign)
     }
@@ -1203,16 +1208,25 @@ impl Particles {
         context: &Context<M>,
         n_input: &Array1<f64>,
         na_input: &Array1<f64>,
-        eq_input: &Array2<f64>,
+        eq_input: &[Array1<f64>],
     ) -> FastInteractionResult {
         use crate::solver::tableau::{self, RK_A, RK_B, RK_C, RK_E, RK_S};
-        #[cfg(not(feature = "parallel"))]
-        use ndarray::azip as zip;
-        #[cfg(feature = "parallel")]
-        use ndarray::par_azip as zip;
 
-        let dim = n_input.dim();
-        let mut result = FastInteractionResult::zero(dim);
+        let large_dim = n_input.dim();
+        let small_dim = self.particle_counts.len();
+        let mut result = FastInteractionResult::zero(large_dim);
+
+        // Since only a small subset of all particles are involved in any given
+        // interaction, we can significantly speed up the fast computation by
+        // restricting our computation to only the relevant entries in the
+        // arrays.  Note that we can't just use small arrays as we still need to
+        // use the full sized `n`, `na`, `dn`, etc arrays to be used within
+        // other functions (`symmetric_delta`, `asymmetric_prefactor`, etc.)
+        let large_indices = {
+            let mut tmp: Vec<_> = self.particle_counts.keys().copied().collect();
+            tmp.sort_unstable();
+            tmp
+        };
 
         if self.gamma_tilde.is_none() && self.delta_gamma_tilde.is_none() {
             log::warn!(
@@ -1224,11 +1238,11 @@ impl Particles {
         // To avoid the need to compute the equilibrium number density for all
         // particles, we use the values that were already computed in the main
         // Runge-Kutta routine and interpolate in between.
-        let mut eq = Array1::from_shape_simple_fn(context.n.dim(), || {
-            crate::utilities::spline::CubicHermite::empty()
-        });
-        for ((i, p), &v) in eq_input.indexed_iter() {
-            eq[p].add(context.beta + RK_C[i] * context.step_size, v);
+        let mut eq_splines: Vec<_> = iter::repeat(Spline::empty()).take(small_dim).collect();
+        for (i, arr) in eq_input.iter().enumerate() {
+            for (spline, &p) in eq_splines.iter_mut().zip(&large_indices) {
+                spline.add(context.beta + RK_C[i] * context.step_size, arr[p]);
+            }
         }
 
         // Local value of β and Δβ for the local Runge-Kutta loop.
@@ -1239,22 +1253,38 @@ impl Particles {
         let mut n = n_input.clone();
         let mut na = na_input.clone();
 
+        // The number density at a particular sub-quadrature step.
+        let mut ni = Array1::zeros(large_dim);
+        let mut nai = Array1::zeros(large_dim);
+        let mut eqi = Array1::zeros(large_dim);
+
         // Global error estimate
-        let mut n_err = Array1::zeros(dim);
-        let mut na_err = Array1::zeros(dim);
+        let mut n_err = Array1::zeros(large_dim);
+        let mut na_err = Array1::zeros(large_dim);
 
         // Local change and error estiamte for each step step of the Runge-Kutta loop
-        let mut dn = Array1::zeros(dim);
-        let mut dna = Array1::zeros(dim);
-        let mut dn_err = Array1::zeros(dim);
-        let mut dna_err = Array1::zeros(dim);
+        let mut dn = Array1::zeros(large_dim);
+        let mut dna = Array1::zeros(large_dim);
+        let mut dn_err = Array1::zeros(large_dim);
+        let mut dna_err = Array1::zeros(large_dim);
+
+        // Compute the max delta to clamp the change
+        let max_delta = self
+            .symmetric_delta(&context.n, &context.eqn, context.in_equilibrium)
+            .abs();
+        let max_asymmetric_delta = self
+            .asymmetric_delta(
+                &context.n,
+                &context.na,
+                &context.eqn,
+                context.in_equilibrium,
+                context.no_asymmetry,
+            )
+            .abs();
 
         // The sub-quadrature changes.
-        let mut k = Array2::zeros((RK_S, dim));
-        let mut ka = Array2::zeros((RK_S, dim));
-
-        // let gamma_tilde = self.gamma_tilde.unwrap_or_default();
-        // let delta_gamma_tilde = self.delta_gamma_tilde.unwrap_or_default();
+        let mut k: Vec<_> = iter::repeat(Array1::zeros(large_dim)).take(RK_S).collect();
+        let mut ka: Vec<_> = iter::repeat(Array1::zeros(large_dim)).take(RK_S).collect();
 
         // To help improve convergence, we scale back any 'enormous' values to improve convergence.
         let gamma_tilde = self
@@ -1271,29 +1301,36 @@ impl Particles {
 
         let mut step = 0_usize;
         let mut steps_discarded = 0_usize;
-        while beta < context.beta + context.step_size {
+
+        // TODO: Is it safe to exit the loop if beta is no longer increasing?
+        // Will the next call to this routine resolve the issue?
+        while beta < context.beta + context.step_size && beta != beta + h {
             step += 1;
 
             // Reset all changes computed so far
-            k.fill(0.0);
-            ka.fill(0.0);
-            dn.fill(0.0);
-            dna.fill(0.0);
-            dn_err.fill(0.0);
-            dna_err.fill(0.0);
+            for &p in &large_indices {
+                k.iter_mut().for_each(|ki| ki[p] = 0.0);
+                ka.iter_mut().for_each(|kai| kai[p] = 0.0);
+                dn[p] = 0.0;
+                dna[p] = 0.0;
+                dn_err[p] = 0.0;
+                dna_err[p] = 0.0;
+            }
 
             for i in 0..RK_S {
                 let beta_i = beta + RK_C[i] * h;
 
-                // Get the inputs to buld the sub-steps
+                // Get the inputs to build the sub-steps
                 let ai = RK_A[i];
-                let ni = (0..i).fold(n.clone(), |total, j| {
-                    total + ai[j] * &k.slice(ndarray::s![j, ..])
-                });
-                let nai = (0..i).fold(na.clone(), |total, j| {
-                    total + ai[j] * &ka.slice(ndarray::s![j, ..])
-                });
-                let eqi = eq.map(|eq| eq.sample(beta_i));
+                for (pi, &p) in large_indices.iter().enumerate() {
+                    ni[p] = n[p];
+                    nai[p] = na[p];
+                    eqi[p] = eq_splines[pi].sample(beta_i);
+                    for j in 0..i {
+                        ni[p] += ai[j] * k[j][p];
+                        nai[p] += ai[j] * k[j][p];
+                    }
+                }
 
                 // Compute the prefactors
                 let (forward, backward) =
@@ -1319,61 +1356,48 @@ impl Particles {
                 // Adjust for possible overshoots.  In this case, we use the
                 // original context to determine the overshoot as this seems to
                 // work best.
-                self.adjust_overshoot(
-                    &mut symmetric_delta,
-                    &mut asymmetric_delta,
-                    &context.n,
-                    &context.na,
-                    &context.eq,
-                    &context.eqn,
-                    context.in_equilibrium,
-                    context.no_asymmetry,
-                );
+                symmetric_delta = symmetric_delta.clamp(-max_delta, max_delta);
+                asymmetric_delta =
+                    asymmetric_delta.clamp(-max_asymmetric_delta, max_asymmetric_delta);
 
-                let mut ki = k.slice_mut(ndarray::s![i, ..]);
-                let mut kai = ka.slice_mut(ndarray::s![i, ..]);
+                let ki = &mut k[i];
+                let kai = &mut ka[i];
 
                 for (&p, &(c, ca)) in &self.particle_counts {
-                    if context.in_equilibrium.binary_search(&p).is_err() {
+                    if c != 0.0 && context.in_equilibrium.binary_search(&p).is_err() {
                         ki[p] = c * symmetric_delta;
                     }
-                    if context.no_asymmetry.binary_search(&p).is_err() {
+                    if ca != 0.0 && context.no_asymmetry.binary_search(&p).is_err() {
                         kai[p] = ca * asymmetric_delta;
                     }
                 }
 
                 let bi = RK_B[i];
                 let ei = RK_E[i];
-                zip!(
-                    (
-                        dn in &mut dn,
-                        dn_err in &mut dn_err,
-                        &ki in &ki,
-                        dna in &mut dna,
-                        dna_err in &mut dna_err,
-                        &kai in &kai
-                    ) {
-                        *dn += bi * ki;
-                        *dn_err += ei * ki;
-                        *dna += bi * kai;
-                        *dna_err += ei * kai;
-                    }
-                );
+                for &p in &large_indices {
+                    dn[p] += bi * ki[p];
+                    dna[p] += bi * kai[p];
+                    dn_err[p] += ei * ki[p];
+                    dna_err[p] += ei * kai[p];
+                }
             }
 
-            let ratio = dn_err
-                .iter()
-                .chain(&dna_err)
-                .map(|err| err.abs())
-                .zip(n.iter().chain(&na))
-                .fold(f64::INFINITY, |min, (err, &n)| {
-                    let max_tolerance = error_tolerance.max_tolerance(n);
-                    min.min(if err == 0.0 {
-                        f64::MAX
-                    } else {
-                        max_tolerance / err
-                    })
+            let mut ratio = f64::INFINITY;
+            for &p in &large_indices {
+                let err = dn_err[p].abs();
+                ratio = ratio.min(if err == 0.0 {
+                    f64::MAX
+                } else {
+                    error_tolerance.max_tolerance(n[p]) / err
                 });
+                let err = dna_err[p].abs();
+                ratio = ratio.min(if err == 0.0 {
+                    f64::MAX
+                } else {
+                    error_tolerance.max_tolerance(na[p]) / err
+                });
+            }
+
             let delta = 0.8 * ratio.powf(1.0 / f64::from(tableau::RK_ORDER + 1));
             let delta = if delta.is_nan() || delta.is_infinite() {
                 0.1
@@ -1387,10 +1411,10 @@ impl Particles {
                 n += &dn;
                 na += &dna;
 
-                dn_err.mapv_inplace(|v| v.abs());
-                dna_err.mapv_inplace(|v| v.abs());
-                n_err += &dn_err;
-                na_err += &dna_err;
+                for &p in &large_indices {
+                    n_err[p] += dn_err[p].abs();
+                    na_err[p] += dna_err[p].abs();
+                }
             } else {
                 steps_discarded += 1;
             }
