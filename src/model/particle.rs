@@ -1,6 +1,7 @@
 //! Basic implementation of a particle type
 
 mod propagator;
+pub use propagator::{Multi as MultiPropagator, Propagator, Single as SinglePropagator};
 
 use crate::{
     model::standard::data,
@@ -9,8 +10,6 @@ use crate::{
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::{cmp, collections::HashMap, f64, fmt};
-
-pub use propagator::Propagator;
 
 /// Particle type
 ///
@@ -267,8 +266,8 @@ impl Particle {
 
     /// Return the propagator denominator for the particle.
     #[must_use]
-    pub fn propagator(&self, s: f64) -> Propagator {
-        Propagator::new(self, s)
+    pub fn propagator(&self, s: f64) -> SinglePropagator {
+        SinglePropagator::new(self, s)
     }
 }
 
