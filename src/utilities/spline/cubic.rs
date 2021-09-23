@@ -57,21 +57,21 @@ impl ConstCubicHermite {
 ///
 /// The `accurate` flag indicates whether the interval between the current point
 /// and the next point is deemed accurate.
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-struct CubicHermiteSplinePoint {
+struct SplinePoint {
     x: f64,
     y: f64,
     m: f64,
     accurate: bool,
 }
 
-impl CubicHermiteSplinePoint {
+impl SplinePoint {
     /// Create a new spline point going through coordinate `(x, y)`.
     ///
     /// The gradient will be NaN initially, and `accurate` is set to `false`.
     fn new(x: f64, y: f64) -> Self {
-        CubicHermiteSplinePoint {
+        SplinePoint {
             x,
             y,
             m: f64::NAN,
@@ -81,14 +81,14 @@ impl CubicHermiteSplinePoint {
 }
 
 /// Cubic Hermite spline interpolator
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[allow(clippy::module_name_repetitions)]
 pub struct CubicHermite {
     // `(x, y, m, accurate)` tuples through which the spline goes through, with
     // gradient `m`.  The accurate flag determines whether the interval between
     // it and the next value is accurate or not.
-    data: Vec<CubicHermiteSplinePoint>,
+    data: Vec<SplinePoint>,
     // Number of points required before it begins to consider whether an
     // interval is accurate.
     min_points: usize,
@@ -100,7 +100,7 @@ impl CubicHermite {
     pub fn empty() -> Self {
         CubicHermite {
             data: Vec::new(),
-            min_points: 2,
+            min_points: 4,
         }
     }
 
@@ -141,13 +141,13 @@ impl CubicHermite {
         match self.data.binary_search_by(|p| p.x.partial_cmp(&x).unwrap()) {
             Ok(_) => (),
             Err(0) => {
-                self.data.insert(0, CubicHermiteSplinePoint::new(x, y));
+                self.data.insert(0, SplinePoint::new(x, y));
 
                 self.compute_gradient(0);
                 self.compute_gradient(1);
             }
             Err(i) if i == self.data.len() => {
-                self.data.insert(i, CubicHermiteSplinePoint::new(x, y));
+                self.data.insert(i, SplinePoint::new(x, y));
 
                 self.compute_gradient(i - 1);
                 self.compute_gradient(i);
@@ -155,7 +155,7 @@ impl CubicHermite {
             Err(i) => {
                 let ny = self.sample(x);
 
-                self.data.insert(i, CubicHermiteSplinePoint::new(x, y));
+                self.data.insert(i, SplinePoint::new(x, y));
 
                 self.compute_gradient(i - 1);
                 self.compute_gradient(i);
@@ -196,6 +196,16 @@ impl CubicHermite {
         }
     }
 
+    /// Check whether the spline contains the point given.
+    #[must_use]
+    pub fn contains(&self, x: f64) -> bool {
+        if self.data.len() >= 2 {
+            self.data[0].x <= x && x <= self.data[self.data.len() - 1].x
+        } else {
+            false
+        }
+    }
+
     /// Check whether a given interval is accurate or not.
     ///
     /// If the point checked falls outside of the boundary, this is
@@ -226,6 +236,10 @@ impl CubicHermite {
     /// The value of `x` cannot be NaN.
     #[must_use]
     pub fn sample(&self, x: f64) -> f64 {
+        debug_assert!(
+            self.data.len() >= 2,
+            "Spline does not have enough points to be sampled."
+        );
         match self.data.binary_search_by(|p| p.x.partial_cmp(&x).unwrap()) {
             Ok(i) => self.data[i].y,
             Err(0) => self.data[0].y,

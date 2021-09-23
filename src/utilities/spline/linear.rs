@@ -47,20 +47,20 @@ impl ConstLinear {
 ///
 /// The `accurate` flag indicates whether the interval between the current point
 /// and the next point is deemed accurate.
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-struct LinearSplinePoint {
+struct SplinePoint {
     x: f64,
     y: f64,
     accurate: bool,
 }
 
-impl LinearSplinePoint {
+impl SplinePoint {
     /// Create a new spline point going through coordinate `(x, y)`.
     ///
     /// The gradient will be NaN initially, and `accurate` is set to `false`.
     fn new(x: f64, y: f64) -> Self {
-        LinearSplinePoint {
+        SplinePoint {
             x,
             y,
             accurate: false,
@@ -69,14 +69,14 @@ impl LinearSplinePoint {
 }
 
 /// Linear spline interpolator
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[allow(clippy::module_name_repetitions)]
 pub struct Linear {
     // `(x, y, m, accurate)` tuples through which the spline goes through, with
     // gradient `m`.  The accurate flag determines whether the interval between
     // it and the next value is accurate or not.
-    data: Vec<LinearSplinePoint>,
+    data: Vec<SplinePoint>,
     // Number of points required before it begins to consider whether an
     // interval is accurate.
     min_points: usize,
@@ -88,7 +88,7 @@ impl Linear {
     pub fn empty() -> Self {
         Linear {
             data: Vec::new(),
-            min_points: 2,
+            min_points: 4,
         }
     }
 
@@ -129,15 +129,15 @@ impl Linear {
         match self.data.binary_search_by(|p| p.x.partial_cmp(&x).unwrap()) {
             Ok(_) => (),
             Err(0) => {
-                self.data.insert(0, LinearSplinePoint::new(x, y));
+                self.data.insert(0, SplinePoint::new(x, y));
             }
             Err(i) if i == self.data.len() => {
-                self.data.insert(i, LinearSplinePoint::new(x, y));
+                self.data.insert(i, SplinePoint::new(x, y));
             }
             Err(i) => {
                 let ny = self.sample(x);
 
-                self.data.insert(i, LinearSplinePoint::new(x, y));
+                self.data.insert(i, SplinePoint::new(x, y));
 
                 let delta = (ny - y).abs();
                 if self.data.len() > self.min_points
@@ -147,6 +147,16 @@ impl Linear {
                     self.data[i].accurate = true;
                 }
             }
+        }
+    }
+
+    /// Check whether the spline contains the point given.
+    #[must_use]
+    pub fn contains(&self, x: f64) -> bool {
+        if self.data.len() >= 2 {
+            self.data[0].x <= x && x <= self.data[self.data.len() - 1].x
+        } else {
+            false
         }
     }
 
@@ -180,8 +190,11 @@ impl Linear {
     /// The value of `x` cannot be NaN.
     #[must_use]
     pub fn sample(&self, x: f64) -> f64 {
+        debug_assert!(
+            self.data.len() >= 2,
+            "Spline does not have enough points to be sampled."
+        );
         match self.data.binary_search_by(|p| p.x.partial_cmp(&x).unwrap()) {
-            Ok(i) => self.data[i].y,
             Err(0) => self.data[0].y,
             Err(i) if i == self.data.len() => self.data[i - 1].y,
             Err(i) => {
@@ -191,6 +204,7 @@ impl Linear {
                 let t = (x - p0.x) / (p1.x - p0.x);
                 p0.y + t * (p1.y - p0.y)
             }
+            Ok(i) => self.data[i].y,
         }
     }
 }
