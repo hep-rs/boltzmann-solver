@@ -258,9 +258,9 @@ impl Particle {
     #[must_use]
     pub fn entropy_dof(&self, beta: f64) -> f64 {
         if self.is_bosonic() {
-            data::BOSON_GSTAR.sample((self.mass * beta).ln()).exp() * self.degrees_of_freedom()
+            data::BOSON_GSTAR.sample(f64::ln(self.mass * beta)).exp() * self.degrees_of_freedom()
         } else {
-            data::FERMION_GSTAR.sample((self.mass * beta).ln()).exp() * self.degrees_of_freedom()
+            data::FERMION_GSTAR.sample(f64::ln(self.mass * beta)).exp() * self.degrees_of_freedom()
         }
     }
 

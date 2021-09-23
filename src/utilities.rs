@@ -20,8 +20,8 @@ pub fn rec_geomspace(start: f64, end: f64, recursions: u32) -> Vec<f64> {
     v.push(start);
     v.push(end);
 
-    let start = start.ln();
-    let end = end.ln();
+    let start = f64::ln(start);
+    let end = f64::ln(end);
 
     let mut base = 2.0;
     for i in 2..2_u64.pow(recursions) {
@@ -34,7 +34,7 @@ pub fn rec_geomspace(start: f64, end: f64, recursions: u32) -> Vec<f64> {
         let b = 2.0 * i - base - 1.0;
         let a = base - b;
 
-        v.push(((a * start + b * end) / base).exp());
+        v.push(f64::exp((a * start + b * end) / base));
     }
     v
 }

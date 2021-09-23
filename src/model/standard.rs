@@ -186,7 +186,7 @@ impl Model for Standard {
 
     fn entropy_dof(&self, beta: f64) -> f64 {
         debug_assert!(beta > 0.0, "beta must be positive.");
-        data::STANDARD_MODEL_GSTAR.sample(beta.ln())
+        data::STANDARD_MODEL_GSTAR.sample(f64::ln(beta))
     }
 
     fn particles(&self) -> &[Particle] {

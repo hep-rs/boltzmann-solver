@@ -6,7 +6,7 @@ mod particle;
 pub(crate) mod standard;
 
 pub use empty::Empty;
-pub use particle::Particle;
+pub use particle::{Particle, Propagator};
 pub use standard::Standard;
 
 use crate::{

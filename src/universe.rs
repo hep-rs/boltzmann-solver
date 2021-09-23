@@ -49,12 +49,17 @@ impl Universe for SingleSpecies {
         match self.statistic {
             Statistic::FermiDirac => {
                 self.dof
-                    * interpolation::linear(&constants::FERMION_GSTAR, (self.mass * beta).ln())
-                        .exp()
+                    * f64::exp(interpolation::linear(
+                        &constants::FERMION_GSTAR,
+                        f64::ln(self.mass * beta),
+                    ))
             }
             Statistic::BoseEinstein => {
                 self.dof
-                    * interpolation::linear(&constants::BOSON_GSTAR, (self.mass * beta).ln()).exp()
+                    * f64::exp(interpolation::linear(
+                        &constants::BOSON_GSTAR,
+                        f64::ln(self.mass * beta),
+                    ))
             }
             Statistic::MaxwellBoltzmann => unimplemented!(),
             Statistic::MaxwellJuttner => unimplemented!(),
