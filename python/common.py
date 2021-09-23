@@ -167,6 +167,7 @@ def plot_integration(df: pd.DataFrame):
             )
         ],
         layout=go.Layout(
+            width=1000,
             xaxis=go.layout.XAxis(
                 title="Integration Step",
                 type="linear",
@@ -176,7 +177,6 @@ def plot_integration(df: pd.DataFrame):
             ),
         ),
     )
-
     return fig
 
 
@@ -210,7 +210,7 @@ def plot_densities(df: pd.DataFrame, ptcls: List[str]):
             go.Scatter(
                 name="-B-L",
                 legendgroup="B-L",
-                showlegend=True,
+                showlegend=False,
                 x=df["beta"],
                 y=df["-na-B-L"],
                 line=go.scatter.Line(width=3, color="black", dash="dash"),
@@ -220,7 +220,7 @@ def plot_densities(df: pd.DataFrame, ptcls: List[str]):
             go.Scatter(
                 name=f"{ptcl}",
                 legendgroup=ptcl,
-                showlegend=False,
+                showlegend=True,
                 x=df["beta"],
                 y=df[f"na-{ptcl}"],
                 line=go.scatter.Line(color=color),
@@ -251,15 +251,7 @@ def plot_densities(df: pd.DataFrame, ptcls: List[str]):
                 x=df["beta"],
                 y=df["dna-B-L"],
                 line=go.scatter.Line(width=3, color="black"),
-            ),
-            go.Scatter(
-                name="B-L",
-                legendgroup="B-L",
-                showlegend=False,
-                x=df["beta"],
-                y=df["-dna-B-L"],
-                line=go.scatter.Line(width=3, color="black", dash="dash"),
-            ),
+            )
         ]
         + [
             go.Scatter(
@@ -269,17 +261,6 @@ def plot_densities(df: pd.DataFrame, ptcls: List[str]):
                 x=df["beta"],
                 y=df[f"dna-{ptcl}"],
                 line=go.scatter.Line(color=color),
-            )
-            for ptcl, color in zip(ptcls, COLORS)
-        ]
-        + [
-            go.Scatter(
-                name=f"{ptcl}",
-                legendgroup=ptcl,
-                showlegend=False,
-                x=df["beta"],
-                y=df[f"-dna-{ptcl}"],
-                line=go.scatter.Line(color=color, dash="dash"),
             )
             for ptcl, color in zip(ptcls, COLORS)
         ],
@@ -349,8 +330,8 @@ def plot_densities(df: pd.DataFrame, ptcls: List[str]):
     )
     fig.update_yaxes(
         title_text="Asymmetry Change [Normalized]",
-        type="log",
-        range=[-20, 1],
+        type="linear",
+        # range=[-20, 1],
         exponentformat="power",
         row=2,
         col=1,
@@ -381,7 +362,7 @@ def plot_densities(df: pd.DataFrame, ptcls: List[str]):
 
 
 def interaction_particle(s: str) -> List[str]:
-    return sorted(s.replace("↔", "").replace("\u0304", "").split())
+    return sorted(s.replace("↔", "").replace("\u0305", "").split())
 
 
 def standardize_interaction(s: str) -> str:
@@ -395,6 +376,7 @@ def plot_gamma(data):
 
     fig = go.FigureWidget(
         layout=go.Layout(
+            width=1000,
             xaxis=go.layout.XAxis(
                 title="Inverse Temperature",
                 type="log",
