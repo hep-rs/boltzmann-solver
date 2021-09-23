@@ -32,6 +32,19 @@ impl FastInteractionResult {
     }
 }
 
+impl ops::Add<Self> for FastInteractionResult {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self {
+        Self {
+            dn: self.dn + rhs.dn,
+            dna: self.dna + rhs.dna,
+            dn_error: self.dn_error + rhs.dn_error,
+            dna_error: self.dna_error + rhs.dna_error,
+        }
+    }
+}
+
 impl ops::AddAssign<&Self> for FastInteractionResult {
     fn add_assign(&mut self, rhs: &Self) {
         self.dn += &rhs.dn;
