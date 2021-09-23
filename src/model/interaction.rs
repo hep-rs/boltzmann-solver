@@ -411,12 +411,7 @@ pub trait Interaction<M: Model> {
     /// [`Interaction::adjusted_rate`] in order to computer the actual rate.
     ///
     /// This method should generally not be implemented.
-    fn apply_change(
-        &self,
-        dn: &mut ArrayViewMut1<f64>,
-        dna: &mut ArrayViewMut1<f64>,
-        context: &Context<M>,
-    ) {
+    fn apply_change(&self, dn: &mut Array1<f64>, dna: &mut Array1<f64>, context: &Context<M>) {
         if let Some(rate) = self.adjusted_rate(context) {
             let particles = self.particles();
 
@@ -532,12 +527,7 @@ where
         (*self).adjusted_rate(context)
     }
 
-    fn apply_change(
-        &self,
-        dn: &mut ArrayViewMut1<f64>,
-        dna: &mut ArrayViewMut1<f64>,
-        context: &Context<M>,
-    ) {
+    fn apply_change(&self, dn: &mut Array1<f64>, dna: &mut Array1<f64>, context: &Context<M>) {
         (*self).apply_change(dn, dna, context);
     }
 }
@@ -579,12 +569,7 @@ where
         self.as_ref().adjusted_rate(context)
     }
 
-    fn apply_change(
-        &self,
-        dn: &mut ArrayViewMut1<f64>,
-        dna: &mut ArrayViewMut1<f64>,
-        context: &Context<M>,
-    ) {
+    fn apply_change(&self, dn: &mut Array1<f64>, dna: &mut Array1<f64>, context: &Context<M>) {
         self.as_ref().apply_change(dn, dna, context);
     }
 }
