@@ -11,7 +11,7 @@ use crate::{
     solver::Context,
     utilities::spline::Linear as Spline,
 };
-use std::{fmt, sync::RwLock};
+use std::{fmt, iter, sync::RwLock};
 
 // TODO: Define a trait alias for MandelstamFn once it is stabilised
 // (https://github.com/rust-lang/rust/issues/41517)
@@ -21,15 +21,27 @@ use std::{fmt, sync::RwLock};
 pub struct FourParticle<M> {
     particles: interaction::Particles,
 
-    /// Squared amplitude as a function of the model.
+    /// Squared amplitude of the interaction.  This is a function of the model
+    /// and the Mandelstam variables `$s$`, `$t$` and `$u$`.
     squared_amplitude: Box<dyn Fn(&M, f64, f64, f64) -> f64 + Sync>,
+    /// Squared amplitude asymmetry for this interaction.  This is a function of
+    /// the model and the Mandelstam variables `$s$`, `$t$` and `$u$`.
     #[allow(clippy::type_complexity)]
     asymmetry: Option<Box<dyn Fn(&M, f64, f64, f64) -> f64 + Sync>>,
 
     gamma_enabled: bool,
     width_enabled: bool,
-    gamma_tilde: RwLock<Spline>,
-    delta_gamma_tilde: RwLock<Spline>,
+
+    /// Since computing `$\tilde\gamma$` can be computationally expensive, we
+    /// (optionally) precompute it and store it in a spline.  Since this
+    /// includes the division by a varying number of heavy particle number
+    /// densities, the discontinuities can cause issues with the spline.  To
+    /// account for this, we store multiple splines based on the number of heavy
+    /// particles: `[0]` for no heavy particles, `[1]` for one heavy particles,
+    /// etc.
+    gamma_tilde: RwLock<Vec<Spline>>,
+    /// Spline for `$\delta\tilde\gamma$`.
+    delta_gamma_tilde: RwLock<Vec<Spline>>,
 }
 
 impl<M> FourParticle<M> {
@@ -62,8 +74,8 @@ impl<M> FourParticle<M> {
             asymmetry: None,
             width_enabled: false,
             gamma_enabled: true,
-            gamma_tilde: RwLock::new(Spline::empty()),
-            delta_gamma_tilde: RwLock::new(Spline::empty()),
+            gamma_tilde: RwLock::new(iter::repeat(Spline::empty()).take(5).collect()),
+            delta_gamma_tilde: RwLock::new(iter::repeat(Spline::empty()).take(5).collect()),
         }
     }
 
@@ -154,6 +166,18 @@ impl<M> FourParticle<M> {
     }
 }
 
+impl<M: Model> FourParticle<M> {
+    /// Count the number of heavy  particles
+    pub fn count_heavy(&self, context: &Context<M>) -> usize {
+        let particles = context.model.particles();
+        self.particles
+            .particle_counts
+            .keys()
+            .filter(|&&idx| particles[idx].mass * context.beta > M_BETA_THRESHOLD)
+            .count()
+    }
+}
+
 impl<M> fmt::Debug for FourParticle<M> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
@@ -196,8 +220,10 @@ where
         // If we need the 'false' gamma (i.e. γ̃), then we use the precomputed
         // value provided the interval is deemed to be accurate.
         if let (false, Ok(spline)) = (real, self.gamma_tilde.read()) {
-            if spline.accurate(context.beta) {
-                return Some(spline.sample(context.beta));
+            let spline = &spline[self.count_heavy(context)];
+            let log_beta = f64::ln(context.beta);
+            if spline.contains(log_beta) {
+                return Some(spline.sample(log_beta));
             }
         }
 
@@ -226,7 +252,8 @@ where
         } else {
             let gamma_tilde = utilities::integrate_st_on_n(integrand, context.beta, p1, p2, p3, p4);
             if let Ok(mut spline) = self.gamma_tilde.write() {
-                spline.add(context.beta, gamma_tilde);
+                let spline = &mut spline[self.count_heavy(context)];
+                spline.add(f64::ln(context.beta), gamma_tilde);
             }
             Some(gamma_tilde)
         }
@@ -238,8 +265,10 @@ where
         // If we need the 'false' gamma (i.e. γ̃), then we use the precomputed
         // value provided the interval is deemed to be accurate.
         if let (false, Ok(spline)) = (real, self.delta_gamma_tilde.read()) {
-            if spline.accurate(context.beta) {
-                return Some(spline.sample(context.beta));
+            let spline = &spline[self.count_heavy(context)];
+            let log_beta = f64::ln(context.beta);
+            if spline.contains(log_beta) {
+                return Some(spline.sample(log_beta));
             }
         }
 
@@ -268,7 +297,8 @@ where
             let delta_gamma_tilde =
                 utilities::integrate_st_on_n(integrand, context.beta, p1, p2, p3, p4);
             if let Ok(mut spline) = self.delta_gamma_tilde.write() {
-                spline.add(context.beta, delta_gamma_tilde);
+                let spline = &mut spline[self.count_heavy(context)];
+                spline.add(f64::ln(context.beta), delta_gamma_tilde);
             }
             Some(delta_gamma_tilde)
         }
