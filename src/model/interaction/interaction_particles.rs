@@ -2625,7 +2625,7 @@ mod tests {
         assert_eq!(interaction.short_display(), format!("{}", interaction));
         assert_eq!(
             interaction.display(&model),
-            Ok("\u{304}one two ↔ \u{304}three two".to_string())
+            Ok("o\u{305}ne two ↔ t\u{305}hree two".to_string())
         );
 
         let interaction = super::Particles::new(&[], &[1, 2, 3]);
@@ -2641,7 +2641,7 @@ mod tests {
         assert_eq!(interaction.short_display(), format!("{}", interaction));
         assert_eq!(
             interaction.display(&model),
-            Ok("\u{304}two one three ↔".to_string())
+            Ok("t\u{305}wo one three ↔".to_string())
         );
 
         let interaction = super::Particles::new(&[1, 2, 3], &[5]);
