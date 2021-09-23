@@ -1,103 +1,14 @@
 //! Particle propagators
 
-use crate::model::Particle;
-use num::{Complex, One, Zero};
-use std::ops;
+use num::Complex;
 
-/// Single particle propagator.
-///
-/// This isn't designed to be used on its own and instead allows for better
-/// handling of multiple propagators.
-#[derive(Debug, Copy, Clone)]
-struct SinglePropagator<'a> {
-    particle: &'a Particle,
-    momentum: f64,
-    numerator: Complex<f64>,
-    conjugated: bool,
-}
+mod multi;
+mod single;
 
-impl<'a> SinglePropagator<'a> {
-    /// Create a new propagator.
-    fn new(p: &'a Particle, s: f64) -> Self {
-        SinglePropagator {
-            particle: p,
-            momentum: s,
-            numerator: One::one(),
-            conjugated: false,
-        }
-    }
+pub use multi::Multi;
+pub use single::Single;
 
-    /// Complex conjugate the propagator
-    fn conj(&mut self) -> &Self {
-        self.numerator = self.numerator.conj();
-        self.conjugated = !self.conjugated;
-        self
-    }
-
-    /// Evaluate the propagator denominator.
-    fn denominator(&self) -> Complex<f64> {
-        match (self.momentum > 0.0, self.conjugated) {
-            (true, false) => Complex::new(
-                self.momentum - self.particle.mass2,
-                self.particle.mass * self.particle.width,
-            ),
-            (true, true) => Complex::new(
-                self.momentum - self.particle.mass2,
-                -self.particle.mass * self.particle.width,
-            ),
-            (false, _) => Complex::new(self.momentum - self.particle.mass2, 0.0),
-        }
-    }
-
-    /// Evaluate the propagator on its own.
-    fn eval(&self) -> Complex<f64> {
-        self.numerator * self.denominator().finv()
-    }
-}
-
-impl<'a> ops::MulAssign<f64> for SinglePropagator<'a> {
-    fn mul_assign(&mut self, rhs: f64) {
-        self.numerator *= rhs;
-    }
-}
-impl<'a> ops::MulAssign<Complex<f64>> for SinglePropagator<'a> {
-    fn mul_assign(&mut self, rhs: Complex<f64>) {
-        self.numerator *= rhs;
-    }
-}
-
-impl<'a> ops::Neg for SinglePropagator<'a> {
-    type Output = Self;
-
-    fn neg(mut self) -> Self::Output {
-        self.numerator = -self.numerator;
-        self
-    }
-}
-
-impl<'a, 'b, 'x, 'y> ops::Mul<&'y SinglePropagator<'b>> for &'x SinglePropagator<'a> {
-    type Output = Complex<f64>;
-
-    #[allow(clippy::suspicious_arithmetic_impl)]
-    fn mul(self, rhs: &'y SinglePropagator<'b>) -> Complex<f64> {
-        if self.conjugated == rhs.conjugated {
-            panic!("Multiplying propagators with the same complex conjugation.");
-        }
-
-        #[allow(clippy::float_cmp)]
-        if self.particle == rhs.particle && self.momentum == rhs.momentum {
-            let mw2 = (self.particle.mass * self.particle.width).powi(2);
-            let numerator = (self.momentum - self.particle.mass2).powi(2) - mw2;
-            let denominator = (self.momentum - self.particle.mass2).powi(2) + mw2;
-
-            self.numerator * rhs.numerator * Complex::new(numerator / denominator.powi(2), 0.0)
-        } else {
-            self.numerator * rhs.numerator * (self.denominator() * rhs.denominator()).finv()
-        }
-    }
-}
-
-/// Propagator for a particle.
+/// Trait to handle particle proapgators.
 ///
 /// This is defined to correctly handle real intermediate states.  Specifically,
 /// the propagator is defined such that
@@ -133,150 +44,65 @@ impl<'a, 'b, 'x, 'y> ops::Mul<&'y SinglePropagator<'b>> for &'x SinglePropagator
 ///
 /// let m = (p1.propagator(125.0) + p2.propagator(125.0)) * (p1.propagator(125.0) + p2.propagator(125.0)).conj();
 ///
-/// assert!((dbg!(m11 + m12 + m12.conj() + m22 - m)).re.abs() < f64::EPSILON);
-/// assert!((dbg!(m11 + m12 + m12.conj() + m22 - m)).im.abs() < f64::EPSILON);
+/// assert!((m11 + m12 + m12.conj() + m22 - m).re.abs() < f64::EPSILON);
+/// assert!((m11 + m12 + m12.conj() + m22 - m).im.abs() < f64::EPSILON);
 /// ```
-#[derive(Debug)]
-pub struct Propagator<'a> {
-    propagators: Vec<SinglePropagator<'a>>,
-}
+pub trait Propagator {
+    /// Return the complex conjugate the propagator.
+    fn conj(self) -> Self;
 
-impl<'a> Propagator<'a> {
-    /// Create a new instance of a [`Propagator`].
-    pub(crate) fn new(p: &'a Particle, s: f64) -> Self {
-        Propagator {
-            propagators: vec![SinglePropagator::new(p, s)],
-        }
-    }
-
-    /// Complex conjugatet the propagator.
-    #[must_use]
-    pub fn conj(mut self) -> Self {
-        for p in &mut self.propagators {
-            p.conj();
-        }
-        self
-    }
-
-    /// Propagator denominator for this particle:
+    /// Evaluate the propagator.
     ///
-    /// ```math
-    /// P_{i}^{-1}(s) \defeq s - m_i^2 + i \theta(s) m_i \Gamma_i.
-    /// ```
-    #[must_use]
-    pub fn eval(&self) -> Complex<f64> {
-        self.propagators.iter().map(SinglePropagator::eval).sum()
-    }
+    /// This is generally not used explicity as the amplitude itself is rarely
+    /// evaluated, only the squared amplitude.
+    fn eval(&self) -> Complex<f64>;
 
     /// Compute the norm squared of the propagator.
     ///
     /// This is equivalent to having `p * p.conj()`, but does not require the
     /// allocation of a second propagator.
     #[must_use]
-    pub fn norm_sqr(&self) -> Complex<f64> {
-        let mut result = Complex::zero();
-
-        for pi in &self.propagators {
-            for pj in &self.propagators {
-                let mut pj = *pj;
-                result += pi * pj.conj();
-            }
-        }
-
-        result
-    }
-}
-
-/// Add propagators together
-impl<'a> ops::Add<Self> for Propagator<'a> {
-    type Output = Self;
-
-    fn add(mut self, mut other: Self) -> Self::Output {
-        self.propagators.append(&mut other.propagators);
-        self
-    }
-}
-
-/// Subtract propagators from each other
-impl<'a> ops::Sub<Self> for Propagator<'a> {
-    type Output = Self;
-
-    fn sub(mut self, mut other: Self) -> Self::Output {
-        self.propagators
-            .extend(other.propagators.drain(..).map(ops::Neg::neg));
-        self
-    }
-}
-
-/// Multiply propagators with floating points.
-impl<'a> ops::Mul<f64> for Propagator<'a> {
-    type Output = Self;
-
-    fn mul(mut self, other: f64) -> Self {
-        for p in &mut self.propagators {
-            *p *= other;
-        }
-        self
-    }
-}
-/// Multiply propagators with floating points.
-impl<'a> ops::Mul<Propagator<'a>> for f64 {
-    type Output = Propagator<'a>;
-
-    fn mul(self, mut other: Propagator<'a>) -> Self::Output {
-        for p in &mut other.propagators {
-            *p *= self;
-        }
-        other
-    }
-}
-
-/// Multiply propagators with floating points.
-impl<'a> ops::Mul<Complex<f64>> for Propagator<'a> {
-    type Output = Self;
-
-    fn mul(mut self, other: Complex<f64>) -> Self {
-        for p in &mut self.propagators {
-            *p *= other;
-        }
-        self
-    }
-}
-/// Multiply propagators with floating points.
-impl<'a> ops::Mul<Propagator<'a>> for Complex<f64> {
-    type Output = Propagator<'a>;
-
-    fn mul(self, mut other: Propagator<'a>) -> Self::Output {
-        for p in &mut other.propagators {
-            *p *= self;
-        }
-        other
-    }
-}
-
-/// Multiply propagators with each other
-impl<'a> ops::Mul<Propagator<'a>> for Propagator<'a> {
-    type Output = Complex<f64>;
-
-    #[allow(clippy::suspicious_arithmetic_impl)]
-    fn mul(self, other: Self) -> Complex<f64> {
-        let mut result = Complex::zero();
-
-        for pi in &self.propagators {
-            for pj in &other.propagators {
-                result += pi * pj;
-            }
-        }
-
-        result
-    }
+    fn norm_sqr(&self) -> f64;
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{model::Particle, utilities::test::complex_approx_eq};
+    use crate::{
+        model::{particle::Propagator, Particle},
+        utilities::test::complex_approx_eq,
+    };
     use num::Complex;
     use std::error;
+
+    // TODO: These tests should be restructed to be more coherant and more
+    // readable.
+    //
+    // Also have to test the following:
+    // - [ ] Single::denominator (all variants)
+    // - [ ] Single::denominator_conj
+    // - [ ] Single::mul_conj
+    // - [ ] Single::mul_assign<f64>
+    // - [ ] Single::mul_assign<Complex<f64>>
+    // - [ ] Single::add<Multi>
+    // - [ ] Single::sub<Multi>
+    // - [ ] Single::mul<Multi>
+    // - [ ] Single::div<f64>
+    // - [ ] Single::div_assign<f64>
+    // - [ ] Single::div<Complex<f64>>
+    // - [ ] Single::div_assign<Complex<f64>>
+    // - [ ] Multi::norm_sqr
+    // - [ ] Multi::add<Multi>
+    // - [ ] Multi::sub<Multi>
+    // - [ ] Multi::mul<Single>
+    // - [ ] Multi::mul<f64>
+    // - [ ] Multi::mul_assign<f64>
+    // - [ ] Multi::mul<Complex<f64>>
+    // - [ ] Multi::mul_assign<Complex<f64>>
+    // - [ ] Multi::div<f64>
+    // - [ ] Multi::div_assign<f64>
+    // - [ ] Multi::div<Complex<f64>>
+    // - [ ] Multi::div_assign<Complex<f64>>
+    // - [ ] Multi::neg
 
     #[test]
     fn eval() -> Result<(), Box<dyn error::Error>> {
@@ -312,7 +138,9 @@ mod tests {
     fn add_sub() -> Result<(), Box<dyn error::Error>> {
         let p1 = Particle::new(0, 10.0, 1e-3);
         let p2 = Particle::new(1, 500.0, 2.0);
+        let p3 = Particle::new(1, 1000.0, 3.0);
 
+        // Adding two propagators
         for &s in &[-p1.mass2, -p2.mass2, -50.0, 0.0, 50.0, p1.mass2, p2.mass2] {
             complex_approx_eq(
                 (p1.propagator(s) + p2.propagator(s)).eval(),
@@ -338,6 +166,41 @@ mod tests {
                 8.0,
                 1e-200,
             )?;
+
+            complex_approx_eq(
+                (p1.propagator(s) + p2.propagator(s) + p3.propagator(s)).eval(),
+                p1.propagator(s).eval() + p2.propagator(s).eval() + p3.propagator(s).eval(),
+                8.0,
+                1e-200,
+            )?;
+            complex_approx_eq(
+                (p1.propagator(s) - p2.propagator(s) - p3.propagator(s)).eval(),
+                p1.propagator(s).eval() - p2.propagator(s).eval() - p3.propagator(s).eval(),
+                8.0,
+                1e-200,
+            )?;
+            complex_approx_eq(
+                (p1.propagator(s)
+                    + 12.34 * p2.propagator(s)
+                    + Complex::new(2.0, 3.0) * p3.propagator(s))
+                .eval(),
+                p1.propagator(s).eval()
+                    + 12.34 * p2.propagator(s).eval()
+                    + Complex::new(2.0, 3.0) * p3.propagator(s).eval(),
+                8.0,
+                1e-200,
+            )?;
+            complex_approx_eq(
+                (p1.propagator(s)
+                    - 12.34 * p2.propagator(s)
+                    - Complex::new(2.0, 3.0) * p3.propagator(s))
+                .eval(),
+                p1.propagator(s).eval()
+                    - 12.34 * p2.propagator(s).eval()
+                    - Complex::new(2.0, 3.0) * p3.propagator(s).eval(),
+                8.0,
+                1e-200,
+            )?;
         }
 
         Ok(())
@@ -349,6 +212,14 @@ mod tests {
         let p2 = Particle::new(1, 500.0, 2.0);
 
         for &s in &[-p1.mass2, -p2.mass2, -50.0, 0.0, 50.0, p1.mass2, p2.mass2] {
+            // Check that `$P_1^* P_2 = (P_2^* P_1)^*$`
+            complex_approx_eq(
+                p1.propagator(s) * p2.propagator(s).conj(),
+                (p1.propagator(s).conj() * p2.propagator(s)).conj(),
+                8.0,
+                1e-200,
+            )?;
+
             let m11 = p1.propagator(s) * p1.propagator(s).conj();
             let m12 = p1.propagator(s) * p2.propagator(s).conj();
             let m21 = p2.propagator(s) * p1.propagator(s).conj();
@@ -362,4 +233,22 @@ mod tests {
 
         Ok(())
     }
+
+    #[test]
+    fn norm_sqr() -> Result<(), Box<dyn error::Error>> {
+        let p1 = Particle::new(0, 10.0, 1e-3);
+        let p2 = Particle::new(1, 500.0, 2.0);
+
+        for &s in &[-p1.mass2, -p2.mass2, -50.0, 0.0, 50.0, p1.mass2, p2.mass2] {
+            complex_approx_eq(
+                p1.propagator(s).conj() * p1.propagator(s),
+                Complex::new(p1.propagator(s).norm_sqr(), 0.0),
+                6.0,
+                1e-200,
+            )?;
+        }
+
+        Ok(())
+    }
+    //
 }
