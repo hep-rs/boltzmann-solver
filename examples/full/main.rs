@@ -21,7 +21,20 @@ use std::fs;
 use std::{env, error, fmt, io, sync::RwLock};
 
 fn main() -> Result<(), Box<dyn error::Error>> {
-    common::setup_logging(4);
+    common::setup_logging(
+        env::args()
+            .skip(1)
+            .filter_map(|arg| {
+                if arg.as_str() == "--verbose" {
+                    Some(1)
+                } else if arg.starts_with("-v") {
+                    Some(arg.chars().filter(|&c| c == 'v').count())
+                } else {
+                    None
+                }
+            })
+            .sum(),
+    );
 
     let args = env::args();
     if args.len() == 1 {
@@ -40,13 +53,9 @@ fn main() -> Result<(), Box<dyn error::Error>> {
             "washout::n1f3" => washout::n1f3(),
             "washout::n3f1" => washout::n3f1(),
             "washout::n3f3" => washout::n3f3(),
-            #[cfg(not(debug_assertions))]
             "full::n1f1" => full::n1f1(),
-            #[cfg(not(debug_assertions))]
             "full::n1f3" => full::n1f3(),
-            #[cfg(not(debug_assertions))]
             "full::n3f1" => full::n3f1(),
-            #[cfg(not(debug_assertions))]
             "full::n3f3" => full::n3f3(),
             #[cfg(feature = "serde")]
             "evolution" => evolution(),
@@ -54,6 +63,8 @@ fn main() -> Result<(), Box<dyn error::Error>> {
             "lepton_equilibrium" => lepton_equilibrium(),
             "gammas" => gammas(),
             "custom" => custom(),
+            "--verbose" => Ok(()),
+            x if x.starts_with("-v") => Ok(()),
             x => panic!("Unknown argument: {}", x),
         }
         .or_else(|e| {
@@ -78,6 +89,21 @@ where
     W: io::Write + 'static,
     S: AsRef<str> + fmt::Display,
 {
+    // Display information about the interactions within the model.
+    {
+        let model = builder.model.as_ref().unwrap();
+        log::info!("{} interactions", model.interactions.len());
+        for (i, interaction) in model.interactions.iter().enumerate() {
+            log::debug!(
+                "{}: {}",
+                i,
+                interaction
+                    .display(builder.model.as_ref().unwrap())
+                    .unwrap()
+            );
+        }
+    }
+
     // Set equilibrium conditions for the vector bosons.
     builder = builder
         .in_equilibrium([
@@ -144,8 +170,6 @@ where
             }
         });
     }
-
-    // builder = builder.step_precision(1e-3, 1e0);
 
     // Build and run the solver
     let mut solver = builder.build()?;
@@ -381,7 +405,6 @@ define_all! {
     |_n, _na| {}
 }
 
-#[cfg(not(debug_assertions))]
 define_all! {
     full,
     [
