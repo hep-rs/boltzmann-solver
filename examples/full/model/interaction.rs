@@ -31,6 +31,14 @@ pub fn hle() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$H \leftrightarrow Q \overline u$`
@@ -59,6 +67,14 @@ pub fn hqu() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$H \leftrightarrow Q \overline d$`
@@ -87,6 +103,14 @@ pub fn hqd() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$H \leftrightarrow \overline L N$`
@@ -170,6 +194,14 @@ pub fn hln() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$f \leftrightarrow f A$`
@@ -206,6 +238,14 @@ pub fn ffa() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$f \leftrightarrow f W$`
@@ -236,6 +276,14 @@ pub fn ffw() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$f \leftrightarrow f G$`
@@ -266,6 +314,14 @@ pub fn ffg() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$H \leftrightarrow H A$`
@@ -294,6 +350,14 @@ pub fn hha() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$H H \leftrightarrow A A$`
@@ -327,6 +391,14 @@ pub fn hhaa() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$H \leftrightarrow H W$`
@@ -355,6 +427,14 @@ pub fn hhw() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$H H \leftrightarrow W W$`
@@ -388,6 +468,14 @@ pub fn hhww() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$H H \leftrightarrow A W$`
@@ -422,6 +510,14 @@ pub fn hhaw() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$H H \leftrightarrow \overline L \overline L$`
@@ -472,6 +568,14 @@ pub fn hhll1() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$H \overline H \leftrightarrow \overline L L$`
@@ -531,6 +635,14 @@ pub fn hhll2() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$H \overline H \leftrightarrow \overline e N$`
@@ -582,6 +694,14 @@ pub fn hhen() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$N \overline H \leftrightarrow \overline L A$`
@@ -659,6 +779,14 @@ pub fn nhla() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$N H \leftrightarrow \overline L W$`
@@ -731,6 +859,14 @@ pub fn nhlw() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$Q \overline u \leftrightarrow L N$`
@@ -778,6 +914,14 @@ pub fn quln() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$Q \overline d \leftrightarrow L N$`
@@ -825,6 +969,14 @@ pub fn qdln() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$Q \overline e \leftrightarrow \overline L N$`
@@ -901,6 +1053,14 @@ pub fn leln() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
 
 /// Interaction `$L N \leftrightarrow L N$`
@@ -954,4 +1114,12 @@ pub fn lnln() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     }
 
     interactions
+        .drain(..)
+        .filter(|i| {
+            i.particles()
+                .particle_counts
+                .values()
+                .any(|&(c, ca)| c != 0.0 && ca != 0.0)
+        })
+        .collect()
 }
