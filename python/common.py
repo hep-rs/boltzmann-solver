@@ -161,19 +161,19 @@ def plot_integration(df: pd.DataFrame):
         data=[
             go.Scatter(
                 name="integration evolution",
-                x=df["step"],
-                y=df["beta"],
+                x=df["beta"],
+                y=df["step"],
                 mode="lines",
             )
         ],
         layout=go.Layout(
             width=1000,
             xaxis=go.layout.XAxis(
-                title="Integration Step",
-                type="linear",
+                title="Inverse Temperature [1/GeV]", type="log", exponentformat="power"
             ),
             yaxis=go.layout.YAxis(
-                title="Inverse Temperature [1/GeV]", type="log", exponentformat="power"
+                title="Integration Step",
+                type="linear",
             ),
         ),
     )
