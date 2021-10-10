@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
-from csv import DictReader
-from typing import Dict
 import sys
+from csv import DictReader
+from pathlib import Path
+from tempfile import gettempdir
+from typing import Dict
 
 
 def main():
@@ -10,13 +12,13 @@ def main():
 
     file = sys.argv[1]
     row: Dict[str, str] = dict()
-    with open(f"/tmp/josh/boltzmann-solver/full/{file}.csv", "r") as f:
+    with open(Path(gettempdir()) / "full" / "{file.replace('::', '_')}.csv", "r") as f:
         reader = DictReader(f)
 
         for row in reader:
             pass
 
-    print(f".beta_range({row['beta']}, 1e0)")
+    print(f".beta_range({row['beta']}, {2 * float(row['beta'])})")
 
     print(".initial_densities([")
     for i, (k, v) in enumerate(filter(lambda kv: kv[0].startswith("n-"), row.items())):
