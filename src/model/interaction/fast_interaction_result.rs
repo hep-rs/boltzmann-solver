@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::{fmt, ops};
 
 /// Result from a fast interaction.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct FastInteractionResult {
     /// Array of changes to be added to the number densities.
@@ -78,6 +78,16 @@ impl fmt::Display for FastInteractionResult {
                 .map(|v| v.abs())
                 .max_by(|a, b| a.partial_cmp(b).unwrap())
                 .unwrap_or(0.0)
+        )
+    }
+}
+
+impl fmt::Debug for FastInteractionResult {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "Fast Interaction Result {{ dn: {:e}, dna: {:e}, dn_error: {:e}, dna_error: {:e} }}",
+            self.dn, self.dna, self.dn_error, self.dna_error
         )
     }
 }
