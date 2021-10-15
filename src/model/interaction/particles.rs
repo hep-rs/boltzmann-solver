@@ -133,10 +133,10 @@ impl Particles {
     /// numbers indicate the corresponding index for the particle, with the sign
     /// indicating whether it is a particle or anti-particle involved.
     #[must_use]
-    pub fn new(incoming: &[isize], outgoing: &[isize]) -> Self {
-        let mut incoming = incoming.to_vec();
+    pub fn new<A: AsRef<[isize]>, B: AsRef<[isize]>>(incoming: A, outgoing: B) -> Self {
+        let mut incoming = incoming.as_ref().to_vec();
         incoming.sort_unstable();
-        let mut outgoing = outgoing.to_vec();
+        let mut outgoing = outgoing.as_ref().to_vec();
         outgoing.sort_unstable();
 
         let mut result = Self {
@@ -374,8 +374,11 @@ impl Particles {
         }
     }
 
-    /// Check whether the computed change in particle number density asymmetry will
-    /// caan overshoot of equilibrium.
+    /// Check whether the computed change in particle number density asymmetry
+    /// can overshoot of equilibrium.
+    ///
+    /// This is achieved by looking at a change of sign of the asymmetric
+    /// prefactor or at a change of sign in the number density.
     #[must_use]
     pub fn asymmetric_overshoots(
         &self,
@@ -386,6 +389,14 @@ impl Particles {
         in_equilibrium: &[usize],
         no_asymmetry: &[usize],
     ) -> bool {
+        for (&p, &(_, ca)) in &self.particle_counts {
+            if no_asymmetry.binary_search(&p).is_err()
+                && na[p].signum() != (na[p] + ca * change).signum()
+            {
+                return true;
+            }
+        }
+
         let f = self.asymmetric_prefactor_fn(n, na, eq, in_equilibrium, no_asymmetry);
         let a = f(0.0);
         if !a.is_finite() {
@@ -467,19 +478,6 @@ impl Particles {
     /// - \left( \prod_{i \in Y} \frac{n_i}{n_i^{(0)}} \right)
     /// ```
     ///
-    /// If there are some `$n_i^{(0)}$` which are zero, then the prefactor will
-    /// be infinite as the interaction will try and get rid of the particle in
-    /// question.
-    ///
-    /// If there are multiple particles for which `$n_i^{(0)}$` is zero located
-    /// on both sides, then the direction of the interaction is first determined
-    /// by the side which contains the most zero equilibrium number densities.
-    /// If these are also equal, then the result is 0.
-    ///
-    /// ```math
-    /// \left( \prod_{i \in X} n_i \right) - \left( \prod_{i \in Y} n_i \right)
-    /// ```
-    ///
     /// The result is given as the pair of `(numerator, denominator)` for
     /// incoming and outgoing particles respectively.
     ///
@@ -502,7 +500,7 @@ impl Particles {
     ///
     /// The `in_equilibrium` slice must be ordered or the result may be wrong.
     #[must_use]
-    pub fn symmetric_prefactor(
+    pub fn symmetric_prefactor_terms(
         &self,
         n: &Array1<f64>,
         eq: &Array1<f64>,
@@ -536,6 +534,56 @@ impl Particles {
         )
     }
 
+    /// Net prefactor scaling the interaction rate.
+    ///
+    /// This uses the output of [`symmetric_prefactor_terms`] and makes
+    /// additional checks to handle cases where some equilibrium number
+    /// densities are zero.
+    ///
+    /// If there are some `$n_i^{(0)}$` which are zero, then the prefactor will
+    /// be infinite as the interaction will try and get rid of the particle in
+    /// question.
+    ///
+    /// If there are multiple particles for which `$n_i^{(0)}$` is zero located
+    /// on both sides, then the direction of the interaction is first determined
+    /// by the side which contains the most zero equilibrium number densities.
+    /// If these are also equal, then the result is 0.
+    ///
+    /// # Warning
+    ///
+    /// The `in_equilibrium` slice must be ordered or the result may be wrong.
+    #[must_use]
+    pub fn symmetric_prefactor(
+        &self,
+        n: &Array1<f64>,
+        eq: &Array1<f64>,
+        in_equilibrium: &[usize],
+    ) -> f64 {
+        let (forward, backward) = self.symmetric_prefactor_terms(n, eq, in_equilibrium);
+        let forward_prefactor = checked_div(forward.0, forward.1);
+        let backward_prefactor = checked_div(backward.0, backward.1);
+
+        if forward_prefactor.is_finite() || backward_prefactor.is_finite() {
+            // If either one or both are finite, we can compute the rate.
+            forward_prefactor - backward_prefactor
+        } else {
+            // If they are both infinite, then there are equilibrium number
+            // densities on both sides which are 0.
+            //
+            // In order to determine the direction, the number of zero
+            // equilibrium number densities on each side is used first.  If they
+            // are both equal, then the product of number densities is used.
+            let forward_zeros = self.incoming_idx.iter().filter(|&&p| eq[p] == 0.0).count();
+            let backward_zeros = self.outgoing_idx.iter().filter(|&&p| eq[p] == 0.0).count();
+
+            match forward_zeros.cmp(&backward_zeros) {
+                Ordering::Less => f64::NEG_INFINITY,
+                Ordering::Greater => f64::INFINITY,
+                Ordering::Equal => 0.0,
+            }
+        }
+    }
+
     /// Net prefactor scaling the interaction rate with a specified change
     /// included.
     ///
@@ -545,6 +593,22 @@ impl Particles {
     ///
     /// Particles which are fixed to be in equilibrium can be specified in the
     /// ordered slice `in_equilibrium`.
+    ///
+    /// This function does takes into account simplifications which might occur
+    /// due to heavy particles.  Specifically, for all particles which are
+    /// heavy, this computes the simplified form of:
+    ///
+    /// ```math
+    /// \left[
+    ///   \left( \prod_{i \in X} \frac{n_i}{n_i^{(0)}} \right)
+    ///   - \left( \prod_{i \in Y} \frac{n_i}{n_i^{(0)}} \right)
+    /// \right]
+    /// \prod_{i \in \text{heavy}} n_i^{(0)}
+    /// ```
+    ///
+    /// The output function, when evaluated at `0` should correspond with
+    /// [`symmetric_prefactor`] except in certain edge cases with zero
+    /// equilibrium number densities.
     ///
     /// # Warning
     ///
@@ -824,7 +888,7 @@ impl Particles {
     /// Both the `in_equilibrium` and `no_asymmetry` slices must be ordered or
     /// the result may be wrong.
     #[must_use]
-    pub fn asymmetric_prefactor(
+    pub fn asymmetric_prefactor_terms(
         &self,
         n: &Array1<f64>,
         na: &Array1<f64>,
@@ -837,30 +901,31 @@ impl Particles {
             // Particles prevented from developing asymmetries can be safely ignored
             .filter(|(p, _)| no_asymmetry.binary_search(p).is_err())
             .enumerate()
-            .fold((0.0, 1.0, 1.0), |(num, den, ignored), (i, (&p, &a))| {
-                let num = num + a * na[p] * self.product_except_incoming(n, i, in_equilibrium);
+            .fold((0.0, 1.0, 1.0), |(mut num, den, ignored), (i, (&p, &a))| {
+                num += a * na[p] * self.product_except_incoming(n, i, in_equilibrium);
                 match (
                     in_equilibrium.binary_search(&p),
                     self.heavy.binary_search(&p),
                 ) {
                     (_, Ok(_)) => (num, den, ignored * eq[p]),
                     (Ok(_), Err(_)) => (num, den, ignored),
-                    (Err(_), Err(_)) => (num, den * eq[p], ignored),
+                    _ => (num, den * eq[p], ignored),
                 }
             });
+
         let backward = self
             .iter_outgoing()
             .filter(|(p, _)| no_asymmetry.binary_search(p).is_err())
             .enumerate()
-            .fold((0.0, 1.0, 1.0), |(num, den, ignored), (i, (&p, &a))| {
-                let num = num + a * na[p] * self.product_except_outgoing(n, i, in_equilibrium);
+            .fold((0.0, 1.0, 1.0), |(mut num, den, ignored), (i, (&p, &a))| {
+                num += a * na[p] * self.product_except_outgoing(n, i, in_equilibrium);
                 match (
                     in_equilibrium.binary_search(&p),
                     self.heavy.binary_search(&p),
                 ) {
                     (_, Ok(_)) => (num, den, ignored * eq[p]),
                     (Ok(_), Err(_)) => (num, den, ignored),
-                    (Err(_), Err(_)) => (num, den * eq[p], ignored),
+                    _ => (num, den * eq[p], ignored),
                 }
             });
 
@@ -868,6 +933,60 @@ impl Particles {
             (backward.2 * forward.0, forward.1),
             (forward.2 * backward.0, backward.1),
         )
+    }
+
+    /// Compute the prefactor to the symmetric interaction rate which alters the
+    /// number density asymmetries.
+    ///
+    /// This uses the output of [`asymmetric_prefactor_terms`] and makes
+    /// additional checks to handle cases where some equilibrium number
+    /// densities are zero.
+    ///
+    /// If there are some `$n_i^{(0)}$` which are zero, then the prefactor will
+    /// be infinite as the interaction will try and get rid of the particle in
+    /// question.
+    ///
+    /// If there are multiple particles for which `$n_i^{(0)}$` is zero located
+    /// on both sides, then the direction of the interaction is first determined
+    /// by the side which contains the most zero equilibrium number densities.
+    /// If these are also equal, then the result is 0.
+    ///
+    /// # Warning
+    ///
+    /// The `in_equilibrium` slice must be ordered or the result may be wrong.
+    #[must_use]
+    pub fn asymmetric_prefactor(
+        &self,
+        n: &Array1<f64>,
+        na: &Array1<f64>,
+        eq: &Array1<f64>,
+        in_equilibrium: &[usize],
+        no_asymmetry: &[usize],
+    ) -> f64 {
+        let (forward, backward) =
+            self.asymmetric_prefactor_terms(n, na, eq, in_equilibrium, no_asymmetry);
+        let forward_prefactor = checked_div(forward.0, forward.1);
+        let backward_prefactor = checked_div(backward.0, backward.1);
+
+        if forward_prefactor.is_finite() || backward_prefactor.is_finite() {
+            // If either one or both are finite, we can compute the rate.
+            forward_prefactor - backward_prefactor
+        } else {
+            // If they are both infinite, then there are equilibrium number
+            // densities on both sides which are 0.
+            //
+            // In order to determine the direction, the number of zero
+            // equilibrium number densities on each side is used first.  If they
+            // are both equal, then the product of number densities is used.
+            let forward_zeros = self.incoming_idx.iter().filter(|&&p| eq[p] == 0.0).count();
+            let backward_zeros = self.outgoing_idx.iter().filter(|&&p| eq[p] == 0.0).count();
+
+            match forward_zeros.cmp(&backward_zeros) {
+                Ordering::Less => f64::NEG_INFINITY,
+                Ordering::Greater => f64::INFINITY,
+                Ordering::Equal => 0.0,
+            }
+        }
     }
 
     /// Net asymmetric prefactor scaling the interaction rate with a specified
@@ -1198,9 +1317,18 @@ impl Particles {
     /// context in order to allow for changes from multiple fast interactions to
     /// be combined.
     ///
-    /// The `eq_input` array should be a size `(RK_S, N)` array of equilibrium
+    /// The `eq_input` should be a list `RK_S` arrays array of equilibrium
     /// number densities as evaluated in the main Runge-Kutta loop at the
     /// specified sub-quadrature steps.
+    ///
+    /// The algorithm makes use of γ̃ and thus the corresponding [`Particles`]
+    /// must have had the appropriate heavy particles set so that the correct
+    /// symmetric and asymmetric scalings can be computed to combine with γ̃.
+    ///
+    /// # Panics
+    ///
+    /// At present, this panics if the step size becomes effectively 0
+    /// preventing the integration from ever completing.
     #[allow(clippy::too_many_lines)]
     #[must_use]
     pub fn fast_interaction_de<M: Model>(
@@ -1210,7 +1338,7 @@ impl Particles {
         na_input: &Array1<f64>,
         eq_input: &[Array1<f64>],
     ) -> FastInteractionResult {
-        use crate::solver::tableau::{self, RK_A, RK_B, RK_C, RK_E, RK_S};
+        use crate::solver::tableau;
 
         let large_dim = n_input.dim();
         let small_dim = self.particle_counts.len();
@@ -1230,8 +1358,12 @@ impl Particles {
 
         if self.gamma_tilde.is_none() && self.delta_gamma_tilde.is_none() {
             log::warn!(
-                "[{}.{:02}|{:>10.4e}] Attempted to solve a fast interactions but neither γ̃ nor δγ̃ where set; result is trivially 0.", context.step, 
-                context.substep, context.beta);
+                "[{}.{:02}|{:>10.4e}] (Fast Interaction {}) Attempted to solve a fast interaction but neither γ̃ nor δγ̃ where set; result is trivially 0 but this is likely an error.",
+                self.display(context.model).unwrap_or_else(|_| self.short_display()),
+                context.step,
+                context.substep,
+                context.beta
+            );
             return result;
         }
 
@@ -1241,7 +1373,7 @@ impl Particles {
         let mut eq_splines: Vec<_> = iter::repeat(Spline::empty()).take(small_dim).collect();
         for (i, arr) in eq_input.iter().enumerate() {
             for (spline, &p) in eq_splines.iter_mut().zip(&large_indices) {
-                spline.add(context.beta + RK_C[i] * context.step_size, arr[p]);
+                spline.add(context.beta + tableau::RK_C[i] * context.step_size, arr[p]);
             }
         }
 
@@ -1283,8 +1415,12 @@ impl Particles {
             .abs();
 
         // The sub-quadrature changes.
-        let mut k: Vec<_> = iter::repeat(Array1::zeros(large_dim)).take(RK_S).collect();
-        let mut ka: Vec<_> = iter::repeat(Array1::zeros(large_dim)).take(RK_S).collect();
+        let mut k: Vec<_> = iter::repeat(Array1::zeros(large_dim))
+            .take(tableau::RK_S)
+            .collect();
+        let mut ka: Vec<_> = iter::repeat(Array1::zeros(large_dim))
+            .take(tableau::RK_S)
+            .collect();
 
         // To help improve convergence, we scale back any 'enormous' values to improve convergence.
         let gamma_tilde = self
@@ -1304,8 +1440,25 @@ impl Particles {
 
         // TODO: Is it safe to exit the loop if beta is no longer increasing?
         // Will the next call to this routine resolve the issue?
-        while beta < context.beta + context.step_size && beta != beta + h {
-            step += 1;
+        while beta < context.beta + context.step_size {
+            if beta == beta + h {
+                log::error!(
+                    "[{}.{:02}|{:>10.4e}] (Fast Interaction {}) β is no longer advancing.",
+                    self.display(context.model)
+                        .unwrap_or_else(|_| self.short_display()),
+                    context.step,
+                    context.substep,
+                    context.beta
+                );
+                panic!(
+                    "[{}.{:02}|{:>10.4e}] (Fast Interaction {}) β is no longer advancing.",
+                    self.display(context.model)
+                        .unwrap_or_else(|_| self.short_display()),
+                    context.step,
+                    context.substep,
+                    context.beta
+                );
+            }
 
             // Reset all changes computed so far
             for &p in &large_indices {
@@ -1317,27 +1470,27 @@ impl Particles {
                 dna_err[p] = 0.0;
             }
 
-            for i in 0..RK_S {
-                let beta_i = beta + RK_C[i] * h;
+            for i in 0..tableau::RK_S {
+                let beta_i = beta + tableau::RK_C[i] * h;
 
                 // Get the inputs to build the sub-steps
-                let ai = RK_A[i];
+                let ai = tableau::RK_A[i];
                 for (pi, &p) in large_indices.iter().enumerate() {
                     ni[p] = n[p];
                     nai[p] = na[p];
                     eqi[p] = eq_splines[pi].sample(beta_i);
                     for j in 0..i {
                         ni[p] += ai[j] * k[j][p];
-                        nai[p] += ai[j] * k[j][p];
+                        nai[p] += ai[j] * ka[j][p];
                     }
                 }
 
                 // Compute the prefactors
                 let (forward, backward) =
-                    self.symmetric_prefactor(&ni, &eqi, context.in_equilibrium);
+                    self.symmetric_prefactor_terms(&ni, &eqi, context.in_equilibrium);
                 let symmetric_prefactor =
                     checked_div(forward.0, forward.1) - checked_div(backward.0, backward.1);
-                let (forward, backward) = self.asymmetric_prefactor(
+                let (forward, backward) = self.asymmetric_prefactor_terms(
                     &ni,
                     &nai,
                     &eqi,
@@ -1362,7 +1515,6 @@ impl Particles {
 
                 let ki = &mut k[i];
                 let kai = &mut ka[i];
-
                 for (&p, &(c, ca)) in &self.particle_counts {
                     if c != 0.0 && context.in_equilibrium.binary_search(&p).is_err() {
                         ki[p] = c * symmetric_delta;
@@ -1372,8 +1524,8 @@ impl Particles {
                     }
                 }
 
-                let bi = RK_B[i];
-                let ei = RK_E[i];
+                let bi = tableau::RK_B[i];
+                let ei = tableau::RK_E[i];
                 for &p in &large_indices {
                     dn[p] += bi * ki[p];
                     dna[p] += bi * kai[p];
@@ -1382,6 +1534,8 @@ impl Particles {
                 }
             }
 
+            // Calculate the ratio of the local error target to the estimated
+            // local error.  This is then used to determine the next step size.
             let mut ratio = f64::INFINITY;
             for &p in &large_indices {
                 let err = dn_err[p].abs();
@@ -1407,10 +1561,8 @@ impl Particles {
 
             if ratio.is_finite() && ratio > 1.0 {
                 beta += h;
-
                 n += &dn;
                 na += &dna;
-
                 for &p in &large_indices {
                     n_err[p] += dn_err[p].abs();
                     na_err[p] += dna_err[p].abs();
@@ -1423,18 +1575,9 @@ impl Particles {
             if beta + h > context.beta + context.step_size {
                 h = (context.beta - beta) + context.step_size;
             }
-        }
 
-        log::debug!(
-            "[{}.{:02}|{:>10.4e}] (Fast Interaction {}) Number of integration steps: {} ({} discarded)",
-            context.step,
-            context.substep,
-            context.beta,
-            self.display(context.model)
-                .unwrap_or_else(|_| self.short_display()),
-            step - steps_discarded,
-            steps_discarded
-        );
+            step += 1;
+        }
 
         // The final change in number density can be computed by adding the
         // changes from each step of the RK integration, but we may as well
@@ -1450,15 +1593,35 @@ impl Particles {
         // Instead, we use the sum of the absolute values of the local error
         // estimates.  This provides an over-estimate of the global error, with
         // the over-estimation getting only larger as the number of steps
-        // increase.  It seems reasonable that taking this estimate and scaling
-        // it down by something proportional to the number of steps might give a
-        // 'good enough' estimate of the global error.
+        // increase.
         #[allow(clippy::cast_precision_loss)]
         let scaling = f64::sqrt(step as f64);
-        n_err.mapv_inplace(|v| v / scaling);
-        na_err.mapv_inplace(|v| v / scaling);
+        n_err.mapv_inplace(|v| f64::ln_1p(v / scaling));
+        na_err.mapv_inplace(|v| f64::ln_1p(v / scaling));
         result.dn_error = n_err;
         result.dna_error = na_err;
+
+        log::debug!(
+                    "[{}.{:02}|{:>10.4e}] (Fast Interaction {}) Number of integration steps: {} ({} discarded).",
+                    context.step,
+                    context.substep,
+                    context.beta,
+                    self.display(context.model)
+                        .unwrap_or_else(|_| self.short_display()),
+                    step - steps_discarded,
+                    steps_discarded,
+                );
+        // log::trace!("[{}.{:02}|{:>10.4e}] (Fast Interaction {}) Result:\n         dn: {:e}\n        dna: {:e}\n   dn error: {:e}\n  dna error: {:e}",
+        //         context.step,
+        //         context.substep,
+        //         context.beta,
+        //         self.display(context.model)
+        //             .unwrap_or_else(|_| self.short_display()),
+        //         result.dn,
+        //         result.dna,
+        //         result.dn_error,
+        //         result.dna_error
+        //     );
 
         result
     }
@@ -1850,7 +2013,7 @@ mod tests {
         for _ in 0..RUN_COUNT {
             let (n, na, eq) = rand_n_na_eq();
 
-            let (forward, backward) = interaction.symmetric_prefactor(&n, &eq, &[]);
+            let (forward, backward) = interaction.symmetric_prefactor_terms(&n, &eq, &[]);
             approx_eq(
                 forward.0 / forward.1,
                 n[1] * n[2] / (eq[1] * eq[2]),
@@ -1886,7 +2049,8 @@ mod tests {
                 .map_err(err_line_print!())?;
             }
 
-            let (forward, backward) = interaction.asymmetric_prefactor(&n, &na, &eq, &[], &[]);
+            let (forward, backward) =
+                interaction.asymmetric_prefactor_terms(&n, &na, &eq, &[], &[]);
             #[allow(clippy::suspicious_operation_groupings)]
             approx_eq(
                 forward.0 / forward.1,
@@ -1939,7 +2103,7 @@ mod tests {
         for _ in 0..RUN_COUNT {
             let (n, na, eq) = rand_n_na_eq();
 
-            let (forward, backward) = interaction.symmetric_prefactor(&n, &eq, &[1, 4]);
+            let (forward, backward) = interaction.symmetric_prefactor_terms(&n, &eq, &[1, 4]);
             approx_eq(forward.0 / forward.1, n[2] / eq[2], EPS_REL, EPS_ABS)
                 .map_err(err_line_print!())?;
             approx_eq(backward.0 / backward.1, n[3] / eq[3], EPS_REL, EPS_ABS)
@@ -1964,7 +2128,8 @@ mod tests {
                 .map_err(err_line_print!())?;
             }
 
-            let (forward, backward) = interaction.asymmetric_prefactor(&n, &na, &eq, &[], &[]);
+            let (forward, backward) =
+                interaction.asymmetric_prefactor_terms(&n, &na, &eq, &[], &[]);
             #[allow(clippy::suspicious_operation_groupings)]
             approx_eq(
                 forward.0 / forward.1,
@@ -2006,7 +2171,7 @@ mod tests {
         Ok(())
     }
 
-    // More complicated iteraction with the same particles on both sides and some multiplicities.
+    // More complicated interaction with the same particles on both sides and some multiplicities.
     #[test]
     fn prefactor_2() -> Result<(), Box<dyn error::Error>> {
         const EPS_REL: f64 = 1e-14;
@@ -2018,7 +2183,7 @@ mod tests {
         for _ in 0..RUN_COUNT {
             let (n, na, eq) = rand_n_na_eq();
 
-            let (forward, backward) = interaction.symmetric_prefactor(&n, &eq, &[]);
+            let (forward, backward) = interaction.symmetric_prefactor_terms(&n, &eq, &[]);
             approx_eq(
                 forward.0 / forward.1,
                 n[1] * n[1] * n[2] / (eq[1] * eq[1] * eq[2]),
@@ -2055,7 +2220,8 @@ mod tests {
                 .map_err(err_line_print!())?;
             }
 
-            let (forward, backward) = interaction.asymmetric_prefactor(&n, &na, &eq, &[], &[]);
+            let (forward, backward) =
+                interaction.asymmetric_prefactor_terms(&n, &na, &eq, &[], &[]);
             approx_eq(
                 forward.0 / forward.1,
                 (na[2] * n[1] * n[1]) / (eq[1] * eq[1] * eq[2]),
@@ -2091,6 +2257,273 @@ mod tests {
                 )
                 .map_err(err_line_print!())?;
             }
+        }
+
+        Ok(())
+    }
+
+    // Prefactor checks with heavy particles.
+    #[allow(clippy::too_many_lines)]
+    #[test]
+    fn prefactor_heavy() -> Result<(), Box<dyn error::Error>> {
+        const EPS_REL: f64 = 1e-14;
+        const EPS_ABS: f64 = 1e-250;
+
+        let mut interaction = super::Particles::new(&[1, -1, 2], &[2, -3]);
+
+        for _ in 0..RUN_COUNT {
+            let (n, na, eq) = rand_n_na_eq();
+            // Heavy particle 1
+            interaction.heavy = vec![1];
+            let (forward, backward) = interaction.symmetric_prefactor_terms(&n, &eq, &[]);
+            approx_eq(
+                forward.0 / forward.1,
+                n[1] * n[1] * n[2] / eq[2],
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+            approx_eq(
+                backward.0 / backward.1,
+                eq[1] * eq[1] * n[2] * n[3] / (eq[2] * eq[3]),
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+
+            let (forward, backward) =
+                interaction.asymmetric_prefactor_terms(&n, &na, &eq, &[], &[]);
+            approx_eq(
+                forward.0 / forward.1,
+                (na[2] * n[1] * n[1]) / eq[2],
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+            #[allow(clippy::suspicious_operation_groupings)]
+            approx_eq(
+                backward.0 / backward.1,
+                eq[1] * eq[1] * (na[2] * n[3] - na[3] * n[2]) / (eq[2] * eq[3]),
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+
+            // Heavy particle 2
+            interaction.heavy = vec![2];
+            let (forward, backward) = interaction.symmetric_prefactor_terms(&n, &eq, &[]);
+            approx_eq(
+                forward.0 / forward.1,
+                eq[2] * n[1] * n[1] * n[2] / (eq[1] * eq[1]),
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+            approx_eq(
+                backward.0 / backward.1,
+                eq[2] * n[2] * n[3] / eq[3],
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+
+            let (forward, backward) =
+                interaction.asymmetric_prefactor_terms(&n, &na, &eq, &[], &[]);
+            approx_eq(
+                forward.0 / forward.1,
+                eq[2] * (na[2] * n[1] * n[1]) / (eq[1] * eq[1]),
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+            #[allow(clippy::suspicious_operation_groupings)]
+            approx_eq(
+                backward.0 / backward.1,
+                eq[2] * (na[2] * n[3] - na[3] * n[2]) / eq[3],
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+
+            // Heavy particle 3
+            interaction.heavy = vec![3];
+            let (forward, backward) = interaction.symmetric_prefactor_terms(&n, &eq, &[]);
+            approx_eq(
+                forward.0 / forward.1,
+                eq[3] * n[1] * n[1] * n[2] / (eq[1] * eq[1] * eq[2]),
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+            approx_eq(
+                backward.0 / backward.1,
+                n[2] * n[3] / (eq[2]),
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+
+            let (forward, backward) =
+                interaction.asymmetric_prefactor_terms(&n, &na, &eq, &[], &[]);
+            approx_eq(
+                forward.0 / forward.1,
+                eq[3] * (na[2] * n[1] * n[1]) / (eq[1] * eq[1] * eq[2]),
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+            #[allow(clippy::suspicious_operation_groupings)]
+            approx_eq(
+                backward.0 / backward.1,
+                (na[2] * n[3] - na[3] * n[2]) / eq[2],
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+
+            // Heavy particle 1, 2
+            interaction.heavy = vec![1, 2];
+            let (forward, backward) = interaction.symmetric_prefactor_terms(&n, &eq, &[]);
+            approx_eq(
+                forward.0 / forward.1,
+                eq[2] * n[1] * n[1] * n[2],
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+            approx_eq(
+                backward.0 / backward.1,
+                eq[1] * eq[1] * eq[2] * n[2] * n[3] / eq[3],
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+
+            let (forward, backward) =
+                interaction.asymmetric_prefactor_terms(&n, &na, &eq, &[], &[]);
+            approx_eq(
+                forward.0 / forward.1,
+                eq[2] * na[2] * n[1] * n[1],
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+            #[allow(clippy::suspicious_operation_groupings)]
+            approx_eq(
+                backward.0 / backward.1,
+                eq[1] * eq[1] * eq[2] * (na[2] * n[3] - na[3] * n[2]) / eq[3],
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+
+            // Heavy particle 1, 3
+            interaction.heavy = vec![1, 3];
+            let (forward, backward) = interaction.symmetric_prefactor_terms(&n, &eq, &[]);
+            approx_eq(
+                forward.0 / forward.1,
+                eq[3] * n[1] * n[1] * n[2] / eq[2],
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+            approx_eq(
+                backward.0 / backward.1,
+                eq[1] * eq[1] * n[2] * n[3] / eq[2],
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+
+            let (forward, backward) =
+                interaction.asymmetric_prefactor_terms(&n, &na, &eq, &[], &[]);
+            approx_eq(
+                forward.0 / forward.1,
+                eq[3] * (na[2] * n[1] * n[1]) / eq[2],
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+            #[allow(clippy::suspicious_operation_groupings)]
+            approx_eq(
+                backward.0 / backward.1,
+                eq[1] * eq[1] * (na[2] * n[3] - na[3] * n[2]) / eq[2],
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+
+            // Heavy particle 2, 3
+            interaction.heavy = vec![2, 3];
+            let (forward, backward) = interaction.symmetric_prefactor_terms(&n, &eq, &[]);
+            approx_eq(
+                forward.0 / forward.1,
+                eq[2] * eq[3] * n[1] * n[1] * n[2] / (eq[1] * eq[1]),
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+            approx_eq(
+                backward.0 / backward.1,
+                eq[2] * n[2] * n[3],
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+
+            let (forward, backward) =
+                interaction.asymmetric_prefactor_terms(&n, &na, &eq, &[], &[]);
+            approx_eq(
+                forward.0 / forward.1,
+                eq[2] * eq[3] * (na[2] * n[1] * n[1]) / (eq[1] * eq[1]),
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+            #[allow(clippy::suspicious_operation_groupings)]
+            approx_eq(
+                backward.0 / backward.1,
+                eq[2] * (na[2] * n[3] - na[3] * n[2]),
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+
+            // Heavy particle 1, 2, 3
+            interaction.heavy = vec![1, 2, 3];
+            let (forward, backward) = interaction.symmetric_prefactor_terms(&n, &eq, &[]);
+            approx_eq(
+                forward.0 / forward.1,
+                eq[2] * eq[3] * n[1] * n[1] * n[2],
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+            approx_eq(
+                backward.0 / backward.1,
+                eq[1] * eq[1] * eq[2] * n[2] * n[3],
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+
+            let (forward, backward) =
+                interaction.asymmetric_prefactor_terms(&n, &na, &eq, &[], &[]);
+            approx_eq(
+                forward.0 / forward.1,
+                eq[2] * eq[3] * (na[2] * n[1] * n[1]),
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
+            #[allow(clippy::suspicious_operation_groupings)]
+            approx_eq(
+                backward.0 / backward.1,
+                eq[1] * eq[1] * eq[2] * (na[2] * n[3] - na[3] * n[2]),
+                EPS_REL,
+                EPS_ABS,
+            )
+            .map_err(err_line_print!())?;
         }
 
         Ok(())
@@ -2559,7 +2992,7 @@ mod tests {
             n += &result.dn;
             na += &result.dna;
 
-            let (forward, backward) = interaction.symmetric_prefactor(&n, &eq, &[]);
+            let (forward, backward) = interaction.symmetric_prefactor_terms(&n, &eq, &[]);
             approx_eq(
                 forward.0 * backward.1,
                 backward.0 * forward.1,
@@ -2567,7 +3000,8 @@ mod tests {
                 ZERO_EPS_ABS,
             )
             .map_err(err_line_print!())?;
-            let (forward, backward) = interaction.asymmetric_prefactor(&n, &na, &eq, &[], &[]);
+            let (forward, backward) =
+                interaction.asymmetric_prefactor_terms(&n, &na, &eq, &[], &[]);
             approx_eq(
                 forward.0 * backward.1,
                 backward.0 * forward.1,
@@ -2593,10 +3027,11 @@ mod tests {
             n += &result.dn;
             na += &result.dna;
 
-            let (forward, backward) = interaction.symmetric_prefactor(&n, &eq, &[]);
+            let (forward, backward) = interaction.symmetric_prefactor_terms(&n, &eq, &[]);
             approx_eq(forward.0 * backward.1, backward.0 * forward.1, 8.0, 1e-15)
                 .map_err(err_line_print!())?;
-            let (forward, backward) = interaction.asymmetric_prefactor(&n, &na, &eq, &[], &[]);
+            let (forward, backward) =
+                interaction.asymmetric_prefactor_terms(&n, &na, &eq, &[], &[]);
             approx_eq(forward.0 * backward.1, backward.0 * forward.1, 8.0, 1e-15)
                 .map_err(err_line_print!())?;
         }
