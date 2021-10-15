@@ -147,6 +147,9 @@
 #[cfg(feature = "nightly")]
 extern crate test;
 
+#[cfg(feature = "blas")]
+extern crate blas_src;
+
 macro_rules! debug_assert_warn {
     ($cond:expr, $($arg:tt)+) => (
         if cfg!(debug_assertions) && ($cond) {

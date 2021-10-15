@@ -21,31 +21,35 @@ ndarray = "0.15"
 num = "0.4"
 quadrature = "0.1"
 special-functions = { git = "https://github.com/hep-rs/special-functions.git" }
-rand = "0.8"
 roots = "0.0.7"
 
 # Optional dependencies
 rayon = { optional = true, version = "1.5" }
 serde = { optional = true, version = "1.0", features = ["derive"] }
-serde_json = { optional = true, version = "1.0"}
+serde_json = { optional = true, version = "1.0" }
+blas-src = { optional = true, version = "0.8"  }
 
 
 [dev-dependencies]
-chrono = "0.4"
+rand = "0.8"
 csv = "1.1"
 fern = { version = "0.6", features = ["colored"] }
 itertools = "0.10"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 zstd = "0.9"
+blas-src = { version = "0.8", features = ["openblas"] }
+openblas-src = { version = "0.10", features = ["system"] }
+
 
 [features]
-default = ["rk98", "parallel", "serialization"]
+default = ["serialization", "blas", "parallel"]
 
 nightly = []
 serialization = ["serde", "ndarray/serde", "num/serde"]
 parallel = ["rayon", "ndarray/rayon"]
 debug = ["serde_json"]
+blas = ["ndarray/blas", "blas-src"]
 
 rk21 = []
 rk32 = []
