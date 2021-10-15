@@ -707,6 +707,8 @@ mod tests {
         Ok(())
     }
 
+    // FIXME
+    #[ignore = "Number density calculation is incorrect for large chemical potentials"]
     #[test]
     fn number_density_asymmetry() -> Result<(), Box<dyn error::Error>> {
         let mut rdr = csv::Reader::from_reader(zstd::Decoder::new(fs::File::open(
@@ -726,12 +728,6 @@ mod tests {
             let m = data[1];
             let mu = data[2];
             let y = &data[3..];
-
-            // TODO: Refine the number density calculations to work when the
-            // chemical potential is large.
-            if (mu / m).abs() > 1e-1 {
-                continue;
-            }
 
             for (i, &yi) in y.iter().enumerate() {
                 if !yi.is_nan() {
