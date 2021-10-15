@@ -67,9 +67,11 @@ where
             csv.write_field(format!("{:.e}", c.beta)).unwrap();
             for i in 1..n {
                 csv.write_field(format!("{:.e}", c.n[i])).unwrap();
-                csv.write_field(format!("{:.e}", dn[i])).unwrap();
+                csv.write_field(format!("{:.e}", dn[i] * (c.beta / c.step_size)))
+                    .unwrap();
                 csv.write_field(format!("{:.e}", c.na[i])).unwrap();
-                csv.write_field(format!("{:.e}", dna[i])).unwrap();
+                csv.write_field(format!("{:.e}", dna[i] * (c.beta / c.step_size)))
+                    .unwrap();
                 csv.write_field(format!("{:.e}", c.eq[i])).unwrap();
             }
             csv.write_record(None::<&[u8]>).unwrap();
