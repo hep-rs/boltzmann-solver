@@ -306,6 +306,107 @@ where
         Some(())
     }
 
+    /// Adjust `dn` and/or `dna` for fast interaction (if applicable).
+    #[cfg(feature = "parallel")]
+    fn fix_fast_interactions(
+        context: &mut Context<M>,
+        ws: &mut Workspace,
+        eq: &[Array1<f64>],
+    ) -> Option<()> {
+        let mut interactions = context.fast_interactions.take()?.into_inner().ok()?;
+
+        if interactions.is_empty() {
+            return Some(());
+        }
+
+        // TODO: Is the bug in full::custom due to overlapping interactions for
+        // particles in equilibrium?
+
+        // As results from one fast interaction might affect the computation of
+        // the next, we have to be careful as to how we parallelize the tasks.
+        // Specifically, we can only run interactions in parallel if they share
+        // no common particles.  We ignore particles whose number density is not
+        // changed by the interaction, and particles who are forced to remain in
+        // equilibrium.
+        let mut anticliques = Vec::new();
+        #[allow(clippy::unnecessary_filter_map)]
+        while !interactions.is_empty() {
+            let mut anticlique = Vec::new();
+            let mut particle_set = HashSet::<usize>::new();
+
+            interactions = interactions
+                .drain()
+                .filter_map(|interaction| {
+                    let relevant_particles: Vec<_> = interaction
+                        .particle_counts
+                        .iter()
+                        .filter_map(|(&idx, &(c, ca))| {
+                            if c == 0.0 && ca == 0.0 {
+                                None
+                            } else {
+                                Some(idx)
+                            }
+                        })
+                        .filter(|idx| {
+                            context
+                                .in_equilibrium
+                                .binary_search(idx)
+                                .and_then(|_| context.no_asymmetry.binary_search(idx))
+                                .is_err()
+                        })
+                        .collect();
+
+                    if particle_set.is_empty()
+                        || relevant_particles
+                            .iter()
+                            .all(|idx| !particle_set.contains(idx))
+                    {
+                        particle_set.extend(relevant_particles);
+                        anticlique.push(interaction);
+                        None
+                    } else {
+                        Some(interaction)
+                    }
+                })
+                .collect();
+
+            anticliques.push(anticlique);
+        }
+
+        log::trace!(
+            "Divided {} fast into interactions into {} groups of sizes {:?}.",
+            anticliques.iter().map(Vec::len).sum::<usize>(),
+            anticliques.len(),
+            anticliques.iter().map(Vec::len).collect::<Vec<_>>()
+        );
+
+        let mut n = &context.n + &ws.dn;
+        let mut na = &context.na + &ws.dna;
+
+        let mut result = FastInteractionResult::zero(context.n.dim());
+        for anticlique in anticliques {
+            let intermediate_result = match anticlique.len() {
+                1 => anticlique[0].fast_interaction_de(context, &n, &na, eq),
+                _ => anticlique
+                    .into_par_iter()
+                    .map(|fi| fi.fast_interaction_de(context, &n, &na, eq))
+                    .reduce(
+                        || FastInteractionResult::zero(n.dim()),
+                        |acc, result| acc + result,
+                    ),
+            };
+
+            log::trace!(
+                "Anticlique result:\n         dn: {:e}\n        dna: {:e}\n   dn error: {:e}\n  dna error: {:e}",
+                intermediate_result.dn,
+                intermediate_result.dna,
+                intermediate_result.dn_error,
+                intermediate_result.dna_error
+            );
+            n += &intermediate_result.dn;
+            na += &intermediate_result.dna;
+            result += intermediate_result;
+        }
 
         *ws += result;
         Some(())
