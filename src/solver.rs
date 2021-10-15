@@ -234,13 +234,19 @@ impl<M> Solver<M>
 where
     M: ModelInteractions,
 {
-    #[cfg(not(feature = "parallel"))]
-    fn compute_ki(
-        &self,
-        ki: &mut ArrayViewMut1<f64>,
-        kai: &mut ArrayViewMut1<f64>,
-        ci: &Context<M>,
-    ) {
+    fn compute_ki(&self, ki: &mut Array1<f64>, kai: &mut Array1<f64>, ci: &Context<M>) {
+        #[cfg(feature = "parallel")]
+        if self.is_precomputed && self.model.interactions().len() < 50 {
+            self.compute_ki_serial(ki, kai, ci);
+        } else {
+            self.compute_ki_parallel(ki, kai, ci);
+        }
+
+        #[cfg(not(feature = "parallel"))]
+        self.compute_ki_serial(ki, kai, ci);
+    }
+
+    fn compute_ki_serial(&self, ki: &mut Array1<f64>, kai: &mut Array1<f64>, ci: &Context<M>) {
         ki.fill(0.0);
         kai.fill(0.0);
         for interaction in self.model.interactions() {
@@ -249,12 +255,7 @@ where
     }
 
     #[cfg(feature = "parallel")]
-    fn compute_ki(
-        &self,
-        ki: &mut ArrayViewMut1<f64>,
-        kai: &mut ArrayViewMut1<f64>,
-        ci: &Context<M>,
-    ) {
+    fn compute_ki_parallel(&self, ki: &mut Array1<f64>, kai: &mut Array1<f64>, ci: &Context<M>) {
         let dim = ki.dim();
 
         let (new_ki, new_kai) = self
@@ -264,7 +265,7 @@ where
             .fold(
                 || (Array1::zeros(dim), Array1::zeros(dim)),
                 |(mut dn, mut dna), interaction| {
-                    interaction.apply_change(&mut dn.view_mut(), &mut dna.view_mut(), ci);
+                    interaction.apply_change(&mut dn, &mut dna, ci);
                     (dn, dna)
                 },
             )
@@ -278,24 +279,33 @@ where
     }
 
     /// Adjust `dn` and/or `dna` for fast interaction (if applicable).
+    #[cfg(not(feature = "parallel"))]
     fn fix_fast_interactions(
         c: &mut Context<M>,
         ws: &mut Workspace,
-        eq: &Array2<f64>,
+        eq: &[Array1<f64>],
     ) -> Option<()> {
+        let interactions = c.fast_interactions.take()?.into_inner().ok()?;
+
         let mut n = &c.n + &ws.dn;
         let mut na = &c.na + &ws.dna;
 
-        let result = c.fast_interactions.as_ref()?.read().ok()?.iter().fold(
-            FastInteractionResult::zero(c.n.dim()),
-            |mut acc, fi| {
-                let result = fi.fast_interaction_de(c, &n, &na, eq);
-                n += &result.dn;
-                na += &result.dna;
-                acc += result;
-                acc
-            },
-        );
+        let result =
+            interactions
+                .iter()
+                .fold(FastInteractionResult::zero(c.n.dim()), |mut acc, fi| {
+                    let result = fi.fast_interaction_de(c, &n, &na, eq);
+                    n += &result.dn;
+                    na += &result.dna;
+                    acc += result;
+                    acc
+                });
+
+        *ws += result;
+
+        Some(())
+    }
+
 
         *ws += result;
         Some(())
