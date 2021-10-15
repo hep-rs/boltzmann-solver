@@ -5,6 +5,7 @@ from typing import List, Tuple, Union
 import numpy as np
 import pandas as pd
 import plotly
+import plotly.subplots
 import plotly.colors
 import plotly.graph_objects as go
 from IPython.core.display import HTML, display
@@ -61,8 +62,16 @@ def read_number_density(
             "na-d2",
             "na-d3",
         ]
-    ].sum(axis=1)
-    data["na-B-L"] -= data[["na-L1", "na-L2", "na-L3", "na-e1", "na-e2", "na-e3"]].sum(
+    ].sum(axis=1) - data[
+        [
+            "na-L1",
+            "na-L2",
+            "na-L3",
+            "na-e1",
+            "na-e2",
+            "na-e3",
+        ]
+    ].sum(
         axis=1
     )
     data["dna-B-L"] = (1 / 3) * data[
@@ -77,10 +86,11 @@ def read_number_density(
             "dna-d2",
             "dna-d3",
         ]
-    ].sum(axis=1)
-    data["dna-B-L"] -= data[
+    ].sum(axis=1) - data[
         ["dna-L1", "dna-L2", "dna-L3", "dna-e1", "dna-e2", "dna-e3"]
-    ].sum(axis=1)
+    ].sum(
+        axis=1
+    )
 
     for col in data.columns:
         if col.startswith("na-") or col.startswith("d"):
