@@ -2,8 +2,8 @@
 
 pub use crate::{
     model::{
-        interaction::Interaction, standard::data as sm_data, Model, ModelInteractions, Particle,
-        Standard as StandardModel,
+        interaction, interaction::Interaction, standard::data as sm_data, Model, ModelInteractions,
+        Particle, Propagator, Standard as StandardModel,
     },
     solver::{Context, Solver, SolverBuilder},
     statistic::Statistics,
