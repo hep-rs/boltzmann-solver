@@ -596,10 +596,10 @@ where
             logger: self.logger,
             step_precision: self.step_precision,
             error_tolerance: self.error_tolerance,
-            fast_interactions: self.fast_interactions,
-            inaccurate: false,
+            use_fast_interactions: self.fast_interactions,
+            is_inaccurate: false,
             abort_when_inaccurate: self.abort_when_inaccurate,
-            precomputed: self.precompute > 0,
+            is_precomputed: self.precompute > 0,
         })
     }
 }

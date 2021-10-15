@@ -216,6 +216,7 @@ impl ops::AddAssign<FastInteractionResult> for Workspace {
 type LoggerFn<M> = Box<dyn Fn(&Context<M>, &Array1<f64>, &Array1<f64>)>;
 
 /// Boltzmann solver
+#[allow(clippy::struct_excessive_bools)]
 pub struct Solver<M> {
     model: M,
     particles_next: Vec<Particle>,
@@ -232,9 +233,10 @@ pub struct Solver<M> {
     step_precision: StepPrecision,
     /// The absolute and relative error tolerances for the integration.
     error_tolerance: ErrorTolerance,
-    fast_interactions: bool,
-    inaccurate: bool,
+    use_fast_interactions: bool,
+    is_inaccurate: bool,
     abort_when_inaccurate: bool,
+    is_precomputed: bool,
 }
 
 impl<M> Solver<M>
@@ -469,6 +471,9 @@ where
 
     /// Ensure that h is within the desired range of step sizes.
     ///
+    // This function also adjusts for the final step so as to ensure the
+    // integration finishes at the target.
+    ///
     /// This function returns a [`Result`] with:
     ///
     /// - `Ok(h)` indicating that the step size was either unchanged or made
@@ -477,6 +482,11 @@ where
     /// - `Err(h)` indicating that the step size was increased.  The local error
     ///   estimate requires a smaller step size than the minimal value allowed
     ///   and thus the result of the integration may be inaccurate.
+    ///
+    /// The result should always be in the range `[step_precision.min * beta,
+    /// step_precision.max * beta]`, with the ony exception being for the last
+    /// integration step when the step size might be smaller than the lower
+    /// bound.
     fn adjust_h(&mut self, step: usize, mut h: f64, beta: f64) -> Result<f64, f64> {
         let h_on_beta = h / beta;
 
@@ -563,11 +573,7 @@ where
         let mut steps_discarded = 0_usize;
         let mut evals = 0_usize;
         let mut beta = self.beta_range.0;
-        let mut h = beta
-            * f64::sqrt(
-                self.step_precision.min.max(self.step_precision.max / 1e6)
-                    * self.step_precision.max,
-            );
+        let mut h = beta * self.step_precision.max;
         let mut beta_logging = beta * BETA_LOG_STEP;
 
         // Run logger for 0th step
@@ -585,17 +591,26 @@ where
             (*self.logger)(&context, &workspace.dn, &workspace.dna);
         }
 
-        while beta < self.beta_range.1 {
-            step += 1;
+        while beta <= self.beta_range.1 {
             workspace.clear_step();
 
             // Log the progress of the integration
             if step % 100 == 0 {
-                log::info!("Step {}, β = {:>10.4e}, Δβ = {:.4e}", step, beta, h);
-            } else if step % 10 == 0 {
-                log::debug!("Step {}, β = {:>10.4e}, Δβ = {:.4e}", step, beta, h);
+                log::info!(
+                    "Step {} (including {} discarded), β = {:>10.4e}, Δβ = {:.4e}",
+                    step,
+                    steps_discarded,
+                    beta,
+                    h
+                );
             } else {
-                log::trace!("Step {}, β = {:>10.4e}, Δβ = {:.4e}", step, beta, h);
+                log::debug!(
+                    "Step {} (including {} discarded), β = {:>10.4e}, Δβ = {:.4e}",
+                    step,
+                    steps_discarded,
+                    beta,
+                    h
+                );
             }
 
             // Compute next step particles
@@ -603,7 +618,7 @@ where
             self.particles_next = self.model.particles().to_vec();
 
             // Initialize the fast interactions if they are being used
-            let mut fast_interactions = if self.fast_interactions {
+            let mut fast_interactions = if self.use_fast_interactions {
                 Some(RwLock::new(HashSet::new()))
             } else {
                 None
@@ -760,7 +775,7 @@ where
             // If the error is within the tolerance, we'll be advancing the
             // iteration step
             if within_tolerance {
-                if beta > beta_logging || beta >= self.beta_range.1 {
+                if beta > beta_logging || beta + h >= self.beta_range.1 {
                     (*self.logger)(&context, &workspace.dn, &workspace.dna);
                     beta_logging = beta * BETA_LOG_STEP;
                 }
@@ -768,7 +783,7 @@ where
                 workspace.advance();
                 beta += h;
             } else if log::log_enabled!(log::Level::Debug) {
-                log::trace!(
+                log::debug!(
                     "[{}|{:>10.4e}] Error is not within tolerance (error ratio: {:e}).",
                     step,
                     beta,
@@ -795,22 +810,26 @@ where
                 }
             };
 
-            // Adjust final integration step if needed
-            if beta + h > self.beta_range.1 {
+            if beta + h >= self.beta_range.1 {
                 log::trace!(
                     "[{}|{:>10.4e}] Fixing overshoot of last integration step.",
                     step,
                     beta
                 );
-                h = self.beta_range.1 - beta;
+                h = (self.beta_range.1 - beta).max(beta * f64::EPSILON);
+
+                // Also adjust `beta_logging` so that the last step is always logged.
+                beta_logging = beta;
             }
+
+            step += 1;
         }
 
         log::info!("Number of integration steps: {}", step - steps_discarded);
         log::info!("Number of integration steps discarded: {}", steps_discarded);
         log::info!("Number of evaluations: {}", evals);
 
-        if self.inaccurate {
+        if self.is_inaccurate {
             Err(Error::Inaccurate(workspace.result()))
         } else {
             Ok(workspace.result())
