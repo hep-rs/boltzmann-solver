@@ -28,9 +28,9 @@ use std::{collections::HashSet, convert::TryFrom, error, fmt, io::Write, ops, sy
 /// The minimum multiplicative step size between two consecutive calls of the logger.
 ///
 /// For debug builds, this is set to `1.0` so that the logger is called every time.  Otherwise
-#[cfg(any(feature = "debug", debug_assertions))]
+#[cfg(feature = "debug")]
 const BETA_LOG_STEP: f64 = 1.0;
-#[cfg(not(any(feature = "debug", debug_assertions)))]
+#[cfg(not(feature = "debug"))]
 const BETA_LOG_STEP: f64 = 1.1;
 
 /// Error type returned by the solver in case there is an error during
@@ -75,7 +75,7 @@ impl Error {
     }
 }
 
-#[cfg(all(feature = "debug", debug_assertions))]
+#[cfg(feature = "debug")]
 #[derive(Serialize)]
 struct Debug<'a> {
     step: usize,
@@ -85,6 +85,8 @@ struct Debug<'a> {
     eq: &'a Array2<f64>,
     eqn: &'a Array2<f64>,
     workspace: &'a Workspace,
+    interaction_indices: Vec<(Vec<isize>, Vec<isize>)>,
+    interaction_names: Vec<String>,
     gammas: &'a Array2<f64>,
     delta_gammas: &'a Array2<f64>,
     fast: Vec<bool>,
@@ -414,7 +416,7 @@ where
         use tableau::{RK_A, RK_C, RK_S};
 
         // Debug information to show the full step information.
-        #[cfg(all(feature = "debug", debug_assertions))]
+        #[cfg(feature = "debug")]
         let (debug_dir, mut gammas, mut delta_gammas, mut normalizations, mut eqn) = {
             let mut temp_dir = std::env::temp_dir();
             temp_dir.push("boltzmann-solver");
@@ -515,8 +517,32 @@ where
                 // Collect the equilibrium number densities for this substep.
                 eq.slice_mut(ndarray::s![i, ..]).assign(&context_i.eq);
 
-                #[cfg(all(feature = "debug", debug_assertions))]
+                #[cfg(feature = "debug")]
                 {
+                    #[cfg(feature = "parallel")]
+                    {
+                        let results: Vec<_> = self
+                            .model
+                            .interactions()
+                            .par_iter()
+                            .enumerate()
+                            .map(|(j, interaction)| {
+                                (
+                                    j,
+                                    interaction.gamma(&context_i, true).unwrap_or_default(),
+                                    interaction
+                                        .delta_gamma(&context_i, true)
+                                        .unwrap_or_default(),
+                                )
+                            })
+                            .collect();
+
+                        for (j, gamma, delta_gamma) in results {
+                            gammas[[i, j]] = gamma;
+                            delta_gammas[[i, j]] = delta_gamma;
+                        }
+                    }
+                    #[cfg(not(feature = "parallel"))]
                     for (j, interaction) in self.model.interactions().iter().enumerate() {
                         gammas[[i, j]] = interaction.gamma(&context_i, true).unwrap_or_default();
                         delta_gammas[[i, j]] = interaction
@@ -550,7 +576,7 @@ where
             Self::fix_fast_interactions(&mut context, &mut workspace, &eq);
             fix_equilibrium(&context, &mut workspace.dn, &mut workspace.dna);
 
-            #[cfg(all(feature = "debug", debug_assertions))]
+            #[cfg(feature = "debug")]
             serde_json::to_writer(
                 std::fs::File::create(debug_dir.join(format!("{}.json", step))).unwrap(),
                 &Debug {
@@ -558,9 +584,31 @@ where
                     beta,
                     h,
                     workspace: &workspace,
-                    eq: &eq,
+                    eq: &Array2::from_shape_fn((RK_S, self.model.len_particles()), |(i, j)| {
+                        eq[i][j]
+                    }),
                     eqn: &eqn,
                     normalizations: &normalizations,
+                    interaction_indices: self
+                        .model
+                        .interactions()
+                        .iter()
+                        .map(|i| {
+                            (
+                                i.particles().incoming_signed.clone(),
+                                i.particles().outgoing_signed.clone(),
+                            )
+                        })
+                        .collect(),
+                    interaction_names: self
+                        .model
+                        .interactions()
+                        .iter()
+                        .map(|i| {
+                            i.display(&self.model)
+                                .unwrap_or_else(|_| i.particles().short_display())
+                        })
+                        .collect(),
                     gammas: &gammas,
                     delta_gammas: &delta_gammas,
                     fast: self
