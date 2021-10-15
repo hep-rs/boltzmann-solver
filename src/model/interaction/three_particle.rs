@@ -112,7 +112,7 @@ where
         self
     }
 
-    /// Adjust whether this interaction will calculate decay widths.
+    /// Adjust whether this interaction will calculate interaction rates.
     #[must_use]
     pub fn enable_gamma(mut self, v: bool) -> Self {
         self.gamma_enabled = v;
