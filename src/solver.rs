@@ -23,7 +23,7 @@ use ndarray::prelude::*;
 use rayon::prelude::*;
 #[cfg(feature = "serde")]
 use serde::Serialize;
-use std::{collections::HashSet, convert::TryFrom, error, fmt, io::Write, ops, sync::RwLock};
+use std::{collections::HashSet, convert::TryFrom, error, fmt, io::Write, iter, ops, sync::RwLock};
 
 /// The minimum multiplicative step size between two consecutive calls of the logger.
 ///
@@ -97,12 +97,16 @@ struct Debug<'a> {
 struct Workspace {
     /// Number density
     n: Array1<f64>,
+    /// Number density at the current sub-quadrature step
+    ni: Array1<f64>,
     /// Number density change
     dn: Array1<f64>,
     /// Number density local error estimate
     dn_error: Array1<f64>,
     /// Number density asymmetry
     na: Array1<f64>,
+    /// Number density asymmetry at the current sub-quadrature step
+    nai: Array1<f64>,
     /// Number density asymmetry change
     dna: Array1<f64>,
     /// Number density asymmetry local error estimate
@@ -110,10 +114,10 @@ struct Workspace {
 
     /// k array for the number density of shape `RK_S × p` where `p` is the
     /// number of particles (including the 0-index particle).
-    k: Array2<f64>,
+    k: Vec<Array1<f64>>,
     /// k array for the number density asymmetry of shape `RK_S × p` where `p`
     /// is the number of particles (including the 0-index particle).
-    ka: Array2<f64>,
+    ka: Vec<Array1<f64>>,
 }
 
 /// Workspace of variables allocated once and then reused during the integration.
@@ -121,15 +125,21 @@ impl Workspace {
     fn new(initial_densities: &Array1<f64>, initial_asymmetries: &Array1<f64>) -> Self {
         let dim = initial_densities.dim();
 
-        let k = Array2::zeros((tableau::RK_S, dim));
-        let ka = Array2::zeros((tableau::RK_S, dim));
+        let k: Vec<_> = iter::repeat(Array::zeros(dim))
+            .take(tableau::RK_S)
+            .collect();
+        let ka: Vec<_> = iter::repeat(Array::zeros(dim))
+            .take(tableau::RK_S)
+            .collect();
 
         Self {
             n: initial_densities.clone(),
+            ni: initial_asymmetries.clone(),
             dn: Array1::zeros(dim),
             dn_error: Array1::zeros(dim),
 
             na: initial_asymmetries.clone(),
+            nai: initial_asymmetries.clone(),
             dna: Array1::zeros(dim),
             dna_error: Array1::zeros(dim),
 
@@ -140,6 +150,8 @@ impl Workspace {
 
     /// Clear the workspace for the next step, filling the changes to 0 and the
     /// error estimates to 0.
+    ///
+    /// This does not alter the sub-quadrature densities.
     fn clear_step(&mut self) {
         self.dn.fill(0.0);
         self.dna.fill(0.0);
@@ -150,22 +162,17 @@ impl Workspace {
     /// Compute and update the changes to number density from k and a given step
     /// of the Runge-Kutta integration.
     fn compute_dn(&mut self, i: usize) {
-        #[cfg(not(feature = "parallel"))]
-        use ndarray::azip as zip;
-        #[cfg(feature = "parallel")]
-        use ndarray::par_azip as zip;
-
         let bi = tableau::RK_B[i];
         let ei = tableau::RK_E[i];
 
-        zip!(
+        ndarray::azip!(
             (
                 dn in &mut self.dn,
                 dn_err in &mut self.dn_error,
-                &ki in &self.k.slice(ndarray::s![i, ..]),
+                &ki in &self.k[i],
                 dna in &mut self.dna,
                 dna_err in &mut self.dna_error,
-                &kai in &self.ka.slice(ndarray::s![i, ..])
+                &kai in &self.ka[i]
             ) {
                 *dn += bi * ki;
                 *dn_err += ei * ki;
@@ -605,7 +612,9 @@ where
             // For fast interactions, we need to know the equilibrium number
             // densities over the step interval.  Instead of recomputing them,
             // we collect them during the Runge-Kutta integration.
-            let mut eq = Array2::zeros((RK_S, workspace.n.dim()));
+            let mut eq: Vec<Array1<f64>> = iter::repeat(Array1::zeros(workspace.n.dim()))
+                .take(RK_S)
+                .collect();
 
             for i in 0..RK_S {
                 evals += 1;
@@ -613,25 +622,26 @@ where
                 // Compute the sub-step values
                 let beta_i = beta + RK_C[i] * h;
                 let ai = RK_A[i];
-                let ni = (0..i).fold(workspace.n.clone(), |total, j| {
-                    total + ai[j] * &workspace.k.slice(ndarray::s![j, ..])
-                });
-                let nai = (0..i).fold(workspace.na.clone(), |total, j| {
-                    total + ai[j] * &workspace.ka.slice(ndarray::s![j, ..])
-                });
+                workspace.ni.assign(&workspace.n);
+                workspace.nai.assign(&workspace.na);
+                #[allow(clippy::needless_range_loop)]
+                for j in 0..i {
+                    workspace.ni.scaled_add(ai[j], &workspace.k[j]);
+                    workspace.nai.scaled_add(ai[j], &workspace.ka[j]);
+                }
                 self.model.set_beta(beta_i);
                 let context_i = self.context(
                     step,
                     Some(i),
                     h,
                     (beta_i, beta + h),
-                    &ni,
-                    &nai,
+                    &workspace.ni,
+                    &workspace.nai,
                     fast_interactions,
                 );
 
                 // Collect the equilibrium number densities for this substep.
-                eq.slice_mut(ndarray::s![i, ..]).assign(&context_i.eq);
+                eq[i].assign(&context_i.eq);
 
                 #[cfg(feature = "debug")]
                 {
@@ -669,11 +679,11 @@ where
                     eqn.slice_mut(ndarray::s![i, ..]).assign(&context_i.eqn);
                 }
 
-                let mut ki = workspace.k.slice_mut(ndarray::s![i, ..]);
-                let mut kai = workspace.ka.slice_mut(ndarray::s![i, ..]);
+                let ki = &mut workspace.k[i];
+                let kai = &mut workspace.ka[i];
 
                 // Compute k[i] and ka[i] from each interaction
-                self.compute_ki(&mut ki, &mut kai, &context_i);
+                self.compute_ki(ki, kai, &context_i);
                 fast_interactions = context_i.into_fast_interactions();
                 workspace.compute_dn(i);
             }
