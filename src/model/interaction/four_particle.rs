@@ -182,10 +182,7 @@ impl<M> fmt::Debug for FourParticle<M> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "FourParticle {{ \
-             particles: {:?}, \
-             squared_amplitude: Box<Fn>, \
-             }}",
+            "FourParticle {{ particles: {:?}, squared_amplitude: Box<Fn> }}",
             self.particles
         )
     }
