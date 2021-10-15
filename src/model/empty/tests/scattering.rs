@@ -211,7 +211,7 @@ fn m0m0() -> Result<(), Box<dyn error::Error>> {
     approx_eq(n[1] - n0[1], n0[3] - n[3], 8.0, 1e-50)?;
 
     // Check final number densities
-    approx_eq(n[1], 5.866e-2, 4.0, 1e-4)?;
+    approx_eq(n[1], 5.8737e-2, 4.0, 1e-4)?;
     approx_eq(n[1], n[2], 4.0, 1e-10)?;
     approx_eq(n[3], 1.9413, 4.0, 1e-4)?;
     approx_eq(n[3], n[4], 4.0, 1e-50)?;
@@ -252,9 +252,9 @@ fn mm00() -> Result<(), Box<dyn error::Error>> {
     approx_eq(n[1] - n0[1], n0[3] - n[3], 8.0, 1e-50)?;
 
     // Check final number densities
-    approx_eq(n[1], 0.27587, 4.0, 1e-4)?;
+    approx_eq(n[1], 0.2263, 4.0, 1e-4)?;
     approx_eq(n[1], n[2], 4.0, 1e-10)?;
-    approx_eq(n[3], 1.7241, 4.0, 1e-4)?;
+    approx_eq(n[3], 1.7737, 4.0, 1e-4)?;
     approx_eq(n[3], n[4], 4.0, 1e-50)?;
 
     assert_eq!(na0, na);
@@ -299,8 +299,8 @@ fn mm00_eq() -> Result<(), Box<dyn error::Error>> {
     approx_eq(n[1] - 1.3, n[2] - 1.1, 8.0, 1e-50)?;
 
     // Check final number densities
-    approx_eq(n[1], 0.3727, 4.0, 1e-10)?;
-    approx_eq(n[2], 0.1727, 4.0, 1e-10)?;
+    approx_eq(n[1], 0.32882, 4.0, 1e-10)?;
+    approx_eq(n[2], 0.12882, 4.0, 1e-10)?;
     approx_eq(n[3], 1.0, 4.0, 1e-10)?;
     approx_eq(n[4], 1.0, 4.0, 1e-10)?;
 

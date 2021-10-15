@@ -59,7 +59,7 @@ pub struct Gamma {
 
 impl Gamma {
     pub fn new() -> Self {
-        let particles = interaction::Particles::new(&[1], &[2, 3]);
+        let particles = interaction::Particles::new([1], [2, 3]);
         Self { particles }
     }
 }
@@ -135,7 +135,7 @@ pub struct Rate {
 
 impl Rate {
     pub fn new() -> Self {
-        let particles = interaction::Particles::new(&[1], &[2, 3]);
+        let particles = interaction::Particles::new([1], [2, 3]);
         Self { particles }
     }
 }
@@ -183,9 +183,9 @@ fn rate() -> Result<(), Box<dyn error::Error>> {
     let (n, _na) = solve("unit_rate.csv", SolverBuilder::new().model(model))?;
 
     // Check final number densities
-    approx_eq(n[1], 1.11e-3, 4.0, 1e-4)?;
-    approx_eq(n[2], 1.9989, 4.0, 1e-50)?;
-    approx_eq(n[3], 1.9989, 4.0, 1e-50)?;
+    approx_eq(n[1], 9.178e-4, 4.0, 1e-4)?;
+    approx_eq(n[2], 1.9991, 4.0, 1e-50)?;
+    approx_eq(n[3], 1.9991, 4.0, 1e-50)?;
 
     Ok(())
 }
@@ -206,7 +206,7 @@ pub struct AdjustedRate {
 
 impl AdjustedRate {
     pub fn new() -> Self {
-        let particles = interaction::Particles::new(&[1], &[2, 3]);
+        let particles = interaction::Particles::new([1], [2, 3]);
         Self { particles }
     }
 }
