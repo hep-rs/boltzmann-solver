@@ -373,25 +373,30 @@ where
 
             Ok(h)
         } else if h_on_beta < self.step_precision.min {
-            h = beta * self.step_precision.min;
-            log::debug!(
-                "[{}|{:>10.4e}] Step size too small, increased h to {:.3e}",
-                step,
-                beta,
-                h
-            );
-
-            // Give a warning (if not done already).
-            if !self.inaccurate {
-                log::warn!(
-                    "[{step}|{beta:.3e}] Step size too small at β = {beta:e}.  Result may not be accurate",
-                    step = step,
-                    beta = beta,
+            // It is possible that there is a 'too small' step size for the last step, which is not an inaccuracy.
+            if beta + h >= self.beta_range.1 {
+                Ok(h)
+            } else {
+                h = beta * self.step_precision.min;
+                log::debug!(
+                    "[{}|{:>10.4e}] Step size too small, increased h to {:.3e}",
+                    step,
+                    beta,
+                    h
                 );
-                self.inaccurate = true;
-            }
 
-            Err(h)
+                // Give a warning (if not done already).
+                if !self.is_inaccurate {
+                    log::warn!(
+                        "[{step}|{beta:.3e}] Step size too small at β = {beta:e}.  Result may not be accurate",
+                        step = step,
+                        beta = beta,
+                    );
+                    self.is_inaccurate = true;
+                }
+
+                Err(h)
+            }
         } else {
             Ok(h)
         }
