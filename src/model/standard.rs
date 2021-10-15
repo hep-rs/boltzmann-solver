@@ -54,32 +54,32 @@ impl Model for Standard {
             Particle::new(0, 0.0, 0.0)
                 .name("none")
                 .dof(0.0)
-                .own_antiparticle(), // dummy particle so particles start at index `1`
-            Particle::new(2, 0.0, 0.0).name("A").own_antiparticle(), // hypercharge gauge boson
+                .own_antiparticle(), // [0] dummy particle so particles start at index `1`
+            Particle::new(2, 0.0, 0.0).name("A").own_antiparticle(), // [1] Hypercharge gauge boson
             Particle::new(2, 0.0, 0.0)
                 .name("W")
                 .dof(3.0)
-                .own_antiparticle(), // SU(2) gauge boson
+                .own_antiparticle(), // [2] SU(2) gauge boson
             Particle::new(2, 0.0, 0.0)
                 .name("G")
                 .dof(8.0)
-                .own_antiparticle(), // SU(3) gauge boson
-            Particle::new(0, 0.0, 0.0).name("H").dof(2.0).complex(), // Higgs
-            Particle::new(1, 0.0, 0.0).name("L1").dof(2.0),
-            Particle::new(1, 0.0, 0.0).name("L2").dof(2.0),
-            Particle::new(1, 0.0, 0.0).name("L3").dof(2.0),
-            Particle::new(1, 0.0, 0.0).name("e1").dof(1.0),
-            Particle::new(1, 0.0, 0.0).name("e2").dof(1.0),
-            Particle::new(1, 0.0, 0.0).name("e3").dof(1.0),
-            Particle::new(1, 0.0, 0.0).name("Q1").dof(2.0 * 3.0),
-            Particle::new(1, 0.0, 0.0).name("Q2").dof(2.0 * 3.0),
-            Particle::new(1, 0.0, 0.0).name("Q3").dof(2.0 * 3.0),
-            Particle::new(1, 0.0, 0.0).name("u1").dof(3.0),
-            Particle::new(1, 0.0, 0.0).name("u2").dof(3.0),
-            Particle::new(1, 0.0, 0.0).name("u3").dof(3.0),
-            Particle::new(1, 0.0, 0.0).name("d1").dof(3.0),
-            Particle::new(1, 0.0, 0.0).name("d2").dof(3.0),
-            Particle::new(1, 0.0, 0.0).name("d3").dof(3.0),
+                .own_antiparticle(), // [3] SU(3) gauge boson
+            Particle::new(0, 0.0, 0.0).name("H").dof(2.0).complex(), // [4] Higgs
+            Particle::new(1, 0.0, 0.0).name("L1").dof(2.0),          // [5]
+            Particle::new(1, 0.0, 0.0).name("L2").dof(2.0),          // [6]
+            Particle::new(1, 0.0, 0.0).name("L3").dof(2.0),          // [7]
+            Particle::new(1, 0.0, 0.0).name("e1").dof(1.0),          // [8]
+            Particle::new(1, 0.0, 0.0).name("e2").dof(1.0),          // [9]
+            Particle::new(1, 0.0, 0.0).name("e3").dof(1.0),          // [10]
+            Particle::new(1, 0.0, 0.0).name("Q1").dof(2.0 * 3.0),    // [11]
+            Particle::new(1, 0.0, 0.0).name("Q2").dof(2.0 * 3.0),    // [12]
+            Particle::new(1, 0.0, 0.0).name("Q3").dof(2.0 * 3.0),    // [13]
+            Particle::new(1, 0.0, 0.0).name("u1").dof(3.0),          // [14]
+            Particle::new(1, 0.0, 0.0).name("u2").dof(3.0),          // [15]
+            Particle::new(1, 0.0, 0.0).name("u3").dof(3.0),          // [16]
+            Particle::new(1, 0.0, 0.0).name("d1").dof(3.0),          // [17]
+            Particle::new(1, 0.0, 0.0).name("d2").dof(3.0),          // [18]
+            Particle::new(1, 0.0, 0.0).name("d3").dof(3.0),          // [19]
         ];
 
         let mh: f64 = data::MASS_H;
