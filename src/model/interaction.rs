@@ -2,14 +2,14 @@
 
 mod fast_interaction_result;
 mod four_particle;
-mod interaction_particles;
 mod partial_width;
+mod particles;
 mod rate_density;
 mod three_particle;
 
 pub use fast_interaction_result::FastInteractionResult;
-pub use interaction_particles::{DisplayError, Particles};
 pub use partial_width::PartialWidth;
+pub use particles::{DisplayError, Particles};
 pub use rate_density::RateDensity;
 
 pub use four_particle::FourParticle;
@@ -17,7 +17,6 @@ pub use three_particle::ThreeParticle;
 
 use crate::{model::Model, solver::Context};
 use ndarray::prelude::*;
-use std::cmp::Ordering;
 
 /// Threshold value of `$\gamma / H N$` which is used to determine when an
 /// interaction is fast.
@@ -115,102 +114,28 @@ pub trait Interaction<M: Model> {
 
     /// Net prefactor scaling the interaction rate.
     ///
-    /// This is defined for a particle `$X \to Y$` as
-    ///
-    /// ```math
-    /// \left( \prod_{i \in X} \frac{n_i}{n_i^{(0)}} \right)
-    /// - \left( \prod_{i \in Y} \frac{n_i}{n_i^{(0)}} \right)
-    /// ```
-    ///
-    /// If there are some `$n_i^{(0)}$` which are zero, then the prefactor will
-    /// be infinite as the interaction will try and get rid of the particle in
-    /// question.
-    ///
-    /// If there are multiple particles for which `$n_i^{(0)}$` is zero located
-    /// on both sides, then the direction of the interaction is first determined
-    /// by the side which contains the most zero equilibrium number densities.
-    /// If these are also equal, then the result is 0.
-    ///
-    /// ```math
-    /// \left( \prod_{i \in X} n_i \right) - \left( \prod_{i \in Y} n_i \right)
-    /// ```
-    ///
-    /// This can produce a result which is infinite if some of the `$n_i^{(0)}`$
-    /// are identically 0 and thus care must be taken to handle these.
+    /// The default implementation makes use of
+    /// [`Particles::symmetric_prefactor`] but can be adjusted if the
+    /// interaction has a different dependence on the number densities.
     fn symmetric_prefactor(&self, context: &Context<M>) -> f64 {
-        let ((forward_numerator, forward_denominator), (backward_numerator, backward_denominator)) =
-            self.particles()
-                .symmetric_prefactor(&context.n, &context.eq, context.in_equilibrium);
-
-        let forward_prefactor = checked_div(forward_numerator, forward_denominator);
-        let backward_prefactor = checked_div(backward_numerator, backward_denominator);
-
-        if forward_prefactor.is_finite() || backward_prefactor.is_finite() {
-            // If either one or both are finite, we can compute the rate.
-            forward_prefactor - backward_prefactor
-        } else {
-            // If they are both infinite, then there are equilibrium number
-            // densities on both sides which are 0.
-            //
-            // In order to determine the direction, the number of zero
-            // equilibrium number densities on each side is used first.  If they
-            // are both equal, then the product of number densities is used.
-            let particles = self.particles();
-
-            let forward_zeros = particles
-                .incoming_idx
-                .iter()
-                .filter(|&&p| context.eq[p] == 0.0)
-                .count();
-            let backward_zeros = particles
-                .outgoing_idx
-                .iter()
-                .filter(|&&p| context.eq[p] == 0.0)
-                .count();
-
-            match forward_zeros.cmp(&backward_zeros) {
-                Ordering::Less => f64::NEG_INFINITY,
-                Ordering::Greater => f64::INFINITY,
-                Ordering::Equal => 0.0,
-            }
-        }
+        self.particles()
+            .symmetric_prefactor(&context.n, &context.eq, context.in_equilibrium)
     }
 
-    /// Compute the prefactor to the symmetric interaction rate which alters the
-    /// number density asymmetries.
+    /// Prefactor to the symmetric interaction rate which alters the number
+    /// density asymmetries.
     ///
-    /// In the forward direction, this is calculated by
-    ///
-    /// ```math
-    /// \frac{
-    ///   \sum_{i \in X} \Delta_i \prod_{j \neq i} n_j
-    /// }{
-    ///   \prod_{i \in X} n_i^{(0)}
-    /// }
-    /// ```
-    ///
-    /// and similarly for the backward rate.  An example of a `$1 \to 2, 3$`
-    /// rate is:
-    ///
-    /// ```math
-    /// \frac{\Delta_1}{n_1^{(0)}} - \frac{\Delta_2 n_3 + \Delta_3 n_2}{n_2^{(0)} n_3^{(0)}}
-    /// ```
-    ///
-    /// This can produce a result which is infinite if some of the `$n_i^{(0)}`$
-    /// are identically 0 and thus care must be taken to handle these.
+    /// The default implementation makes use of
+    /// [`Particles::asymmetric_prefactor`] but can be adjusted if the
+    /// interaction has a different dependence on the number densities.
     fn asymmetric_prefactor(&self, context: &Context<M>) -> f64 {
-        let ((forward_numerator, forward_denominator), (backward_numerator, backward_denominator)) =
-            self.particles().asymmetric_prefactor(
-                &context.n,
-                &context.na,
-                &context.eq,
-                context.in_equilibrium,
-                context.no_asymmetry,
-            );
-        let forward = checked_div(forward_numerator, forward_denominator);
-        let backward = checked_div(backward_numerator, backward_denominator);
-
-        forward - backward
+        self.particles().asymmetric_prefactor(
+            &context.n,
+            &context.na,
+            &context.eq,
+            context.in_equilibrium,
+            context.no_asymmetry,
+        )
     }
 
     /// Calculate the actual interaction rates density taking into account
@@ -247,12 +172,15 @@ pub trait Interaction<M: Model> {
         }
 
         let mut rate = RateDensity::zero();
+
         let symmetric_prefactor = self.symmetric_prefactor(context);
+        let asymmetric_prefactor = self.asymmetric_prefactor(context);
+
         rate.gamma = gamma;
         rate.symmetric = checked_mul(gamma, symmetric_prefactor);
         rate.delta_gamma = delta_gamma;
         rate.asymmetric = checked_mul(delta_gamma.unwrap_or_default(), symmetric_prefactor)
-            + checked_mul(gamma, self.asymmetric_prefactor(context));
+            + checked_mul(gamma, asymmetric_prefactor);
 
         Some(rate * context.normalization)
     }
@@ -299,7 +227,7 @@ pub trait Interaction<M: Model> {
                     // is larger.
                     if rate.gamma_tilde.abs() * context.beta > FAST_THRESHOLD {
                         log::trace!(
-                            "[{}.{:02}|{:>10.4e}] Detected fast interaction {} with γ̃ = {:.3e}",
+                            "[{}.{:02}|{:>10.4e}] Detected fast interaction {} with γ̃ = {:.3e}, δγ̃ = {:.3e}",
                             context.step,
                             context.substep,
                             context.beta,
@@ -307,10 +235,12 @@ pub trait Interaction<M: Model> {
                                 .display(context.model)
                                 .unwrap_or_else(|_| self.particles().short_display()),
                             rate.gamma_tilde,
+                            rate.delta_gamma_tilde.unwrap_or_default()
                         );
 
                         let mut fast_interactions = fast_interactions.write().unwrap();
                         let mut particles = self.particles().clone();
+
                         particles.gamma_tilde = Some(rate.gamma_tilde);
                         particles.delta_gamma_tilde = rate.delta_gamma_tilde;
                         particles.heavy = context
@@ -376,6 +306,10 @@ pub trait Interaction<M: Model> {
             return None;
         }
 
+        if rate.symmetric == 0.0 && rate.asymmetric == 0.0 {
+            return None;
+        }
+
         rate *= context.step_size;
 
         if self.particles().adjust_overshoot(
@@ -389,12 +323,15 @@ pub trait Interaction<M: Model> {
             context.no_asymmetry,
         ) {
             // log::trace!(
-            //     "[{}.{:02}|{:>10.4e}] Adjusted Rate: {:<12.5e}|{:<12.5e}",
-            //     c.step,
-            //     c.substep,
-            //     c.beta,
-            //     rate.gamma / c.step_size,
-            //     rate.symmetric / c.step_size
+            //     "[{}.{:02}|{:>10.4e}] Adjusted Rate {}: {:<12.5e}|{:<12.5e}",
+            //     context.step,
+            //     context.substep,
+            //     context.beta,
+            //     self.particles()
+            //         .display(context.model)
+            //         .unwrap_or_else(|_| self.particles().short_display()),
+            //     rate.gamma / context.step_size,
+            //     rate.symmetric / context.step_size
             // );
         }
 
@@ -416,10 +353,10 @@ pub trait Interaction<M: Model> {
             let particles = self.particles();
 
             for (&p, &(c, ca)) in &particles.particle_counts {
-                if context.in_equilibrium.binary_search(&p).is_err() {
+                if rate.symmetric != 0.0 && context.in_equilibrium.binary_search(&p).is_err() {
                     dn[p] += c * rate.symmetric;
                 }
-                if context.no_asymmetry.binary_search(&p).is_err() {
+                if rate.asymmetric != 0.0 && context.no_asymmetry.binary_search(&p).is_err() {
                     dna[p] += ca * rate.asymmetric;
                 }
             }
