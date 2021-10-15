@@ -190,7 +190,7 @@ def plot_integration(df: pd.DataFrame):
     return fig
 
 
-def plot_densities(df: pd.DataFrame, ptcls: List[str]):
+def plot_densities(df: pd.DataFrame, ptcls: List[str], show_changes=False):
     """Plot particle densities.
 
     The top plot shows the asymmetry of the various particle species listed.  If
@@ -201,7 +201,7 @@ def plot_densities(df: pd.DataFrame, ptcls: List[str]):
     """
 
     fig = plotly.subplots.make_subplots(
-        rows=4,
+        rows=4 if show_changes else 2,
         cols=1,
         shared_xaxes=True,
         vertical_spacing=0.01,
@@ -252,31 +252,32 @@ def plot_densities(df: pd.DataFrame, ptcls: List[str]):
         cols=1,
     )
 
-    fig.add_traces(
-        [
-            go.Scatter(
-                name="B-L",
-                legendgroup="B-L",
-                showlegend=False,
-                x=df["beta"],
-                y=df["dna-B-L"],
-                line=go.scatter.Line(width=3, color="black"),
-            )
-        ]
-        + [
-            go.Scatter(
-                name=f"{ptcl}",
-                legendgroup=ptcl,
-                showlegend=False,
-                x=df["beta"],
-                y=df[f"dna-{ptcl}"],
-                line=go.scatter.Line(color=color),
-            )
-            for ptcl, color in zip(ptcls, COLORS)
-        ],
-        rows=2,
-        cols=1,
-    )
+    if show_changes:
+        fig.add_traces(
+            [
+                go.Scatter(
+                    name="B-L",
+                    legendgroup="B-L",
+                    showlegend=False,
+                    x=df["beta"],
+                    y=df["dna-B-L"],
+                    line=go.scatter.Line(width=3, color="black"),
+                )
+            ]
+            + [
+                go.Scatter(
+                    name=f"{ptcl}",
+                    legendgroup=ptcl,
+                    showlegend=False,
+                    x=df["beta"],
+                    y=df[f"dna-{ptcl}"],
+                    line=go.scatter.Line(color=color),
+                )
+                for ptcl, color in zip(ptcls, COLORS)
+            ],
+            rows=2,
+            cols=1,
+        )
 
     fig.add_traces(
         [
@@ -301,32 +302,35 @@ def plot_densities(df: pd.DataFrame, ptcls: List[str]):
             )
             for ptcl, color in zip(ptcls, COLORS)
         ],
-        rows=3,
+        rows=3 if show_changes else 2,
         cols=1,
     )
 
-    fig.add_traces(
-        [
-            go.Scatter(
-                name=f"{ptcl}",
-                legendgroup=ptcl,
-                showlegend=False,
-                x=df["beta"],
-                y=df[f"dn-{ptcl}"],
-                line=go.scatter.Line(color=color),
-            )
-            for ptcl, color in zip(ptcls, COLORS)
-        ],
-        rows=4,
-        cols=1,
-    )
+    if show_changes:
+        fig.add_traces(
+            [
+                go.Scatter(
+                    name=f"{ptcl}",
+                    legendgroup=ptcl,
+                    showlegend=False,
+                    x=df["beta"],
+                    y=df[f"dn-{ptcl}"],
+                    line=go.scatter.Line(color=color),
+                )
+                for ptcl, color in zip(ptcls, COLORS)
+            ],
+            rows=4,
+            cols=1,
+        )
 
-    for row in [1, 2, 3, 4]:
+    for row in range(4 if show_changes else 2):
         fig.update_xaxes(
-            title_text="Inverse Temperature [1/GeV]" if row == 4 else None,
+            title_text="Inverse Temperature [1/GeV]"
+            if row == (4 if show_changes else 2)
+            else None,
             type="log",
             exponentformat="power",
-            row=row,
+            row=row + 1,
             col=1,
         )
 
@@ -339,33 +343,34 @@ def plot_densities(df: pd.DataFrame, ptcls: List[str]):
         col=1,
     )
     fig.update_yaxes(
-        title_text="Asymmetry Change [Normalized]",
-        type="linear",
-        # range=[-20, 1],
-        exponentformat="power",
-        row=2,
-        col=1,
-    )
-    fig.update_yaxes(
         title_text="Density [Normalized]",
         type="linear",
         exponentformat="power",
         rangemode="tozero",
-        row=3,
+        row=3 if show_changes else 2,
         col=1,
     )
-    fig.update_yaxes(
-        title_text="Density Change [Normalized]",
-        type="linear",
-        exponentformat="power",
-        rangemode="tozero",
-        row=4,
-        col=1,
-    )
+    if show_changes:
+        fig.update_yaxes(
+            title_text="Asymmetry Change [Normalized]",
+            type="linear",
+            # range=[-20, 1],
+            exponentformat="power",
+            row=2,
+            col=1,
+        )
+        fig.update_yaxes(
+            title_text="Density Change [Normalized]",
+            type="linear",
+            exponentformat="power",
+            rangemode="tozero",
+            row=4,
+            col=1,
+        )
 
     fig.update_layout(
         width=1000,
-        height=1400,
+        height=400 * (4 if show_changes else 2),
     )
 
     return fig
