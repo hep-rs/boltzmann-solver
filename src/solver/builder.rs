@@ -4,7 +4,6 @@ use crate::{
         options::{ErrorTolerance, StepPrecision},
         Context, LoggerFn, Solver,
     },
-    utilities::rec_geomspace,
 };
 use ndarray::prelude::*;
 #[cfg(feature = "parallel")]
@@ -79,8 +78,8 @@ pub struct SolverBuilder<M> {
     step_precision: StepPrecision,
     /// Local error allowed to determine step size as absolute and relative.
     error_tolerance: ErrorTolerance,
-    /// Whether interactions are precomputed or not
-    precompute: bool,
+    /// The number of points to sample to build the spline, or 0 of disabling the precompute.
+    precompute: usize,
     /// Whether fast interactions are enabled
     fast_interactions: bool,
     /// Whether to abort the integration if the step size becomes too small
@@ -119,7 +118,7 @@ impl<M> SolverBuilder<M> {
             logger: Box::new(|_, _, _| {}),
             step_precision: StepPrecision::default(),
             error_tolerance: ErrorTolerance::default(),
-            precompute: true,
+            precompute: 1,
             fast_interactions: true,
             abort_when_inaccurate: false,
         }
@@ -280,13 +279,13 @@ impl<M> SolverBuilder<M> {
     /// p_\text{min} \beta < h < p_\text{max} \beta
     /// ```
     ///
-    /// The default values are `$p_\text{min} = 10^{-10}$` and `$p_\text{max} =
-    /// 1$`.
-    ///
     /// The relative step precision has a higher priority on the step size than
     /// the error.  That is, the step size will never be less than
     /// `$p_\text{min} \beta$` even if this results in a larger local error than
     /// desired.
+    ///
+    /// The minimum value for `$p_\text{min}$` is automatically adjusted such
+    /// that the integration will keep increasing, albeit extremely slowly.
     ///
     /// # Panics
     ///
@@ -298,7 +297,10 @@ impl<M> SolverBuilder<M> {
             "Minimum step precision must be smaller than the maximum step precision."
         );
         assert!(min >= 0.0, "Minimum step precision cannot be negative.");
-        self.step_precision = StepPrecision { min, max };
+        self.step_precision = StepPrecision {
+            min: min.max(f64::EPSILON),
+            max,
+        };
         self
     }
 
@@ -333,8 +335,24 @@ impl<M> SolverBuilder<M> {
     /// Upon calling [`SolverBuilder::build`], set whether interactions should
     /// be precomputed.
     ///
+    /// If a number greater than 0 is provided, this sets the number of data
+    /// points to compute in order to produce the spline.  Note that there is a
+    /// lower bound of
+    ///
+    /// ```math
+    /// 4 \left\lceil \log_{2} \frac{\beta_\text{end}}{\beta_\text{start}} \right\rceil
+    /// ```
+    ///
+    /// for the number of points computed (which is approximately 13 points per
+    /// decade), thus a value of 1 will use the default.
+    ///
+    /// If set to 0, the precomputation is disabled entirely.  Instead,
+    /// computation are stored as they are computed which will still speed up
+    /// cases where an integration step is repeated with a smaller step size,
+    /// but will not otherwise help much.
+    ///
     /// By default, interactions are precomputed.
-    pub fn precompute(mut self, v: bool) -> Self {
+    pub fn precompute(mut self, v: usize) -> Self {
         self.precompute = v;
         self
     }
@@ -421,27 +439,22 @@ where
     M: ModelInteractions,
 {
     /// Precompute the interaction rates.
+    #[allow(dead_code)]
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
     #[cfg(not(feature = "parallel"))]
-    fn do_precompute(model: &mut M, beta_range: (f64, f64)) {
-        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-        let subdivs = f64::log2(f64::log2(beta_range.1 / beta_range.0).ceil())
-            .ceil()
-            .max(4.0) as u32;
+    fn do_precompute(model: &mut M, beta_range: (f64, f64), mut subdivs: usize) {
+        subdivs = subdivs.max(4 * f64::log2(beta_range.1 / beta_range.0).ceil() as usize);
 
-        for (i, &beta) in [
-            0.98 * beta_range.0,
-            0.99 * beta_range.0,
-            1.01 * beta_range.1,
-            1.02 * beta_range.1,
-        ]
-        .iter()
-        .chain(&rec_geomspace(beta_range.0, beta_range.1, subdivs))
-        .enumerate()
+        for (i, beta) in // rec_geomspace(beta_range.0, beta_range.1, subdivs)
+            Array1::geomspace(beta_range.0, beta_range.1, subdivs)
+                .unwrap()
+                .into_iter()
+                .enumerate()
         {
-            if i % 1024 == 3 {
-                log::info!("Precomputing step {:>5} / {}", i - 3, 2_usize.pow(subdivs));
-            } else if i % 128 == 3 {
-                log::trace!("Precomputing step {:>5} / {}", i - 3, 2_usize.pow(subdivs));
+            if i % 50 == 0 {
+                log::info!("Precomputing step {:>5} / {}", i, subdivs);
+            } else {
+                log::trace!("Precomputing step {:>5} / {}", i, subdivs);
             }
 
             model.set_beta(beta);
@@ -455,27 +468,22 @@ where
     }
 
     /// Precompute the interaction rates.
+    #[allow(dead_code)]
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
     #[cfg(feature = "parallel")]
-    fn do_precompute(model: &mut M, beta_range: (f64, f64)) {
-        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-        let subdivs = f64::log2(f64::log2(beta_range.1 / beta_range.0).ceil())
-            .ceil()
-            .max(4.0) as u32;
+    fn do_precompute(model: &mut M, beta_range: (f64, f64), mut subdivs: usize) {
+        subdivs = subdivs.max(4 * f64::log2(beta_range.1 / beta_range.0).ceil() as usize);
 
-        for (i, &beta) in [
-            0.98 * beta_range.0,
-            0.99 * beta_range.0,
-            1.01 * beta_range.1,
-            1.02 * beta_range.1,
-        ]
-        .iter()
-        .chain(&rec_geomspace(beta_range.0, beta_range.1, subdivs))
-        .enumerate()
+        for (i, beta) in // rec_geomspace(beta_range.0, beta_range.1, subdivs)
+            Array1::geomspace(beta_range.0, beta_range.1, subdivs)
+                .unwrap()
+                .into_iter()
+                .enumerate()
         {
-            if i % 1024 == 3 {
-                log::info!("Precomputing step {:>5} / {}", i - 3, 2_usize.pow(subdivs));
-            } else if i % 128 == 3 {
-                log::debug!("Precomputing step {:>5} / {}", i - 3, 2_usize.pow(subdivs));
+            if i % 50 == 0 {
+                log::info!("Precomputing step {:>5} / {}", i, subdivs);
+            } else {
+                log::debug!("Precomputing step {:>5} / {}", i, subdivs);
             }
 
             model.set_beta(beta);
@@ -544,15 +552,37 @@ where
         no_asymmetry.sort_unstable();
 
         // Collect the number of interactions within the model.
-        let interactions: HashSet<_> = model.interactions().iter().map(|i| i.particles()).collect();
+        let mut interactions: HashSet<_> =
+            model.interactions().iter().map(|i| i.particles()).collect();
         if interactions.len() != model.interactions().len() {
+            interactions.clear();
+            let mut duplicates: Vec<_> = model
+                .interactions()
+                .iter()
+                .filter_map(|i| {
+                    let particles = i.particles();
+                    if interactions.insert(particles) {
+                        None
+                    } else {
+                        Some(
+                            particles
+                                .display(&model)
+                                .unwrap_or_else(|_| particles.short_display()),
+                        )
+                    }
+                })
+                .collect();
+            duplicates.sort();
+            log::error!("There are multiple interactions with the same set of incoming / outgoing particles. \
+            The amplitudes of these interactions should be combined instead of combining the squared ampliutes. \
+            The interactions were:\n • {}", duplicates.join("\n • "));
             return Err(Error::DuplicateInteractions);
         }
 
         // Run the precomputations so that the solver can run multiple times
         // later.
-        if self.precompute {
-            Self::do_precompute(&mut model, beta_range);
+        if self.precompute > 0 {
+            Self::do_precompute(&mut model, beta_range, self.precompute);
         }
 
         Ok(Solver {
@@ -569,6 +599,7 @@ where
             fast_interactions: self.fast_interactions,
             inaccurate: false,
             abort_when_inaccurate: self.abort_when_inaccurate,
+            precomputed: self.precompute > 0,
         })
     }
 }
