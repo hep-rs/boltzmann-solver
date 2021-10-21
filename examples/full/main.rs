@@ -63,7 +63,7 @@ fn main() -> Result<(), Box<dyn error::Error>> {
             "higgs_equilibrium" => higgs_equilibrium(),
             "lepton_equilibrium" => lepton_equilibrium(),
             "gammas" => gammas(),
-            "custom" => custom(),
+            // "custom" => custom(),
             "scan" => scan(),
             "--verbose" => Ok(()),
             x if x.starts_with("-v") => Ok(()),
@@ -316,44 +316,6 @@ macro_rules! define_all {
             }
         }
     };
-}
-
-// {$name:ident, $csv:expr, $filter:expr, $interactions3:expr, $interactions4:expr, $pre:expr, $post:expr}
-define! {
-    custom,
-    "custom",
-    n1f1,
-    [
-        interaction::hqu,
-        interaction::hqd,
-        interaction::hle,
-        interaction::hln,
-        interaction::hhw,
-        interaction::hha,
-        interaction::ffa,
-        interaction::ffw,
-        interaction::ffg,
-    ],
-    [
-        interaction::hhww,
-        interaction::hhaa,
-        interaction::hhaw,
-        interaction::hhll1,
-        interaction::hhll2,
-        interaction::hhen,
-        interaction::nhla,
-        interaction::nhlw,
-        interaction::quln,
-        interaction::qdln,
-        interaction::leln,
-        interaction::lnln,
-    ],
-    |builder: SolverBuilder<_>| {
-        builder
-        .precompute(0)
-
-    },
-    |n, na| (n, na)
 }
 
 define_all! {
