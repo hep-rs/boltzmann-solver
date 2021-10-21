@@ -13,6 +13,7 @@ use boltzmann_solver::{
     prelude::*,
 };
 use common::{into_interaction_box, n1f1, n3f1, n3f3};
+use itertools::iproduct;
 use ndarray::prelude::*;
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
@@ -63,6 +64,7 @@ fn main() -> Result<(), Box<dyn error::Error>> {
             "lepton_equilibrium" => lepton_equilibrium(),
             "gammas" => gammas(),
             "custom" => custom(),
+            "scan" => scan(),
             "--verbose" => Ok(()),
             x if x.starts_with("-v") => Ok(()),
             x => panic!("Unknown argument: {}", x),
@@ -629,6 +631,74 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
     for row in data.axis_iter(Axis(0)) {
         csv.serialize(row.as_slice().unwrap())?;
     }
+
+    Ok(())
+}
+
+fn scan() -> Result<(), Box<dyn error::Error>> {
+    // Create the CSV file
+    let output_dir = common::output_dir("scan");
+    let mut csv = csv::Writer::from_path(output_dir.join("result.csv"))?;
+    csv.serialize(["mn", "b-l"])?;
+    let result_csv = RwLock::new(csv);
+
+    let model_fn = || {
+        let mut model = LeptogenesisModel::zero();
+        for i in [
+            interaction::hqu,
+            interaction::hqd,
+            interaction::hle,
+            interaction::hln,
+            interaction::hhw,
+            interaction::hha,
+            interaction::ffa,
+            interaction::ffw,
+            interaction::ffg,
+        ] {
+            model
+                .interactions
+                .extend(i().drain(..).filter(common::n1f1).map(into_interaction_box));
+        }
+        for i in [interaction::hhww, interaction::hhaa, interaction::hhaw] {
+            model
+                .interactions
+                .extend(i().drain(..).filter(common::n1f1).map(into_interaction_box));
+        }
+
+        model
+    };
+
+    Array1::geomspace(1e3, 1e10, 100)
+        .unwrap()
+        .iter()
+        .enumerate()
+        .par_bridge()
+        .for_each(|(i, &mn)| {
+            let mut model = model_fn();
+            model.mn[0] = mn;
+            model.mn[1] = 1e2 * mn;
+            model.mn[2] = 1e4 * mn;
+
+            let builder = init_builder(model);
+            let csv = csv::Writer::from_path(output_dir.join(format!("{}.csv", i))).unwrap();
+            let (_n, na) = solve(builder, Some(csv)).unwrap();
+
+            let bl = (1.0 / 3.0)
+                * iproduct!(["Q", "u", "d"], 0..3)
+                    .map(|(p, i)| {
+                        let p = LeptogenesisModel::static_particle_idx(p, i).unwrap();
+                        na[p]
+                    })
+                    .sum::<f64>()
+                - iproduct!(["L", "e"], 0..3)
+                    .map(|(p, i)| {
+                        let p = LeptogenesisModel::static_particle_idx(p, i).unwrap();
+                        na[p]
+                    })
+                    .sum::<f64>();
+
+            result_csv.write().unwrap().serialize([mn, bl]).unwrap();
+        });
 
     Ok(())
 }
