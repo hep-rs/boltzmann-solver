@@ -1131,18 +1131,31 @@
 <span id="1062">1062</span>
 <span id="1063">1063</span>
 <span id="1064">1064</span>
+<span id="1065">1065</span>
+<span id="1066">1066</span>
+<span id="1067">1067</span>
+<span id="1068">1068</span>
+<span id="1069">1069</span>
+<span id="1070">1070</span>
+<span id="1071">1071</span>
+<span id="1072">1072</span>
+<span id="1073">1073</span>
+<span id="1074">1074</span>
+<span id="1075">1075</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">utilities</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">model</span>::{
         <span class="ident">interaction</span>,
-        <span class="ident">interaction</span>::{<span class="ident">checked_div</span>, <span class="ident">checked_mul</span>, <span class="ident">Interaction</span>, <span class="ident">RateDensity</span>, <span class="ident">M_BETA_THRESHOLD</span>},
+        <span class="ident">interaction</span>::{
+            <span class="ident">checked_div</span>, <span class="ident">checked_mul</span>, <span class="ident">Interaction</span>, <span class="ident">PartialWidth</span>, <span class="ident">RateDensity</span>, <span class="ident">M_BETA_THRESHOLD</span>,
+        },
         <span class="ident">Model</span>,
     },
     <span class="ident">solver::Context</span>,
-    <span class="ident">utilities::spline::Spline</span>,
+    <span class="ident">utilities::spline::Linear</span> <span class="kw">as</span> <span class="ident">Spline</span>,
 };
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">sync::RwLock</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">iter</span>, <span class="ident">sync::RwLock</span>};
 
 <span class="comment">// TODO: Define a trait alias for MandelstamFn once it is stabilised</span>
 <span class="comment">// (https://github.com/rust-lang/rust/issues/41517)</span>
@@ -1151,16 +1164,28 @@
 <span class="doccomment">/// amplitude.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FourParticle</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
     <span class="ident">particles</span>: <span class="ident">interaction::Particles</span>,
-    <span class="doccomment">/// Squared amplitude as a function of the model.</span>
-    <span class="ident">squared_amplitude</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
-    <span class="comment">// gamma_spline_real: RwLock&lt;Spline&gt;,</span>
-    <span class="comment">// gamma_spline_on_n: RwLock&lt;Spline&gt;,</span>
+
+    <span class="doccomment">/// Squared amplitude of the interaction.  This is a function of the model</span>
+    <span class="doccomment">/// and the Mandelstam variables `$s$`, `$t$` and `$u$`.</span>
+    <span class="ident">squared_amplitude</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Squared amplitude asymmetry for this interaction.  This is a function of</span>
+    <span class="doccomment">/// the model and the Mandelstam variables `$s$`, `$t$` and `$u$`.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
-    <span class="ident">asymmetry</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">asymmetry_spline_true</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Spline</span><span class="op">&gt;</span>,
-    <span class="ident">asymmetry_spline_false</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Spline</span><span class="op">&gt;</span>,
+    <span class="ident">asymmetry</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+
     <span class="ident">gamma_enabled</span>: <span class="ident">bool</span>,
     <span class="ident">width_enabled</span>: <span class="ident">bool</span>,
+
+    <span class="doccomment">/// Since computing `$\tilde\gamma$` can be computationally expensive, we</span>
+    <span class="doccomment">/// (optionally) precompute it and store it in a spline.  Since this</span>
+    <span class="doccomment">/// includes the division by a varying number of heavy particle number</span>
+    <span class="doccomment">/// densities, the discontinuities can cause issues with the spline.  To</span>
+    <span class="doccomment">/// account for this, we store multiple splines based on the number of heavy</span>
+    <span class="doccomment">/// particles: `[0]` for no heavy particles, `[1]` for one heavy particles,</span>
+    <span class="doccomment">/// etc.</span>
+    <span class="ident">gamma_tilde</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Spline</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Spline for `$\delta\tilde\gamma$`.</span>
+    <span class="ident">delta_gamma_tilde</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Spline</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="ident">FourParticle</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
@@ -1181,22 +1206,20 @@
     <span class="doccomment">/// Crossing symmetry is then used in order to compute the other processes.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The three-body decays are not currently computed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">squared_amplitude</span>: <span class="ident">F</span>, <span class="ident">p1</span>: <span class="ident">isize</span>, <span class="ident">p2</span>: <span class="ident">isize</span>, <span class="ident">p3</span>: <span class="ident">isize</span>, <span class="ident">p4</span>: <span class="ident">isize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">squared_amplitude</span>: <span class="ident">F</span>, <span class="ident">p1</span>: <span class="ident">isize</span>, <span class="ident">p2</span>: <span class="ident">isize</span>, <span class="ident">p3</span>: <span class="ident">isize</span>, <span class="ident">p4</span>: <span class="ident">isize</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
         <span class="kw">let</span> <span class="ident">particles</span> <span class="op">=</span> <span class="ident">interaction::Particles::new</span>(<span class="kw-2">&amp;</span>[<span class="ident">p1</span>, <span class="ident">p2</span>], <span class="kw-2">&amp;</span>[<span class="ident">p3</span>, <span class="ident">p4</span>]);
 
         <span class="self">Self</span> {
             <span class="ident">particles</span>,
             <span class="ident">squared_amplitude</span>: <span class="ident">Box::new</span>(<span class="ident">squared_amplitude</span>),
-            <span class="comment">// gamma_spline_real: RwLock::new(Spline::empty()),</span>
-            <span class="comment">// gamma_spline_on_n: RwLock::new(Spline::empty()),</span>
             <span class="ident">asymmetry</span>: <span class="prelude-val">None</span>,
-            <span class="ident">asymmetry_spline_true</span>: <span class="ident">RwLock::new</span>(<span class="ident">Spline::empty</span>()),
-            <span class="ident">asymmetry_spline_false</span>: <span class="ident">RwLock::new</span>(<span class="ident">Spline::empty</span>()),
             <span class="ident">width_enabled</span>: <span class="bool-val">false</span>,
             <span class="ident">gamma_enabled</span>: <span class="bool-val">true</span>,
+            <span class="ident">gamma_tilde</span>: <span class="ident">RwLock::new</span>(<span class="ident">iter::repeat</span>(<span class="ident">Spline::empty</span>()).<span class="ident">take</span>(<span class="number">5</span>).<span class="ident">collect</span>()),
+            <span class="ident">delta_gamma_tilde</span>: <span class="ident">RwLock::new</span>(<span class="ident">iter::repeat</span>(<span class="ident">Spline::empty</span>()).<span class="ident">take</span>(<span class="number">5</span>).<span class="ident">collect</span>()),
         }
     }
 
@@ -1221,9 +1244,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// where `$s$`, `$t$` and `$u$` are the usual Mandelstam variables.</span>
     <span class="doccomment">/// Crossing symmetry is then used in order to compute the other processes.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_all</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">squared_amplitude</span>: <span class="ident">F</span>, <span class="ident">p1</span>: <span class="ident">isize</span>, <span class="ident">p2</span>: <span class="ident">isize</span>, <span class="ident">p3</span>: <span class="ident">isize</span>, <span class="ident">p4</span>: <span class="ident">isize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_all</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">squared_amplitude</span>: <span class="ident">F</span>, <span class="ident">p1</span>: <span class="ident">isize</span>, <span class="ident">p2</span>: <span class="ident">isize</span>, <span class="ident">p3</span>: <span class="ident">isize</span>, <span class="ident">p4</span>: <span class="ident">isize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">3</span>);
         <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">squared_amplitude</span>, <span class="ident">p1</span>, <span class="ident">p2</span>, <span class="ident">p3</span>, <span class="ident">p4</span>));
@@ -1264,35 +1287,46 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This asymmetry is subsequently used to compute the asymmetric</span>
     <span class="doccomment">/// interaction rate given by [`Interaction::delta_gamma`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_asymmetry</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">asymmetry</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_asymmetry</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">asymmetry</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
         <span class="self">self</span>.<span class="ident">asymmetry</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">asymmetry</span>));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Adjust whether this interaction will calculate decay widths.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_width</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_width</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">width_enabled</span> <span class="op">=</span> <span class="ident">v</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Adjust whether this interaction will calculate decay widths.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_gamma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_gamma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">gamma_enabled</span> <span class="op">=</span> <span class="ident">v</span>;
         <span class="self">self</span>
     }
 }
 
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span><span class="op">&gt;</span> <span class="ident">FourParticle</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Count the number of heavy  particles</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count_heavy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="ident">usize</span> {
+        <span class="kw">let</span> <span class="ident">particles</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">model</span>.<span class="ident">particles</span>();
+        <span class="self">self</span>.<span class="ident">particles</span>
+            .<span class="ident">particle_counts</span>
+            .<span class="ident">keys</span>()
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="op">&amp;&amp;</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">particles</span>[<span class="ident">idx</span>].<span class="ident">mass</span> <span class="op">*</span> <span class="ident">context</span>.<span class="ident">beta</span> <span class="op">&gt;</span> <span class="ident">M_BETA_THRESHOLD</span>)
+            .<span class="ident">count</span>()
+    }
+}
+
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">FourParticle</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(
             <span class="ident">f</span>,
-            <span class="string">&quot;FourParticle {{ \
-             particles: {:?}, \
-             squared_amplitude: Box&lt;Fn&gt;, \
-             }}&quot;</span>,
+            <span class="string">&quot;FourParticle {{ particles: {:?}, squared_amplitude: Box&lt;Fn&gt; }}&quot;</span>,
             <span class="self">self</span>.<span class="ident">particles</span>
         )
     }
@@ -1302,38 +1336,39 @@
 <span class="kw">where</span>
     <span class="ident">M</span>: <span class="ident">Model</span>,
 {
-    <span class="kw">fn</span> <span class="ident">particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">interaction::Particles</span> {
+    <span class="kw">fn</span> <span class="ident">particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">interaction::Particles</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">particles</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">width_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">width_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">width_enabled</span>
     }
 
-    <span class="comment">// TODO: Implement three-body decays</span>
-    <span class="comment">// fn width(&amp;self, c: &amp;Context&lt;M&gt;) -&gt; Option&lt;PartialWidth&gt; {}</span>
+    <span class="kw">fn</span> <span class="ident">width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartialWidth</span><span class="op">&gt;</span> {
+        <span class="comment">// TODO: Implement three-body decays</span>
+        <span class="prelude-val">None</span>
+    }
 
-    <span class="kw">fn</span> <span class="ident">gamma_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">gamma_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">gamma_enabled</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">gamma_enabled</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class="comment">// let ln_beta = c.beta.ln();</span>
-        <span class="comment">// if let Ok(spline) = if real {</span>
-        <span class="comment">//     self.gamma_spline_real.read()</span>
-        <span class="comment">// } else {</span>
-        <span class="comment">//     self.gamma_spline_on_n.read()</span>
-        <span class="comment">// } {</span>
-        <span class="comment">//     if spline.accurate(ln_beta) {</span>
-        <span class="comment">//         return Some(spline.sample(ln_beta));</span>
-        <span class="comment">//     }</span>
-        <span class="comment">// }</span>
+        <span class="comment">// If we need the &#39;false&#39; gamma (i.e. γ̃), then we use the precomputed</span>
+        <span class="comment">// value provided the interval is deemed to be accurate.</span>
+        <span class="kw">if</span> <span class="kw">let</span> (<span class="bool-val">false</span>, <span class="prelude-val">Ok</span>(<span class="ident">spline</span>)) <span class="op">=</span> (<span class="ident">real</span>, <span class="self">self</span>.<span class="ident">gamma_tilde</span>.<span class="ident">read</span>()) {
+            <span class="kw">let</span> <span class="ident">spline</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">spline</span>[<span class="self">self</span>.<span class="ident">count_heavy</span>(<span class="ident">context</span>)];
+            <span class="kw">let</span> <span class="ident">log_beta</span> <span class="op">=</span> <span class="ident">f64::ln</span>(<span class="ident">context</span>.<span class="ident">beta</span>);
+            <span class="kw">if</span> <span class="ident">spline</span>.<span class="ident">contains</span>(<span class="ident">log_beta</span>) {
+                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">spline</span>.<span class="ident">sample</span>(<span class="ident">log_beta</span>));
+            }
+        }
 
-        <span class="kw">let</span> <span class="ident">ptcl</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">model</span>.<span class="ident">particles</span>();
+        <span class="kw">let</span> <span class="ident">ptcl</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">model</span>.<span class="ident">particles</span>();
 
         <span class="comment">// Get the particles involved</span>
         <span class="kw">let</span> <span class="ident">p1</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ptcl</span>[<span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">incoming_idx</span>[<span class="number">0</span>]];
@@ -1343,52 +1378,42 @@
 
         <span class="kw">let</span> <span class="ident">integrand</span> <span class="op">=</span> <span class="op">|</span><span class="ident">s</span>, <span class="ident">t</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">p1</span>.<span class="ident">mass2</span> <span class="op">+</span> <span class="ident">p2</span>.<span class="ident">mass2</span> <span class="op">+</span> <span class="ident">p3</span>.<span class="ident">mass2</span> <span class="op">+</span> <span class="ident">p4</span>.<span class="ident">mass2</span> <span class="op">-</span> <span class="ident">s</span> <span class="op">-</span> <span class="ident">t</span>;
-            (<span class="self">self</span>.<span class="ident">squared_amplitude</span>)(<span class="ident">c</span>.<span class="ident">model</span>, <span class="ident">s</span>, <span class="ident">t</span>, <span class="ident">u</span>).<span class="ident">abs</span>()
+            (<span class="self">self</span>.<span class="ident">squared_amplitude</span>)(<span class="ident">context</span>.<span class="ident">model</span>, <span class="ident">s</span>, <span class="ident">t</span>, <span class="ident">u</span>).<span class="ident">abs</span>()
         };
-        <span class="kw">let</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">real</span> {
-            <span class="ident">utilities::integrate_st</span>(<span class="ident">integrand</span>, <span class="ident">c</span>.<span class="ident">beta</span>, <span class="ident">p1</span>, <span class="ident">p2</span>, <span class="ident">p3</span>, <span class="ident">p4</span>)
+
+        <span class="kw">if</span> <span class="ident">real</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">utilities::integrate_st</span>(
+                <span class="ident">integrand</span>,
+                <span class="ident">context</span>.<span class="ident">beta</span>,
+                <span class="ident">p1</span>,
+                <span class="ident">p2</span>,
+                <span class="ident">p3</span>,
+                <span class="ident">p4</span>,
+            ))
         } <span class="kw">else</span> {
-            <span class="ident">utilities::integrate_st_on_n</span>(<span class="ident">integrand</span>, <span class="ident">c</span>.<span class="ident">beta</span>, <span class="ident">p1</span>, <span class="ident">p2</span>, <span class="ident">p3</span>, <span class="ident">p4</span>)
-        };
-
-        <span class="comment">// debug_assert!(</span>
-        <span class="comment">//     gamma.is_finite(),</span>
-        <span class="comment">//     &quot;[{}.{:02}|{:&gt;10.4e}] Computed a non-finit value for γ in interaction {}: {}&quot;,</span>
-        <span class="comment">//     c.step,</span>
-        <span class="comment">//     c.substep,</span>
-        <span class="comment">//     c.beta,</span>
-        <span class="comment">//     self.particles()</span>
-        <span class="comment">//         .display(c.model)</span>
-        <span class="comment">//         .unwrap_or_else(|_| self.particles().short_display()),</span>
-        <span class="comment">//     gamma</span>
-        <span class="comment">// );</span>
-
-        <span class="comment">// if let Ok(mut spline) = if real {</span>
-        <span class="comment">//     self.gamma_spline_real.write()</span>
-        <span class="comment">// } else {</span>
-        <span class="comment">//     self.gamma_spline_on_n.write()</span>
-        <span class="comment">// } {</span>
-        <span class="comment">//     spline.add(ln_beta, gamma);</span>
-        <span class="comment">// }</span>
-
-        <span class="prelude-val">Some</span>(<span class="ident">gamma</span>)
+            <span class="kw">let</span> <span class="ident">gamma_tilde</span> <span class="op">=</span> <span class="ident">utilities::integrate_st_on_n</span>(<span class="ident">integrand</span>, <span class="ident">context</span>.<span class="ident">beta</span>, <span class="ident">p1</span>, <span class="ident">p2</span>, <span class="ident">p3</span>, <span class="ident">p4</span>);
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">spline</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">gamma_tilde</span>.<span class="ident">write</span>() {
+                <span class="kw">let</span> <span class="ident">spline</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">spline</span>[<span class="self">self</span>.<span class="ident">count_heavy</span>(<span class="ident">context</span>)];
+                <span class="ident">spline</span>.<span class="ident">add</span>(<span class="ident">f64::ln</span>(<span class="ident">context</span>.<span class="ident">beta</span>), <span class="ident">gamma_tilde</span>);
+            }
+            <span class="prelude-val">Some</span>(<span class="ident">gamma_tilde</span>)
+        }
     }
 
-    <span class="kw">fn</span> <span class="ident">delta_gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">delta_gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">asymmetry</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">asymmetry</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">ln_beta</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">beta</span>.<span class="ident">ln</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">spline</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">real</span> {
-            <span class="self">self</span>.<span class="ident">asymmetry_spline_true</span>.<span class="ident">read</span>()
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">asymmetry_spline_false</span>.<span class="ident">read</span>()
-        } {
-            <span class="kw">if</span> <span class="ident">spline</span>.<span class="ident">accurate</span>(<span class="ident">ln_beta</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">spline</span>.<span class="ident">sample</span>(<span class="ident">ln_beta</span>));
+        <span class="comment">// If we need the &#39;false&#39; gamma (i.e. γ̃), then we use the precomputed</span>
+        <span class="comment">// value provided the interval is deemed to be accurate.</span>
+        <span class="kw">if</span> <span class="kw">let</span> (<span class="bool-val">false</span>, <span class="prelude-val">Ok</span>(<span class="ident">spline</span>)) <span class="op">=</span> (<span class="ident">real</span>, <span class="self">self</span>.<span class="ident">delta_gamma_tilde</span>.<span class="ident">read</span>()) {
+            <span class="kw">let</span> <span class="ident">spline</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">spline</span>[<span class="self">self</span>.<span class="ident">count_heavy</span>(<span class="ident">context</span>)];
+            <span class="kw">let</span> <span class="ident">log_beta</span> <span class="op">=</span> <span class="ident">f64::ln</span>(<span class="ident">context</span>.<span class="ident">beta</span>);
+            <span class="kw">if</span> <span class="ident">spline</span>.<span class="ident">contains</span>(<span class="ident">log_beta</span>) {
+                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">spline</span>.<span class="ident">sample</span>(<span class="ident">log_beta</span>));
             }
         }
 
-        <span class="kw">let</span> <span class="ident">ptcl</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">model</span>.<span class="ident">particles</span>();
+        <span class="kw">let</span> <span class="ident">ptcl</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">model</span>.<span class="ident">particles</span>();
 
         <span class="kw">let</span> <span class="ident">p1</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ptcl</span>[<span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">incoming_idx</span>[<span class="number">0</span>]];
         <span class="kw">let</span> <span class="ident">p2</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ptcl</span>[<span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">incoming_idx</span>[<span class="number">1</span>]];
@@ -1397,49 +1422,41 @@
 
         <span class="kw">let</span> <span class="ident">integrand</span> <span class="op">=</span> <span class="op">|</span><span class="ident">s</span>, <span class="ident">t</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">p1</span>.<span class="ident">mass2</span> <span class="op">+</span> <span class="ident">p2</span>.<span class="ident">mass2</span> <span class="op">+</span> <span class="ident">p3</span>.<span class="ident">mass2</span> <span class="op">+</span> <span class="ident">p4</span>.<span class="ident">mass2</span> <span class="op">-</span> <span class="ident">s</span> <span class="op">-</span> <span class="ident">t</span>;
-            <span class="ident">asymmetry</span>(<span class="ident">c</span>.<span class="ident">model</span>, <span class="ident">s</span>, <span class="ident">t</span>, <span class="ident">u</span>).<span class="ident">abs</span>()
-        };
-        <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">real</span> {
-            <span class="ident">utilities::integrate_st</span>(<span class="ident">integrand</span>, <span class="ident">c</span>.<span class="ident">beta</span>, <span class="ident">p1</span>, <span class="ident">p2</span>, <span class="ident">p3</span>, <span class="ident">p4</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">utilities::integrate_st_on_n</span>(<span class="ident">integrand</span>, <span class="ident">c</span>.<span class="ident">beta</span>, <span class="ident">p1</span>, <span class="ident">p2</span>, <span class="ident">p3</span>, <span class="ident">p4</span>)
+            <span class="ident">asymmetry</span>(<span class="ident">context</span>.<span class="ident">model</span>, <span class="ident">s</span>, <span class="ident">t</span>, <span class="ident">u</span>).<span class="ident">abs</span>()
         };
 
-        <span class="comment">// debug_assert!(</span>
-        <span class="comment">//     delta_gamma.is_finite(),</span>
-        <span class="comment">//     &quot;[{}.{:02}|{:&gt;10.4e}] Computed a non-finit value for δγ in interaction {}: {}&quot;,</span>
-        <span class="comment">//     c.step,</span>
-        <span class="comment">//     c.substep,</span>
-        <span class="comment">//     c.beta,</span>
-        <span class="comment">//     self.particles()</span>
-        <span class="comment">//         .display(c.model)</span>
-        <span class="comment">//         .unwrap_or_else(|_| self.particles().short_display()),</span>
-        <span class="comment">//     delta_gamma</span>
-        <span class="comment">// );</span>
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">spline</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">real</span> {
-            <span class="self">self</span>.<span class="ident">asymmetry_spline_true</span>.<span class="ident">write</span>()
+        <span class="kw">if</span> <span class="ident">real</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">utilities::integrate_st</span>(
+                <span class="ident">integrand</span>,
+                <span class="ident">context</span>.<span class="ident">beta</span>,
+                <span class="ident">p1</span>,
+                <span class="ident">p2</span>,
+                <span class="ident">p3</span>,
+                <span class="ident">p4</span>,
+            ))
         } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">asymmetry_spline_false</span>.<span class="ident">write</span>()
-        } {
-            <span class="ident">spline</span>.<span class="ident">add</span>(<span class="ident">ln_beta</span>, <span class="ident">delta_gamma</span>);
+            <span class="kw">let</span> <span class="ident">delta_gamma_tilde</span> <span class="op">=</span>
+                <span class="ident">utilities::integrate_st_on_n</span>(<span class="ident">integrand</span>, <span class="ident">context</span>.<span class="ident">beta</span>, <span class="ident">p1</span>, <span class="ident">p2</span>, <span class="ident">p3</span>, <span class="ident">p4</span>);
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">spline</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">delta_gamma_tilde</span>.<span class="ident">write</span>() {
+                <span class="kw">let</span> <span class="ident">spline</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">spline</span>[<span class="self">self</span>.<span class="ident">count_heavy</span>(<span class="ident">context</span>)];
+                <span class="ident">spline</span>.<span class="ident">add</span>(<span class="ident">f64::ln</span>(<span class="ident">context</span>.<span class="ident">beta</span>), <span class="ident">delta_gamma_tilde</span>);
+            }
+            <span class="prelude-val">Some</span>(<span class="ident">delta_gamma_tilde</span>)
         }
-
-        <span class="prelude-val">Some</span>(<span class="ident">delta_gamma</span>)
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_lines</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">gamma</span>(<span class="ident">c</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">delta_gamma</span>(<span class="ident">c</span>, <span class="bool-val">false</span>);
+    <span class="kw">fn</span> <span class="ident">rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">gamma</span>(<span class="ident">context</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">delta_gamma</span>(<span class="ident">context</span>, <span class="bool-val">false</span>);
 
         <span class="comment">// If both rates are 0, there&#39;s no need to adjust it to the particles&#39;</span>
         <span class="comment">// number densities.</span>
-        <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+        <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">==</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>() <span class="op">==</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">ptcl</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">model</span>.<span class="ident">particles</span>();
+        <span class="kw">let</span> <span class="ident">ptcl</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">model</span>.<span class="ident">particles</span>();
 
         <span class="kw">let</span> [<span class="ident">i1</span>, <span class="ident">i2</span>, <span class="ident">i3</span>, <span class="ident">i4</span>] <span class="op">=</span> [
             <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">incoming_idx</span>[<span class="number">0</span>],
@@ -1448,14 +1465,19 @@
             <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">outgoing_idx</span>[<span class="number">1</span>],
         ];
         <span class="kw">let</span> [<span class="ident">p1</span>, <span class="ident">p2</span>, <span class="ident">p3</span>, <span class="ident">p4</span>] <span class="op">=</span> [<span class="kw-2">&amp;</span><span class="ident">ptcl</span>[<span class="ident">i1</span>], <span class="kw-2">&amp;</span><span class="ident">ptcl</span>[<span class="ident">i2</span>], <span class="kw-2">&amp;</span><span class="ident">ptcl</span>[<span class="ident">i3</span>], <span class="kw-2">&amp;</span><span class="ident">ptcl</span>[<span class="ident">i4</span>]];
-        <span class="kw">let</span> [<span class="ident">n1</span>, <span class="ident">n2</span>, <span class="ident">n3</span>, <span class="ident">n4</span>] <span class="op">=</span> [<span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">i1</span>], <span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">i2</span>], <span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">i3</span>], <span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">i4</span>]];
+        <span class="kw">let</span> [<span class="ident">n1</span>, <span class="ident">n2</span>, <span class="ident">n3</span>, <span class="ident">n4</span>] <span class="op">=</span> [<span class="ident">context</span>.<span class="ident">n</span>[<span class="ident">i1</span>], <span class="ident">context</span>.<span class="ident">n</span>[<span class="ident">i2</span>], <span class="ident">context</span>.<span class="ident">n</span>[<span class="ident">i3</span>], <span class="ident">context</span>.<span class="ident">n</span>[<span class="ident">i4</span>]];
         <span class="kw">let</span> [<span class="ident">na1</span>, <span class="ident">na2</span>, <span class="ident">na3</span>, <span class="ident">na4</span>] <span class="op">=</span> [
-            <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">incoming_sign</span>[<span class="number">0</span>] <span class="op">*</span> <span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">i1</span>],
-            <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">incoming_sign</span>[<span class="number">1</span>] <span class="op">*</span> <span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">i2</span>],
-            <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">outgoing_sign</span>[<span class="number">0</span>] <span class="op">*</span> <span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">i3</span>],
-            <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">outgoing_sign</span>[<span class="number">1</span>] <span class="op">*</span> <span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">i4</span>],
+            <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">incoming_sign</span>[<span class="number">0</span>] <span class="op">*</span> <span class="ident">context</span>.<span class="ident">na</span>[<span class="ident">i1</span>],
+            <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">incoming_sign</span>[<span class="number">1</span>] <span class="op">*</span> <span class="ident">context</span>.<span class="ident">na</span>[<span class="ident">i2</span>],
+            <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">outgoing_sign</span>[<span class="number">0</span>] <span class="op">*</span> <span class="ident">context</span>.<span class="ident">na</span>[<span class="ident">i3</span>],
+            <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">outgoing_sign</span>[<span class="number">1</span>] <span class="op">*</span> <span class="ident">context</span>.<span class="ident">na</span>[<span class="ident">i4</span>],
         ];
-        <span class="kw">let</span> [<span class="ident">eq1</span>, <span class="ident">eq2</span>, <span class="ident">eq3</span>, <span class="ident">eq4</span>] <span class="op">=</span> [<span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">i1</span>], <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">i2</span>], <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">i3</span>], <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">i4</span>]];
+        <span class="kw">let</span> [<span class="ident">eq1</span>, <span class="ident">eq2</span>, <span class="ident">eq3</span>, <span class="ident">eq4</span>] <span class="op">=</span> [
+            <span class="ident">context</span>.<span class="ident">eq</span>[<span class="ident">i1</span>],
+            <span class="ident">context</span>.<span class="ident">eq</span>[<span class="ident">i2</span>],
+            <span class="ident">context</span>.<span class="ident">eq</span>[<span class="ident">i3</span>],
+            <span class="ident">context</span>.<span class="ident">eq</span>[<span class="ident">i4</span>],
+        ];
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rate</span> <span class="op">=</span> <span class="ident">RateDensity::zero</span>();
 
@@ -1470,13 +1492,13 @@
         <span class="comment">// the other divisors is also 0.</span>
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unnested_or_patterns</span>)]</span>
         <span class="kw">match</span> (
-            <span class="ident">p1</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">c</span>.<span class="ident">beta</span> <span class="op">&gt;</span> <span class="ident">M_BETA_THRESHOLD</span>,
-            <span class="ident">p2</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">c</span>.<span class="ident">beta</span> <span class="op">&gt;</span> <span class="ident">M_BETA_THRESHOLD</span>,
-            <span class="ident">p3</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">c</span>.<span class="ident">beta</span> <span class="op">&gt;</span> <span class="ident">M_BETA_THRESHOLD</span>,
-            <span class="ident">p4</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">c</span>.<span class="ident">beta</span> <span class="op">&gt;</span> <span class="ident">M_BETA_THRESHOLD</span>,
+            <span class="ident">p1</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">context</span>.<span class="ident">beta</span> <span class="op">&gt;</span> <span class="ident">M_BETA_THRESHOLD</span>,
+            <span class="ident">p2</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">context</span>.<span class="ident">beta</span> <span class="op">&gt;</span> <span class="ident">M_BETA_THRESHOLD</span>,
+            <span class="ident">p3</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">context</span>.<span class="ident">beta</span> <span class="op">&gt;</span> <span class="ident">M_BETA_THRESHOLD</span>,
+            <span class="ident">p4</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">context</span>.<span class="ident">beta</span> <span class="op">&gt;</span> <span class="ident">M_BETA_THRESHOLD</span>,
         ) {
             <span class="comment">// No heavy particle</span>
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; {
                 <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span>;
                 <span class="ident">rate</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>;
                 <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>();
@@ -1492,11 +1514,11 @@
             }
 
             <span class="comment">// One heavy particles</span>
-            (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; {
                 <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq1</span>;
                 <span class="ident">rate</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">eq1</span>);
                 <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>();
-                <span class="kw">if</span> <span class="ident">eq1</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+                <span class="kw">if</span> <span class="ident">eq1</span> <span class="op">==</span> <span class="number">0.0</span> {
                     <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="ident">n1</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n2</span>, <span class="ident">eq2</span>);
                     <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                     <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
@@ -1518,11 +1540,11 @@
                     );
                 }
             }
-            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; {
                 <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq2</span>;
                 <span class="ident">rate</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">eq2</span>);
                 <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>();
-                <span class="kw">if</span> <span class="ident">eq2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+                <span class="kw">if</span> <span class="ident">eq2</span> <span class="op">==</span> <span class="number">0.0</span> {
                     <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="ident">checked_div</span>(<span class="ident">n1</span>, <span class="ident">eq1</span>) <span class="op">*</span> <span class="ident">n2</span>;
                     <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                     <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
@@ -1539,11 +1561,11 @@
                         );
                 }
             }
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; {
                 <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq3</span>;
                 <span class="ident">rate</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">eq3</span>);
                 <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>();
-                <span class="kw">if</span> <span class="ident">eq3</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+                <span class="kw">if</span> <span class="ident">eq3</span> <span class="op">==</span> <span class="number">0.0</span> {
                     <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="op">-</span><span class="ident">n3</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n4</span>, <span class="ident">eq4</span>);
                     <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                     <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
@@ -1560,11 +1582,11 @@
                         );
                 };
             }
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; {
                 <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq4</span>;
                 <span class="ident">rate</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">eq4</span>);
                 <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>();
-                <span class="kw">if</span> <span class="ident">eq4</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+                <span class="kw">if</span> <span class="ident">eq4</span> <span class="op">==</span> <span class="number">0.0</span> {
                     <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="op">-</span><span class="ident">checked_div</span>(<span class="ident">n3</span>, <span class="ident">eq3</span>) <span class="op">*</span> <span class="ident">n4</span>;
                     <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">gamma</span>;
                     <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
@@ -1583,11 +1605,11 @@
             }
 
             <span class="comment">// Two heavy particles</span>
-            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; {
                 <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq2</span>;
                 <span class="ident">rate</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq2</span>);
                 <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>();
-                <span class="kw">if</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+                <span class="kw">if</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">==</span> <span class="number">0.0</span> {
                     <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="ident">n1</span> <span class="op">*</span> <span class="ident">n2</span>;
                     <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                     <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
@@ -1604,28 +1626,28 @@
                         );
                 }
             }
-            (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; {
                 <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq3</span>;
                 <span class="ident">rate</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq3</span>);
                 <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>();
-                <span class="kw">match</span> (<span class="ident">eq1</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>, <span class="ident">eq3</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>) {
-                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">match</span> (<span class="ident">eq1</span> <span class="op">==</span> <span class="number">0.0</span>, <span class="ident">eq3</span> <span class="op">==</span> <span class="number">0.0</span>) {
+                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; {
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                     }
-                    (<span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">n1</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n2</span>, <span class="ident">eq2</span>);
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
                             <span class="op">+</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">na1</span> <span class="op">*</span> <span class="ident">n2</span> <span class="op">+</span> <span class="ident">na2</span> <span class="op">*</span> <span class="ident">n1</span>, <span class="ident">eq2</span>));
                     }
-                    (<span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="op">-</span><span class="ident">eq1</span> <span class="op">*</span> <span class="ident">n3</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n4</span>, <span class="ident">eq4</span>);
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
                             <span class="op">-</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">na3</span> <span class="op">*</span> <span class="ident">n4</span> <span class="op">+</span> <span class="ident">na4</span> <span class="op">*</span> <span class="ident">n3</span>, <span class="ident">eq4</span>);
                     }
-                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span>
                             <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">n1</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n2</span>, <span class="ident">eq2</span>) <span class="op">-</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">n3</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n4</span>, <span class="ident">eq4</span>);
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
@@ -1638,28 +1660,28 @@
                     }
                 }
             }
-            (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; {
                 <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq4</span>;
                 <span class="ident">rate</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq4</span>);
                 <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>();
-                <span class="kw">match</span> (<span class="ident">eq1</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>, <span class="ident">eq4</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>) {
-                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">match</span> (<span class="ident">eq1</span> <span class="op">==</span> <span class="number">0.0</span>, <span class="ident">eq4</span> <span class="op">==</span> <span class="number">0.0</span>) {
+                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; {
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                     }
-                    (<span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="ident">eq4</span> <span class="op">*</span> <span class="ident">n1</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n2</span>, <span class="ident">eq2</span>);
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
                             <span class="op">+</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">eq4</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">na1</span> <span class="op">*</span> <span class="ident">n2</span> <span class="op">+</span> <span class="ident">na2</span> <span class="op">*</span> <span class="ident">n1</span>, <span class="ident">eq2</span>));
                     }
-                    (<span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="op">-</span><span class="ident">eq1</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n3</span>, <span class="ident">eq3</span>) <span class="op">*</span> <span class="ident">n4</span>;
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
                             <span class="op">-</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">na3</span> <span class="op">*</span> <span class="ident">n4</span> <span class="op">+</span> <span class="ident">na4</span> <span class="op">*</span> <span class="ident">n3</span>, <span class="ident">eq3</span>);
                     }
-                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span>
                             <span class="ident">eq4</span> <span class="op">*</span> <span class="ident">n1</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n2</span>, <span class="ident">eq2</span>) <span class="op">-</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n3</span>, <span class="ident">eq3</span>) <span class="op">*</span> <span class="ident">n4</span>;
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
@@ -1672,28 +1694,28 @@
                     }
                 }
             }
-            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; {
                 <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">eq3</span>;
                 <span class="ident">rate</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">eq3</span>);
                 <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>();
-                <span class="kw">match</span> (<span class="ident">eq2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>, <span class="ident">eq3</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>) {
-                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">match</span> (<span class="ident">eq2</span> <span class="op">==</span> <span class="number">0.0</span>, <span class="ident">eq3</span> <span class="op">==</span> <span class="number">0.0</span>) {
+                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; {
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                     }
-                    (<span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n1</span>, <span class="ident">eq1</span>) <span class="op">*</span> <span class="ident">n2</span>;
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
                             <span class="op">+</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">na1</span> <span class="op">*</span> <span class="ident">n2</span> <span class="op">+</span> <span class="ident">na2</span> <span class="op">*</span> <span class="ident">n1</span>, <span class="ident">eq1</span>));
                     }
-                    (<span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="op">-</span><span class="ident">eq2</span> <span class="op">*</span> <span class="ident">n3</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n4</span>, <span class="ident">eq4</span>);
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
                             <span class="op">-</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">na3</span> <span class="op">*</span> <span class="ident">n4</span> <span class="op">+</span> <span class="ident">na4</span> <span class="op">*</span> <span class="ident">n3</span>, <span class="ident">eq4</span>);
                     }
-                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span>
                             <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n1</span>, <span class="ident">eq1</span>) <span class="op">*</span> <span class="ident">n2</span> <span class="op">-</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">n3</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n4</span>, <span class="ident">eq4</span>);
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
@@ -1706,28 +1728,28 @@
                     }
                 }
             }
-            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; {
                 <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">eq4</span>;
                 <span class="ident">rate</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">eq4</span>);
                 <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>();
-                <span class="kw">match</span> (<span class="ident">eq2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>, <span class="ident">eq4</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>) {
-                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">match</span> (<span class="ident">eq2</span> <span class="op">==</span> <span class="number">0.0</span>, <span class="ident">eq4</span> <span class="op">==</span> <span class="number">0.0</span>) {
+                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; {
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                     }
-                    (<span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="ident">eq4</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n1</span>, <span class="ident">eq1</span>) <span class="op">*</span> <span class="ident">n2</span>;
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
                             <span class="op">+</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">eq4</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">na1</span> <span class="op">*</span> <span class="ident">n2</span> <span class="op">+</span> <span class="ident">na2</span> <span class="op">*</span> <span class="ident">n1</span>, <span class="ident">eq1</span>));
                     }
-                    (<span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="op">-</span><span class="ident">eq2</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n3</span>, <span class="ident">eq3</span>) <span class="op">*</span> <span class="ident">n4</span>;
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
                             <span class="op">-</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">na3</span> <span class="op">*</span> <span class="ident">n4</span> <span class="op">+</span> <span class="ident">na4</span> <span class="op">*</span> <span class="ident">n3</span>, <span class="ident">eq3</span>);
                     }
-                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span>
                             <span class="ident">eq4</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n1</span>, <span class="ident">eq1</span>) <span class="op">*</span> <span class="ident">n2</span> <span class="op">-</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n3</span>, <span class="ident">eq3</span>) <span class="op">*</span> <span class="ident">n4</span>;
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
@@ -1740,11 +1762,11 @@
                     }
                 }
             }
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; {
                 <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">eq4</span>;
                 <span class="ident">rate</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">eq4</span>);
                 <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>();
-                <span class="kw">if</span> <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">eq4</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+                <span class="kw">if</span> <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">eq4</span> <span class="op">==</span> <span class="number">0.0</span> {
                     <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="op">-</span><span class="ident">n3</span> <span class="op">*</span> <span class="ident">n4</span>;
                     <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                     <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
@@ -1763,28 +1785,28 @@
             }
 
             <span class="comment">// Three heaving particles</span>
-            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; {
                 <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">eq3</span>;
                 <span class="ident">rate</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">eq3</span>);
                 <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>();
-                <span class="kw">match</span> (<span class="ident">eq1</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>, <span class="ident">eq2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>, <span class="ident">eq3</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>) {
-                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">match</span> (<span class="ident">eq1</span> <span class="op">==</span> <span class="number">0.0</span>, <span class="ident">eq2</span> <span class="op">==</span> <span class="number">0.0</span>, <span class="ident">eq3</span> <span class="op">==</span> <span class="number">0.0</span>) {
+                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; {
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                     }
-                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">n1</span> <span class="op">*</span> <span class="ident">n2</span>;
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
                             <span class="op">+</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">eq3</span> <span class="op">*</span> (<span class="ident">na1</span> <span class="op">*</span> <span class="ident">n2</span> <span class="op">+</span> <span class="ident">na2</span> <span class="op">*</span> <span class="ident">n1</span>));
                     }
-                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">n3</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n4</span>, <span class="ident">eq4</span>);
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
                             <span class="op">+</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">na3</span> <span class="op">*</span> <span class="ident">n4</span> <span class="op">+</span> <span class="ident">na4</span> <span class="op">*</span> <span class="ident">n3</span>, <span class="ident">eq4</span>));
                     }
-                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span>
                             <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">n1</span> <span class="op">*</span> <span class="ident">n2</span> <span class="op">-</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">n3</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n4</span>, <span class="ident">eq4</span>);
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
@@ -1797,28 +1819,28 @@
                     }
                 }
             }
-            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; {
                 <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">eq4</span>;
                 <span class="ident">rate</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">eq4</span>);
                 <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>();
-                <span class="kw">match</span> (<span class="ident">eq1</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>, <span class="ident">eq2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>, <span class="ident">eq4</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>) {
-                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">match</span> (<span class="ident">eq1</span> <span class="op">==</span> <span class="number">0.0</span>, <span class="ident">eq2</span> <span class="op">==</span> <span class="number">0.0</span>, <span class="ident">eq4</span> <span class="op">==</span> <span class="number">0.0</span>) {
+                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; {
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                     }
-                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="ident">eq4</span> <span class="op">*</span> <span class="ident">n1</span> <span class="op">*</span> <span class="ident">n2</span>;
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
                             <span class="op">+</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">eq4</span> <span class="op">*</span> (<span class="ident">na1</span> <span class="op">*</span> <span class="ident">n2</span> <span class="op">+</span> <span class="ident">na2</span> <span class="op">*</span> <span class="ident">n1</span>));
                     }
-                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n3</span>, <span class="ident">eq3</span>) <span class="op">*</span> <span class="ident">n4</span>;
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="op">-</span><span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
                             <span class="op">-</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">na3</span> <span class="op">*</span> <span class="ident">n4</span> <span class="op">+</span> <span class="ident">na4</span> <span class="op">*</span> <span class="ident">n3</span>, <span class="ident">eq3</span>);
                     }
-                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span>
                             <span class="ident">eq4</span> <span class="op">*</span> <span class="ident">n1</span> <span class="op">*</span> <span class="ident">n2</span> <span class="op">-</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n3</span>, <span class="ident">eq3</span>) <span class="op">*</span> <span class="ident">n4</span>;
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
@@ -1831,28 +1853,28 @@
                     }
                 }
             }
-            (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; {
                 <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">eq4</span>;
                 <span class="ident">rate</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">eq4</span>);
                 <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>();
-                <span class="kw">match</span> (<span class="ident">eq1</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>, <span class="ident">eq3</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>, <span class="ident">eq4</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>) {
-                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">match</span> (<span class="ident">eq1</span> <span class="op">==</span> <span class="number">0.0</span>, <span class="ident">eq3</span> <span class="op">==</span> <span class="number">0.0</span>, <span class="ident">eq4</span> <span class="op">==</span> <span class="number">0.0</span>) {
+                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; {
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                     }
-                    (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="op">-</span><span class="ident">eq1</span> <span class="op">*</span> <span class="ident">n3</span> <span class="op">*</span> <span class="ident">n4</span>;
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
                             <span class="op">-</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> (<span class="ident">na3</span> <span class="op">*</span> <span class="ident">n4</span> <span class="op">+</span> <span class="ident">na4</span> <span class="op">*</span> <span class="ident">n3</span>);
                     }
-                    (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">eq4</span> <span class="op">*</span> <span class="ident">n1</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n2</span>, <span class="ident">eq2</span>);
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
                             <span class="op">+</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">eq4</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">na1</span> <span class="op">*</span> <span class="ident">n2</span> <span class="op">+</span> <span class="ident">na2</span> <span class="op">*</span> <span class="ident">n1</span>, <span class="ident">eq2</span>));
                     }
-                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span>
                             <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">eq4</span> <span class="op">*</span> <span class="ident">n1</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n2</span>, <span class="ident">eq2</span>) <span class="op">-</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">n3</span> <span class="op">*</span> <span class="ident">n4</span>;
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
@@ -1865,28 +1887,28 @@
                     }
                 }
             }
-            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; {
                 <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">eq4</span>;
                 <span class="ident">rate</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">eq4</span>);
                 <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>();
-                <span class="kw">match</span> (<span class="ident">eq2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>, <span class="ident">eq3</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>, <span class="ident">eq4</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>) {
-                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">match</span> (<span class="ident">eq2</span> <span class="op">==</span> <span class="number">0.0</span>, <span class="ident">eq3</span> <span class="op">==</span> <span class="number">0.0</span>, <span class="ident">eq4</span> <span class="op">==</span> <span class="number">0.0</span>) {
+                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; {
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                     }
-                    (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="op">-</span><span class="ident">eq2</span> <span class="op">*</span> <span class="ident">n3</span> <span class="op">*</span> <span class="ident">n4</span>;
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
                             <span class="op">-</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> (<span class="ident">na3</span> <span class="op">*</span> <span class="ident">n4</span> <span class="op">+</span> <span class="ident">na4</span> <span class="op">*</span> <span class="ident">n3</span>);
                     }
-                    (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">eq4</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n1</span>, <span class="ident">eq1</span>) <span class="op">*</span> <span class="ident">n2</span>;
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
                         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">symmetric_prefactor</span>)
                             <span class="op">+</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">eq4</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">na1</span> <span class="op">*</span> <span class="ident">n2</span> <span class="op">+</span> <span class="ident">na2</span> <span class="op">*</span> <span class="ident">n1</span>, <span class="ident">eq2</span>));
                     }
-                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span>
                             <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">eq4</span> <span class="op">*</span> <span class="ident">checked_div</span>(<span class="ident">n1</span>, <span class="ident">eq1</span>) <span class="op">*</span> <span class="ident">n2</span> <span class="op">-</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">n3</span> <span class="op">*</span> <span class="ident">n4</span>;
                         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
@@ -1900,11 +1922,11 @@
                 }
             }
             <span class="comment">// Four heavy particles</span>
-            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; {
                 <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">eq4</span>;
                 <span class="ident">rate</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">*</span> <span class="ident">eq1</span> <span class="op">*</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">eq3</span> <span class="op">*</span> <span class="ident">eq4</span>);
                 <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>();
-                <span class="kw">if</span> <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+                <span class="kw">if</span> <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">==</span> <span class="number">0.0</span> {
                     <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                     <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="number">0.0</span>;
                 } <span class="kw">else</span> {
@@ -1919,7 +1941,7 @@
             }
         };
 
-        <span class="prelude-val">Some</span>(<span class="ident">rate</span> <span class="op">*</span> <span class="ident">c</span>.<span class="ident">normalization</span>)
+        <span class="prelude-val">Some</span>(<span class="ident">rate</span> <span class="op">*</span> <span class="ident">context</span>.<span class="ident">normalization</span>)
     }
 }
 
@@ -1961,7 +1983,7 @@
 
     <span class="doccomment">/// Shorthand to create the CSV file in the appropriate directory and with</span>
     <span class="doccomment">/// headers.</span>
-    <span class="kw">fn</span> <span class="ident">create_csv</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">p</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">csv::Writer</span><span class="op">&lt;</span><span class="ident">fs::File</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">create_csv</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">p</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">csv::Writer</span><span class="op">&lt;</span><span class="ident">fs::File</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">dir</span> <span class="op">=</span> <span class="ident">temp_dir</span>()
             .<span class="ident">join</span>(<span class="string">&quot;boltzmann-solver&quot;</span>)
             .<span class="ident">join</span>(<span class="string">&quot;interaction&quot;</span>)
@@ -1974,7 +1996,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">massless</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">massless</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">Empty::default</span>();
         <span class="ident">model</span>.<span class="ident">extend_particles</span>(
             [<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>]
@@ -2019,7 +2041,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">massive_m000</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">massive_m000</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">Empty::default</span>();
         <span class="ident">model</span>.<span class="ident">extend_particles</span>(
             [<span class="number">1e10</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>]
@@ -2063,7 +2085,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">massive_m0m0</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">massive_m0m0</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">Empty::default</span>();
         <span class="ident">model</span>.<span class="ident">extend_particles</span>(
             [<span class="number">1e10</span>, <span class="number">0.0</span>, <span class="number">1e10</span>, <span class="number">0.0</span>]
@@ -2107,7 +2129,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">massive_mm00</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">massive_mm00</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">Empty::default</span>();
         <span class="ident">model</span>.<span class="ident">extend_particles</span>(
             [<span class="number">1e10</span>, <span class="number">1e10</span>, <span class="number">0.0</span>, <span class="number">0.0</span>]
@@ -2152,7 +2174,7 @@
 
     <span class="doccomment">/// Unit amplitude</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">massive_mmmm</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">massive_mmmm</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">Empty::default</span>();
         <span class="ident">model</span>.<span class="ident">extend_particles</span>(
             [<span class="number">1e10</span>, <span class="number">1e10</span>, <span class="number">1e10</span>, <span class="number">1e10</span>]

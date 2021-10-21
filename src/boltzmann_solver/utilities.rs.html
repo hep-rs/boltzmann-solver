@@ -163,14 +163,14 @@
 <span class="doccomment">/// This is the analogous version of the recursively generated linearly spaced</span>
 <span class="doccomment">/// interval [`rec_linspace`].</span>
 <span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rec_geomspace</span>(<span class="ident">start</span>: <span class="ident">f64</span>, <span class="ident">end</span>: <span class="ident">f64</span>, <span class="ident">recursions</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rec_geomspace</span>(<span class="ident">start</span>: <span class="ident">f64</span>, <span class="ident">end</span>: <span class="ident">f64</span>, <span class="ident">recursions</span>: <span class="ident">u32</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">2_usize</span>.<span class="ident">pow</span>(<span class="ident">recursions</span>));
 
     <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">start</span>);
     <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">end</span>);
 
-    <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">start</span>.<span class="ident">ln</span>();
-    <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">end</span>.<span class="ident">ln</span>();
+    <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">f64::ln</span>(<span class="ident">start</span>);
+    <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">f64::ln</span>(<span class="ident">end</span>);
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">base</span> <span class="op">=</span> <span class="number">2.0</span>;
     <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">2</span>..<span class="number">2_u64</span>.<span class="ident">pow</span>(<span class="ident">recursions</span>) {
@@ -183,7 +183,7 @@
         <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">i</span> <span class="op">-</span> <span class="ident">base</span> <span class="op">-</span> <span class="number">1.0</span>;
         <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">base</span> <span class="op">-</span> <span class="ident">b</span>;
 
-        <span class="ident">v</span>.<span class="ident">push</span>(((<span class="ident">a</span> <span class="op">*</span> <span class="ident">start</span> <span class="op">+</span> <span class="ident">b</span> <span class="op">*</span> <span class="ident">end</span>) <span class="op">/</span> <span class="ident">base</span>).<span class="ident">exp</span>());
+        <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">f64::exp</span>((<span class="ident">a</span> <span class="op">*</span> <span class="ident">start</span> <span class="op">+</span> <span class="ident">b</span> <span class="op">*</span> <span class="ident">end</span>) <span class="op">/</span> <span class="ident">base</span>));
     }
     <span class="ident">v</span>
 }
@@ -206,7 +206,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The number of recursions is determined by `recursions`.</span>
 <span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rec_linspace</span>(<span class="ident">start</span>: <span class="ident">f64</span>, <span class="ident">end</span>: <span class="ident">f64</span>, <span class="ident">recursions</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rec_linspace</span>(<span class="ident">start</span>: <span class="ident">f64</span>, <span class="ident">end</span>: <span class="ident">f64</span>, <span class="ident">recursions</span>: <span class="ident">u32</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">2_usize</span>.<span class="ident">pow</span>(<span class="ident">recursions</span>));
 
     <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">start</span>);

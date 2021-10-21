@@ -578,9 +578,9 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ThreeParticle</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
     <span class="ident">particles</span>: <span class="ident">Particles</span>,
     <span class="doccomment">/// Squared amplitude as a function of the model.</span>
-    <span class="ident">squared_amplitude</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
+    <span class="ident">squared_amplitude</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>) -&gt; <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Asymmetry between the amplitude and its `$\CP$` conjugate.</span>
-    <span class="ident">asymmetry</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">asymmetry</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>) -&gt; <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">gamma_enabled</span>: <span class="ident">bool</span>,
     <span class="ident">width_enabled</span>: <span class="ident">bool</span>,
 }
@@ -600,9 +600,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the process differs from its `$\CP$`-conjugate process, the asymmetry</span>
     <span class="doccomment">/// can be specified with [`ThreeParticle::asymmetry`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">squared_amplitude</span>: <span class="ident">F</span>, <span class="ident">p1</span>: <span class="ident">isize</span>, <span class="ident">p2</span>: <span class="ident">isize</span>, <span class="ident">p3</span>: <span class="ident">isize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">squared_amplitude</span>: <span class="ident">F</span>, <span class="ident">p1</span>: <span class="ident">isize</span>, <span class="ident">p2</span>: <span class="ident">isize</span>, <span class="ident">p3</span>: <span class="ident">isize</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>) -&gt; <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
         <span class="kw">let</span> <span class="ident">particles</span> <span class="op">=</span> <span class="ident">Particles::new</span>(<span class="kw-2">&amp;</span>[<span class="ident">p1</span>], <span class="kw-2">&amp;</span>[<span class="ident">p2</span>, <span class="ident">p3</span>]);
 
@@ -622,9 +622,9 @@
     <span class="doccomment">/// - `$p_1 \leftrightarrow p_2 p_3$`,</span>
     <span class="doccomment">/// - `$\overline{p_2} \leftrightarrow \overline{p_1} p_3$`, and</span>
     <span class="doccomment">/// - `$\overline{p_3} \leftrightarrow \overline{p_1} p_2$`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_all</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">squared_amplitude</span>: <span class="ident">F</span>, <span class="ident">p1</span>: <span class="ident">isize</span>, <span class="ident">p2</span>: <span class="ident">isize</span>, <span class="ident">p3</span>: <span class="ident">isize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_all</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">squared_amplitude</span>: <span class="ident">F</span>, <span class="ident">p1</span>: <span class="ident">isize</span>, <span class="ident">p2</span>: <span class="ident">isize</span>, <span class="ident">p3</span>: <span class="ident">isize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>) -&gt; <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">squared_amplitude</span>, <span class="ident">p1</span>, <span class="ident">p2</span>, <span class="ident">p3</span>)];
 
@@ -651,18 +651,18 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This asymmetry is subsequently used to compute the asymmetric</span>
     <span class="doccomment">/// interaction rate given by [`Interaction::delta_gamma`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">asymmetry</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">asymmetry</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">asymmetry</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">asymmetry</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>) -&gt; <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
         <span class="self">self</span>.<span class="ident">set_asymmetry</span>(<span class="ident">asymmetry</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Same as [`ThreeParticle::asymmetry`] but modifies the interaction by reference.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_asymmetry</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">asymmetry</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_asymmetry</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">asymmetry</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">M</span>) -&gt; <span class="ident">f64</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
         <span class="self">self</span>.<span class="ident">asymmetry</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">asymmetry</span>));
         <span class="self">self</span>
@@ -670,21 +670,21 @@
 
     <span class="doccomment">/// Adjust whether this interaction will calculate decay widths.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_width</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_width</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">width_enabled</span> <span class="op">=</span> <span class="ident">v</span>;
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Adjust whether this interaction will calculate decay widths.</span>
+    <span class="doccomment">/// Adjust whether this interaction will calculate interaction rates.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_gamma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_gamma</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">gamma_enabled</span> <span class="op">=</span> <span class="ident">v</span>;
         <span class="self">self</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ThreeParticle</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">asymmetry</span>.<span class="ident">is_some</span>() {
             <span class="macro">write!</span>(
                 <span class="ident">f</span>,
@@ -713,20 +713,20 @@
 <span class="kw">where</span>
     <span class="ident">M</span>: <span class="ident">Model</span>,
 {
-    <span class="kw">fn</span> <span class="ident">particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Particles</span> {
+    <span class="kw">fn</span> <span class="ident">particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Particles</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">particles</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">width_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">width_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">width_enabled</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartialWidth</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartialWidth</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">width_enabled</span>() {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">ptcl</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">model</span>.<span class="ident">particles</span>();
+        <span class="kw">let</span> <span class="ident">ptcl</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">model</span>.<span class="ident">particles</span>();
 
         <span class="comment">// Get the *squared* masses</span>
         <span class="kw">let</span> <span class="ident">p1</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ptcl</span>[<span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">incoming_idx</span>[<span class="number">0</span>]];
@@ -737,17 +737,17 @@
             <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">kallen_lambda_sqrt</span>(<span class="ident">p1</span>.<span class="ident">mass2</span>, <span class="ident">p2</span>.<span class="ident">mass2</span>, <span class="ident">p3</span>.<span class="ident">mass2</span>) <span class="op">/</span> (<span class="number">2.0</span> <span class="op">*</span> <span class="ident">p1</span>.<span class="ident">mass</span>);
 
             <span class="comment">// 1 / 8 π ≅ 0.039788735772973836</span>
-            <span class="kw">let</span> <span class="ident">width</span> <span class="op">=</span>
-                <span class="number">0.039_788_735_772_973_836</span> <span class="op">*</span> <span class="ident">p</span> <span class="op">/</span> <span class="ident">p1</span>.<span class="ident">mass2</span> <span class="op">*</span> (<span class="self">self</span>.<span class="ident">squared_amplitude</span>)(<span class="ident">c</span>.<span class="ident">model</span>).<span class="ident">abs</span>();
+            <span class="kw">let</span> <span class="ident">width</span> <span class="op">=</span> <span class="number">0.039_788_735_772_973_836</span> <span class="op">*</span> <span class="ident">p</span> <span class="op">/</span> <span class="ident">p1</span>.<span class="ident">mass2</span>
+                <span class="op">*</span> (<span class="self">self</span>.<span class="ident">squared_amplitude</span>)(<span class="ident">context</span>.<span class="ident">model</span>).<span class="ident">abs</span>();
 
             <span class="macro">debug_assert!</span>(
                 <span class="ident">width</span>.<span class="ident">is_finite</span>(),
                 <span class="string">&quot;[{}.{:02}|{:&gt;10.4e}] Computed a non-finit width in interaction {}: {}&quot;</span>,
-                <span class="ident">c</span>.<span class="ident">step</span>,
-                <span class="ident">c</span>.<span class="ident">substep</span>,
-                <span class="ident">c</span>.<span class="ident">beta</span>,
+                <span class="ident">context</span>.<span class="ident">step</span>,
+                <span class="ident">context</span>.<span class="ident">substep</span>,
+                <span class="ident">context</span>.<span class="ident">beta</span>,
                 <span class="self">self</span>.<span class="ident">particles</span>()
-                    .<span class="ident">display</span>(<span class="ident">c</span>.<span class="ident">model</span>)
+                    .<span class="ident">display</span>(<span class="ident">context</span>.<span class="ident">model</span>)
                     .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">particles</span>().<span class="ident">short_display</span>()),
                 <span class="ident">width</span>
             );
@@ -762,7 +762,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">gamma_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">gamma_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">gamma_enabled</span>
     }
 
@@ -785,12 +785,12 @@
     <span class="doccomment">/// density approximates a Maxwell--Boltzmann distribution (irrespective of</span>
     <span class="doccomment">/// the original statistic), hence why we must use a threshold to switch</span>
     <span class="doccomment">/// between the two methods.</span>
-    <span class="kw">fn</span> <span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">gamma_enabled</span>() {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">ptcl</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">model</span>.<span class="ident">particles</span>();
+        <span class="kw">let</span> <span class="ident">ptcl</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">model</span>.<span class="ident">particles</span>();
 
         <span class="comment">// Get the particles</span>
         <span class="kw">let</span> <span class="ident">p1</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ptcl</span>[<span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">incoming_idx</span>[<span class="number">0</span>]];
@@ -802,17 +802,17 @@
             <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="number">0.0</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">p1</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">c</span>.<span class="ident">beta</span>;
+        <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">p1</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">context</span>.<span class="ident">beta</span>;
         <span class="kw">let</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">real</span> <span class="op">|</span><span class="op">|</span> <span class="ident">z</span> <span class="op">&lt;</span> <span class="ident">M_BETA_THRESHOLD</span> {
             <span class="comment">// 1 / 32 π³ ≅ 0.001007860451037484</span>
             <span class="number">0.001_007_860_451_037_484</span>
-                <span class="op">*</span> (<span class="self">self</span>.<span class="ident">squared_amplitude</span>)(<span class="ident">c</span>.<span class="ident">model</span>).<span class="ident">abs</span>()
+                <span class="op">*</span> (<span class="self">self</span>.<span class="ident">squared_amplitude</span>)(<span class="ident">context</span>.<span class="ident">model</span>).<span class="ident">abs</span>()
                 <span class="op">*</span> <span class="ident">kallen_lambda_sqrt</span>(<span class="ident">p1</span>.<span class="ident">mass2</span>, <span class="ident">p2</span>.<span class="ident">mass2</span>, <span class="ident">p3</span>.<span class="ident">mass2</span>)
                 <span class="op">*</span> (<span class="ident">bessel::k1</span>(<span class="ident">z</span>) <span class="op">/</span> <span class="ident">z</span>)
         } <span class="kw">else</span> {
             <span class="comment">// ζ(3) / 16 π³ ≅ 0.0024230112251823</span>
             <span class="number">0.002_423_011_225_182_3</span>
-                <span class="op">*</span> (<span class="self">self</span>.<span class="ident">squared_amplitude</span>)(<span class="ident">c</span>.<span class="ident">model</span>).<span class="ident">abs</span>()
+                <span class="op">*</span> (<span class="self">self</span>.<span class="ident">squared_amplitude</span>)(<span class="ident">context</span>.<span class="ident">model</span>).<span class="ident">abs</span>()
                 <span class="op">*</span> <span class="ident">kallen_lambda_sqrt</span>(<span class="ident">p1</span>.<span class="ident">mass2</span>, <span class="ident">p2</span>.<span class="ident">mass2</span>, <span class="ident">p3</span>.<span class="ident">mass2</span>)
                 <span class="op">*</span> (<span class="ident">bessel::k1_on_k2</span>(<span class="ident">z</span>) <span class="op">/</span> <span class="ident">z</span>.<span class="ident">powi</span>(<span class="number">3</span>))
                 <span class="op">/</span> <span class="ident">p1</span>.<span class="ident">degrees_of_freedom</span>()
@@ -821,11 +821,11 @@
         <span class="macro">debug_assert!</span>(
             <span class="ident">gamma</span>.<span class="ident">is_finite</span>(),
             <span class="string">&quot;[{}.{:02}|{:&gt;10.4e}] Computed a non-finite value for γ in interaction {}: {}&quot;</span>,
-            <span class="ident">c</span>.<span class="ident">step</span>,
-            <span class="ident">c</span>.<span class="ident">substep</span>,
-            <span class="ident">c</span>.<span class="ident">beta</span>,
+            <span class="ident">context</span>.<span class="ident">step</span>,
+            <span class="ident">context</span>.<span class="ident">substep</span>,
+            <span class="ident">context</span>.<span class="ident">beta</span>,
             <span class="self">self</span>.<span class="ident">particles</span>()
-                .<span class="ident">display</span>(<span class="ident">c</span>.<span class="ident">model</span>)
+                .<span class="ident">display</span>(<span class="ident">context</span>.<span class="ident">model</span>)
                 .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">particles</span>().<span class="ident">short_display</span>()),
             <span class="ident">gamma</span>
         );
@@ -833,10 +833,10 @@
         <span class="prelude-val">Some</span>(<span class="ident">gamma</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">delta_gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">delta_gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">asymmetry</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">asymmetry</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">ptcl</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">model</span>.<span class="ident">particles</span>();
+        <span class="kw">let</span> <span class="ident">ptcl</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">model</span>.<span class="ident">particles</span>();
 
         <span class="comment">// Get the particles</span>
         <span class="kw">let</span> <span class="ident">p1</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ptcl</span>[<span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">incoming_idx</span>[<span class="number">0</span>]];
@@ -848,17 +848,17 @@
             <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="number">0.0</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">p1</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">c</span>.<span class="ident">beta</span>;
+        <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">p1</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">context</span>.<span class="ident">beta</span>;
         <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">real</span> <span class="op">|</span><span class="op">|</span> <span class="ident">z</span> <span class="op">&lt;</span> <span class="ident">M_BETA_THRESHOLD</span> {
             <span class="comment">// 1 / 32 π³ ≅ 0.001007860451037484</span>
             <span class="number">0.001_007_860_451_037_484</span>
-                <span class="op">*</span> <span class="ident">asymmetry</span>(<span class="ident">c</span>.<span class="ident">model</span>).<span class="ident">abs</span>()
+                <span class="op">*</span> <span class="ident">asymmetry</span>(<span class="ident">context</span>.<span class="ident">model</span>).<span class="ident">abs</span>()
                 <span class="op">*</span> <span class="ident">kallen_lambda_sqrt</span>(<span class="ident">p1</span>.<span class="ident">mass2</span>, <span class="ident">p2</span>.<span class="ident">mass2</span>, <span class="ident">p3</span>.<span class="ident">mass2</span>)
                 <span class="op">*</span> (<span class="ident">bessel::k1</span>(<span class="ident">z</span>) <span class="op">/</span> <span class="ident">z</span>)
         } <span class="kw">else</span> {
             <span class="comment">// ζ(3) / 16 π³ ≅ 0.0024230112251823</span>
             <span class="number">0.002_423_011_225_182_3</span>
-                <span class="op">*</span> <span class="ident">asymmetry</span>(<span class="ident">c</span>.<span class="ident">model</span>).<span class="ident">abs</span>()
+                <span class="op">*</span> <span class="ident">asymmetry</span>(<span class="ident">context</span>.<span class="ident">model</span>).<span class="ident">abs</span>()
                 <span class="op">*</span> <span class="ident">kallen_lambda_sqrt</span>(<span class="ident">p1</span>.<span class="ident">mass2</span>, <span class="ident">p2</span>.<span class="ident">mass2</span>, <span class="ident">p3</span>.<span class="ident">mass2</span>)
                 <span class="op">*</span> (<span class="ident">bessel::k1_on_k2</span>(<span class="ident">z</span>) <span class="op">/</span> <span class="ident">z</span>.<span class="ident">powi</span>(<span class="number">3</span>))
                 <span class="op">/</span> <span class="ident">p1</span>.<span class="ident">degrees_of_freedom</span>()
@@ -867,11 +867,11 @@
         <span class="macro">debug_assert!</span>(
             <span class="ident">delta_gamma</span>.<span class="ident">is_finite</span>(),
             <span class="string">&quot;[{}.{:02}|{:&gt;10.4e}] Computed a non-finite value for δγ in interaction {}: {}&quot;</span>,
-            <span class="ident">c</span>.<span class="ident">step</span>,
-            <span class="ident">c</span>.<span class="ident">substep</span>,
-            <span class="ident">c</span>.<span class="ident">beta</span>,
+            <span class="ident">context</span>.<span class="ident">step</span>,
+            <span class="ident">context</span>.<span class="ident">substep</span>,
+            <span class="ident">context</span>.<span class="ident">beta</span>,
             <span class="self">self</span>.<span class="ident">particles</span>()
-                .<span class="ident">display</span>(<span class="ident">c</span>.<span class="ident">model</span>)
+                .<span class="ident">display</span>(<span class="ident">context</span>.<span class="ident">model</span>)
                 .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">particles</span>().<span class="ident">short_display</span>()),
             <span class="ident">delta_gamma</span>
         );
@@ -881,17 +881,17 @@
 
     <span class="doccomment">/// Override the default implementation of [`Interaction::rate`] to make use</span>
     <span class="doccomment">/// of the adjusted reaction rate density.</span>
-    <span class="kw">fn</span> <span class="ident">rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">gamma</span>(<span class="ident">c</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">delta_gamma</span>(<span class="ident">c</span>, <span class="bool-val">false</span>);
+    <span class="kw">fn</span> <span class="ident">rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">gamma</span>(<span class="ident">context</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">delta_gamma</span>(<span class="ident">context</span>, <span class="bool-val">false</span>);
 
         <span class="comment">// If both rates are 0, there&#39;s no need to adjust it to the particles&#39;</span>
         <span class="comment">// number densities.</span>
-        <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+        <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">==</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>() <span class="op">==</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">ptcl</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">model</span>.<span class="ident">particles</span>();
+        <span class="kw">let</span> <span class="ident">ptcl</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">model</span>.<span class="ident">particles</span>();
 
         <span class="comment">// Get the various quantities associated with each particle.</span>
         <span class="kw">let</span> [<span class="ident">i0</span>, <span class="ident">i1</span>, <span class="ident">i2</span>] <span class="op">=</span> [
@@ -900,15 +900,15 @@
             <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">outgoing_idx</span>[<span class="number">1</span>],
         ];
         <span class="kw">let</span> <span class="ident">p1</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ptcl</span>[<span class="ident">i0</span>];
-        <span class="kw">let</span> [<span class="ident">n1</span>, <span class="ident">n2</span>, <span class="ident">n3</span>] <span class="op">=</span> [<span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">i0</span>], <span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">i1</span>], <span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">i2</span>]];
+        <span class="kw">let</span> [<span class="ident">n1</span>, <span class="ident">n2</span>, <span class="ident">n3</span>] <span class="op">=</span> [<span class="ident">context</span>.<span class="ident">n</span>[<span class="ident">i0</span>], <span class="ident">context</span>.<span class="ident">n</span>[<span class="ident">i1</span>], <span class="ident">context</span>.<span class="ident">n</span>[<span class="ident">i2</span>]];
         <span class="kw">let</span> [<span class="ident">na1</span>, <span class="ident">na2</span>, <span class="ident">na3</span>] <span class="op">=</span> [
-            <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">incoming_sign</span>[<span class="number">0</span>] <span class="op">*</span> <span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">i0</span>],
-            <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">outgoing_sign</span>[<span class="number">0</span>] <span class="op">*</span> <span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">i1</span>],
-            <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">outgoing_sign</span>[<span class="number">1</span>] <span class="op">*</span> <span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">i2</span>],
+            <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">incoming_sign</span>[<span class="number">0</span>] <span class="op">*</span> <span class="ident">context</span>.<span class="ident">na</span>[<span class="ident">i0</span>],
+            <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">outgoing_sign</span>[<span class="number">0</span>] <span class="op">*</span> <span class="ident">context</span>.<span class="ident">na</span>[<span class="ident">i1</span>],
+            <span class="self">self</span>.<span class="ident">particles</span>.<span class="ident">outgoing_sign</span>[<span class="number">1</span>] <span class="op">*</span> <span class="ident">context</span>.<span class="ident">na</span>[<span class="ident">i2</span>],
         ];
-        <span class="kw">let</span> [<span class="ident">eq1</span>, <span class="ident">eq2</span>, <span class="ident">eq3</span>] <span class="op">=</span> [<span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">i0</span>], <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">i1</span>], <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">i2</span>]];
+        <span class="kw">let</span> [<span class="ident">eq1</span>, <span class="ident">eq2</span>, <span class="ident">eq3</span>] <span class="op">=</span> [<span class="ident">context</span>.<span class="ident">eq</span>[<span class="ident">i0</span>], <span class="ident">context</span>.<span class="ident">eq</span>[<span class="ident">i1</span>], <span class="ident">context</span>.<span class="ident">eq</span>[<span class="ident">i2</span>]];
 
-        <span class="kw">if</span> <span class="ident">eq1</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">eq3</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+        <span class="kw">if</span> <span class="ident">eq1</span> <span class="op">==</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="ident">eq2</span> <span class="op">*</span> <span class="ident">eq3</span> <span class="op">==</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
@@ -919,7 +919,7 @@
         <span class="ident">rate</span>.<span class="ident">gamma_tilde</span> <span class="op">=</span> <span class="ident">gamma</span>;
         <span class="ident">rate</span>.<span class="ident">delta_gamma_tilde</span> <span class="op">=</span> <span class="ident">delta_gamma</span>;
 
-        <span class="kw">if</span> <span class="ident">p1</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">c</span>.<span class="ident">beta</span> <span class="op">&lt;</span> <span class="ident">M_BETA_THRESHOLD</span> {
+        <span class="kw">if</span> <span class="ident">p1</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">context</span>.<span class="ident">beta</span> <span class="op">&lt;</span> <span class="ident">M_BETA_THRESHOLD</span> {
             <span class="comment">// Below the M_BETA_THRESHOLD, `gamma` is the usual rate which must</span>
             <span class="comment">// be scaled by factors of `n / eq` to get the actual forward and</span>
             <span class="comment">// backward rates.</span>
@@ -945,7 +945,7 @@
 
             <span class="comment">// If eq1 is zero, the remaining n1 density is trying to decay and</span>
             <span class="comment">// the inverse decay should be negligible.</span>
-            <span class="kw">if</span> <span class="ident">eq1</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+            <span class="kw">if</span> <span class="ident">eq1</span> <span class="op">==</span> <span class="number">0.0</span> {
                 <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">n1</span>);
                 <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>, <span class="ident">n1</span>) <span class="op">+</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">na1</span>);
             } <span class="kw">else</span> {
@@ -959,7 +959,7 @@
             }
         }
 
-        <span class="prelude-val">Some</span>(<span class="ident">rate</span> <span class="op">*</span> <span class="ident">c</span>.<span class="ident">normalization</span>)
+        <span class="prelude-val">Some</span>(<span class="ident">rate</span> <span class="op">*</span> <span class="ident">context</span>.<span class="ident">normalization</span>)
     }
 }
 
@@ -1000,7 +1000,7 @@
 
     <span class="doccomment">/// Shorthand to create the CSV file in the appropriate directory and with</span>
     <span class="doccomment">/// headers.</span>
-    <span class="kw">fn</span> <span class="ident">create_csv</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">p</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">csv::Writer</span><span class="op">&lt;</span><span class="ident">fs::File</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">create_csv</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">p</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">csv::Writer</span><span class="op">&lt;</span><span class="ident">fs::File</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">dir</span> <span class="op">=</span> <span class="ident">temp_dir</span>()
             .<span class="ident">join</span>(<span class="string">&quot;boltzmann-solver&quot;</span>)
             .<span class="ident">join</span>(<span class="string">&quot;interaction&quot;</span>)
@@ -1014,7 +1014,7 @@
 
     <span class="doccomment">/// Unit amplitude</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">unit_amplitude</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">unit_amplitude</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">Empty::default</span>();
         <span class="ident">model</span>.<span class="ident">extend_particles</span>(
             [<span class="number">1e10</span>, <span class="number">1e5</span>, <span class="number">1e2</span>]

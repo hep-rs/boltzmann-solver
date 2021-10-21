@@ -287,7 +287,7 @@
 <span class="kw">impl</span> <span class="ident">RateDensity</span> {
     <span class="doccomment">/// Create a new instanse with both rates being 0.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zero</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zero</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">RateDensity</span> {
             <span class="ident">gamma</span>: <span class="number">0.0</span>,
             <span class="ident">gamma_tilde</span>: <span class="number">0.0</span>,
@@ -300,13 +300,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">default::Default</span> <span class="kw">for</span> <span class="ident">RateDensity</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::zero</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">RateDensity</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(
             <span class="ident">f</span>,
             <span class="string">&quot;RateDensity {{ γ: {}, δγ: {} }}&quot;</span>,
@@ -317,7 +317,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::LowerExp</span> <span class="kw">for</span> <span class="ident">RateDensity</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(
             <span class="ident">f</span>,
             <span class="string">&quot;RateDensity {{ γ: {:e}, δγ: {:e} }}&quot;</span>,
@@ -331,7 +331,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
     <span class="doccomment">/// Multiplies the symmetric and asymmetric rates, but leaves `gamma` unchanged.</span>
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">gamma</span>: <span class="self">self</span>.<span class="ident">gamma</span> <span class="op">*</span> <span class="ident">rhs</span>,
             <span class="ident">gamma_tilde</span>: <span class="self">self</span>.<span class="ident">gamma_tilde</span> <span class="op">*</span> <span class="ident">rhs</span>,
@@ -346,7 +346,7 @@
 <span class="kw">impl</span> <span class="ident">ops::Mul</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">f64</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">RateDensity</span>;
 
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">RateDensity</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RateDensity</span> {
+    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">RateDensity</span>) -&gt; <span class="ident">RateDensity</span> {
         <span class="ident">rhs</span> <span class="op">*</span> <span class="self">self</span>
     }
 }
@@ -365,7 +365,7 @@
 <span class="kw">impl</span> <span class="ident">ops::Div</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RateDensity</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">gamma</span>: <span class="self">self</span>.<span class="ident">gamma</span> <span class="op">/</span> <span class="ident">rhs</span>,
             <span class="ident">gamma_tilde</span>: <span class="self">self</span>.<span class="ident">gamma_tilde</span> <span class="op">/</span> <span class="ident">rhs</span>,

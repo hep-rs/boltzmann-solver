@@ -142,8 +142,6 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interaction::Particles</span>;
 <span class="kw">use</span> <span class="ident">ndarray::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashSet</span>, <span class="ident">fmt</span>, <span class="ident">sync::RwLock</span>};
@@ -196,15 +194,13 @@
     <span class="doccomment">/// sign and multiplicity is stored in the value.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fast_interactions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">Particles</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// List of particles which are forced in equilibrium.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the context</span>
     <span class="kw">pub</span> <span class="ident">in_equilibrium</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">usize</span>],
     <span class="doccomment">/// List of particles which are forced to never develop any asymmetry.</span>
     <span class="kw">pub</span> <span class="ident">no_asymmetry</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">usize</span>],
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(
             <span class="ident">f</span>,
             <span class="string">&quot;Context {{ step: {}, substep: {}, beta: {:e},\n  n: {:e},\n  na: {:e},\n  eq: {:e}\n  eqn:{:e}\n}}&quot;</span>,
@@ -217,7 +213,7 @@
     <span class="doccomment">/// Unwrap the context leaving only the fast interactions.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If fast interactions are disabled, the result is an empty vectors.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_fast_interactions</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">Particles</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_fast_interactions</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">Particles</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fast_interactions</span>
     }
 }

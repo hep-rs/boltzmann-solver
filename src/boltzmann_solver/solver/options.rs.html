@@ -170,7 +170,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">StepPrecision</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">StepPrecision</span> {
             <span class="ident">min</span>: <span class="number">1e-4</span>,
             <span class="ident">max</span>: <span class="number">1e0</span>,
@@ -179,7 +179,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">StepPrecision</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(
             <span class="ident">f</span>,
             <span class="string">&quot;StepPrecision {{ min: {}, max: {} }}&quot;</span>,
@@ -202,13 +202,13 @@
     <span class="doccomment">/// ```math</span>
     <span class="doccomment">/// \varepsilon_\text{max} = \max[\varepsilon_\text{abs}, \varepsilon_\text{rel} * \abs{y}]</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">max_tolerance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">y</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">max_tolerance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">y</span>: <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> {
         <span class="self">self</span>.<span class="ident">abs</span>.<span class="ident">max</span>(<span class="ident">y</span>.<span class="ident">abs</span>() <span class="op">*</span> <span class="self">self</span>.<span class="ident">rel</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ErrorTolerance</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ErrorTolerance</span> {
             <span class="ident">abs</span>: <span class="number">1e-10</span>,
             <span class="ident">rel</span>: <span class="number">1e-4</span>,
@@ -219,7 +219,7 @@
 <span class="kw">impl</span> <span class="ident">ops::Mul</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ErrorTolerance</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ErrorTolerance</span> {
             <span class="ident">abs</span>: <span class="self">self</span>.<span class="ident">abs</span> <span class="op">*</span> <span class="ident">other</span>,
             <span class="ident">rel</span>: <span class="self">self</span>.<span class="ident">rel</span> <span class="op">*</span> <span class="ident">other</span>,
@@ -230,7 +230,7 @@
 <span class="kw">impl</span> <span class="ident">ops::Div</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ErrorTolerance</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ErrorTolerance</span> {
             <span class="ident">abs</span>: <span class="self">self</span>.<span class="ident">abs</span> <span class="op">/</span> <span class="ident">other</span>,
             <span class="ident">rel</span>: <span class="self">self</span>.<span class="ident">rel</span> <span class="op">/</span> <span class="ident">other</span>,
@@ -239,7 +239,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ErrorTolerance</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(
             <span class="ident">f</span>,
             <span class="string">&quot;ErrorTolerance {{ abs: {}, rel: {} }}&quot;</span>,

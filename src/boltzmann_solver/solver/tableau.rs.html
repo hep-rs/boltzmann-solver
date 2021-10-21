@@ -378,6 +378,45 @@
 <span id="309">309</span>
 <span id="310">310</span>
 <span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
 </pre><pre class="rust"><code><span class="doccomment">//! # Butcher tableaux</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! A Butcher tableau is as described [on</span>
@@ -416,24 +455,63 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rk87</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rk98</span>;
 
+<span class="comment">// Although all RK orders are available at all times, we default to using the</span>
+<span class="comment">// lowest order specified within the features.  If none is specified, the 9(8)</span>
+<span class="comment">// method is used.</span>
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk21&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rk21</span>::{<span class="ident">RK_A</span>, <span class="ident">RK_B</span>, <span class="ident">RK_C</span>, <span class="ident">RK_E</span>, <span class="ident">RK_ORDER</span>, <span class="ident">RK_S</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk32&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk32&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk21&quot;</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rk32</span>::{<span class="ident">RK_A</span>, <span class="ident">RK_B</span>, <span class="ident">RK_C</span>, <span class="ident">RK_E</span>, <span class="ident">RK_ORDER</span>, <span class="ident">RK_S</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk43&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk43&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk21&quot;</span>), <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk32&quot;</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rk43</span>::{<span class="ident">RK_A</span>, <span class="ident">RK_B</span>, <span class="ident">RK_C</span>, <span class="ident">RK_E</span>, <span class="ident">RK_ORDER</span>, <span class="ident">RK_S</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk54&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk54&quot;</span>,
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk21&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk32&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk43&quot;</span>),
+))]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rk54</span>::{<span class="ident">RK_A</span>, <span class="ident">RK_B</span>, <span class="ident">RK_C</span>, <span class="ident">RK_E</span>, <span class="ident">RK_ORDER</span>, <span class="ident">RK_S</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk65&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk65&quot;</span>,
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk21&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk32&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk43&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk54&quot;</span>),
+))]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rk65</span>::{<span class="ident">RK_A</span>, <span class="ident">RK_B</span>, <span class="ident">RK_C</span>, <span class="ident">RK_E</span>, <span class="ident">RK_ORDER</span>, <span class="ident">RK_S</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk76&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk76&quot;</span>,
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk21&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk32&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk43&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk54&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk65&quot;</span>),
+))]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rk76</span>::{<span class="ident">RK_A</span>, <span class="ident">RK_B</span>, <span class="ident">RK_C</span>, <span class="ident">RK_E</span>, <span class="ident">RK_ORDER</span>, <span class="ident">RK_S</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk87&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk87&quot;</span>,
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk21&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk32&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk43&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk54&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk65&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk76&quot;</span>),
+))]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rk87</span>::{<span class="ident">RK_A</span>, <span class="ident">RK_B</span>, <span class="ident">RK_C</span>, <span class="ident">RK_E</span>, <span class="ident">RK_ORDER</span>, <span class="ident">RK_S</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk98&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk98&quot;</span>,
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk21&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk32&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk43&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk54&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk65&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk76&quot;</span>),
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk87&quot;</span>)
+))]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rk98</span>::{<span class="ident">RK_A</span>, <span class="ident">RK_B</span>, <span class="ident">RK_C</span>, <span class="ident">RK_E</span>, <span class="ident">RK_ORDER</span>, <span class="ident">RK_S</span>};
 
-<span class="comment">// Use Runge-Kutta 8(7) by default</span>
+<span class="comment">// Default if no feature is specified</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
     <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk21&quot;</span>),
     <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk32&quot;</span>),
@@ -444,7 +522,7 @@
     <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk87&quot;</span>),
     <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rk98&quot;</span>)
 ))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rk87</span>::{<span class="ident">RK_A</span>, <span class="ident">RK_B</span>, <span class="ident">RK_C</span>, <span class="ident">RK_E</span>, <span class="ident">RK_ORDER</span>, <span class="ident">RK_S</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rk98</span>::{<span class="ident">RK_A</span>, <span class="ident">RK_B</span>, <span class="ident">RK_C</span>, <span class="ident">RK_E</span>, <span class="ident">RK_ORDER</span>, <span class="ident">RK_S</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
@@ -455,15 +533,15 @@
     <span class="kw">const</span> <span class="ident">TWO_PI</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">PI</span>;
 
     <span class="macro">macro_rules!</span> <span class="ident">solve_rk</span> {
-        ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+        ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span> ) =&gt; {
             <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
                 <span class="kw-2">mut</span> <span class="ident">y</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
                 <span class="kw-2">mut</span> <span class="ident">t</span>: <span class="ident">f64</span>,
                 <span class="ident">tf</span>: <span class="ident">f64</span>,
                 <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>,
-            ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>)
+            ) -&gt; (<span class="ident">f64</span>, <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>)
             <span class="kw">where</span>
-                <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">f64</span>, <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+                <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">f64</span>, <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) -&gt; <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
             {
                 <span class="kw">use</span> <span class="kw">super</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>::<span class="kw-2">*</span>;
 
@@ -510,7 +588,7 @@
 
                     <span class="comment">// Compute the change in step size based on the current error And</span>
                     <span class="comment">// correspondingly adjust the step size</span>
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h_est</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">err</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h_est</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">err</span> <span class="op">==</span> <span class="number">0.0</span> {
                         <span class="ident">h</span> <span class="op">*</span> <span class="ident">delta_max</span>
                     } <span class="kw">else</span> {
                         <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="number">0.9</span> <span class="op">*</span> (<span class="ident">tol</span> <span class="op">/</span> <span class="ident">err</span>).<span class="ident">powf</span>(<span class="number">1.0</span> <span class="op">/</span> <span class="ident">f64::from</span>(<span class="ident">RK_ORDER</span> <span class="op">+</span> <span class="number">1</span>));
@@ -567,10 +645,10 @@
     <span class="macro">solve_rk!</span>(<span class="ident">solve_rk98</span>, <span class="ident">rk98</span>);
 
     <span class="macro">macro_rules!</span> <span class="ident">test_sine</span> {
-        ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prec</span>:<span class="ident">expr</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+        ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prec</span>:<span class="ident">expr</span> ) =&gt; {
             <span class="attribute">#[<span class="ident">test</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">_t</span>: <span class="ident">f64</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> { <span class="macro">array!</span>[<span class="op">-</span><span class="ident">x</span>[<span class="number">1</span>], <span class="ident">x</span>[<span class="number">0</span>]] };
+            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">_t</span>: <span class="ident">f64</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">|</span> -&gt; <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> { <span class="macro">array!</span>[<span class="op">-</span><span class="ident">x</span>[<span class="number">1</span>], <span class="ident">x</span>[<span class="number">0</span>]] };
 
                 <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="macro">array!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>];
                 <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="number">0.0</span>;
@@ -594,10 +672,10 @@
     <span class="macro">test_sine!</span>(<span class="ident">test_sine_rk98</span>, <span class="ident">solve_rk98</span>, <span class="number">6.0</span>);
 
     <span class="macro">macro_rules!</span> <span class="ident">test_lotka_volterra</span> {
-        ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prec</span>:<span class="ident">expr</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+        ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prec</span>:<span class="ident">expr</span> ) =&gt; {
             <span class="attribute">#[<span class="ident">test</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">_t</span>: <span class="ident">f64</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">_t</span>: <span class="ident">f64</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">|</span> -&gt; <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
                     <span class="macro">array!</span>[<span class="ident">x</span>[<span class="number">0</span>] <span class="op">*</span> (<span class="number">2.0</span> <span class="op">-</span> <span class="ident">x</span>[<span class="number">1</span>]), <span class="ident">x</span>[<span class="number">1</span>] <span class="op">*</span> (<span class="ident">x</span>[<span class="number">0</span>] <span class="op">-</span> <span class="number">1.0</span>)]
                 };
 
@@ -636,10 +714,10 @@
     <span class="kw">const</span> <span class="ident">TWO_PI</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">PI</span>;
 
     <span class="macro">macro_rules!</span> <span class="ident">bench_sine</span> {
-        ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>:<span class="ident">ident</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+        ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>:<span class="ident">ident</span> ) =&gt; {
             <span class="attribute">#[<span class="ident">bench</span>]</span>
             <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
-                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">_t</span>: <span class="ident">f64</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> { <span class="macro">array!</span>[<span class="op">-</span><span class="ident">x</span>[<span class="number">1</span>], <span class="ident">x</span>[<span class="number">0</span>]] };
+                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">_t</span>: <span class="ident">f64</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">|</span> -&gt; <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> { <span class="macro">array!</span>[<span class="op">-</span><span class="ident">x</span>[<span class="number">1</span>], <span class="ident">x</span>[<span class="number">0</span>]] };
 
                 <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="macro">array!</span>[<span class="number">1.0</span>, <span class="number">0.0</span>];
@@ -662,10 +740,10 @@
     <span class="macro">bench_sine!</span>(<span class="ident">bench_sine_rk98</span>, <span class="ident">solve_rk98</span>);
 
     <span class="macro">macro_rules!</span> <span class="ident">bench_lotka_volterra</span> {
-        ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>:<span class="ident">ident</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+        ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">solver</span>:<span class="ident">ident</span> ) =&gt; {
             <span class="attribute">#[<span class="ident">bench</span>]</span>
             <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
-                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">_t</span>: <span class="ident">f64</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">_t</span>: <span class="ident">f64</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">|</span> -&gt; <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
                     <span class="macro">array!</span>[<span class="ident">x</span>[<span class="number">0</span>] <span class="op">*</span> (<span class="number">2.0</span> <span class="op">-</span> <span class="ident">x</span>[<span class="number">1</span>]), <span class="ident">x</span>[<span class="number">1</span>] <span class="op">*</span> (<span class="ident">x</span>[<span class="number">0</span>] <span class="op">-</span> <span class="number">1.0</span>)]
                 };
 

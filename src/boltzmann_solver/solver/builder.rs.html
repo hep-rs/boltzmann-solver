@@ -657,13 +657,33 @@
 <span id="588">588</span>
 <span id="589">589</span>
 <span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">model</span>::{<span class="ident">interaction::Interaction</span>, <span class="ident">ModelInteractions</span>, <span class="ident">Particle</span>},
     <span class="ident">solver</span>::{
         <span class="ident">options</span>::{<span class="ident">ErrorTolerance</span>, <span class="ident">StepPrecision</span>},
         <span class="ident">Context</span>, <span class="ident">LoggerFn</span>, <span class="ident">Solver</span>,
     },
-    <span class="ident">utilities::rec_geomspace</span>,
 };
 <span class="kw">use</span> <span class="ident">ndarray::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>)]</span>
@@ -672,10 +692,6 @@
     <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
     <span class="ident">error</span>, <span class="ident">fmt</span>,
 };
-
-<span class="comment">// Number of recursive subdivisions in beta range (so there are 2^N</span>
-<span class="comment">// subdivisions).</span>
-<span class="kw">const</span> <span class="ident">PRECOMPUTE_SUBDIV</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">12</span>;
 
 <span class="doccomment">/// Error type returned by the solver builder in case there is an error.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -692,28 +708,31 @@
     <span class="ident">TooManyNoAsymmetry</span>,
     <span class="doccomment">/// The underlying model has not been specified</span>
     <span class="ident">UndefinedModel</span>,
+    <span class="doccomment">/// Duplicate itneraction</span>
+    <span class="ident">DuplicateInteractions</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error::InvalidInitialDensities</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;initial number densities are invalid&quot;</span>),
-            <span class="ident">Error::InvalidInitialAsymmetries</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::InvalidInitialDensities</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;initial number densities are invalid&quot;</span>),
+            <span class="ident">Error::InvalidInitialAsymmetries</span> =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;initial number density asymmetries are invalid&quot;</span>)
             }
-            <span class="ident">Error::TooManyInEquilibrium</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::TooManyInEquilibrium</span> =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;too many particles held in equilibrium for the model&quot;</span>)
             }
-            <span class="ident">Error::TooManyNoAsymmetry</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::TooManyNoAsymmetry</span> =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;too many particles without asymmetry for the model&quot;</span>)
             }
-            <span class="ident">Error::UndefinedModel</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;underlying model is not defined&quot;</span>),
+            <span class="ident">Error::UndefinedModel</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;underlying model is not defined&quot;</span>),
+            <span class="ident">Error::DuplicateInteractions</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;duplicate interaction&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 }
@@ -739,8 +758,8 @@
     <span class="ident">step_precision</span>: <span class="ident">StepPrecision</span>,
     <span class="doccomment">/// Local error allowed to determine step size as absolute and relative.</span>
     <span class="ident">error_tolerance</span>: <span class="ident">ErrorTolerance</span>,
-    <span class="doccomment">/// Whether interactions are precomputed or not</span>
-    <span class="ident">precompute</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// The number of points to sample to build the spline, or 0 of disabling the precompute.</span>
+    <span class="ident">precompute</span>: <span class="ident">usize</span>,
     <span class="doccomment">/// Whether fast interactions are enabled</span>
     <span class="ident">fast_interactions</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Whether to abort the integration if the step size becomes too small</span>
@@ -768,7 +787,7 @@
     <span class="doccomment">/// // let solver = solver_builder.build();</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">model</span>: <span class="prelude-val">None</span>,
             <span class="ident">initial_densities</span>: <span class="ident">HashMap::new</span>(),
@@ -779,7 +798,7 @@
             <span class="ident">logger</span>: <span class="ident">Box::new</span>(<span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {}),
             <span class="ident">step_precision</span>: <span class="ident">StepPrecision::default</span>(),
             <span class="ident">error_tolerance</span>: <span class="ident">ErrorTolerance::default</span>(),
-            <span class="ident">precompute</span>: <span class="bool-val">true</span>,
+            <span class="ident">precompute</span>: <span class="number">1</span>,
             <span class="ident">fast_interactions</span>: <span class="bool-val">true</span>,
             <span class="ident">abort_when_inaccurate</span>: <span class="bool-val">false</span>,
         }
@@ -790,7 +809,7 @@
     <span class="doccomment">/// Add a function that can modify the model before it is used by the</span>
     <span class="doccomment">/// context.  This is particularly useful if there is a baseline model with</span>
     <span class="doccomment">/// fixed parameters and only certain parameters are changed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="ident">M</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">model</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">model</span>);
         <span class="self">self</span>
     }
@@ -806,7 +825,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Repeated initial conditions are combined together with any duplicates</span>
     <span class="doccomment">/// overiding previous calls.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initial_densities</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initial_densities</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">usize</span>, <span class="ident">f64</span>)<span class="op">&gt;</span>,
     {
@@ -824,7 +843,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Repeated initial conditions are combined together with any duplicates</span>
     <span class="doccomment">/// overiding previous calls.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initial_asymmetries</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">na</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initial_asymmetries</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">na</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">usize</span>, <span class="ident">f64</span>)<span class="op">&gt;</span>,
     {
@@ -844,7 +863,7 @@
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if the starting value is larger than the final value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">beta_range</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">start</span>: <span class="ident">f64</span>, <span class="ident">end</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">beta_range</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">start</span>: <span class="ident">f64</span>, <span class="ident">end</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(
             <span class="ident">start</span> <span class="op">&lt;</span> <span class="ident">end</span>,
             <span class="string">&quot;The initial β must be smaller than the final β value.&quot;</span>
@@ -863,7 +882,7 @@
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if the starting value is smaller than the final value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">temperature_range</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">start</span>: <span class="ident">f64</span>, <span class="ident">end</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">temperature_range</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">start</span>: <span class="ident">f64</span>, <span class="ident">end</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(
             <span class="ident">start</span> <span class="op">&gt;</span> <span class="ident">end</span>,
             <span class="string">&quot;The initial temperature must be larger than the final temperature.&quot;</span>
@@ -882,7 +901,7 @@
     <span class="doccomment">/// These particles are specified by their index.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Multiple calls of this function will combine the results together.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">in_equilibrium</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">eq</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">in_equilibrium</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">eq</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">usize</span><span class="op">&gt;</span>,
     {
@@ -899,7 +918,7 @@
     <span class="doccomment">/// These particles are specified by their index.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Multiple calls of this function will combine the results together.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">no_asymmetry</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">na</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">no_asymmetry</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">na</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">usize</span><span class="op">&gt;</span>,
     {
@@ -918,7 +937,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is useful if one wants to track the evolution of the solutions and</span>
     <span class="doccomment">/// log these in a CSV file.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">logger</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">logger</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -940,25 +959,28 @@
     <span class="doccomment">/// p_\text{min} \beta &lt; h &lt; p_\text{max} \beta</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The default values are `$p_\text{min} = 10^{-10}$` and `$p_\text{max} =</span>
-    <span class="doccomment">/// 1$`.</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// The relative step precision has a higher priority on the step size than</span>
     <span class="doccomment">/// the error.  That is, the step size will never be less than</span>
     <span class="doccomment">/// `$p_\text{min} \beta$` even if this results in a larger local error than</span>
     <span class="doccomment">/// desired.</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// The minimum value for `$p_\text{min}$` is automatically adjusted such</span>
+    <span class="doccomment">/// that the integration will keep increasing, albeit extremely slowly.</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will panic if `$p_\text{min} \geq p_\text{max}$` or if</span>
     <span class="doccomment">/// `$p_\text{min}$` is negative.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">step_precision</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">min</span>: <span class="ident">f64</span>, <span class="ident">max</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">step_precision</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">min</span>: <span class="ident">f64</span>, <span class="ident">max</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(
             <span class="ident">min</span> <span class="op">&lt;</span> <span class="ident">max</span>,
             <span class="string">&quot;Minimum step precision must be smaller than the maximum step precision.&quot;</span>
         );
         <span class="macro">assert!</span>(<span class="ident">min</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0.0</span>, <span class="string">&quot;Minimum step precision cannot be negative.&quot;</span>);
-        <span class="self">self</span>.<span class="ident">step_precision</span> <span class="op">=</span> <span class="ident">StepPrecision</span> { <span class="ident">min</span>, <span class="ident">max</span> };
+        <span class="self">self</span>.<span class="ident">step_precision</span> <span class="op">=</span> <span class="ident">StepPrecision</span> {
+            <span class="ident">min</span>: <span class="ident">min</span>.<span class="ident">max</span>(<span class="ident">f64::EPSILON</span>),
+            <span class="ident">max</span>,
+        };
         <span class="self">self</span>
     }
 
@@ -983,7 +1005,7 @@
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if the tolerance is less than or equal to 0.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_tolerance</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">abs</span>: <span class="ident">f64</span>, <span class="ident">rel</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_tolerance</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">abs</span>: <span class="ident">f64</span>, <span class="ident">rel</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(<span class="ident">abs</span> <span class="op">&gt;</span> <span class="number">0.0</span>, <span class="string">&quot;The absolute tolerance must be greater than 0.&quot;</span>);
         <span class="macro">assert!</span>(<span class="ident">rel</span> <span class="op">&gt;</span> <span class="number">0.0</span>, <span class="string">&quot;The relative tolerance must be greater than 0.&quot;</span>);
         <span class="self">self</span>.<span class="ident">error_tolerance</span> <span class="op">=</span> <span class="ident">ErrorTolerance</span> { <span class="ident">abs</span>, <span class="ident">rel</span> };
@@ -993,8 +1015,24 @@
     <span class="doccomment">/// Upon calling [`SolverBuilder::build`], set whether interactions should</span>
     <span class="doccomment">/// be precomputed.</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// If a number greater than 0 is provided, this sets the number of data</span>
+    <span class="doccomment">/// points to compute in order to produce the spline.  Note that there is a</span>
+    <span class="doccomment">/// lower bound of</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```math</span>
+    <span class="doccomment">/// 4 \left\lceil \log_{2} \frac{\beta_\text{end}}{\beta_\text{start}} \right\rceil</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// for the number of points computed (which is approximately 13 points per</span>
+    <span class="doccomment">/// decade), thus a value of 1 will use the default.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If set to 0, the precomputation is disabled entirely.  Instead,</span>
+    <span class="doccomment">/// computation are stored as they are computed which will still speed up</span>
+    <span class="doccomment">/// cases where an integration step is repeated with a smaller step size,</span>
+    <span class="doccomment">/// but will not otherwise help much.</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// By default, interactions are precomputed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">precompute</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">precompute</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">precompute</span> <span class="op">=</span> <span class="ident">v</span>;
         <span class="self">self</span>
     }
@@ -1004,13 +1042,13 @@
     <span class="doccomment">/// # Warning</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This feature is currently experimental and may not produce reliable results.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fast_interaction</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fast_interaction</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">fast_interactions</span> <span class="op">=</span> <span class="ident">v</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Specify whether local inaccuracies cause the integration to abort.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">abort_when_inaccurate</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">abort_when_inaccurate</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">abort_when_inaccurate</span> <span class="op">=</span> <span class="ident">v</span>;
         <span class="self">self</span>
     }
@@ -1021,7 +1059,7 @@
         <span class="ident">beta</span>: <span class="ident">f64</span>,
         <span class="ident">particles</span>: <span class="kw-2">&amp;</span>[<span class="ident">Particle</span>],
         <span class="ident">initial_densities</span>: <span class="ident">I</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">f64</span>)<span class="op">&gt;</span>,
     {
@@ -1052,7 +1090,7 @@
     <span class="kw">fn</span> <span class="ident">generate_initial_asymmetries</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span>(
         <span class="ident">particles</span>: <span class="kw-2">&amp;</span>[<span class="ident">Particle</span>],
         <span class="ident">initial_asymmetries</span>: <span class="ident">I</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">f64</span>)<span class="op">&gt;</span>,
     {
@@ -1082,35 +1120,21 @@
 {
     <span class="doccomment">/// Precompute the interaction rates.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::cast_possible_truncation</span>, <span class="ident">clippy::cast_sign_loss</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">do_precompute</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">M</span>, <span class="ident">beta_range</span>: (<span class="ident">f64</span>, <span class="ident">f64</span>)) {
-        <span class="macro">log::info!</span>(<span class="string">&quot;Pre-computing γ...&quot;</span>);
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="ident">beta</span>) <span class="kw">in</span> [
-            <span class="number">0.98</span> <span class="op">*</span> <span class="ident">beta_range</span>.<span class="number">0</span>,
-            <span class="number">0.99</span> <span class="op">*</span> <span class="ident">beta_range</span>.<span class="number">0</span>,
-            <span class="number">1.01</span> <span class="op">*</span> <span class="ident">beta_range</span>.<span class="number">1</span>,
-            <span class="number">1.02</span> <span class="op">*</span> <span class="ident">beta_range</span>.<span class="number">1</span>,
-        ]
-        .<span class="ident">iter</span>()
-        .<span class="ident">chain</span>(<span class="kw-2">&amp;</span><span class="ident">rec_geomspace</span>(
-            <span class="ident">beta_range</span>.<span class="number">0</span>,
-            <span class="ident">beta_range</span>.<span class="number">1</span>,
-            <span class="ident">PRECOMPUTE_SUBDIV</span>,
-        ))
-        .<span class="ident">enumerate</span>()
+    <span class="kw">fn</span> <span class="ident">do_precompute</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">M</span>, <span class="ident">beta_range</span>: (<span class="ident">f64</span>, <span class="ident">f64</span>), <span class="kw-2">mut</span> <span class="ident">subdivs</span>: <span class="ident">usize</span>) {
+        <span class="ident">subdivs</span> <span class="op">=</span> <span class="ident">subdivs</span>.<span class="ident">max</span>(<span class="number">4</span> <span class="op">*</span> <span class="ident">f64::log2</span>(<span class="ident">beta_range</span>.<span class="number">1</span> <span class="op">/</span> <span class="ident">beta_range</span>.<span class="number">0</span>).<span class="ident">ceil</span>() <span class="kw">as</span> <span class="ident">usize</span>);
+
+        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">beta</span>) <span class="kw">in</span> <span class="comment">// rec_geomspace(beta_range.0, beta_range.1, subdivs)</span>
+            <span class="ident">Array1::geomspace</span>(<span class="ident">beta_range</span>.<span class="number">0</span>, <span class="ident">beta_range</span>.<span class="number">1</span>, <span class="ident">subdivs</span>)
+                .<span class="ident">unwrap</span>()
+                .<span class="ident">into_iter</span>()
+                .<span class="ident">enumerate</span>()
         {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">%</span> <span class="number">1024</span> <span class="op">=</span><span class="op">=</span> <span class="number">3</span> {
-                <span class="macro">log::info!</span>(
-                    <span class="string">&quot;Precomputing step {} / {}&quot;</span>,
-                    <span class="ident">i</span> <span class="op">-</span> <span class="number">3</span>,
-                    <span class="number">2_usize</span>.<span class="ident">pow</span>(<span class="ident">PRECOMPUTE_SUBDIV</span>)
-                );
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">%</span> <span class="number">128</span> <span class="op">=</span><span class="op">=</span> <span class="number">3</span> {
-                <span class="macro">log::trace!</span>(
-                    <span class="string">&quot;Precomputing step {} / {}&quot;</span>,
-                    <span class="ident">i</span> <span class="op">-</span> <span class="number">3</span>,
-                    <span class="number">2_usize</span>.<span class="ident">pow</span>(<span class="ident">PRECOMPUTE_SUBDIV</span>)
-                );
+            <span class="kw">if</span> <span class="ident">i</span> <span class="op">%</span> <span class="number">50</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="macro">log::info!</span>(<span class="string">&quot;Precomputing step {:&gt;5} / {}&quot;</span>, <span class="ident">i</span>, <span class="ident">subdivs</span>);
+            } <span class="kw">else</span> {
+                <span class="macro">log::trace!</span>(<span class="string">&quot;Precomputing step {:&gt;5} / {}&quot;</span>, <span class="ident">i</span>, <span class="ident">subdivs</span>);
             }
 
             <span class="ident">model</span>.<span class="ident">set_beta</span>(<span class="ident">beta</span>);
@@ -1120,39 +1144,26 @@
                 <span class="ident">interaction</span>.<span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>, <span class="bool-val">false</span>);
             }
         }
+        <span class="macro">log::info!</span>(<span class="string">&quot;Precomputation complete&quot;</span>);
     }
 
     <span class="doccomment">/// Precompute the interaction rates.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::cast_possible_truncation</span>, <span class="ident">clippy::cast_sign_loss</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parallel&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">do_precompute</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">M</span>, <span class="ident">beta_range</span>: (<span class="ident">f64</span>, <span class="ident">f64</span>)) {
-        <span class="macro">log::info!</span>(<span class="string">&quot;Pre-computing γ...&quot;</span>);
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="ident">beta</span>) <span class="kw">in</span> [
-            <span class="number">0.98</span> <span class="op">*</span> <span class="ident">beta_range</span>.<span class="number">0</span>,
-            <span class="number">0.99</span> <span class="op">*</span> <span class="ident">beta_range</span>.<span class="number">0</span>,
-            <span class="number">1.01</span> <span class="op">*</span> <span class="ident">beta_range</span>.<span class="number">1</span>,
-            <span class="number">1.02</span> <span class="op">*</span> <span class="ident">beta_range</span>.<span class="number">1</span>,
-        ]
-        .<span class="ident">iter</span>()
-        .<span class="ident">chain</span>(<span class="kw-2">&amp;</span><span class="ident">rec_geomspace</span>(
-            <span class="ident">beta_range</span>.<span class="number">0</span>,
-            <span class="ident">beta_range</span>.<span class="number">1</span>,
-            <span class="ident">PRECOMPUTE_SUBDIV</span>,
-        ))
-        .<span class="ident">enumerate</span>()
+    <span class="kw">fn</span> <span class="ident">do_precompute</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">M</span>, <span class="ident">beta_range</span>: (<span class="ident">f64</span>, <span class="ident">f64</span>), <span class="kw-2">mut</span> <span class="ident">subdivs</span>: <span class="ident">usize</span>) {
+        <span class="ident">subdivs</span> <span class="op">=</span> <span class="ident">subdivs</span>.<span class="ident">max</span>(<span class="number">4</span> <span class="op">*</span> <span class="ident">f64::log2</span>(<span class="ident">beta_range</span>.<span class="number">1</span> <span class="op">/</span> <span class="ident">beta_range</span>.<span class="number">0</span>).<span class="ident">ceil</span>() <span class="kw">as</span> <span class="ident">usize</span>);
+
+        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">beta</span>) <span class="kw">in</span> <span class="comment">// rec_geomspace(beta_range.0, beta_range.1, subdivs)</span>
+            <span class="ident">Array1::geomspace</span>(<span class="ident">beta_range</span>.<span class="number">0</span>, <span class="ident">beta_range</span>.<span class="number">1</span>, <span class="ident">subdivs</span>)
+                .<span class="ident">unwrap</span>()
+                .<span class="ident">into_iter</span>()
+                .<span class="ident">enumerate</span>()
         {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">%</span> <span class="number">1024</span> <span class="op">=</span><span class="op">=</span> <span class="number">3</span> {
-                <span class="macro">log::info!</span>(
-                    <span class="string">&quot;Precomputing step {} / {}&quot;</span>,
-                    <span class="ident">i</span> <span class="op">-</span> <span class="number">3</span>,
-                    <span class="number">2_usize</span>.<span class="ident">pow</span>(<span class="ident">PRECOMPUTE_SUBDIV</span>)
-                );
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">%</span> <span class="number">128</span> <span class="op">=</span><span class="op">=</span> <span class="number">3</span> {
-                <span class="macro">log::debug!</span>(
-                    <span class="string">&quot;Precomputing step {} / {}&quot;</span>,
-                    <span class="ident">i</span> <span class="op">-</span> <span class="number">3</span>,
-                    <span class="number">2_usize</span>.<span class="ident">pow</span>(<span class="ident">PRECOMPUTE_SUBDIV</span>)
-                );
+            <span class="kw">if</span> <span class="ident">i</span> <span class="op">%</span> <span class="number">50</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="macro">log::info!</span>(<span class="string">&quot;Precomputing step {:&gt;5} / {}&quot;</span>, <span class="ident">i</span>, <span class="ident">subdivs</span>);
+            } <span class="kw">else</span> {
+                <span class="macro">log::debug!</span>(<span class="string">&quot;Precomputing step {:&gt;5} / {}&quot;</span>, <span class="ident">i</span>, <span class="ident">subdivs</span>);
             }
 
             <span class="ident">model</span>.<span class="ident">set_beta</span>(<span class="ident">beta</span>);
@@ -1162,6 +1173,8 @@
                 <span class="ident">interaction</span>.<span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>, <span class="bool-val">false</span>);
             });
         }
+
+        <span class="macro">log::info!</span>(<span class="string">&quot;Precomputation complete&quot;</span>);
     }
 
     <span class="doccomment">/// Build the Boltzmann solver.</span>
@@ -1170,7 +1183,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will produce an error if some of the configurations options are</span>
     <span class="doccomment">/// deemed to be invalid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Solver</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">ok_or</span>(<span class="ident">Error::UndefinedModel</span>)<span class="question-mark">?</span>;
         <span class="ident">model</span>.<span class="ident">set_beta</span>(<span class="self">self</span>.<span class="ident">beta_range</span>.<span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">particles</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">particles</span>();
@@ -1218,11 +1231,39 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">no_asymmetry</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">no_asymmetry</span>.<span class="ident">drain</span>().<span class="ident">collect</span>();
         <span class="ident">no_asymmetry</span>.<span class="ident">sort_unstable</span>();
 
+        <span class="comment">// Collect the number of interactions within the model.</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interactions</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span>
+            <span class="ident">model</span>.<span class="ident">interactions</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">particles</span>()).<span class="ident">collect</span>();
+        <span class="kw">if</span> <span class="ident">interactions</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">model</span>.<span class="ident">interactions</span>().<span class="ident">len</span>() {
+            <span class="ident">interactions</span>.<span class="ident">clear</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">duplicates</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model</span>
+                .<span class="ident">interactions</span>()
+                .<span class="ident">iter</span>()
+                .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
+                    <span class="kw">let</span> <span class="ident">particles</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">particles</span>();
+                    <span class="kw">if</span> <span class="ident">interactions</span>.<span class="ident">insert</span>(<span class="ident">particles</span>) {
+                        <span class="prelude-val">None</span>
+                    } <span class="kw">else</span> {
+                        <span class="prelude-val">Some</span>(
+                            <span class="ident">particles</span>
+                                .<span class="ident">display</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>)
+                                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">particles</span>.<span class="ident">short_display</span>()),
+                        )
+                    }
+                })
+                .<span class="ident">collect</span>();
+            <span class="ident">duplicates</span>.<span class="ident">sort</span>();
+            <span class="macro">log::error!</span>(<span class="string">&quot;There are multiple interactions with the same set of incoming / outgoing particles. \
+            The amplitudes of these interactions should be combined instead of combining the squared ampliutes. \
+            The interactions were:\n • {}&quot;</span>, <span class="ident">duplicates</span>.<span class="ident">join</span>(<span class="string">&quot;\n • &quot;</span>));
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::DuplicateInteractions</span>);
+        }
+
         <span class="comment">// Run the precomputations so that the solver can run multiple times</span>
         <span class="comment">// later.</span>
-        <span class="comment">// if self.precompute {</span>
-        <span class="comment">//     Self::do_precompute(&amp;mut model, beta_range);</span>
-        <span class="comment">// }</span>
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">precompute</span> <span class="op">&gt;</span> <span class="number">0</span> {
+            <span class="ident"><span class="self">Self</span>::do_precompute</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">model</span>, <span class="ident">beta_range</span>, <span class="self">self</span>.<span class="ident">precompute</span>);
+        }
 
         <span class="prelude-val">Ok</span>(<span class="ident">Solver</span> {
             <span class="ident">model</span>,
@@ -1235,15 +1276,16 @@
             <span class="ident">logger</span>: <span class="self">self</span>.<span class="ident">logger</span>,
             <span class="ident">step_precision</span>: <span class="self">self</span>.<span class="ident">step_precision</span>,
             <span class="ident">error_tolerance</span>: <span class="self">self</span>.<span class="ident">error_tolerance</span>,
-            <span class="ident">fast_interactions</span>: <span class="self">self</span>.<span class="ident">fast_interactions</span>,
-            <span class="ident">inaccurate</span>: <span class="bool-val">false</span>,
+            <span class="ident">use_fast_interactions</span>: <span class="self">self</span>.<span class="ident">fast_interactions</span>,
+            <span class="ident">is_inaccurate</span>: <span class="bool-val">false</span>,
             <span class="ident">abort_when_inaccurate</span>: <span class="self">self</span>.<span class="ident">abort_when_inaccurate</span>,
+            <span class="ident">is_precomputed</span>: <span class="self">self</span>.<span class="ident">precompute</span> <span class="op">&gt;</span> <span class="number">0</span>,
         })
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SolverBuilder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>()
     }
 }

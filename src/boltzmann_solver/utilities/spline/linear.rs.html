@@ -303,6 +303,20 @@
 <span id="234">234</span>
 <span id="235">235</span>
 <span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Linear interpolation</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
@@ -329,15 +343,15 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The value of `x` cannot be NaN.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sample</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sample</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> {
         <span class="kw">match</span> <span class="self">self</span>
             .<span class="ident">data</span>
             .<span class="ident">binary_search_by</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="ident">xi</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">xi</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>).<span class="ident">unwrap</span>())
         {
-            <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">i</span>].<span class="number">1</span>,
-            <span class="prelude-val">Err</span>(<span class="number">0</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>].<span class="number">1</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">i</span> <span class="op">-</span> <span class="number">1</span>].<span class="number">1</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">i</span>) =&gt; <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">i</span>].<span class="number">1</span>,
+            <span class="prelude-val">Err</span>(<span class="number">0</span>) =&gt; <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>].<span class="number">1</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() =&gt; <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">i</span> <span class="op">-</span> <span class="number">1</span>].<span class="number">1</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">i</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">x0</span>, <span class="ident">y0</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">i</span> <span class="op">-</span> <span class="number">1</span>];
                 <span class="kw">let</span> (<span class="ident">x1</span>, <span class="ident">y1</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">i</span>];
 
@@ -352,20 +366,20 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The `accurate` flag indicates whether the interval between the current point</span>
 <span class="doccomment">/// and the next point is deemed accurate.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="kw">struct</span> <span class="ident">LinearSplinePoint</span> {
+<span class="kw">struct</span> <span class="ident">SplinePoint</span> {
     <span class="ident">x</span>: <span class="ident">f64</span>,
     <span class="ident">y</span>: <span class="ident">f64</span>,
     <span class="ident">accurate</span>: <span class="ident">bool</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">LinearSplinePoint</span> {
+<span class="kw">impl</span> <span class="ident">SplinePoint</span> {
     <span class="doccomment">/// Create a new spline point going through coordinate `(x, y)`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The gradient will be NaN initially, and `accurate` is set to `false`.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">x</span>: <span class="ident">f64</span>, <span class="ident">y</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">LinearSplinePoint</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">x</span>: <span class="ident">f64</span>, <span class="ident">y</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">SplinePoint</span> {
             <span class="ident">x</span>,
             <span class="ident">y</span>,
             <span class="ident">accurate</span>: <span class="bool-val">false</span>,
@@ -374,14 +388,14 @@
 }
 
 <span class="doccomment">/// Linear spline interpolator</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::module_name_repetitions</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Linear</span> {
     <span class="comment">// `(x, y, m, accurate)` tuples through which the spline goes through, with</span>
     <span class="comment">// gradient `m`.  The accurate flag determines whether the interval between</span>
     <span class="comment">// it and the next value is accurate or not.</span>
-    <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LinearSplinePoint</span><span class="op">&gt;</span>,
+    <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SplinePoint</span><span class="op">&gt;</span>,
     <span class="comment">// Number of points required before it begins to consider whether an</span>
     <span class="comment">// interval is accurate.</span>
     <span class="ident">min_points</span>: <span class="ident">usize</span>,
@@ -390,22 +404,22 @@
 <span class="kw">impl</span> <span class="ident">Linear</span> {
     <span class="doccomment">/// Create a new empty linear Spline.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Linear</span> {
             <span class="ident">data</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">min_points</span>: <span class="number">64</span>,
+            <span class="ident">min_points</span>: <span class="number">4</span>,
         }
     }
 
     <span class="doccomment">/// Return the number of data points in the underlying data.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>()
     }
 
     <span class="doccomment">/// Check whether the spline is empty</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">is_empty</span>()
     }
 
@@ -432,17 +446,17 @@
     <span class="doccomment">/// The value of `x` cannot be NaN.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">f64</span>, <span class="ident">y</span>: <span class="ident">f64</span>) {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">binary_search_by</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">x</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>).<span class="ident">unwrap</span>()) {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="prelude-val">Err</span>(<span class="number">0</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="ident">LinearSplinePoint::new</span>(<span class="ident">x</span>, <span class="ident">y</span>));
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
+            <span class="prelude-val">Err</span>(<span class="number">0</span>) =&gt; {
+                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="ident">SplinePoint::new</span>(<span class="ident">x</span>, <span class="ident">y</span>));
             }
-            <span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">insert</span>(<span class="ident">i</span>, <span class="ident">LinearSplinePoint::new</span>(<span class="ident">x</span>, <span class="ident">y</span>));
+            <span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() =&gt; {
+                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">insert</span>(<span class="ident">i</span>, <span class="ident">SplinePoint::new</span>(<span class="ident">x</span>, <span class="ident">y</span>));
             }
-            <span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">i</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">ny</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sample</span>(<span class="ident">x</span>);
 
-                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">insert</span>(<span class="ident">i</span>, <span class="ident">LinearSplinePoint::new</span>(<span class="ident">x</span>, <span class="ident">y</span>));
+                <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">insert</span>(<span class="ident">i</span>, <span class="ident">SplinePoint::new</span>(<span class="ident">x</span>, <span class="ident">y</span>));
 
                 <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> (<span class="ident">ny</span> <span class="op">-</span> <span class="ident">y</span>).<span class="ident">abs</span>();
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">min_points</span>
@@ -452,6 +466,16 @@
                     <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">i</span>].<span class="ident">accurate</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 }
             }
+        }
+    }
+
+    <span class="doccomment">/// Check whether the spline contains the point given.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">f64</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span> {
+            <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>].<span class="ident">x</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">x</span> <span class="op">&amp;&amp;</span> <span class="ident">x</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>].<span class="ident">x</span>
+        } <span class="kw">else</span> {
+            <span class="bool-val">false</span>
         }
     }
 
@@ -466,12 +490,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The value of `x` cannot be NaN.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accurate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accurate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">f64</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">binary_search_by</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">x</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>).<span class="ident">unwrap</span>()) {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">Err</span>(<span class="number">0</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">i</span>].<span class="ident">accurate</span>,
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Err</span>(<span class="number">0</span>) =&gt; <span class="bool-val">false</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() =&gt; <span class="bool-val">false</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">i</span>) =&gt; <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">i</span>].<span class="ident">accurate</span>,
         }
     }
 
@@ -484,18 +508,22 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The value of `x` cannot be NaN.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sample</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sample</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> {
+        <span class="macro">debug_assert!</span>(
+            <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span>,
+            <span class="string">&quot;Spline does not have enough points to be sampled.&quot;</span>
+        );
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">binary_search_by</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">x</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>).<span class="ident">unwrap</span>()) {
-            <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">i</span>].<span class="ident">y</span>,
-            <span class="prelude-val">Err</span>(<span class="number">0</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>].<span class="ident">y</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">i</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">y</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="number">0</span>) =&gt; <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>].<span class="ident">y</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() =&gt; <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">i</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">y</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">i</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">p0</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[<span class="ident">i</span> <span class="op">-</span> <span class="number">1</span>];
                 <span class="kw">let</span> <span class="ident">p1</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[<span class="ident">i</span>];
 
                 <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> (<span class="ident">x</span> <span class="op">-</span> <span class="ident">p0</span>.<span class="ident">x</span>) <span class="op">/</span> (<span class="ident">p1</span>.<span class="ident">x</span> <span class="op">-</span> <span class="ident">p0</span>.<span class="ident">x</span>);
                 <span class="ident">p0</span>.<span class="ident">y</span> <span class="op">+</span> <span class="ident">t</span> <span class="op">*</span> (<span class="ident">p1</span>.<span class="ident">y</span> <span class="op">-</span> <span class="ident">p0</span>.<span class="ident">y</span>)
             }
+            <span class="prelude-val">Ok</span>(<span class="ident">i</span>) =&gt; <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">i</span>].<span class="ident">y</span>,
         }
     }
 }
@@ -508,12 +536,12 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">RECURSIONS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">12</span>;
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">f</span>(<span class="ident">x</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">f</span>(<span class="ident">x</span>: <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> {
         <span class="ident">x</span> <span class="op">*</span> (<span class="ident">x</span> <span class="op">-</span> <span class="number">1.0</span>) <span class="op">*</span> (<span class="ident">x</span> <span class="op">-</span> <span class="number">0.2</span>) <span class="op">*</span> (<span class="ident">x</span> <span class="op">-</span> <span class="number">0.5</span>) <span class="op">*</span> <span class="ident">f64::exp</span>(<span class="op">-</span><span class="number">3.0</span> <span class="op">*</span> <span class="ident">f64::exp</span>(<span class="ident">x</span>))
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">spline</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">spline</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">spline</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::Linear::empty</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">env::temp_dir</span>();

@@ -607,88 +607,18 @@
 <span id="538">538</span>
 <span id="539">539</span>
 <span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
-<span id="549">549</span>
-<span id="550">550</span>
-<span id="551">551</span>
-<span id="552">552</span>
-<span id="553">553</span>
-<span id="554">554</span>
-<span id="555">555</span>
-<span id="556">556</span>
-<span id="557">557</span>
-<span id="558">558</span>
-<span id="559">559</span>
-<span id="560">560</span>
-<span id="561">561</span>
-<span id="562">562</span>
-<span id="563">563</span>
-<span id="564">564</span>
-<span id="565">565</span>
-<span id="566">566</span>
-<span id="567">567</span>
-<span id="568">568</span>
-<span id="569">569</span>
-<span id="570">570</span>
-<span id="571">571</span>
-<span id="572">572</span>
-<span id="573">573</span>
-<span id="574">574</span>
-<span id="575">575</span>
-<span id="576">576</span>
-<span id="577">577</span>
-<span id="578">578</span>
-<span id="579">579</span>
-<span id="580">580</span>
-<span id="581">581</span>
-<span id="582">582</span>
-<span id="583">583</span>
-<span id="584">584</span>
-<span id="585">585</span>
-<span id="586">586</span>
-<span id="587">587</span>
-<span id="588">588</span>
-<span id="589">589</span>
-<span id="590">590</span>
-<span id="591">591</span>
-<span id="592">592</span>
-<span id="593">593</span>
-<span id="594">594</span>
-<span id="595">595</span>
-<span id="596">596</span>
-<span id="597">597</span>
-<span id="598">598</span>
-<span id="599">599</span>
-<span id="600">600</span>
-<span id="601">601</span>
-<span id="602">602</span>
-<span id="603">603</span>
-<span id="604">604</span>
-<span id="605">605</span>
-<span id="606">606</span>
-<span id="607">607</span>
-<span id="608">608</span>
-<span id="609">609</span>
-<span id="610">610</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Common trait and implementations for interactions.</span>
 
 <span class="kw">mod</span> <span class="ident">fast_interaction_result</span>;
 <span class="kw">mod</span> <span class="ident">four_particle</span>;
-<span class="kw">mod</span> <span class="ident">interaction_particles</span>;
 <span class="kw">mod</span> <span class="ident">partial_width</span>;
+<span class="kw">mod</span> <span class="ident">particles</span>;
 <span class="kw">mod</span> <span class="ident">rate_density</span>;
 <span class="kw">mod</span> <span class="ident">three_particle</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">fast_interaction_result::FastInteractionResult</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">interaction_particles</span>::{<span class="ident">DisplayError</span>, <span class="ident">Particles</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">partial_width::PartialWidth</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">particles</span>::{<span class="ident">DisplayError</span>, <span class="ident">Particles</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rate_density::RateDensity</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">four_particle::FourParticle</span>;
@@ -696,7 +626,6 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">model::Model</span>, <span class="ident">solver::Context</span>};
 <span class="kw">use</span> <span class="ident">ndarray::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
 
 <span class="doccomment">/// Threshold value of `$\gamma / H N$` which is used to determine when an</span>
 <span class="doccomment">/// interaction is fast.</span>
@@ -710,7 +639,7 @@
 <span class="doccomment">/// Generic interaction between particles.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Interaction</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Return the particles involved in this interaction</span>
-    <span class="kw">fn</span> <span class="ident">particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Particles</span>;
+    <span class="kw">fn</span> <span class="ident">particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Particles</span>;
 
     <span class="doccomment">/// Whether this interaction is to be used to determine decays.</span>
     <span class="doccomment">///</span>
@@ -718,7 +647,7 @@
     <span class="doccomment">/// expected to return `None` all the time.  If it is enabled, then</span>
     <span class="doccomment">/// [`Interaction::width`] is expected to return `None` only when the decay</span>
     <span class="doccomment">/// is not kinematically allowed.</span>
-    <span class="kw">fn</span> <span class="ident">width_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">width_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
 
     <span class="doccomment">/// Calculate the decay width associated with a particular interaction.</span>
     <span class="doccomment">///</span>
@@ -730,7 +659,7 @@
     <span class="doccomment">/// order to avoid unnecessary computation (though the incorrect</span>
     <span class="doccomment">/// implementation will not be detrimental other than in performance).</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartialWidth</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartialWidth</span><span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 
@@ -738,7 +667,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If this returns true, then [`Interaction::gamma`] is expected to return</span>
     <span class="doccomment">/// `None`.</span>
-    <span class="kw">fn</span> <span class="ident">gamma_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">gamma_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
 
     <span class="doccomment">/// Calculate the reaction rate density of this interaction.</span>
     <span class="doccomment">///</span>
@@ -764,7 +693,7 @@
     <span class="doccomment">/// number density of the decaying particle in order to avoid possible `0 /</span>
     <span class="doccomment">/// 0` errors.  In order to get the real interaction rate, `real` should be</span>
     <span class="doccomment">/// set to true.</span>
-    <span class="kw">fn</span> <span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Asymmetry between the interaction and its `$\CP$` conjugate:</span>
     <span class="doccomment">///</span>
@@ -788,108 +717,34 @@
     <span class="doccomment">/// 0` errors.  In order to get the real interaction rate, `real` should be</span>
     <span class="doccomment">/// set to true.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">delta_gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">delta_gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 
     <span class="doccomment">/// Net prefactor scaling the interaction rate.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is defined for a particle `$X \to Y$` as</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```math</span>
-    <span class="doccomment">/// \left( \prod_{i \in X} \frac{n_i}{n_i^{(0)}} \right)</span>
-    <span class="doccomment">/// - \left( \prod_{i \in Y} \frac{n_i}{n_i^{(0)}} \right)</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If there are some `$n_i^{(0)}$` which are zero, then the prefactor will</span>
-    <span class="doccomment">/// be infinite as the interaction will try and get rid of the particle in</span>
-    <span class="doccomment">/// question.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If there are multiple particles for which `$n_i^{(0)}$` is zero located</span>
-    <span class="doccomment">/// on both sides, then the direction of the interaction is first determined</span>
-    <span class="doccomment">/// by the side which contains the most zero equilibrium number densities.</span>
-    <span class="doccomment">/// If these are also equal, then the result is 0.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```math</span>
-    <span class="doccomment">/// \left( \prod_{i \in X} n_i \right) - \left( \prod_{i \in Y} n_i \right)</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can produce a result which is infinite if some of the `$n_i^{(0)}`$</span>
-    <span class="doccomment">/// are identically 0 and thus care must be taken to handle these.</span>
-    <span class="kw">fn</span> <span class="ident">symmetric_prefactor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
-        <span class="kw">let</span> ((<span class="ident">forward_numerator</span>, <span class="ident">forward_denominator</span>), (<span class="ident">backward_numerator</span>, <span class="ident">backward_denominator</span>)) <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">particles</span>()
-                .<span class="ident">symmetric_prefactor</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">eq</span>, <span class="ident">c</span>.<span class="ident">in_equilibrium</span>);
-
-        <span class="kw">let</span> <span class="ident">forward_prefactor</span> <span class="op">=</span> <span class="ident">checked_div</span>(<span class="ident">forward_numerator</span>, <span class="ident">forward_denominator</span>);
-        <span class="kw">let</span> <span class="ident">backward_prefactor</span> <span class="op">=</span> <span class="ident">checked_div</span>(<span class="ident">backward_numerator</span>, <span class="ident">backward_denominator</span>);
-
-        <span class="kw">if</span> <span class="ident">forward_prefactor</span>.<span class="ident">is_finite</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">backward_prefactor</span>.<span class="ident">is_finite</span>() {
-            <span class="comment">// If either one or both are finite, we can compute the rate.</span>
-            <span class="ident">forward_prefactor</span> <span class="op">-</span> <span class="ident">backward_prefactor</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// If they are both infinite, then there are equilibrium number</span>
-            <span class="comment">// densities on both sides which are 0.</span>
-            <span class="comment">//</span>
-            <span class="comment">// In order to determine the direction, the number of zero</span>
-            <span class="comment">// equilibrium number densities on each side is used first.  If they</span>
-            <span class="comment">// are both equal, then the product of number densities is used.</span>
-            <span class="kw">let</span> <span class="ident">particles</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">particles</span>();
-
-            <span class="kw">let</span> <span class="ident">forward_zeros</span> <span class="op">=</span> <span class="ident">particles</span>
-                .<span class="ident">incoming_idx</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">filter</span>(<span class="op">|</span><span class="op">&amp;&amp;</span><span class="ident">p</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">p</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>)
-                .<span class="ident">count</span>();
-            <span class="kw">let</span> <span class="ident">backward_zeros</span> <span class="op">=</span> <span class="ident">particles</span>
-                .<span class="ident">outgoing_idx</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">filter</span>(<span class="op">|</span><span class="op">&amp;&amp;</span><span class="ident">p</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">eq</span>[<span class="ident">p</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>)
-                .<span class="ident">count</span>();
-
-            <span class="kw">match</span> <span class="ident">forward_zeros</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">backward_zeros</span>) {
-                <span class="ident">Ordering::Less</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f64::NEG_INFINITY</span>,
-                <span class="ident">Ordering::Greater</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f64::INFINITY</span>,
-                <span class="ident">Ordering::Equal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0.0</span>,
-            }
-        }
+    <span class="doccomment">/// The default implementation makes use of</span>
+    <span class="doccomment">/// [`Particles::symmetric_prefactor`] but can be adjusted if the</span>
+    <span class="doccomment">/// interaction has a different dependence on the number densities.</span>
+    <span class="kw">fn</span> <span class="ident">symmetric_prefactor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="ident">f64</span> {
+        <span class="self">self</span>.<span class="ident">particles</span>()
+            .<span class="ident">symmetric_prefactor</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>.<span class="ident">n</span>, <span class="kw-2">&amp;</span><span class="ident">context</span>.<span class="ident">eq</span>, <span class="ident">context</span>.<span class="ident">in_equilibrium</span>)
     }
 
-    <span class="doccomment">/// Compute the prefactor to the symmetric interaction rate which alters the</span>
-    <span class="doccomment">/// number density asymmetries.</span>
+    <span class="doccomment">/// Prefactor to the symmetric interaction rate which alters the number</span>
+    <span class="doccomment">/// density asymmetries.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// In the forward direction, this is calculated by</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```math</span>
-    <span class="doccomment">/// \frac{</span>
-    <span class="doccomment">///   \sum_{i \in X} \Delta_i \prod_{j \neq i} n_j</span>
-    <span class="doccomment">/// }{</span>
-    <span class="doccomment">///   \prod_{i \in X} n_i^{(0)}</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// and similarly for the backward rate.  An example of a `$1 \to 2, 3$`</span>
-    <span class="doccomment">/// rate is:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```math</span>
-    <span class="doccomment">/// \frac{\Delta_1}{n_1^{(0)}} - \frac{\Delta_2 n_3 + \Delta_3 n_2}{n_2^{(0)} n_3^{(0)}}</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can produce a result which is infinite if some of the `$n_i^{(0)}`$</span>
-    <span class="doccomment">/// are identically 0 and thus care must be taken to handle these.</span>
-    <span class="kw">fn</span> <span class="ident">asymmetric_prefactor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
-        <span class="kw">let</span> ((<span class="ident">forward_numerator</span>, <span class="ident">forward_denominator</span>), (<span class="ident">backward_numerator</span>, <span class="ident">backward_denominator</span>)) <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">particles</span>().<span class="ident">asymmetric_prefactor</span>(
-                <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">n</span>,
-                <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">na</span>,
-                <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">eq</span>,
-                <span class="ident">c</span>.<span class="ident">in_equilibrium</span>,
-                <span class="ident">c</span>.<span class="ident">no_asymmetry</span>,
-            );
-        <span class="kw">let</span> <span class="ident">forward</span> <span class="op">=</span> <span class="ident">checked_div</span>(<span class="ident">forward_numerator</span>, <span class="ident">forward_denominator</span>);
-        <span class="kw">let</span> <span class="ident">backward</span> <span class="op">=</span> <span class="ident">checked_div</span>(<span class="ident">backward_numerator</span>, <span class="ident">backward_denominator</span>);
-
-        <span class="ident">forward</span> <span class="op">-</span> <span class="ident">backward</span>
+    <span class="doccomment">/// The default implementation makes use of</span>
+    <span class="doccomment">/// [`Particles::asymmetric_prefactor`] but can be adjusted if the</span>
+    <span class="doccomment">/// interaction has a different dependence on the number densities.</span>
+    <span class="kw">fn</span> <span class="ident">asymmetric_prefactor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="ident">f64</span> {
+        <span class="self">self</span>.<span class="ident">particles</span>().<span class="ident">asymmetric_prefactor</span>(
+            <span class="kw-2">&amp;</span><span class="ident">context</span>.<span class="ident">n</span>,
+            <span class="kw-2">&amp;</span><span class="ident">context</span>.<span class="ident">na</span>,
+            <span class="kw-2">&amp;</span><span class="ident">context</span>.<span class="ident">eq</span>,
+            <span class="ident">context</span>.<span class="ident">in_equilibrium</span>,
+            <span class="ident">context</span>.<span class="ident">no_asymmetry</span>,
+        )
     }
 
     <span class="doccomment">/// Calculate the actual interaction rates density taking into account</span>
@@ -915,25 +770,28 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The default implementation uses the output of [`Interaction::gamma`] and</span>
     <span class="doccomment">/// [`Interaction::delta_gamma`] in order to computer the actual rate.</span>
-    <span class="kw">fn</span> <span class="ident">rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">gamma</span>(<span class="ident">c</span>, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">delta_gamma</span>(<span class="ident">c</span>, <span class="bool-val">true</span>);
+    <span class="kw">fn</span> <span class="ident">rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">gamma</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">gamma</span>(<span class="ident">context</span>, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">delta_gamma</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">delta_gamma</span>(<span class="ident">context</span>, <span class="bool-val">true</span>);
 
         <span class="comment">// If both rates are 0, there&#39;s no need to adjust it to the particles&#39;</span>
         <span class="comment">// number densities.</span>
-        <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+        <span class="kw">if</span> <span class="ident">gamma</span> <span class="op">==</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>() <span class="op">==</span> <span class="number">0.0</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rate</span> <span class="op">=</span> <span class="ident">RateDensity::zero</span>();
-        <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">symmetric_prefactor</span>(<span class="ident">c</span>);
+
+        <span class="kw">let</span> <span class="ident">symmetric_prefactor</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">symmetric_prefactor</span>(<span class="ident">context</span>);
+        <span class="kw">let</span> <span class="ident">asymmetric_prefactor</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">asymmetric_prefactor</span>(<span class="ident">context</span>);
+
         <span class="ident">rate</span>.<span class="ident">gamma</span> <span class="op">=</span> <span class="ident">gamma</span>;
         <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">symmetric_prefactor</span>);
         <span class="ident">rate</span>.<span class="ident">delta_gamma</span> <span class="op">=</span> <span class="ident">delta_gamma</span>;
         <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">=</span> <span class="ident">checked_mul</span>(<span class="ident">delta_gamma</span>.<span class="ident">unwrap_or_default</span>(), <span class="ident">symmetric_prefactor</span>)
-            <span class="op">+</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="self">self</span>.<span class="ident">asymmetric_prefactor</span>(<span class="ident">c</span>));
+            <span class="op">+</span> <span class="ident">checked_mul</span>(<span class="ident">gamma</span>, <span class="ident">asymmetric_prefactor</span>);
 
-        <span class="prelude-val">Some</span>(<span class="ident">rate</span> <span class="op">*</span> <span class="ident">c</span>.<span class="ident">normalization</span>)
+        <span class="prelude-val">Some</span>(<span class="ident">rate</span> <span class="op">*</span> <span class="ident">context</span>.<span class="ident">normalization</span>)
     }
 
     <span class="doccomment">/// Checks whether the interaction has already been deemed fast.</span>
@@ -943,8 +801,9 @@
     <span class="doccomment">/// substep 0.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If fast interactions are disabled, this always returns `false`.</span>
-    <span class="kw">fn</span> <span class="ident">is_fast_check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="ident">c</span>.<span class="ident">fast_interactions</span>
+    <span class="kw">fn</span> <span class="ident">is_fast_check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">context</span>
+            .<span class="ident">fast_interactions</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">fast_interactions</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">fast_interactions</span> <span class="op">=</span> <span class="ident">fast_interactions</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>();
@@ -966,37 +825,40 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// A `true` result must mean that we are using fast interactions.  If fast</span>
     <span class="doccomment">/// interactions are disabled, this always returns `false`.</span>
-    <span class="kw">fn</span> <span class="ident">is_fast</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rate</span>: <span class="kw-2">&amp;</span><span class="ident">RateDensity</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="ident">c</span>.<span class="ident">fast_interactions</span>
+    <span class="kw">fn</span> <span class="ident">is_fast</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rate</span>: <span class="kw-2">&amp;</span><span class="ident">RateDensity</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">context</span>
+            .<span class="ident">fast_interactions</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">fast_interactions</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">substep</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="ident">context</span>.<span class="ident">substep</span> <span class="op">==</span> <span class="number">0</span> {
                     <span class="comment">// We have to multiply by beta as gamma is normalized by `$1</span>
                     <span class="comment">// / H N \beta$`, but we must check whether `$\gamma / H N$`</span>
                     <span class="comment">// is larger.</span>
-                    <span class="kw">if</span> <span class="ident">rate</span>.<span class="ident">gamma_tilde</span>.<span class="ident">abs</span>() <span class="op">*</span> <span class="ident">c</span>.<span class="ident">beta</span> <span class="op">&gt;</span> <span class="ident">FAST_THRESHOLD</span> {
-                        <span class="macro">log::debug!</span>(
-                            <span class="string">&quot;[{}.{:02}|{:&gt;10.4e}] Detected fast interaction {} with γ̃ = {:.3e}&quot;</span>,
-                            <span class="ident">c</span>.<span class="ident">step</span>,
-                            <span class="ident">c</span>.<span class="ident">substep</span>,
-                            <span class="ident">c</span>.<span class="ident">beta</span>,
+                    <span class="kw">if</span> <span class="ident">rate</span>.<span class="ident">gamma_tilde</span>.<span class="ident">abs</span>() <span class="op">*</span> <span class="ident">context</span>.<span class="ident">beta</span> <span class="op">&gt;</span> <span class="ident">FAST_THRESHOLD</span> {
+                        <span class="macro">log::trace!</span>(
+                            <span class="string">&quot;[{}.{:02}|{:&gt;10.4e}] Detected fast interaction {} with γ̃ = {:.3e}, δγ̃ = {:.3e}&quot;</span>,
+                            <span class="ident">context</span>.<span class="ident">step</span>,
+                            <span class="ident">context</span>.<span class="ident">substep</span>,
+                            <span class="ident">context</span>.<span class="ident">beta</span>,
                             <span class="self">self</span>.<span class="ident">particles</span>()
-                                .<span class="ident">display</span>(<span class="ident">c</span>.<span class="ident">model</span>)
+                                .<span class="ident">display</span>(<span class="ident">context</span>.<span class="ident">model</span>)
                                 .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">particles</span>().<span class="ident">short_display</span>()),
                             <span class="ident">rate</span>.<span class="ident">gamma_tilde</span>,
+                            <span class="ident">rate</span>.<span class="ident">delta_gamma_tilde</span>.<span class="ident">unwrap_or_default</span>()
                         );
 
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fast_interactions</span> <span class="op">=</span> <span class="ident">fast_interactions</span>.<span class="ident">write</span>().<span class="ident">unwrap</span>();
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">particles</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">particles</span>().<span class="ident">clone</span>();
+
                         <span class="ident">particles</span>.<span class="ident">gamma_tilde</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">rate</span>.<span class="ident">gamma_tilde</span>);
                         <span class="ident">particles</span>.<span class="ident">delta_gamma_tilde</span> <span class="op">=</span> <span class="ident">rate</span>.<span class="ident">delta_gamma_tilde</span>;
-                        <span class="ident">particles</span>.<span class="ident">heavy</span> <span class="op">=</span> <span class="ident">c</span>
+                        <span class="ident">particles</span>.<span class="ident">heavy</span> <span class="op">=</span> <span class="ident">context</span>
                             .<span class="ident">model</span>
                             .<span class="ident">particles</span>()
                             .<span class="ident">iter</span>()
                             .<span class="ident">enumerate</span>()
                             .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">p</span>)<span class="op">|</span> {
-                                <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">c</span>.<span class="ident">beta</span> <span class="op">&gt;</span> <span class="ident">M_BETA_THRESHOLD</span> {
+                                <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">mass</span> <span class="op">*</span> <span class="ident">context</span>.<span class="ident">beta</span> <span class="op">&gt;</span> <span class="ident">M_BETA_THRESHOLD</span> {
                                     <span class="prelude-val">Some</span>(<span class="ident">i</span>)
                                 } <span class="kw">else</span> {
                                     <span class="prelude-val">None</span>
@@ -1040,32 +902,45 @@
     <span class="doccomment">/// particle&#39;s [`interaction::Particles`] should be added to the context&#39;s</span>
     <span class="doccomment">/// list of fast interactions (if being used).  This allows for the fast</span>
     <span class="doccomment">/// interaction to be handled separated.</span>
-    <span class="kw">fn</span> <span class="ident">adjusted_rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">adjusted_rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
         <span class="comment">// If the interaction was already deemed to be fast (from a previous</span>
         <span class="comment">// substep), bypass any computation and return None.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_fast_check</span>(<span class="ident">c</span>) {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_fast_check</span>(<span class="ident">context</span>) {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rate</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rate</span>(<span class="ident">c</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rate</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rate</span>(<span class="ident">context</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_fast</span>(<span class="kw-2">&amp;</span><span class="ident">rate</span>, <span class="ident">c</span>) {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_fast</span>(<span class="kw-2">&amp;</span><span class="ident">rate</span>, <span class="ident">context</span>) {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class="ident">rate</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">c</span>.<span class="ident">step_size</span>;
+        <span class="kw">if</span> <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">==</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">==</span> <span class="number">0.0</span> {
+            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        }
 
-        <span class="kw">if</span> <span class="self">self</span>
-            .<span class="ident">particles</span>()
-            .<span class="ident">adjust_overshoot</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rate</span>.<span class="ident">symmetric</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rate</span>.<span class="ident">asymmetric</span>, <span class="ident">c</span>)
-        {
+        <span class="ident">rate</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">context</span>.<span class="ident">step_size</span>;
+
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">particles</span>().<span class="ident">adjust_overshoot</span>(
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rate</span>.<span class="ident">symmetric</span>,
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rate</span>.<span class="ident">asymmetric</span>,
+            <span class="kw-2">&amp;</span><span class="ident">context</span>.<span class="ident">n</span>,
+            <span class="kw-2">&amp;</span><span class="ident">context</span>.<span class="ident">na</span>,
+            <span class="kw-2">&amp;</span><span class="ident">context</span>.<span class="ident">eq</span>,
+            <span class="kw-2">&amp;</span><span class="ident">context</span>.<span class="ident">eqn</span>,
+            <span class="ident">context</span>.<span class="ident">in_equilibrium</span>,
+            <span class="ident">context</span>.<span class="ident">no_asymmetry</span>,
+        ) {
             <span class="comment">// log::trace!(</span>
-            <span class="comment">//     &quot;[{}.{:02}|{:&gt;10.4e}] Adjusted Rate: {:&lt;12.5e}|{:&lt;12.5e}&quot;,</span>
-            <span class="comment">//     c.step,</span>
-            <span class="comment">//     c.substep,</span>
-            <span class="comment">//     c.beta,</span>
-            <span class="comment">//     rate.gamma / c.step_size,</span>
-            <span class="comment">//     rate.symmetric / c.step_size</span>
+            <span class="comment">//     &quot;[{}.{:02}|{:&gt;10.4e}] Adjusted Rate {}: {:&lt;12.5e}|{:&lt;12.5e}&quot;,</span>
+            <span class="comment">//     context.step,</span>
+            <span class="comment">//     context.substep,</span>
+            <span class="comment">//     context.beta,</span>
+            <span class="comment">//     self.particles()</span>
+            <span class="comment">//         .display(context.model)</span>
+            <span class="comment">//         .unwrap_or_else(|_| self.particles().short_display()),</span>
+            <span class="comment">//     rate.gamma / context.step_size,</span>
+            <span class="comment">//     rate.symmetric / context.step_size</span>
             <span class="comment">// );</span>
         }
 
@@ -1082,18 +957,17 @@
     <span class="doccomment">/// [`Interaction::adjusted_rate`] in order to computer the actual rate.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method should generally not be implemented.</span>
-    <span class="kw">fn</span> <span class="ident">apply_change</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">dn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ArrayViewMut1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-        <span class="ident">dna</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ArrayViewMut1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-        <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
-    ) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rate</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">adjusted_rate</span>(<span class="ident">c</span>) {
+    <span class="kw">fn</span> <span class="ident">apply_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">dna</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rate</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">adjusted_rate</span>(<span class="ident">context</span>) {
             <span class="kw">let</span> <span class="ident">particles</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">particles</span>();
 
             <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">p</span>, <span class="kw-2">&amp;</span>(<span class="ident">c</span>, <span class="ident">ca</span>)) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">particles</span>.<span class="ident">particle_counts</span> {
-                <span class="ident">dn</span>[<span class="ident">p</span>] <span class="op">+</span><span class="op">=</span> <span class="ident">c</span> <span class="op">*</span> <span class="ident">rate</span>.<span class="ident">symmetric</span>;
-                <span class="ident">dna</span>[<span class="ident">p</span>] <span class="op">+</span><span class="op">=</span> <span class="ident">ca</span> <span class="op">*</span> <span class="ident">rate</span>.<span class="ident">asymmetric</span>;
+                <span class="kw">if</span> <span class="ident">rate</span>.<span class="ident">symmetric</span> <span class="op">!</span><span class="op">=</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="ident">context</span>.<span class="ident">in_equilibrium</span>.<span class="ident">binary_search</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>).<span class="ident">is_err</span>() {
+                    <span class="ident">dn</span>[<span class="ident">p</span>] <span class="op">+</span><span class="op">=</span> <span class="ident">c</span> <span class="op">*</span> <span class="ident">rate</span>.<span class="ident">symmetric</span>;
+                }
+                <span class="kw">if</span> <span class="ident">rate</span>.<span class="ident">asymmetric</span> <span class="op">!</span><span class="op">=</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="ident">context</span>.<span class="ident">no_asymmetry</span>.<span class="ident">binary_search</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>).<span class="ident">is_err</span>() {
+                    <span class="ident">dna</span>[<span class="ident">p</span>] <span class="op">+</span><span class="op">=</span> <span class="ident">ca</span> <span class="op">*</span> <span class="ident">rate</span>.<span class="ident">asymmetric</span>;
+                }
             }
         }
     }
@@ -1103,7 +977,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// See [`InteractionParticles::display`] for more information.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">display</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">DisplayError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">display</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">M</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">DisplayError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">particles</span>().<span class="ident">display</span>(<span class="ident">model</span>)
     }
 }
@@ -1119,8 +993,8 @@
 <span class="doccomment">/// Note that if `$b = 0$` and `$a \neq 0$`, then the result will be infinite.</span>
 <span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">checked_div</span>(<span class="ident">a</span>: <span class="ident">f64</span>, <span class="ident">b</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
-    <span class="kw">if</span> <span class="ident">a</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">checked_div</span>(<span class="ident">a</span>: <span class="ident">f64</span>, <span class="ident">b</span>: <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> {
+    <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="number">0.0</span> {
         <span class="number">0.0</span>
     } <span class="kw">else</span> {
         <span class="ident">a</span> <span class="op">/</span> <span class="ident">b</span>
@@ -1138,10 +1012,10 @@
 <span class="doccomment">/// other.</span>
 <span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">checked_mul</span>(<span class="ident">a</span>: <span class="ident">f64</span>, <span class="ident">b</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">checked_mul</span>(<span class="ident">a</span>: <span class="ident">f64</span>, <span class="ident">b</span>: <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> {
     <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">is_nan</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">is_nan</span>() {
         <span class="ident">f64::NAN</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">a</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">b</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="number">0.0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">b</span> <span class="op">==</span> <span class="number">0.0</span> {
         <span class="number">0.0</span>
     } <span class="kw">else</span> {
         <span class="ident">a</span> <span class="op">*</span> <span class="ident">b</span>
@@ -1154,16 +1028,12 @@
 <span class="doccomment">///   interaction going on.</span>
 <span class="doccomment">/// - Particles which have no asymmetry, irrespective if any interaction</span>
 <span class="doccomment">///   going on.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fix_equilibrium</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(
-    <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
-    <span class="ident">dn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ArrayViewMut1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="ident">dna</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ArrayViewMut1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-) {
-    <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">p</span> <span class="kw">in</span> <span class="ident">c</span>.<span class="ident">in_equilibrium</span> {
-        <span class="ident">dn</span>[<span class="ident">p</span>] <span class="op">=</span> <span class="ident">c</span>.<span class="ident">n</span>[<span class="ident">p</span>] <span class="op">-</span> <span class="ident">c</span>.<span class="ident">eqn</span>[<span class="ident">p</span>];
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fix_equilibrium</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">dn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">dna</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) {
+    <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">p</span> <span class="kw">in</span> <span class="ident">context</span>.<span class="ident">in_equilibrium</span> {
+        <span class="ident">dn</span>[<span class="ident">p</span>] <span class="op">=</span> <span class="ident">context</span>.<span class="ident">eqn</span>[<span class="ident">p</span>] <span class="op">-</span> <span class="ident">context</span>.<span class="ident">n</span>[<span class="ident">p</span>];
     }
-    <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">p</span> <span class="kw">in</span> <span class="ident">c</span>.<span class="ident">no_asymmetry</span> {
-        <span class="ident">dna</span>[<span class="ident">p</span>] <span class="op">=</span> <span class="op">-</span><span class="ident">c</span>.<span class="ident">na</span>[<span class="ident">p</span>];
+    <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">p</span> <span class="kw">in</span> <span class="ident">context</span>.<span class="ident">no_asymmetry</span> {
+        <span class="ident">dna</span>[<span class="ident">p</span>] <span class="op">=</span> <span class="op">-</span><span class="ident">context</span>.<span class="ident">na</span>[<span class="ident">p</span>];
     }
 }
 
@@ -1172,44 +1042,39 @@
     <span class="ident">I</span>: <span class="ident">Interaction</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
     <span class="ident">M</span>: <span class="ident">Model</span>,
 {
-    <span class="kw">fn</span> <span class="ident">particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Particles</span> {
+    <span class="kw">fn</span> <span class="ident">particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Particles</span> {
         (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">particles</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">width_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">width_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">width_enabled</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartialWidth</span><span class="op">&gt;</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">width</span>(<span class="ident">c</span>)
+    <span class="kw">fn</span> <span class="ident">width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartialWidth</span><span class="op">&gt;</span> {
+        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">width</span>(<span class="ident">context</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">gamma_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">gamma_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">gamma_enabled</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">gamma</span>(<span class="ident">c</span>, <span class="ident">real</span>)
+    <span class="kw">fn</span> <span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">gamma</span>(<span class="ident">context</span>, <span class="ident">real</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">delta_gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">delta_gamma</span>(<span class="ident">c</span>, <span class="ident">real</span>)
+    <span class="kw">fn</span> <span class="ident">delta_gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">delta_gamma</span>(<span class="ident">context</span>, <span class="ident">real</span>)
     }
-    <span class="kw">fn</span> <span class="ident">rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">rate</span>(<span class="ident">c</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">adjusted_rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">adjusted_rate</span>(<span class="ident">c</span>)
+    <span class="kw">fn</span> <span class="ident">rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
+        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">rate</span>(<span class="ident">context</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">apply_change</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">dn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ArrayViewMut1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-        <span class="ident">dna</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ArrayViewMut1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-        <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
-    ) {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">apply_change</span>(<span class="ident">dn</span>, <span class="ident">dna</span>, <span class="ident">c</span>);
+    <span class="kw">fn</span> <span class="ident">adjusted_rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
+        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">adjusted_rate</span>(<span class="ident">context</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">apply_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">dna</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) {
+        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">apply_change</span>(<span class="ident">dn</span>, <span class="ident">dna</span>, <span class="ident">context</span>);
     }
 }
 
@@ -1218,45 +1083,40 @@
     <span class="ident">I</span>: <span class="ident">Interaction</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
     <span class="ident">M</span>: <span class="ident">Model</span>,
 {
-    <span class="kw">fn</span> <span class="ident">particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Particles</span> {
+    <span class="kw">fn</span> <span class="ident">particles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Particles</span> {
         <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">particles</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">width_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">width_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">width_enabled</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartialWidth</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">width</span>(<span class="ident">c</span>)
+    <span class="kw">fn</span> <span class="ident">width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartialWidth</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">width</span>(<span class="ident">context</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">gamma_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">gamma_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">gamma_enabled</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">gamma</span>(<span class="ident">c</span>, <span class="ident">real</span>)
+    <span class="kw">fn</span> <span class="ident">gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">gamma</span>(<span class="ident">context</span>, <span class="ident">real</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">delta_gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">delta_gamma</span>(<span class="ident">c</span>, <span class="ident">real</span>)
+    <span class="kw">fn</span> <span class="ident">delta_gamma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">real</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">delta_gamma</span>(<span class="ident">context</span>, <span class="ident">real</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">rate</span>(<span class="ident">c</span>)
+    <span class="kw">fn</span> <span class="ident">rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">rate</span>(<span class="ident">context</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">adjusted_rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">adjusted_rate</span>(<span class="ident">c</span>)
+    <span class="kw">fn</span> <span class="ident">adjusted_rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateDensity</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">adjusted_rate</span>(<span class="ident">context</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">apply_change</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">dn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ArrayViewMut1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-        <span class="ident">dna</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ArrayViewMut1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-        <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
-    ) {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">apply_change</span>(<span class="ident">dn</span>, <span class="ident">dna</span>, <span class="ident">c</span>);
+    <span class="kw">fn</span> <span class="ident">apply_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">dna</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) {
+        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">apply_change</span>(<span class="ident">dn</span>, <span class="ident">dna</span>, <span class="ident">context</span>);
     }
 }
 
