@@ -131,6 +131,11 @@ impl Model for Standard {
     /// included, the contributions of these interactions should also be
     /// included.
     fn set_beta(&mut self, beta: f64) {
+        debug_assert!(
+            beta.is_finite(),
+            "The inverse temperature should always be finite.\
+             For the zero-temperature case, use Model::zero."
+        );
         self.beta = beta;
 
         // Update the values of the gauge coupling for the running
