@@ -195,6 +195,7 @@ impl Model for LeptogenesisModel {
         };
 
         model.calculate_yv();
+        model.update_widths();
 
         model
     }
