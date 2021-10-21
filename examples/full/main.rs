@@ -18,7 +18,7 @@ use ndarray::prelude::*;
 use rayon::prelude::*;
 #[cfg(feature = "serde")]
 use std::fs;
-use std::{env, error, fmt, io, sync::RwLock};
+use std::{env, error, io, sync::RwLock};
 
 fn main() -> Result<(), Box<dyn error::Error>> {
     common::setup_logging(
@@ -76,19 +76,8 @@ fn main() -> Result<(), Box<dyn error::Error>> {
     Ok(())
 }
 
-/// Solve the Boltzmann equations and return the final values.
-///
-/// The model function is specified by `model`, and optionally a CSV writer can
-/// be given to record the progress of Boltzmann equations.
-pub fn solve<W, S>(
-    mut builder: SolverBuilder<LeptogenesisModel>,
-    names: &[S],
-    csv: Option<csv::Writer<W>>,
-) -> Result<(Array1<f64>, Array1<f64>), Box<dyn error::Error>>
-where
-    W: io::Write + 'static,
-    S: AsRef<str> + fmt::Display,
-{
+pub fn init_builder(model: LeptogenesisModel) -> SolverBuilder<LeptogenesisModel> {
+    let mut builder = SolverBuilder::new().model(model).beta_range(1e-12, 1e0);
     // Display information about the interactions within the model.
     {
         let model = builder.model.as_ref().unwrap();
@@ -104,6 +93,9 @@ where
         }
     }
 
+    // builder = builder.precompute(0);
+    builder = builder.step_precision(0.0, 1.0);
+
     // Set equilibrium conditions for the vector bosons.
     builder = builder
         .in_equilibrium([
@@ -116,6 +108,26 @@ where
             LeptogenesisModel::static_particle_idx("W", 0).unwrap(),
             LeptogenesisModel::static_particle_idx("G", 0).unwrap(),
         ]);
+
+    builder
+}
+
+/// Solve the Boltzmann equations and return the final values.
+///
+/// The model function is specified by `model`, and optionally a CSV writer can
+/// be given to record the progress of Boltzmann equations.
+pub fn solve<W>(
+    mut builder: SolverBuilder<LeptogenesisModel>,
+    csv: Option<csv::Writer<W>>,
+) -> Result<(Array1<f64>, Array1<f64>), Box<dyn error::Error>>
+where
+    W: io::Write + 'static,
+{
+    let names: Vec<_> = builder
+        .model
+        .as_ref()
+        .map(|model| model.particles().iter().map(|p| p.name.clone()).collect())
+        .unwrap();
 
     // Add the logger if needed
     if let Some(mut csv) = csv {
@@ -237,18 +249,9 @@ macro_rules! define {
                     .extend(i().drain(..).filter($filter).map(into_interaction_box));
             }
 
-            // Collect the names now as SolverBuilder takes ownership of the
-            // model later.
-            let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
-
-            let mut builder = SolverBuilder::new()
-                .model(model)
-                .beta_range(1e-12, 1e0)
-                .fast_interaction(true);
-
+            let mut builder = init_builder(model);
             builder = $pre(builder);
-
-            let (n, na) = solve(builder, &names, Some(csv))?;
+            let (n, na) = solve(builder, Some(csv))?;
 
             log::info!("Final number density:\n{:.3e}", n);
             log::info!("Final number density asymmetry:\n{:.3e}", na);
@@ -513,16 +516,11 @@ pub fn higgs_equilibrium() -> Result<(), Box<dyn error::Error>> {
         let p_h = model.particle_idx("H", 0).unwrap();
         let n_eq = model.particles()[p_h].normalized_number_density(beta, 0.0);
 
-        // Collect the names now as SolverBuilder takes ownership of the model
-        // later.
-        let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
-
-        let builder = SolverBuilder::new()
-            .model(model)
+        let builder = init_builder(model)
             .beta_range(beta, beta * 1e3)
             .initial_densities([(p_h, 1.1 * n_eq)]);
 
-        solve(builder, &names, Some(csv)).unwrap();
+        solve(builder, Some(csv)).unwrap();
     });
 
     Ok(())
@@ -554,17 +552,11 @@ pub fn lepton_equilibrium() -> Result<(), Box<dyn error::Error>> {
         let p_l = model.particle_idx("L", 0).unwrap();
         let n_eq = model.particles()[p_l].normalized_number_density(beta, 0.0);
 
-        // Collect the names now as SolverBuilder takes ownership of the model
-        // later.
-        let names: Vec<_> = model.particles().iter().map(|p| p.name.clone()).collect();
-
-        let builder = SolverBuilder::new()
-            .model(model)
+        let builder = init_builder(model)
             .beta_range(beta, beta * 1e3)
-            .initial_densities([(p_l, 1.1 * n_eq)])
-            .fast_interaction(true);
+            .initial_densities([(p_l, 1.1 * n_eq)]);
 
-        solve(builder, &names, Some(csv)).unwrap();
+        solve(builder, Some(csv)).unwrap();
     });
 
     Ok(())
