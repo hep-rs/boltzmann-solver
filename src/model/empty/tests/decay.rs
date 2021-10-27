@@ -64,7 +64,7 @@ fn asymmetric() -> Result<(), Box<dyn error::Error>> {
     let (n0, _na0) = (c.eq, c.na);
 
     // Run the solver
-    let (n, _na) = solve("asymmetric.csv", SolverBuilder::new().model(model))?;
+    let (n, na) = solve("asymmetric.csv", SolverBuilder::new().model(model))?;
 
     // Check initial number densities
     approx_eq(n0[1], 1.0, 4.0, 1e-50)?;
@@ -75,6 +75,10 @@ fn asymmetric() -> Result<(), Box<dyn error::Error>> {
     approx_eq(n[1], 0.0, 4.0, 1e-8)?;
     approx_eq(n[2], 2.0, 4.0, 1e-50)?;
     approx_eq(n[3], 2.0, 4.0, 1e-50)?;
+
+    approx_eq(na[1], -9.31e-29, 2.0, 0.0)?;
+    approx_eq(na[2], 9.31e-29, 2.0, 0.0)?;
+    approx_eq(na[3], 9.31e-29, 2.0, 0.0)?;
 
     // assert_eq!(na0, na);
 
