@@ -12,7 +12,7 @@ use boltzmann_solver::{
     model::interaction::{FourParticle, ThreeParticle},
     prelude::*,
 };
-use common::{into_interaction_box, n1f1, n3f1, n3f3};
+use common::{into_interaction_box, n1f1, n1f3, n3f1, n3f3};
 use itertools::iproduct;
 use ndarray::prelude::*;
 #[cfg(feature = "parallel")]
@@ -409,7 +409,7 @@ fn evolution() -> Result<(), Box<dyn error::Error>> {
     let output_dir = common::output_dir("full");
 
     let mut data = [Vec::new(), Vec::new(), Vec::new()];
-    let filters = [n1f1, n3f1, n3f3];
+    let filters = [n1f1, n3f1, n1f3, n3f3];
 
     for &beta in Array1::geomspace(1e-17, 1e-2, 1024).unwrap().iter() {
         for i in 0..data.len() {
@@ -438,18 +438,17 @@ fn evolution() -> Result<(), Box<dyn error::Error>> {
         }
     }
 
-    serde_json::to_writer(
-        io::BufWriter::new(fs::File::create(output_dir.join("evolution_n1f1.json"))?),
-        &data[0],
-    )?;
-    serde_json::to_writer(
-        io::BufWriter::new(fs::File::create(output_dir.join("evolution_n3f1.json"))?),
-        &data[1],
-    )?;
-    serde_json::to_writer(
-        io::BufWriter::new(fs::File::create(output_dir.join("evolution_n3f3.json"))?),
-        &data[2],
-    )?;
+    for (data, name) in data.into_iter().zip([
+        "evolution_n1f1.json",
+        "evolution_n3f1.json",
+        "evolution_n1f3.json",
+        "evolution_n3f3.json",
+    ]) {
+        serde_json::to_writer(
+            io::BufWriter::new(fs::File::create(output_dir.join(name))?),
+            &data,
+        )?;
+    }
 
     Ok(())
 }
