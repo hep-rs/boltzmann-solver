@@ -234,9 +234,9 @@ where
         let p2 = &ptcl[self.particles.outgoing_idx[0]];
         let p3 = &ptcl[self.particles.outgoing_idx[1]];
 
-        // If the decay is kinematically forbidden, return 0.
-        if p1.mass < p2.mass + p3.mass {
-            return Some(0.0);
+        // If the decay is kinematically forbidden, return None.
+        if p1.mass <= p2.mass + p3.mass {
+            return None;
         }
 
         let z = p1.mass * context.beta;
@@ -280,9 +280,9 @@ where
         let p2 = &ptcl[self.particles.outgoing_idx[0]];
         let p3 = &ptcl[self.particles.outgoing_idx[1]];
 
-        // If the decay is kinematically forbidden, return 0.
-        if p1.mass < p2.mass + p3.mass {
-            return Some(0.0);
+        // If the decay is kinematically forbidden, return None.
+        if p1.mass <= p2.mass + p3.mass {
+            return None;
         }
 
         let z = p1.mass * context.beta;
