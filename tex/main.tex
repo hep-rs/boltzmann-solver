@@ -1,28 +1,400 @@
-\documentclass{scrartcl}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% HEADER
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\usepackage{mathtools}
+%% The [KOMA-script](https://www.ctan.org/pkg/koma-script) package provides
+%% alternatives to replacements for the default classes (`scrartcl`, `scrreprt`,
+%% `scrbook`, `scrlttr2`) and provides a lot of options to more easily customize the
+%% layout of the page.
+\documentclass[
+  a4paper,             % The size of the layout
+  11pt,                % The font size (10pt, 11pt, 12pt)
+  oneside,             % Whether the document is one-sided or two-sided
+  onecolumn,           % Whether to have one or two columns in the layout
+  bibliography=totoc,  % Adjust how the bibliography appears in ToC
+  final,               % As opposed to draft (which speeds up compilation)
+]{scrartcl}
+%% One of the important options in the list above is `draft`/`final`.  If draft
+%% mode is enabled, LaTeX and most packages will disable features which take up
+%% a lot of time in order to speed up compilation.  Draft mode also highlights
+%% certain error in the output document.  On the other hand, final mode enables
+%% all features which will increase (sometimes quite significantly) the
+%% compilation time of the document.
 
-\mathtoolsset{
-  showonlyrefs,
+%% For the vast majority of packages, the order in which they are loaded does
+%% not matter.  There are a few exceptions though, mostly relating to the
+%% various referencing packages (hyperef, cleveref, ...).  The following package
+%% must be loaded first and provides some additional functionalities to other
+%% packages.
+\usepackage{etex}
+\usepackage{ifluatex}  % Provides the command \ifluatex
+
+%% Formatting
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{geometry}   % Customize text width, page height, margins, etc.
+\geometry{
+  %% See the geometry package's documentation for all the options available
+  textwidth=13cm,
 }
 
-\usepackage[compat=1.1.0]{tikz-feynman}
+\usepackage{multicol}   % {multicols}{n} environment
+\usepackage{pdflscape}  % {landscape} environment
+\usepackage{pageslts}   % Improved page numbering
+\usepackage{enumitem}   % Easily customize lists
+
+\usepackage{setspace}   % Line spacing
+\singlespacing%
+% \onehalfspacing%
+% \doublespacing%
+
+%% Change the formatting of titles and sections.
+\setkomafont{part}{\normalfont\scshape\Huge}
+\setkomafont{partnumber}{\normalfont\scshape\huge}
+\setkomafont{section}{\normalfont\Huge}
+\setkomafont{subsection}{\normalfont\huge}
+\setkomafont{subsubsection}{\normalfont\Large}
+\setkomafont{paragraph}{\normalfont\large\scshape}
+
+%% Change the formatting of section entries in the table of contents
+\setkomafont{sectionentry}{\scshape}
+
+%% Modify the indentation at the start of each paragraph.
+\setlength{\parindent}{1em}
+
+%% Font
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{microtype}   % Fine small typographical details
+\usepackage{realscripts} % Use the font's sub- and superscripts
+
+% \ifluatex%
+  \usepackage{fontspec}  % Allows for any font to be specified
+
+  % Change the main font
+  \setmainfont{EB Garamond}[
+    % Contextuals={Alternate},
+    % Ligatures={Historic},
+    Ligatures={Rare},
+    Numbers=OldStyle,
+    % CharacterVariant={1},    % historical s
+    % CharacterVariant={3},    % historical j
+    % CharacterVariant={6},    % guillemets
+    % CharacterVariant={11},   % distinguish i and 1
+    % CharacterVariant={21},   % a
+    % CharacterVariant={27},   % g
+    ItalicFeatures={
+      CharacterVariant={4},  % &
+      CharacterVariant={5:3},  % v
+    }
+  ]
+
+
+  % Change the mono-space font
+  \setmonofont{Fira Code}[
+    Scale=MatchLowercase,
+  ]
+% \else
+%   \usepackage{ebgaramond}  % A fall-back that isn't as nice as fontspec
+% \fi
+
+\usepackage[cmintegrals,varg]{newtxmath}  % Nice math font with Garamond
+
+%% Languages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[UKenglish]{babel}           % Set up the language
+\usepackage[style=british]{csquotes}    % Advanced handling of quotes
+\usepackage[perpage,symbol*]{footmisc}  % Have symbols instead of numbers for footnotes
+
+%% siunitx is an incredible useful package to display numbers and their
+%% associated units.  It also offers extra commands to specify lists and ranges
+%% of values with units.  Some commands which it provides include:
+%% - \SI{quantity}{units}
+%% - \SIRange{start}{end}{units}
+%% - \SIList{a, b, ..., d}{units}
+%% With the units being given as `\kilo\metre\per\year\per\pico\barn`.
+\usepackage{siunitx}
+
+%% Adjust the way units are displayed in ranges and units so that they are only
+%% mentinoed once.
+\sisetup{
+  range-units=single,
+  list-units=single,
+}
+
+%% Declare a few extra units
+\DeclareSIUnit\year{yr}
+\DeclareSIUnit\barn{b}
+\DeclareSIUnit\fb{\femto\barn}
+\DeclareSIUnit\pb{\pico\barn}
+
+%% Graphics & Figure
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Graphics can be included in a LaTeX document with
+%%
+%% ```
+%% \includegraphics[options]{image}
+%% ```
+%%
+%% Usually, the extension for the image is not specified and LaTeX will
+%% figure out the best one.  It is of course possible to add the extension to
+%% specify a particular image.
+%%
+%% In order to ensure that the image is a particular width, you can use
+%% `width=<distance>`.  This will also scale the height but keep the aspect
+%% ratio (if you also specify the height, the aspect ratio will not be kept).
+%% It is tempting to specify an exact distance such as `4cm`; but it is
+%% generally better to have a relative distance such as `0.4\linewidth`.  This
+%% way, the image will scale nicely if the context is changed.
+\usepackage{graphicx}   % Handle graphics
+
+%% Look for images in the './images/' sub-directory
+\graphicspath{{./images/}}
+
+\usepackage{xcolor}     % Define and use colours
+\usepackage{subcaption} % Subfigures inside a figure
+
+\usepackage{tikz}       % Powerful drawing language
+\usepackage{pgfplots}   % Plotting with LaTeX
+\usepackage[compat=1.1.0]{tikz-feynman}  % Package to draw Feynman diagram
+\pgfplotsset{compat=1.14}
+
+%% TikZ pictures and plots can significantly increase the time it takes to
+%% produce the output.  The `external` TikZ library library defers the creation
+%% of these figures to a sub-process which creates a separate PDF file which is
+%% then simply imported into the main document.  To call the sub-process, you
+%% have to execute the appropriate makefile.  If you are using LatexMk, you can
+%% use the `.latexmkrc` to automatically do this for you.
+%%
+%% The following setup works on Linux, and should work on OS X too.
+% \usetikzlibrary{external}
+% \tikzexternalize[shell escape=-shell-escape, prefix=images/tikz/]
+% \immediate\write18{mkdir -p images/tikz/}
+% \tikzset{
+%     external/mode=list and make,
+%     external/system call={
+%         lualatex \tikzexternalcheckshellescape -halt-on-error -interaction=batchmode -jobname="\image" "\texsource" || rm "\image.pdf"},
+% }
+
+%% Math Packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}     % The core math package
+% \usepackage{amssymb}     % Defines additional math fonts and symbols
+\usepackage{mathtools}   % Various extra maths functions
+\usepackage{dsfont}      % A double stroke font (for double stroke 1)
+% \usepackage{autonum}   % Only number referenced equations (must be loaded after cleverref)
+
+%% Define a new command called \withnumber which forces the line to have number
+%% (even if it is referenced elsewhere).
+\newcommand\withnumber{\refstepcounter{equation}\tag{\theequation}}
+
+%% Allows page breaks in math (1 = avoid if possible, 4 = whenever).  Page
+%% breaks can be avoided at particular places by using \\* instead of \\.
+\allowdisplaybreaks[2]
+
+%% Tables
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tabularx}  % Improved tabular environment
+\usepackage{longtable} % Multipage tables
+\usepackage{array}     % New column types, including >x<
+\usepackage{booktabs}  % Provides nicer horizontal lines
+\usepackage{multirow}  % Allows cells to span multiple rows
+\usepackage{longtable} % Allows for tables to span multiple pages
+
+%% Define the maths version of clr columns.
+\newcolumntype{C}{>{\(}c<{\)}}
+\newcolumntype{L}{>{\(}l<{\)}}
+\newcolumntype{R}{>{\(}r<{\)}}
+
+%% When designing tables, it is better to avoid having too many lines.  In
+%% general, the vertical alignments will suffice to guide the eye and the only
+%% horizontal lines present should demarcate particular sections within the
+%% table (e.g. the title from the body, and the body from the averages at the
+%% bottom).  The `booktabs` package provides `\toprule`, `\midrule` and
+%% `\bottomrule` for this purpose.
+
+%% Code
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{minted}
+
+%% Linking and Referencing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{hyperref}  % Automatically inserts hyperlinks.
+\usepackage{cleveref}  % Use `\cref` to reference anything
+% \usepackage{autonum}   % Must be loaded after all *ref packages
+
+%% Define some slightly nicer colors
+\definecolor{link-color}{RGB}{96 0 0}
+\definecolor{cite-color}{RGB}{0 96 0}
+\definecolor{file-color}{RGB}{0 0 96}
+\definecolor{url-color}{RGB}{0 0 96}
+\definecolor{link-border-color}{RGB}{255 159 159}
+\definecolor{cite-border-color}{RGB}{159 255 159}
+\definecolor{file-border-color}{RGB}{159 159 255}
+\definecolor{url-border-color}{RGB}{159 159 255}
+
+\hypersetup{
+  %% When `colorlinks` is true, all links will be coloured which looks nice in
+  %% digital version of the document but not in print.  If the document is
+  %% intended for printing, then `colorlinks` should set to false.
+  colorlinks=true,
+  linkcolor=link-color,
+  citecolor=cite-color,
+  filecolor=file-color,
+  urlcolor=url-color,
+  linkbordercolor=link-border-color,
+  citebordercolor=cite-border-color,
+  urlbordercolor=url-border-color,
+}
+
+%% Glossary
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This package requires `makeglossaries` to be run after the initial run of
+%% LaTeX so that the glossary is generated and the a second run of LaTeX is need
+%% to included the newly generated glossary.  (This is automatically handled by
+%% Latexmk with the provided .latexmkrc).
+
+%% hyperref should be loaded first
+\usepackage[toc]{glossaries}
+\usepackage{glossaries-extra}
+
+\setglossarystyle{index}
+\setabbreviationstyle[acronym]{long-short-sc}
+
+\loadglsentries{glossary.glos}
+
+\makeglossaries%
+
+%% Bibliography
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% hyperref should be loaded first
+\usepackage[
+  %% See the extensive documentation for biblatex for a description of what
+  %% these options do
+  autocite=inline,
+  backend=biber,
+  biblabel=brackets,
+  doi=true,
+  eprint=true,
+  maxnames=4,
+  style=phys,
+]{biblatex}
+
+%% Add a bib file
+\addbibresource{references.bib}
+
+%% Other modifications/package
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% This is not a CTAN package but instead contains a whole lot of small scripts I
+%% use nearly all the time.
 \usepackage{jpellis}
 
-\usepackage{cleveref}
+%% Document Information
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%% Define a few shorthand commands.  The `makeatletter' and `makeatother' allows
+%% the use of '@' in commands which is reserved for hidden functions.
+\makeatletter
+\newcommand\@degreetitle{}
+\newcommand\degreetitle[1]{\renewcommand\@degreetitle{#1}}
+
+\newcommand\@department{}
+\newcommand\department[1]{\renewcommand\@department{#1}}
+
+\newcommand\@university{}
+\newcommand\university[1]{\renewcommand\@university{#1}}
+
+\newcommand\@keywords{}
+\newcommand\keywords[1]{\renewcommand\@keywords{#1}}
+
+\AtEndPreamble{
+  %% Set the PDF metadata, though this can only be done once they've been all
+  %% defined which is at the end of the preamble.
+  \hypersetup{
+    pdftitle={\@title},
+    pdfauthor={\@author},
+    pdfsubject={\@subject},
+    pdfkeywords={\@keywords},
+  }
+}
+\makeatother
+
+%% The \texorpdfstring string will, depending on context, either print proper
+%% TeX command (in this case LaTeX will the special kerning), or the plain text
+%% fallback.  This is useful if you have equation, links or special formatting
+%% in titles as the PDF bookmarks can't handle them.
 \title{Boltzmann Solver}
-\author{Joshua P.~Ellis}
+% \subtitle{A Practical Introduction to \texorpdfstring{\LaTeX}{LaTeX}}
 
+\subject{Boltzmann Solver}
+\keywords{boltzmann equation, numerical method, ordinary differential equation}
+
+\author{Joshua P.~\textsc{Ellis}}
+\degreetitle{Doctor of Philosphy (Physics)}
+\department{School of Physics}
+\university{The University of Melbourne}
+
+\date{\today}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% DOCUMENT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
+%% Adjust the pagenumbering to capital Latin letters
+\pagenumbering{Alph}
 
-\maketitle
+%% Title
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% We don't want any page numbers, chapter headings, etc. on the page
+\pagestyle{empty}
 
-\vfill
+\begin{titlepage}
+  \makeatletter
+  \begin{center}
+    \vspace*{2.5cm}
+
+    {\Huge \@title} \\[0em]
+    \rule{\linewidth}{2pt}
+    {\huge \textsc{\@subtitle}} \\[6em]
+
+    {\large By} \\[1cm]
+    {\huge \@author} \\[0.5ex]
+    {\Large \normalfont\@degreetitle}
+
+    \vfill
+
+    {\Large \@department} \\[1ex]
+    {\Large \@university}
+
+    \vfill
+
+    {\large \@date}
+  \end{center}
+
+\makeatother
+\end{titlepage}
+
+%% Table of Content
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage%
+\pagestyle{plain}
+\pagenumbering{roman}
 
 \tableofcontents
 
-\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CONTENT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage%
+\pagenumbering{arabic}
 
 \section{Phase Space integration}%
 \label{sec:phase_space_integration}
@@ -38,8 +410,8 @@ where
 \begin{equation}
   \dd \Pi
   \defeq \frac{g}{2 E} \ddbar^3{\vt p}
-  = \frac{\vt p^2}{2 E} \frac{\dd \abs{\vt p} \dd \Omega}{(2\pi)^3}
-  = \frac{\abs{\vt p}}{2} \frac{\dd E \dd \Omega}{(2 \pi)^3}
+  = g \frac{\vt p^2}{2 E} \frac{\dd \abs{\vt p} \dd \Omega}{(2\pi)^3}
+  = g \frac{\abs{\vt p}}{2} \frac{\dd E \dd \Omega}{(2 \pi)^3}
 \end{equation}
 where the last equality is achieved by noting that \(m^2 = E^2 - \abs{\vt p}^2\)
 thereby implying that \(\abs{\vt p} \dd \abs{\vt p} \equiv E \dd E\).
@@ -48,248 +420,506 @@ thereby implying that \(\abs{\vt p} \dd \abs{\vt p} \equiv E \dd E\).
 \label{sec:two-body_phase_space}
 
 The two-body phase space, \(\Phi_2\), is the smallest non-trivial space that can
-be integrated over easily.
-
-Defining the two-body phase space \(\Phi_2(q_{12}; p_1, p_2)\), where \(q_{12} =
-(p_1 + p_2)\) is the 4-momentum shared between these two particle and \(s_{12}^2
-\defeq q_{12}^2\) is the centre-of-mass energy of these two particles.
+be integrated over easily.  For convenience, we define
+\begin{subequations}
 \begin{align}
-  \dd \Phi_2(q_{12}; p_1, p_2)
-   & = \dd \Pi_1 \dd \Pi_2 (2 \pi)^4 \delta^4(p_1 + p_2 - q_{12})                                                   \\
-   & = \frac{g_1}{2 E_1} \ddbar^3{\vt p_1} \frac{g_2}{2 E_2} \ddbar^3{\vt p_2}
-  (2\pi) \delta(E_1 + E_2 - E_{12}) (2\pi)^3 \delta^3(\vt p_1 + \vt p_2 - \vt q_{12})                               \\
-  %  & = \frac{g_1 g_2}{4 (2 \pi)^2} \frac{\dd^3 \vt p_1}{E_1} \frac{\dd^3 \vt p_2}{E_2}
-  % \delta(E_1 + E_2 - E_{12}) \delta^3(\vt p_1 + \vt p_2 - \vt q_{12})                                               \\
-  \intertext{The integral over \(\vt p_2\) can be done trivially with the Dirac delta (note that after this integration, \(E_2\) no longer depends on \(\abs{\vt p_2}\) and now depends on \(\abs{\vt q_{12} - \vt p_1}\))}
-   & = \frac{g_1 g_2}{16 \pi^2} \frac{\dd^3 \vt p_1}{E_1} \frac{1}{E_2}
-  \delta(E_1 + E_2 - E_{12})
-  \intertext{The final quantity is Lorentz invariant, so we may choose the centre-of-mass frame for the calculations in which \(p_1 = (E_1, \vt p)\), \(p_2 = (E_2, - \vt p)\), and \(q_{12} = (\sqrt{s_{12}}, \vt 0)\).}
-   & = \frac{g_1 g_2}{16 \pi^2} \frac{\abs{\vt p}^2 \dd \abs{\vt p}}{E_1 E_2}
-  \delta(E_1 + E_2 - \sqrt{s_{12}}) \dd \Omega
-  \intertext{Given that \(E_1 = \sqrt{\abs{\vt p}^2 + m_1^2}\) and similarly for \(E_2\), the zeros of the Dirac delta can be found at \(\abs{\vt p} = \lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2) / 2 \sqrt{s_{12}}\):}
-   & = \frac{g_1 g_2}{16 \pi^2} \frac{\abs{\vt p}^2 \dd \abs{\vt p}}{E_1 E_2}
-  \left[ \ddfrac{(E_1 + E_2)}{\abs{\vt p}} \right]^{-1}
-  \delta\left( \abs{\vt p} - \frac{\lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2)}{2 \sqrt{s_{12}}} \right) \dd \Omega \\
-   & = \frac{g_1 g_2}{16 \pi^2} \dd \abs{\vt p} \frac{\abs{\vt p}^2 }{4 E_1 E_2}
-  \left[ \frac{\abs{\vt p}}{E_1} + \frac{\abs{\vt p}}{E_2} \right]^{-1}
-  \delta\left( \abs{\vt p} - \frac{\lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2)}{2 \sqrt{s_{12}}} \right) \dd \Omega \\
-   & = \frac{g_1 g_2}{16 \pi^2}
-  \frac{\lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2) / 2 \sqrt{s_{12}}}{E_1 + E_2} \dd \Omega                        \\
-   & = g_1 g_2 \frac{\lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2)}{32 \pi^2 s_{12}} \dd \Omega                       \\
-   & \stackrel{\int \dd \Omega}{=} g_1 g_2 \frac{\lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2)}{8 \pi s_{12}}
+  q_{12} &\defeq p_1 + p_2, \\
+  s_{12} &\defeq q_{12}^2 = (p_1 + p_2)^2,
 \end{align}
+\end{subequations}
+and we can express a two-body phase space in relation to the sum of their
+momenta:
+\begin{subequations}
+  \begin{align}
+    \dd \Phi_2(q_{12}; p_1, p_2)
+    & = \dd \Pi_1 \dd \Pi_2 (2 \pi)^4 \delta^4(p_1 + p_2 - q_{12})                                                   \\
+    & = \frac{g_1}{2 E_1} \ddbar^3{\vt p_1} \frac{g_2}{2 E_2} \ddbar^3{\vt p_2}
+    (2\pi) \delta(E_1 + E_2 - E_{12}) (2\pi)^3 \delta^3(\vt p_1 + \vt p_2 - \vt q_{12})                               \\
+    %  & = \frac{g_1 g_2}{4 (2 \pi)^2} \frac{\dd^3 \vt p_1}{E_1} \frac{\dd^3 \vt p_2}{E_2}
+    % \delta(E_1 + E_2 - E_{12}) \delta^3(\vt p_1 + \vt p_2 - \vt q_{12})                                               \\
+    \intertext{The integral over \(\vt p_2\) can be done trivially with the Dirac delta (note that after this integration, \(E_2\) no longer depends on \(\abs{\vt p_2}\) and now depends on \(\abs{\vt q_{12} - \vt p_1}\))}
+    & = \frac{g_1 g_2}{16 \pi^2} \frac{\dd^3 \vt p_1}{E_1} \frac{1}{E_2}
+    \delta(E_1 + E_2 - E_{12})
+    \intertext{The final quantity is Lorentz invariant, so we may choose the centre-of-mass frame for the calculations in which \(p_1 = (E_1, \vt p)\), \(p_2 = (E_2, - \vt p)\), and \(q_{12} = (\sqrt{s_{12}}, \vt 0)\).}
+    & = \frac{g_1 g_2}{16 \pi^2} \frac{\abs{\vt p_1}^2 \dd \abs{\vt p_1}}{E_1 E_2}
+    \delta(E_1 + E_2 - \sqrt{s_{12}}) \dd \Omega
+    \intertext{Given that \(E_1 = \sqrt{\abs{\vt p_1}^2 + m_1^2}\) and similarly for \(E_2\), the zero of the Dirac delta can be found at \(\abs{\vt p_1} = \lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2) / 2 \sqrt{s_{12}}\):}
+    & = \frac{g_1 g_2}{16 \pi^2} \frac{\abs{\vt p_1}^2 \dd \abs{\vt p_1}}{E_1 E_2}
+    \left[ \ddfrac{(E_1 + E_2)}{\abs{\vt p_1}} \right]^{-1}
+    \delta\left( \abs{\vt p_1} - \frac{\lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2)}{2 \sqrt{s_{12}}} \right) \dd \Omega \\
+    & = \frac{g_1 g_2}{16 \pi^2} \dd \abs{\vt p_1} \frac{\abs{\vt p_1}^2 }{4 E_1 E_2}
+    \left[ \frac{\abs{\vt p_1}}{E_1} + \frac{\abs{\vt p_1}}{E_2} \right]^{-1}
+    \delta\left( \abs{\vt p_1} - \frac{\lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2)}{2 \sqrt{s_{12}}} \right) \dd \Omega \\
+    & = \frac{g_1 g_2}{16 \pi^2}
+    \frac{\lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2) / 2 \sqrt{s_{12}}}{E_1 + E_2} \dd \Omega                        \\
+    & = \frac{g_1 g_2}{32 \pi^2} \frac{\lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2)}{s_{12}} \dd \Omega                       \\
+    & \stackrel{\int \dd \Omega}{=} \frac{g_1 g_2}{8 \pi} \frac{\lambda^{\frac{1}{2}}(s_{12}, m_1^2, m_2^2)}{s_{12}}
+  \end{align}
+\end{subequations}
 
-\subsubsection{Phase Space Decomposition}%
+\subsection{Phase Space Decomposition}%
 \label{sec:phase_space_decomposition}
 
-We will be introducing new intermediate momenta \(q_{ij} = p_i + p_j\) such that
-\(q_{ij}^2 = s_{ij}\), and then integrating over them and introducing Dirac
+We will be introducing new intermediate momenta \(q_{ij} = p_i + p_j\) and
+variable \(s_{ij}\) and then integrating over them both and introducing Dirac
 deltas in order to enforce momentum conservation.  We will use the following two
 identities:
-\begin{align}
-  1 & = \int \ddbar^4{q_{ij}} (2 \pi)^4 \delta(q_{ij} - p_i - p_j) \Theta(q_{ij}^0) \\
-  1 & = \int \ddbar{s_{ij}} (2\pi) \delta(s_{ij} - q_{ij}^2)
-\end{align}
+\begin{subequations}
+  \begin{align}
+    1 & = \int \ddbar^4{q_{ij}} (2 \pi)^4 \delta(q_{ij} - p_i - p_j) \\
+    1 & = \int \dd {s_{ij}} \delta(s_{ij} - q_{ij}^2) \Theta(q_{ij}^0)
+  \end{align}
+\end{subequations}
 The first enforces momentum conservation, the second enforces an `on-shell'
-condition.  The \(\Theta\) is the Heaviside theta function which is equal to 0
-when its argument is negative, and 1 otherwise and ensures that the integration
-happens for \(\sqrt{s_{ij}} > 0\) only.  Combined, they can be expressed as
-\begin{equation}
-  1 = \int \ddbar^3{\vt q_{ij}} \frac{1}{2 E_{ij}} \ddbar{s_{ij}} (2 \pi)^4 \delta^4(q_{ij} - p_i - p_j) = \int \dd \Pi_{ij} \ddbar{s_{ij}} (2 \pi)^4 \delta^4(q_{ij} - p_i - p_j)
-\end{equation}
+condition.  Combined, they can be expressed as
+\begin{subequations}%
+  \label{eq:phase_space_identity}
+  \begin{align}
+    1 &= \int \ddbar^4{q_{ij}} \dd {s_{ij}} (2 \pi)^4 \delta^4(q_{ij} - p_i - p_j) \delta(s_{ij} - q_{ij}^2) \Theta(q_{ij}^0) \\
+    &= \int \ddbar^3{\vt q_{ij}} \ddbar{q_{ij}^0}  \dd {s_{ij}} (2 \pi)^4 \delta^4(q_{ij} - p_i - p_j) \delta(s_{ij} - q_{ij}^2) \Theta(q_{ij}^0)
+    \intertext{
+      The zeros of the last Dirac delta are located at \(q_{ij}^0 = \pm \sqrt{\vt q_{ij}^2 + s_{ij}}\)
+      and the Heaviside theta function ensures the positive value is chosen, so we can perform the integration over \(q_{ij}^0\).
+      As the Dirac delta depends on \((q_{ij}^0)^2\), a factor of \(1 / 2 q_{ij}^0 = 1 / 2 E_{ij}\) appears
+      in the integrand and we obtain
+    }
+    &= \int \ddbar^3{\vt q_{ij}} \frac{1}{2 E_{ij}} \ddbar{s_{ij}} (2 \pi)^4 \delta^4(q_{ij} - p_i - p_j) \\
+    &= \int \dd \Pi_{ij} \ddbar{s_{ij}} (2 \pi)^4 \delta^4(q_{ij} - p_i - p_j)
+  \end{align}
+\end{subequations}
 where \(E_{ij} = q_{ij}^0\) is the time-like component of \(q_{ij}\).
 
 The goal now will be to express \(\dd \Phi_n(q; p_1, \dots, p_n)\) in terms of a
 product of smaller phase spaces (and then recursively apply this until only
 two-body phase spaces remain).
 
+\begin{subequations}
+  \begin{align}
+    \dd \Phi_n(q; p_1, p_2, \dots, p_n)
+    & = \dd \Pi_1 \dd \Pi_2 \cdots \dd \Pi_n (2 \pi)^4 \delta^4(p_1 + p_2 + \cdots + p_n - q)                 \\
+    & = \dd \Pi_1 \dd \Pi_2 \cdots \dd \Pi_n (2 \pi)^4 \delta^4(p_1 + p_2 + \cdots + p_n - q)                 \\
+    & \quad \times \dd \Pi_{12} \ddbar{s_{ij}} (2 \pi)^4 \delta^4(q_{12} - p_1 - p_2)
+    \intertext{The combination of \(\dd \Pi_1 \dd \Pi_2 (2 \pi)^4 \delta^4(q_{12} - p_1 - p_2)\) is exactly equal to \(\dd \Phi_2(q_{12}; p_1, p_2)\).}
+    & = \dd \Phi_2(q_{12}; p_1, p_2) \ddbar{s_{12}}                                                           \\
+    & \quad \times \dd \Pi_{12} \dd \Pi_3 \cdots \dd \Pi_n (2\pi)^4 \delta^4(q_{12} + p_3 + \cdots + p_n - q) \\
+    & = \dd \Phi_2(q_{12}; p_1, p_2) \ddbar{s_{12}} \dd \Phi_{n-1}(q; q_{12}, p_3, \ldots, p_n)
+  \end{align}
+\end{subequations}
+
+\clearpage
+\section{Phase Space and Number Densities}
+
+In thermal equilibrium, the phase space of a particle species is described by
+\begin{equation}
+  f(\beta; E, m, \mu) = \frac{g}{e^{(E - \mu) \beta} + \xi}
+\end{equation}
+where \(\xi\) is \(+1\), \(-1\) or \(0\) for Fermi--Dirac, Bose--Einstein and
+Maxwell--Boltzmann statistics respectively.
+
+The associated number density for this particle is
+\begin{equation}
+  N(\beta; m, \mu) = \int f \ddbar^3{\vt p} = \frac{1}{2 \pi^2} \int_m^\infty f E \sqrt{E^2 - m^2} \dd E.
+\end{equation}
+The integral can only be analytically evaluated for the Maxwell--Boltzmann
+distribution:
+\begin{equation}
+  N_{\textsc{mb}}(\beta; m, \mu) = \frac{g}{2 \pi^2} \frac{m^2 K_2(m \beta)}{\beta} e^{\mu \beta}.
+\end{equation}
+
+The massless case can be evaluated for all three distributions:
+\begin{subequations}
+  \begin{align}
+    N(\beta; 0, \mu) &= \frac{g}{\pi^2 \beta^3} \times \begin{cases}
+       \Li_3(e^{\mu \beta}) & \text{Bose--Einstein} \\
+       - \Li_3(- e^{\mu \beta}) & \text{Fermi--Dirac} \\
+       e^{\mu \beta} & \text{Maxwell--Boltzmann}
+    \end{cases} \\
+    &= \frac{g}{\pi^2 \beta^3} \times \begin{cases}
+       \zeta(3) + \frac{\pi^2}{6} \mu \beta + \calO(\mu^2) & \text{Bose--Einstein} \\
+       \frac{3 \zeta(3)}{4} + \frac{\pi^2}{12} \mu \beta + \calO(\mu^2) & \text{Fermi--Dirac} \\
+       1 + \mu \beta + \calO(\mu^2) & \text{Maxwell--Boltzmann}
+    \end{cases}
+  \end{align}
+\end{subequations}
+where \(\Li_3\) is the polylogarithm function, \(\zeta\) is the Riemann zeta
+function and \(\zeta(3) \approx 1.20206\).
+
+It is conventional to normalize the number density to a reference point that has
+a constant comoving number density.  Two common conventions include the entropy
+density and the photon number density.  In this work, we will use the
+equilibrium number density of a single massless bosonic degree of freedom, which
+is equivalent to half the photon density.
+
+\begin{subequations}
+  \begin{align}
+    n_{\textsc{mb}}(\beta; m, \mu) &= \frac{g}{2 \zeta(3)} m^2 \beta^2 K_2(m \beta) e^{\mu \beta} \\
+    n(\beta; 0, \mu) &= \frac{g}{\zeta(3)} \times \begin{cases}
+       \Li_3(e^{\mu \beta}) & \text{Bose--Einstein} \\
+       - \Li_3(- e^{\mu \beta}) & \text{Fermi--Dirac} \\
+       e^{\mu \beta} & \text{Maxwell--Boltzmann}
+    \end{cases} \\
+    &= g \times \begin{cases}
+       1 + \frac{\pi^2}{6 \zeta(3)} \mu \beta + \calO(\mu^2) & \text{Bose--Einstein} \\
+       \frac{3}{4} + \frac{\pi^2}{12 \zeta(3)} \mu \beta + \calO(\mu^2) & \text{Fermi--Dirac} \\
+       \frac{g}{\zeta(3)} + \frac{1}{\zeta(3)} \mu \beta + \calO(\mu^2) & \text{Maxwell--Boltzmann}
+    \end{cases}
+  \end{align}
+\end{subequations}
+
+One important property that will be used to make the interaction rate
+calculations more tractable is to assume that the particles following a
+Maxwell--Boltzmann distribution.  In that case, one important property that
+emerges is the following relation:
+\begin{equation}
+  \label{eq:phase_space_to_number_density}
+  \frac{f(\beta; E, m, \mu)}{f(\beta; E, m, 0)} = e^{\mu \beta} = \frac{N(\beta; m, \mu)}{N(\beta; m, 0)}
+\end{equation}
+which allows the phase space to be related to the equilibrium phase space and
+the ratio of number densities.  This assumption is still approximately true for
+the quantum statistical distributions provided the chemical potential is small.
+
+\subsection{Number Density Asymmetry}%
+\label{sec:number_density_asymmetry}
+
+The number density asymmetry for a particle \(p\) is defined to be
+\begin{equation}
+  \Delta \defeq N - \overline N
+\end{equation}
+or the equivalent using the normalized number density.  The asymmetry can be
+evaluated by computing the integral
+\begin{equation}
+  \Delta = \int f - \overline f \ddbar{\vt p} 
+\end{equation}
+and provided that the particle and antiparticle have a fast
+co-annihilation/pair-creation interaction, the chemical potentials of both will
+be equal and opposite.
+
+As with the number density, this can only be analytically evaluated for the
+Maxwell--Boltzmann distribution:
+\begin{equation}
+  \Delta_{\textsc{mb}}(\beta; m, \mu)
+  = \frac{g}{2 \pi^2} \frac{m^2 K_2(m \beta)}{\beta} \sinh(\mu \beta)
+\end{equation}
+and the massless case can be evaluated for all three distributions:
+\begin{subequations}
+  \begin{align}
+    \Delta(\beta; 0, \mu) &= \frac{g}{\pi^2 \beta^3} \times \begin{cases}
+      \frac{1}{12} \left[ 2 \pi^2 \mu\beta - (\mu\beta)^3 \right] & \text{Bose--Einstein} \\
+      \frac{1}{12} \left[ \pi^2 \mu\beta + (\mu\beta)^3 \right] & \text{Fermi--Dirac} \\
+      \sinh(\mu \beta) & \text{Maxwell--Boltzmann}
+    \end{cases}.
+  \end{align}
+\end{subequations}
+For normalized number density asymmetries, the above evaluate to
+\begin{equation}
+  \Delta_{\textsc{mb}}(\beta; m, \mu)
+  = \frac{g}{2 \zeta(3)} \frac{\beta^2 m^2 K_2(m \beta)}{\beta} \sinh(\mu \beta)
+\end{equation}
+and the massless case can be evaluated for all three distributions:
+\begin{subequations}
+  \begin{align}
+    \Delta(\beta; 0, \mu) &= \frac{g}{\zeta(3)} \times \begin{cases}
+      \frac{1}{12} \left[ 2 \pi^2 \mu\beta - (\mu\beta)^3 \right] & \text{Bose--Einstein} \\
+      \frac{1}{12} \left[ \pi^2 \mu\beta + (\mu\beta)^3 \right] & \text{Fermi--Dirac} \\
+      \sinh(\mu \beta) & \text{Maxwell--Boltzmann}
+    \end{cases}
+  \end{align}
+\end{subequations}
+
+For small chemical potentials, the phase space differences is
+\begin{equation}
+  f - \overline f = \frac{2 \beta \mu e^{E \beta}}{(e^{E \beta} + \xi)^2} + \calO(\mu^3)
+\end{equation}
+and therefore an alternative expression for the asymmetry is
+\begin{equation}
+  \Delta = 2 \beta \mu \int \frac{e^{E \beta}}{(e^{E \beta} + \xi)^2} \ddbar^3{\vt p}
+\end{equation}
+which unfortunately does not have a closed analytic form save for \(\xi = 0\).
+
+\clearpage
+\section{Boltzmann Equations}%
+\label{sec:boltzmann_equations}
+
+In full generality, the boltzmann equation for a particle with phase space
+distribution \(f\) is
+\begin{equation}
+  \vt L[f] = \vt C[f]
+\end{equation}
+where \(\vt L\) is the Liouville operator and \(\vt C\) is the collision
+operator.  The most general form of the phase space is a function of both
+position, momentum and time; however, assuming the Universe to be homogeneous
+and isotropic implies that the phase space only depends on energy and time.
+
+\subsection{Liouville Operator}%
+\label{sec:liouville_operator}
+
+The Liouville operator in general is
+\begin{equation}
+  \vt L[f] = \left[ p^\mu \partial_\mu - \Gamma^\mu_{\nu\sigma} p^\nu p^\sigma \partial_\mu \right] f,
+\end{equation}
+under the \textsc{flrw} metric is
+\begin{equation}
+  \vt L[f] \stackrel{\textsc{flrw}}{=} \left[E \pfrac{}{t} - H \abs{\vt p}^2 \pfrac{}{E}\right] f
+\end{equation}
+where \(H \defeq \dot a / a\) is Hubble's constant.
+
+As we are not interested in the phase space directly but instead the number
+density of the particle species interacting, we integrate the Liouville operator
+over the phase space of the particle (where \(g\) is the number of internal
+degrees of freedom of the particle):
+\begin{subequations}
+  \begin{align}
+    g \int \vt L[f] \dd \Pi
+    &= \int \left[E \pfrac{}{t} - H \abs{\vt p}^2 \pfrac{}{E}\right] f \frac{g}{2E} \ddbar^3{\vt p} \\
+    &= \frac{g}{2} \int \left[\pfrac{}{t} - H \frac{E^2 - m^2}{E} \pfrac{}{E}\right] f \ddbar^3{\vt p} \\
+    &= g \int E \pfrac{f}{t} + 2 H E f - \pfrac{}{E} \left[H (E^2 - m^2) f \right] \ddbar^3{\vt p} \\
+    &= g \int E \pfrac{f}{t} + 2 H E f \ddbar^3{\vt p} - g \left[H (E^2 - m^2) f \right]_{E = m}^{E = \infty} \\
+    &= \pfrac{N}{t} - 3 H N
+  \end{align}
+\end{subequations}
+
+\subsection{Collision Operator}%
+\label{sec:collision_operator}
+
+As for the collision operator, only the inelastic contributions survive.  Taking
+the interaction to be \(\vt a \leftrightarrow \vt b\) for some set of particles
+\(\vt a\) annihilating into \(\vt b\).  The collision term is:
+\begin{equation}
+  \begin{aligned}
+    g_{a_1} \int \vt C[f_{a_1}] \dd \Pi_{a_1}
+    &= \int_{\vt a}^{\vt b} \left[ \left(\prod_{i \in \vt a} f_i\right) \left(\prod_{i \in \vt b} 1 - \xi_i f_i\right) \abs{\pzcM_{\vt a}^{\vt b}}^2 \right. \\
+    &\quad\qquad \left. - \left(\prod_{i \in \vt b} f_i\right) \left(\prod_{i \in \vt a} 1 - \xi_i f_i\right) \abs{\pzcM_{\vt b}^{\vt a}}^2 \right]
+  \end{aligned}
+\end{equation}
+where we have introduced the following abbreviations:
+\begin{subequations}
+  \begin{align}
+    \int_{\vt a}^{\vt b} &\defeq (2\pi)^4 \delta(p_{\vt a} - p_{\vt b}) \dd \Pi_{\vt a} \dd \Pi_{\vt b}, \\
+    \abs{\pzcM_{\vt a}^{\vt b}}^2 &\defeq \abs{\pzcM(\vt a \to \vt b)}^2, \\
+    p_{\vt a} &\defeq \sum_{i \in \vt a} p_i, \\
+    \dd \Pi_{\vt a} &\defeq \prod_{i \in \vt a} \dd \Pi_i, \\
+    \dd \Pi_i &\defeq \frac{g_i}{2 E_i} \ddbar^3{\vt p_i} \equiv \frac{g_i \abs{\vt p_i}}{2} \frac{\dd E_i \dd \Omega_i}{(2 \pi)^3}
+  \end{align}
+\end{subequations}
+and the squared amplitude is \emph{summed} over all internal degrees of freedom.
+Furthermore, the phase space is described by
+\begin{equation}
+  f_i \defeq \frac{1}{e^{(E_i - \mu_i) \beta} + \xi_i}
+\end{equation}
+where \(\xi_i\) is \(+1\) for fermions, \(-1\) for bosons and \(0\) if we wish
+to use a Maxwell--Boltzmann distribution.  The quantum statistical factors are
+\begin{equation}
+  1 - \xi_i f_i \equiv e^{(E_i - \mu_i) \beta} f_i
+\end{equation}
+
+If we assume particles phase space can be reasonably approximated by a
+Maxwell--Boltzmann distribution, then the quantum statistic factors can be
+omitted and we can replace the phase space factors with equilibrium phase space
+scaled by ratios of number densities (see
+\cref{eq:phase_space_to_number_density}):
+\begin{equation}
+  \int_{\vt a}^{\vt b} \left[ \abs{\pzcM_{\vt a}^{\vt b}}^2 \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right)
+  - \abs{\pzcM_{\vt b}^{\vt a}}^2 \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} f_i^{(0)} \right) \right]
+\end{equation}
+Energy conservation ensures that \(\prod_{i \in \vt a} f_i^{(0)} = \prod_{i \in
+\vt b} f_i^{(0)}\) and we may further simplify
+\begin{equation}
+  \int_{\vt a}^{\vt b} \prod_{i \in \vt a} f_i^{(0)} \left[
+    \abs{\pzcM_{\vt a}^{\vt b}}^2 \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} \right)
+    - \abs{\pzcM_{\vt b}^{\vt a}}^2 \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right)
+  \right]
+\end{equation}
+Finally, if we define the CP asymmetry in the squared amplitude as
+\begin{equation}
+  \abs{\delta \pzcM_{\vt a}^{\vt b}}^2 \defeq \abs{\pzcM_{\vt a}^{\vt b}}^2 - \abs{\pzcM_{\vt b}^{\vt a}}^2
+\end{equation}
+then we obtain the final simplification for the interaction rate density:
+\begin{equation}
+  \begin{aligned}
+    &\int_{\vt a}^{\vt b} \prod_{i \in \vt a} f_i^{(0)} \left[
+      \abs{\pzcM_{\vt a}^{\vt b}}^2 \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} - \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right)
+      + \abs{\delta \pzcM_{\vt a}^{\vt b}}^2 \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right)
+    \right] \\
+    &= \left( \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} - \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right)
+      \underbrace{\int_{\vt a}^{\vt b} \abs{\pzcM_{\vt a}^{\vt b}} \prod_{i \in \vt a} f_i^{(0)}}_{\gamma} \\
+    &\quad + \left( \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right) \underbrace{\int_{\vt a}^{\vt b} \abs{\delta \pzcM_{\vt a}^{\vt b}}^2 \prod_{i \in \vt a} f_i^{(0)}}_{\delta \gamma}
+  \end{aligned}
+\end{equation}
+
+\subsection{\texorpdfstring{\(1 \leftrightarrow n\)}{1 to n} Interactions}
+
+The reaction density is given by
+\begin{equation}
+  \left( \frac{n_a}{n_a^{(0)}} - \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right) \int_{a}^{\vt b} \abs{\pzcM_a^{\vt b}}^2 f_a^{(0)}
+\end{equation}
+
+\begin{equation}
+  \begin{aligned}
+    \int_a^{bc} f_a^{(0)}
+    &= \left[ \int \dd \Pi_a f_a^{(0)} \right] \left[ \int \dd \Pi_{\vt b} (2 \pi)^4 \delta^4(p_a - p_{\vt b}) \abs{\pzcM_a^{\vt b}} \right] \\
+    &= \left[ g_a \frac{m_a K_1(m_a \beta)}{4 \pi^2 \beta} \right] \Big[ 2 m_a \Gamma(a \to \vt b) \Big]
+  \end{aligned}
+\end{equation}
+
+\subsubsection{\texorpdfstring{\(1 \leftrightarrow 2\)}{1 to 2} Decay}
+
+In the specific case of a \(1 \leftrightarrow 2\) interaction, the expression is
 \begin{align}
-  \dd \Phi_n(q; p_1, p_2, \dots, p_n)
-   & = \dd \Pi_1 \dd \Pi_2 \cdots \dd \Pi_n (2 \pi)^4 \delta^4(p_1 + p_2 + \cdots + p_n - q)                 \\
-   & = \dd \Pi_1 \dd \Pi_2 \cdots \dd \Pi_n (2 \pi)^4 \delta^4(p_1 + p_2 + \cdots + p_n - q)                 \\
-   & \quad \times \dd \Pi_{12} \ddbar{s_{ij}} (2 \pi)^4 \delta^4(q_{12} - p_1 - p_2)
-  \intertext{The combination of \(\dd \Pi_1 \dd \Pi_2 (2 \pi)^4 \delta^4(q_{12} - p_1 - p_2)\) is exactly equal to \(\dd \Phi_2(q_{12}; p_1, p_2)\).}
-   & = \dd \Phi_2(q_{12}; p_1, p_2) \ddbar{s_{12}}                                                           \\
-   & \quad \times \dd \Pi_{12} \dd \Pi_3 \cdots \dd \Pi_n (2\pi)^4 \delta^4(q_{12} + p_3 + \cdots + p_n - q) \\
-   & = \dd \Phi_2(q_{12}; p_1, p_2) \ddbar{s_{12}} \dd \Phi_{n-1}(q; q_{12}, p_3, \ldots, p_n)
+  \left[ \frac{n_a}{n_a^{(0)}} - \frac{n_b n_c}{n_b^{(0)} n_c^{(0)}} \right] \int_a^{bc} \abs{\pzcM_a^{bc}} f_a^{(0)}.
 \end{align}
-
-\subsection{\(1 \leftrightarrow n\) Interactions}
-
-The reaction density is given by
-\begin{equation}
-  \gamma(a \to \vt b) \int \dd \Pi_a \dd \Pi_{\vt b} (2\pi)^4 \delta^4(p_a - p_{\vt c}) \abs{\pzcM(a \to \vt b)}^2 f_a^{(0)}
-\end{equation}
-
-% \subsubsection{\(1 \leftrightarrow 1\) Mixing}%
-% \label{sec:1-to-1_mixing}
-
-% The reaction density is given by
-% \begin{equation}
-%   \gamma(a \to b) = \int \dd \Pi_a \dd \Pi_b (2 \pi)^4 \delta^4(p_a - p_b) \abs{\pzcM(a \leftrightarrow b)}^2 f_a^{(0)}
-% \end{equation}
-% which can be evaluated using the 2-body phase space, with \(q_{ab} = 2 p_b\):
-% \begin{align}
-%   \dd \Pi_a \dd \Pi_b (2 \pi)^4 \delta^4(p_a - p_b)
-%    & = \dd \Phi(q_{ab}; p_a, p_b)                                                                 \\
-%    & = \frac{g_a g_b \lambda^{\frac{1}{2}}(q_{ab}^2, m_a^2, m_b^2)}{32 \pi^2 q_{ab}^2} \dd \Omega
-% \end{align}
-% Thus the reaction density is
-% \begin{equation}
-%   \gamma(a \to b) = \frac{4 \pi g_a g_b \lambda^{\frac{1}{2}(q_{ab}^2, m_a^2, m_b^2)}}{32 \pi^2 }\abs{\pzcM}^2 f_a^{(0)}
-% \end{equation}
-
-% The reverse rate is
-% \begin{align}
-%   \gamma(b \to a)
-%    & = \int \dd \Pi_b \dd \Pi_a (2 \pi)^4 \delta^4(p_b - p_a) \abs{\pzcM}^2 f_b^{(0)}                      \\
-%    & = \frac{4\pi g_a g_b \lambda^{\frac{1}{2}}(q_{ab}^2, m_a^2, m_b^2)}{32 \pi^2} \abs{\pzcM}^2 f_b^{(0)}
-% \end{align}
-% Thus the change in \(n_a\) is:
-% \begin{align}
-%   \ddfrac{n_a}{t}
-%    & = \frac{n_b}{n_b^{(0)}} \gamma(b \to a) - \frac{n_a}{n_a^{(0)}} \gamma(a \to b)                                                                 \\
-%    & = \frac{g_a g_b \lambda^{\frac{1}{2}}(q_{ab}^2, m_a^2, m_b^2)}{8\pi} \left[ \frac{n_b}{n_b^{(0)}} f_b^{(0)} - \frac{n_a}{n_a^{(0)}} f_a \right]
-% \end{align}
-
-\subsubsection{\(1 \leftrightarrow 2\) Decay}
-
-The reaction density is given by
-\begin{equation}
-  \gamma(a \rightarrow bc) =
-  \int \dd \Pi_a \dd \Pi_b \dd \Pi_c (2\pi)^4
-  \delta^4(p_a - p_b - p_c)
-  \abs{\pzcM(a \leftrightarrow bc)}^2 f_a^{(0)}.
-\end{equation}
-As we are summing over all internal degrees of freedom, the final amplitude has
-no dependence on any integration variable and can be taken outside the integral.
-
-The integration over the final state particles can be done easily as it is
-exactly a two-particle phase space,
+For three particle interaction summed over all spins, all dependence on external
+momenta vanish and thus the integral can be done exactly with the matrix element
+outside of the integral
 \begin{equation}
   \begin{aligned}
-    \int \dd \Pi_b \dd \Pi_c (2\pi)^4 \delta^4(p_a - p_b - p_c)
-     & \equiv \int \dd \Phi_2(p_a; p_b, p_c)                                    \\
-    %  & = g_b g_c \frac{\lambda^{\frac{1}{2}}(m_a^2, m_b^2, m_c^2)}{32 \pi^2 m_a^2} \dd \Omega_{bc} \\
-     & = g_b g_c \frac{\lambda^{\frac{1}{2}}(m_a^2, m_b^2, m_c^2)}{8 \pi m_a^2}
+    \int_a^{bc} f_a^{(0)}
+    &= \left[ \int \dd \Pi_a f_a^{(0)} \right] \left[ \int \dd \Pi_b \dd \Pi_c (2 \pi)^4 \delta^4(p_a - p_b - p_c) \right] \\
+    &= \left[ g_a \frac{m_a K_1(m_a \beta)}{4 \pi^2 \beta} \right] \left[ g_b g_c \frac{\lambda^\frac{1}{2}(m_a^2, m_b^2, m_c^2)}{8 \pi m_a^2} \right] \\
+    &= \frac{g_a g_b g_c}{32 \pi^3} \lambda^\frac{1}{2}(m_a^2, m_b^2, m_c^2) \frac{K_1(m_a \beta)}{m_a \beta}
   \end{aligned}
 \end{equation}
-In the limit that \(m_b, m_c \to 0\), this simplifies to \(g_b g_c / 8 \pi\).
-
-% When combined with the squared amplitude, can be related to the
-% 0-temperature decay width as
-% \begin{equation}
-%   \begin{aligned}
-%     \dd \Gamma
-%            & = \frac{\abs{\pzcM}^2}{32\pi^2}
-%     \overbrace{\frac{\lambda^{\frac{1}{2}}(m_a^2, m_b^2, m_c^2)}{2 m_a}}^{\abs{\vt p_a}}
-%     \frac{1}{m_a^2} \dd \Omega_{bc}                                                                 \\
-%     \Gamma & = \frac{\abs{\pzcM}^2}{16\pi} \frac{\lambda^{\frac{1}{2}}(m_a^2, m_b^2, m_c^2)}{m_a^3}
-%   \end{aligned}
-% \end{equation}
-
-As for the integration over the initial particle's phase space:
+Hence the interaction rate is
 \begin{equation}
-  % \begin{aligned}
-  \int \dd \Pi_a f_a^{(0)}
-  = g_a \int f_a^{(0)} \frac{\abs{\vt p_a}}{2} \frac{\dd E_a \dd \Omega_a}{(2\pi)^3}
-  = g_a \frac{m_a K_1(m_a \beta)}{4 \pi^2 \beta}
-  % \end{aligned}
+  \left[ \frac{n_a}{n_a^{(0)}} - \frac{n_b n_c}{n_b^{(0)} n_c^{(0)}} \right]
+  \frac{g_a g_b g_c}{32 \pi^3} \lambda^\frac{1}{2}(m_a^2, m_b^2, m_c^2) \frac{K_1(m_a \beta)}{m_a \beta} \abs{\pzcM_a^{bc}}
 \end{equation}
 
-This the interaction density can be expressed in a succinct closed form as
-\begin{equation}
-  \gamma(a \to bc) = \frac{g_a g_b g_c}{32 \pi^3} \abs{\pzcM}^2
-  \lambda^{\frac{1}{2}}(m_a^2, m_b^2, m_c^2)
-  \frac{K_1(m_a \beta)}{m_a \beta} .
-\end{equation}
-which goes towards 0 quite quickly when \(m_a \beta > 1\).  Having said that,
-the forward interaction rate is scaled by \(n_a / n_a^{(0)}\) where \(n_a^{(0)}
-\propto K_2(m_a \beta)\) which also goes to 0 quickly when \(m_a \beta > 1\).
-Thus in order to avoid having \(0 / 0\) in the computation, we combine the two:
+Although the above form is mathematically sound, it quickly becomes difficult to
+compute numerically as \(\beta\) becomes larger since \(K_1(m_a \beta) \to 0\)
+and \(n_a^{(0)} \sim K_2(m_a \beta) \to 0\) resulting in a \(0 / 0\) error.
+Note that we never need to worry about the other equilibrium number densities
+going to 0 as it is always the heaviest particle that is decaying.  Thus we
+define:
 \begin{equation}
   \begin{aligned}
-    \frac{N_a}{N_a^{(0)}} \gamma(a \to bc)
-     & = N_a \left( \frac{g_a m_a^2 K_2(m_a \beta)}{2 \pi^2 \beta} \right)^{-1} \gamma(a \to bc) \\
-     & = N_a g_b g_c \abs{\pzcM}^2
-    \frac{\lambda^{\frac{1}{2}}(m_a^2, m_b^2, m_c^2)}{16 \pi m_a^3}
-    \frac{K_1(m_a \beta)}{K_2(m_a \beta)}                                                        \\
-     & = n_a \frac{\zeta(3)}{16 \pi} g_b g_c \abs{\pzcM}^2
-    \lambda^{\frac{1}{2}}(m_a^2, m_b^2, m_c^2)
-    \frac{1}{m_a^3 \beta^3}
-    \frac{K_1(m_a \beta)}{K_2(m_a \beta)},
+    \tilde\gamma &\defeq \frac{\gamma}{n_a^{(0)}} \\
+    &= \frac{g_b g_c \zeta(3)}{16 \pi^3} \lambda^{\frac{1}{2}}(m_a^2, m_b^2, m_c^2) \frac{K_1(m_a \beta)}{K_2(m_a \beta)} \frac{1}{(m_a \beta)^3} \abs{\pzcM_a^{bc}}^2
   \end{aligned}
 \end{equation}
-where \(N_a\) is the non-normalized number density, and \(n_a\) is normalized to
-a single massless bosonic degree of freedom.  The ratio of Bessel function
-behaves as
+and the interaction rate therefore can be expressed as
+\begin{equation}
+  \left[ n_a - n_a^{(0)} \frac{n_b n_c}{n_b^{(0)} n_c^{(0)}} \right] \tilde \gamma
+\end{equation}
+
+The ratio of Bessel functions behaves as
 \begin{equation}
   \frac{K_1(x)}{K_2(x)} = \begin{cases}
     \frac{x}{2} + \calO(x^3)                                              & x \ll 1 \\
     1 - \frac{3}{2x} + \frac{15}{8 x^2} + \calO\left(\frac{1}{x^3}\right) & x \gg 1
-  \end{cases}.
+  \end{cases},
 \end{equation}
+and thus even as \(m_a \beta \to \infty\) the first particle will continue to
+decay even if its equilibrium number density is 0 (as expected).
 
-The backward rate is given by
-\begin{equation}
-  \gamma(bc \to a) = \int \dd\Pi_a \dd\Pi_b \dd\Pi_c (2\pi)^4 \delta^4(p_a - p_b - p_c) \abs{\pzcM(a \leftrightarrow bc)}^2 f_b^{(0)} f_c^{(0)}
-\end{equation}
-The time-like component of the Dirac delta enforces that \(E_a = E_b + E_c\) and
-thus we have that
-\begin{equation}
-  f_b^{(0)} f_c^{(0)} = e^{(E_b + E_c) \beta} = e^{E_a \beta} = f_a^{(0)}
-\end{equation}
-thus recovering the same equation the forward rate.  As for the rate scaled by
-the number densities of the initial state particles, there is no easy
-cancelation (unless the particle have \emph{exactly} the same masses).
+Once the normalization is taken into account, then \(\gamma \sim \beta\) as
+\(\beta \gg m_a\) and the interaction rate keeps increasing so that the particle
+will always decay eventually.
 
-\subsubsection{\(1 \leftrightarrow 3\) Decay}%
+\subsubsection{\texorpdfstring{\(1 \leftrightarrow 3\)}{1 to 3} Decay}%
 \label{sec:1-to-3_decay}
 
-\subsection{\(2 \leftrightarrow n\) Scattering}%
+\todo{To calculate}
+
+\subsection{\texorpdfstring{\(2 \leftrightarrow n\)}{1 to n} Scattering}%
 \label{sec:2-to-n_scattering}
 
 The reaction density is given by
 \begin{equation}
-  \gamma(ab \to \vt c)
-  = \int \dd \Pi_a \dd \Pi_b \dd \Pi_{\vt c} (2 \pi)^4 \delta^4 (p_a + p_b - p_{\vt c}) \abs{\pzcM(ab \to \vt c)}^2 f_a^{(0)} f_b^{(0)}.
+  \left( \frac{n_a n_b}{n_a^{(0)} n_b^{(0)}} - \prod_{i \in \vt c} \frac{n_i}{n_i^{(0)}} \right) \int_{ab}^{\vt c} \abs{\pzcM_{ab}^{\vt c}}^2 f_a^{(0)} f_b^{(0)}.
 \end{equation}
-The integration over the initial states can be done first
-\begin{align}
-  \gamma(ab \to \vt c)
-   & = \int \dd \Pi_a \dd \Pi_b \dd \Pi_{\vt c} (2 \pi)^4 \delta^4 (p_a + p_b - p_{\vt c}) \abs{\pzcM(ab \to \vt c)}^2 f_a^{(0)} f_b^{(0)}                                                            \\
-   & = \int \dd \Phi_2(q_{ab}; p_a, p_b) \ddbar{s} \dd \Pi_{ab} \dd \Pi_{\vt c} (2 \pi)^4 \delta^4(q_{ab} - p_{\vt c}) \abs{\pzcM(ab \to \vt c)}^2 f^{(0)}_a f^{(0)}_b
-  \intertext{The zero-chemical-potential phase space distributions can be expressed in terms of the centre-of-mass energy: \(f^{(0)}_a f^{(0)}_b = \exp[-(E_a + E_b)\beta] = \exp[- E_{ab} \beta]\).  Furthermore, we can choose a reference frame such that the solid angle integration in \(\dd \Phi_2(q_{ab}; p_a, p_b)\) is trivial (and therefore \(\Phi_2(q_{ab}; p_a, p_b) = g_a g_b \lambda^{\frac{1}{2}}(s, m_a^2, m_b^2) / 8 \pi s\))}
-   & = \int \ddbar{s} \underbrace{\Phi_2(q_{ab}; p_a, p_b) \dd \Pi_{\vt c} (2 \pi)^4 \delta^4(q_{ab} - p_{\vt c}) \abs{\pzcM(ab \to \vt c)}^2}_{\defeq \hat \sigma(s)} \dd \Pi_{ab} e^{-E_{ab} \beta} \\
-   & = \int \ddbar{s} \hat \sigma(s) \ddbar^3{\vt p_{ab}} \frac{1}{2 E_{ab}} e^{-E_{ab} \beta}                                                                                                        \\
-   & = \frac{1}{32 \pi^4} \int \hat \sigma(s) \abs{\vt p_{ab}} e^{-E_{ab} \beta} \dd E_{ab} \dd \Omega_{ab} \dd s                                                                                     \\
-   & = \frac{1}{32 \pi^4} \int \hat \sigma(s) \sqrt{E_{ab}^2 - s} e^{-E_{ab} \beta} \dd E_{ab} \dd \Omega_{ab} \dd s                                                                                  \\
-   & = \frac{1}{8 \pi^3 \beta} \int \hat \sigma(s) \sqrt{s} K_1(\sqrt{s} \beta) \dd s
-\end{align}
-Note that there is an alternative definition for \(\hat \sigma\) which has an
-additional factor of \(8 \pi\), and thus changing the \(1 / 8 \pi^3\)
-prefactor to \(1 / 64 \pi^4\).
 
-\subsubsection{\(2 \leftrightarrow 2\) Scattering}%
+In order to make it easier to compute, we insert the identity from \cref{eq:phase_space_identity}
+\begin{equation}
+  \begin{aligned}
+    \dd \Pi_a \dd \Pi_b &\equiv \dd \Phi_2(q_{ab}; p_a, p_b) \ddbar s \dd \Pi_{ab} \\
+    &= \frac{g_a g_b}{8 \pi} \frac{\lambda^\frac{1}{2}(s, m_a^2, m_b^2)}{s} \ddbar s \dd\Pi_{ab}
+  \end{aligned}
+\end{equation}
+Specifically, since we are assuming Maxwell--Boltzmann distributions, then
+\(f_a^{(0)} f_b^{(0)} = \exp[-(E_a + E_b) \beta] = \exp[-E_{ab} \beta]\) and the
+squared amplitude depends on \(s\) but not \(\vt p_{ab}\) so we can integrate
+over the intermediate momentum we introduced:
+\begin{equation}
+  \begin{aligned}
+    \int \dd \Pi_{ab} f_a^{(0)} f_b^{(0)}
+    &= \int \ddbar^3{\vt p_{ab}} \frac{1}{2 E_{ab}} e^{- E_{ab} \beta} \\
+    &= \int \frac{\sqrt{E_{ab}^2 - s}}{2} e^{- E_{ab} \beta} \frac{\dd E_{ab} \dd \Omega_{ab}}{(2 \pi)^3} \\
+    &= \frac{1}{4 \pi^2} \frac{\sqrt{s}}{\beta} K_1(\sqrt{s} \beta)
+  \end{aligned}
+\end{equation}
+Putting together the initial particle integration, we obtain:
+\begin{equation}
+  \begin{aligned}
+    \int_{ab}^{\vt b} \abs{\pzcM_{ab}^{\vt c}} f_a^{(0)} f_b^{(0)}
+    &= \frac{1}{4 \pi^2} \int \ddbar s \frac{\sqrt{s}}{\beta} K_1(\sqrt{s} \beta) \\
+    &\qquad \times \frac{g_a g_b}{8 \pi} \frac{\lambda^\frac{1}{2}(s, m_a^2, m_b^2)}{s} \\
+    &\qquad \times \int \dd \Pi_{\vt c} (2\pi)^4 \delta^4(q_{ab} - p_{\vt c}) \abs{\pzcM_{ab}^{\vt c}} \\
+    &= \frac{g_a g_b}{64 \pi^4} \int \dd s \frac{K_1(\sqrt{s} \beta)}{\sqrt{s} \beta} \\
+    &\qquad \times \lambda^\frac{1}{2}(s, m_a^2, m_b^2) \\
+    &\qquad \times \int \dd \Pi_{\vt c} (2\pi)^4 \delta^4(q_{ab} - p_{\vt c}) \abs{\pzcM_{ab}^{\vt c}}
+  \end{aligned}
+\end{equation}
+
+\subsubsection{\texorpdfstring{\(2 \leftrightarrow 2\)}{2 to 2} Scattering}%
 \label{sec:2-to-2_scattering}
 
 When both initial and final states have two particles, both initial and final
-two-body phase spaces can be greatly simplified.
+two-body phase spaces can be greatly simplified.  Specifically, the integration
+over the final state particles is:
+\begin{equation}
+  \begin{aligned}
+    \int \dd \Pi_c \dd \Pi_d (2 \pi)^4 \delta^4(q_{ab} - p_c - p_d) \abs{\pzcM_{ab}^{cd}}
+    &= \int \dd \Phi_2(q_{ab}; p_c, p_d) \abs{\pzcM_{ab}^{cd}} \\
+    &= \frac{g_c g_d}{32 \pi^2} \frac{\lambda^\frac{1}{2}(s, m_c^2, m_d^2)}{s} \int \dd \Omega_{cd} \abs{\pzcM_{ab}^{cd}}
+  \end{aligned}
+\end{equation}
+and the integration over \(\phi_{cd}\) can be done trivially and the
+integration over \(\cos \theta_{cd}\) can be done by relating it to the
+Mandelstam \(t\) variable (\cref{eq:t_angular})
+\begin{equation}
+  \begin{aligned}
+    &= \frac{g_c g_d}{32 \pi^2} \frac{\lambda^\frac{1}{2}(s, m_c^2, m_d^2)}{s} \int 2 \pi \frac{\dd \cos\theta}{\dd t} \dd t \abs{\pzcM_{ab}^{cd}} \\
+    &= \frac{g_c g_d}{8 \pi} \frac{1}{\lambda^\frac{1}{2}(s, m_a^2, m_b^2)} \int \dd t \abs{\pzcM_{ab}^{cd}}
+  \end{aligned}
+\end{equation}
 
-\begin{align}
-  \hat \sigma(s)
-   & = \Phi_2(q_{ab}; p_a, p_b) \int \dd \Phi_2(q_{ab}; p_c, p_d) \abs{\pzcM(ab \to cd)}^2                                                      \\
-   & = \Phi_2(q_{ab}; p_a, p_b) \frac{g_c g_d \lambda^{\frac{1}{2}}(s, m_c^2, m_d^2)}{32 \pi^2 s} \int \dd \Omega_{cd} \abs{\pzcM(ab \to cd)}^2
-  \intertext{The integration over \(\phi_{cd}\) can be done trivially as we are averaging over polarization.  One only needs only to integrate over \(\cos \theta_{cd}\).  We can arbitrarily orient this such \(\cos \theta_{cd} = \cos \theta_c\), and by using the relation \cref{eq:t_angular}, the angular integral can be related to an integral over the \(t\) Mandelstam variable:}
-   & = \frac{g_a g_b \lambda^{\frac{1}{2}}(s, m_a^2, m_b^2)}{8 \pi s} \frac{g_c g_d \lambda^{\frac{1}{2}}(s, m_c^2, m_d^2)}{16 \pi s}
-  \int \ddfrac{\cos \theta}{t} \dd t \abs{\pzcM(ab \to cd)}^2                                                                                   \\
-   & = \frac{g_a g_b g_c g_d}{64 \pi^2 s} \int \dd t \abs{\pzcM(ab \to cd)}^2
-\end{align}
+Thus the whole interaction rate is
+\begin{equation}
+  \begin{aligned}
+    \int_{ab}^{cd} \abs{\pzcM_{ab}^{cd}} f_a^{(0)} f_b^{(0)}
+    &= \frac{g_a g_b g_c g_d}{512 \pi^5} \int \frac{K_1(\sqrt s \beta)}{\sqrt s \beta} \abs{\pzcM_{ab}^{cd}} \dd t \dd s
+  \end{aligned}
+\end{equation}
 
-As a result, the full expression for a \(2 \to 2\) reaction is:
-\begin{align}
-  \gamma(ab \to cd) = \frac{g_a g_b g_c g_d}{512 \pi^5 \beta} \int \abs{\pzcM(ab \to cd)}^2 \frac{K_1(\sqrt{s} \beta)}{\sqrt s} \dd s \dd t
-\end{align}
+As with the decay case, it can be numerically more stable to compute the
+interaction rate \(\gamma\) divided by the (normalized) number density; however,
+unlike the decay case there are multiple cases to consider depending on the
+number of heavy particles with near-zero equilibrium number density:
+\begin{subequations}
+  \begin{align}
+    \frac{K_1(\sqrt s \beta)}{\sqrt s \beta} \frac{1}{n_a^{(0)}}
+    &= \left( \sqrt{\frac{8}{\pi}} \zeta(3) \right) \frac{\sqrt{\pi / 2}}{g_a} \frac{e^{\beta (m_a - \sqrt{s})}}{(\sqrt{m_a} \sqrt[4]{s} \beta)^3} \\
+    \frac{K_1(\sqrt s \beta)}{\sqrt s \beta} \frac{1}{n_a^{(0)} n_b^{(0)}}
+    &= \left( \sqrt{\frac{8}{\pi}} \zeta(3) \right)^2 \frac{\sqrt{\pi / 2}}{g_a g_b} \frac{e^{\beta (m_a + m_b - \sqrt{s})}}{\left(\sqrt{m_a m_b} \sqrt[4]{s} \beta^\frac{3}{2}\right)^3} \\
+    \frac{K_1(\sqrt s \beta)}{\sqrt s \beta} \frac{1}{n_a^{(0)} n_b^{(0)} n_c^{(0)}}
+    &= \left( \sqrt{\frac{8}{\pi}} \zeta(3) \right)^3 \frac{\sqrt{\pi / 2}}{g_a g_b g_c} \frac{e^{\beta (m_a + m_b + m_c - \sqrt{s})}}{\left(\sqrt{m_a m_b m_c} \sqrt[4]{s} \beta^2\right)^3} \\
+    \frac{K_1(\sqrt s \beta)}{\sqrt s \beta} \frac{1}{n_a^{(0)} n_b^{(0)} n_c^{(0)} n_d^{(0)}}
+    &= \left( \sqrt{\frac{8}{\pi}} \zeta(3) \right)^4 \frac{\sqrt{\pi / 2}}{g_a g_b g_c g_d} \frac{e^{\beta (m_a + m_b + m_c + m_d - \sqrt{s})}}{\left(\sqrt{m_a m_b m_c m_d} \sqrt[4]{s} \beta^\frac{5}{2} \right)^3}
+  \end{align}
+\end{subequations}
+Important to note is that as \(s \to \infty\), all of the above are
+exponentially suppressed, but in the case of 3 and 4 heavy particles there is a
+partial exponential enhancement when \(\max\{m_a + m_b, m_c +
+m_d\} < \sqrt{s} < m_a + m_b + m_c (+ m_d)\).
+
+In the special case where \(\abs{\pzcM_{ab}^{cd}}\) is constant and only one of
+the four particles is massive, the interaction rate can be evaluated exactly to
+be
+\begin{equation}
+  \int_{ab}^{cd} \abs{\pzcM_{ab}^{cd}} f_a^{(0)} f_b^{(0)}
+  = \frac{g_a g_b g_c g_d}{128 \pi^5} \frac{m K_1(m \beta)}{\beta^3} \abs{\pzcM_{ab}^{cd}}
+\end{equation}
+After normalization by \(1 / H \beta N_1\)
 
 \subsubsection{Mandelstam Variables}%
 \label{sec:mandelstam_variables}
@@ -325,8 +955,8 @@ Now the \(t\) Mandelstam variable is:
 \begin{align}
   t & = (E_a - E_c)^2 - 2 \abs{\vt p}^2 + 2 \abs{\vt p}^2 \cos \theta                                                \\
     & = \frac{\left( m_a^2 - m_b^2 - m_c^2 + m_d^2 \right)^2}{4 s}
-  - \frac{\lambda^{\frac{1}{2}}(s, m_a^2, m_b^2) \lambda^{\frac{1}{2}}(s, m_3^2, m_4^2)}{2 s}                        \\
-    & \qquad + \frac{\lambda^{\frac{1}{2}}(s, m_a^2, m_b^2) \lambda^{\frac{1}{2}}(s, m_3^2, m_4^2)}{2 s} \cos \theta
+  - \frac{\lambda^{\frac{1}{2}}(s, m_a^2, m_b^2) \lambda^{\frac{1}{2}}(s, m_c^2, m_d^2)}{2 s}                        \\
+    & \qquad + \frac{\lambda^{\frac{1}{2}}(s, m_a^2, m_b^2) \lambda^{\frac{1}{2}}(s, m_c^2, m_d^2)}{2 s} \cos \theta
 \end{align}
 And in particular, one can relate a differential in \(\cos \theta\) to a differential in \(t\):
 \begin{equation}
@@ -344,26 +974,32 @@ As for the domain of integration of \(t\), it is not difficult to see that
     \right]
 \end{equation}
 
+\subsection{Chemical Potentials}
+\label{sec:chemical_potentials}
+
+Provided that chemical potentials are small, 
+
+\cleardoublepage
 \section{Boltzmann Equations}%
 \label{sec:boltzmann_equation}
 
-We consider an interaction \(ab \leftrightarrow cd\), by \(\mathcal{CPT}\)
+We consider an interaction \(ab \leftrightarrow cd\), by \gls{CPT}
 invariance we have that:
 \begin{equation}
   \gamma(ab \to cd) = \gamma(\overline{c} \overline{d} \to \overline{a} \overline{b})
 \end{equation}
-and the \(\mathcal{CP}\) asymmetry is taken into account with \(\epsilon\) such
+and the \gls{CP} asymmetry is taken into account with \(\epsilon\) such
 that
 \begin{equation}
   \gamma(ab \to cd) - \gamma(\overline{a} \overline{b} \to \overline{c} \overline{d})
   = \epsilon
   = \gamma(\overline{c} \overline{d} \to \overline{a} \overline{b}) - \gamma(cd \to ab).
 \end{equation}
-and using \(\mathcal{CPT}\) invariance as well, this can be written as
+and using \gls{CPT} invariance as well, this can be written as
 \begin{equation}
-  \epsilon = \gamma(ab \to cd) - \gamma(cd \to ab).
+  \delta\gamma = \gamma(ab \to cd) - \gamma(cd \to ab).
 \end{equation}
-As a result, any forward or backward process and their \(\mathcal{CP}\)
+As a result, any forward or backward process and their \gls{CP}
 conjugate can expressed in terms of the original forward rate \(\gamma\), and
 the asymmetry \(\epsilon\).
 
@@ -374,9 +1010,9 @@ number densities
 \end{equation}
 and it is worth noting that generally
 \begin{equation}
-  \abs{\epsilon} \ll \gamma \qquad\qquad \abs{\Delta_a} \ll n_a,
+  \abs{\delta\gamma} \ll \gamma \qquad\qquad \abs{\Delta_a} \ll n_a,
 \end{equation}
-and in the \(\mathcal{CP}\)-conserving limit, both \(\epsilon\) and \(\Delta_a\)
+and in the \gls{CP}-conserving limit, both \(\epsilon\) and \(\Delta_a\)
 go to zero.
 
 The change in number density for \(a\) and \(\overline{a}\) are:
@@ -396,16 +1032,16 @@ The change in number density for \(a\) and \(\overline{a}\) are:
   \frac{n_{\overline c} n_{\overline d}}{n_c^{(0)} n_d^{(0)}}
   - \frac{n_{\overline a} n_{\overline b}}{n_a^{(0)} n_b^{(0)}}
   \right] \gamma
-  + \frac{n_{\overline a} n_{\overline b}}{n_a^{(0)} n_b^{(0)}} \epsilon.                                                      \\
+  + \frac{n_{\overline a} n_{\overline b}}{n_a^{(0)} n_b^{(0)}} \delta\gamma.                                                      \\
 \end{align}
 
-In the \(\mathcal{CP}\) conserving limit, both of these simplify to
+In the \gls{CP} conserving limit, both of these simplify to
 \begin{equation}
   \ddfrac{n_a}{t} = \ddfrac{n_{\overline a}}{t}
   = \left[ \frac{n_c n_d}{n_c^{(0)} n_d^{(0)}}  - \frac{n_a n_b}{n_a^{(0)} n_b^{(0)}} \right] \gamma(ab \to cd)
 \end{equation}
 
-Computing the rate of change of the \(\mathcal{CP}\) asymmetry (obviously before
+Computing the rate of change of the \gls{CP} asymmetry (obviously before
 taking any limits), we obtain:
 \begin{equation}
   \begin{aligned}
@@ -415,11 +1051,11 @@ taking any limits), we obtain:
     \frac{\Delta_c n_d + \Delta_d n_c}{n_c^{(0)} n_d^{(0)}}
     - \frac{\Delta_a n_b + \Delta_b n_a}{n_a^{(0)} n_b^{(0)}} \right] \gamma
     - \left[
-    \frac{n_a n_b}{n_a^{(0)} n_b^{(0)}} + \frac{n_c n_d}{n_c^{(0)} n_d^{(0)}}
-    \right] \epsilon
+      \frac{n_c n_d}{n_c^{(0)} n_d^{(0)}} - \frac{n_a n_b}{n_a^{(0)} n_b^{(0)}}
+    \right] \delta\gamma
   \end{aligned}
 \end{equation}
-where we have omitted terms proportional to \(\Delta^2\) and \(\epsilon \Delta\)
+where we have omitted terms proportional to \(\Delta^2\) and \(\delta\gamma \Delta\)
 (for any combination of \(\Delta_i\)).
 
 \subsection{Three-Body Interactions}%
@@ -427,7 +1063,7 @@ where we have omitted terms proportional to \(\Delta^2\) and \(\epsilon \Delta\)
 
 Given a three-body interaction with (tree-level) squared amplitude
 \(\abs{\pzcM}^2\), then there are six possible interactions (ignoring their
-\(\mathcal{CPT}\) counterparts):
+\gls{CPT} counterparts):
 \begin{equation}
   \begin{aligned}
     a           & \to bc                         & \qquad
@@ -492,12 +1128,27 @@ and antiparticle respectively:
     - \gamma(\vt b \to \vt a) \left[ \prod_{i \in \vt a} \frac{n_{\overline i}}{n_i^{(0)}} + \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right]
   \end{aligned}
 \end{equation}
-where we have used \(\mathcal{CPT}\) invariance to equal the rates \(\vt a \to
+where we have used \gls{CPT} invariance to equal the rates \(\vt a \to
 \vt b\) and \(\overline{\vt b} \to \overline{\vt a}\).  Further assuming
-\(\mathcal{CP}\) symmetry, this can be simplified further to
+\gls{CP} symmetry, this can be simplified further to
 \begin{equation}
   \ddfrac{\Delta n_a}{t} = - \gamma(\vt a \leftrightarrow \vt b) \left[ \prod_{i \in \vt a} \frac{n_i}{n_i^{(0)}} + \prod_{i \in \vt a} \frac{n_{\overline i}}{n_i^{(0)}} + \prod_{i \in \vt b} \frac{n_{\overline i}}{n_i^{(0)}} + \prod_{i \in \vt b} \frac{n_i}{n_i^{(0)}} \right]
 \end{equation}
+
+\subsection{Number Density Prefactors}%
+\label{sec:number_density_prefactors}
+
+For a three-particle integration, the prefactor to account for the number
+densities in the forward and backward rates are:
+\begin{equation}
+  \begin{aligned}
+    p(1 \to 2)
+    &= \int_{\vt a}^{\vt b} f_a = \int \dd \Pi_a f_a \\
+    &= e^{\mu \beta} \frac{m K_1(m \beta)}{4 \pi^2 \beta}
+  \end{aligned}
+\end{equation}
+
+\printglossaries%
 
 
 \end{document}

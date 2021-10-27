@@ -89,7 +89,7 @@
 %% must be loaded first and provides some additional functionalities to other
 %% packages.
 
-\usepackage{ifluatex}  % Provides the command \ifluatex
+\usepackage{iftex}
 
 %% Languages
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -156,12 +156,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \usepackage{microtype}   % Fine small typographical details
-\usepackage{realscripts} % Use the font's sub- and superscripts
+
 
 %% LaTeX allows for some if-else statements.  It is very rare that you'll have
 %% to use them, though this is one example since we only want to include a
 %% particular package if this example is compiled with LuaLaTeX.
 \ifluatex
+  \usepackage{realscripts} % Use the font's sub- and superscripts
   \usepackage{fontspec}  % Allows for any font to be specified
 
   % Change the main font
@@ -355,10 +356,12 @@
 %% Latexmk with the provided .latexmkrc).
 
 %% hyperref should be loaded first
-\usepackage[toc]{glossaries}
-\usepackage{glossaries-extra}
+% \usepackage{glossaries}
+\usepackage[
+  toc=false
+]{glossaries-extra}
 
-\setglossarystyle{index}
+% \setglossarystyle{index}
 \setabbreviationstyle[acronym]{long-short-sc}
 
 \loadglsentries{glossary.glos}
@@ -452,31 +455,31 @@
 %% We don't want any page numbers, chapter headings, etc. on the page
 \pagestyle{empty}
 
-% \begin{titlepage}
-%   \makeatletter
-%   \begin{center}
-%     \vspace*{2.5cm}
+\begin{titlepage}
+  \makeatletter
+  \begin{center}
+    \vspace*{2.5cm}
 
-%     {\Huge \@title} \\[0em]
-%     \rule{\linewidth}{2pt}
-%     {\huge \textsc{\@subtitle}} \\[6em]
+    {\Huge \@title} \\[0em]
+    \rule{\linewidth}{2pt}
+    {\huge \textsc{\@subtitle}} \\[6em]
 
-%     {\large By} \\[1cm]
-%     {\huge \@author} \\[0.5ex]
-%     {\Large \normalfont \@degreetitle}
+    {\large By} \\[1cm]
+    {\huge \@author} \\[0.5ex]
+    {\Large \normalfont \@degreetitle}
 
-%     \vfill
+    \vfill
 
-%     {\Large \@department} \\[1ex]
-%     {\Large \@university}
+    {\Large \@department} \\[1ex]
+    {\Large \@university}
 
-%     \vfill
+    \vfill
 
-%     {\large \@date}
-%   \end{center}
+    {\large \@date}
+  \end{center}
 
-%   \makeatother
-% \end{titlepage}
+  \makeatother
+\end{titlepage}
 
 %% Table of Content
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

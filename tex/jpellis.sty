@@ -1,0 +1,588 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Joshua Ellis' own package of shortcuts
+% Copyright (C) 2017  Joshua Ellis
+%
+% This package provides many functions which facilitate the entry of text,
+% especially relating to physics.  There is no official documentation for this
+% though comments throughout this file should suffice.
+%
+%
+% This work may be distributed and/or modified under the conditions of the LaTeX
+% Project Public License, either version 1.3 of this license or (at your option)
+% any later version.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainer of this work is Joshua Ellis.
+%
+% This program is distributed in the hope that it will be useful, but WITHOUT
+% ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+% FOR A PARTICULAR PURPOSE.  See the LaTeX Project Public License for more
+% details.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{jpellis}
+
+%% Key values
+\RequirePackage{pgfopts}
+
+%% Occasionally, some of the (re)definitions clash with other packages.  These
+%% can be enabled or disabled as desired.
+\newif\ifjpellis@physics
+\newif\ifjpellis@operators
+\newif\ifjpellis@alphabets@bb
+\newif\ifjpellis@alphabets@pzc
+\newif\ifjpellis@alphabets@scr
+\newif\ifjpellis@alphabets@short
+\newif\ifjpellis@maths
+\newif\ifjpellis@delimiters
+
+\pgfkeys{
+    /jpellis/.is family,
+    jpellis,
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    physics/.is if=jpellis@physics,
+    physics=true,
+    maths/.is if=jpellis@maths,
+    maths=true,
+    operators/.is if=jpellis@operators,
+    operators=true,
+    delimiters/.is if=jpellis@delimiters,
+    delimiters=true,
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    alphabets/.is family,
+    alphabets/short/.is if=jpellis@alphabets@short,
+    alphabets/short=true,
+    alphabets/bb/.is if=jpellis@alphabets@bb,
+    alphabets/bb=true,
+    alphabets/pzc/.is if=jpellis@alphabets@pzc,
+    alphabets/pzc=true,
+    alphabets/scr/.is if=jpellis@alphabets@scr,
+    alphabets/scr=true,
+}
+
+\ProcessPgfOptions{/jpellis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Miscellaneous
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\RequirePackage{xcolor}
+\providecommand\todo[1]{%
+    \marginpar[%
+      \Huge\vspace{-0.8ex}\hfill%
+      \color{red}\(\rightarrow\)%
+    ]{%
+      \Huge\vspace{-0.8ex}%
+      \color{red}\(\leftarrow\)%
+    }
+    \footnote{\color{red} #1}%
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Physics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Defines various quite a few short hands useful in physics.  These include:
+%%
+%% - Symbols
+%%   - \emf electromotive force
+%%   - \SM for small caps 'SM' (Standard Model)
+%% - bra-ket functions.  These all come in starred and unstarred flavours
+%%   where the starred version adjusts its size to fit the contents.
+%%   - \bra{}               < |
+%%   - \ket{}               | >
+%%   - \braket{}{}          < | >
+%%   - \brakket{}{}{}       < | | >
+%%   There are also \dbraket and \dbrakket  versions which replace | with ||;
+%%   and \praket and \prakket which use parentheses instead of angle brackets.
+%%
+%% - (Anti)-commutator.  Also in starred/unstarred flavours
+%%   - \commut{}{}          [ , ]
+%%   - \accommut{}{}        { , }
+%%
+%% - Feynman slash with \fsl{}
+\ifjpellis@physics
+  %% Symbols
+  \providecommand*\emf{\ensuremath{\mathcal{E}}}
+
+  %% Bra-ket functions (and related)
+  \providecommand*\bra{\@ifstar
+    \braStar %
+    \braNoStar}
+  \providecommand*\braStar[1]{
+    \left\langle #1 \right\rvert}
+  \providecommand*\braNoStar[1]{
+    \langle {\textstyle #1} \rvert}
+
+  \providecommand*\ket{\@ifstar
+    \ketStar %
+    \ketNoStar}
+  \providecommand*\ketStar[1]{
+    \left\lvert #1 \right\rangle}
+  \providecommand*\ketNoStar[1]{
+    \lvert {\textstyle #1} \rangle}
+
+  \providecommand*\braket{\@ifstar
+    \braketStar%
+    \braketNoStar}
+  \providecommand*\braketStar[2]{
+    \left\langle #1 \vphantom{#2} \!\right. %
+    \left| #2 \vphantom{#1} \right\rangle}
+  \providecommand*\braketNoStar[2]{
+    \langle {\textstyle #1} | {\textstyle #2} \rangle}
+
+  \providecommand*\brakket{\@ifstar
+    \brakketStar%
+    \brakketNoStar}
+  \providecommand*\brakketStar[3]{
+    \left\langle #1 \vphantom{#2 #3} \!\right.
+    \left| \vphantom{#1} #2 \vphantom{#3} \!\right.
+    \left| \vphantom{#1 #2} #3 \right\rangle}
+  \providecommand*\brakketNoStar[3]{
+    \langle {\textstyle #1} | {\textstyle #2} | {\textstyle #3} \rangle}
+
+  \providecommand*\praket{\@ifstar
+    \praketStar%
+    \praketNoStar}
+  \providecommand*\praketStar[2]{
+    \left( #1 \vphantom{#2} \!\right. %
+    \left| #2 \vphantom{#1} \right)}
+  \providecommand*{\praketNoStar}[2]{
+    ( {\textstyle #1} | {\textstyle #2} )}
+
+  \providecommand*\prakket{\@ifstar
+    \prakketStar%
+    \prakketNoStar}
+  \providecommand*\prakketStar[3]{
+    \left( #1 \vphantom{#2 #3} \!\right.
+    \left| \vphantom{#1} #2 \vphantom{#3} \!\right.
+    \left| \vphantom{#1 #2} #3 \right)}
+  \providecommand*\prakketNoStar[3]{
+    ( {\textstyle #1} | {\textstyle #2} | {\textstyle #3} \rangle}
+
+  \providecommand*\dbraket{\@ifstar
+    \dbraketStar%
+    \dbraketNoStar}
+  \providecommand*\dbraketStar[2]{
+    \left\langle #1 \vphantom{#2} \!\right. %
+    \left\| #2 \vphantom{#1} \right\rangle}
+  \providecommand*\dbraketNoStar[2]{
+    \langle {\textstyle #1} \| {\textstyle #2} \rangle}
+
+  \providecommand*\dbrakket{\@ifstar
+    \dbrakketStar%
+    \dbrakketNoStar}
+  \providecommand*\dbrakketStar[3]{
+    \left\langle #1 \vphantom{#2 #3} \!\right.
+    \left\| \vphantom{#1} #2 \vphantom{#3} \!\right.
+    \left\| \vphantom{#1 #2} #3 \right\rangle}
+  \providecommand*\dbrakketNoStar[3]{
+    \langle {\textstyle #1} \| {\textstyle #2} \| {\textstyle #3} \rangle}
+
+  %% Commutator and Anticommutator
+  \providecommand*\commut{\@ifstar
+    \commutStar%
+    \commutNoStar}
+  \providecommand*\commutStar[2]{
+    \left[ #1 \vphantom{#2} \!\right., %
+    \left. #2 \vphantom{#1} \right]}
+  \providecommand*{\commutNoStar}[2]{
+    [ #1 , #2 ]}
+  \providecommand*\acommut{\@ifstar
+    \acommutStar%
+    \acommutNoStar}
+  \providecommand*\acommutStar[2]{
+    \left\{ #1 \vphantom{#2} \!\right., %
+    \left. #2 \vphantom{#1} \right\}}
+  \providecommand*\acommutNoStar[2]{
+    \{ #1 , #2 \}}
+
+  %% Feynman slash
+  \RequirePackage{slashed}
+  \providecommand*\fsl[1]{\slashed{#1}}
+
+  %% SM in small caps
+  \providecommand*\SM{\textsc{sm}}
+
+  %% Branching franctin
+  \RequirePackage{mathtools}
+  \DeclareMathOperator{\Br}{\mathcal{B}}
+
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Maths
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Provide some generic maths shortcuts.  These include:
+%%
+%% - \e
+%%   Shorthand for '\cdot 10^'
+%%
+%% - \vt, \uv
+%%   For vectors, unit vectors and phasors, displaying them in bold and with the
+%%   hat as appropriate.  The unit vectors 'i' and 'j' use the special \imath and
+%%   \jmath which do not feature the dot.
+%%
+%% - \dd, \ddbar and \dD
+%%   Upright 'd' for derivatives, d/(2p) and 'D'
+%%
+%% - \st, \pcc, \phc
+%%   Shorthand for 'such that', '+ complex conjugate' and '+ Hermitian
+%%   conjugate'.  In each case, they are realized as: s.t., + c.c., + h.c.
+%%
+%% - \pfrac, \ddfrac
+%%   Shorthand for complete and partial derivative fractions.  For example
+%%   \pfrac{^2 y}{x^2} will result in \frac{\partial^2 y}{x^2}.
+%%
+%% - \inR, \inZ, \inC, \inQ, \inN Shorthand for 'in reals', 'in integers', 'in
+%%   complex', 'in rational', 'in natural'.
+%%
+%% - \bmtx, \vmtx, \pmtx
+%%   Shorthands for the various matrix environments.
+\ifjpellis@maths
+  %% Provides the exponent shorthand in scientific notation.
+  \providecommand*{\e}[1]{\cdot 10^{#1}}
+
+  %% Define a poor man's bold.  This is using the poor man's bold
+  %% implementation described in the 'bm' package.
+  % \def\jpellis@pmb#1{{%
+  %     \setbox\tw@\hbox{$\m@th\mkern.4mu$}%
+  %     \mathchoice%
+  %     \jpellis@pmb@\displaystyle\@empty{#1}%
+  %     \jpellis@pmb@\textstyle\@empty{#1}%
+  %     \jpellis@pmb@\scriptstyle\defaultscriptratio{#1}%
+  %     \jpellis@pmb@\scriptscriptstyle\defaultscriptscriptratio{#1}}}
+  % \def\jpellis@pmb@#1#2#3{{%
+  %     \setbox\z@\hbox{$\m@th#1#3$}%
+  %     \dimen@#2\wd\tw@%
+  %     \dimen@=0.4\dimen@%
+  %     \rlap{\copy\z@}%
+  %     \kern\dimen@%
+  %     \raise1.1\dimen@\rlap{\copy\z@}%
+  %     \kern\dimen@%
+  %     \rlap{\copy\z@}%
+  %     \kern\dimen@%
+  %     \raise1.1\dimen@\rlap{\copy\z@}%
+  %     \kern\dimen@%
+  %     \box\z@}}
+
+  %% Vectors (\vt) and unit vectors (\uv)
+  \RequirePackage{etoolbox}
+  \RequirePackage{xstring}
+  \def\str@bb{\mathbb}
+  \def\str@pzc{\mathpzc}
+  \def\str@scr{\mathscr}
+  \providecommand*{\vt}[1]{\boldsymbol{#1}}
+  % \providecommand*{\vt}[1]{%
+  %   \StrExpand[1]{#1}{\str@in}
+  %   \expandarg
+  %   \IfSubStr*{\str@in}{math}{
+  %     % There's an alphabet specified, make sure it's not in our list of
+  %     % manual 'poor man's bold' alphabets
+  %     \IfSubStr*{\str@in}{\str@scr}{
+  %       \jpellis@pmb{#1}
+  %     }{
+  %       \IfSubStr*{\str@in}{\str@pzc}{
+  %         \jpellis@pmb{#1}
+  %       }{
+  %         \IfSubStr*{\str@in}{\str@bb}{
+  %           \jpellis@pmb{#1}
+  %         }{
+  %           % None of the alphabets we look for, so use \boldsymbol.
+  %           \boldsymbol{#1}
+  %         }
+  %       }
+  %     }
+  %   }{
+  %     % Otherwise, proceed with \boldsymbol
+  %     \boldsymbol{#1}
+  %   }
+  % }
+  \providecommand*{\uv}[1]{
+    \ifstrequal{#1}{i}{
+      \boldsymbol{\hat{\imath}}
+    }{
+      \ifstrequal{#1}{j}{
+        \boldsymbol{\hat{\jmath}}
+      }{
+        \boldsymbol{\hat{\vt{#1}}}
+      }
+    }
+  }
+
+  %% Differential operators:
+  %% - \dd for upright 'd'
+  %% - \ddbar for (d^n)/(2pi)^n
+  %% - \dD for the capital D derivative
+  \providecommand*{\dd}{\mathop{}\!\mathrm{d}}
+  \def\@ifchevron#1{\@ifnextchar ^{\@firstoftwo{#1}}}
+  \def\ddbar{%
+    \@ifchevron{\ddbar@opt}{\ddbar@noopt}%
+  }
+  \def\ddbar@opt#1#2{\frac{\dd^{#1} #2}{(2\pi)^{#1}}}
+  \def\ddbar@noopt#1{\frac{\dd #1}{2\pi}}
+  \providecommand*{\dD}{\mathop{}\!\mathrm{D}}
+
+  %% A shortcut for derivative (partial \pfrac and exact \ddfrac)
+  \providecommand*{\pfrac}[2]{\frac{\partial{#1}}{\partial{#2}}}
+  \providecommand*{\ddfrac}[2]{\frac{\dd{#1}}{\dd{#2}}}
+
+  %% Abbreviation for the `such that', '+c.c' and '+ h.c'
+  \providecommand*{\st}{\text{ s.t. }}
+  \providecommand*{\pcc}{+ \mathrm{c.c.}}
+  \providecommand*{\phc}{+ \mathrm{h.c.}}
+
+  %% Provide in R, in Z, ...
+  \providecommand*{\inC}{\in\mathbb{C}}
+  \providecommand*{\inF}{\in\mathbb{F}}
+  \providecommand*{\inN}{\in\mathbb{N}}
+  \providecommand*{\inQ}{\in\mathbb{Q}}
+  \providecommand*{\inR}{\in\mathbb{R}}
+  \providecommand*{\inZ}{\in\mathbb{Z}}
+
+  %% Provide simpler matrix commands (bmtx and vmtx)
+  \providecommand*{\bmtx}[1]{\begin{bmatrix}#1\end{bmatrix}}
+  \providecommand*{\vmtx}[1]{\begin{vmatrix}#1\end{vmatrix}}
+  \providecommand*{\pmtx}[1]{\begin{pmatrix}#1\end{pmatrix}}
+
+  %% Redefine the \Re and \Im
+  \renewcommand*{\Re}{\mathop{\mathfrak{Re}}}
+  \renewcommand*{\Im}{\mathop{\mathfrak{Im}}}
+
+  %% Define the polylogarithm
+  \DeclareMathOperator{\Li}{Li}
+
+  %% Provide \defeq and \eqdef
+  \newcommand*\defeq{\vcentcolon=}
+  \newcommand*\eqdef{=\vcentcolon}
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Operators
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Declares a lot of new operators
+\ifjpellis@operators
+    \RequirePackage{mathtools}
+
+    %% Additional trigonometric functions
+    \DeclareMathOperator{\sech}{sech}
+    \DeclareMathOperator{\csch}{csch}
+    % \DeclareMathOperator{\coth}{coth} % Already defined
+    \DeclareMathOperator{\arcsinh}{arcsinh}
+    \DeclareMathOperator{\arccosh}{arccosh}
+    \DeclareMathOperator{\arctanh}{arctanh}
+    \DeclareMathOperator{\arccsch}{arccsch}
+    \DeclareMathOperator{\arcsech}{arcsech}
+    \DeclareMathOperator{\arccoth}{arccoth}
+    \DeclareMathOperator{\sinc}{sinc}
+
+    %% Complex
+    \DeclareMathOperator{\Arg}{Arg}
+    \DeclareMathOperator{\Log}{Log}
+
+    %% Matrices
+    \DeclareMathOperator{\Tr}{Tr}
+    \DeclareMathOperator{\diag}{diag}
+    \def\tr{\mathsf{T}}
+
+    %% Special functions
+    \DeclareMathOperator{\erf}{erf}
+    \DeclareMathOperator{\sign}{sign}
+
+    %% Groups
+    \providecommand*{\SO}[1]{\ensuremath{\mathrm{SO}(#1)}}
+    \providecommand*{\SU}[1]{\ensuremath{\mathrm{SU}(#1)}}
+    \providecommand*{\Sp}[1]{\ensuremath{\mathrm{Sp}(#1)}}
+    \providecommand*{\Uone}[1]{\ensuremath{\mathrm{U}(1)_{#1}}}
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Delimiters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Defines the following delimiters which all come in starred and unstarred
+%% flavours, where the starred flavours adjust in size to fit the arguments.
+\ifjpellis@delimiters
+    \RequirePackage{mathtools}
+
+    \DeclarePairedDelimiter\norm{\lVert}{\rVert}
+    \DeclarePairedDelimiter\abs{\lvert}{\rvert}
+    \DeclarePairedDelimiter\angles{\langle}{\rangle}
+    \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+    \DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Alphabets
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Define some new alphabets and also define easier ways to access them.
+%% Instead of having to type \mathcal{A}, one can more simply type \calA.
+%%
+%% For examples of what these alphabets look like, refer to the 'Math Alphabets'
+%% in the 'Comprehensive Symbol List'
+
+%% The 'pzc' alphabet is a similar to the standard calligraphic alphabet,
+%% though arguably is a little nicer.
+\ifjpellis@alphabets@pzc
+  \DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+  \ifjpellis@alphabets@short
+    \providecommand*\pzcA{\mathpzc{A}}
+    \providecommand*\pzcB{\mathpzc{B}}
+    \providecommand*\pzcC{\mathpzc{C}}
+    \providecommand*\pzcD{\mathpzc{D}}
+    \providecommand*\pzcE{\mathpzc{E}}
+    \providecommand*\pzcF{\mathpzc{F}}
+    \providecommand*\pzcG{\mathpzc{G}}
+    \providecommand*\pzcH{\mathpzc{H}}
+    \providecommand*\pzcI{\mathpzc{I}}
+    \providecommand*\pzcJ{\mathpzc{J}}
+    \providecommand*\pzcK{\mathpzc{K}}
+    \providecommand*\pzcL{\mathpzc{L}}
+    \providecommand*\pzcM{\mathpzc{M}}
+    \providecommand*\pzcN{\mathpzc{N}}
+    \providecommand*\pzcO{\mathpzc{O}}
+    \providecommand*\pzcP{\mathpzc{P}}
+    \providecommand*\pzcQ{\mathpzc{Q}}
+    \providecommand*\pzcR{\mathpzc{R}}
+    \providecommand*\pzcS{\mathpzc{S}}
+    \providecommand*\pzcT{\mathpzc{T}}
+    \providecommand*\pzcU{\mathpzc{U}}
+    \providecommand*\pzcV{\mathpzc{V}}
+    \providecommand*\pzcW{\mathpzc{W}}
+    \providecommand*\pzcX{\mathpzc{X}}
+    \providecommand*\pzcY{\mathpzc{Y}}
+    \providecommand*\pzcZ{\mathpzc{Z}}
+  \fi
+\fi
+
+%% The scr alphabet provide much more decorated calligraphic %% symbols.
+\ifjpellis@alphabets@scr
+  \RequirePackage{mathrsfs}
+  % \RequirePackage[scr,scaled=1.1]{rsfso}
+  \ifjpellis@alphabets@short
+    \providecommand*\scrA{\mathscr{A}}
+    \providecommand*\scrB{\mathscr{B}}
+    \providecommand*\scrC{\mathscr{C}}
+    \providecommand*\scrD{\mathscr{D}}
+    \providecommand*\scrE{\mathscr{E}}
+    \providecommand*\scrF{\mathscr{F}}
+    \providecommand*\scrG{\mathscr{G}}
+    \providecommand*\scrH{\mathscr{H}}
+    \providecommand*\scrI{\mathscr{I}}
+    \providecommand*\scrJ{\mathscr{J}}
+    \providecommand*\scrK{\mathscr{K}}
+    \providecommand*\scrL{\mathscr{L}}
+    \providecommand*\scrM{\mathscr{M}}
+    \providecommand*\scrN{\mathscr{N}}
+    \providecommand*\scrO{\mathscr{O}}
+    \providecommand*\scrP{\mathscr{P}}
+    \providecommand*\scrQ{\mathscr{Q}}
+    \providecommand*\scrR{\mathscr{R}}
+    \providecommand*\scrS{\mathscr{S}}
+    \providecommand*\scrT{\mathscr{T}}
+    \providecommand*\scrU{\mathscr{U}}
+    \providecommand*\scrV{\mathscr{V}}
+    \providecommand*\scrW{\mathscr{W}}
+    \providecommand*\scrX{\mathscr{X}}
+    \providecommand*\scrY{\mathscr{Y}}
+    \providecommand*\scrZ{\mathscr{Z}}
+  \fi
+\fi
+
+%% The Blackboard font is the one used to denote sets of numbers (C, Z, ...)
+\ifjpellis@alphabets@bb
+  \RequirePackage{amsfonts}
+  \ifjpellis@alphabets@short
+    \providecommand*\bbA{\mathbb{A}}
+    \providecommand*\bbB{\mathbb{B}}
+    \providecommand*\bbC{\mathbb{C}}
+    \providecommand*\bbD{\mathbb{D}}
+    \providecommand*\bbE{\mathbb{E}}
+    \providecommand*\bbF{\mathbb{F}}
+    \providecommand*\bbG{\mathbb{G}}
+    \providecommand*\bbH{\mathbb{H}}
+    \providecommand*\bbI{\mathbb{I}}
+    \providecommand*\bbJ{\mathbb{J}}
+    \providecommand*\bbK{\mathbb{K}}
+    \providecommand*\bbL{\mathbb{L}}
+    \providecommand*\bbM{\mathbb{M}}
+    \providecommand*\bbN{\mathbb{N}}
+    \providecommand*\bbO{\mathbb{O}}
+    \providecommand*\bbP{\mathbb{P}}
+    \providecommand*\bbQ{\mathbb{Q}}
+    \providecommand*\bbR{\mathbb{R}}
+    \providecommand*\bbS{\mathbb{S}}
+    \providecommand*\bbT{\mathbb{T}}
+    \providecommand*\bbU{\mathbb{U}}
+    \providecommand*\bbV{\mathbb{V}}
+    \providecommand*\bbW{\mathbb{W}}
+    \providecommand*\bbX{\mathbb{X}}
+    \providecommand*\bbY{\mathbb{Y}}
+    \providecommand*\bbZ{\mathbb{Z}}
+  \fi
+\fi
+
+%% Provide the same shortcuts for the standard calligraphic and blackboard
+%% fonts.
+\ifjpellis@alphabets@short
+  \providecommand*\calA{\mathcal{A}}
+  \providecommand*\calB{\mathcal{B}}
+  \providecommand*\calC{\mathcal{C}}
+  \providecommand*\calD{\mathcal{D}}
+  \providecommand*\calE{\mathcal{E}}
+  \providecommand*\calF{\mathcal{F}}
+  \providecommand*\calG{\mathcal{G}}
+  \providecommand*\calH{\mathcal{H}}
+  \providecommand*\calI{\mathcal{I}}
+  \providecommand*\calJ{\mathcal{J}}
+  \providecommand*\calK{\mathcal{K}}
+  \providecommand*\calL{\mathcal{L}}
+  \providecommand*\calM{\mathcal{M}}
+  \providecommand*\calN{\mathcal{N}}
+  \providecommand*\calO{\mathcal{O}}
+  \providecommand*\calP{\mathcal{P}}
+  \providecommand*\calQ{\mathcal{Q}}
+  \providecommand*\calR{\mathcal{R}}
+  \providecommand*\calS{\mathcal{S}}
+  \providecommand*\calT{\mathcal{T}}
+  \providecommand*\calU{\mathcal{U}}
+  \providecommand*\calV{\mathcal{V}}
+  \providecommand*\calW{\mathcal{W}}
+  \providecommand*\calX{\mathcal{X}}
+  \providecommand*\calY{\mathcal{Y}}
+  \providecommand*\calZ{\mathcal{Z}}
+\fi
+
+%% Provide the same shortcuts for the standard calligraphic and blackboard
+%% fonts.
+\ifjpellis@alphabets@short
+  \providecommand*\scA{\textsc{a}}
+  \providecommand*\scB{\textsc{b}}
+  \providecommand*\scC{\textsc{c}}
+  \providecommand*\scD{\textsc{d}}
+  \providecommand*\scE{\textsc{e}}
+  \providecommand*\scF{\textsc{f}}
+  \providecommand*\scG{\textsc{g}}
+  \providecommand*\scH{\textsc{h}}
+  \providecommand*\scI{\textsc{i}}
+  \providecommand*\scJ{\textsc{j}}
+  \providecommand*\scK{\textsc{k}}
+  \providecommand*\scL{\textsc{l}}
+  \providecommand*\scM{\textsc{m}}
+  \providecommand*\scN{\textsc{n}}
+  \providecommand*\scO{\textsc{o}}
+  \providecommand*\scP{\textsc{p}}
+  \providecommand*\scQ{\textsc{q}}
+  \providecommand*\scR{\textsc{r}}
+  \providecommand*\scS{\textsc{s}}
+  \providecommand*\scT{\textsc{t}}
+  \providecommand*\scU{\textsc{u}}
+  \providecommand*\scV{\textsc{v}}
+  \providecommand*\scW{\textsc{w}}
+  \providecommand*\scX{\textsc{x}}
+  \providecommand*\scY{\textsc{y}}
+  \providecommand*\scZ{\textsc{z}}
+\fi
+
+\endinput
