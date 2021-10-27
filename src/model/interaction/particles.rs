@@ -391,6 +391,7 @@ impl Particles {
     ) -> bool {
         for (&p, &(_, ca)) in &self.particle_counts {
             if no_asymmetry.binary_search(&p).is_err()
+                && na[p] != 0.0
                 && na[p].signum() != (na[p] + ca * change).signum()
             {
                 return true;
