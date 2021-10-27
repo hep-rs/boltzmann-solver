@@ -214,7 +214,6 @@ fn s_divisions(beta: f64, p1: &Particle, p2: &Particle, p3: &Particle, p4: &Part
     // to 0 within machine precision.  So we use this as the upper bound instead
     // of infinity.
     let s_max = (1e3 / beta.powi(2)).max(1e1 * s_min);
-    // let s_max = ;
 
     let mut s_divs = Array1::geomspace(if s_min == 0.0 { 1e-50 } else { s_min }, s_max, 4)
         .unwrap()
