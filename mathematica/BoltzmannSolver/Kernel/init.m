@@ -22,6 +22,7 @@ Get["BoltzmannSolver`Mandelstam`"];
 Get["BoltzmannSolver`NormalArgs`"];
 Get["BoltzmannSolver`SquaredAmplitude`"];
 Get["BoltzmannSolver`InteractionGamma`"];
+Get["BoltzmannSolver`Propagator`"];
 
 Protect[ExpandValues];
 
