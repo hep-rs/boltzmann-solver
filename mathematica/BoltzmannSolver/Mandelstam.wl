@@ -1,4 +1,10 @@
-MandelstamTRange::usage = "Calculate the range of Mandelstam variables.  The
+MandelstamTRange::usage = "Calculate the range of the Mandelstam t variables.  The
+first argument is the Mandelstam s variable.  The remaining four arguments are
+the masses of the four particles.";
+MandelstamTMin::usage = "Calculate the lower bound of the Mandelstam t variables.  The
+first argument is the Mandelstam s variable.  The remaining four arguments are
+the masses of the four particles.";
+MandelstamTMax::usage = "Calculate the upper bound of the Mandelstam t variables.  The
 first argument is the Mandelstam s variable.  The remaining four arguments are
 the masses of the four particles.";
 IntegrateT::usage  = "Integrate a squared amplitude over the Mandelstam t variable.";
@@ -15,6 +21,8 @@ MandelstamTRange::invalids12 = "The Mandelstam s value must be larger than (m1 +
 MandelstamTRange::invalids34 = "The Mandelstam s value must be larger than (m3 + m4)^2.";
 
 Attributes[MandelstamTRange] = {Listable, NumericFunction};
+Attributes[MandelstamTMin] = {Listable, NumericFunction};
+Attributes[MandelstamTMax] = {Listable, NumericFunction};
 
 (* Allow particles to be given instead of masses *)
 MandelstamTRange[s_, p1_?ParticleQ, m2_, m3_, m4_] := MandelstamTRange[s, Mass[p1], m2, m3, m4 ];
@@ -22,21 +30,73 @@ MandelstamTRange[s_, m1_, p2_?ParticleQ, m3_, m4_] := MandelstamTRange[s, m1, Ma
 MandelstamTRange[s_, m1_, m2_, p3_?ParticleQ, m4_] := MandelstamTRange[s, m1, m2, Mass[p3], m4 ];
 MandelstamTRange[s_, m1_, m2_, m3_, p4_?ParticleQ] := MandelstamTRange[s, m1, m2, m3, Mass[p4] ];
 
+MandelstamTMin[s_, p1_?ParticleQ, m2_, m3_, m4_] := MandelstamTMin[s, Mass[p1], m2, m3, m4 ];
+MandelstamTMin[s_, m1_, p2_?ParticleQ, m3_, m4_] := MandelstamTMin[s, m1, Mass[p2], m3, m4 ];
+MandelstamTMin[s_, m1_, m2_, p3_?ParticleQ, m4_] := MandelstamTMin[s, m1, m2, Mass[p3], m4 ];
+MandelstamTMin[s_, m1_, m2_, m3_, p4_?ParticleQ] := MandelstamTMin[s, m1, m2, m3, Mass[p4] ];
+
+MandelstamTMax[s_, p1_?ParticleQ, m2_, m3_, m4_] := MandelstamTMax[s, Mass[p1], m2, m3, m4 ];
+MandelstamTMax[s_, m1_, p2_?ParticleQ, m3_, m4_] := MandelstamTMax[s, m1, Mass[p2], m3, m4 ];
+MandelstamTMax[s_, m1_, m2_, p3_?ParticleQ, m4_] := MandelstamTMax[s, m1, m2, Mass[p3], m4 ];
+MandelstamTMax[s_, m1_, m2_, m3_, p4_?ParticleQ] := MandelstamTMax[s, m1, m2, m3, Mass[p4] ];
+
 (* Numerical expansion expands the arguments *)
 MandelstamTRange /: N[MandelstamTRange[s_, m1_, m2_, m3_, m4_], ___precision] := MandelstamTRange@@N[{s, m1, m2, m3, m4}, precision];
+MandelstamTMin /: N[MandelstamTMin[s_, m1_, m2_, m3_, m4_], ___precision] := MandelstamTMin@@N[{s, m1, m2, m3, m4}, precision];
+MandelstamTMax /: N[MandelstamTMax[s_, m1_, m2_, m3_, m4_], ___precision] := MandelstamTMax@@N[{s, m1, m2, m3, m4}, precision];
 
-MandelstamTRange[s_?InexactNumberQ, m1_?InexactNumberQ, m2_?InexactNumberQ, m3_?InexactNumberQ, m4_?InexactNumberQ] := Module[
+MandelstamTRange[s_, m1_, m2_, m3_, m4_] := Module[
+  {
+    x1 = m1^2 / s,
+    x2 = m2^2 / s,
+    x3 = m3^2 / s,
+    x4 = m4^2 / s
+  },
+  If[s < (m1 + m2)^2, Message[MandelstamTRange::invalids12] ];
+  If[s < (m3 + m4)^2, Message[MandelstamTRange::invalids34] ];
+  If[PossibleZeroQ[s], Return[{0, 0}] ];
+  s/4 * {
+    (x1 - x2 - x3 + x4)^2 - (Sqrt[X`Kallen\[Lambda][1, x1, x2] ] - Sqrt[X`Kallen\[Lambda][1, x3, x4] ])^2,
+    (x1 - x2 - x3 + x4)^2 - (Sqrt[X`Kallen\[Lambda][1, x1, x2] ] + Sqrt[X`Kallen\[Lambda][1, x3, x4] ])^2
+  }
+];
+MandelstamTRange[Infinity, _, _, _, _] := {-Infinity, 0};
+
+MandelstamTMin[s_, m1_, m2_, m3_, m4_] := Module[
   {
     baseline = 1/2 (m1^2 + m2^2 + m3^2 + m4^2 - s - (m1^2 - m2^2) (m3^2 - m4^2) / s),
     cosine = Sqrt[X`Kallen\[Lambda][s, m1^2, m2^2]] Sqrt[X`Kallen\[Lambda][s, m3^2, m4^2]] / (2 s)
   },
   If[s < (m1 + m2)^2, Message[MandelstamTRange::invalids12] ];
   If[s < (m3 + m4)^2, Message[MandelstamTRange::invalids34] ];
-  {baseline - cosine, baseline + cosine}
+  If[PossibleZeroQ[s], Return[0] ];
+  baseline - cosine
 ];
+MandelstamTMin[Infinity, _, _, _, _] := -Infinity;
 
+MandelstamTMax[s_, m1_, m2_, m3_, m4_] := Module[
+  {
+    baseline = 1/2 (m1^2 + m2^2 + m3^2 + m4^2 - s - (m1^2 - m2^2) (m3^2 - m4^2) / s),
+    cosine = Sqrt[X`Kallen\[Lambda][s, m1^2, m2^2]] Sqrt[X`Kallen\[Lambda][s, m3^2, m4^2]] / (2 s)
+  },
+  If[s < (m1 + m2)^2, Message[MandelstamTRange::invalids12] ];
+  If[s < (m3 + m4)^2, Message[MandelstamTRange::invalids34] ];
+  If[PossibleZeroQ[s], Return[0] ];
+  baseline + cosine
+];
+MandelstanTMax[Infinity, _, _, _, _] := 0;
+
+(*
+ * The following functions are used to calculate the Mandelstam variables
+ * for the decay of a particle.
+ *
+ * The first argument is the mass of the decaying particle.
+ * The second argument is the mass of the particle that decays.
+*)
 
 Protect[MandelstamTRange];
+Protect[MandelstamTMin];
+Protect[MandelstamTMax];
 
 
 (* Mandelstam T Integration *)
@@ -67,8 +127,8 @@ IntegrateT /: MakeBoxes[IntegrateT[f_, s_, beta_, m1_, m2_, m3_, m4_], Tradition
 
 IntegrateT[f_?NumberQ, s_, beta_, m1_, m2_, m3_, m4_] := IntegrateT[Function[{t}, f], s, beta, m1, m2, m3, m4];
 IntegrateT[
-  f:(_?ValueQ | _Function), s_?InexactNumberQ, beta_?InexactNumberQ, m1_?InexactNumberQ, m2_?InexactNumberQ, m3_?InexactNumberQ, m4_?InexactNumberQ
-] /; AnyInexactNumberQ[s, beta, m1, m2, m3, m4] := Block[
+  f:(_?ValueQ | _Function), s_, beta_, m1_, m2_, m3_, m4_
+] := Block[
   {
     tMin, tMax
   },
@@ -78,7 +138,7 @@ IntegrateT[
     {t, tMin, tMax},
     (* Method -> {"ClenshawCurtisRule", "SymbolicProcessing" -> 0}, *)
     Method -> {Automatic, "SymbolicProcessing" -> 0},
-    WorkingPrecision -> Precision[{s, beta, m1, m2, m3, m4}]
+    WorkingPrecision -> (Precision[{s, beta, m1, m2, m3, m4}] /. Infinity -> MachinePrecision)
   ]
 ];
 
@@ -88,44 +148,23 @@ Protect[IntegrateT];
 (* Mandelstam S and T Integration *)
 (* ****************************** *)
 
-IntegrateST[f_, beta_, p1_?ParticleQ, m2_, m3_, m4_] = IntegrateST[f, beta, Mass[p1], m2, m3, m4 ]
-IntegrateST[f_, beta_, m1_, p2_?ParticleQ, m3_, m4_] = IntegrateST[f, beta, m1, Mass[p2], m3, m4 ]
-IntegrateST[f_, beta_, m1_, m2_, p3_?ParticleQ, m4_] = IntegrateST[f, beta, m1, m2, Mass[p3], m4 ]
-IntegrateST[f_, beta_, m1_, m2_, m3_, p4_?ParticleQ] = IntegrateST[f, beta, m1, m2, m3, Mass[p4] ]
+Attributes[IntegrateST] = {HoldFirst, Listable};
 
-(* Numerical expansion expands the arguments *)
-IntegrateST /: N[IntegrateST[f_, beta_, m1_, m2_, m3_, m4_], ___precision] := CurryApplied[IntegrateST, 6][f]@@N[{beta, m1, m2, m3, m4}, precision];
+IntegrateST[f_, {s_, t_}, beta_, p1_?ParticleQ, m2_, m3_, m4_] = IntegrateST[f, {s, t}, beta, Mass[p1], m2, m3, m4 ]
+IntegrateST[f_, {s_, t_}, beta_, m1_, p2_?ParticleQ, m3_, m4_] = IntegrateST[f, {s, t}, beta, m1, Mass[p2], m3, m4 ]
+IntegrateST[f_, {s_, t_}, beta_, m1_, m2_, p3_?ParticleQ, m4_] = IntegrateST[f, {s, t}, beta, m1, m2, Mass[p3], m4 ]
+IntegrateST[f_, {s_, t_}, beta_, m1_, m2_, m3_, p4_?ParticleQ] = IntegrateST[f, {s, t}, beta, m1, m2, m3, Mass[p4] ]
 
-IntegrateST /: MakeBoxes[IntegrateST[f_, beta_, m1_, m2_, m3_, m4_], TraditionalForm] := With[
+IntegrateST[f_, {s_, t_}, beta_, m1_, m2_, m3_, m4_, opt:OptionsPattern[]] := Block[
   {
-    sMin = Max[m1^2 + m2^2, m3^2 + m4^2],
-    integrand = f[\[FormalS], \[FormalT]]
-  },
-  RowBox[{
-    MakeBoxes[1 / (512 \[Pi]^5 beta), TraditionalForm],
-    SubsuperscriptBox["\[Integral]", MakeBoxes[sMin, TraditionalForm], "\[Infinity]"],
-    SubsuperscriptBox["\[Integral]", SubscriptBox[\[FormalT], "min"], SubscriptBox[\[FormalT], "max"]],
-    FractionBox[MakeBoxes[BesselK[1, Sqrt[\[FormalS]] beta], TraditionalForm], MakeBoxes[Sqrt[\[FormalS]], TraditionalForm]],
-    MakeBoxes[integrand, TraditionalForm],
-    "\[DifferentialD]", \[FormalT],
-    "\[DifferentialD]", \[FormalS]
-  }]
-];
-
-IntegrateST[f_?InexactNumberQ, beta_, m1_, m2_, m3_, m4_] := IntegrateST[Function[{s, t}, f], beta, m1, m2, m3, m4];
-IntegrateST[
-  f:(_?ValueQ | _Function), beta_?InexactNumberQ, m1_?InexactNumberQ, m2_?InexactNumberQ, m3_?InexactNumberQ, m4_?InexactNumberQ
-] /; AnyInexactNumberQ[beta, m1, m2, m3, m4] := Block[
-  {
-    sMin = Max[(m1 + m2)^2, (m3 + m4)^2]
+    sMin = Max[m1 + m2, m3 + m4]^2
   },
 
-  1/(512 \[Pi]^5 beta) NIntegrate[
-    BesselK[1, Sqrt[s] beta]/Sqrt[s] IntegrateT[f, s, beta, m1, m2, m3, m4],
-    {s, sMin, \[Infinity]},
-    (* Method -> {"DoubleExponential", "SymbolicProcessing" -> 0}, *)
-    Method -> {Automatic, "SymbolicProcessing" -> 0},
-    WorkingPrecision -> Precision[{beta, m1, m2, m3, m4}]
+  1/(512 \[Pi]^5) NIntegrate[
+    f BesselK[1, Sqrt[s] beta]/(Sqrt[s] beta),
+    {s, Max[m1 + m2, m3 + m4]^2, \[Infinity]},
+    {t, MandelstamTMin[s, m1, m2, m3, m4], MandelstamTMax[s, m1, m2, m3, m4]},
+    opt
   ]
 ];
 
