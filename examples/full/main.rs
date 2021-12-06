@@ -63,7 +63,7 @@ fn main() -> Result<(), Box<dyn error::Error>> {
             "higgs_equilibrium" => higgs_equilibrium(),
             "lepton_equilibrium" => lepton_equilibrium(),
             "gammas" => gammas(),
-            // "custom" => custom(),
+            #[cfg(feature = "parallel")]
             "scan" => scan(),
             "--verbose" => Ok(()),
             x if x.starts_with("-v") => Ok(()),
@@ -336,7 +336,6 @@ define_all! {
         interaction::hhaa,
         interaction::hhaw,
     ]
-    // std::iter::empty::<&dyn Fn() -> Vec<FourParticle<LeptogenesisModel>>>()
 }
 
 define_all! {
@@ -408,7 +407,7 @@ fn evolution() -> Result<(), Box<dyn error::Error>> {
     // Create the CSV files
     let output_dir = common::output_dir("full");
 
-    let mut data = [Vec::new(), Vec::new(), Vec::new()];
+    let mut data = [Vec::new(), Vec::new(), Vec::new(), Vec::new()];
     let filters = [n1f1, n3f1, n1f3, n3f3];
 
     for &beta in Array1::geomspace(1e-17, 1e-2, 1024).unwrap().iter() {
@@ -568,6 +567,7 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
     let mut solver = SolverBuilder::new()
         .model(model)
         .beta_range(1e-20, 1e0)
+        .precompute(0)
         .build()
         .unwrap();
 
@@ -596,6 +596,7 @@ fn gammas() -> Result<(), Box<dyn error::Error>> {
     Ok(())
 }
 
+#[cfg(feature = "parallel")]
 fn scan() -> Result<(), Box<dyn error::Error>> {
     // Create the CSV file
     let output_dir = common::output_dir("scan");
