@@ -651,37 +651,44 @@ pub fn hhen() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
     let mut interactions = Vec::new();
 
     for (i1, i2, i3, i4) in iproduct!(0..1, 0..1, 0..3, 0..3) {
-        let squared_amplitude = move |m: &LeptogenesisModel, s, t, u| {
+        let squared_amplitude = move |m: &LeptogenesisModel, _s, t, u| {
             // let p1 = m.particle("H", i1);
             let p2 = m.particle("H", i2);
             let p3 = m.particle("e", i3);
             let p4 = m.particle("N", i4);
 
-            let m11: Complex<f64> = (m.yv[[i4, i3]].norm_sqr() * m.sm.ye[[i3, i3]].powi(2))
-                * (p3.propagator(t) * p3.propagator(t).conj())
-                * (-p2.mass2 * (s + p4.mass2 + t + u)
-                    + p4.mass2 * (s + u)
-                    + p3.mass2 * (3.0 * p4.mass2 - 3.0 * p2.mass2 + t)
-                    + p2.mass2.powi(2)
-                    + t * u);
+            let mut result = Complex::zero();
 
-            let m12: Complex<f64> = (m.yv[[i4, i3]].norm_sqr() * m.sm.ye[[i3, i3]].powi(2))
-                * (p3.propagator(u) * p3.propagator(t).conj())
-                * (-p2.mass2 * (s + t + u)
-                    + p3.mass2 * (p4.mass2 + 2.0 * p2.mass2)
-                    + p4.mass2.powi(2)
-                    + t * u);
+            for (i5, ic5) in iproduct!(0..3, 0..3) {
+                let p5 = m.particle("L", i5);
+                let pc5 = m.particle("L", ic5);
 
-            let m22: Complex<f64> = (m.yv[[i4, i3]].norm_sqr() * m.sm.ye[[i3, i3]].powi(2))
-                * (p3.propagator(u) * p3.propagator(u).conj())
-                * (p3.mass2 * (s - p4.mass2 + p2.mass2 + t)
-                    - p2.mass2 * (s + t + u)
-                    - 2.0 * p3.mass2.powi(2)
-                    + p4.mass2 * (p2.mass2 - u)
-                    + p2.mass2.powi(2)
-                    + t * u);
+                let m11_22 = (m.sm.ye[[i3, i5]]
+                    * m.yv[[i4, ic5]]
+                    * m.sm.ye[[i3, ic5]]
+                    * m.yv[[i4, i5]].conj())
+                    * ((p4.mass2 * (p3.mass2 - p2.mass2 + u)
+                        + p3.mass2 * (u - p2.mass2)
+                        + p2.mass2.powi(2)
+                        - t * u)
+                        * (p5.propagator(t) * pc5.propagator(t).conj()))
+                    + ((p4.mass2 * (p3.mass2 - p2.mass2 + t)
+                        + p3.mass2 * (t - p2.mass2)
+                        + p2.mass2.powi(2)
+                        - t * u)
+                        * (p5.propagator(u) * pc5.propagator(u).conj()));
 
-            (m11 + 2.0 * m12 + m22).re
+                let m12 = m.sm.ye[[i3, i5]]
+                    * m.yv[[i4, ic5]]
+                    * m.sm.ye[[i3, ic5]]
+                    * m.yv[[i4, i5]].conj()
+                    * (pc5.propagator(t) * p5.propagator(u).conj())
+                    * (-p3.mass2 * p4.mass2 + p2.mass2.powi(2) - t * u);
+
+                result += m11_22 + 2.0 * m12;
+            }
+
+            result.re
         };
 
         interactions.append(&mut interaction::FourParticle::new_all(
