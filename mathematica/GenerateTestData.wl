@@ -5,7 +5,8 @@ SetOptions[$Output, FormatType -> OutputForm]
 $Sections = {
   "all",
   "number_density",
-  "phase_space"
+  "phase_space",
+  "st_integral"
 };
 
 sections = ToLowerCase @ Rest @ $ScriptCommandLine;
@@ -204,22 +205,22 @@ If[MemberQ[sections, "number_density"],
 
   (* Maxwell-Boltzmann distribution is always analytical *)
   MaxwellBoltzmann[beta_, m_?PossibleZeroQ, mu_] = 1/(2 Pi^2) Integrate[
-    u^2 / Exp[beta (u - mu)],
+    u^2 / Exp[beta * (u - mu)],
     {u, 0, Infinity},
     Assumptions -> beta > 0 && mu \[Element] Reals
   ];
   MaxwellBoltzmann[beta_, m_, mu_] = 1/(2 Pi^2) Integrate[
-    u Sqrt[u^2 - m^2] / Exp[beta (u - mu)],
+    u Sqrt[u^2 - m^2] / Exp[beta * (u - mu)],
     {u, m, Infinity},
     Assumptions -> beta > 0 && mu \[Element] Reals && m > 0
   ];
   MaxwellBoltzmannAsymmetry[beta_, m_?PossibleZeroQ, mu_] = 1/(2 Pi^2) Integrate[
-    u^2 / Exp[beta (u - mu)] - u^2 / Exp[beta (u + mu)],
+    u^2 / Exp[beta * (u - mu)] - u^2 / Exp[beta * (u + mu)],
     {u, 0, Infinity},
     Assumptions -> beta > 0 && mu \[Element] Reals
   ];
   MaxwellBoltzmannAsymmetry[beta_, m_, mu_] = 1/(2 Pi^2) Integrate[
-    u Sqrt[u^2 - m^2] / Exp[beta (u - mu)] - u Sqrt[u^2 - m^2] / Exp[beta (u + mu)],
+    u Sqrt[u^2 - m^2] / Exp[beta * (u - mu)] - u Sqrt[u^2 - m^2] / Exp[beta * (u + mu)],
     {u, m, Infinity},
     Assumptions -> beta > 0 && mu \[Element] Reals && m > 0
   ];
@@ -237,24 +238,22 @@ If[MemberQ[sections, "number_density"],
 
   (* Massless case can be done analytically *)
   FermiDirac[beta_, m_?PossibleZeroQ, mu_] = 1/(2 Pi^2) Integrate[
-    u^2 / (Exp[beta (u - mu)] + 1),
+    u^2 / (Exp[beta * (u - mu)] + 1),
     {u, 0, Infinity},
     Assumptions -> beta > 0
   ];
   FermiDiracAsymmetry[beta_, m_?PossibleZeroQ, mu_] = 1/(2 beta^3 Pi^2) ((mu beta)^3 / 3 + Pi^2 / 3 mu beta);
   (* For large values, PolyLog[3, ...] fails to allocate enough memory, so we
   use the series expansion *)
-  FermiDirac[beta_, m_?PossibleZeroQ, mu_] /; beta mu > 10^5 = Block[{},
-    Normal@Series[
+  FermiDirac[beta_, m_?PossibleZeroQ, mu_] /; beta mu > 10^5 = Normal@Series[
       FermiDirac[beta, 0, mu] 
         /. {beta -> x / mu},
       {x, Infinity, 10}
-    ] /. x -> beta mu
-  ];
+    ] /. x -> beta mu;
   
   BoseEinstein[beta_, m_?PossibleZeroQ, mu_] /; mu > 0 = "NaN";
   BoseEinstein[beta_, m_?PossibleZeroQ, mu_] = 1/(2 Pi^2) Integrate[
-    u^2 / (Exp[beta (u - mu)] - 1),
+    u^2 / (Exp[beta * (u - mu)] - 1),
     {u, 0, Infinity},
     Assumptions -> beta > 0 && mu < 0
   ];
@@ -322,7 +321,7 @@ If[MemberQ[sections, "number_density"],
       Power::indet,
       Power::infy
     ];
-  ]
+  ];
 
   (* Prevent infinite memory being allocation *)
   ParallelEvaluate[
@@ -386,7 +385,7 @@ If[MemberQ[sections, "number_density"],
       Power::indet,
       Power::infy
     ];
-  ]
+  ];
 
   (* Reset precision *)
   ParallelEvaluate[
@@ -464,4 +463,133 @@ If[MemberQ[sections, "phase_space"],
     $MinPrecision = 0;
     $MaxPrecision = Infinity;
   ];
+];
+
+
+(*****************************************************************************)
+(* S T Integrals *)
+(*****************************************************************************)
+
+
+If[MemberQ[sections, "st_integral"],
+  dir = CreateDataDir["."];
+
+  Lambda[a_, b_, c_] := a^2 + b^2 + c^2 - 2(a b + b c + a c);
+
+  MandelstamTMin[s_, m1_, m2_, m3_, m4_] := Module[
+    {
+      baseline = 1/2 (m1^2 + m2^2 + m3^2 + m4^2 - s - (m1^2 - m2^2) (m3^2 - m4^2) / s),
+      cosine = Sqrt[Lambda[s, m1^2, m2^2]] Sqrt[Lambda[s, m3^2, m4^2]] / (2 s)
+    },
+    If[s < (m1 + m2)^2, Message[MandelstamTRange::invalids12] ];
+    If[s < (m3 + m4)^2, Message[MandelstamTRange::invalids34] ];
+    If[PossibleZeroQ[s], Return[0] ];
+    baseline - cosine
+  ];
+  MandelstamTMin[Infinity, _, _, _, _] := -Infinity;
+
+  MandelstamTMax[s_, m1_, m2_, m3_, m4_] := Module[
+    {
+      baseline = 1/2 (m1^2 + m2^2 + m3^2 + m4^2 - s - (m1^2 - m2^2) (m3^2 - m4^2) / s),
+      cosine = Sqrt[Lambda[s, m1^2, m2^2]] Sqrt[Lambda[s, m3^2, m4^2]] / (2 s)
+    },
+    If[s < (m1 + m2)^2, Message[MandelstamTRange::invalids12] ];
+    If[s < (m3 + m4)^2, Message[MandelstamTRange::invalids34] ];
+    If[PossibleZeroQ[s], Return[0] ];
+    baseline + cosine
+  ];
+  MandelstanTMax[Infinity, _, _, _, _] := 0;
+
+  f1[s_, t_] := s^2;
+  f2[s_, t_] := s t;
+  f3[s_, t_] := t^2;
+  f4[s_, t_] := s^2 / (s + 1);
+  f5[s_, t_] := s t / (s + 1);
+  f6[s_, t_] := s^2 t^2 / ((s + 1) (t^2 + 1));
+
+  stIntegral[f_, beta_, m1_, m2_, m3_, m4_] := Block[{
+      sMin = Max[m1 + m2, m3 + m4]^2
+    },
+    NIntegrate[
+      f[s, t] BesselK[1, Sqrt[s] beta] / (Sqrt[s] beta),
+      {s, sMin, Infinity},
+      {t, MandelstamTMin[s, m1, m2, m3, m4], MandelstamTMax[s, m1, m2, m3, m4]},
+      Method -> {
+        "GlobalAdaptive",
+        "SingularityDepth" -> 2
+      },
+      MaxRecursion -> 5,
+      WorkingPrecision -> 60,
+      PrecisionGoal -> 6,
+      AccuracyGoal -> 100
+    ] / (512 \[Pi]^5)
+  ];
+
+  (* Turn off warnings *)
+  ParallelEvaluate[
+    Off[
+      General::munfl,
+      General::ovfl,
+      Power::infy
+    ];
+  ];
+
+  GenerateCSV[
+    FileNameJoin[{dir, "st_integral_massless.csv"}],
+    {"beta", "m1", "m2", "m3", "m4", "f1", "f2", "f3", "f4", "f5", "f6"},
+    Function[{beta, m1, m2, m3, m4}, 
+      {
+        beta, m1, m2, m3, m4,
+        stIntegral[f1, beta, m1, m2, m3, m4],
+        stIntegral[f2, beta, m1, m2, m3, m4],
+        stIntegral[f3, beta, m1, m2, m3, m4],
+        stIntegral[f4, beta, m1, m2, m3, m4],
+        stIntegral[f5, beta, m1, m2, m3, m4],
+        stIntegral[f6, beta, m1, m2, m3, m4]
+      }
+    ],
+    SeedRandom[123454321];
+    RandomAccessSample[10^3,
+      {beta, m1, m2, m3, m4},
+      {beta, Select[# > 0&] @ PositiveSample[200]},
+      {m1, {0}},
+      {m2, {0}},
+      {m3, {0}},
+      {m4, {0}}
+    ]
+  ];
+
+  GenerateCSV[
+    FileNameJoin[{dir, "st_integral_massive.csv"}],
+    {"beta", "m1", "m2", "m3", "m4", "f1", "f2", "f3", "f4", "f5", "f6"},
+    Function[{beta, m1, m2, m3, m4}, 
+      {
+        beta, m1, m2, m3, m4,
+        stIntegral[f1, beta, m1, m2, m3, m4],
+        stIntegral[f2, beta, m1, m2, m3, m4],
+        stIntegral[f3, beta, m1, m2, m3, m4],
+        stIntegral[f4, beta, m1, m2, m3, m4],
+        stIntegral[f5, beta, m1, m2, m3, m4],
+        stIntegral[f6, beta, m1, m2, m3, m4]
+      }
+    ],
+    SeedRandom[123454321];
+    RandomAccessSample[10^3,
+      {beta, m1, m2, m3, m4},
+      {beta, Select[# > 0&] @ PositiveSample[200]},
+      {m1, PositiveSample[200]},
+      {m2, PositiveSample[200]},
+      {m3, PositiveSample[200]},
+      {m4, PositiveSample[200]}
+    ]
+  ];
+
+  (* Reinstate warnings *)
+  ParallelEvaluate[
+    On[General::munfl];
+    On[General::ovfl];
+    On[Power::infy];
+  ];
+
+  ClearAll[MandelstamTMax, MandelstamTMin, f1, f2, f3, f4, f5, f6, Lambda];
 ];
