@@ -1,11 +1,9 @@
-use super::M_BETA_THRESHOLD;
-use crate::{constants::PI_5, prelude::Particle};
-use ndarray::Array1;
-use quadrature::{clenshaw_curtis, double_exponential};
-use special_functions::{bessel, particle_physics::kallen_lambda_sqrt};
-use std::f64;
+mod integrate;
 
-const INTEGRATION_PRECISION: f64 = 1e-10;
+use super::M_BETA_THRESHOLD;
+use crate::{constants::PI_5, prelude::ParticleData};
+use special_functions::particle_physics::kallen_lambda_sqrt;
+use std::f64;
 
 /// Return the minimum and maximum value of the Mandelstam variable `$t$` based
 /// on the four particle masses with particles 1 and 2 being initial state and
@@ -22,9 +20,13 @@ const INTEGRATION_PRECISION: f64 = 1e-10;
 /// \end{aligned}
 /// ```
 #[must_use]
-pub fn t_range(s: f64, p1: &Particle, p2: &Particle, p3: &Particle, p4: &Particle) -> (f64, f64) {
-    const THRESHOLD: f64 = 1e-3;
-
+pub fn t_range(
+    s: f64,
+    p1: &ParticleData,
+    p2: &ParticleData,
+    p3: &ParticleData,
+    p4: &ParticleData,
+) -> (f64, f64) {
     // debug_assert!(
     //     s * (1.0 + 10.0 * f64::EPSILON) >= (p1.mass + p2.mass).powi(2),
     //     "s cannot be smaller than (m1 + m2)² (s = {:e}, (m1 + m2)² = {:e}).",
@@ -42,129 +44,12 @@ pub fn t_range(s: f64, p1: &Particle, p2: &Particle, p3: &Particle, p4: &Particl
         return (0.0, 0.0);
     }
 
-    let (m1, m2, m3, m4) = (p1.mass2, p2.mass2, p3.mass2, p4.mass2);
-    let (x1, x2, x3, x4) = (m1 / s, m2 / s, m3 / s, m4 / s);
+    let (x1, x2, x3, x4) = (p1.mass2 / s, p2.mass2 / s, p3.mass2 / s, p4.mass2 / s);
 
-    let x_max = x1.max(x2).max(x3).max(x4);
+    let baseline = p1.mass2 + p3.mass2 - s / 2.0 * (1.0 + x1 - x2) * (1.0 + x3 - x4);
+    let cosine = s / 2.0 * kallen_lambda_sqrt(1.0, x1, x2) * kallen_lambda_sqrt(1.0, x3, x4);
 
-    match (
-        x1 / x_max < THRESHOLD,
-        x2 / x_max < THRESHOLD,
-        x3 / x_max < THRESHOLD,
-        x4 / x_max < THRESHOLD,
-    ) {
-        // // 2 small values
-        // (true, true, false, false) => {
-        //     let sqrt34 = kallen_lambda_sqrt(1.0, x3, x4);
-        //     (
-        //         0.5 * s
-        //             * (sqrt34 * (2.0 * x1 * x2 + x1 + x2 - 1.0)
-        //                 + x3
-        //                 + x2 * (x3 - x4 + 1.0)
-        //                 + x4
-        //                 + x1 * (-x3 + x4 + 1.0)
-        //                 - 1.0),
-        //         0.5 * s
-        //             * (sqrt34 * (-x2 - x1 * (2.0 * x2 + 1.0) + 1.0)
-        //                 + x3
-        //                 + x2 * (x3 - x4 + 1.0)
-        //                 + x4
-        //                 + x1 * (-x3 + x4 + 1.0)
-        //                 - 1.0),
-        //     )
-        // }
-        // (true, false, true, false) => {
-        //     let ox2 = 1.0 / (x2 - 1.0);
-        //     let ox24 = ox2 / (x4 - 1.0);
-        //     (
-        //         s * (ox24 * ((x2 - 1.0).powi(2) - x1 * (x2 + 1.0)) * x3 + x2 * (x3 + 1.0)
-        //             - ox2 * (x1 * (x2 * x3 + 1.0) + ((x1 - x2 + 2.0) * x2 - 1.0) * x4)
-        //             - 1.0),
-        //         s * (ox24 * (x1 * (x2 + 1.0) - (x2 - 1.0).powi(2)) * x3
-        //             + x3
-        //             + ox2 * (x1 * (x2 + x3) - x1 * x4)),
-        //     )
-        // }
-        // (true, false, false, true) => {
-        //     let ox2 = 1.0 / (x2 - 1.0);
-        //     let ox23 = ox2 / (x3 - 1.0);
-        //     (
-        //         x2 + x3 - 1.0 + ox2 * x1 * (x3 - 1.0) + ox23 * (x2 * x2 - (x1 + 2.0) * x2 - x1 * x3 + 1.0) * x4,
-        //         - ox23 * (x1 * x2 * x3 * x3) + ox3 * x2 * x3 * x3 +
-        //     )
-        // }
-        // (false, true, true, false) => {
-        //     (
-        //         s * (
-
-        //         ),
-        //         s * ()
-        //     )
-        // }
-        // (false, true, false, true) => {
-        //     (
-        //         s * (
-        //             -x3 * x1 + x1 + x3 + x2 * (x3 * (x1 * (x3 - x4 - 1.0) - 1.0) - x4 + 1.0) / (x1 - 1.0) / (x3 - 1.0) + (x1 * x3 - 1.0) * x4 / (x3 - 1.0) - 1.0
-        //         ),
-        //         s * (
-        //             x2 * (x1 - x3) * (x3 - 1.0) + (x1 * (-x1 + x2 + 1.0) + (x1 + x2 - 1.0) * x3) * x4
-        //         ) / (x1 - 1.0) / (x3 - 1.0)
-        //     )
-        // }
-        // (false, false, true, true) => {
-        //     let sqrt12 = kallen_lambda_sqrt(1.0, x1, x2);
-        //     (
-        //         0.5 * s
-        //             * (x3 + x2 * (x3 - x4 + 1.0) + x4 + x1 * (-x3 + x4 + 1.0) + sqrt12 * (2.0 * x3 * x4 + x3 + x4 - 1) - 1.0),
-        //         0.5 * s
-        //             * (x3 + x2 * (x3 - x4 + 1.0) + x4 + x1 * (-x3 + x4 + 1.0) + sqrt12 * (-x4 - x3 * (2.0 * x3 + 1.0) + 1.0) + 1.0),
-        //     )
-        // }
-        // 3 small values
-        // (true, true, true, false) => {
-        //     let prefactor = x3 / (x4 - 1.0);
-        //     (
-        //         s * (x2 * x1 + x1 + x2 - (x1 + 1.0) * x2 * x4 + x4 - 1.0
-        //             + prefactor * (x2 * (x4 + 1.0) * x1 + x1 + x2 * x4 - 1.0)),
-        //         s * (x1 * (x2 * (x4 - 1.0) + x4)
-        //             + prefactor * (-((x1 + 1.0) * x2) - x1 * (x2 + 1.0) * x4 + x4)),
-        //     )
-        // }
-        // (true, true, false, true) => {
-        //     let prefactor = x4 / (x3 - 1.0);
-        //     (
-        //         s * (x2 - x1 * (x2 + 1.0) * (x3 - 1.0) + x3 - 1.0
-        //             + prefactor * (x1 * (x3 + 1.0) * x2 + x2 + x1 * x3 - 1.0)),
-        //         s * (x2 * (x1 * (x3 - 1.0) + x3)
-        //             + prefactor * (-x1 * (x2 + 1.0) - (x1 + 1.0) * x2 * x3 + x3)),
-        //     )
-        // }
-        // (true, false, true, true) => {
-        //     let prefactor = x1 / (x2 - 1.0);
-        //     (
-        //         s * (x2 + x3 - (x2 - 1.0) * (x3 + 1.0) * x4 - 1.0
-        //             + prefactor * (x3 + (x3 + x2 * (x3 + 1.0)) * x4 - 1.0)),
-        //         s * (x3 * (x2 + (x2 - 1.0) * x4)
-        //             + prefactor * (-x3 * (x4 + 1.0) * x2 + x2 - (x3 + 1.0) * x4)),
-        //     )
-        // }
-        // (false, true, true, true) => {
-        //     let prefactor = x2 / (x1 - 1.0);
-        //     (
-        //         s * (-x3 * (x4 + 1.0) * x1 + x1 + x4 + x3 * (x4 + 1.0) - 1.0
-        //             + prefactor * (x4 + x3 * (x4 + x1 * (x4 + 1.0)) - 1.0)),
-        //         s * ((x1 + (x1 - 1.0) * x3) * x4
-        //             + prefactor * (-((x3 + 1.0) * x4 * x1) + x1 - x3 * (x4 + 1.0))),
-        //     )
-        // }
-        _ => {
-            let baseline = x1 + x2 + x3 + x4 - 1.0 - (x1 - x2) * (x3 - x4);
-            let sqrt12 = kallen_lambda_sqrt(1.0, x1, x2);
-            let sqrt34 = kallen_lambda_sqrt(1.0, x3, x4);
-            let cosine = sqrt12 * sqrt34;
-            (0.5 * s * (baseline - cosine), 0.5 * s * (baseline + cosine))
-        }
-    }
+    (baseline - cosine, baseline + cosine)
 }
 
 /// Integrate the function of `$t$` over its range.
@@ -175,53 +60,25 @@ pub fn t_range(s: f64, p1: &Particle, p2: &Particle, p3: &Particle, p4: &Particl
 pub fn integrate_t<F>(
     integrand: F,
     s: f64,
-    p1: &Particle,
-    p2: &Particle,
-    p3: &Particle,
-    p4: &Particle,
+    p1: &ParticleData,
+    p2: &ParticleData,
+    p3: &ParticleData,
+    p4: &ParticleData,
 ) -> f64
 where
     F: Fn(f64) -> f64,
 {
     let (ta, tb) = t_range(s, p1, p2, p3, p4);
-    let mut t_divs = vec![ta, tb];
 
-    for m_squared in [p1, p2, p3, p4].iter().map(|p| p.mass2) {
-        t_divs.extend(&[m_squared * 0.98, m_squared * 1.02]);
-    }
-    t_divs.sort_unstable_by(|a, b| a.partial_cmp(b).unwrap());
-    t_divs.dedup();
-    t_divs.retain(|&t| ta <= t && t <= tb);
+    let (integral, err) = integrate::legendre(integrand, ta, tb);
 
-    let mut integral = 0.0;
-
-    for (&t1, &t2) in t_divs[..t_divs.len() - 1].iter().zip(&t_divs[1..]) {
-        integral += clenshaw_curtis::integrate(&integrand, t1, t2, INTEGRATION_PRECISION).integral;
-    }
+    log::trace!(
+        "Mandelstam t Integration Result: {:e} ± {:e}",
+        integral,
+        err
+    );
 
     integral
-}
-
-#[must_use]
-fn s_divisions(beta: f64, p1: &Particle, p2: &Particle, p3: &Particle, p4: &Particle) -> Vec<f64> {
-    // The weighing by the bessel function means  that most of the integral's
-    // non-zero values are near the lower bound of the s domain.  We use
-    // Clenshaw-Curtis integration for the lower range, and then
-    // double-exponential integration for the rest of the range.
-
-    let s_min = (p1.mass + p2.mass).max(p3.mass + p4.mass).powi(2);
-    // For values above of √s β above 700, the factor of K₁(√s β)/√s β evaluates
-    // to 0 within machine precision.  So we use this as the upper bound instead
-    // of infinity.
-    let s_max = (1e3 / beta.powi(2)).max(1e1 * s_min);
-
-    let mut s_divs = Array1::geomspace(if s_min == 0.0 { 1e-50 } else { s_min }, s_max, 4)
-        .unwrap()
-        .into_raw_vec();
-    s_divs[0] = s_min;
-    s_divs.sort_unstable_by(|a, b| a.partial_cmp(b).unwrap());
-
-    s_divs
 }
 
 /// Integrate the amplitude with respect to the Mandelstam variable `$s$` and
@@ -239,60 +96,32 @@ fn s_divisions(beta: f64, p1: &Particle, p2: &Particle, p3: &Particle, p4: &Part
 pub fn integrate_st<F>(
     amplitude: F,
     beta: f64,
-    p1: &Particle,
-    p2: &Particle,
-    p3: &Particle,
-    p4: &Particle,
+    p1: &ParticleData,
+    p2: &ParticleData,
+    p3: &ParticleData,
+    p4: &ParticleData,
 ) -> f64
 where
     F: Fn(f64, f64) -> f64,
 {
-    let s_divs = s_divisions(beta, p1, p2, p3, p4);
-    let s_max = *s_divs.last().unwrap();
+    let s_min = (p1.mass + p2.mass).max(p3.mass + p4.mass).powi(2);
+    let x_min = s_min.sqrt() * beta;
 
-    // Integrand of `s` for regular Clenshaw-Curtis integration
-    let s_integrand_cc = |s: f64| {
-        // Combination of factors constant w.r.t. t
-        let sqrt_s = s.sqrt();
-        let s_factors = bessel::k1(sqrt_s * beta) / (sqrt_s * beta);
-
-        // let (t_min, t_max) = t_range(s, m1, m2, m3, m4);
-        let t_integrand = |t: f64| amplitude(s, t);
-        integrate_t(t_integrand, s, p1, p2, p3, p4) * s_factors
-        // clenshaw_curtis::integrate(&t_integrand, t_min, t_max, INTEGRATION_PRECISION).integral
-    };
-
-    // Integrand optimized for the last upper interval intended to be used with
-    // a double exponential
-    let s_integrand_de = |ss: f64| {
-        // Remap the interval [s_med, s_max] onto [0, 1].  The following
-        // rescaling will cause the numerical integration to sample more heavily
-        // from the lower part of the domain (unlike a simple linear rescaling).
-        // let delta = (s_max - s_med).recip() + 1.0;
-        // let s = ss / (delta - ss) + s_med;
-        // let dsdss = delta / (delta - ss).powi(2);
-
-        // Remap the semi-infinite s interval onto [0, 1)
-        let s = ss / (1.0 - ss) + s_max;
-        let dsdss = (ss - 1.0).powi(-2);
-
-        // Combination of factors constant w.r.t. t
-        let sqrt_s = s.sqrt();
-        let s_factors = bessel::k1(sqrt_s * beta) / (sqrt_s * beta) * dsdss;
+    let integrand = |x: f64| {
+        let sqrt_s = x / beta;
+        let s = sqrt_s.powi(2);
 
         let t_integrand = |t: f64| amplitude(s, t);
-        integrate_t(t_integrand, s, p1, p2, p3, p4) * s_factors
+        integrate_t(t_integrand, s, p1, p2, p3, p4)
     };
 
-    let mut integral = 0.0;
+    let (integral, err) = integrate::bessel(integrand, x_min);
 
-    for (&s1, &s2) in s_divs.iter().zip(&s_divs[1..]) {
-        integral +=
-            clenshaw_curtis::integrate(&s_integrand_cc, s1, s2, INTEGRATION_PRECISION).integral;
-    }
-
-    integral +=
-        double_exponential::integrate(&s_integrand_de, 0.0, 1.0, INTEGRATION_PRECISION).integral;
+    log::trace!(
+        "Mandelstam s Integration Result: {:e} ± {:e}",
+        integral,
+        err
+    );
 
     integral / (512.0 * PI_5)
 }
@@ -306,10 +135,10 @@ where
 pub fn integrate_st_on_n<F>(
     amplitude: F,
     beta: f64,
-    p1: &Particle,
-    p2: &Particle,
-    p3: &Particle,
-    p4: &Particle,
+    p1: &ParticleData,
+    p2: &ParticleData,
+    p3: &ParticleData,
+    p4: &ParticleData,
 ) -> f64
 where
     F: Fn(f64, f64) -> f64,
@@ -365,65 +194,39 @@ where
 fn integrate_st_on_n1<F>(
     amplitude: F,
     beta: f64,
-    p1: &Particle,
-    p2: &Particle,
-    p3: &Particle,
-    p4: &Particle,
-    h1: &Particle,
+    p1: &ParticleData,
+    p2: &ParticleData,
+    p3: &ParticleData,
+    p4: &ParticleData,
+    h1: &ParticleData,
 ) -> f64
 where
     F: Fn(f64, f64) -> f64,
 {
-    let s_divs = s_divisions(beta, p1, p2, p3, p4);
-    let s_max = *s_divs.last().unwrap();
+    // For values above of √s β above 700, the factor of K₁(√s β)/√s β evaluates
+    // to 0 within machine precision.  So we use this as the upper bound instead
+    // of infinity.
+    let s_min = (p1.mass + p2.mass).max(p3.mass + p4.mass).powi(2);
+    let s_max = (1e3 / beta.powi(2)).max(1e1 * s_min);
 
-    // Integrand of `s` for regular Clenshaw-Curtis integration
-    let s_integrand_cc = |s: f64| {
-        // Combination of factors constant w.r.t. t
+    let integrand = |s: f64| {
         let sqrt_s = s.sqrt();
         // 2 ζ(3) ≅ 2.4041138063191885
-        let s_factors = (2.404_113_806_319_188_5 / h1.degrees_of_freedom())
+        let s_factor = (2.404_113_806_319_188_5 / h1.degrees_of_freedom())
             * f64::exp((h1.mass - sqrt_s) * beta)
             / ((h1.mass * sqrt_s).sqrt() * beta).powi(3);
 
-        let t_integrand = |t: f64| amplitude(s, t) * s_factors;
-        integrate_t(t_integrand, s, p1, p2, p3, p4)
+        let t_integrand = |t: f64| amplitude(s, t);
+        integrate_t(t_integrand, s, p1, p2, p3, p4) * s_factor
     };
 
-    // Integrand optimized for the last upper interval intended to be used with
-    // a double exponential
-    let s_integrand_de = |ss: f64| {
-        // Remap the interval [s_med, s_max] onto [0, 1].  The following
-        // rescaling will cause the numerical integration to sample more heavily
-        // from the lower part of the domain (unlike a simple linear rescaling).
-        // let delta = (s_max - s_med).recip() + 1.0;
-        // let s = ss / (delta - ss) + s_med;
-        // let dsdss = delta / (delta - ss).powi(2);
+    let (integral, err) = integrate::legendre(integrand, s_min, s_max);
 
-        // Remap the semi-infinite s interval onto [0, 1)
-        let s = ss / (1.0 - ss) + s_max;
-        let dsdss = (ss - 1.0).powi(-2);
-
-        // Combination of factors constant w.r.t. t
-        let sqrt_s = s.sqrt();
-        let s_factors = (2.404_113_806_319_188_5 / h1.degrees_of_freedom())
-            * f64::exp((h1.mass - sqrt_s) * beta)
-            / ((h1.mass * sqrt_s).sqrt() * beta).powi(3)
-            * dsdss;
-
-        let t_integrand = |t: f64| amplitude(s, t) * s_factors;
-        integrate_t(t_integrand, s, p1, p2, p3, p4)
-    };
-
-    let mut integral = 0.0;
-
-    for (&s1, &s2) in s_divs.iter().zip(&s_divs[1..]) {
-        integral +=
-            clenshaw_curtis::integrate(&s_integrand_cc, s1, s2, INTEGRATION_PRECISION).integral;
-    }
-
-    integral +=
-        double_exponential::integrate(&s_integrand_de, 0.0, 1.0, INTEGRATION_PRECISION).integral;
+    log::trace!(
+        "Mandelstam t Integration Result: {:e} ± {:e}",
+        integral,
+        err
+    );
 
     integral / (512.0 * PI_5)
 }
@@ -442,68 +245,41 @@ where
 fn integrate_st_on_n2<F>(
     amplitude: F,
     beta: f64,
-    p1: &Particle,
-    p2: &Particle,
-    p3: &Particle,
-    p4: &Particle,
-    h1: &Particle,
-    h2: &Particle,
+    p1: &ParticleData,
+    p2: &ParticleData,
+    p3: &ParticleData,
+    p4: &ParticleData,
+    h1: &ParticleData,
+    h2: &ParticleData,
 ) -> f64
 where
     F: Fn(f64, f64) -> f64,
 {
-    let s_divs = s_divisions(beta, p1, p2, p3, p4);
-    let s_max = *s_divs.last().unwrap();
+    // For values above of √s β above 700, the factor of K₁(√s β)/√s β evaluates
+    // to 0 within machine precision.  So we use this as the upper bound instead
+    // of infinity.
+    let s_min = (p1.mass + p2.mass).max(p3.mass + p4.mass).powi(2);
+    let s_max = (1e3 / beta.powi(2)).max(1e1 * s_min);
 
-    // Integrand of `s` for regular Clenshaw-Curtis integration
-    let s_integrand_cc = |s: f64| {
-        // Combination of factors constant w.r.t. t
+    let integrand = |s: f64| {
         let sqrt_s = s.sqrt();
         // 4 √(2 / π) ζ(3)² ≅ 4.611583817377448
-        let s_factors = (4.611_583_817_377_448
+        let s_factor = (4.611_583_817_377_448
             / (h1.degrees_of_freedom() * h2.degrees_of_freedom()))
             * f64::exp((h1.mass + h2.mass - sqrt_s) * beta)
             / ((h1.mass * h2.mass * sqrt_s * beta.powi(3)).sqrt()).powi(3);
 
-        let t_integrand = |t: f64| amplitude(s, t) * s_factors;
-        integrate_t(t_integrand, s, p1, p2, p3, p4)
+        let t_integrand = |t: f64| amplitude(s, t);
+        integrate_t(t_integrand, s, p1, p2, p3, p4) * s_factor
     };
 
-    // Integrand optimized for the last upper interval intended to be used with
-    // a double exponential
-    let s_integrand_de = |ss: f64| {
-        // Remap the interval [s_med, s_max] onto [0, 1].  The following
-        // rescaling will cause the numerical integration to sample more heavily
-        // from the lower part of the domain (unlike a simple linear rescaling).
-        // let delta = (s_max - s_med).recip() + 1.0;
-        // let s = ss / (delta - ss) + s_med;
-        // let dsdss = delta / (delta - ss).powi(2);
+    let (integral, err) = integrate::legendre(integrand, s_min, s_max);
 
-        // Remap the semi-infinite s interval onto [0, 1)
-        let s = ss / (1.0 - ss) + s_max;
-        let dsdss = (ss - 1.0).powi(-2);
-
-        // Combination of factors constant w.r.t. t
-        let sqrt_s = s.sqrt();
-        let s_factors = (4.611_583_817_377_448
-            / (h1.degrees_of_freedom() * h2.degrees_of_freedom()))
-            * f64::exp((h1.mass + h2.mass - sqrt_s) * beta)
-            / ((h1.mass * h2.mass * sqrt_s).sqrt() * beta.powf(1.5)).powi(3)
-            * dsdss;
-
-        let t_integrand = |t: f64| amplitude(s, t) * s_factors;
-        integrate_t(t_integrand, s, p1, p2, p3, p4)
-    };
-
-    let mut integral = 0.0;
-
-    for (&s1, &s2) in s_divs.iter().zip(&s_divs[1..]) {
-        integral +=
-            clenshaw_curtis::integrate(&s_integrand_cc, s1, s2, INTEGRATION_PRECISION).integral;
-    }
-
-    integral +=
-        double_exponential::integrate(&s_integrand_de, 0.0, 1.0, INTEGRATION_PRECISION).integral;
+    log::trace!(
+        "Mandelstam t Integration Result: {:e} ± {:e}",
+        integral,
+        err
+    );
 
     integral / (512.0 * PI_5)
 }
@@ -523,71 +299,42 @@ where
 fn integrate_st_on_n3<F>(
     amplitude: F,
     beta: f64,
-    p1: &Particle,
-    p2: &Particle,
-    p3: &Particle,
-    p4: &Particle,
-    h1: &Particle,
-    h2: &Particle,
-    h3: &Particle,
+    p1: &ParticleData,
+    p2: &ParticleData,
+    p3: &ParticleData,
+    p4: &ParticleData,
+    h1: &ParticleData,
+    h2: &ParticleData,
+    h3: &ParticleData,
 ) -> f64
 where
     F: Fn(f64, f64) -> f64,
 {
-    let mut s_divs = s_divisions(beta, p1, p2, p3, p4);
-    s_divs.push((h1.mass + h2.mass + h3.mass).powi(2));
-    s_divs.sort_unstable_by(|a, b| a.partial_cmp(b).unwrap());
-    let s_max = *s_divs.last().unwrap();
+    // For values above of √s β above 700, the factor of K₁(√s β)/√s β evaluates
+    // to 0 within machine precision.  So we use this as the upper bound instead
+    // of infinity.
+    let s_min = (p1.mass + p2.mass).max(p3.mass + p4.mass).powi(2);
+    let s_max = (1e3 / beta.powi(2)).max(1e1 * s_min);
 
-    // Integrand of `s` for regular Clenshaw-Curtis integration
-    let s_integrand_cc = |s: f64| {
-        // Combination of factors constant w.r.t. t
+    let integrand = |s: f64| {
         let sqrt_s = s.sqrt();
         // 16 ζ(3)³ / π ≅ 8.845964466739566
-        let s_factors = (8.845_964_466_739_566
+        let s_factor = (8.845_964_466_739_566
             / (h1.degrees_of_freedom() * h2.degrees_of_freedom() * h3.degrees_of_freedom()))
             * f64::exp((h1.mass + h2.mass + h3.mass - sqrt_s) * beta)
             / ((h1.mass * h2.mass * h3.mass * sqrt_s).sqrt() * beta.powi(2)).powi(3);
 
-        let t_integrand = |t: f64| amplitude(s, t) * s_factors;
-        integrate_t(t_integrand, s, p1, p2, p3, p4)
+        let t_integrand = |t: f64| amplitude(s, t);
+        integrate_t(t_integrand, s, p1, p2, p3, p4) * s_factor
     };
 
-    // Integrand optimized for the last upper interval intended to be used with
-    // a double exponential
-    let s_integrand_de = |ss: f64| {
-        // Remap the interval [s_med, s_max] onto [0, 1].  The following
-        // rescaling will cause the numerical integration to sample more heavily
-        // from the lower part of the domain (unlike a simple linear rescaling).
-        // let delta = (s_max - s_med).recip() + 1.0;
-        // let s = ss / (delta - ss) + s_med;
-        // let dsdss = delta / (delta - ss).powi(2);
+    let (integral, err) = integrate::legendre(integrand, s_min, s_max);
 
-        // Remap the semi-infinite s interval onto [0, 1)
-        let s = ss / (1.0 - ss) + s_max;
-        let dsdss = (ss - 1.0).powi(-2);
-
-        // Combination of factors constant w.r.t. t
-        let sqrt_s = s.sqrt();
-        let s_factors = (8.845_964_466_739_566
-            / (h1.degrees_of_freedom() * h2.degrees_of_freedom() * h3.degrees_of_freedom()))
-            * f64::exp((h1.mass + h2.mass + h3.mass - sqrt_s) * beta)
-            / ((h1.mass * h2.mass * h3.mass * sqrt_s).sqrt() * beta.powi(2)).powi(3)
-            * dsdss;
-
-        let t_integrand = |t: f64| amplitude(s, t) * s_factors;
-        integrate_t(t_integrand, s, p1, p2, p3, p4)
-    };
-
-    let mut integral = 0.0;
-
-    for (&s1, &s2) in s_divs.iter().zip(&s_divs[1..]) {
-        integral +=
-            clenshaw_curtis::integrate(&s_integrand_cc, s1, s2, INTEGRATION_PRECISION).integral;
-    }
-
-    integral +=
-        double_exponential::integrate(&s_integrand_de, 0.0, 1.0, INTEGRATION_PRECISION).integral;
+    log::trace!(
+        "Mandelstam t Integration Result: {:e} ± {:e}",
+        integral,
+        err
+    );
 
     integral / (512.0 * PI_5)
 }
@@ -605,32 +352,24 @@ where
 fn integrate_st_on_n4<F>(
     amplitude: F,
     beta: f64,
-    p1: &Particle,
-    p2: &Particle,
-    p3: &Particle,
-    p4: &Particle,
+    p1: &ParticleData,
+    p2: &ParticleData,
+    p3: &ParticleData,
+    p4: &ParticleData,
 ) -> f64
 where
     F: Fn(f64, f64) -> f64,
 {
-    let mut s_divs = s_divisions(beta, p1, p2, p3, p4);
-    s_divs.extend_from_slice(&[
-        (p1.mass + p2.mass + p3.mass).powi(2),
-        (p1.mass + p2.mass + p4.mass).powi(2),
-        (p1.mass + p3.mass + p4.mass).powi(2),
-        (p2.mass + p3.mass + p4.mass).powi(2),
-        (p1.mass + p2.mass + p3.mass + p4.mass).powi(2),
-    ]);
-    s_divs.sort_unstable_by(|a, b| a.partial_cmp(b).unwrap());
-    s_divs.dedup();
-    let s_max = *s_divs.last().unwrap();
+    // For values above of √s β above 700, the factor of K₁(√s β)/√s β evaluates
+    // to 0 within machine precision.  So we use this as the upper bound instead
+    // of infinity.
+    let s_min = (p1.mass + p2.mass).max(p3.mass + p4.mass).powi(2);
+    let s_max = (1e3 / beta.powi(2)).max(1e1 * s_min);
 
-    // Integrand of `s` for regular Clenshaw-Curtis integration
-    let s_integrand_cc = |s: f64| {
-        // Combination of factors constant w.r.t. t
+    let integrand = |s: f64| {
         let sqrt_s = s.sqrt();
         // 32 √2 ζ(3)⁴ / π^(3/2) ≅ 16.968375821762574
-        let s_factors = (16.968_375_821_762_574
+        let s_factor = (16.968_375_821_762_574
             / (p1.degrees_of_freedom()
                 * p2.degrees_of_freedom()
                 * p3.degrees_of_freedom()
@@ -638,55 +377,24 @@ where
             * f64::exp((p1.mass + p2.mass + p3.mass + p4.mass - sqrt_s) * beta)
             / ((p1.mass * p2.mass * p3.mass * p4.mass * sqrt_s * beta.powi(5)).sqrt()).powi(3);
 
-        let t_integrand = |t: f64| amplitude(s, t) * s_factors;
-        integrate_t(t_integrand, s, p1, p2, p3, p4)
+        let t_integrand = |t: f64| amplitude(s, t);
+        integrate_t(t_integrand, s, p1, p2, p3, p4) * s_factor
     };
 
-    // Integrand optimized for the last upper interval intended to be used with
-    // a double exponential
-    let s_integrand_de = |ss: f64| {
-        // Remap the interval [s_med, s_max] onto [0, 1].  The following
-        // rescaling will cause the numerical integration to sample more heavily
-        // from the lower part of the domain (unlike a simple linear rescaling).
-        // let delta = (s_max - s_med).recip() + 1.0;
-        // let s = ss / (delta - ss) + s_med;
-        // let dsdss = delta / (delta - ss).powi(2);
+    let (integral, err) = integrate::legendre(integrand, s_min, s_max);
 
-        // Remap the semi-infinite s interval onto [0, 1)
-        let s = ss / (1.0 - ss) + s_max;
-        let dsdss = (ss - 1.0).powi(-2);
-
-        // Combination of factors constant w.r.t. t
-        let sqrt_s = s.sqrt();
-        let s_factors = (16.968_375_821_762_574
-            / (p1.degrees_of_freedom()
-                * p2.degrees_of_freedom()
-                * p3.degrees_of_freedom()
-                * p4.degrees_of_freedom()))
-            * f64::exp((p1.mass + p2.mass + p3.mass + p4.mass - sqrt_s) * beta)
-            / ((p1.mass * p2.mass * p3.mass * p4.mass * sqrt_s).sqrt() * beta.powf(2.5)).powi(3)
-            * dsdss;
-
-        let t_integrand = |t: f64| amplitude(s, t) * s_factors;
-        integrate_t(t_integrand, s, p1, p2, p3, p4)
-    };
-
-    let mut integral = 0.0;
-
-    for (&s1, &s2) in s_divs.iter().zip(&s_divs[1..]) {
-        integral +=
-            clenshaw_curtis::integrate(&s_integrand_cc, s1, s2, INTEGRATION_PRECISION).integral;
-    }
-
-    integral +=
-        double_exponential::integrate(&s_integrand_de, 0.0, 1.0, INTEGRATION_PRECISION).integral;
+    log::trace!(
+        "Mandelstam t Integration Result: {:e} ± {:e}",
+        integral,
+        err
+    );
 
     integral / (512.0 * PI_5)
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{prelude::Particle, utilities::test::approx_eq};
+    use crate::{model::particle::SCALAR, prelude::ParticleData, utilities::test::approx_eq};
     use ndarray::Array1;
     use serde::{Deserialize, Serialize};
     use std::{env::temp_dir, error, fs, path::Path};
@@ -708,7 +416,7 @@ mod tests {
     /// Test Mandelstam t domain for all massless particles
     #[test]
     fn t_range_massless() -> Result<(), Box<dyn error::Error>> {
-        let p = Particle::new(0, 0.0, 0.0);
+        let p: ParticleData = ParticleData::new(SCALAR, 0.0, 0.0);
 
         for &s in &Array1::geomspace(1e-10, 1e10, 1000).unwrap() {
             let (t1, t2) = super::t_range(s, &p, &p, &p, &p);
@@ -723,10 +431,10 @@ mod tests {
     /// simplifies to a nice closed form).
     #[test]
     fn t_range_massive() -> Result<(), Box<dyn error::Error>> {
-        let p0 = Particle::new(0, 0.0, 0.0);
+        let p0: ParticleData = ParticleData::new(SCALAR, 0.0, 0.0);
 
-        for &m in &Array1::geomspace(1e-10, 1e10, 100).unwrap() {
-            let pm = Particle::new(0, m, 0.0);
+        for &m in &Array1::geomspace(1e-10_f64, 1e10, 100).unwrap() {
+            let pm = ParticleData::new(SCALAR, m, 0.0);
 
             for &s in &Array1::geomspace(pm.mass2, pm.mass2 * 1e20, 1000).unwrap() {
                 // Due to minor rounding issues, it's possible that s is small
@@ -788,10 +496,10 @@ mod tests {
 
         for record in csv.deserialize() {
             let row: Row = record?;
-            let p1 = Particle::new(0, row.m1, 0.0);
-            let p2 = Particle::new(0, row.m2, 0.0);
-            let p3 = Particle::new(0, row.m3, 0.0);
-            let p4 = Particle::new(0, row.m4, 0.0);
+            let p1: ParticleData = ParticleData::new(SCALAR, row.m1, 0.0);
+            let p2 = ParticleData::new(SCALAR, row.m2, 0.0);
+            let p3 = ParticleData::new(SCALAR, row.m3, 0.0);
+            let p4 = ParticleData::new(SCALAR, row.m4, 0.0);
 
             let (t1, t2) = super::t_range(row.s, &p1, &p2, &p3, &p4);
             approx_eq(row.t1, t1, 0.5, row.s / 1e12)?;
@@ -809,7 +517,7 @@ mod tests {
 
     #[test]
     fn integrate_t_massless() -> Result<(), Box<dyn error::Error>> {
-        let p = Particle::new(0, 0.0, 0.0);
+        let p: ParticleData = ParticleData::new(SCALAR, 0.0, 0.0);
 
         for &s in &Array1::geomspace(1e-10, 1e10, 1000).unwrap() {
             approx_eq(super::integrate_t(|_t| 1.0, s, &p, &p, &p, &p), s, 8.0, 0.0)?;
@@ -829,64 +537,41 @@ mod tests {
 
     #[test]
     fn integrate_st_massless() -> Result<(), Box<dyn error::Error>> {
-        #[derive(Debug, serde::Serialize)]
-        struct Row {
-            beta: f64,
-            m0: f64,
-            m1: f64,
-            m2: f64,
+        let mut rdr = csv::Reader::from_reader(zstd::Decoder::new(fs::File::open(
+            "tests/data/st_integral_massless.csv.zst",
+        )?)?);
+
+        let functions = [
+            |s, _t| s * s,
+            |s, t| s * t,
+            |_s, t| t * t,
+            |s, _t| s * s / (s + 1.0),
+            |s, t| s * t / (s + 1.0),
+            |s, t| s * s * t * t / (s + 1.0) / (t + 1.0),
+        ];
+
+        for (row, result) in rdr.deserialize().enumerate() {
+            let data: [f64; 5 + 6] = result.unwrap();
+
+            let beta = data[0];
+            let p1 = ParticleData::new(SCALAR, data[1], 0.0);
+            let p2 = ParticleData::new(SCALAR, data[2], 0.0);
+            let p3 = ParticleData::new(SCALAR, data[3], 0.0);
+            let p4 = ParticleData::new(SCALAR, data[4], 0.0);
+            let y = &data[5..];
+
+            for (i, function) in functions.iter().enumerate() {
+                let yi = y[i];
+                let nyi = super::integrate_st(function, beta, &p1, &p2, &p3, &p4);
+                approx_eq(yi, nyi, 11.0, 10_f64.powi(-200)).map_err(|err| {
+                    println!(
+                        "[{}] ∫({}, {:e}, {:e}, {:e}, {:e}, {:e}) = {:e} but expected {:e}.",
+                        row, i, beta, p1.mass, p2.mass, p3.mass, p4.mass, nyi, yi
+                    );
+                    err
+                })?;
+            }
         }
-
-        let p = Particle::new(0, 0.0, 0.0);
-        let mut csv = create_csv("integrate_st_massless.csv")?;
-
-        let m0 = |_, _| 1.0;
-        let m1 = |s, _| s;
-        let m2 = |s: f64, _| s.powi(2);
-        for &beta in &Array1::geomspace(1e-20, 1e20, 1000).unwrap() {
-            let row = Row {
-                beta,
-                m0: super::integrate_st(m0, beta, &p, &p, &p, &p),
-                m1: super::integrate_st(m1, beta, &p, &p, &p, &p),
-                m2: super::integrate_st(m2, beta, &p, &p, &p, &p),
-            };
-            csv.serialize(row)?;
-
-            // approx_eq(
-            //     super::integrate_st(m0, beta, &p, &p, &p, &p),
-            //     1.0 / (128.0 * PI_5 * beta.powi(4)),
-            //     0.5,
-            //     0.0,
-            // )?;
-            // approx_eq(
-            //     super::integrate_st(m1, beta, &p, &p, &p, &p),
-            //     1.0 / (16.0 * PI_5 * beta.powi(6)),
-            //     4.0,
-            //     0.0,
-            // )?;
-            // approx_eq(
-            //     super::integrate_st(m2, beta, &p, &p, &p, &p),
-            //     1.0 / (2.0 * PI_5 * beta.powi(8)),
-            //     4.0,
-            //     0.0,
-            // )?;
-        }
-
-        // let m3 = |s: f64, _| 1.0 / (s.powi(2) + 1.0);
-        // approx_eq(
-        //     super::integrate_st(m3, BETA, &p, &p, &p, &p),
-        //     5.671_609_064_313_106e-6,
-        //     4.0,
-        //     0.0,
-        // )?;
-
-        // let m4 = |_, t: f64| 1.0 / (t.powi(2) + 1.0);
-        // approx_eq(
-        //     super::integrate_st(m4, BETA, &p, &p, &p, &p),
-        //     1.063_840_621_992_219e-5,
-        //     4.0,
-        //     0.0,
-        // )?;
 
         Ok(())
     }
@@ -895,10 +580,10 @@ mod tests {
     #[test]
     fn integrate_st_massive() -> Result<(), Box<dyn error::Error>> {
         const BETA: f64 = 1e-2;
-        let p1 = Particle::new(0, 0.2, 0.0);
-        let p2 = Particle::new(0, 0.5, 0.0);
-        let p3 = Particle::new(0, 2.0, 0.0);
-        let p4 = Particle::new(0, 5.0, 0.0);
+        let p1 = ParticleData::new(SCALAR, 0.2, 0.0);
+        let p2 = ParticleData::new(SCALAR, 0.5, 0.0);
+        let p3 = ParticleData::new(SCALAR, 2.0, 0.0);
+        let p4 = ParticleData::new(SCALAR, 5.0, 0.0);
 
         let m2 = |_, _| 1.0;
         approx_eq(
@@ -939,8 +624,8 @@ mod tests {
             gamma_tilde: f64,
         }
 
-        let p0 = Particle::new(0, 0.0, 0.0);
-        let pm = Particle::new(0, 1e10, 0.0);
+        let p0 = ParticleData::new(SCALAR, 0.0, 0.0);
+        let pm = ParticleData::new(SCALAR, 1e10, 0.0);
 
         let mut csv = create_csv("integrate_st_on_n1.csv")?;
 
@@ -975,8 +660,8 @@ mod tests {
             gamma_tilde: f64,
         }
 
-        let p0 = Particle::new(0, 0.0, 0.0);
-        let pm = Particle::new(0, 1e10, 0.0);
+        let p0 = ParticleData::new(SCALAR, 0.0, 0.0);
+        let pm = ParticleData::new(SCALAR, 1e10, 0.0);
 
         let mut csv = create_csv("integrate_st_on_n2.csv")?;
 
@@ -1011,8 +696,8 @@ mod tests {
             gamma_tilde: f64,
         }
 
-        let p0 = Particle::new(0, 0.0, 0.0);
-        let pm = Particle::new(0, 1e10, 0.0);
+        let p0 = ParticleData::new(SCALAR, 0.0, 0.0);
+        let pm = ParticleData::new(SCALAR, 1e10, 0.0);
 
         let mut csv = create_csv("integrate_st_on_n3.csv")?;
 
@@ -1047,7 +732,7 @@ mod tests {
             gamma_tilde: f64,
         }
 
-        let pm = Particle::new(0, 1e10, 0.0);
+        let pm = ParticleData::new(SCALAR, 1e10, 0.0);
 
         let mut csv = create_csv("integrate_st_on_n4.csv")?;
 

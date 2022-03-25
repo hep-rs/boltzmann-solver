@@ -45,24 +45,79 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 
     for arg in args.skip(1) {
         match arg.as_str() {
-            "particle_indices" => particle_indices(),
-            "decay::n1f1" => decay::n1f1(),
-            "decay::n1f3" => decay::n1f3(),
-            "decay::n3f1" => decay::n3f1(),
-            "decay::n3f3" => decay::n3f3(),
-            "washout::n1f1" => washout::n1f1(),
-            "washout::n1f3" => washout::n1f3(),
-            "washout::n3f1" => washout::n3f1(),
-            "washout::n3f3" => washout::n3f3(),
-            "full::n1f1" => full::n1f1(),
-            "full::n1f3" => full::n1f3(),
-            "full::n3f1" => full::n3f1(),
-            "full::n3f3" => full::n3f3(),
+            "particle_indices" => {
+                log::info!("Executing particle_indices");
+                particle_indices()
+            }
+            "decay::n1f1" => {
+                log::info!("Executing decay::n1f1");
+                decay::n1f1()
+            }
+            "decay::n1f3" => {
+                log::info!("Executing decay::n1f3");
+                decay::n1f3()
+            }
+            "decay::n3f1" => {
+                log::info!("Executing decay::n3f1");
+                decay::n3f1()
+            }
+            "decay::n3f3" => {
+                log::info!("Executing decay::n3f3");
+                decay::n3f3()
+            }
+            "washout::n1f1" => {
+                log::info!("Executing washout::n1f1");
+                washout::n1f1()
+            }
+            "washout::n1f3" => {
+                log::info!("Executing washout::n1f3");
+                washout::n1f3()
+            }
+            "washout::n3f1" => {
+                log::info!("Executing washout::n3f1");
+                washout::n3f1()
+            }
+            "washout::n3f3" => {
+                log::info!("Executing washout::n3f3");
+                washout::n3f3()
+            }
+            "full::n1f1" => {
+                log::info!("Executing full::n1f1");
+                full::n1f1()
+            }
+            "full::n1f3" => {
+                log::info!("Executing full::n1f3");
+                full::n1f3()
+            }
+            "full::n3f1" => {
+                log::info!("Executing full::n3f1");
+                full::n3f1()
+            }
+            "full::n3f3" => {
+                log::info!("Executing full::n3f3");
+                full::n3f3()
+            }
             #[cfg(feature = "serde")]
-            "evolution" => evolution(),
-            "higgs_equilibrium" => higgs_equilibrium(),
-            "lepton_equilibrium" => lepton_equilibrium(),
-            "gammas" => gammas(),
+            "evolution" => {
+                log::info!("Executing evolution");
+                evolution()
+            }
+            "higgs_equilibrium" => {
+                log::info!("Executing higgs_equilibrium");
+                higgs_equilibrium()
+            }
+            "lepton_equilibrium" => {
+                log::info!("Executing lepton_equilibrium");
+                lepton_equilibrium()
+            }
+            "gammas" => {
+                log::info!("Executing gammas");
+                gammas()
+            }
+            "custom" => {
+                log::info!("Executing custom");
+                custom()
+            }
             #[cfg(feature = "parallel")]
             "scan" => scan(),
             "--verbose" => Ok(()),
@@ -316,6 +371,97 @@ macro_rules! define_all {
             }
         }
     };
+}
+
+define! {
+    custom,
+    "custom",
+    n1f1,
+    [
+        interaction::hqu,
+        interaction::hqd,
+        interaction::hle,
+        interaction::hln,
+        interaction::hhw,
+        interaction::hha,
+        interaction::ffa,
+        interaction::ffw,
+        interaction::ffg,
+    ],
+    [
+        // interaction::hhww,
+        // interaction::hhaa,
+        // interaction::hhaw,
+        // interaction::hhll1,
+        // interaction::hhll2,
+        // interaction::hhen,
+        interaction::nhla,
+        interaction::nhlw,
+        // interaction::quln,
+        // interaction::qdln,
+        // interaction::leln,
+        // interaction::lnln,
+    ],
+    |mut builder: SolverBuilder<LeptogenesisModel>| {
+        if let Some(model) = builder.model.as_mut() {
+            model.interactions = model.interactions.drain(..).enumerate().filter(|(i, _)| matches!(i, 11)).map(|(_, i)| i).collect();
+        };
+        builder
+        .precompute(0)
+        .step_precision(0.0, 1.0)
+        .beta_range(4.3859913782893124e-6, 9e-06)
+        .initial_densities([
+            (0, 0e0),
+            (1, 2.735669295264402e0),
+            (2, 7.8733000793058405e0),
+            (3, 1.6000000002534442e1),
+            (4, 3.503431960313858e0),
+            (5, 2.975320950465898e0),
+            (6, 2.9782647739662647e0),
+            (7, 2.9781824734365943e0),
+            (8, 1.4916706661970924e0),
+            (9, 1.4897755109189428e0),
+            (10, 1.4897736810079851e0),
+            (11, 8.860283341882194e0),
+            (12, 8.873259343930803e0),
+            (13, 8.772384088247565e0),
+            (14, 4.449948723618308e0),
+            (15, 4.44805700622475e0),
+            (16, 4.397343483428914e0),
+            (17, 4.457610936804523e0),
+            (18, 4.458083563050498e0),
+            (19, 4.458053295312409e0),
+            (20, 1.704139014646231e-1),
+            (21, 1.4998479640881337e0),
+            (22, 1.4996319827140796e0),
+        ])
+        .initial_asymmetries([
+            (0, 0e0),
+            (1, 0e0),
+            (2, 0e0),
+            (3, 0e0),
+            (4, -9.542832170066237e-8),
+            (5, 4.762313498692587e-7),
+            (6, 0e0),
+            (7, 0e0),
+            (8, 2.1851962325770943e-6),
+            (9, 0e0),
+            (10, 0e0),
+            (11, -4.942038070768123e-6),
+            (12, 0e0),
+            (13, 0e0),
+            (14, 9.160747044454148e-6),
+            (15, 0e0),
+            (16, 0e0),
+            (17, -4.218708973685958e-6),
+            (18, 0e0),
+            (19, 0e0),
+            (20, 0e0),
+            (21, 0e0),
+            (22, 0e0),
+        ])
+    },
+    |n, na| (n, na)
 }
 
 define_all! {

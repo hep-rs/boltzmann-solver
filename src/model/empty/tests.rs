@@ -1,5 +1,5 @@
 use crate::{
-    model::{Empty, Model, Particle},
+    model::{particle::SCALAR, Empty, Model, ParticleData},
     prelude::ModelInteractions,
     solver::SolverBuilder,
 };
@@ -34,7 +34,7 @@ where
     let n = builder
         .model
         .as_ref()
-        .map(|m| m.len_particles())
+        .map(Model::len_particles)
         .unwrap_or_default();
 
     // Run the solver
@@ -86,8 +86,8 @@ fn no_interaction() -> Result<(), Box<dyn error::Error>> {
     // crate::utilities::test::setup_logging(4);
 
     let mut model = Empty::default();
-    model.push_particle(Particle::new(0, 1e5, 1e1).name("1"));
-    model.push_particle(Particle::new(0, 1e3, 1e1).name("2"));
+    model.push_particle(ParticleData::new(SCALAR, 1e5, 1e1).name("1"));
+    model.push_particle(ParticleData::new(SCALAR, 1e3, 1e1).name("2"));
 
     // Get the initial conditions
     model.set_beta(BETA_START);

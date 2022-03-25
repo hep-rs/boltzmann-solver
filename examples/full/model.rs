@@ -7,7 +7,7 @@
 
 pub mod interaction;
 
-use boltzmann_solver::prelude::*;
+use boltzmann_solver::{model::LEFT_WEYL_SPINOR, prelude::*};
 use ndarray::{array, prelude::*};
 use num::{Complex, One, Zero};
 #[cfg(feature = "serde")]
@@ -172,12 +172,21 @@ impl Model for LeptogenesisModel {
         let mut sm = StandardModel::zero();
 
         let mn = array![1e6, 1e8, 1e10];
-        sm.particles
-            .push(Particle::new(1, mn[0], 0.0).name("N1").own_antiparticle());
-        sm.particles
-            .push(Particle::new(1, mn[1], 0.0).name("N2").own_antiparticle());
-        sm.particles
-            .push(Particle::new(1, mn[2], 0.0).name("N3").own_antiparticle());
+        sm.particles.push(
+            ParticleData::new(LEFT_WEYL_SPINOR, mn[0], 0.0)
+                .name("N1")
+                .own_antiparticle(),
+        );
+        sm.particles.push(
+            ParticleData::new(LEFT_WEYL_SPINOR, mn[1], 0.0)
+                .name("N2")
+                .own_antiparticle(),
+        );
+        sm.particles.push(
+            ParticleData::new(LEFT_WEYL_SPINOR, mn[2], 0.0)
+                .name("N3")
+                .own_antiparticle(),
+        );
 
         let mut model = LeptogenesisModel {
             sm,
@@ -240,6 +249,33 @@ impl Model for LeptogenesisModel {
         }
 
         self.update_widths();
+
+        // for i in 0..3 {
+        //     self.particle_mut("L", i).self_energy = Some(Box::new(move |s, m| {
+        //         let lepton = m.particle("L", i);
+        //         let higgs = m.particle("H", 0);
+
+        //         let mut sum = Complex::zero();
+        //         for j in 0..3 {
+        //             let electron = m.particle("e", j);
+        //             let neutrino = m.particle("N", j);
+        //             sum += m.sm.ye[[j, i]]
+        //                 * m.sm.ye[[j, i]]
+        //                 * pave::b(0, 1, s, electron.mass, higgs.mass);
+
+        //             sum += m.yv[[j, i]]
+        //                 * m.yv[[j, i]].conj()
+        //                 * pave::b(0, 1, s, neutrino.mass, higgs.mass);
+        //         }
+        //         sum *= 2.0;
+
+        //         sum += m.sm.g1.powi(2) * pave::b(0, 1, s, lepton.mass, m.particle("A", 0).mass);
+        //         sum +=
+        //             3.0 * m.sm.g2.powi(2) * pave::b(0, 1, s, lepton.mass, m.particle("W", 0).mass);
+
+        //         sum.re / (32.0 * boltzmann_solver::constants::PI_2)
+        //     }))
+        // }
     }
 
     fn get_beta(&self) -> f64 {
@@ -254,11 +290,11 @@ impl Model for LeptogenesisModel {
                 .sum::<f64>()
     }
 
-    fn particles(&self) -> &[Particle] {
+    fn particles(&self) -> &[ParticleData] {
         &self.sm.particles
     }
 
-    fn particles_mut(&mut self) -> &mut [Particle] {
+    fn particles_mut(&mut self) -> &mut [ParticleData] {
         &mut self.sm.particles
     }
 
@@ -269,6 +305,310 @@ impl Model for LeptogenesisModel {
         };
 
         idx.or_else(|(name, i)| StandardModel::static_particle_idx(name, i))
+    }
+
+    #[allow(clippy::too_many_lines)]
+    fn self_energy_absorptive(&self, p: &ParticleData, momentum: f64) -> f64 {
+        use boltzmann_solver::constants::PI_2;
+        use special_functions::particle_physics::pave_absorptive::b;
+
+        let ptcls = self.particles();
+        let pa = &ptcls[1];
+        let pw = &ptcls[2];
+        let pg = &ptcls[3];
+        let ph = &ptcls[4];
+        let pl = &ptcls[5..8];
+        let pe = &ptcls[8..11];
+        let pq = &ptcls[11..14];
+        let pu = &ptcls[14..17];
+        let pd = &ptcls[17..20];
+        let pn = &ptcls[20..23];
+
+        match p.name.as_str() {
+            "A" => 0.0,
+            "W" => 0.0,
+            "G" => 0.0,
+            "H" => {
+                (64.0 * PI_2).recip()
+                    * (4.0
+                        * (0..3)
+                            .map(|i| {
+                                (0..3)
+                                    .map(|j| {
+                                        3.0 * self.sm.yd[[j, i]].powi(2)
+                                            * (momentum - (pd[j].mass2 + pq[i].mass2))
+                                            * b(0, 0, momentum, pq[i].mass, pd[j].mass)
+                                            + 3.0
+                                                * self.sm.yu[[j, i]].powi(2)
+                                                * (momentum - (pu[j].mass2 + pq[i].mass2))
+                                                * b(0, 0, momentum, pu[i].mass, pd[j].mass)
+                                            + self.sm.ye[[j, i]].powi(2)
+                                                * (momentum - (pe[j].mass2 + pl[i].mass2))
+                                                * b(0, 0, momentum, pl[i].mass, pe[j].mass)
+                                            + self.yv[[j, i]].norm_sqr()
+                                                * (momentum - (pn[j].mass2 + pl[i].mass2))
+                                                * b(0, 0, momentum, pn[i].mass, pl[j].mass)
+                                    })
+                                    .sum::<f64>()
+                            })
+                            .sum::<f64>()
+                        + self.sm.g1.powi(2)
+                            * (-2.0 * momentum + pa.mass2 - 2.0 * ph.mass2)
+                            * b(0, 0, momentum, ph.mass, pa.mass)
+                        + 3.0
+                            * self.sm.g2.powi(2)
+                            * (-2.0 * momentum + pw.mass2 - 2.0 * ph.mass2)
+                            * b(0, 0, momentum, ph.mass, pw.mass))
+            }
+            "L1" => {
+                let i = 0;
+
+                (32.0 * PI_2).recip()
+                    * (self.sm.g1.powi(2) * b(0, 1, momentum, pl[i].mass, pa.mass)
+                        + 3.0 * self.sm.g2.powi(2) * b(0, 1, momentum, pl[i].mass, pw.mass)
+                        + pl[i].mass
+                        + 2.0
+                            * (0..3)
+                                .map(|j| {
+                                    self.sm.ye[[j, i]].powi(2)
+                                        * b(0, 1, momentum, pe[j].mass, ph.mass)
+                                        + self.yv[[j, i]].norm_sqr()
+                                            * b(0, 1, momentum, pn[j].mass, ph.mass)
+                                })
+                                .sum::<f64>())
+            }
+            "L2" => {
+                let i = 1;
+                (32.0 * PI_2).recip()
+                    * (self.sm.g1.powi(2) * b(0, 1, momentum, pl[i].mass, pa.mass)
+                        + 3.0 * self.sm.g2.powi(2) * b(0, 1, momentum, pl[i].mass, pw.mass)
+                        + pl[i].mass
+                        + 2.0
+                            * (0..3)
+                                .map(|j| {
+                                    self.sm.ye[[j, i]].powi(2)
+                                        * b(0, 1, momentum, pe[j].mass, ph.mass)
+                                        + self.yv[[j, i]].norm_sqr()
+                                            * b(0, 1, momentum, pn[j].mass, ph.mass)
+                                })
+                                .sum::<f64>())
+            }
+            "L3" => {
+                let i = 2;
+                (32.0 * PI_2).recip()
+                    * (self.sm.g1.powi(2) * b(0, 1, momentum, pl[i].mass, pa.mass)
+                        + 3.0 * self.sm.g2.powi(2) * b(0, 1, momentum, pl[i].mass, pw.mass)
+                        + pl[i].mass
+                        + 2.0
+                            * (0..3)
+                                .map(|j| {
+                                    self.sm.ye[[j, i]].powi(2)
+                                        * b(0, 1, momentum, pe[j].mass, ph.mass)
+                                        + self.yv[[j, i]].norm_sqr()
+                                            * b(0, 1, momentum, pn[j].mass, ph.mass)
+                                })
+                                .sum::<f64>())
+            }
+            "e1" => {
+                let i = 0;
+                (8.0 * PI_2).recip()
+                    * (self.sm.g1.powi(2) * b(0, 1, momentum, pl[i].mass, pa.mass)
+                        + (0..3)
+                            .map(|j| {
+                                self.sm.ye[[i, j]].powi(2) * b(0, 1, momentum, pl[j].mass, ph.mass)
+                            })
+                            .sum::<f64>())
+            }
+            "e2" => {
+                let i = 1;
+                (8.0 * PI_2).recip()
+                    * (self.sm.g1.powi(2) * b(0, 1, momentum, pl[i].mass, pa.mass)
+                        + (0..3)
+                            .map(|j| {
+                                self.sm.ye[[i, j]].powi(2) * b(0, 1, momentum, pl[j].mass, ph.mass)
+                            })
+                            .sum::<f64>())
+            }
+            "e3" => {
+                let i = 2;
+                (8.0 * PI_2).recip()
+                    * (self.sm.g1.powi(2) * b(0, 1, momentum, pl[i].mass, pa.mass)
+                        + (0..3)
+                            .map(|j| {
+                                self.sm.ye[[i, j]].powi(2) * b(0, 1, momentum, pl[j].mass, ph.mass)
+                            })
+                            .sum::<f64>())
+            }
+            "N1" => {
+                let i = 0;
+                (8.0 * PI_2).recip()
+                    * ((0..3)
+                        .map(|j| {
+                            self.yv[[i, j]].norm_sqr() * b(0, 1, momentum, pl[j].mass, ph.mass)
+                        })
+                        .sum::<f64>())
+            }
+            "N2" => {
+                let i = 1;
+                (8.0 * PI_2).recip()
+                    * ((0..3)
+                        .map(|j| {
+                            self.yv[[i, j]].norm_sqr() * b(0, 1, momentum, pl[j].mass, ph.mass)
+                        })
+                        .sum::<f64>())
+            }
+            "N3" => {
+                let i = 2;
+                (8.0 * PI_2).recip()
+                    * ((0..3)
+                        .map(|j| {
+                            self.yv[[i, j]].norm_sqr() * b(0, 1, momentum, pl[j].mass, ph.mass)
+                        })
+                        .sum::<f64>())
+            }
+            "Q1" => {
+                let i = 0;
+                (96.0 * PI_2).recip()
+                    * (self.sm.g1.powi(2) * b(0, 1, momentum, pq[i].mass, pa.mass)
+                        + 27.0 * self.sm.g2.powi(2) * b(0, 1, momentum, pq[i].mass, pw.mass)
+                        + 48.0 * self.sm.g3.powi(2) * b(0, 1, momentum, pq[i].mass, pg.mass)
+                        + 18.0
+                            * (0..3)
+                                .map(|j| {
+                                    self.sm.yd[[j, i]].powi(2)
+                                        * b(0, 1, momentum, pd[j].mass, ph.mass)
+                                })
+                                .sum::<f64>()
+                        + 18.0
+                            * (0..3)
+                                .map(|j| {
+                                    self.sm.yu[[j, i]].powi(2)
+                                        * b(0, 1, momentum, pu[j].mass, ph.mass)
+                                })
+                                .sum::<f64>())
+            }
+            "Q2" => {
+                let i = 1;
+                (96.0 * PI_2).recip()
+                    * (self.sm.g1.powi(2) * b(0, 1, momentum, pq[i].mass, pa.mass)
+                        + 27.0 * self.sm.g2.powi(2) * b(0, 1, momentum, pq[i].mass, pw.mass)
+                        + 48.0 * self.sm.g3.powi(2) * b(0, 1, momentum, pq[i].mass, pg.mass)
+                        + 18.0
+                            * (0..3)
+                                .map(|j| {
+                                    self.sm.yd[[j, i]].powi(2)
+                                        * b(0, 1, momentum, pd[j].mass, ph.mass)
+                                })
+                                .sum::<f64>()
+                        + 18.0
+                            * (0..3)
+                                .map(|j| {
+                                    self.sm.yu[[j, i]].powi(2)
+                                        * b(0, 1, momentum, pu[j].mass, ph.mass)
+                                })
+                                .sum::<f64>())
+            }
+            "Q3" => {
+                let i = 2;
+                (96.0 * PI_2).recip()
+                    * (self.sm.g1.powi(2) * b(0, 1, momentum, pq[i].mass, pa.mass)
+                        + 27.0 * self.sm.g2.powi(2) * b(0, 1, momentum, pq[i].mass, pw.mass)
+                        + 48.0 * self.sm.g3.powi(2) * b(0, 1, momentum, pq[i].mass, pg.mass)
+                        + 18.0
+                            * (0..3)
+                                .map(|j| {
+                                    self.sm.yd[[j, i]].powi(2)
+                                        * b(0, 1, momentum, pd[j].mass, ph.mass)
+                                })
+                                .sum::<f64>()
+                        + 18.0
+                            * (0..3)
+                                .map(|j| {
+                                    self.sm.yu[[j, i]].powi(2)
+                                        * b(0, 1, momentum, pu[j].mass, ph.mass)
+                                })
+                                .sum::<f64>())
+            }
+            "u1" => {
+                let i = 0;
+                (24.0 * PI_2).recip()
+                    * (4.0 * self.sm.g1.powi(2) * b(0, 1, momentum, pu[i].mass, pa.mass)
+                        + 12.0 * self.sm.g3.powi(2) * b(0, 1, momentum, pu[i].mass, pg.mass)
+                        + 9.0
+                            * (0..3)
+                                .map(|j| {
+                                    self.sm.yu[[i, j]].powi(2)
+                                        * b(0, 1, momentum, pq[j].mass, ph.mass)
+                                })
+                                .sum::<f64>())
+            }
+            "u2" => {
+                let i = 1;
+                (24.0 * PI_2).recip()
+                    * (4.0 * self.sm.g1.powi(2) * b(0, 1, momentum, pu[i].mass, pa.mass)
+                        + 12.0 * self.sm.g3.powi(2) * b(0, 1, momentum, pu[i].mass, pg.mass)
+                        + 9.0
+                            * (0..3)
+                                .map(|j| {
+                                    self.sm.yu[[i, j]].powi(2)
+                                        * b(0, 1, momentum, pq[j].mass, ph.mass)
+                                })
+                                .sum::<f64>())
+            }
+            "u3" => {
+                let i = 2;
+                (24.0 * PI_2).recip()
+                    * (4.0 * self.sm.g1.powi(2) * b(0, 1, momentum, pu[i].mass, pa.mass)
+                        + 12.0 * self.sm.g3.powi(2) * b(0, 1, momentum, pu[i].mass, pg.mass)
+                        + 9.0
+                            * (0..3)
+                                .map(|j| {
+                                    self.sm.yu[[i, j]].powi(2)
+                                        * b(0, 1, momentum, pq[j].mass, ph.mass)
+                                })
+                                .sum::<f64>())
+            }
+            "d1" => {
+                let i = 0;
+                (24.0 * PI_2).recip()
+                    * (self.sm.g1.powi(2) * b(0, 1, momentum, pd[i].mass, pa.mass)
+                        + 12.0 * self.sm.g3.powi(2) * b(0, 1, momentum, pd[i].mass, pg.mass)
+                        + 9.0
+                            * (0..3)
+                                .map(|j| {
+                                    self.sm.yd[[i, j]].powi(2)
+                                        * b(0, 1, momentum, pq[j].mass, ph.mass)
+                                })
+                                .sum::<f64>())
+            }
+            "d2" => {
+                let i = 1;
+                (24.0 * PI_2).recip()
+                    * (self.sm.g1.powi(2) * b(0, 1, momentum, pd[i].mass, pa.mass)
+                        + 12.0 * self.sm.g3.powi(2) * b(0, 1, momentum, pd[i].mass, pg.mass)
+                        + 9.0
+                            * (0..3)
+                                .map(|j| {
+                                    self.sm.yd[[i, j]].powi(2)
+                                        * b(0, 1, momentum, pq[j].mass, ph.mass)
+                                })
+                                .sum::<f64>())
+            }
+            "d3" => {
+                let i = 2;
+                (24.0 * PI_2).recip()
+                    * (self.sm.g1.powi(2) * b(0, 1, momentum, pd[i].mass, pa.mass)
+                        + 12.0 * self.sm.g3.powi(2) * b(0, 1, momentum, pd[i].mass, pg.mass)
+                        + 9.0
+                            * (0..3)
+                                .map(|j| {
+                                    self.sm.yd[[i, j]].powi(2)
+                                        * b(0, 1, momentum, pq[j].mass, ph.mass)
+                                })
+                                .sum::<f64>())
+            }
+            _ => 0.0,
+        }
     }
 }
 
@@ -289,5 +629,11 @@ impl ModelInteractions for LeptogenesisModel {
 
     fn interactions(&self) -> &[Self::Item] {
         &self.interactions
+    }
+}
+
+impl std::default::Default for LeptogenesisModel {
+    fn default() -> Self {
+        Self::zero()
     }
 }

@@ -74,6 +74,30 @@ impl roots::Convergency<f64> for AbsRelConvergency {
     }
 }
 
+#[cfg(feature = "debug")]
+#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+struct Debug {
+    gamma_tilde_input: Option<f64>,
+    delta_gamma_tilde_input: Option<f64>,
+    gamma_tilde: f64,
+    delta_gamma_tilde: f64,
+    beta: HashMap<usize, HashMap<usize, f64>>,
+    n: HashMap<usize, HashMap<usize, Vec<f64>>>,
+    dn: Vec<f64>,
+    dn_error: Vec<f64>,
+    na: HashMap<usize, HashMap<usize, Vec<f64>>>,
+    dna: Vec<f64>,
+    dna_error: Vec<f64>,
+    eq: HashMap<usize, HashMap<usize, Vec<f64>>>,
+    k: HashMap<usize, HashMap<usize, Vec<f64>>>,
+    ka: HashMap<usize, HashMap<usize, Vec<f64>>>,
+    symmetric_delta: HashMap<usize, HashMap<usize, f64>>,
+    asymmetric_delta: HashMap<usize, HashMap<usize, f64>>,
+    symmetric_prefactor: HashMap<usize, HashMap<usize, f64>>,
+    asymmetric_prefactor: HashMap<usize, HashMap<usize, f64>>,
+}
+
 /// List of particles involved in the interaction.
 #[allow(clippy::module_name_repetitions)]
 #[allow(clippy::unsafe_derive_deserialize)]
@@ -241,8 +265,8 @@ impl Particles {
     #[must_use]
     pub fn cp(&self) -> Self {
         Self {
-            incoming_idx: self.outgoing_idx.iter().copied().collect(),
-            outgoing_idx: self.incoming_idx.iter().copied().collect(),
+            incoming_idx: self.outgoing_idx.clone(),
+            outgoing_idx: self.incoming_idx.clone(),
             incoming_sign: self.outgoing_sign.iter().map(ops::Neg::neg).collect(),
             outgoing_sign: self.incoming_sign.iter().map(ops::Neg::neg).collect(),
             incoming_signed: self.outgoing_signed.iter().map(ops::Neg::neg).collect(),
@@ -452,6 +476,38 @@ impl Particles {
 
         if self.symmetric_overshoots(*symmetric_change, n, eqn, in_equilibrium) {
             let bound = OVERSHOOT_FACTOR * self.symmetric_delta(n, eqn, in_equilibrium).abs();
+            //             if bound.is_nan() {
+            //                 log::error!(
+            //                     r#"NAN bounds:
+            // {{
+            //     "self": {},
+            //     "symmetric_change": {},
+            //     "n": {},
+            //     "na": {},
+            //     "eq": {},
+            //     "eqn": {},
+            //     "in_equilibrium": {},
+            //     "no_asymmetry": {},
+            //     "bound": {},
+            //     "overshoot_factor": {},
+            //     "symmetric_delta": {},
+            //     "asymmetric_delta": {}
+            // }}"#,
+            //                     self,
+            //                     serde_json::to_string(&symmetric_change).unwrap(),
+            //                     serde_json::to_string(&n).unwrap(),
+            //                     serde_json::to_string(&na).unwrap(),
+            //                     serde_json::to_string(&eq).unwrap(),
+            //                     serde_json::to_string(&eqn).unwrap(),
+            //                     serde_json::to_string(&in_equilibrium).unwrap(),
+            //                     serde_json::to_string(&no_asymmetry).unwrap(),
+            //                     bound,
+            //                     OVERSHOOT_FACTOR,
+            //                     self.symmetric_delta(n, eqn, in_equilibrium),
+            //                     self.asymmetric_delta(n, na, eqn, in_equilibrium, no_asymmetry),
+            //                 );
+            //             }
+
             *symmetric_change = symmetric_change.clamp(-bound, bound);
 
             result = true;
@@ -462,6 +518,38 @@ impl Particles {
                 * self
                     .asymmetric_delta(n, na, eq, in_equilibrium, no_asymmetry)
                     .abs();
+            //             if bound.is_nan() {
+            //                 log::error!(
+            //                     r#"NAN bounds:
+            // {{
+            //     "self": {},
+            //     "symmetric_change": {},
+            //     "n": {},
+            //     "na": {},
+            //     "eq": {},
+            //     "eqn": {},
+            //     "in_equilibrium": {},
+            //     "no_asymmetry": {},
+            //     "bound": {},
+            //     "overshoot_factor": {},
+            //     "symmetric_delta": {},
+            //     "asymmetric_delta": {}
+            // }}"#,
+            //                     self,
+            //                     serde_json::to_string(&symmetric_change).unwrap(),
+            //                     serde_json::to_string(&n).unwrap(),
+            //                     serde_json::to_string(&na).unwrap(),
+            //                     serde_json::to_string(&eq).unwrap(),
+            //                     serde_json::to_string(&eqn).unwrap(),
+            //                     serde_json::to_string(&in_equilibrium).unwrap(),
+            //                     serde_json::to_string(&no_asymmetry).unwrap(),
+            //                     bound,
+            //                     OVERSHOOT_FACTOR,
+            //                     self.symmetric_delta(n, eqn, in_equilibrium),
+            //                     self.asymmetric_delta(n, na, eqn, in_equilibrium, no_asymmetry),
+            //                 );
+            //             }
+
             *asymmetric_change = asymmetric_change.clamp(-bound, bound);
 
             result = true;
@@ -1341,6 +1429,16 @@ impl Particles {
     ) -> FastInteractionResult {
         use crate::solver::tableau;
 
+        /// This is designed to handle fast interaction whereby γ / β H N ≫ 1,
+        /// but we insert a ceiling for extremely large interaction rates which
+        /// would not compute well even with substeps.
+        const GAMMA_MAX: f64 = 1e2;
+
+        /// Adjust the scaling of the error tolerance. As we are doing a whole
+        /// integration routine with no reliable way of getting an error
+        /// estimate on the result, we use a smaller error estimate.
+        const TOLERANCE_SCALING: f64 = 1e-3;
+
         let large_dim = n_input.dim();
         let small_dim = self.particle_counts.len();
         let mut result = FastInteractionResult::zero(large_dim);
@@ -1401,20 +1499,6 @@ impl Particles {
         let mut dn_err = Array1::zeros(large_dim);
         let mut dna_err = Array1::zeros(large_dim);
 
-        // Compute the max delta to clamp the change
-        let max_delta = self
-            .symmetric_delta(&context.n, &context.eqn, context.in_equilibrium)
-            .abs();
-        let max_asymmetric_delta = self
-            .asymmetric_delta(
-                &context.n,
-                &context.na,
-                &context.eqn,
-                context.in_equilibrium,
-                context.no_asymmetry,
-            )
-            .abs();
-
         // The sub-quadrature changes.
         let mut k: Vec<_> = iter::repeat(Array1::zeros(large_dim))
             .take(tableau::RK_S)
@@ -1427,38 +1511,81 @@ impl Particles {
         let gamma_tilde = self
             .gamma_tilde
             .unwrap_or_default()
-            .clamp(-1e3 / h, 1e3 / h);
+            .clamp(-GAMMA_MAX / h, GAMMA_MAX / h);
         let delta_gamma_tilde = self
             .delta_gamma_tilde
             .unwrap_or_default()
-            .clamp(-1e3 / h, 1e3 / h);
+            .clamp(-GAMMA_MAX / h, GAMMA_MAX / h);
 
         // We use the default error tolerance, scaling it down to be more precise.
-        let error_tolerance = crate::solver::options::ErrorTolerance::default() / 1e2;
+        let error_tolerance = crate::solver::options::ErrorTolerance::default() * TOLERANCE_SCALING;
+
+        #[cfg(feature = "debug")]
+        let mut debug = Debug {
+            gamma_tilde_input: self.gamma_tilde,
+            delta_gamma_tilde_input: self.delta_gamma_tilde,
+            gamma_tilde,
+            delta_gamma_tilde,
+            beta: HashMap::new(),
+            n: HashMap::new(),
+            dn: Vec::new(),
+            dn_error: Vec::new(),
+            na: HashMap::new(),
+            dna: Vec::new(),
+            dna_error: Vec::new(),
+            eq: HashMap::new(),
+            k: HashMap::new(),
+            ka: HashMap::new(),
+            symmetric_delta: HashMap::new(),
+            asymmetric_delta: HashMap::new(),
+            symmetric_prefactor: HashMap::new(),
+            asymmetric_prefactor: HashMap::new(),
+        };
 
         let mut step = 0_usize;
         let mut steps_discarded = 0_usize;
 
-        // TODO: Is it safe to exit the loop if beta is no longer increasing?
-        // Will the next call to this routine resolve the issue?
+        // If we are no longer advancing, we exit and return 'NaN' as the error
+        // estimates.  This ensures that the main integration loop will repeat
+        // the step with a smaller step size.
         while beta < context.beta + context.step_size {
+            #[allow(clippy::float_cmp)]
             if beta == beta + h {
-                log::error!(
-                    "[{}.{:02}|{:>10.4e}] (Fast Interaction {}) β is no longer advancing.",
-                    self.display(context.model)
-                        .unwrap_or_else(|_| self.short_display()),
+                log::debug!(
+                    "[{}.{:02}|{:>10.4e}|{}] β is no longer advancing.",
                     context.step,
                     context.substep,
-                    context.beta
-                );
-                panic!(
-                    "[{}.{:02}|{:>10.4e}] (Fast Interaction {}) β is no longer advancing.",
+                    context.beta,
                     self.display(context.model)
                         .unwrap_or_else(|_| self.short_display()),
-                    context.step,
-                    context.substep,
-                    context.beta
                 );
+
+                #[cfg(feature = "debug")]
+                {
+                    debug.dn.fill(f64::NAN);
+                    debug.dn_error.fill(f64::NAN);
+                    debug.dna.fill(f64::NAN);
+                    debug.dna_error.fill(f64::NAN);
+
+                    serde_json::to_writer(
+                        std::fs::File::create(format!(
+                            "/tmp/josh/boltzmann-solver/debug/{}-{}.json",
+                            context.step,
+                            self.display(context.model)
+                                .unwrap_or_else(|_| self.short_display())
+                        ))
+                        .unwrap(),
+                        &debug,
+                    )
+                    .unwrap();
+                }
+
+                result.dn.fill(0.0);
+                result.dn_error.fill(f64::NAN);
+                result.dna.fill(0.0);
+                result.dna_error.fill(f64::NAN);
+
+                return result;
             }
 
             // Reset all changes computed so far
@@ -1502,17 +1629,10 @@ impl Particles {
                     checked_div(forward.0, forward.1) - checked_div(backward.0, backward.1);
 
                 // Compute the changes
-                let mut symmetric_delta = h * gamma_tilde * symmetric_prefactor;
-                let mut asymmetric_delta = h
+                let symmetric_delta = h * gamma_tilde * symmetric_prefactor;
+                let asymmetric_delta = h
                     * (gamma_tilde * asymmetric_prefactor
                         + delta_gamma_tilde * symmetric_prefactor);
-
-                // Adjust for possible overshoots.  In this case, we use the
-                // original context to determine the overshoot as this seems to
-                // work best.
-                symmetric_delta = symmetric_delta.clamp(-max_delta, max_delta);
-                asymmetric_delta =
-                    asymmetric_delta.clamp(-max_asymmetric_delta, max_asymmetric_delta);
 
                 let ki = &mut k[i];
                 let kai = &mut ka[i];
@@ -1533,6 +1653,60 @@ impl Particles {
                     dn_err[p] += ei * ki[p];
                     dna_err[p] += ei * kai[p];
                 }
+
+                #[cfg(feature = "debug")]
+                {
+                    debug
+                        .beta
+                        .entry(step)
+                        .or_insert_with(HashMap::new)
+                        .insert(i, beta_i);
+                    debug
+                        .n
+                        .entry(step)
+                        .or_insert_with(HashMap::new)
+                        .insert(i, ni.to_vec());
+                    debug
+                        .na
+                        .entry(step)
+                        .or_insert_with(HashMap::new)
+                        .insert(i, nai.to_vec());
+                    debug
+                        .eq
+                        .entry(step)
+                        .or_insert_with(HashMap::new)
+                        .insert(i, eqi.to_vec());
+                    debug
+                        .k
+                        .entry(step)
+                        .or_insert_with(HashMap::new)
+                        .insert(i, ki.to_vec());
+                    debug
+                        .ka
+                        .entry(step)
+                        .or_insert_with(HashMap::new)
+                        .insert(i, kai.to_vec());
+                    debug
+                        .symmetric_delta
+                        .entry(step)
+                        .or_insert_with(HashMap::new)
+                        .insert(i, symmetric_delta);
+                    debug
+                        .asymmetric_delta
+                        .entry(step)
+                        .or_insert_with(HashMap::new)
+                        .insert(i, asymmetric_delta);
+                    debug
+                        .symmetric_prefactor
+                        .entry(step)
+                        .or_insert_with(HashMap::new)
+                        .insert(i, symmetric_prefactor);
+                    debug
+                        .asymmetric_prefactor
+                        .entry(step)
+                        .or_insert_with(HashMap::new)
+                        .insert(i, asymmetric_prefactor);
+                }
             }
 
             // Calculate the ratio of the local error target to the estimated
@@ -1542,14 +1716,18 @@ impl Particles {
                 let err = dn_err[p].abs();
                 ratio = ratio.min(if err == 0.0 {
                     f64::MAX
+                } else if err.is_nan() {
+                    0.0
                 } else {
                     error_tolerance.max_tolerance(n[p]) / err
                 });
                 let err = dna_err[p].abs();
                 ratio = ratio.min(if err == 0.0 {
                     f64::MAX
+                } else if err.is_nan() {
+                    0.0
                 } else {
-                    error_tolerance.max_tolerance(na[p]) / err
+                    error_tolerance.max_asymmetric_tolerance(na[p]) / err
                 });
             }
 
@@ -1602,16 +1780,37 @@ impl Particles {
         result.dn_error = n_err;
         result.dna_error = na_err;
 
-        log::debug!(
-                    "[{}.{:02}|{:>10.4e}] (Fast Interaction {}) Number of integration steps: {} ({} discarded).",
+        #[cfg(feature = "debug")]
+        {
+            debug.dn = result.dn.to_vec();
+            debug.dn_error = result.dn_error.to_vec();
+            debug.dna = result.dna.to_vec();
+            debug.dna_error = result.dna_error.to_vec();
+
+            serde_json::to_writer(
+                std::fs::File::create(format!(
+                    "/tmp/josh/boltzmann-solver/debug/{}-{}.json",
                     context.step,
-                    context.substep,
-                    context.beta,
                     self.display(context.model)
-                        .unwrap_or_else(|_| self.short_display()),
-                    step - steps_discarded,
-                    steps_discarded,
-                );
+                        .unwrap_or_else(|_| self.short_display())
+                ))
+                .unwrap(),
+                &debug,
+            )
+            .unwrap();
+        }
+
+        log::debug!(
+            "[{}.{:02}|{:>10.4e}|{}] Number of integration steps: {} ({} discarded).",
+            context.step,
+            context.substep,
+            context.beta,
+            self.display(context.model)
+                .unwrap_or_else(|_| self.short_display()),
+            step - steps_discarded,
+            steps_discarded,
+        );
+
         // log::trace!("[{}.{:02}|{:>10.4e}] (Fast Interaction {}) Result:\n         dn: {:e}\n        dna: {:e}\n   dn error: {:e}\n  dna error: {:e}",
         //         context.step,
         //         context.substep,
@@ -1715,7 +1914,7 @@ impl hash::Hash for Particles {
 
 #[cfg(test)]
 mod tests {
-    use crate::utilities::test::approx_eq;
+    use crate::{model::particle::SCALAR, utilities::test::approx_eq};
     use ndarray::prelude::*;
     use rand::prelude::Distribution;
     use serde::Deserialize;
@@ -3043,10 +3242,10 @@ mod tests {
     #[test]
     fn display() {
         let mut model = crate::model::Empty::default();
-        model.push_particle(crate::prelude::Particle::new(0, 1.0, 1e-3).name("one"));
-        model.push_particle(crate::prelude::Particle::new(0, 1.0, 1e-3).name("two"));
-        model.push_particle(crate::prelude::Particle::new(0, 1.0, 1e-3).name("three"));
-        model.push_particle(crate::prelude::Particle::new(0, 1.0, 1e-3).name("four"));
+        model.push_particle(crate::prelude::ParticleData::new(SCALAR, 1.0, 1e-3).name("one"));
+        model.push_particle(crate::prelude::ParticleData::new(SCALAR, 1.0, 1e-3).name("two"));
+        model.push_particle(crate::prelude::ParticleData::new(SCALAR, 1.0, 1e-3).name("three"));
+        model.push_particle(crate::prelude::ParticleData::new(SCALAR, 1.0, 1e-3).name("four"));
 
         let interaction = super::Particles::new(&[0, 1], &[1, 2]);
         assert_eq!(interaction.short_display(), "0 1 ↔ 1 2");

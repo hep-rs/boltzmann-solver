@@ -2,7 +2,7 @@
 
 use super::{solve, BETA_START};
 use crate::{
-    model::{interaction, Empty, Model, Particle},
+    model::{interaction, particle::SCALAR, Empty, Model, ParticleData},
     solver::SolverBuilder,
     utilities::test::approx_eq,
 };
@@ -17,7 +17,7 @@ fn symmetric() -> Result<(), Box<dyn error::Error>> {
         [1e5, 1e2, 1e1]
             .iter()
             .enumerate()
-            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+            .map(|(i, &m)| ParticleData::new(SCALAR, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(interaction::ThreeParticle::new(|_m| 1.0, 1, 2, 3));
 
@@ -53,7 +53,7 @@ fn asymmetric() -> Result<(), Box<dyn error::Error>> {
         [1e5, 1e2, 1e1]
             .iter()
             .enumerate()
-            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+            .map(|(i, &m)| ParticleData::new(SCALAR, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model
         .push_interaction(interaction::ThreeParticle::new(|_m| 1e-0, 1, 2, 3).asymmetry(|_m| 1e-3));
@@ -94,7 +94,7 @@ fn chained_decay() -> Result<(), Box<dyn error::Error>> {
         [1e7, 1e5, 1e2, 1e1]
             .iter()
             .enumerate()
-            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+            .map(|(i, &m)| ParticleData::new(SCALAR, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(interaction::ThreeParticle::new(|_m| 1e0, 1, 2, 3));
     model.push_interaction(interaction::ThreeParticle::new(|_m| 1e0, 2, 3, 4));

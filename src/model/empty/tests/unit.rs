@@ -2,7 +2,8 @@
 
 use super::{solve, BETA_END, BETA_START};
 use crate::{
-    model::{interaction, interaction::RateDensity, Empty, Interaction, Model, Particle},
+    model::particle::SCALAR,
+    model::{interaction, interaction::RateDensity, Empty, Interaction, Model, ParticleData},
     solver::{Context, SolverBuilder},
     utilities::test::approx_eq,
 };
@@ -17,7 +18,7 @@ fn amplitude() -> Result<(), Box<dyn error::Error>> {
         [1e5, 1e2, 1e1]
             .iter()
             .enumerate()
-            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+            .map(|(i, &m)| ParticleData::new(SCALAR, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(interaction::ThreeParticle::new(|_m| 1.0, 1, 2, 3));
 
@@ -92,7 +93,7 @@ fn gamma() -> Result<(), Box<dyn error::Error>> {
         [1e5, 1e2, 1e1]
             .iter()
             .enumerate()
-            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+            .map(|(i, &m)| ParticleData::new(SCALAR, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(Gamma::new());
 
@@ -175,7 +176,7 @@ fn rate() -> Result<(), Box<dyn error::Error>> {
         [1e5, 1e2, 1e1]
             .iter()
             .enumerate()
-            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+            .map(|(i, &m)| ParticleData::new(SCALAR, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(Rate::new());
 
@@ -249,7 +250,7 @@ fn adjusted_rate() -> Result<(), Box<dyn error::Error>> {
         [1e5, 1e2, 1e1]
             .iter()
             .enumerate()
-            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+            .map(|(i, &m)| ParticleData::new(SCALAR, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(AdjustedRate::new());
 

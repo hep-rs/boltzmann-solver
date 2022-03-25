@@ -1,15 +1,114 @@
 //! Basic implementation of a particle type
 
+mod lorentz_representation;
 mod propagator;
-pub use propagator::{Multi as MultiPropagator, Propagator, Single as SinglePropagator};
 
 use crate::{
-    model::standard::data,
+    model::{standard::data, Model},
     statistic::{Statistic, Statistics},
 };
+pub use lorentz_representation::{
+    LorentzRepresentation, DIRAC_SPINOR, LEFT_WEYL_SPINOR, RIGHT_WEYL_SPINOR, SCALAR, TENSOR,
+    VECTOR,
+};
+use num::Complex;
+pub use propagator::{Multi as MultiPropagator, Propagator, Single as SinglePropagator};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::{cmp, collections::HashMap, f64, fmt};
+use std::{cmp, f64, fmt, hash};
+
+// /// Trait for a particle belonging to a model.
+// pub trait ModelParticle<M> {
+//     /// Representation of the particle under the Lorentz group.
+//     fn representation(&self) -> LorentzRepresentation {
+//         self.particle_data().representation
+//     }
+
+//     /// Internal degrees of the particle.
+//     fn dof(&self) -> f64 {
+//         self.particle_data().dof
+//     }
+
+//     /// Name
+//     fn name(&self) -> &str {
+//         &self.particle_data().name
+//     }
+
+//     /// Get a reference to the particle data
+//     fn particle_data(&self) -> &ParticleData;
+
+//     /// Get a mutable reference to the particle data
+//     fn particle_data_mut(&mut self) -> &mut ParticleData;
+
+//     /// Mass of the particle in GeV.
+//     fn mass(&self) -> f64 {
+//         self.particle_data().mass
+//     }
+
+//     /// Squared mass of the particle in GeV`$^2$`.
+//     fn mass2(&self) -> f64 {
+//         self.particle_data().mass2
+//     }
+
+//     /// Width of the particle in GeV.
+//     fn width(&self) -> f64 {
+//         self.particle_data().width
+//     }
+
+//     /// Squared width of the particle in GeV`$^2$`.
+//     fn width2(&self) -> f64 {
+//         self.particle_data().width2
+//     }
+
+//     /// Recalculate the mass of the particle.
+//     ///
+//     /// As model parameters might change due to RGE running or because of
+//     /// thermal contributions, the mass of the particle might change.  The
+//     /// result of the calculation should be stored internally so that it can be
+//     /// returned by the [`mass`] and [`mass2`] functions.
+//     fn calculate_mass(&mut self, model: &M) -> f64;
+
+//     /// Recalculate the width of the particle.
+//     ///
+//     /// As model parameters might change due to RGE running or because of
+//     /// thermal contributions, the width of the particle might change.  The
+//     /// result of the calculation should be stored internally so that it can be
+//     /// returned by the [`width`] and [`width2`] functions.
+//     ///
+//     /// This can also be computed from [`self_energy_absorptive`] by using the
+//     /// relation `$\Sigma(p^2 = m^2) = m \Gamma$`.
+//     fn calculate_width(&mut self, model: &M) -> f64 {
+//         let mass = self.mass();
+//         let width = self.self_energy_absorptive(model, mass * mass) / mass;
+
+//         let pdata = self.particle_data_mut();
+//         pdata.width = width;
+//         pdata.width2 = width * width;
+//         width
+//     }
+
+//     /// Imaginary component of the self-energy at the specified momentum
+//     /// transfer which is given in terms of the invariant `$p^2$`.
+//     ///
+//     /// Physically this corresponds to when intermediate particles in the
+//     /// self-energy go on-shell.  These can be calculated using the Cutkosky
+//     /// rules, or using known results from Passarino-Veltman functions.
+//     fn self_energy_absorptive(&self, model: &M, momentum: f64) -> f64;
+// }
+
+// impl<M> PartialEq for dyn ModelParticle<M> {
+//     fn eq(&self, other: &dyn ModelParticle<M>) -> bool {
+//         self.name() == other.name()
+//     }
+// }
+
+// impl<M> Eq for dyn ModelParticle<M> {}
+
+// impl<M> std::hash::Hash for dyn ModelParticle<M> {
+//     fn hash<H: hash::Hasher>(&self, state: &mut H) {
+//         self.name().hash(state);
+//     }
+// }
 
 /// Particle type
 ///
@@ -26,12 +125,12 @@ use std::{cmp, collections::HashMap, f64, fmt};
 /// For hashing purposes, only the particle's name is taken into account.
 ///
 /// In the long run, it is intended that this type be replaced by another one.
-#[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-pub struct Particle {
+#[derive(Debug, Clone)]
+pub struct Data {
     // The spin is stored as twice the spin, so a spin-½ particle has `spin ==
     // 1` and a spin-1 particle has `spin == 2`.
-    spin: u8,
+    representation: LorentzRepresentation,
     /// Whether the particle is its own antiparticle or not.
     ///
     /// By default, this is assumed to be false and can be set to true with
@@ -57,34 +156,27 @@ pub struct Particle {
     /// This should be updated using [`Particle::set_width`] so that both the
     /// width and squared width are updated simultaneously.
     pub width2: f64,
-    /// Decays
-    #[cfg_attr(feature = "serde", serde(skip))]
-    pub decays: HashMap<Vec<isize>, f64>,
-    // Whether the particle is complex or not
-    complex: bool,
-    // Internal degrees of freedom of the particle
-    dof: f64,
+    /// Internal degrees of freedom of the particle
+    pub dof: f64,
     /// Name
     pub name: String,
 }
 
-impl Particle {
+impl Data {
     /// Create a new particle with the specified spin and mass.
     ///
     /// The mass is specified in units of GeV, and the spin is multiplied by a
     /// factor of two such that a spin-½ particle has `spin == 1` and a spin-1
     /// particle has `spin == 2`.
     #[must_use]
-    pub fn new(spin: u8, mass: f64, width: f64) -> Self {
+    pub fn new(representation: LorentzRepresentation, mass: f64, width: f64) -> Self {
         Self {
-            spin,
+            representation,
             own_antiparticle: false,
             mass,
             mass2: mass.powi(2),
             width,
             width2: width.powi(2),
-            decays: HashMap::new(),
-            complex: false,
             dof: 1.0,
             name: "?".to_string(),
         }
@@ -104,24 +196,6 @@ impl Particle {
         self
     }
 
-    /// Indicate that the particle is real.
-    ///
-    /// This function returns self and should be used in constructors.
-    #[must_use]
-    pub fn real(mut self) -> Self {
-        self.complex = false;
-        self
-    }
-
-    /// Indicate that the particle is complex.
-    ///
-    /// This function returns self and should be used in constructors.
-    #[must_use]
-    pub fn complex(mut self) -> Self {
-        self.complex = true;
-        self
-    }
-
     /// Indicate that the particle is its own antiparticle, thereby preventing
     /// any asymmetry from being generated in its density.
     #[must_use]
@@ -130,7 +204,9 @@ impl Particle {
         self
     }
 
-    /// Specify how many internal degrees of freedom this particle has.
+    /// Specify how many internal degrees of freedom this particle has.  These
+    /// can be because the particle is complex or any other internal gauge
+    /// symmetries.
     ///
     /// This is a multiplicative factor to the degrees of freedom.  For a
     /// 'pseudo' particle such as `$B-L$`, this should be set to zero.
@@ -150,34 +226,30 @@ impl Particle {
     #[must_use]
     pub fn name<S: Into<String>>(mut self, name: S) -> Self {
         self.name = name.into();
-        if self.name.is_empty() {
-            panic!("Particle name cannot be empty.");
-        }
+        assert!(!self.name.is_empty(), "Particle name cannot be empty.");
         self
-    }
-
-    /// Returns true if the particle is real (real scalar, Majorana fermion)
-    #[must_use]
-    pub fn is_real(&self) -> bool {
-        !self.complex
-    }
-
-    /// Returns true if the particle is complex (complex scalar, Dirac fermion)
-    #[must_use]
-    pub fn is_complex(&self) -> bool {
-        self.complex
     }
 
     /// Returns true if the particle is bosonic.
     #[must_use]
     pub fn is_bosonic(&self) -> bool {
-        self.spin % 2 == 0
+        self.representation.is_bosonic()
     }
 
     /// Returns true if the particle is fermionic.
     #[must_use]
     pub fn is_fermionic(&self) -> bool {
-        self.spin % 2 == 1
+        self.representation.is_fermionic()
+    }
+
+    /// Check whether the particle is massless.
+    ///
+    /// As the calculation for the mass may not be exact, this checks whether
+    /// the mass square is less than the minimum positive normal floating point
+    /// (equivalent to `$m \lesssim 10^{-150}$`).
+    #[must_use]
+    pub fn is_massless(&self) -> bool {
+        self.mass2 < f64::MIN_POSITIVE
     }
 
     /// Return the number of degrees of freedom for the underlying particle.
@@ -185,12 +257,11 @@ impl Particle {
     /// The general formula is:
     ///
     /// ```math
-    /// N_\text{int} \times N_\text{spin} \times N_\text{complex}
+    /// N_\text{int} \times N_\text{spin}
     /// ```
     ///
     /// where `$N_\text{int}$` are the internal degrees of freedom,
-    /// `$N_\text{spin}$` are the spin degrees of freedom, and
-    /// `$N_\text{complex}$` are the degrees of freedom for complex particle.
+    /// `$N_\text{spin}$` are the spin degrees of freedom.
     ///
     /// The spin degrees of freedom are:
     /// - spin-0: 1
@@ -208,15 +279,14 @@ impl Particle {
     /// Panics if a particle with spin greater than 2 is given.
     #[must_use]
     pub fn degrees_of_freedom(&self) -> f64 {
-        let dof = self.dof * if self.complex { 2.0 } else { 1.0 };
-        match (self.spin, self.mass) {
-            (0, _) => dof,
-            (n, _) if n % 2 == 1 => f64::from(n + 1) * dof,
+        match (self.representation.spin(), self.mass) {
+            (0, _) => self.dof,
+            (n, _) if n % 2 == 1 => f64::from(n + 1) * self.dof,
             (n, m) if n % 2 == 0 => {
                 if m == 0.0 {
-                    2.0 * dof
+                    2.0 * self.dof
                 } else {
-                    f64::from(n + 1) * dof
+                    f64::from(n + 1) * self.dof
                 }
             }
             _ => unimplemented!("Particles with spin greater than 2 are not supported."),
@@ -265,24 +335,58 @@ impl Particle {
     }
 
     /// Return the propagator denominator for the particle.
+    ///
+    /// The propagator is defined as follow:
+    ///
+    /// ```math
+    /// \mathcal{P}_i^{-1}(s) = s - m_i^2 + i \theta(s) m_i \Gamma_i,
+    /// ```
+    ///
+    /// where `$\theta$` is the Heaviside step function.
     #[must_use]
-    pub fn propagator(&self, s: f64) -> SinglePropagator {
-        SinglePropagator::new(self, s)
+    pub fn propagator<M: Model>(&self, model: &M, s: f64) -> Complex<f64> {
+        SinglePropagator::new(self, model, s).eval()
+    }
+
+    /// Return the RIS propagator for the particle.
+    ///
+    /// The RIS propagator is defined such that a real intermediate state is
+    /// substracted from the propagator.  This is done to avoid a
+    /// double-counting issue of with `$2 \xleftrightarrow{P} 2$` interaction
+    /// with some intermediate particle `$P$` and the combination of the two
+    /// 3-particle interactions 2 ↔ P and P ↔ 2.
+    ///
+    /// The definition is follows that of a regular
+    /// [propagator](`Particle::propagator`) except in the following case:
+    ///
+    /// ```math
+    /// \mathcal{P}_i(s) \mathcal{P}_i^*(s)
+    /// = \frac{(s - m_i^2)^2 - (m_i \Gamma_i)^2}{[(s - m_i^2)^2 + (m_i \Gamma_i)^2]^2}.
+    /// ```
+    #[must_use]
+    pub fn ris_propagator<M: Model>(&self, model: &M, s: f64) -> SinglePropagator {
+        SinglePropagator::new(self, model, s)
     }
 }
 
-impl cmp::PartialEq for Particle {
+impl cmp::PartialEq for Data {
     fn eq(&self, other: &Self) -> bool {
-        self.spin == other.spin && self.mass == other.mass
+        self.name == other.name
     }
 }
-impl Eq for Particle {}
+impl Eq for Data {}
+
+impl hash::Hash for Data {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+    }
+}
 
 /// Display the particle by its name.
 ///
 /// To display all of the particle's properties, use the
 /// [`Debug`](std::fmt::Display).
-impl fmt::Display for Particle {
+impl fmt::Display for Data {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.name)
     }
@@ -290,17 +394,19 @@ impl fmt::Display for Particle {
 
 #[cfg(test)]
 mod tests {
-    use super::Particle;
-    use crate::utilities::test::approx_eq;
+    use super::Data;
+    use crate::{
+        model::particle::{DIRAC_SPINOR, SCALAR, TENSOR},
+        utilities::test::approx_eq,
+    };
     use std::error;
 
     #[test]
     fn real_scalar() -> Result<(), Box<dyn error::Error>> {
-        let mut particle = Particle::new(0, 1.0, 0.1);
+        let mut particle: Data = Data::new(SCALAR, 1.0, 0.1);
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
-        assert!(!particle.is_complex());
 
         approx_eq(particle.entropy_dof(1e-10), 1.0, 8.0, 0.0)?;
         assert!(particle.entropy_dof(1e10) < 1e-30);
@@ -330,11 +436,10 @@ mod tests {
 
     #[test]
     fn complex_scalar() -> Result<(), Box<dyn error::Error>> {
-        let particle = Particle::new(0, 1.0, 0.1).complex();
+        let particle: Data = Data::new(SCALAR, 1.0, 0.1).dof(2.0);
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
-        assert!(particle.is_complex());
 
         approx_eq(particle.entropy_dof(1e-10), 2.0, 8.0, 0.0)?;
         assert!(particle.entropy_dof(1e10) < 1e-30);
@@ -351,11 +456,10 @@ mod tests {
 
     #[test]
     fn fermion() -> Result<(), Box<dyn error::Error>> {
-        let particle = Particle::new(1, 1.0, 0.1);
+        let particle: Data = Data::new(DIRAC_SPINOR, 1.0, 0.1);
 
         assert!(!particle.is_bosonic());
         assert!(particle.is_fermionic());
-        assert!(!particle.is_complex());
 
         approx_eq(particle.entropy_dof(1e-10), 2.0 * 0.875, 8.0, 0.0)?;
         assert!(particle.entropy_dof(1e10) < 1e-30);
@@ -372,11 +476,10 @@ mod tests {
 
     #[test]
     fn gauge_boson() -> Result<(), Box<dyn error::Error>> {
-        let particle = Particle::new(2, 1.0, 0.1);
+        let particle: Data = Data::new(TENSOR, 1.0, 0.1);
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
-        assert!(!particle.is_complex());
 
         approx_eq(particle.entropy_dof(1e-10), 3.0, 8.0, 0.0)?;
         assert!(particle.entropy_dof(1e10) < 1e-30);
@@ -393,11 +496,10 @@ mod tests {
 
     #[test]
     fn complex_scalar_dof() -> Result<(), Box<dyn error::Error>> {
-        let particle = Particle::new(0, 1.0, 0.1).complex().dof(2.5);
+        let particle: Data = Data::new(SCALAR, 1.0, 0.1).dof(2.0 * 2.5);
 
         assert!(particle.is_bosonic());
         assert!(!particle.is_fermionic());
-        assert!(particle.is_complex());
 
         approx_eq(particle.entropy_dof(1e-10), 5.0, 8.0, 0.0)?;
         assert!(particle.entropy_dof(1e10) < 1e-30);
@@ -414,11 +516,10 @@ mod tests {
 
     #[test]
     fn fermion_dof() -> Result<(), Box<dyn error::Error>> {
-        let particle = Particle::new(1, 1.0, 0.1).dof(1.2);
+        let particle: Data = Data::new(DIRAC_SPINOR, 1.0, 0.1).dof(1.2);
 
         assert!(!particle.is_bosonic());
         assert!(particle.is_fermionic());
-        assert!(!particle.is_complex());
 
         approx_eq(particle.entropy_dof(1e-10), 2.0 * 1.2 * 0.875, 8.0, 0.0)?;
         assert!(particle.entropy_dof(1e10) < 1e-30);

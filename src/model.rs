@@ -6,7 +6,10 @@ mod particle;
 pub(crate) mod standard;
 
 pub use empty::Empty;
-pub use particle::{Particle, Propagator};
+pub use particle::{
+    Data as ParticleData, LorentzRepresentation, Propagator, DIRAC_SPINOR, LEFT_WEYL_SPINOR,
+    RIGHT_WEYL_SPINOR, SCALAR, TENSOR, VECTOR,
+};
 pub use standard::Standard;
 
 use crate::{
@@ -15,11 +18,7 @@ use crate::{
     statistic::{Statistic, Statistics},
 };
 use ndarray::prelude::*;
-#[cfg(feature = "parallel")]
-use rayon::prelude::*;
-#[cfg(feature = "parallel")]
-use std::sync::RwLock;
-use std::{collections::HashMap, convert::TryFrom, iter};
+use std::convert::TryFrom;
 
 /// Contains all the information relevant to a particular model, including
 /// masses, widths and couplings.  All these attributes can be dependent on the
@@ -69,7 +68,7 @@ where
     fn hubble_rate(&self, beta: f64) -> f64 {
         debug_assert_warn!(
             beta > 1e8,
-            "For β > 10⁸ GeV⁻¹, our Universe transitions into the matter
+            "For β > 10^8 GeV⁻¹, our Universe transitions into the matter
             dominated epoch where this implementation of the Hubble rate no
             longer applies."
         );
@@ -84,14 +83,14 @@ where
     }
 
     /// Return a list of particles in the model.
-    fn particles(&self) -> &[Particle];
+    fn particles(&self) -> &[ParticleData];
 
     /// Return a mutable list of particles in the model.
     ///
     /// This is available to allow mutating particles within the model. This
     /// should not change the ordering of the particles as these are assumed to
     /// be fixed throughout the integration.
-    fn particles_mut(&mut self) -> &mut [Particle];
+    fn particles_mut(&mut self) -> &mut [ParticleData];
 
     /// Return the index corresponding to a particle's name and generation
     /// index.
@@ -189,7 +188,7 @@ where
     /// # Panics
     ///
     /// Panics if then name or particle is not known within the model.
-    fn particle<S: AsRef<str>>(&self, name: S, i: usize) -> &Particle {
+    fn particle<S: AsRef<str>>(&self, name: S, i: usize) -> &ParticleData {
         match self.particle_idx(name.as_ref(), i) {
             Ok(idx) => &self.particles()[idx],
             Err((name, i)) => {
@@ -204,7 +203,7 @@ where
     /// # Panics
     ///
     /// Panics if then name or particle is not known within the model.
-    fn particle_mut(&mut self, name: &str, i: usize) -> &mut Particle {
+    fn particle_mut(&mut self, name: &str, i: usize) -> &mut ParticleData {
         match self.particle_idx(name, i) {
             Ok(idx) => &mut self.particles_mut()[idx],
             Err((name, i)) => {
@@ -253,6 +252,26 @@ where
             no_asymmetry: &[],
         }
     }
+
+    /// Calculate the widths of all particles.
+    ///
+    /// This uses absorptive component of the self-energy in order to obtain the
+    /// width through the relation `$m \Gamma = \Sigma(m^2)$`.
+    fn update_widths(&mut self) {
+        let widths: Vec<_> = self
+            .particles()
+            .iter()
+            .map(|p| self.self_energy_absorptive(p, p.mass2) / p.mass)
+            .collect();
+
+        for (p, w) in self.particles_mut().iter_mut().zip(widths) {
+            p.set_width(w);
+        }
+    }
+
+    /// The momentum transfer is specified by the Lorentz-invariant quantity
+    /// `$p^2$`.
+    fn self_energy_absorptive(&self, p: &ParticleData, momentum: f64) -> f64;
 }
 
 /// Supertrait for [`Model`] for the handling of interactions.
@@ -272,37 +291,6 @@ where
 
     /// Return an iterator over all interactions in the model.
     fn interactions(&self) -> &[Self::Item];
-
-    /// Calculate the widths of all particles.
-    ///
-    /// This computes the possible decays of all particles given the
-    /// interactions specified within the model in order to compute the
-    /// particle's final width.
-    ///
-    /// The information is stored in each particle's [`Particle::width`] and the
-    /// partial widths are stored in [`Particle::decays`].
-    fn update_widths(&mut self) {
-        let mut widths: Vec<_> = iter::repeat_with(|| (0.0, HashMap::new()))
-            .take(self.particles().len())
-            .collect();
-
-        let c = self.as_context();
-        for interaction in self.interactions() {
-            if let Some(partial_width) = interaction.width(&c) {
-                let parent_idx = partial_width.parent_idx();
-                widths[parent_idx].0 += partial_width.width;
-                widths[parent_idx]
-                    .1
-                    .insert(partial_width.daughters, partial_width.width);
-            }
-        }
-
-        for (i, (width, hm)) in widths.into_iter().enumerate() {
-            let p = &mut self.particles_mut()[i];
-            p.set_width(width);
-            p.decays = hm;
-        }
-    }
 }
 
 /// Supertrait for [`Model`] for the handling of interactions.
@@ -322,47 +310,4 @@ where
 
     /// Return an iterator over all interactions in the model.
     fn interactions(&self) -> &[Self::Item];
-
-    /// Calculate the widths of all particles.
-    ///
-    /// This computes the possible decays of all particles given the
-    /// interactions specified within the model in order to compute the
-    /// particle's final width.
-    ///
-    /// The information is stored in each particle's [`Particle::width`] and the
-    /// partial widths are stored in [`Particle::decays`].
-    fn update_widths(&mut self) {
-        let widths: RwLock<Vec<_>> = RwLock::new(
-            iter::repeat_with(|| (0.0, HashMap::new()))
-                .take(self.particles().len())
-                .collect(),
-        );
-
-        let c = self.as_context();
-
-        self.interactions().par_iter().for_each(|interaction| {
-            if let Some(partial_width) = interaction.width(&c) {
-                let parent_idx = partial_width.parent_idx();
-                let mut widths = widths
-                    .write()
-                    .expect("cannot get write access of widths behind RwLock");
-                widths[parent_idx].0 += partial_width.width;
-                widths[parent_idx]
-                    .1
-                    .insert(partial_width.daughters, partial_width.width);
-            }
-        });
-
-        let ptcl = self.particles_mut();
-        for (i, (width, hm)) in widths
-            .into_inner()
-            .expect("cannot unwrap RwLock protecting widths")
-            .into_iter()
-            .enumerate()
-        {
-            let p = &mut ptcl[i];
-            p.set_width(width);
-            p.decays = hm;
-        }
-    }
 }

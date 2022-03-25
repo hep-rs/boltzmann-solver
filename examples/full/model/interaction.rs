@@ -171,6 +171,27 @@ pub fn hln() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
                         let p5 = m.particle("L", i5);
                         let p6 = m.particle("H", i6);
 
+                        let c_im = pave::c(
+                            0, 0, 0, p2.mass2, p3.mass2, p1.mass2, p4.mass, p6.mass, p5.mass,
+                        );
+                        if c_im.is_nan() {
+                            log::warn!(
+                                "NAN C({}, {}, {}, {:e}, {:e}, {:e}, {:e}, {:e}, {:e})",
+                                0,
+                                0,
+                                0,
+                                p2.mass2,
+                                p3.mass2,
+                                p1.mass2,
+                                p4.mass,
+                                p6.mass,
+                                p5.mass
+                            );
+                            let _ = pave::c(
+                                0, 0, 0, p2.mass2, p3.mass2, p1.mass2, p4.mass, p6.mass, p5.mass,
+                            );
+                        }
+
                         (p3.mass * p4.mass)
                             * 2.0
                             * (m.yv[[i3, i2]]
@@ -187,6 +208,10 @@ pub fn hln() -> Vec<interaction::ThreeParticle<LeptogenesisModel>> {
                                     ))
                     })
                     .sum::<f64>();
+
+                if mass_correction.is_nan() || vertex_correction.is_nan() {
+                    log::warn!("NAN correction");
+                }
 
                 (mass_correction + vertex_correction) / (16.0 * PI_2)
             });
@@ -545,13 +570,13 @@ pub fn hhll1() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
                     * (s - 2.0 * p3.mass2);
 
                 // H H -> vv and ee
-                let m11 = prefactor * (pc5.propagator(t) * p5.propagator(t).conj());
-                let m12 = prefactor * (pc5.propagator(u) * p5.propagator(t).conj());
-                let m22 = prefactor * (pc5.propagator(u) * p5.propagator(u).conj());
+                let m11 = prefactor * (pc5.propagator(m, t) * p5.propagator(m, t).conj());
+                let m12 = prefactor * (pc5.propagator(m, u) * p5.propagator(m, t).conj());
+                let m22 = prefactor * (pc5.propagator(m, u) * p5.propagator(m, u).conj());
                 result += 2.0 * (m11 + 2.0 * m12 + m22);
 
                 // HH -> ve
-                let m11 = prefactor * (pc5.propagator(t) * p5.propagator(t).conj());
+                let m11 = prefactor * (pc5.propagator(m, t) * p5.propagator(m, t).conj());
                 result += m11;
             }
 
@@ -600,7 +625,7 @@ pub fn hhll2() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
                     * m.yv[[ic5, i3]]
                     * m.yv[[i5, i3]].conj()
                     * m.yv[[ic5, i4]].conj())
-                    * (pc5.propagator(t) * p5.propagator(t).conj())
+                    * (pc5.propagator(m, t) * p5.propagator(m, t).conj())
                     * (-p2.mass2 * (s + p4.mass2 + t + u) + p4.mass2 * (s + u)
                         - p3.mass2 * (3.0 * p4.mass2 - 3.0 * p2.mass2 + t)
                         + p2.mass2.powi(2)
@@ -612,7 +637,7 @@ pub fn hhll2() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
                     * m.yv[[ic5, i4]]
                     * m.yv[[i5, i4]].conj()
                     * m.yv[[ic5, i3]].conj())
-                    * (pc5.propagator(u) * p5.propagator(u).conj())
+                    * (pc5.propagator(m, u) * p5.propagator(m, u).conj())
                     * (p3.mass2 * (s - p4.mass2 + p2.mass2 + t)
                         - p2.mass2 * (s + t + u)
                         - 2.0 * p3.mass2.powi(2)
@@ -663,29 +688,34 @@ pub fn hhen() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
                 let p5 = m.particle("L", i5);
                 let pc5 = m.particle("L", ic5);
 
-                let m11_22 = (m.sm.ye[[i3, i5]]
+                let m11 = (m.sm.ye[[i3, i5]]
                     * m.yv[[i4, ic5]]
                     * m.sm.ye[[i3, ic5]]
                     * m.yv[[i4, i5]].conj())
-                    * ((p4.mass2 * (p3.mass2 - p2.mass2 + u)
-                        + p3.mass2 * (u - p2.mass2)
+                    * (p3.mass2 * (p4.mass2 - p2.mass2 + t)
+                        + p4.mass2 * (t - p2.mass2)
                         + p2.mass2.powi(2)
                         - t * u)
-                        * (p5.propagator(t) * pc5.propagator(t).conj()))
-                    + ((p4.mass2 * (p3.mass2 - p2.mass2 + t)
-                        + p3.mass2 * (t - p2.mass2)
+                    * (p5.propagator(m, t) * pc5.propagator(m, t).conj());
+
+                let m22 = (m.sm.ye[[i3, i5]]
+                    * m.yv[[i4, ic5]]
+                    * m.sm.ye[[i3, ic5]]
+                    * m.yv[[i4, i5]].conj())
+                    * (p3.mass2 * (p4.mass2 - p2.mass2 + u)
+                        + p4.mass2 * (u - p2.mass2)
                         + p2.mass2.powi(2)
                         - t * u)
-                        * (p5.propagator(u) * pc5.propagator(u).conj()));
+                    * (p5.propagator(m, u) * pc5.propagator(m, u).conj());
 
                 let m12 = m.sm.ye[[i3, i5]]
                     * m.yv[[i4, ic5]]
                     * m.sm.ye[[i3, ic5]]
                     * m.yv[[i4, i5]].conj()
-                    * (pc5.propagator(t) * p5.propagator(u).conj())
-                    * (-p3.mass2 * p4.mass2 + p2.mass2.powi(2) - t * u);
+                    * (-p3.mass2 * p4.mass2 + p2.mass2.powi(2) - t * u)
+                    * (pc5.propagator(m, u) * p5.propagator(m, t).conj());
 
-                result += m11_22 + 2.0 * m12;
+                result += m11 + m22 + 2.0 * m12;
             }
 
             result.re
@@ -725,7 +755,7 @@ pub fn nhla() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
 
             let m11: Complex<f64> = m.sm.g1.powi(2)
                 * m.yv[[i1, i3]].norm_sqr()
-                * (p3.propagator(s) * p3.propagator(s).conj())
+                * (p3.propagator(m, s) * p3.propagator(m, s).conj())
                 * (p1.mass2
                     * (s.powi(2) - 5.0 * p3.mass2 * (s + p4.mass2) + 4.0 * s * p4.mass2
                         - p4.mass2.powi(2)
@@ -743,7 +773,7 @@ pub fn nhla() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
 
             let m12: Complex<f64> = m.sm.g1.powi(2)
                 * m.yv[[i1, i3]].norm_sqr()
-                * (p2.propagator(t) * p3.propagator(s).conj())
+                * (p2.propagator(m, t) * p3.propagator(m, s).conj())
                 * (
                     // -4.0 * Complex::i() * epsilon
                     p4.mass2 * (s.powi(2) - s * t - u * (2.0 * t + u))
@@ -767,12 +797,12 @@ pub fn nhla() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
 
             let m22: Complex<f64> = -m.sm.g1.powi(2)
                 * m.yv[[i1, i3]].norm_sqr()
-                * (p2.propagator(t) * p2.propagator(t).conj())
+                * (p2.propagator(m, t) * p2.propagator(m, t).conj())
                 * (-p3.mass2 - p1.mass2 + t)
                 * (-2.0 * p2.mass2 * (p4.mass2 + t) + (p4.mass2 + t).powi(2) + p2.mass2.powi(2))
                 / (4.0 * p4.mass2);
 
-            2.0 * (m11 + 2.0 * m12 * m22).re
+            2.0 * (m11 + 2.0 * m12 + m22).re
         };
 
         interactions.append(&mut interaction::FourParticle::new_all(
@@ -809,49 +839,39 @@ pub fn nhlw() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
 
             let m11: Complex<f64> = m.sm.g2.powi(2)
                 * m.yv[[i1, i3]].norm_sqr()
-                * (p3.propagator(s) * p3.propagator(s).conj())
-                * (p1.mass2 * (s.powi(2) + 4.0 * s * p4.mass2 - p4.mass2.powi(2)) - s.powi(2) * t
+                * (p3.propagator(m, s) * p3.propagator(m, s).conj())
+                * (p1.mass2 * (s.powi(2) + 2.0 * s * p4.mass2 - 2.0 * p4.mass2.powi(2))
+                    - s.powi(2) * t
                     + p3.mass2
-                        * (-5.0 * p1.mass2 * (s + p4.mass2)
-                            + p4.mass2 * (s + 3.0 * t + 2.0 * u)
-                            + s * (s + 4.0 * t + u)
-                            - 3.0 * p4.mass2.powi(2))
-                    - p3.mass2.powi(2) * (4.0 * s - 6.0 * p1.mass2 + p4.mass2 + 4.0 * t + 2.0 * u)
-                    - 2.0 * s * p4.mass2 * (t + u)
-                    + p4.mass2 * (2.0 * s + t)
-                    + 4.0 * p3.mass2.powi(3))
+                        * (p4.mass2 * (s + p1.mass2 - p2.mass2)
+                            + s * (-2.0 * p1.mass2 + p2.mass2 + t))
+                    - 2.0 * s * p4.mass2 * u
+                    + p3.mass2.powi(2) * (p1.mass2 - p2.mass2)
+                    + 2.0 * p4.mass2.powi(2) * p2.mass2)
                 / (4.0 * p4.mass2);
 
             let m12: Complex<f64> = m.sm.g2.powi(2)
                 * m.yv[[i1, i3]].norm_sqr()
-                * (p2.propagator(t) * p3.propagator(s).conj())
-                * (p4.mass2
-                    * (
-                        // -4.0 * Complex::i() * epsilon
-                        s.powi(2)
-                            * p3.mass2
-                            * (s - 6.0 * p1.mass2 - 3.0 * p2.mass2 + 5.0 * t + 4.0 * u)
-                            + p2.mass2 * (-s - 3.0 * p1.mass2 + 2.0 * t + u)
-                            - s * t
-                            - 4.0 * p3.mass2.powi(2)
-                            + 3.0 * p1.mass2 * u
-                            - u * (2.0 * t + u)
-                    )
-                    + (t + p2.mass2)
-                        * (-p3.mass2 * (s - 3.0 * p1.mass2 + 2.0 * t + u)
-                            + s * (t - p1.mass2)
-                            + 2.0 * p4.mass2.powi(2))
-                    + p4.mass2.powi(2) * (-2.0 * p3.mass2 - p2.mass2 + u))
+                * (p2.propagator(m, t) * p3.propagator(m, s).conj())
+                * (-p4.mass2
+                    * (p1.mass2 * (-2.0 * s + 4.0 * p3.mass2 + 5.0 * p2.mass2 - t - 3.0 * u)
+                        + s * t
+                        + p1.mass2.powi(2)
+                        + p3.mass2 * p2.mass2
+                        - 2.0 * p2.mass2 * t)
+                    + (p2.mass2 - t) * (s * p1.mass2 + p3.mass2 * (p2.mass2 - p1.mass2))
+                    + s * t * (t - p2.mass2)
+                    - p1.mass2 * p4.mass2.powi(2))
                 / (4.0 * p4.mass2);
 
             let m22: Complex<f64> = -m.sm.g2.powi(2)
                 * m.yv[[i1, i3]].norm_sqr()
-                * (p2.propagator(t) * p2.propagator(t).conj())
-                * (-p3.mass2 - p1.mass2 + t)
+                * (p2.propagator(m, t) * p2.propagator(m, t).conj())
+                * (-p1.mass2 - p3.mass2 + t)
                 * (-2.0 * p2.mass2 * (p4.mass2 + t) + (t - p4.mass2).powi(2) + p2.mass2.powi(2))
                 / (4.0 * p4.mass2);
 
-            6.0 * (m11 + 2.0 * m12 * m22).re
+            2.0 * (m11 + 2.0 * m12 + m22).re
         };
 
         interactions.append(&mut interaction::FourParticle::new_all(
@@ -900,8 +920,8 @@ pub fn quln() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
                     * (m.sm.yu[[i1, i1]].powi(2) * m.yv[[i4, i3]].norm_sqr())
                     * (s - 2.0 * p3.mass2)
                     * (s - p1.mass2 - p2.mass2)
-                    * p5.propagator(s).conj()
-                    * pc5.propagator(s);
+                    * p5.propagator(m, s).conj()
+                    * pc5.propagator(m, s);
 
                 result += 2.0 * m11;
             }
@@ -955,8 +975,8 @@ pub fn qdln() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
                     * (m.sm.yd[[i2, i1]].powi(2) * m.yv[[i4, i3]].norm_sqr())
                     * (s - p1.mass2 - p2.mass2)
                     * (s - p3.mass2 - p4.mass2)
-                    * p5.propagator(s).conj()
-                    * pc5.propagator(s);
+                    * p5.propagator(m, s).conj()
+                    * pc5.propagator(m, s);
 
                 result += m11;
             }
@@ -1010,15 +1030,15 @@ pub fn leln() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
                     (m.sm.ye[[i1, i1]].powi(2) * m.yv[[i4, i3]].norm_sqr())
                         * (s - 2.0 * p3.mass2)
                         * (s - p1.mass2 - p2.mass2)
-                        * p5.propagator(s).conj()
-                        * pc5.propagator(s)
+                        * p5.propagator(m, s).conj()
+                        * pc5.propagator(m, s)
                 } else {
                     Complex::zero()
                 };
 
                 let m12 = if i1 == i2 && i1 == i3 && i1 == i4 {
                     0.5 * (m.yv[[i4, i1]] * m.yv[[i4, i3]].conj() * m.sm.ye[[i1, i1]].powi(2))
-                        * (pc5.propagator(u) * p5.propagator(s).conj())
+                        * (pc5.propagator(m, u) * p5.propagator(m, s).conj())
                         * (
                             // 4.0 * Complex::i() * epsilon
                             s.powi(2) + p2.mass2 * (-s + p3.mass2 + p4.mass2 + t - u)
@@ -1036,8 +1056,8 @@ pub fn leln() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
                     (m.sm.ye[[i2, i2]].powi(2) * m.yv[[i4, i1]].norm_sqr())
                         * (u - p2.mass - p1.mass2)
                         * (u - p1.mass2 - p4.mass2)
-                        * p5.propagator(u).conj()
-                        * pc5.propagator(u)
+                        * p5.propagator(m, u).conj()
+                        * pc5.propagator(m, u)
                 } else {
                     Complex::zero()
                 };
@@ -1089,19 +1109,19 @@ pub fn lnln() -> Vec<interaction::FourParticle<LeptogenesisModel>> {
                 let m11 = (m.yv[[i1, i2]].norm_sqr() * m.yv[[i4, i3]].norm_sqr())
                     * (s - 2.0 * p3.mass2)
                     * (s - p1.mass2 - p2.mass2)
-                    * p5.propagator(s).conj()
-                    * pc5.propagator(s);
+                    * p5.propagator(m, s).conj()
+                    * pc5.propagator(m, s);
 
                 let m12 = (p2.mass * p4.mass)
                     * (m.yv[[i4, i1]] * m.yv[[i4, i3]] * (m.yv[[i2, i1]] * m.yv[[i2, i3]]).conj())
-                    * (pc5.propagator(u) * p5.propagator(s).conj())
+                    * (pc5.propagator(m, u) * p5.propagator(m, s).conj())
                     * (p1.mass + p3.mass2 - t);
 
                 let m22 = (m.yv[[i2, i3]].norm_sqr() * m.yv[[i4, i1]].norm_sqr())
                     * (u - p1.mass2 - p4.mass2)
                     * (u - p3.mass2 - p2.mass2)
-                    * p5.propagator(u).conj()
-                    * pc5.propagator(u);
+                    * p5.propagator(m, u).conj()
+                    * pc5.propagator(m, u);
 
                 result += m11 + 2.0 * m12 + m22;
             }

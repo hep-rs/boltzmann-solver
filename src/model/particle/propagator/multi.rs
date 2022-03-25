@@ -7,18 +7,23 @@ use std::ops;
 /// This isn't designed to be used on its own and instead allows for better
 /// handling of multiple propagators.
 #[derive(Debug)]
-pub struct Multi<'a> {
-    pub(crate) propagators: Vec<Single<'a>>,
+pub struct Multi {
+    pub(crate) propagators: Vec<Single>,
     pub(crate) conjugated: bool,
 }
 
-impl<'a> Propagator for Multi<'a> {
+impl Propagator for Multi {
     /// Complex conjugatet the propagator.
     #[must_use]
     fn conj(mut self) -> Self {
-        for p in &mut self.propagators {
-            *p = p.conj();
-        }
+        self.ref_conj();
+        self
+    }
+
+    fn ref_conj(&mut self) -> &mut Self {
+        self.propagators.iter_mut().for_each(|p| {
+            p.ref_conj();
+        });
         self.conjugated = !self.conjugated;
         self
     }
@@ -57,7 +62,7 @@ impl<'a> Propagator for Multi<'a> {
     }
 }
 
-impl<'a> ops::Add<Self> for Multi<'a> {
+impl ops::Add<Self> for Multi {
     type Output = Self;
 
     fn add(mut self, mut rhs: Self) -> Self::Output {
@@ -70,10 +75,10 @@ impl<'a> ops::Add<Self> for Multi<'a> {
     }
 }
 
-impl<'a> ops::Add<Single<'a>> for Multi<'a> {
+impl ops::Add<Single> for Multi {
     type Output = Self;
 
-    fn add(mut self, rhs: Single<'a>) -> Self::Output {
+    fn add(mut self, rhs: Single) -> Self::Output {
         debug_assert!(
             self.conjugated == rhs.conjugated,
             "When adding two propagators, they must have the same conjugation."
@@ -83,15 +88,15 @@ impl<'a> ops::Add<Single<'a>> for Multi<'a> {
     }
 }
 
-impl<'a> ops::Add<Multi<'a>> for Single<'a> {
-    type Output = Multi<'a>;
+impl ops::Add<Multi> for Single {
+    type Output = Multi;
 
-    fn add(self, rhs: Multi<'a>) -> Self::Output {
+    fn add(self, rhs: Multi) -> Self::Output {
         rhs + self
     }
 }
 
-impl<'a> ops::Sub<Self> for Multi<'a> {
+impl ops::Sub<Self> for Multi {
     type Output = Self;
 
     fn sub(mut self, mut rhs: Self) -> Self::Output {
@@ -105,10 +110,10 @@ impl<'a> ops::Sub<Self> for Multi<'a> {
     }
 }
 
-impl<'a> ops::Sub<Single<'a>> for Multi<'a> {
+impl ops::Sub<Single> for Multi {
     type Output = Self;
 
-    fn sub(mut self, rhs: Single<'a>) -> Self::Output {
+    fn sub(mut self, rhs: Single) -> Self::Output {
         debug_assert!(
             self.conjugated == rhs.conjugated,
             "When adding two propagators, they must have the same conjugation."
@@ -118,17 +123,17 @@ impl<'a> ops::Sub<Single<'a>> for Multi<'a> {
     }
 }
 
-impl<'a> ops::Sub<Multi<'a>> for Single<'a> {
-    type Output = Multi<'a>;
+impl ops::Sub<Multi> for Single {
+    type Output = Multi;
 
-    fn sub(self, mut rhs: Multi<'a>) -> Self::Output {
+    fn sub(self, mut rhs: Multi) -> Self::Output {
         rhs = -rhs;
         rhs.propagators.push(self);
         rhs
     }
 }
 
-impl<'a> ops::Mul<Self> for Multi<'a> {
+impl ops::Mul<Self> for Multi {
     type Output = Complex<f64>;
 
     #[allow(clippy::suspicious_arithmetic_impl)]
@@ -150,11 +155,11 @@ impl<'a> ops::Mul<Self> for Multi<'a> {
     }
 }
 
-impl<'a> ops::Mul<Single<'a>> for Multi<'a> {
+impl ops::Mul<Single> for Multi {
     type Output = Complex<f64>;
 
     #[allow(clippy::suspicious_arithmetic_impl)]
-    fn mul(self, rhs: Single<'a>) -> Self::Output {
+    fn mul(self, rhs: Single) -> Self::Output {
         debug_assert!(
             self.conjugated != rhs.conjugated,
             "When multiplying two propagators, they must have the opposite conjugation."
@@ -168,16 +173,16 @@ impl<'a> ops::Mul<Single<'a>> for Multi<'a> {
     }
 }
 
-impl<'a> ops::Mul<Multi<'a>> for Single<'a> {
+impl ops::Mul<Multi> for Single {
     type Output = Complex<f64>;
 
     #[allow(clippy::suspicious_arithmetic_impl)]
-    fn mul(self, rhs: Multi<'a>) -> Complex<f64> {
+    fn mul(self, rhs: Multi) -> Complex<f64> {
         rhs * self
     }
 }
 
-impl<'a> ops::Mul<f64> for Multi<'a> {
+impl ops::Mul<f64> for Multi {
     type Output = Self;
 
     fn mul(mut self, rhs: f64) -> Self::Output {
@@ -188,10 +193,10 @@ impl<'a> ops::Mul<f64> for Multi<'a> {
     }
 }
 
-impl<'a> ops::Mul<Multi<'a>> for f64 {
-    type Output = Multi<'a>;
+impl ops::Mul<Multi> for f64 {
+    type Output = Multi;
 
-    fn mul(self, mut rhs: Multi<'a>) -> Self::Output {
+    fn mul(self, mut rhs: Multi) -> Self::Output {
         for p in &mut rhs.propagators {
             *p *= self;
         }
@@ -199,7 +204,7 @@ impl<'a> ops::Mul<Multi<'a>> for f64 {
     }
 }
 
-impl<'a> ops::MulAssign<f64> for Multi<'a> {
+impl ops::MulAssign<f64> for Multi {
     fn mul_assign(&mut self, rhs: f64) {
         for p in &mut self.propagators {
             *p *= rhs;
@@ -207,7 +212,7 @@ impl<'a> ops::MulAssign<f64> for Multi<'a> {
     }
 }
 
-impl<'a> ops::Mul<Complex<f64>> for Multi<'a> {
+impl ops::Mul<Complex<f64>> for Multi {
     type Output = Self;
 
     fn mul(mut self, rhs: Complex<f64>) -> Self::Output {
@@ -218,10 +223,10 @@ impl<'a> ops::Mul<Complex<f64>> for Multi<'a> {
     }
 }
 
-impl<'a> ops::Mul<Multi<'a>> for Complex<f64> {
-    type Output = Multi<'a>;
+impl ops::Mul<Multi> for Complex<f64> {
+    type Output = Multi;
 
-    fn mul(self, mut rhs: Multi<'a>) -> Self::Output {
+    fn mul(self, mut rhs: Multi) -> Self::Output {
         for p in &mut rhs.propagators {
             *p *= self;
         }
@@ -229,7 +234,7 @@ impl<'a> ops::Mul<Multi<'a>> for Complex<f64> {
     }
 }
 
-impl<'a> ops::MulAssign<Complex<f64>> for Multi<'a> {
+impl ops::MulAssign<Complex<f64>> for Multi {
     fn mul_assign(&mut self, rhs: Complex<f64>) {
         for p in &mut self.propagators {
             *p *= rhs;
@@ -237,7 +242,7 @@ impl<'a> ops::MulAssign<Complex<f64>> for Multi<'a> {
     }
 }
 
-impl<'a> ops::Div<f64> for Multi<'a> {
+impl ops::Div<f64> for Multi {
     type Output = Self;
 
     fn div(mut self, rhs: f64) -> Self::Output {
@@ -248,7 +253,7 @@ impl<'a> ops::Div<f64> for Multi<'a> {
     }
 }
 
-impl<'a> ops::DivAssign<f64> for Multi<'a> {
+impl ops::DivAssign<f64> for Multi {
     fn div_assign(&mut self, rhs: f64) {
         for p in &mut self.propagators {
             *p /= rhs;
@@ -256,7 +261,7 @@ impl<'a> ops::DivAssign<f64> for Multi<'a> {
     }
 }
 
-impl<'a> ops::Div<Complex<f64>> for Multi<'a> {
+impl ops::Div<Complex<f64>> for Multi {
     type Output = Self;
 
     fn div(mut self, rhs: Complex<f64>) -> Self::Output {
@@ -267,7 +272,7 @@ impl<'a> ops::Div<Complex<f64>> for Multi<'a> {
     }
 }
 
-impl<'a> ops::DivAssign<Complex<f64>> for Multi<'a> {
+impl ops::DivAssign<Complex<f64>> for Multi {
     fn div_assign(&mut self, rhs: Complex<f64>) {
         for p in &mut self.propagators {
             *p /= rhs;
@@ -275,13 +280,11 @@ impl<'a> ops::DivAssign<Complex<f64>> for Multi<'a> {
     }
 }
 
-impl<'a> ops::Neg for Multi<'a> {
+impl ops::Neg for Multi {
     type Output = Self;
 
     fn neg(mut self) -> Self::Output {
-        for p in &mut self.propagators {
-            *p = -*p;
-        }
+        self.propagators = self.propagators.drain(..).map(ops::Neg::neg).collect();
         self
     }
 }

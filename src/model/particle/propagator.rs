@@ -35,21 +35,25 @@ pub use single::Single;
 /// ```rust
 /// use boltzmann_solver::prelude::*;
 ///
-/// let p1 = Particle::new(0, 125.0, 1e-3);
-/// let p2 = Particle::new(1, 350.0, 1.0);
+/// let p1 = Particle::new(SCALAR,  125.0, 1e-3);
+/// let p2 = Particle::new(DIRAC_SPINOR, 350.0, 1.0);
 ///
-/// let m11 = p1.propagator(125.0) * p1.propagator(125.0).conj();
-/// let m12 = p1.propagator(125.0) * p2.propagator(125.0).conj();
-/// let m22 = p2.propagator(125.0) * p2.propagator(125.0).conj();
+/// let m11 = p1.ris_propagator(125.0) * p1.ris_propagator(125.0).conj();
+/// let m12 = p1.ris_propagator(125.0) * p2.ris_propagator(125.0).conj();
+/// let m22 = p2.ris_propagator(125.0) * p2.ris_propagator(125.0).conj();
 ///
-/// let m = (p1.propagator(125.0) + p2.propagator(125.0)) * (p1.propagator(125.0) + p2.propagator(125.0)).conj();
+/// let m = (p1.ris_propagator(125.0) + p2.ris_propagator(125.0)) * (p1.ris_propagator(125.0) + p2.ris_propagator(125.0)).conj();
 ///
 /// assert!((m11 + m12 + m12.conj() + m22 - m).re.abs() < f64::EPSILON);
 /// assert!((m11 + m12 + m12.conj() + m22 - m).im.abs() < f64::EPSILON);
 /// ```
 pub trait Propagator {
     /// Return the complex conjugate the propagator.
+    #[must_use]
     fn conj(self) -> Self;
+
+    /// Complex conjugates the propagator in place.
+    fn ref_conj(&mut self) -> &mut Self;
 
     /// Evaluate the propagator.
     ///
@@ -68,13 +72,16 @@ pub trait Propagator {
 #[cfg(test)]
 mod tests {
     use crate::{
-        model::{particle::Propagator, Particle},
+        model::{
+            particle::{Propagator, DIRAC_SPINOR, SCALAR},
+            Empty as EmptyModel, ParticleData,
+        },
         utilities::test::complex_approx_eq,
     };
     use num::Complex;
     use std::error;
 
-    // TODO: These tests should be restructed to be more coherant and more
+    // TODO: These tests should be restructured to be more coherent and more
     // readable.
     //
     // Also have to test the following:
@@ -106,25 +113,26 @@ mod tests {
 
     #[test]
     fn eval() -> Result<(), Box<dyn error::Error>> {
-        let p = Particle::new(0, 10.0, 1e-3);
+        let m = EmptyModel::default();
+        let p = ParticleData::new(SCALAR, 10.0, 1e-3);
 
         for &numerator in &[Complex::new(-3.45, 1.23), Complex::new(1.23, 3.45)] {
             complex_approx_eq(
-                numerator * p.propagator(-100.0).eval(),
+                numerator * p.ris_propagator(&m, -100.0).eval(),
                 numerator * Complex::new(-0.005, 0.0),
                 8.0,
                 1e-200,
             )?;
 
             complex_approx_eq(
-                numerator * p.propagator(0.0).eval(),
+                numerator * p.ris_propagator(&m, 0.0).eval(),
                 numerator * Complex::new(-0.01, 0.0),
                 8.0,
                 1e-200,
             )?;
 
             complex_approx_eq(
-                numerator * p.propagator(100.0).eval(),
+                numerator * p.ris_propagator(&m, 100.0).eval(),
                 numerator * Complex::new(0.0, -100.0),
                 8.0,
                 1e-200,
@@ -136,68 +144,75 @@ mod tests {
 
     #[test]
     fn add_sub() -> Result<(), Box<dyn error::Error>> {
-        let p1 = Particle::new(0, 10.0, 1e-3);
-        let p2 = Particle::new(1, 500.0, 2.0);
-        let p3 = Particle::new(1, 1000.0, 3.0);
+        let m = EmptyModel::default();
+        let p1 = ParticleData::new(SCALAR, 10.0, 1e-3);
+        let p2 = ParticleData::new(DIRAC_SPINOR, 500.0, 2.0);
+        let p3 = ParticleData::new(DIRAC_SPINOR, 1000.0, 3.0);
 
         // Adding two propagators
         for &s in &[-p1.mass2, -p2.mass2, -50.0, 0.0, 50.0, p1.mass2, p2.mass2] {
             complex_approx_eq(
-                (p1.propagator(s) + p2.propagator(s)).eval(),
-                p1.propagator(s).eval() + p2.propagator(s).eval(),
+                (p1.ris_propagator(&m, s) + p2.ris_propagator(&m, s)).eval(),
+                p1.ris_propagator(&m, s).eval() + p2.ris_propagator(&m, s).eval(),
                 8.0,
                 1e-200,
             )?;
             complex_approx_eq(
-                (p1.propagator(s) - p2.propagator(s)).eval(),
-                p1.propagator(s).eval() - p2.propagator(s).eval(),
+                (p1.ris_propagator(&m, s) - p2.ris_propagator(&m, s)).eval(),
+                p1.ris_propagator(&m, s).eval() - p2.ris_propagator(&m, s).eval(),
                 8.0,
                 1e-200,
             )?;
             complex_approx_eq(
-                (p1.propagator(s) + 12.34 * p2.propagator(s)).eval(),
-                p1.propagator(s).eval() + 12.34 * p2.propagator(s).eval(),
+                (p1.ris_propagator(&m, s) + 12.34 * p2.ris_propagator(&m, s)).eval(),
+                p1.ris_propagator(&m, s).eval() + 12.34 * p2.ris_propagator(&m, s).eval(),
                 8.0,
                 1e-200,
             )?;
             complex_approx_eq(
-                (p1.propagator(s) - 12.34 * p2.propagator(s)).eval(),
-                p1.propagator(s).eval() - 12.34 * p2.propagator(s).eval(),
+                (p1.ris_propagator(&m, s) - 12.34 * p2.ris_propagator(&m, s)).eval(),
+                p1.ris_propagator(&m, s).eval() - 12.34 * p2.ris_propagator(&m, s).eval(),
                 8.0,
                 1e-200,
             )?;
 
             complex_approx_eq(
-                (p1.propagator(s) + p2.propagator(s) + p3.propagator(s)).eval(),
-                p1.propagator(s).eval() + p2.propagator(s).eval() + p3.propagator(s).eval(),
+                (p1.ris_propagator(&m, s) + p2.ris_propagator(&m, s) + p3.ris_propagator(&m, s))
+                    .eval(),
+                p1.ris_propagator(&m, s).eval()
+                    + p2.ris_propagator(&m, s).eval()
+                    + p3.ris_propagator(&m, s).eval(),
                 8.0,
                 1e-200,
             )?;
             complex_approx_eq(
-                (p1.propagator(s) - p2.propagator(s) - p3.propagator(s)).eval(),
-                p1.propagator(s).eval() - p2.propagator(s).eval() - p3.propagator(s).eval(),
+                (p1.ris_propagator(&m, s) - p2.ris_propagator(&m, s) - p3.ris_propagator(&m, s))
+                    .eval(),
+                p1.ris_propagator(&m, s).eval()
+                    - p2.ris_propagator(&m, s).eval()
+                    - p3.ris_propagator(&m, s).eval(),
                 8.0,
                 1e-200,
             )?;
             complex_approx_eq(
-                (p1.propagator(s)
-                    + 12.34 * p2.propagator(s)
-                    + Complex::new(2.0, 3.0) * p3.propagator(s))
+                (p1.ris_propagator(&m, s)
+                    + 12.34 * p2.ris_propagator(&m, s)
+                    + Complex::new(2.0, 3.0) * p3.ris_propagator(&m, s))
                 .eval(),
-                p1.propagator(s).eval()
-                    + 12.34 * p2.propagator(s).eval()
-                    + Complex::new(2.0, 3.0) * p3.propagator(s).eval(),
+                p1.ris_propagator(&m, s).eval()
+                    + 12.34 * p2.ris_propagator(&m, s).eval()
+                    + Complex::new(2.0, 3.0) * p3.ris_propagator(&m, s).eval(),
                 8.0,
                 1e-200,
             )?;
             complex_approx_eq(
-                (p1.propagator(s)
-                    - 12.34 * p2.propagator(s)
-                    - Complex::new(2.0, 3.0) * p3.propagator(s))
+                (p1.ris_propagator(&m, s)
+                    - 12.34 * p2.ris_propagator(&m, s)
+                    - Complex::new(2.0, 3.0) * p3.ris_propagator(&m, s))
                 .eval(),
-                p1.propagator(s).eval()
-                    - 12.34 * p2.propagator(s).eval()
-                    - Complex::new(2.0, 3.0) * p3.propagator(s).eval(),
+                p1.ris_propagator(&m, s).eval()
+                    - 12.34 * p2.ris_propagator(&m, s).eval()
+                    - Complex::new(2.0, 3.0) * p3.ris_propagator(&m, s).eval(),
                 8.0,
                 1e-200,
             )?;
@@ -208,25 +223,26 @@ mod tests {
 
     #[test]
     fn multiplication() -> Result<(), Box<dyn error::Error>> {
-        let p1 = Particle::new(0, 10.0, 1e-3);
-        let p2 = Particle::new(1, 500.0, 2.0);
+        let m = EmptyModel::default();
+        let p1 = ParticleData::new(SCALAR, 10.0, 1e-3);
+        let p2 = ParticleData::new(DIRAC_SPINOR, 500.0, 2.0);
 
         for &s in &[-p1.mass2, -p2.mass2, -50.0, 0.0, 50.0, p1.mass2, p2.mass2] {
             // Check that `$P_1^* P_2 = (P_2^* P_1)^*$`
             complex_approx_eq(
-                p1.propagator(s) * p2.propagator(s).conj(),
-                (p1.propagator(s).conj() * p2.propagator(s)).conj(),
+                p1.ris_propagator(&m, s) * p2.ris_propagator(&m, s).conj(),
+                (p1.ris_propagator(&m, s).conj() * p2.ris_propagator(&m, s)).conj(),
                 8.0,
                 1e-200,
             )?;
 
-            let m11 = p1.propagator(s) * p1.propagator(s).conj();
-            let m12 = p1.propagator(s) * p2.propagator(s).conj();
-            let m21 = p2.propagator(s) * p1.propagator(s).conj();
-            let m22 = p2.propagator(s) * p2.propagator(s).conj();
+            let m11 = p1.ris_propagator(&m, s) * p1.ris_propagator(&m, s).conj();
+            let m12 = p1.ris_propagator(&m, s) * p2.ris_propagator(&m, s).conj();
+            let m21 = p2.ris_propagator(&m, s) * p1.ris_propagator(&m, s).conj();
+            let m22 = p2.ris_propagator(&m, s) * p2.ris_propagator(&m, s).conj();
 
-            let m = (p1.propagator(s) + p2.propagator(s))
-                * (p1.propagator(s) + p2.propagator(s)).conj();
+            let m = (p1.ris_propagator(&m, s) + p2.ris_propagator(&m, s))
+                * (p1.ris_propagator(&m, s) + p2.ris_propagator(&m, s)).conj();
 
             complex_approx_eq(m11 + m12 + m21 + m22, m, 8.0, 1e-200)?;
         }
@@ -236,13 +252,14 @@ mod tests {
 
     #[test]
     fn norm_sqr() -> Result<(), Box<dyn error::Error>> {
-        let p1 = Particle::new(0, 10.0, 1e-3);
-        let p2 = Particle::new(1, 500.0, 2.0);
+        let m = EmptyModel::default();
+        let p1 = ParticleData::new(SCALAR, 10.0, 1e-3);
+        let p2 = ParticleData::new(DIRAC_SPINOR, 500.0, 2.0);
 
         for &s in &[-p1.mass2, -p2.mass2, -50.0, 0.0, 50.0, p1.mass2, p2.mass2] {
             complex_approx_eq(
-                p1.propagator(s).conj() * p1.propagator(s),
-                Complex::new(p1.propagator(s).norm_sqr(), 0.0),
+                p1.ris_propagator(&m, s).conj() * p1.ris_propagator(&m, s),
+                Complex::new(p1.ris_propagator(&m, s).norm_sqr(), 0.0),
                 6.0,
                 1e-200,
             )?;

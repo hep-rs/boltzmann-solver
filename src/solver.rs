@@ -13,7 +13,7 @@ pub use context::Context;
 use crate::{
     model::{
         interaction::{self, fix_equilibrium, FastInteractionResult, Interaction},
-        Model, ModelInteractions, Particle,
+        Model, ModelInteractions, ParticleData,
     },
     solver::options::{ErrorTolerance, StepPrecision},
     statistic::{Statistic, Statistics},
@@ -23,6 +23,8 @@ use ndarray::prelude::*;
 use rayon::prelude::*;
 #[cfg(feature = "serde")]
 use serde::Serialize;
+#[cfg(feature = "debug")]
+use std::collections::HashMap;
 use std::{collections::HashSet, convert::TryFrom, error, fmt, io::Write, iter, ops, sync::RwLock};
 
 /// The minimum multiplicative step size between two consecutive calls of the logger.
@@ -77,19 +79,38 @@ impl Error {
 
 #[cfg(feature = "debug")]
 #[derive(Serialize)]
-struct Debug<'a> {
+struct InteractionDebug {
+    incoming: Vec<isize>,
+    outgoing: Vec<isize>,
+    incoming_names: Vec<String>,
+    outgoing_names: Vec<String>,
+    gamma: Option<f64>,
+    delta_gamma: Option<f64>,
+    symmetric_prefactor: f64,
+    asymmetric_prefactor: f64,
+    dn: Vec<f64>,
+    dna: Vec<f64>,
+    fast: bool,
+}
+
+#[cfg(feature = "debug")]
+#[derive(Serialize)]
+struct Debug {
     step: usize,
-    beta: f64,
     h: f64,
-    normalizations: &'a Array1<f64>,
-    eq: &'a Array2<f64>,
-    eqn: &'a Array2<f64>,
-    workspace: &'a Workspace,
-    interaction_indices: Vec<(Vec<isize>, Vec<isize>)>,
-    interaction_names: Vec<String>,
-    gammas: &'a Array2<f64>,
-    delta_gammas: &'a Array2<f64>,
-    fast: Vec<bool>,
+    beta: HashMap<usize, f64>,
+    n: HashMap<usize, Vec<f64>>,
+    na: HashMap<usize, Vec<f64>>,
+    eq: HashMap<usize, Vec<f64>>,
+    eqn: HashMap<usize, Vec<f64>>,
+    k: HashMap<usize, Vec<f64>>,
+    ka: HashMap<usize, Vec<f64>>,
+    dn: Vec<f64>,
+    dn_error: Vec<f64>,
+    dna: Vec<f64>,
+    dna_error: Vec<f64>,
+    interactions: HashMap<usize, Vec<InteractionDebug>>,
+    normalizations: HashMap<usize, f64>,
 }
 
 /// Workspace of functions to reuse during the integration
@@ -219,7 +240,7 @@ type LoggerFn<M> = Box<dyn Fn(&Context<M>, &Array1<f64>, &Array1<f64>)>;
 #[allow(clippy::struct_excessive_bools)]
 pub struct Solver<M> {
     model: M,
-    particles_next: Vec<Particle>,
+    particles_next: Vec<ParticleData>,
     initial_densities: Array1<f64>,
     initial_asymmetries: Array1<f64>,
     beta_range: (f64, f64),
@@ -312,7 +333,7 @@ where
 
         *ws += result;
 
-        Some(())
+        Ok(())
     }
 
     /// Adjust `dn` and/or `dna` for fast interaction (if applicable).
@@ -412,6 +433,18 @@ where
                 intermediate_result.dn_error,
                 intermediate_result.dna_error
             );
+
+            if intermediate_result
+                .dn_error
+                .iter()
+                .chain(&intermediate_result.dna_error)
+                .any(|x| x.is_nan())
+            {
+                log::warn!("Fast interaction produced NaN");
+                *ws += result;
+                return None;
+            }
+
             n += &intermediate_result.dn;
             na += &intermediate_result.dna;
             result += intermediate_result;
@@ -444,26 +477,46 @@ where
         const MIN_DELTA: f64 = 0.1;
         const MAX_DELTA: f64 = 2.0;
 
-        let ratio = ws
-            .dn_error
-            .iter()
-            .chain(&ws.dna_error)
-            .map(|err| err.abs())
-            .zip(n.iter().chain(na))
-            .fold(f64::INFINITY, |min, (err, &n)| {
-                let max_tolerance = self.error_tolerance.max_tolerance(n);
+        let ratio_symmetric =
+            ws.dn_error
+                .iter()
+                .map(|err| err.abs())
+                .zip(n)
+                .fold(f64::INFINITY, |min, (err, &n)| {
+                    let max_tolerance = self.error_tolerance.max_tolerance(n);
+                    min.min(if err == 0.0 {
+                        f64::MAX
+                    } else if err.is_nan() {
+                        0.0
+                    } else {
+                        max_tolerance / err
+                    })
+                });
+
+        let ratio_asymmetric = ws.dna_error.iter().map(|err| err.abs()).zip(na).fold(
+            f64::INFINITY,
+            |min, (err, &na)| {
+                let max_tolerance = self.error_tolerance.max_asymmetric_tolerance(na);
                 min.min(if err == 0.0 {
                     f64::MAX
+                } else if err.is_nan() {
+                    0.0
                 } else {
                     max_tolerance / err
                 })
-            });
+            },
+        );
+
+        let ratio = f64::min(ratio_symmetric, ratio_asymmetric);
 
         (ratio.is_finite() && ratio > 1.0, ratio, {
             let delta = 0.8 * ratio.powf(1.0 / f64::from(tableau::RK_ORDER + 1));
             if delta.is_nan() {
                 MIN_DELTA
             } else {
+                if MIN_DELTA > MAX_DELTA {
+                    log::error!("Clamp Error: {} ≮ {}", MIN_DELTA, MAX_DELTA);
+                }
                 delta.clamp(MIN_DELTA, MAX_DELTA)
             }
         })
@@ -550,20 +603,13 @@ where
 
         // Debug information to show the full step information.
         #[cfg(feature = "debug")]
-        let (debug_dir, mut gammas, mut delta_gammas, mut normalizations, mut eqn) = {
+        let debug_dir = {
             let mut temp_dir = std::env::temp_dir();
             temp_dir.push("boltzmann-solver");
             temp_dir.push("debug");
             std::fs::remove_dir_all(&temp_dir).unwrap_or_default();
             std::fs::create_dir_all(&temp_dir).unwrap_or_default();
-
-            (
-                temp_dir,
-                Array2::zeros((RK_S, self.model.interactions().len())),
-                Array2::zeros((RK_S, self.model.interactions().len())),
-                Array1::zeros(RK_S),
-                Array2::zeros((RK_S, self.model.len_particles())),
-            )
+            temp_dir
         };
 
         // Initialize all the variables that will be used in the integration
@@ -617,6 +663,25 @@ where
             self.model.set_beta(beta + h);
             self.particles_next = self.model.particles().to_vec();
 
+            #[cfg(feature = "debug")]
+            let mut debug = Debug {
+                step,
+                h,
+                beta: HashMap::new(),
+                n: HashMap::new(),
+                na: HashMap::new(),
+                eq: HashMap::new(),
+                eqn: HashMap::new(),
+                k: HashMap::new(),
+                ka: HashMap::new(),
+                dn: Vec::new(),
+                dn_error: Vec::new(),
+                dna: Vec::new(),
+                dna_error: Vec::new(),
+                interactions: HashMap::new(),
+                normalizations: HashMap::new(),
+            };
+
             // Initialize the fast interactions if they are being used
             let mut fast_interactions = if self.use_fast_interactions {
                 Some(RwLock::new(HashSet::new()))
@@ -658,47 +723,67 @@ where
                 // Collect the equilibrium number densities for this substep.
                 eq[i].assign(&context_i.eq);
 
-                #[cfg(feature = "debug")]
-                {
-                    #[cfg(feature = "parallel")]
-                    {
-                        let results: Vec<_> = self
-                            .model
-                            .interactions()
-                            .par_iter()
-                            .enumerate()
-                            .map(|(j, interaction)| {
-                                (
-                                    j,
-                                    interaction.gamma(&context_i, true).unwrap_or_default(),
-                                    interaction
-                                        .delta_gamma(&context_i, true)
-                                        .unwrap_or_default(),
-                                )
-                            })
-                            .collect();
-
-                        for (j, gamma, delta_gamma) in results {
-                            gammas[[i, j]] = gamma;
-                            delta_gammas[[i, j]] = delta_gamma;
-                        }
-                    }
-                    #[cfg(not(feature = "parallel"))]
-                    for (j, interaction) in self.model.interactions().iter().enumerate() {
-                        gammas[[i, j]] = interaction.gamma(&context_i, true).unwrap_or_default();
-                        delta_gammas[[i, j]] = interaction
-                            .delta_gamma(&context_i, true)
-                            .unwrap_or_default();
-                    }
-                    normalizations[i] = context_i.normalization;
-                    eqn.slice_mut(ndarray::s![i, ..]).assign(&context_i.eqn);
-                }
-
                 let ki = &mut workspace.k[i];
                 let kai = &mut workspace.ka[i];
 
                 // Compute k[i] and ka[i] from each interaction
                 self.compute_ki(ki, kai, &context_i);
+
+                #[cfg(feature = "debug")]
+                {
+                    debug.beta.insert(i, beta_i);
+                    debug.n.insert(i, context_i.n.to_vec());
+                    debug.na.insert(i, context_i.na.to_vec());
+                    debug.eq.insert(i, context_i.eq.to_vec());
+                    debug.eqn.insert(i, context_i.eqn.to_vec());
+                    debug.k.insert(i, ki.to_vec());
+                    debug.ka.insert(i, kai.to_vec());
+                    debug.normalizations.insert(i, context_i.normalization);
+
+                    #[cfg(feature = "parallel")]
+                    let iter = self.model.interactions().par_iter();
+                    #[cfg(not(feature = "parallel"))]
+                    let iter = self.model.interactions().iter();
+
+                    debug.interactions.insert(
+                        i,
+                        iter.map(|interaction| {
+                            let mut dn = Array1::zeros(workspace.n.dim());
+                            let mut dna = Array1::zeros(workspace.na.dim());
+                            interaction.apply_change(&mut dn, &mut dna, &context_i);
+
+                            InteractionDebug {
+                                incoming: interaction.particles().incoming_signed.clone(),
+                                outgoing: interaction.particles().outgoing_signed.clone(),
+                                incoming_names: interaction
+                                    .particles()
+                                    .incoming_signed
+                                    .iter()
+                                    .map(|&i| self.model.particle_name(i).unwrap())
+                                    .collect(),
+                                outgoing_names: interaction
+                                    .particles()
+                                    .outgoing_signed
+                                    .iter()
+                                    .map(|&i| self.model.particle_name(i).unwrap())
+                                    .collect(),
+                                gamma: interaction.gamma(&context_i, false),
+                                delta_gamma: interaction.delta_gamma(&context_i, false),
+                                symmetric_prefactor: interaction.symmetric_prefactor(&context_i),
+                                asymmetric_prefactor: interaction.asymmetric_prefactor(&context_i),
+                                dn: dn.to_vec(),
+                                dna: dna.to_vec(),
+                                fast: context_i
+                                    .fast_interactions
+                                    .as_ref()
+                                    .and_then(|lock| lock.read().ok())
+                                    .map_or(false, |s| s.contains(interaction.particles())),
+                            }
+                        })
+                        .collect(),
+                    );
+                }
+
                 fast_interactions = context_i.into_fast_interactions();
                 workspace.compute_dn(i);
             }
@@ -714,63 +799,36 @@ where
                 fast_interactions,
             );
 
-            Self::fix_fast_interactions(&mut context, &mut workspace, &eq);
-            fix_equilibrium(&context, &mut workspace.dn, &mut workspace.dna);
+            // If the error is already too large and the step will be discarded,
+            // there's no need to evaluate the fast interactions.  Otherwise, we
+            // compute the fast interactions and recompute the error
+            let (mut within_tolerance, mut error_ratio, mut delta) =
+                self.delta(&workspace, &context.n, &context.na);
+
+            if within_tolerance {
+                Self::fix_fast_interactions(&mut context, &mut workspace, &eq);
+                fix_equilibrium(&context, &mut workspace.dn, &mut workspace.dna);
+
+                let tmp = self.delta(&workspace, &context.n, &context.na);
+
+                within_tolerance = tmp.0;
+                error_ratio = tmp.1;
+                delta = tmp.2;
+            }
 
             #[cfg(feature = "debug")]
-            serde_json::to_writer(
-                std::fs::File::create(debug_dir.join(format!("{}.json", step))).unwrap(),
-                &Debug {
-                    step,
-                    beta,
-                    h,
-                    workspace: &workspace,
-                    eq: &Array2::from_shape_fn((RK_S, self.model.len_particles()), |(i, j)| {
-                        eq[i][j]
-                    }),
-                    eqn: &eqn,
-                    normalizations: &normalizations,
-                    interaction_indices: self
-                        .model
-                        .interactions()
-                        .iter()
-                        .map(|i| {
-                            (
-                                i.particles().incoming_signed.clone(),
-                                i.particles().outgoing_signed.clone(),
-                            )
-                        })
-                        .collect(),
-                    interaction_names: self
-                        .model
-                        .interactions()
-                        .iter()
-                        .map(|i| {
-                            i.display(&self.model)
-                                .unwrap_or_else(|_| i.particles().short_display())
-                        })
-                        .collect(),
-                    gammas: &gammas,
-                    delta_gammas: &delta_gammas,
-                    fast: self
-                        .model
-                        .interactions()
-                        .iter()
-                        .map(|i| i.particles())
-                        .map(|p| {
-                            context
-                                .fast_interactions
-                                .as_ref()
-                                .and_then(|f| f.read().ok())
-                                .map_or(false, |f| f.contains(p))
-                        })
-                        .collect(),
-                },
-            )
-            .unwrap();
+            {
+                debug.dn = workspace.dn.to_vec();
+                debug.dn_error = workspace.dn_error.to_vec();
+                debug.dna = workspace.dna.to_vec();
+                debug.dna_error = workspace.dna_error.to_vec();
 
-            let (within_tolerance, error_ratio, delta) =
-                self.delta(&workspace, &context.n, &context.na);
+                serde_json::to_writer(
+                    std::fs::File::create(debug_dir.join(format!("{}.json", step))).unwrap(),
+                    &debug,
+                )
+                .unwrap();
+            }
 
             // If the error is within the tolerance, we'll be advancing the
             // iteration step
@@ -782,15 +840,15 @@ where
 
                 workspace.advance();
                 beta += h;
-            } else if log::log_enabled!(log::Level::Debug) {
-                log::debug!(
-                    "[{}|{:>10.4e}] Error is not within tolerance (error ratio: {:e}).",
-                    step,
-                    beta,
-                    error_ratio
-                );
-                steps_discarded += 1;
             } else {
+                if log::log_enabled!(log::Level::Debug) {
+                    log::debug!(
+                        "[{}|{:>10.4e}] Error is not within tolerance (error ratio: {:e}).",
+                        step,
+                        beta,
+                        error_ratio
+                    );
+                }
                 steps_discarded += 1;
             }
 
@@ -862,7 +920,7 @@ where
         let na = Array1::zeros(n.dim());
 
         for (i, &beta) in Array1::geomspace(self.beta_range.0, self.beta_range.1, size)
-            .unwrap_or(ndarray::array![])
+            .unwrap_or_else(|| ndarray::array![])
             .iter()
             .enumerate()
         {
@@ -1028,7 +1086,7 @@ where
 /// The `normalized` flag
 fn equilibrium_number_densities<'a, I>(particles: I, beta: f64) -> Array1<f64>
 where
-    I: IntoIterator<Item = &'a Particle>,
+    I: IntoIterator<Item = &'a ParticleData>,
 {
     particles
         .into_iter()

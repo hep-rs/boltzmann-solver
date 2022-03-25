@@ -20,7 +20,7 @@ use ndarray::prelude::*;
 
 /// Threshold value of `$\gamma / H N$` which is used to determine when an
 /// interaction is fast.
-const FAST_THRESHOLD: f64 = 1e0;
+const FAST_THRESHOLD: f64 = 1e2;
 
 /// Threshold value of `$m \beta$` above which particle's equilibrium number
 /// density is deemed to be too small which might lead to inaccurate results if
@@ -312,28 +312,28 @@ pub trait Interaction<M: Model> {
 
         rate *= context.step_size;
 
-        if self.particles().adjust_overshoot(
-            &mut rate.symmetric,
-            &mut rate.asymmetric,
-            &context.n,
-            &context.na,
-            &context.eq,
-            &context.eqn,
-            context.in_equilibrium,
-            context.no_asymmetry,
-        ) {
-            // log::trace!(
-            //     "[{}.{:02}|{:>10.4e}] Adjusted Rate {}: {:<12.5e}|{:<12.5e}",
-            //     context.step,
-            //     context.substep,
-            //     context.beta,
-            //     self.particles()
-            //         .display(context.model)
-            //         .unwrap_or_else(|_| self.particles().short_display()),
-            //     rate.gamma / context.step_size,
-            //     rate.symmetric / context.step_size
-            // );
-        }
+        // if self.particles().adjust_overshoot(
+        //     &mut rate.symmetric,
+        //     &mut rate.asymmetric,
+        //     &context.n,
+        //     &context.na,
+        //     &context.eq,
+        //     &context.eqn,
+        //     context.in_equilibrium,
+        //     context.no_asymmetry,
+        // ) {
+        //     // log::trace!(
+        //     //     "[{}.{:02}|{:>10.4e}] Adjusted Rate {}: {:<12.5e}|{:<12.5e}",
+        //     //     context.step,
+        //     //     context.substep,
+        //     //     context.beta,
+        //     //     self.particles()
+        //     //         .display(context.model)
+        //     //         .unwrap_or_else(|_| self.particles().short_display()),
+        //     //     rate.gamma / context.step_size,
+        //     //     rate.symmetric / context.step_size
+        //     // );
+        // }
 
         Some(rate)
     }

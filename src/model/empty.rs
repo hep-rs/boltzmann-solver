@@ -1,5 +1,5 @@
-use crate::model::Interaction;
-use crate::model::{Model, ModelInteractions, Particle};
+use crate::model::{particle::SCALAR, Model, ModelInteractions, ParticleData};
+use crate::prelude::Interaction;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::{f64, fmt};
@@ -17,7 +17,7 @@ pub struct Empty {
     beta: f64,
 
     /// Particles
-    particles: Vec<Particle>,
+    particles: Vec<ParticleData>,
 
     /// Interactions between the particles.
     #[cfg(feature = "parallel")]
@@ -52,7 +52,7 @@ impl Empty {
     ///
     /// Note that the particle comes with a default `none` particle at index 0,
     /// thus the index of particles added with this start from 1.
-    pub fn push_particle(&mut self, p: Particle) {
+    pub fn push_particle(&mut self, p: ParticleData) {
         self.particles.push(p);
     }
 
@@ -62,7 +62,7 @@ impl Empty {
     /// thus the index of particles added with this start from 1.
     pub fn extend_particles<I>(&mut self, iter: I)
     where
-        I: IntoIterator<Item = Particle>,
+        I: IntoIterator<Item = ParticleData>,
     {
         self.particles.extend(iter);
     }
@@ -122,7 +122,7 @@ impl Model for Empty {
     fn zero() -> Self {
         Self {
             beta: f64::INFINITY,
-            particles: vec![Particle::new(0, 0.0, 0.0).name("none")],
+            particles: vec![ParticleData::new(SCALAR, 0.0, 0.0).name("none")],
             interactions: Vec::new(),
         }
     }
@@ -140,11 +140,11 @@ impl Model for Empty {
         1.0
     }
 
-    fn particles(&self) -> &[Particle] {
+    fn particles(&self) -> &[ParticleData] {
         &self.particles
     }
 
-    fn particles_mut(&mut self) -> &mut [Particle] {
+    fn particles_mut(&mut self) -> &mut [ParticleData] {
         &mut self.particles
     }
 
@@ -163,6 +163,12 @@ impl Model for Empty {
             }
         }
         Err((name, i))
+    }
+
+    /// As the model is empty (at least initially), this method will simply
+    /// return 0 by default.
+    fn self_energy_absorptive(&self, _p: &ParticleData, _momentum: f64) -> f64 {
+        0.0
     }
 }
 

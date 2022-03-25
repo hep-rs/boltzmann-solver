@@ -3,7 +3,9 @@
 
 use super::{solve, BETA_END};
 use crate::{
-    model::{interaction, interaction::RateDensity, Empty, Interaction, Particle},
+    model::{
+        interaction, interaction::RateDensity, particle::SCALAR, Empty, Interaction, ParticleData,
+    },
     solver::{Context, SolverBuilder},
     utilities::test::approx_eq,
 };
@@ -107,8 +109,8 @@ fn sin_cos() -> Result<(), Box<dyn error::Error>> {
     // crate::utilities::test::setup_logging(4);
 
     let mut model = Empty::default();
-    model.push_particle(Particle::new(0, 1.0, 1.0).name("1"));
-    model.push_particle(Particle::new(0, 1.0, 1.0).name("2"));
+    model.push_particle(ParticleData::new(SCALAR, 1.0, 1.0).name("1"));
+    model.push_particle(ParticleData::new(SCALAR, 1.0, 1.0).name("2"));
     model.push_interaction(SinCos1::new());
     model.push_interaction(SinCos2::new());
 
@@ -216,8 +218,8 @@ fn brusselator_stable() -> Result<(), Box<dyn error::Error>> {
     // crate::utilities::test::setup_logging(4);
 
     let mut model = Empty::default();
-    model.push_particle(Particle::new(0, 1.0, 1.0).name("1"));
-    model.push_particle(Particle::new(0, 1.0, 1.0).name("2"));
+    model.push_particle(ParticleData::new(SCALAR, 1.0, 1.0).name("1"));
+    model.push_particle(ParticleData::new(SCALAR, 1.0, 1.0).name("2"));
     model.push_interaction(BrusselatorStable1::new());
     model.push_interaction(BrusselatorStable2::new());
 
@@ -324,8 +326,8 @@ fn brusselator_unstable() -> Result<(), Box<dyn error::Error>> {
     // crate::utilities::test::setup_logging(4);
 
     let mut model = Empty::default();
-    model.push_particle(Particle::new(0, 1.0, 1.0).name("1"));
-    model.push_particle(Particle::new(0, 1.0, 1.0).name("2"));
+    model.push_particle(ParticleData::new(SCALAR, 1.0, 1.0).name("1"));
+    model.push_particle(ParticleData::new(SCALAR, 1.0, 1.0).name("2"));
     model.push_interaction(BrusselatorUnstable1::new());
     model.push_interaction(BrusselatorUnstable2::new());
 

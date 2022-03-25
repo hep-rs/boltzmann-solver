@@ -2,7 +2,7 @@
 
 use super::{solve, BETA_START};
 use crate::{
-    model::{interaction, Empty, Particle},
+    model::{interaction, particle::SCALAR, Empty, ParticleData},
     prelude::*,
     solver::SolverBuilder,
     utilities::test::approx_eq,
@@ -18,7 +18,7 @@ fn massless() -> Result<(), Box<dyn error::Error>> {
         [0.0, 0.0, 0.0, 0.0]
             .iter()
             .enumerate()
-            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+            .map(|(i, &m)| ParticleData::new(SCALAR, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(interaction::FourParticle::new(
         |_m, _s, _t, _u| 1e-10,
@@ -64,7 +64,7 @@ fn massless_eq_1122() -> Result<(), Box<dyn error::Error>> {
         [0.0, 0.0, 0.0, 0.0]
             .iter()
             .enumerate()
-            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+            .map(|(i, &m)| ParticleData::new(SCALAR, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(interaction::FourParticle::new(
         |_m, _s, _t, _u| 1e-10,
@@ -106,7 +106,7 @@ fn massless_eq_1234() -> Result<(), Box<dyn error::Error>> {
         [0.0, 0.0, 0.0, 0.0]
             .iter()
             .enumerate()
-            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+            .map(|(i, &m)| ParticleData::new(SCALAR, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(interaction::FourParticle::new(
         |_m, _s, _t, _u| 1e-10,
@@ -148,7 +148,7 @@ fn m000() -> Result<(), Box<dyn error::Error>> {
         [1e5, 0.0, 0.0, 0.0]
             .iter()
             .enumerate()
-            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+            .map(|(i, &m)| ParticleData::new(SCALAR, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(interaction::FourParticle::new(
         |_m, _s, _t, _u| 1e-10,
@@ -189,7 +189,7 @@ fn m0m0() -> Result<(), Box<dyn error::Error>> {
         [1e5, 0.0, 1e4, 0.0]
             .iter()
             .enumerate()
-            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+            .map(|(i, &m)| ParticleData::new(SCALAR, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(interaction::FourParticle::new(
         |_m, _s, _t, _u| 1e-10,
@@ -230,7 +230,7 @@ fn mm00() -> Result<(), Box<dyn error::Error>> {
         [1e5, 1e5, 0.0, 0.0]
             .iter()
             .enumerate()
-            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+            .map(|(i, &m)| ParticleData::new(SCALAR, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(interaction::FourParticle::new(
         |_m, _s, _t, _u| 1e-10,
@@ -271,7 +271,7 @@ fn mm00_eq() -> Result<(), Box<dyn error::Error>> {
         [1e5, 1e5, 0.0, 0.0]
             .iter()
             .enumerate()
-            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+            .map(|(i, &m)| ParticleData::new(SCALAR, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(interaction::FourParticle::new(
         |_m, _s, _t, _u| 1e-10,
@@ -318,7 +318,7 @@ fn mmmm() -> Result<(), Box<dyn error::Error>> {
         [1e5, 1e5, 1e5, 1e5]
             .iter()
             .enumerate()
-            .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+            .map(|(i, &m)| ParticleData::new(SCALAR, m, m / 100.0).name(format!("{}", i + 1))),
     );
     model.push_interaction(interaction::FourParticle::new(
         |_m, _s, _t, _u| 1e-10,

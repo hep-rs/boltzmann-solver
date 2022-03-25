@@ -88,6 +88,7 @@ where
     ///
     /// This asymmetry is subsequently used to compute the asymmetric
     /// interaction rate given by [`Interaction::delta_gamma`].
+    #[must_use]
     pub fn asymmetry<F>(mut self, asymmetry: F) -> Self
     where
         F: Fn(&M) -> f64 + Sync + 'static,
@@ -403,7 +404,7 @@ where
 #[cfg(test)]
 mod tests {
     use crate::{
-        model::{interaction, Empty},
+        model::{interaction, particle::SCALAR, Empty},
         prelude::*,
         statistic::Statistic,
     };
@@ -457,7 +458,7 @@ mod tests {
             [1e10, 1e5, 1e2]
                 .iter()
                 .enumerate()
-                .map(|(i, &m)| Particle::new(0, m, m / 100.0).name(format!("{}", i + 1))),
+                .map(|(i, &m)| ParticleData::new(SCALAR, m, m / 100.0).name(format!("{}", i + 1))),
         );
         let interaction = interaction::ThreeParticle::new(|_m| 1.0, 1, 2, 3);
         let mut csv = create_csv("unit_amplitude.csv")?;

@@ -1,5 +1,5 @@
 use crate::{
-    model::{interaction::Interaction, ModelInteractions, Particle},
+    model::{interaction::Interaction, ModelInteractions, ParticleData},
     solver::{
         options::{ErrorTolerance, StepPrecision},
         Context, LoggerFn, Solver,
@@ -390,7 +390,7 @@ impl<M> SolverBuilder<M> {
     /// right number of initial conditions and they are all finite.
     fn generate_initial_densities<'a, I>(
         beta: f64,
-        particles: &[Particle],
+        particles: &[ParticleData],
         initial_densities: I,
     ) -> Result<Array1<f64>, Error>
     where
@@ -421,7 +421,7 @@ impl<M> SolverBuilder<M> {
     /// Check the validity of the initial asymmetries, making sure we have the
     /// right number of initial conditions and they are all finite.
     fn generate_initial_asymmetries<'a, I>(
-        particles: &[Particle],
+        particles: &[ParticleData],
         initial_asymmetries: I,
     ) -> Result<Array1<f64>, Error>
     where
@@ -565,8 +565,11 @@ where
         no_asymmetry.sort_unstable();
 
         // Collect the number of interactions within the model.
-        let mut interactions: HashSet<_> =
-            model.interactions().iter().map(|i| i.particles()).collect();
+        let mut interactions: HashSet<_> = model
+            .interactions()
+            .iter()
+            .map(Interaction::particles)
+            .collect();
         if interactions.len() != model.interactions().len() {
             interactions.clear();
             let mut duplicates: Vec<_> = model
