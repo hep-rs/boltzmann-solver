@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;model&#x2F;particle.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>particle.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><link
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/particle.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>particle.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><link
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/katex@0.11/dist/katex.min.css"
   crossorigin="anonymous"
@@ -67,105 +68,109 @@
   });
 </script>
 
-<style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../boltzmann_solver/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
-<span id="2">  2</span>
-<span id="3">  3</span>
-<span id="4">  4</span>
-<span id="5">  5</span>
-<span id="6">  6</span>
-<span id="7">  7</span>
-<span id="8">  8</span>
-<span id="9">  9</span>
-<span id="10"> 10</span>
-<span id="11"> 11</span>
-<span id="12"> 12</span>
-<span id="13"> 13</span>
-<span id="14"> 14</span>
-<span id="15"> 15</span>
-<span id="16"> 16</span>
-<span id="17"> 17</span>
-<span id="18"> 18</span>
-<span id="19"> 19</span>
-<span id="20"> 20</span>
-<span id="21"> 21</span>
-<span id="22"> 22</span>
-<span id="23"> 23</span>
-<span id="24"> 24</span>
-<span id="25"> 25</span>
-<span id="26"> 26</span>
-<span id="27"> 27</span>
-<span id="28"> 28</span>
-<span id="29"> 29</span>
-<span id="30"> 30</span>
-<span id="31"> 31</span>
-<span id="32"> 32</span>
-<span id="33"> 33</span>
-<span id="34"> 34</span>
-<span id="35"> 35</span>
-<span id="36"> 36</span>
-<span id="37"> 37</span>
-<span id="38"> 38</span>
-<span id="39"> 39</span>
-<span id="40"> 40</span>
-<span id="41"> 41</span>
-<span id="42"> 42</span>
-<span id="43"> 43</span>
-<span id="44"> 44</span>
-<span id="45"> 45</span>
-<span id="46"> 46</span>
-<span id="47"> 47</span>
-<span id="48"> 48</span>
-<span id="49"> 49</span>
-<span id="50"> 50</span>
-<span id="51"> 51</span>
-<span id="52"> 52</span>
-<span id="53"> 53</span>
-<span id="54"> 54</span>
-<span id="55"> 55</span>
-<span id="56"> 56</span>
-<span id="57"> 57</span>
-<span id="58"> 58</span>
-<span id="59"> 59</span>
-<span id="60"> 60</span>
-<span id="61"> 61</span>
-<span id="62"> 62</span>
-<span id="63"> 63</span>
-<span id="64"> 64</span>
-<span id="65"> 65</span>
-<span id="66"> 66</span>
-<span id="67"> 67</span>
-<span id="68"> 68</span>
-<span id="69"> 69</span>
-<span id="70"> 70</span>
-<span id="71"> 71</span>
-<span id="72"> 72</span>
-<span id="73"> 73</span>
-<span id="74"> 74</span>
-<span id="75"> 75</span>
-<span id="76"> 76</span>
-<span id="77"> 77</span>
-<span id="78"> 78</span>
-<span id="79"> 79</span>
-<span id="80"> 80</span>
-<span id="81"> 81</span>
-<span id="82"> 82</span>
-<span id="83"> 83</span>
-<span id="84"> 84</span>
-<span id="85"> 85</span>
-<span id="86"> 86</span>
-<span id="87"> 87</span>
-<span id="88"> 88</span>
-<span id="89"> 89</span>
-<span id="90"> 90</span>
-<span id="91"> 91</span>
-<span id="92"> 92</span>
-<span id="93"> 93</span>
-<span id="94"> 94</span>
-<span id="95"> 95</span>
-<span id="96"> 96</span>
-<span id="97"> 97</span>
-<span id="98"> 98</span>
-<span id="99"> 99</span>
+</head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../boltzmann_solver/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../../../boltzmann_solver/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../boltzmann_solver/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
@@ -502,18 +507,218 @@
 <span id="433">433</span>
 <span id="434">434</span>
 <span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Basic implementation of a particle type</span>
 
+<span class="kw">mod</span> <span class="ident">lorentz_representation</span>;
 <span class="kw">mod</span> <span class="ident">propagator</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">propagator</span>::{<span class="ident">Multi</span> <span class="kw">as</span> <span class="ident">MultiPropagator</span>, <span class="ident">Propagator</span>, <span class="ident">Single</span> <span class="kw">as</span> <span class="ident">SinglePropagator</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">model::standard::data</span>,
+    <span class="ident">model</span>::{<span class="ident">standard::data</span>, <span class="ident">Model</span>},
     <span class="ident">statistic</span>::{<span class="ident">Statistic</span>, <span class="ident">Statistics</span>},
 };
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lorentz_representation</span>::{
+    <span class="ident">LorentzRepresentation</span>, <span class="ident">DIRAC_SPINOR</span>, <span class="ident">LEFT_WEYL_SPINOR</span>, <span class="ident">RIGHT_WEYL_SPINOR</span>, <span class="ident">SCALAR</span>, <span class="ident">TENSOR</span>,
+    <span class="ident">VECTOR</span>,
+};
+<span class="kw">use</span> <span class="ident">num::Complex</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">propagator</span>::{<span class="ident">Multi</span> <span class="kw">as</span> <span class="ident">MultiPropagator</span>, <span class="ident">Propagator</span>, <span class="ident">Single</span> <span class="kw">as</span> <span class="ident">SinglePropagator</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cmp</span>, <span class="ident">collections::HashMap</span>, <span class="ident">f64</span>, <span class="ident">fmt</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cmp</span>, <span class="ident">f64</span>, <span class="ident">fmt</span>, <span class="ident">hash</span>};
+
+<span class="comment">// /// Trait for a particle belonging to a model.</span>
+<span class="comment">// pub trait ModelParticle&lt;M&gt; {</span>
+<span class="comment">//     /// Representation of the particle under the Lorentz group.</span>
+<span class="comment">//     fn representation(&amp;self) -&gt; LorentzRepresentation {</span>
+<span class="comment">//         self.particle_data().representation</span>
+<span class="comment">//     }</span>
+
+<span class="comment">//     /// Internal degrees of the particle.</span>
+<span class="comment">//     fn dof(&amp;self) -&gt; f64 {</span>
+<span class="comment">//         self.particle_data().dof</span>
+<span class="comment">//     }</span>
+
+<span class="comment">//     /// Name</span>
+<span class="comment">//     fn name(&amp;self) -&gt; &amp;str {</span>
+<span class="comment">//         &amp;self.particle_data().name</span>
+<span class="comment">//     }</span>
+
+<span class="comment">//     /// Get a reference to the particle data</span>
+<span class="comment">//     fn particle_data(&amp;self) -&gt; &amp;ParticleData;</span>
+
+<span class="comment">//     /// Get a mutable reference to the particle data</span>
+<span class="comment">//     fn particle_data_mut(&amp;mut self) -&gt; &amp;mut ParticleData;</span>
+
+<span class="comment">//     /// Mass of the particle in GeV.</span>
+<span class="comment">//     fn mass(&amp;self) -&gt; f64 {</span>
+<span class="comment">//         self.particle_data().mass</span>
+<span class="comment">//     }</span>
+
+<span class="comment">//     /// Squared mass of the particle in GeV`$^2$`.</span>
+<span class="comment">//     fn mass2(&amp;self) -&gt; f64 {</span>
+<span class="comment">//         self.particle_data().mass2</span>
+<span class="comment">//     }</span>
+
+<span class="comment">//     /// Width of the particle in GeV.</span>
+<span class="comment">//     fn width(&amp;self) -&gt; f64 {</span>
+<span class="comment">//         self.particle_data().width</span>
+<span class="comment">//     }</span>
+
+<span class="comment">//     /// Squared width of the particle in GeV`$^2$`.</span>
+<span class="comment">//     fn width2(&amp;self) -&gt; f64 {</span>
+<span class="comment">//         self.particle_data().width2</span>
+<span class="comment">//     }</span>
+
+<span class="comment">//     /// Recalculate the mass of the particle.</span>
+<span class="comment">//     ///</span>
+<span class="comment">//     /// As model parameters might change due to RGE running or because of</span>
+<span class="comment">//     /// thermal contributions, the mass of the particle might change.  The</span>
+<span class="comment">//     /// result of the calculation should be stored internally so that it can be</span>
+<span class="comment">//     /// returned by the [`mass`] and [`mass2`] functions.</span>
+<span class="comment">//     fn calculate_mass(&amp;mut self, model: &amp;M) -&gt; f64;</span>
+
+<span class="comment">//     /// Recalculate the width of the particle.</span>
+<span class="comment">//     ///</span>
+<span class="comment">//     /// As model parameters might change due to RGE running or because of</span>
+<span class="comment">//     /// thermal contributions, the width of the particle might change.  The</span>
+<span class="comment">//     /// result of the calculation should be stored internally so that it can be</span>
+<span class="comment">//     /// returned by the [`width`] and [`width2`] functions.</span>
+<span class="comment">//     ///</span>
+<span class="comment">//     /// This can also be computed from [`self_energy_absorptive`] by using the</span>
+<span class="comment">//     /// relation `$\Sigma(p^2 = m^2) = m \Gamma$`.</span>
+<span class="comment">//     fn calculate_width(&amp;mut self, model: &amp;M) -&gt; f64 {</span>
+<span class="comment">//         let mass = self.mass();</span>
+<span class="comment">//         let width = self.self_energy_absorptive(model, mass * mass) / mass;</span>
+
+<span class="comment">//         let pdata = self.particle_data_mut();</span>
+<span class="comment">//         pdata.width = width;</span>
+<span class="comment">//         pdata.width2 = width * width;</span>
+<span class="comment">//         width</span>
+<span class="comment">//     }</span>
+
+<span class="comment">//     /// Imaginary component of the self-energy at the specified momentum</span>
+<span class="comment">//     /// transfer which is given in terms of the invariant `$p^2$`.</span>
+<span class="comment">//     ///</span>
+<span class="comment">//     /// Physically this corresponds to when intermediate particles in the</span>
+<span class="comment">//     /// self-energy go on-shell.  These can be calculated using the Cutkosky</span>
+<span class="comment">//     /// rules, or using known results from Passarino-Veltman functions.</span>
+<span class="comment">//     fn self_energy_absorptive(&amp;self, model: &amp;M, momentum: f64) -&gt; f64;</span>
+<span class="comment">// }</span>
+
+<span class="comment">// impl&lt;M&gt; PartialEq for dyn ModelParticle&lt;M&gt; {</span>
+<span class="comment">//     fn eq(&amp;self, other: &amp;dyn ModelParticle&lt;M&gt;) -&gt; bool {</span>
+<span class="comment">//         self.name() == other.name()</span>
+<span class="comment">//     }</span>
+<span class="comment">// }</span>
+
+<span class="comment">// impl&lt;M&gt; Eq for dyn ModelParticle&lt;M&gt; {}</span>
+
+<span class="comment">// impl&lt;M&gt; std::hash::Hash for dyn ModelParticle&lt;M&gt; {</span>
+<span class="comment">//     fn hash&lt;H: hash::Hasher&gt;(&amp;self, state: &amp;mut H) {</span>
+<span class="comment">//         self.name().hash(state);</span>
+<span class="comment">//     }</span>
+<span class="comment">// }</span>
 
 <span class="doccomment">/// Particle type</span>
 <span class="doccomment">///</span>
@@ -530,12 +735,12 @@
 <span class="doccomment">/// For hashing purposes, only the particle&#39;s name is taken into account.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// In the long run, it is intended that this type be replaced by another one.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Particle</span> {
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Data</span> {
     <span class="comment">// The spin is stored as twice the spin, so a spin-½ particle has `spin ==</span>
     <span class="comment">// 1` and a spin-1 particle has `spin == 2`.</span>
-    <span class="ident">spin</span>: <span class="ident">u8</span>,
+    <span class="ident">representation</span>: <span class="ident">LorentzRepresentation</span>,
     <span class="doccomment">/// Whether the particle is its own antiparticle or not.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// By default, this is assumed to be false and can be set to true with</span>
@@ -561,68 +766,43 @@
     <span class="doccomment">/// This should be updated using [`Particle::set_width`] so that both the</span>
     <span class="doccomment">/// width and squared width are updated simultaneously.</span>
     <span class="kw">pub</span> <span class="ident">width2</span>: <span class="ident">f64</span>,
-    <span class="doccomment">/// Decays</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">serde</span>(<span class="ident">skip</span>))]</span>
-    <span class="kw">pub</span> <span class="ident">decays</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span>, <span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="comment">// Whether the particle is complex or not</span>
-    <span class="ident">complex</span>: <span class="ident">bool</span>,
-    <span class="comment">// Internal degrees of freedom of the particle</span>
-    <span class="ident">dof</span>: <span class="ident">f64</span>,
+    <span class="doccomment">/// Internal degrees of freedom of the particle</span>
+    <span class="kw">pub</span> <span class="ident">dof</span>: <span class="ident">f64</span>,
     <span class="doccomment">/// Name</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Particle</span> {
+<span class="kw">impl</span> <span class="ident">Data</span> {
     <span class="doccomment">/// Create a new particle with the specified spin and mass.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The mass is specified in units of GeV, and the spin is multiplied by a</span>
     <span class="doccomment">/// factor of two such that a spin-½ particle has `spin == 1` and a spin-1</span>
     <span class="doccomment">/// particle has `spin == 2`.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">spin</span>: <span class="ident">u8</span>, <span class="ident">mass</span>: <span class="ident">f64</span>, <span class="ident">width</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">representation</span>: <span class="ident">LorentzRepresentation</span>, <span class="ident">mass</span>: <span class="ident">f64</span>, <span class="ident">width</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
-            <span class="ident">spin</span>,
+            <span class="ident">representation</span>,
             <span class="ident">own_antiparticle</span>: <span class="bool-val">false</span>,
             <span class="ident">mass</span>,
             <span class="ident">mass2</span>: <span class="ident">mass</span>.<span class="ident">powi</span>(<span class="number">2</span>),
             <span class="ident">width</span>,
             <span class="ident">width2</span>: <span class="ident">width</span>.<span class="ident">powi</span>(<span class="number">2</span>),
-            <span class="ident">decays</span>: <span class="ident">HashMap::new</span>(),
-            <span class="ident">complex</span>: <span class="bool-val">false</span>,
             <span class="ident">dof</span>: <span class="number">1.0</span>,
             <span class="ident">name</span>: <span class="string">&quot;?&quot;</span>.<span class="ident">to_string</span>(),
         }
     }
 
     <span class="doccomment">/// Set the mass of the particle.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_mass</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">mass</span>: <span class="ident">f64</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_mass</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">mass</span>: <span class="ident">f64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">mass</span> <span class="op">=</span> <span class="ident">mass</span>;
         <span class="self">self</span>.<span class="ident">mass2</span> <span class="op">=</span> <span class="ident">mass</span>.<span class="ident">powi</span>(<span class="number">2</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the width of the particle.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_width</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">width</span>: <span class="ident">f64</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_width</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">width</span>: <span class="ident">f64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">width</span> <span class="op">=</span> <span class="ident">width</span>;
         <span class="self">self</span>.<span class="ident">width2</span> <span class="op">=</span> <span class="ident">width</span>.<span class="ident">powi</span>(<span class="number">2</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Indicate that the particle is real.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function returns self and should be used in constructors.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">real</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">complex</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Indicate that the particle is complex.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function returns self and should be used in constructors.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">complex</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">complex</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="self">self</span>
     }
 
@@ -634,7 +814,9 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Specify how many internal degrees of freedom this particle has.</span>
+    <span class="doccomment">/// Specify how many internal degrees of freedom this particle has.  These</span>
+    <span class="doccomment">/// can be because the particle is complex or any other internal gauge</span>
+    <span class="doccomment">/// symmetries.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is a multiplicative factor to the degrees of freedom.  For a</span>
     <span class="doccomment">/// &#39;pseudo&#39; particle such as `$B-L$`, this should be set to zero.</span>
@@ -654,34 +836,30 @@
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">is_empty</span>() {
-            <span class="macro">panic!</span>(<span class="string">&quot;Particle name cannot be empty.&quot;</span>);
-        }
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">name</span>.<span class="ident">is_empty</span>(), <span class="string">&quot;Particle name cannot be empty.&quot;</span>);
         <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Returns true if the particle is real (real scalar, Majorana fermion)</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_real</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">complex</span>
-    }
-
-    <span class="doccomment">/// Returns true if the particle is complex (complex scalar, Dirac fermion)</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_complex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">complex</span>
     }
 
     <span class="doccomment">/// Returns true if the particle is bosonic.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_bosonic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">spin</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span>
+        <span class="self">self</span>.<span class="ident">representation</span>.<span class="ident">is_bosonic</span>()
     }
 
     <span class="doccomment">/// Returns true if the particle is fermionic.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_fermionic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">spin</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">1</span>
+        <span class="self">self</span>.<span class="ident">representation</span>.<span class="ident">is_fermionic</span>()
+    }
+
+    <span class="doccomment">/// Check whether the particle is massless.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// As the calculation for the mass may not be exact, this checks whether</span>
+    <span class="doccomment">/// the mass square is less than the minimum positive normal floating point</span>
+    <span class="doccomment">/// (equivalent to `$m \lesssim 10^{-150}$`).</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_massless</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">mass2</span> <span class="op">&lt;</span> <span class="ident">f64::MIN_POSITIVE</span>
     }
 
     <span class="doccomment">/// Return the number of degrees of freedom for the underlying particle.</span>
@@ -689,12 +867,11 @@
     <span class="doccomment">/// The general formula is:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```math</span>
-    <span class="doccomment">/// N_\text{int} \times N_\text{spin} \times N_\text{complex}</span>
+    <span class="doccomment">/// N_\text{int} \times N_\text{spin}</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// where `$N_\text{int}$` are the internal degrees of freedom,</span>
-    <span class="doccomment">/// `$N_\text{spin}$` are the spin degrees of freedom, and</span>
-    <span class="doccomment">/// `$N_\text{complex}$` are the degrees of freedom for complex particle.</span>
+    <span class="doccomment">/// `$N_\text{spin}$` are the spin degrees of freedom.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The spin degrees of freedom are:</span>
     <span class="doccomment">/// - spin-0: 1</span>
@@ -712,15 +889,14 @@
     <span class="doccomment">/// Panics if a particle with spin greater than 2 is given.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">degrees_of_freedom</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">f64</span> {
-        <span class="kw">let</span> <span class="ident">dof</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">dof</span> <span class="op">*</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">complex</span> { <span class="number">2.0</span> } <span class="kw">else</span> { <span class="number">1.0</span> };
-        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">spin</span>, <span class="self">self</span>.<span class="ident">mass</span>) {
-            (<span class="number">0</span>, <span class="kw">_</span>) =&gt; <span class="ident">dof</span>,
-            (<span class="ident">n</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">1</span> =&gt; <span class="ident">f64::from</span>(<span class="ident">n</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">*</span> <span class="ident">dof</span>,
+        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">representation</span>.<span class="ident">spin</span>(), <span class="self">self</span>.<span class="ident">mass</span>) {
+            (<span class="number">0</span>, <span class="kw">_</span>) =&gt; <span class="self">self</span>.<span class="ident">dof</span>,
+            (<span class="ident">n</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">1</span> =&gt; <span class="ident">f64::from</span>(<span class="ident">n</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">dof</span>,
             (<span class="ident">n</span>, <span class="ident">m</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">m</span> <span class="op">==</span> <span class="number">0.0</span> {
-                    <span class="number">2.0</span> <span class="op">*</span> <span class="ident">dof</span>
+                    <span class="number">2.0</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">dof</span>
                 } <span class="kw">else</span> {
-                    <span class="ident">f64::from</span>(<span class="ident">n</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">*</span> <span class="ident">dof</span>
+                    <span class="ident">f64::from</span>(<span class="ident">n</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">dof</span>
                 }
             }
             <span class="kw">_</span> =&gt; <span class="macro">unimplemented!</span>(<span class="string">&quot;Particles with spin greater than 2 are not supported.&quot;</span>),
@@ -769,42 +945,78 @@
     }
 
     <span class="doccomment">/// Return the propagator denominator for the particle.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The propagator is defined as follow:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```math</span>
+    <span class="doccomment">/// \mathcal{P}_i^{-1}(s) = s - m_i^2 + i \theta(s) m_i \Gamma_i,</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// where `$\theta$` is the Heaviside step function.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">propagator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>: <span class="ident">f64</span>) -&gt; <span class="ident">SinglePropagator</span> {
-        <span class="ident">SinglePropagator::new</span>(<span class="self">self</span>, <span class="ident">s</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">propagator</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">s</span>: <span class="ident">f64</span>) -&gt; <span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+        <span class="ident">SinglePropagator::new</span>(<span class="self">self</span>, <span class="ident">model</span>, <span class="ident">s</span>).<span class="ident">eval</span>()
+    }
+
+    <span class="doccomment">/// Return the RIS propagator for the particle.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The RIS propagator is defined such that a real intermediate state is</span>
+    <span class="doccomment">/// substracted from the propagator.  This is done to avoid a</span>
+    <span class="doccomment">/// double-counting issue of with `$2 \xleftrightarrow{P} 2$` interaction</span>
+    <span class="doccomment">/// with some intermediate particle `$P$` and the combination of the two</span>
+    <span class="doccomment">/// 3-particle interactions 2 ↔ P and P ↔ 2.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The definition is follows that of a regular</span>
+    <span class="doccomment">/// [propagator](`Particle::propagator`) except in the following case:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```math</span>
+    <span class="doccomment">/// \mathcal{P}_i(s) \mathcal{P}_i^*(s)</span>
+    <span class="doccomment">/// = \frac{(s - m_i^2)^2 - (m_i \Gamma_i)^2}{[(s - m_i^2)^2 + (m_i \Gamma_i)^2]^2}.</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ris_propagator</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Model</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">s</span>: <span class="ident">f64</span>) -&gt; <span class="ident">SinglePropagator</span> {
+        <span class="ident">SinglePropagator::new</span>(<span class="self">self</span>, <span class="ident">model</span>, <span class="ident">s</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">cmp::PartialEq</span> <span class="kw">for</span> <span class="ident">Particle</span> {
+<span class="kw">impl</span> <span class="ident">cmp::PartialEq</span> <span class="kw">for</span> <span class="ident">Data</span> {
     <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">spin</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">spin</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">mass</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">mass</span>
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">name</span>
     }
 }
-<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Particle</span> {}
+<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Data</span> {}
+
+<span class="kw">impl</span> <span class="ident">hash::Hash</span> <span class="kw">for</span> <span class="ident">Data</span> {
+    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">hash::Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
+        <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
+    }
+}
 
 <span class="doccomment">/// Display the particle by its name.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// To display all of the particle&#39;s properties, use the</span>
 <span class="doccomment">/// [`Debug`](std::fmt::Display).</span>
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Particle</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Data</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Particle</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utilities::test::approx_eq</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Data</span>;
+    <span class="kw">use</span> <span class="kw">crate</span>::{
+        <span class="ident">model::particle</span>::{<span class="ident">DIRAC_SPINOR</span>, <span class="ident">SCALAR</span>, <span class="ident">TENSOR</span>},
+        <span class="ident">utilities::test::approx_eq</span>,
+    };
     <span class="kw">use</span> <span class="ident">std::error</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">real_scalar</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">particle</span> <span class="op">=</span> <span class="ident">Particle::new</span>(<span class="number">0</span>, <span class="number">1.0</span>, <span class="number">0.1</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">particle</span>: <span class="ident">Data</span> <span class="op">=</span> <span class="ident">Data::new</span>(<span class="ident">SCALAR</span>, <span class="number">1.0</span>, <span class="number">0.1</span>);
 
         <span class="macro">assert!</span>(<span class="ident">particle</span>.<span class="ident">is_bosonic</span>());
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_fermionic</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_complex</span>());
 
         <span class="ident">approx_eq</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>), <span class="number">1.0</span>, <span class="number">8.0</span>, <span class="number">0.0</span>)<span class="question-mark">?</span>;
         <span class="macro">assert!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e10</span>) <span class="op">&lt;</span> <span class="number">1e-30</span>);
@@ -834,11 +1046,10 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">complex_scalar</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">particle</span> <span class="op">=</span> <span class="ident">Particle::new</span>(<span class="number">0</span>, <span class="number">1.0</span>, <span class="number">0.1</span>).<span class="ident">complex</span>();
+        <span class="kw">let</span> <span class="ident">particle</span>: <span class="ident">Data</span> <span class="op">=</span> <span class="ident">Data::new</span>(<span class="ident">SCALAR</span>, <span class="number">1.0</span>, <span class="number">0.1</span>).<span class="ident">dof</span>(<span class="number">2.0</span>);
 
         <span class="macro">assert!</span>(<span class="ident">particle</span>.<span class="ident">is_bosonic</span>());
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_fermionic</span>());
-        <span class="macro">assert!</span>(<span class="ident">particle</span>.<span class="ident">is_complex</span>());
 
         <span class="ident">approx_eq</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>), <span class="number">2.0</span>, <span class="number">8.0</span>, <span class="number">0.0</span>)<span class="question-mark">?</span>;
         <span class="macro">assert!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e10</span>) <span class="op">&lt;</span> <span class="number">1e-30</span>);
@@ -855,11 +1066,10 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">fermion</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">particle</span> <span class="op">=</span> <span class="ident">Particle::new</span>(<span class="number">1</span>, <span class="number">1.0</span>, <span class="number">0.1</span>);
+        <span class="kw">let</span> <span class="ident">particle</span>: <span class="ident">Data</span> <span class="op">=</span> <span class="ident">Data::new</span>(<span class="ident">DIRAC_SPINOR</span>, <span class="number">1.0</span>, <span class="number">0.1</span>);
 
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_bosonic</span>());
         <span class="macro">assert!</span>(<span class="ident">particle</span>.<span class="ident">is_fermionic</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_complex</span>());
 
         <span class="ident">approx_eq</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>), <span class="number">2.0</span> <span class="op">*</span> <span class="number">0.875</span>, <span class="number">8.0</span>, <span class="number">0.0</span>)<span class="question-mark">?</span>;
         <span class="macro">assert!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e10</span>) <span class="op">&lt;</span> <span class="number">1e-30</span>);
@@ -876,11 +1086,10 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">gauge_boson</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">particle</span> <span class="op">=</span> <span class="ident">Particle::new</span>(<span class="number">2</span>, <span class="number">1.0</span>, <span class="number">0.1</span>);
+        <span class="kw">let</span> <span class="ident">particle</span>: <span class="ident">Data</span> <span class="op">=</span> <span class="ident">Data::new</span>(<span class="ident">TENSOR</span>, <span class="number">1.0</span>, <span class="number">0.1</span>);
 
         <span class="macro">assert!</span>(<span class="ident">particle</span>.<span class="ident">is_bosonic</span>());
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_fermionic</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_complex</span>());
 
         <span class="ident">approx_eq</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>), <span class="number">3.0</span>, <span class="number">8.0</span>, <span class="number">0.0</span>)<span class="question-mark">?</span>;
         <span class="macro">assert!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e10</span>) <span class="op">&lt;</span> <span class="number">1e-30</span>);
@@ -897,11 +1106,10 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">complex_scalar_dof</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">particle</span> <span class="op">=</span> <span class="ident">Particle::new</span>(<span class="number">0</span>, <span class="number">1.0</span>, <span class="number">0.1</span>).<span class="ident">complex</span>().<span class="ident">dof</span>(<span class="number">2.5</span>);
+        <span class="kw">let</span> <span class="ident">particle</span>: <span class="ident">Data</span> <span class="op">=</span> <span class="ident">Data::new</span>(<span class="ident">SCALAR</span>, <span class="number">1.0</span>, <span class="number">0.1</span>).<span class="ident">dof</span>(<span class="number">2.0</span> <span class="op">*</span> <span class="number">2.5</span>);
 
         <span class="macro">assert!</span>(<span class="ident">particle</span>.<span class="ident">is_bosonic</span>());
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_fermionic</span>());
-        <span class="macro">assert!</span>(<span class="ident">particle</span>.<span class="ident">is_complex</span>());
 
         <span class="ident">approx_eq</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>), <span class="number">5.0</span>, <span class="number">8.0</span>, <span class="number">0.0</span>)<span class="question-mark">?</span>;
         <span class="macro">assert!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e10</span>) <span class="op">&lt;</span> <span class="number">1e-30</span>);
@@ -918,11 +1126,10 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">fermion_dof</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">particle</span> <span class="op">=</span> <span class="ident">Particle::new</span>(<span class="number">1</span>, <span class="number">1.0</span>, <span class="number">0.1</span>).<span class="ident">dof</span>(<span class="number">1.2</span>);
+        <span class="kw">let</span> <span class="ident">particle</span>: <span class="ident">Data</span> <span class="op">=</span> <span class="ident">Data::new</span>(<span class="ident">DIRAC_SPINOR</span>, <span class="number">1.0</span>, <span class="number">0.1</span>).<span class="ident">dof</span>(<span class="number">1.2</span>);
 
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_bosonic</span>());
         <span class="macro">assert!</span>(<span class="ident">particle</span>.<span class="ident">is_fermionic</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">particle</span>.<span class="ident">is_complex</span>());
 
         <span class="ident">approx_eq</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e-10</span>), <span class="number">2.0</span> <span class="op">*</span> <span class="number">1.2</span> <span class="op">*</span> <span class="number">0.875</span>, <span class="number">8.0</span>, <span class="number">0.0</span>)<span class="question-mark">?</span>;
         <span class="macro">assert!</span>(<span class="ident">particle</span>.<span class="ident">entropy_dof</span>(<span class="number">1e10</span>) <span class="op">&lt;</span> <span class="number">1e-30</span>);
@@ -938,6 +1145,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="boltzmann_solver" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="boltzmann_solver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (63b8f01bb 2022-03-24)" ></div>
 </body></html>
