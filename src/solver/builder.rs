@@ -129,6 +129,7 @@ impl<M> SolverBuilder<M> {
     /// Add a function that can modify the model before it is used by the
     /// context.  This is particularly useful if there is a baseline model with
     /// fixed parameters and only certain parameters are changed.
+    #[must_use]
     pub fn model(mut self, model: M) -> Self {
         self.model = Some(model);
         self
@@ -145,6 +146,7 @@ impl<M> SolverBuilder<M> {
     ///
     /// Repeated initial conditions are combined together with any duplicates
     /// overiding previous calls.
+    #[must_use]
     pub fn initial_densities<I>(mut self, n: I) -> Self
     where
         I: IntoIterator<Item = (usize, f64)>,
@@ -163,6 +165,7 @@ impl<M> SolverBuilder<M> {
     ///
     /// Repeated initial conditions are combined together with any duplicates
     /// overiding previous calls.
+    #[must_use]
     pub fn initial_asymmetries<I>(mut self, na: I) -> Self
     where
         I: IntoIterator<Item = (usize, f64)>,
@@ -183,6 +186,7 @@ impl<M> SolverBuilder<M> {
     /// # Panics
     ///
     /// Panics if the starting value is larger than the final value.
+    #[must_use]
     pub fn beta_range(mut self, start: f64, end: f64) -> Self {
         assert!(
             start < end,
@@ -202,6 +206,7 @@ impl<M> SolverBuilder<M> {
     /// # Panics
     ///
     /// Panics if the starting value is smaller than the final value.
+    #[must_use]
     pub fn temperature_range(mut self, start: f64, end: f64) -> Self {
         assert!(
             start > end,
@@ -221,6 +226,7 @@ impl<M> SolverBuilder<M> {
     /// These particles are specified by their index.
     ///
     /// Multiple calls of this function will combine the results together.
+    #[must_use]
     pub fn in_equilibrium<I>(mut self, eq: I) -> Self
     where
         I: IntoIterator<Item = usize>,
@@ -238,6 +244,7 @@ impl<M> SolverBuilder<M> {
     /// These particles are specified by their index.
     ///
     /// Multiple calls of this function will combine the results together.
+    #[must_use]
     pub fn no_asymmetry<I>(mut self, na: I) -> Self
     where
         I: IntoIterator<Item = usize>,
@@ -257,6 +264,7 @@ impl<M> SolverBuilder<M> {
     ///
     /// This is useful if one wants to track the evolution of the solutions and
     /// log these in a CSV file.
+    #[must_use]
     pub fn logger<F>(mut self, f: F) -> Self
     where
         F: Fn(&Context<M>, &Array1<f64>, &Array1<f64>) + 'static,
@@ -291,6 +299,7 @@ impl<M> SolverBuilder<M> {
     ///
     /// This will panic if `$p_\text{min} \geq p_\text{max}$` or if
     /// `$p_\text{min}$` is negative.
+    #[must_use]
     pub fn step_precision(mut self, min: f64, max: f64) -> Self {
         assert!(
             min < max,
@@ -325,6 +334,7 @@ impl<M> SolverBuilder<M> {
     /// # Panics
     ///
     /// Panics if the tolerance is less than or equal to 0.
+    #[must_use]
     pub fn error_tolerance(mut self, abs: f64, rel: f64) -> Self {
         assert!(abs > 0.0, "The absolute tolerance must be greater than 0.");
         assert!(rel > 0.0, "The relative tolerance must be greater than 0.");
@@ -352,6 +362,7 @@ impl<M> SolverBuilder<M> {
     /// but will not otherwise help much.
     ///
     /// By default, interactions are precomputed.
+    #[must_use]
     pub fn precompute(mut self, v: usize) -> Self {
         self.precompute = v;
         self
@@ -362,12 +373,14 @@ impl<M> SolverBuilder<M> {
     /// # Warning
     ///
     /// This feature is currently experimental and may not produce reliable results.
+    #[must_use]
     pub fn fast_interaction(mut self, v: bool) -> Self {
         self.fast_interactions = v;
         self
     }
 
     /// Specify whether local inaccuracies cause the integration to abort.
+    #[must_use]
     pub fn abort_when_inaccurate(mut self, v: bool) -> Self {
         self.abort_when_inaccurate = v;
         self
